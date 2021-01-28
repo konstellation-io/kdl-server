@@ -17,7 +17,7 @@ jobs:
       - name: Generate a pre-release
         uses: intelygenz/action-product-version-tags@v0.1.8
         with:
-          current-major: 1
+          current-major: 0
           prefix: "release-"
           mode: 'pre-release'
           pre-release: 'alpha'

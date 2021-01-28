@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'server-v*.*.*'
+      - 'v*.*.*'
 
 jobs:
   docker-admin-api:

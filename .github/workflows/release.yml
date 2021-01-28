@@ -1,34 +1,19 @@
 name: Release
+
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - kdl-client/**
+  workflow_dispatch:
 
 jobs:
-  release:
-    name: New Release
+  create-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Generate a release
+        uses: intelygenz/action-product-version-tags@v0.1.8
         with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
-
-      - name: Add new release
-        working-directory: kdl-client
+          prefix: "release-"
+          mode: 'release'
+          default-branch: 'master'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: yarn && npx semantic-release
-
-      - name: Dispatch Publish Desktop App action 🚀
-        uses: benc-uk/workflow-dispatch@v1
-        with:
-          workflow: Publish Desktop App
-          token: ${{ secrets.ELECTRON_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PATNAME }}

@@ -72,8 +72,8 @@ jobs:
           # yq w -i helm/kdl/values.yaml 'adminUI.image.tag' ${{ steps.get_version.outputs.VERSION }}
 
           # set app version and chart version for kdl
-          yq w -i helm/kdl/Chart.yaml 'appVersion' ${{ steps.get_version.outputs.VERSION }}
-          yq w -i helm/kdl/Chart.yaml 'version' ${{ steps.get_version.outputs.RELEASE_VERSION }}
+          yq w -i helm/kdl-server/Chart.yaml 'appVersion' ${{ steps.get_version.outputs.VERSION }}
+          yq w -i helm/kdl-server/Chart.yaml 'version' ${{ steps.get_version.outputs.RELEASE_VERSION }}
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.0.0

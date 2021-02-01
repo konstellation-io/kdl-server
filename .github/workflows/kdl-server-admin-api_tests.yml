@@ -7,7 +7,7 @@ on:
     tags-ignore:
       - v*
     paths:
-      - "lab/admin-api/**/*"
+      - "admin-api/**/*"
       - ".github/workflows/lab-admin-api*"
 
 jobs:
@@ -23,12 +23,12 @@ jobs:
           go-version: 1.14.x
       - name: Test
         run: go test ./... -cover -v -coverprofile=coverage.out
-        working-directory: ./lab/admin-api
+        working-directory: ./admin-api
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
         with:
           name: coverage-report
-          path: lab/admin-api/coverage.out
+          path: admin-api/coverage.out
   
   sonarcloud:
     name: SonarCloud
@@ -42,11 +42,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: coverage-report
-          path: lab/admin-api
+          path: admin-api
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         with:
-          projectBaseDir: lab/admin-api
+          projectBaseDir: admin-api
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_ADMIN_API }}

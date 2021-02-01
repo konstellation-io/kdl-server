@@ -34,8 +34,8 @@ jobs:
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
         with:
-          context: ./kdl-server/admin-api
-          file: ./kdl-server/admin-api/Dockerfile
+          context: ./lab/admin-api
+          file: ./lab/admin-api/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
@@ -69,7 +69,7 @@ jobs:
       - name: Replace component version with YQ
         run:  |
           # set image tags on kdl
-          # yq w -i helm/kdl/values.yaml 'adminUI.image.tag' ${{ steps.get_version.outputs.VERSION }}
+          # yq w -i helm/kdl-server/values.yaml 'adminUI.image.tag' ${{ steps.get_version.outputs.VERSION }}
 
           # set app version and chart version for kdl
           yq w -i helm/kdl-server/Chart.yaml 'appVersion' ${{ steps.get_version.outputs.VERSION }}

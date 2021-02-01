@@ -31,9 +31,6 @@ MONGO_DB=kdl
 MONGO_USER="admin"
 MONGO_PASS=123456
 
-# DEV Admin User
-ADMIN_DEV_EMAIL="dev@local.local"
-
 . ./.kdlctl.conf
 . ./scripts/kdlctl/common_functions.sh
 . ./scripts/kdlctl/cmd_help.sh

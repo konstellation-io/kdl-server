@@ -56,8 +56,8 @@ prepare_helm() {
 }
 
 clean_helm_deps() {
-  rm -rf helm/kdl/charts/*
-  helm dep update helm/kdl
+  rm -rf helm/kdl-server/charts/*
+  helm dep update helm/kdl-server
 }
 
 get_kubectl_dry_run() {
@@ -91,7 +91,7 @@ create_namespace() {
 
 deploy_helm_chart() {
   echo_info "📦 Applying helm chart..."
-  run helm dep update helm/kdl
+  run helm dep update helm/kdl-server
   run helm upgrade \
     --wait \
     --install "${RELEASE_NAME}" \
@@ -102,5 +102,5 @@ deploy_helm_chart() {
     --set science-toolkit.gitea.admin.username=$GITEA_ADMIN_USER \
     --set science-toolkit.gitea.admin.password=$GITEA_ADMIN_PASSWORD \
     --timeout 60m \
-    helm/kdl
+    helm/kdl-server
 }

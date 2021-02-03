@@ -3,7 +3,7 @@
 cmd_restart() {
     TYPE=${1:-"minikube"}
 
-    if [ "$TYPE" = "kre" ]; then
+    if [ "$TYPE" = "kdl" ]; then
       restart_admin_pods
     fi
 
@@ -24,7 +24,7 @@ show_restart_help() {
 
     types:
       minikube  restarts minikube (default option).
-      kre       restarts pods on kre namespace.
+      kdl       restarts pods on kdl namespace.
       version   <runtime-name> <version-name> restarts all pods inside a version.
 
     $(help_global_options)
@@ -39,7 +39,7 @@ restart_admin_pods() {
     return
   fi
 
-  echo_wait "Restarting kre pods"
+  echo_wait "Restarting kdl pods"
   # shellcheck disable=SC2086 # this behaviour is expected here
   run kubectl -n "${NAMESPACE}" delete pod ${POD_NAMES} --grace-period=0
 }
@@ -53,7 +53,7 @@ get_version_pods() {
 restart_version() {
   NAME=$1
   VERSION=$2
-  NAMESPACE="kre-${NAME}"
+  NAMESPACE="kdl-${NAME}"
 
   POD_NAMES=$(get_version_pods "$NAMESPACE" "$VERSION" | tr '\n' ' ')
 

@@ -5,4 +5,4 @@ metadata:
   labels:
     app:  kdl-server-configmap
 data:
-  TOOLKIT_TLS: "{{ .Values.tls.enabled }}"
+  KDL_SERVER_PORT: "8080"

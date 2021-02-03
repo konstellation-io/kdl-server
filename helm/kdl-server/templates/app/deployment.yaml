@@ -43,6 +43,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: kdl-server-configmap
+            - secretRef:
+                name: kdl-server-secrets
           ports:
             - containerPort: 3000
         - name: kdl-server-proxy
@@ -79,7 +81,7 @@ spec:
               subPath: oauth2_proxy.cfg
           ports:
             - name: http
-              containerPort: 4180
+              containerPort: 3000
               protocol: TCP
       volumes:
         - name: oauth2-config

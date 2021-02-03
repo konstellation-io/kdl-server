@@ -21,3 +21,27 @@ giteaOauth2Setup:
     repository: terminus7/gitea-oauth2-setup
     tag: 1.1.5
     pullPolicy: IfNotPresent
+
+mongodb:
+  service:
+    name: "mongodb"
+  auth:
+    adminUser: "admin"
+    adminPassword: "123456"
+  mongodbUsername: "admin"
+  mongodbPassword: "123456"
+  storage:
+    className: standard
+    size: 3G
+  volumePermissions:
+    enabled: false
+    image:
+      registry: docker.io
+      repository: debian
+      tag: buster-slim
+  initConfigMap:
+    name: kdl-mongo-init-script
+  persistentVolume:
+    enabled: true
+    storageClass: standard
+    size: 5Gi

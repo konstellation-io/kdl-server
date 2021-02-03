@@ -1,0 +1,12 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  display: flex;
+  align-items: center;
+
+  > div {
+    border-right: 1px solid palette(base);
+  }
+}

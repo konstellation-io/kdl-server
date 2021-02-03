@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MessageActionBox component Component match snapshot 1`] = `
+<div
+  className="container default"
+  onClick={[Function]}
+>
+  <p
+    className="title"
+  >
+    Some title
+  </p>
+  <p
+    className="description"
+  >
+    Some description
+  </p>
+  <div
+    className="action"
+  >
+    <div
+      className="confirmation"
+    >
+      <J
+        checked={false}
+        onChange={[Function]}
+      />
+      <p
+        className="confirmationText"
+      >
+        Some message
+      </p>
+    </div>
+    <P
+      Icon={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "compare": null,
+          "displayName": "ArchiveIcon",
+          "muiName": "SvgIcon",
+          "type": Object {
+            "$$typeof": Symbol(react.forward_ref),
+            "render": [Function],
+          },
+        }
+      }
+      disabled={true}
+      height={30}
+      label="Some label"
+      onClick={[MockFunction]}
+      primary={true}
+      theme="default"
+    />
+  </div>
+</div>
+`;

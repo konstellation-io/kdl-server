@@ -1,0 +1,19 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.info {
+  padding: 2 * $grid-unit 2 * $grid-unit 4 * $grid-unit 2 * $grid-unit;
+}
+
+.tabContent {
+  background-color: palette(base, 600);
+  flex-grow: 1;
+  overflow: hidden;
+}

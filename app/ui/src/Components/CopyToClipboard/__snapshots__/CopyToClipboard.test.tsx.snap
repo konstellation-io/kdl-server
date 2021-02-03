@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CopyToClipboard component Component match snapshot 1`] = `
+<P
+  Icon={
+    Object {
+      "$$typeof": Symbol(react.memo),
+      "compare": null,
+      "displayName": "FileCopyOutlinedIcon",
+      "muiName": "SvgIcon",
+      "type": Object {
+        "$$typeof": Symbol(react.forward_ref),
+        "render": [Function],
+      },
+    }
+  }
+  className="container"
+  label=""
+  onClick={[Function]}
+/>
+`;

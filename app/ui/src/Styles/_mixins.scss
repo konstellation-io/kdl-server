@@ -1,0 +1,76 @@
+@import '~kwc/styles/borders';
+@import '~kwc/styles/mixins';
+
+@mixin circle($color, $size: $grid-unit) {
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  background-color: $color;
+}
+
+@mixin arrow($size, $top, $left, $color) {
+  &:after {
+    content: '';
+    position: absolute;
+    top: $top;
+    left: $left;
+    width: $size;
+    height: $size;
+    border: 1px solid $color;
+    border-top-color: transparent;
+    border-left-color: transparent;
+    transform: rotate(-33deg) skew(25deg);
+  }
+}
+
+@mixin l-shape-arrow($height, $width, $top, $left, $color) {
+  @include arrow(6px, $height - 4px, $width, $color);
+
+  position: absolute;
+  top: $top;
+  left: $left;
+  width: $width;
+  height: $height;
+  border-left: 1px dashed $color;
+  border-bottom: 1px dashed $color;
+}
+
+@mixin border-box($color) {
+  background-color: palette(base, 600);
+  border: 1px solid $color;
+  border-radius: 4px;
+  padding: 3 * $grid-unit;
+
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin circle-before($color) {
+  position: relative;
+
+  &:before {
+    @include circle($color);
+
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 7px;
+  }
+}
+
+@mixin make-triangle($base, $color) {
+  width: 0;
+  height: 0;
+  border: 0px solid transparent;
+  border-bottom-color: $color;
+  border-bottom-width: $base;
+  border-left-width: $base / 2;
+  border-right-width: $base / 2;
+}
+
+@mixin make-project-icon($base, $color) {
+  width: $base;
+  height: $base;
+  background-color: $color;
+  clip-path: polygon(0 50%, 20% 0, 100% 0, 80% 50%, 100% 100%, 20% 100%);
+}

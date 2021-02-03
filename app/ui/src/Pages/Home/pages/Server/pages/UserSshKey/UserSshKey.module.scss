@@ -1,0 +1,40 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  overflow: auto;
+  height: 100%;
+  padding-bottom: 10 * $grid-unit;
+}
+
+.title {
+  color: font-color(lowlight);
+  line-height: 8 * $grid-unit;
+  text-align: left;
+
+  padding-left: 3 * $grid-unit;
+  background-color: palette(base, 600);
+}
+
+.subtitle {
+  @include font-body;
+  color: font-color(lowlight);
+
+  background-color: palette(lowlight, 900);
+  margin: 0;
+  padding: 2 * $grid-unit 3 * $grid-unit 2 * $grid-unit 3 * $grid-unit;
+}
+
+.key {
+  padding: 3 * $grid-unit;
+}
+
+.faqs {
+  .box {
+    margin-bottom: 2 * $grid-unit;
+  }
+  h2 {
+    padding-left: 4 * $grid-unit;
+  }
+}

@@ -1,0 +1,29 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.repositoryInternal {
+  display: flex;
+  align-items: flex-start;
+  .url {
+    .urlTitle {
+      @include font-caption;
+      text-transform: uppercase;
+      margin-top: 0;
+      color: font-color(regular);
+    }
+    .serverUrlContainer {
+      display: flex;
+      align-items: center;
+      margin-top: 2.5 * $grid-unit;
+    }
+    .urlContent {
+      @include font-title;
+      color: font-color(light);
+      margin-left: 3 * $grid-unit;
+    }
+  }
+  .slug {
+    margin-left: $grid-unit;
+  }
+}

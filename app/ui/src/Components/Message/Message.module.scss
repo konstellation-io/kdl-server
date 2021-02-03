@@ -1,0 +1,9 @@
+@import 'Styles/colors';
+@import 'Styles/mixins';
+
+.container {
+  @include font-body;
+  color: font-color(lowlight);
+
+  margin: 6 * $grid-unit 0 0 2.6 * $grid-unit;
+}

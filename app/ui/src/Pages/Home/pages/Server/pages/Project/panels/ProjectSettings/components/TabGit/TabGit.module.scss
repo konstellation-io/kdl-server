@@ -1,0 +1,61 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  position: relative;
+  padding: 3 * $grid-unit 2 * $grid-unit;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.edit {
+  position: absolute;
+  top: 2 * $grid-unit;
+  right: 2 * $grid-unit;
+}
+
+.repoType {
+  @include font-caption;
+  color: font-color(regular);
+
+  display: flex;
+
+  .repoTypeName {
+    margin: 0 0 0 1.5 * $grid-unit;
+  }
+}
+
+.url {
+  @include font-body;
+  color: font-color(lowlight);
+
+  display: flex;
+  align-items: center;
+  margin-top: $grid-unit;
+}
+
+.log {
+  background-color: palette(base, 800);
+  flex-grow: 1;
+  padding: 2 * $grid-unit;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-top: 3 * $grid-unit;
+
+  .title {
+    @include font-caption;
+    color: font-color(regular);
+
+    margin-bottom: 2 * $grid-unit;
+  }
+  .content {
+    @include font-code;
+    color: font-color(light);
+
+    white-space: pre-line;
+    overflow: auto;
+  }
+}

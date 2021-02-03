@@ -1,0 +1,46 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.container {
+  @include shadow(2);
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    background-color: palette(lowlight, 900);
+
+    .project {
+      .projectName {
+        @include font-body;
+        color: font-color(lowlight);
+        padding: $grid-unit 2 * $grid-unit;
+
+        &:hover {
+          @include glow(3, palette(highlight, 800));
+          color: palette(base);
+          background-color: palette(highlight);
+        }
+      }
+
+      &.selectedProject {
+        cursor: default;
+        pointer-events: none;
+
+        .projectName {
+          color: palette(base);
+          background-color: palette(highlight, 600);
+        }
+      }
+    }
+  }
+
+  .addProjectButton {
+    border-top: 2px solid palette(base);
+    border-bottom-left-radius: $grid-unit / 2;
+    border-bottom-right-radius: $grid-unit / 2;
+    background-color: palette(lowlight, 900);
+  }
+}

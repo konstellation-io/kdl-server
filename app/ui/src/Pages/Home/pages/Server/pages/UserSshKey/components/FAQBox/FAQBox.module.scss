@@ -1,0 +1,101 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  background-color: palette(base, 700);
+  overflow: hidden;
+
+  &.opened .header:after {
+    transform: rotate(45deg) scale(-1);
+    top: 20px;
+  }
+}
+
+.header {
+  @include font-body;
+  color: font-color(lowlight);
+
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 5 * $grid-unit;
+  padding-left: 4 * $grid-unit;
+  cursor: pointer;
+  background-color: palette(base, 700);
+
+  transition: background-color ease 0.2s, color ease 0.2s;
+
+  .label {
+    margin-left: $grid-unit;
+  }
+
+  &:hover {
+    background-color: palette(base, 500);
+    color: font-color(light);
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 16px;
+    transform: rotate(45deg);
+    right: 3 * $grid-unit;
+    width: 7px;
+    height: 7px;
+    border: solid 1px font-color(lowlight);
+    border-left-color: transparent;
+    border-top-color: transparent;
+
+    transition: top ease 0.4s, transform ease 0.4s;
+  }
+}
+.content {
+  margin: 3 * $grid-unit;
+  padding: 3 * $grid-unit;
+
+  background-color: palette(base, 500);
+  border: solid 1px palette(lowlight, 900);
+  border-radius: 0.5 * $grid-unit;
+
+  &.warn {
+    border-color: palette(alert, 700);
+  }
+  &.error {
+    border-color: palette(error, 700);
+  }
+
+  .title {
+    @include font-small;
+    color: font-color(light);
+
+    margin: 0 0 2 * $grid-unit 0;
+  }
+
+  .description {
+    @include font-small;
+    color: font-color(regular);
+
+    margin: 0;
+  }
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: flex-end;
+  margin-top: 3 * $grid-unit;
+
+  .confirmation {
+    display: flex;
+    align-items: center;
+
+    .confirmationText {
+      @include font-small;
+      color: font-color(lowlight);
+
+      margin: 0 4 * $grid-unit 0 2 * $grid-unit;
+    }
+  }
+}

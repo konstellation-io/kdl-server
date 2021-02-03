@@ -1,0 +1,54 @@
+@import './variables';
+@import './colors';
+@import './mixins';
+@import './shadows';
+
+.Toastify__toast-container {
+  width: auto;
+}
+
+.Toastify__toast {
+  @include shadow(4);
+  @include font-small;
+
+  color: font-color(light);
+
+  background-color: palette(base, 400) !important;
+  padding-right: 50px;
+  text-align: left;
+  min-height: 6 * $grid-unit;
+  padding-left: 5 * $grid-unit;
+  border-radius: 0;
+
+  &:after {
+    position: absolute;
+    top: 50%;
+    left: 1.5 * $grid-unit;
+    transform: translateY(-50%);
+    content: '';
+    width: 1.5 * $grid-unit;
+    height: 1.5 * $grid-unit;
+    border-radius: 50%;
+  }
+
+  .Toastify__close-button {
+    position: absolute;
+    top: 50%;
+    right: 2 * $grid-unit;
+    line-height: $grid-unit;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+
+  &--info:after {
+    background-color: palette(highlight);
+  }
+
+  &--error {
+    background-color: palette(error, 800) !important;
+
+    &:after {
+      background-color: transparent;
+    }
+  }
+}

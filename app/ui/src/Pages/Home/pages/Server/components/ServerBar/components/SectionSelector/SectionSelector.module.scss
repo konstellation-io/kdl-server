@@ -1,0 +1,38 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  background-color: palette(base, 700);
+  border-bottom-left-radius: $grid-unit / 2;
+  border-bottom-right-radius: $grid-unit / 2;
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    .section {
+      display: flex;
+      align-items: center;
+
+      > div {
+        width: 100%;
+        padding-right: 2 * $grid-unit;
+
+        > svg {
+          margin-left: $grid-unit * 1.75;
+        }
+      }
+
+      &.selectedSection {
+        cursor: default;
+        pointer-events: none;
+      }
+      &.selectedSection > div {
+        color: font-color(highlight);
+        border-left: 2px solid palette(highlight);
+      }
+    }
+  }
+}

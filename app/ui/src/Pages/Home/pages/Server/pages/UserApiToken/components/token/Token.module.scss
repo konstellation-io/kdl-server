@@ -1,0 +1,49 @@
+@import 'Styles/colors';
+@import 'Styles/variables';
+@import 'Styles/mixins';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  &:hover {
+    background-color: palette(base, 900);
+  }
+  .wrapper {
+    margin: 0 3.5 * $grid-unit;
+    padding: 3 * $grid-unit 0 2.5 * $grid-unit 0;
+    border-bottom: 1px solid palette(base, 400);
+  }
+
+  .labelContainer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    .labelWrapper {
+      color: font-color(lowlight);
+      display: flex;
+      .infoContainer {
+        margin-left: $grid-unit;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        .datesContainer {
+          margin-top: 2 * $grid-unit;
+          display: flex;
+          align-items: center;
+          .dateLabel {
+            @include font-caption;
+            color: font-color(regular);
+          }
+          .date {
+            @include font-caption;
+            color: font-color(light);
+            margin-left: $grid-unit;
+          }
+          & > div:last-child {
+            margin-left: 3 * $grid-unit;
+          }
+        }
+      }
+    }
+  }
+}

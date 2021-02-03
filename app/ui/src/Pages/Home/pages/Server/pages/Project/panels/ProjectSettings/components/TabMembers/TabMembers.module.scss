@@ -1,0 +1,22 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.formSearch {
+  padding: 2 * $grid-unit;
+  display: flex;
+  align-items: flex-start;
+
+  .formInput {
+    flex-grow: 1;
+    margin-right: $grid-unit;
+
+    ul {
+      text-transform: lowercase;
+    }
+
+    input {
+      @include font-body;
+    }
+  }
+}

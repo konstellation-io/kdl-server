@@ -1,0 +1,9 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}

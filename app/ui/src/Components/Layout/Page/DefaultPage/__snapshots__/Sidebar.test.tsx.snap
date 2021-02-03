@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Sidebar component Component match snapshot 1`] = `
+<div
+  className="sidebar"
+>
+  <h1>
+    Some title
+  </h1>
+  <h3
+    className="subtitle"
+  >
+    Some subtitle
+  </h3>
+  <div
+    className="top"
+  />
+  <div
+    className="bottom"
+  />
+</div>
+`;

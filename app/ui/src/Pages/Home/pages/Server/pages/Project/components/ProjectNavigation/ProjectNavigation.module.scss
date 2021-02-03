@@ -1,0 +1,72 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.container {
+  @include shadow(4);
+
+  width: 25 * $grid-unit;
+
+  max-width: 5 * $grid-unit;
+  background-color: palette(base, 900);
+
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+
+  transition: max-width ease 0.3s;
+
+  .bottom {
+    background-color: palette(base, 600);
+
+    .navButton:hover {
+      background-color: palette(base, 300);
+    }
+  }
+
+  &.opened {
+    max-width: 25 * $grid-unit;
+  }
+}
+
+.navButton {
+  height: 5 * $grid-unit;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background-color: transparent;
+  border-left: 2px solid transparent;
+
+  transition: background-color ease 0.3s, border-left ease 0.3s, color ease 0.2s;
+  color: font-color(lowlight);
+
+  .icon {
+    margin: 0 1.4 * $grid-unit;
+    transition: transform ease 0.3s;
+  }
+
+  .label {
+    @include font-caption;
+
+    margin-left: 2px;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  &:hover {
+    background-color: palette(base, 400);
+    color: font-color(light);
+  }
+}
+
+.active .navButton {
+  color: font-color(highlight);
+  border-left: 2px solid palette(highlight);
+}
+
+.collapsed .icon {
+  transform: scaleX(-1);
+}

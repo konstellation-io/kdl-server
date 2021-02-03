@@ -1,0 +1,23 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  position: relative;
+  display: flex;
+  height: 8 * $grid-unit;
+  border-bottom: solid 2px palette(base, 400);
+  background-color: palette(lowlight, 900);
+  align-items: center;
+
+  z-index: 2;
+}
+
+.addProjectButton {
+  height: 8 * $grid-unit !important;
+}
+
+.left {
+  display: flex;
+  height: 100%;
+}

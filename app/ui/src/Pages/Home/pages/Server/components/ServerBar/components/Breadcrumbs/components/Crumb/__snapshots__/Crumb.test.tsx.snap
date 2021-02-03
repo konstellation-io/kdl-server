@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Crumb component should render without crashing 1`] = `
+<div
+  className="container"
+>
+  <div
+    className="crumbContainer"
+    onClick={[Function]}
+  >
+    <DashboardIcon />
+    <span
+      className="crumbText"
+    >
+      foo
+    </span>
+  </div>
+  <AnimateHeight
+    animateOpacity={false}
+    animationStateClasses={
+      Object {
+        "animating": "rah-animating",
+        "animatingDown": "rah-animating--down",
+        "animatingToHeightAuto": "rah-animating--to-height-auto",
+        "animatingToHeightSpecific": "rah-animating--to-height-specific",
+        "animatingToHeightZero": "rah-animating--to-height-zero",
+        "animatingUp": "rah-animating--up",
+        "static": "rah-static",
+        "staticHeightAuto": "rah-static--height-auto",
+        "staticHeightSpecific": "rah-static--height-specific",
+        "staticHeightZero": "rah-static--height-zero",
+      }
+    }
+    applyInlineTransitions={true}
+    className="content"
+    delay={0}
+    duration={300}
+    easing="ease"
+    height={0}
+    style={Object {}}
+  >
+    <BottomComponent
+      closeComponent={[Function]}
+    />
+  </AnimateHeight>
+</div>
+`;

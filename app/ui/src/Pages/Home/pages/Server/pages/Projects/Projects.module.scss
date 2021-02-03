@@ -1,0 +1,11 @@
+@import 'Styles/colors';
+@import 'Styles/mixins';
+@import 'Styles/variables';
+@import 'Styles/borders';
+@import 'Styles/shadows';
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 4 * $grid-unit 4.5 * $grid-unit 4 * $grid-unit 5 * $grid-unit;
+}

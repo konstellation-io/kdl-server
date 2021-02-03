@@ -1,0 +1,20 @@
+@import 'Styles/colors';
+@import 'Styles/variables';
+@import 'Styles/mixins';
+
+.circledMessage {
+  @include font-small;
+  padding-left: 2 * $grid-unit;
+  line-height: 3 * $grid-unit;
+  margin: 0 $grid-unit / 2;
+
+  &.success {
+    @include circle-before(palette(success));
+    color: palette(success);
+  }
+
+  &.error {
+    @include circle-before(palette(alert));
+    color: palette(alert);
+  }
+}

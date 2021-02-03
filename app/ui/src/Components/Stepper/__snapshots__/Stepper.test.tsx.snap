@@ -1,0 +1,64 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Step component Component match snapshot 1`] = `
+<div
+  className="step disabled"
+  onClick={
+    [MockFunction] {
+      "calls": Array [
+        Array [
+          2,
+        ],
+      ],
+      "results": Array [
+        Object {
+          "type": "return",
+          "value": undefined,
+        },
+      ],
+    }
+  }
+>
+  <div
+    className="circle"
+  >
+    <NotInterestedIcon
+      className="icon-small"
+    />
+  </div>
+  <p
+    className="label"
+  >
+    Step 1
+  </p>
+</div>
+`;
+
+exports[`Stepper component Component match snapshot 1`] = `
+<div
+  className="container"
+>
+  <Step
+    active={false}
+    completed={false}
+    disabled={true}
+    error={false}
+    id={1}
+    key="0"
+    label="Step 1"
+    onClick={[Function]}
+    visited={false}
+  />
+  <Step
+    active={true}
+    completed={false}
+    disabled={false}
+    error={false}
+    id={2}
+    key="1"
+    label="Step 2"
+    onClick={[Function]}
+    visited={true}
+  />
+</div>
+`;

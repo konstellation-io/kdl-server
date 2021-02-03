@@ -1,0 +1,88 @@
+@import 'Styles/variables';
+@import 'Styles/colors';
+@import 'Styles/mixins';
+@import 'Styles/animations';
+
+.actionButton {
+  width: 20 * $grid-unit;
+}
+
+.steps {
+  position: relative;
+  height: 17 * $grid-unit;
+  background-color: palette(base, 700);
+  flex-shrink: 0;
+}
+
+.stepper {
+  margin-left: 8 * $grid-unit;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sections {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.pages {
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background-color: palette(base, 900);
+
+  > div {
+    position: absolute;
+    width: 100%;
+    padding: 6 * $grid-unit 8 * $grid-unit;
+  }
+}
+
+.next {
+  .enter {
+    animation: slideInRight 0.2s forwards;
+  }
+  .exit {
+    animation: slideOutLeft 0.2s forwards;
+  }
+}
+
+.prev {
+  .enter {
+    animation: slideInLeft 0.2s forwards;
+  }
+  .exit {
+    animation: slideOutRight 0.2s forwards;
+  }
+}
+
+.sidebarComponent {
+  @include font-small;
+  color: font-color(lowlight);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 3 * $grid-unit;
+
+  .repoIcon {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5 * $grid-unit;
+  }
+  .repoLabel {
+    @include font-subheader;
+    color: font-color(light);
+    width: 50%;
+  }
+}

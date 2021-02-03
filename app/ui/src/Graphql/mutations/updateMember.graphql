@@ -1,0 +1,6 @@
+mutation UpdateMember($input: UpdateMemberInput!) {
+  updateMember(input: $input) {
+    id
+    accessLevel
+  }
+}

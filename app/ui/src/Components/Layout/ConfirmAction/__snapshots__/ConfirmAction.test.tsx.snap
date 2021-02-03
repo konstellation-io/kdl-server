@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ConfirmAction component - with input Component match snapshot 1`] = `
+<Fragment>
+  <div
+    onClick={[Function]}
+  >
+    <div
+      id="child-1"
+    >
+      Child 1
+    </div>
+  </div>
+</Fragment>
+`;
+
+exports[`ConfirmAction component - without input Component match snapshot 1`] = `
+<Fragment>
+  <div
+    onClick={[Function]}
+  >
+    <div
+      id="child-1"
+    >
+      Child 1
+    </div>
+  </div>
+</Fragment>
+`;

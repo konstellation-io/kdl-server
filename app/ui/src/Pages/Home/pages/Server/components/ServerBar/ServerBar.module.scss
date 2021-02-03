@@ -1,0 +1,60 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  display: flex;
+  height: 5 * $grid-unit;
+  background-color: palette(base, 900);
+  white-space: nowrap;
+
+  z-index: 3;
+}
+
+.left,
+.right {
+  display: flex;
+  z-index: 3;
+}
+
+.formSearch {
+  input {
+    background-color: transparent;
+    border: transparent;
+    border-left: solid 1px palette(lowlight, 900);
+  }
+}
+
+.serverDetails {
+  position: relative;
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  align-self: center;
+  padding-left: 0.5 * $grid-unit;
+  height: 100%;
+
+  .serverName {
+    display: flex;
+    align-items: center;
+    border-right: solid 2px palette(base, 500);
+
+    .serverLabel {
+      @include font-caption;
+      color: font-color(regular);
+
+      align-self: center;
+      margin-right: $grid-unit;
+    }
+
+    .serverState {
+      @include make-triangle(2 * $grid-unit, palette(success));
+
+      margin-right: $grid-unit;
+    }
+    .serverNameInput {
+      @include font-subheader;
+      color: font-color(light);
+    }
+  }
+}

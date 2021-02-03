@@ -1,0 +1,15 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.title {
+  @include font-small;
+  color: font-color(lowlight);
+
+  margin: 3 * $grid-unit 3 * $grid-unit 0 3 * $grid-unit;
+}
+
+.container > div:nth-child(2) > div > div {
+  background-color: palette(lowlight, 800);
+  color: font-color(light);
+}

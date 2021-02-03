@@ -1,0 +1,11 @@
+query GetProjectMembers($id: ID!) {
+  project(id: $id) {
+    members {
+      id
+      email
+      accessLevel
+      addedDate
+      lastActivity
+    }
+  }
+}

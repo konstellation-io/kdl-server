@@ -1,0 +1,34 @@
+@import 'Styles/colors';
+@import 'Styles/mixins';
+@import 'Styles/borders';
+@import 'Styles/shadows';
+
+.settings > div > div {
+  background-color: transparent !important;
+}
+
+.settingButton {
+  background-color: palette(base, 500);
+}
+
+.logoutMessage {
+  @include font-body;
+  color: font-color(lowlight);
+  white-space: initial;
+  text-align: left;
+}
+
+.separator {
+  @include font-caption;
+  color: font-color(regular);
+
+  cursor: default;
+  background-color: palette(base);
+
+  border-top: 2px solid palette(base, 900);
+
+  &:hover {
+    background-color: palette(base);
+    color: font-color(regular);
+  }
+}

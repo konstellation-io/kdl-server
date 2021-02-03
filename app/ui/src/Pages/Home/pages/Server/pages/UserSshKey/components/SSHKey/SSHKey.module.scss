@@ -1,0 +1,69 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.fieldLabel {
+  @include font-caption;
+  color: font-color(regular);
+}
+
+.key {
+  display: flex;
+  align-items: center;
+
+  .keyValue {
+    @include font-title;
+    color: font-color(light);
+
+    padding: 2 * $grid-unit;
+    border: solid 1px font-color(regular);
+    max-width: 40 * $grid-unit;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .copyPre {
+    @include font-caption;
+    color: font-color(regular);
+
+    margin-left: 2.5 * $grid-unit;
+  }
+
+  .copy {
+    margin-left: 2 * $grid-unit;
+    background-color: palette(base, 300);
+    color: font-color(light);
+
+    &:hover {
+      background-color: palette(base, 200);
+    }
+  }
+}
+
+.info {
+  @include font-caption;
+  color: font-color(regular);
+
+  display: flex;
+  margin-top: $grid-unit;
+
+  & .infoEl:not(:last-child) {
+    margin-right: 3 * $grid-unit;
+  }
+
+  & .infoEl:last-child .infoValue {
+    color: font-color(light);
+  }
+
+  .infoEl {
+    display: flex;
+    align-items: center;
+
+    .infoValue {
+      text-transform: uppercase;
+
+      margin-left: 1.5 * $grid-unit;
+    }
+  }
+}

@@ -1,0 +1,125 @@
+@import 'Styles/variables';
+@import 'Styles/colors';
+@import 'Styles/mixins';
+
+.container {
+  display: flex;
+}
+
+$circle-diameter: 30px;
+$separator-width: 2.5 * $grid-unit;
+$separator-padding: 3 * $grid-unit;
+
+.container .step:not(:first-child) {
+  .circle {
+    margin-left: $separator-width + 2 * $separator-padding;
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: calc(50% - 1px);
+      left: -($separator-width + $separator-padding);
+      width: $separator-width;
+      height: 2px;
+      background-color: font-color(lowlight);
+    }
+
+    &:after {
+      @extend .circle:before;
+      background-color: palette(highlight);
+      width: 0;
+
+      transition: width linear 0.3s;
+    }
+  }
+
+  &.visited .circle:after {
+    width: $separator-width;
+  }
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  height: 9 * $grid-unit;
+  cursor: pointer;
+
+  &:hover {
+    .label {
+      color: font-color(light);
+    }
+
+    .circle {
+      color: font-color(light);
+      border-color: font-color(light);
+      background-color: palette(base, 400);
+    }
+  }
+
+  .circle {
+    position: relative;
+    width: $circle-diameter;
+    height: $circle-diameter;
+    border-radius: 50%;
+    border: solid 1px font-color(lowlight);
+    background-color: transparent;
+    color: palette(lowlight);
+
+    transition: border linear 0.3s, background-color linear 0.3s,
+      color linear 0.3s;
+
+    > svg {
+      @include center;
+    }
+  }
+
+  .label {
+    @include font-caption;
+    color: font-color(lowlight);
+    text-transform: uppercase;
+    margin: 0 0 0 $grid-unit;
+    transition: color linear 0.3s;
+  }
+
+  &.disabled .label {
+    color: palette(base, 400);
+  }
+  &.active .label {
+    color: palette(highlight);
+  }
+
+  &.completed {
+    .circle {
+      background-color: palette(highlight);
+
+      > svg {
+        color: font-color(dark);
+      }
+    }
+
+    &:hover .circle {
+      background-color: palette(highlight, 100);
+    }
+  }
+
+  &.active {
+    pointer-events: none;
+
+    .circle {
+      color: palette(highlight);
+      border-color: palette(highlight);
+    }
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    .circle {
+      background-color: font-color(dark);
+      border-color: palette(base, 400);
+
+      > svg {
+        color: palette(base, 400);
+      }
+    }
+  }
+}

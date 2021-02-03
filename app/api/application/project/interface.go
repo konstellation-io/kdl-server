@@ -14,5 +14,5 @@ type Repository interface {
 }
 
 type UseCase interface {
-	Create(ctx context.Context, project entity.Project) (entity.Project, error)
+	Create(ctx context.Context, name, description string) (entity.Project, error)
 }

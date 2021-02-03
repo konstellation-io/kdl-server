@@ -16,8 +16,9 @@ func NewInteractor(logger logging.Logger, repo Repository) *Interactor {
 	return &Interactor{logger: logger, repo: repo}
 }
 
-func (i Interactor) Create(ctx context.Context, project entity.Project) (entity.Project, error) {
+func (i Interactor) Create(ctx context.Context, name, description string) (entity.Project, error) {
 	insertedProject := entity.Project{}
+	project := entity.NewProject(name, description)
 
 	insertedID, err := i.repo.Create(ctx, project)
 	if err != nil {

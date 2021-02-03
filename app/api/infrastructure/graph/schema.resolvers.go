@@ -5,7 +5,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
@@ -15,19 +14,20 @@ import (
 func (r *mutationResolver) CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error) {
 	projectInput := entity.NewProject(input.Name, input.Description)
 	createdProject, err := r.projectInteractor.Create(ctx, projectInput)
+
 	return &createdProject, err
 }
 
 func (r *mutationResolver) UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error) {
-	panic(fmt.Errorf("not implemented"))
+	panic(entity.ErrNotImplemented)
 }
 
 func (r *queryResolver) Projects(ctx context.Context) ([]*entity.Project, error) {
-	panic(fmt.Errorf("not implemented"))
+	panic(entity.ErrNotImplemented)
 }
 
 func (r *queryResolver) Project(ctx context.Context, id string) (*entity.Project, error) {
-	panic(fmt.Errorf("not implemented"))
+	panic(entity.ErrNotImplemented)
 }
 
 // Mutation returns generated.MutationResolver implementation.

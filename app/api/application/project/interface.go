@@ -1,9 +1,10 @@
 package project
 
-//go:generate mockgen -source=${GOFILE} -destination=mocks_${GOFILE} -package=project
+//go:generate mockgen -source=${GOFILE} -destination=mocks_${GOFILE} -package=${GOPACKAGE}
 
 import (
 	"context"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 )
 

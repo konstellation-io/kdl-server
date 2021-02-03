@@ -16,6 +16,7 @@ func (e ToolName) IsValid() bool {
 	case ToolNameGitea, ToolNameMinio, ToolNameJupyter, ToolNameVscode, ToolNameDrone, ToolNameMlflow:
 		return true
 	}
+
 	return false
 }
 

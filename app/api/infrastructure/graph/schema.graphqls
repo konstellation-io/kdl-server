@@ -1,0 +1,94 @@
+
+type Query {
+  projects: [Project!]!
+  project(id: ID!): Project!
+}
+
+type Mutation {
+  createProject(input: CreateProjectInput!): Project!
+  updateProject(input: UpdateProjectInput!): Project!
+}
+
+input RepositoryInput {
+  type: RepositoryType!
+  url: String!
+}
+
+input CreateProjectInput {
+  name: String!
+  description: String!
+  repository: RepositoryInput!
+}
+
+input UpdateProjectRepositoryInput {
+  url: String!
+}
+
+input UpdateProjectInput {
+  id: ID!
+  name: String
+  repository: UpdateProjectRepositoryInput
+}
+
+enum RepositoryType {
+  INTERNAL
+  EXTERNAL
+}
+
+type Repository {
+  id: ID!
+  type: RepositoryType!
+  url: String!
+  connected: Boolean!
+}
+
+enum ProjectState {
+  STARTED
+  STOPPED
+  ARCHIVED
+}
+
+enum AccessLevel {
+  VIEWER
+  MANAGER
+  ADMIN
+}
+
+type Member {
+  id: ID!
+  email: String!
+  accessLevel: AccessLevel!
+  addedDate: String!
+  lastActivity: String
+}
+
+enum ToolName {
+  GITEA,
+  MINIO,
+  JUPYTER,
+  VSCODE,
+  DRONE,
+  MLFLOW,
+}
+
+
+type Tool {
+  id: ID!
+  toolName: ToolName!
+  url: String!
+}
+
+type Project {
+  id: ID!
+  name: String!
+  description: String!
+  favorite: Boolean!
+  repository: Repository
+  state: ProjectState!
+  creationDate: String!
+  lastActivationDate: String!
+  error: String
+  members: [Member!]!
+  tools: [Tool!]!
+  areToolsActive: Boolean!
+}

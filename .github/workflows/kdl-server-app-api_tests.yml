@@ -1,4 +1,4 @@
-name: KDL Server admin-api Tests
+name: KDL Server app-api Tests
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     tags-ignore:
       - v*
     paths:
-      - "admin-api/**/*"
-      - ".github/workflows/lab-admin-api*"
+      - "app/api/**/*"
+      - ".github/workflows/kdl-server-app-api*"
 
 jobs:
   test:
@@ -23,12 +23,12 @@ jobs:
           go-version: 1.14.x
       - name: Test
         run: go test ./... -cover -v -coverprofile=coverage.out
-        working-directory: ./admin-api
+        working-directory: ./app/api
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
         with:
           name: coverage-report
-          path: admin-api/coverage.out
+          path: app/api/coverage.out
   
   sonarcloud:
     name: SonarCloud
@@ -42,11 +42,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: coverage-report
-          path: admin-api
+          path: app/api
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         with:
-          projectBaseDir: admin-api
+          projectBaseDir: app/api
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_ADMIN_API }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_APP_API }}

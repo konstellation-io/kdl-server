@@ -4,10 +4,10 @@ FROM golang:1.14.12-alpine3.12 as builder
 ENV CGO_ENABLED=0
 
 WORKDIR /app
-COPY go.* ./
+COPY api/go.* ./
 RUN go mod download
-COPY ../../admin-api .
-RUN go build -o admin-api .
+COPY api .
+RUN go build -o kdl-server .
 
 
 FROM alpine:3.10.2
@@ -28,8 +28,8 @@ RUN apk add -U --no-cache ca-certificates
 RUN mkdir -p /var/log/app
 
 WORKDIR /app
-COPY --from=builder /app/admin-api .
-RUN apk add libcap && setcap 'cap_net_bind_service=+ep' /app/admin-api
+COPY --from=builder /app/ .
+RUN apk add libcap && setcap 'cap_net_bind_service=+ep' /app/kdl-server
 RUN chown -R kdl:0 /app \
     && chmod -R g+w /app \
     && chown -R kdl:0 /var/log/app \
@@ -37,4 +37,4 @@ RUN chown -R kdl:0 /app \
 
 USER kdl
 
-CMD ["sh","-c","/app/admin-api 2>&1 | tee -a /var/log/app/app.log"]
+CMD ["sh","-c","/app/kdl-server 2>&1 | tee -a /var/log/app/app.log"]

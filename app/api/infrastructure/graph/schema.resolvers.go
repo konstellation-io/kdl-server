@@ -12,8 +12,7 @@ import (
 )
 
 func (r *mutationResolver) CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error) {
-	projectInput := entity.NewProject(input.Name, input.Description)
-	createdProject, err := r.projectInteractor.Create(ctx, projectInput)
+	createdProject, err := r.projectInteractor.Create(ctx, input.Name, input.Description)
 
 	return &createdProject, err
 }

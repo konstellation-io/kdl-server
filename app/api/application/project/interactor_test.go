@@ -47,19 +47,21 @@ func TestInteractor_Create(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const projectID = "project.1234"
+	const projectName = "project-x"
+	const projectDesc = "description"
 
 	ctx := context.Background()
-	p := entity.NewProject("project-x", "description")
+	p := entity.NewProject(projectName, projectDesc)
 	expectedProject := entity.Project{
 		ID:          projectID,
-		Name:        "project-x",
-		Description: "description",
+		Name:        projectName,
+		Description: projectDesc,
 	}
 
 	s.mocks.repo.EXPECT().Create(ctx, p).Return(projectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, projectID).Return(expectedProject, nil)
 
-	createdProject, err := s.interactor.Create(ctx, p)
+	createdProject, err := s.interactor.Create(ctx, projectName, projectDesc)
 
 	require.Nil(t, err)
 	require.Equal(t, expectedProject, createdProject)

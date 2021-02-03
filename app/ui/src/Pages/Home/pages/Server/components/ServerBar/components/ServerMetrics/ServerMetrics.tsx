@@ -72,12 +72,12 @@ const ServerMetrics: FC<Props & BottomComponentProps> = ({
   const { push } = useHistory();
   const handleUsersClick = () => {
     closeComponent();
-    push(buildRoute.server(ROUTE.USERS, 'serverId'));
+    push(ROUTE.USERS);
   };
 
   const handleProjectsClick = () => {
     closeComponent();
-    push(buildRoute.server(ROUTE.HOME, 'serverId'));
+    push(ROUTE.HOME);
   };
 
   return (

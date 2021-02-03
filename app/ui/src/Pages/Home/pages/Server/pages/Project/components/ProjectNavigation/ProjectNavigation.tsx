@@ -31,7 +31,7 @@ function ProjectNavigation() {
     setOpened(!opened);
   }
 
-  const projectRoutes = useProjectNavigation(serverId, projectId);
+  const projectRoutes = useProjectNavigation(projectId);
 
   return (
     <div className={cx(styles.container, { [styles.opened]: opened })}>

@@ -5,12 +5,11 @@ import {
 } from 'Graphql/client/queries/getNewProject.graphql';
 import React, { useEffect } from 'react';
 
-import { RouteServerParams } from 'Constants/routes';
 import styles from './InternalRepository.module.scss';
 import useNewProject from '../../../../../../apollo/hooks/useNewProject';
-import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import IconLink from '@material-ui/icons/Link';
+import { CONFIG } from 'index';
 
 function validateProjectSlug(value: string): string {
   const error = CHECK.getValidationError([
@@ -29,6 +28,7 @@ type Props = {
   showErrors: boolean;
 };
 function InternalRepository({ showErrors }: Props) {
+  const SERVER_URL = CONFIG.SERVER_URL;
   const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
   const { updateValue, updateError, clearError } = useNewProject(
     'internalRepository'
@@ -40,8 +40,7 @@ function InternalRepository({ showErrors }: Props) {
   const slugError = errors?.slug;
 
   useEffect(() => {
-    // TODO: change server url
-    // updateValue('url', `${server?.url}.${slug}`);
+    updateValue('url', `${SERVER_URL}.${slug}`);
     updateValue('url', `slug`);
   }, [updateValue, slug]);
 
@@ -49,15 +48,13 @@ function InternalRepository({ showErrors }: Props) {
 
   const slugOk = validateProjectSlug(slug);
 
-  // TODO: change server url
   return (
     <div className={styles.repositoryInternal}>
       <div className={styles.url}>
         <p className={styles.urlTitle}>repository url</p>
         <div className={styles.serverUrlContainer}>
           <IconLink className="icon-regular" />
-          {/*<span className={styles.urlContent}>{`${server?.url}/`}</span>*/}
-          <span className={styles.urlContent}>{`/`}</span>
+          <span className={styles.urlContent}>{`${SERVER_URL}/`}</span>
         </div>
       </div>
       <TextInput

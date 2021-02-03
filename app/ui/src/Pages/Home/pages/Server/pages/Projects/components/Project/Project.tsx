@@ -19,7 +19,7 @@ const Project: FC<Props> = ({ project }) => {
   const isProjectArchived = project.state === ProjectState.ARCHIVED;
 
   return (
-    <Link to={buildRoute.project(ROUTE.PROJECT, project.id)}>
+    <Link to={buildRoute(ROUTE.PROJECT, project.id)}>
       <div
         className={cx(styles.container, {
           [styles.archived]: isProjectArchived,

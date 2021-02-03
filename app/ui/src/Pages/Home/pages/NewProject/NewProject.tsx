@@ -128,7 +128,7 @@ function NewProject() {
           <ActionButton
             key="create"
             label="CREATE"
-            to={ROUTE.CREATION_PROJECT}
+            to={ROUTE.PROJECT_CREATION}
             primary
           />,
         ];

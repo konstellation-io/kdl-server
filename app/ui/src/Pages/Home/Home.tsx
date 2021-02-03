@@ -51,7 +51,7 @@ function Home() {
           <Route exact path={ROUTE.NEW_USER} component={NewUser} />
           <Route
             exact
-            path={ROUTE.CREATION_PROJECT}
+            path={ROUTE.PROJECT_CREATION}
             component={ProjectCreation}
           />
           <Route

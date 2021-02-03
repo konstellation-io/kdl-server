@@ -42,7 +42,7 @@ function useProjectNavigation(projectId: string) {
     () =>
       Object.entries(projectRoutesConfiguration).map(
         ([routeString, { id, label, Icon }]) => ({
-          to: buildRoute.project(routeString as ROUTE, projectId),
+          to: buildRoute(routeString as ROUTE, projectId),
           id,
           label,
           Icon,

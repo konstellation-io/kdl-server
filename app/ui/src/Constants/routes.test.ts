@@ -19,8 +19,8 @@ describe('route utils - buildRoute', () => {
     const serverId = 'someServer';
     const projectId = 'someProject';
 
-    const route1 = buildRoute.project(ROUTE.NEW_SERVER, serverId, projectId);
-    const route2 = buildRoute.project(ROUTE.PROJECT, serverId, projectId);
+    const route1 = buildRoute(ROUTE.NEW_SERVER, serverId, projectId);
+    const route2 = buildRoute(ROUTE.PROJECT, serverId, projectId);
 
     const expectedRoute1 = '/new-server';
     const expectedRoute2 = '/server/someServer/project/someProject';

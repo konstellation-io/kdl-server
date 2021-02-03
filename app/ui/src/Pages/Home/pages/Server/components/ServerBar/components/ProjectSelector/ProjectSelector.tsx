@@ -18,7 +18,7 @@ const ProjectSelector: FC<Props & BottomComponentProps> = ({
     <ul>
       {options.map(({ id, name }: GetProjects_projects) => (
         <NavLink
-          to={buildRoute.project(ROUTE.PROJECT, id)}
+          to={buildRoute(ROUTE.PROJECT, id)}
           key={id}
           onClick={closeComponent}
           activeClassName={styles.selectedProject}

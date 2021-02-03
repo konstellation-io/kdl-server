@@ -10,7 +10,6 @@ import { RepositoryType } from 'Graphql/types/globalTypes';
 import StatusCircle from 'Components/LottieShapes/StatusCircle/StatusCircle';
 import { repoTypeToStepName } from '../NewProject/NewProject';
 import styles from './ProjectCreation.module.scss';
-import { useParams } from 'react-router-dom';
 import useProject from 'Graphql/hooks/useProject';
 import { useQuery } from '@apollo/client';
 
@@ -64,7 +63,7 @@ function ProjectCreation() {
           />
           <Button
             label="GO TO PROJECT"
-            to={buildRoute.project(
+            to={buildRoute(
               ROUTE.PROJECT,
               dataCreateProject?.createProject.id || ''
             )}

@@ -6,7 +6,7 @@ ENV CGO_ENABLED=0
 WORKDIR /app
 COPY go.* ./
 RUN go mod download
-COPY . .
+COPY ../../admin-api .
 RUN go build -o admin-api .
 
 

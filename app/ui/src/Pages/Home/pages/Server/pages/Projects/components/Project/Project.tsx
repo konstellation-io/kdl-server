@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { ProjectState, RepositoryType } from 'Graphql/types/globalTypes';
-import ROUTE, { buildRoute } from 'Constants/routes';
+import ROUTE, { RouteServerParams, buildRoute } from 'Constants/routes';
 import React, { FC, MouseEvent } from 'react';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
@@ -16,10 +16,11 @@ type Props = {
 };
 
 const Project: FC<Props> = ({ project }) => {
+  const { serverId } = useParams<RouteServerParams>();
   const isProjectArchived = project.state === ProjectState.ARCHIVED;
 
   return (
-    <Link to={buildRoute.project(ROUTE.PROJECT, project.id)}>
+    <Link to={buildRoute.project(ROUTE.PROJECT, serverId, project.id)}>
       <div
         className={cx(styles.container, {
           [styles.archived]: isProjectArchived,

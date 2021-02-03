@@ -37,18 +37,18 @@ export interface EnhancedRouteConfiguration extends RouteConfiguration {
   to: string;
 }
 
-function useProjectNavigation(projectId: string) {
+function useProjectNavigation(serverId: string, projectId: string) {
   const routesConfigurations: EnhancedRouteConfiguration[] = useMemo(
     () =>
       Object.entries(projectRoutesConfiguration).map(
         ([routeString, { id, label, Icon }]) => ({
-          to: buildRoute.project(routeString as ROUTE, projectId),
+          to: buildRoute.project(routeString as ROUTE, serverId, projectId),
           id,
           label,
           Icon,
         })
       ),
-    [projectId]
+    [serverId, projectId]
   );
   return routesConfigurations;
 }

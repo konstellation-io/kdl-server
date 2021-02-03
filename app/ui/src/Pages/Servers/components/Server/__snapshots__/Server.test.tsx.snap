@@ -1,0 +1,311 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ActionButton component Component match snapshot 1`] = `
+<div
+  className="actionButtonContainer"
+>
+  <div
+    className="actionButtonBg"
+    onClick={[Function]}
+  />
+  <div
+    className="actionButtonContent"
+  >
+    <ArchiveIcon
+      className="icon-regular"
+    />
+    <p
+      className="actionButtonLabel"
+    >
+      Some label
+    </p>
+  </div>
+</div>
+`;
+
+exports[`AddServer component Component match snapshot 1`] = `
+<div
+  className="addServerContainer"
+>
+  <div
+    className="addServerBg"
+    onClick={[Function]}
+  />
+  <div
+    className="addServerLabel"
+  >
+    <AddIcon
+      className="icon-regular"
+    />
+    <p>
+      Some label
+    </p>
+  </div>
+</div>
+`;
+
+exports[`LocalServer component Component match snapshot 1`] = `
+<Server
+  actions={
+    Array [
+      Object {
+        "Icon": Object {
+          "$$typeof": Symbol(react.memo),
+          "compare": null,
+          "displayName": "StopIcon",
+          "muiName": "SvgIcon",
+          "type": Object {
+            "$$typeof": Symbol(react.forward_ref),
+            "render": [Function],
+          },
+        },
+        "label": "STOP",
+        "onClick": [Function],
+      },
+    ]
+  }
+  local={true}
+  name="Some name"
+  onOpenUrl="/server/serverId"
+  serverId="serverId"
+  state="STARTED"
+/>
+`;
+
+exports[`RemoteServer component Component match snapshot 1`] = `
+<Server
+  actions={
+    Array [
+      Object {
+        "Icon": Object {
+          "$$typeof": Symbol(react.memo),
+          "compare": null,
+          "displayName": "StopIcon",
+          "muiName": "SvgIcon",
+          "type": Object {
+            "$$typeof": Symbol(react.forward_ref),
+            "render": [Function],
+          },
+        },
+        "label": "SIGN OUT",
+        "onClick": [Function],
+      },
+    ]
+  }
+  name="Some name"
+  onOpenUrl="/server/serverId"
+  serverId="serverId"
+  state="SIGNED_IN"
+  url="some.url"
+/>
+`;
+
+exports[`Server component Component match snapshot 1`] = `
+<div
+  className="cannotOpen"
+>
+  <div
+    className="container"
+  >
+    <div
+      className="bg"
+    >
+      <div
+        className="bgBand"
+      />
+    </div>
+    <div
+      className="label STOPPED noOffset"
+    >
+      STOPPED
+    </div>
+    <div
+      className="triangle down"
+    >
+      <div
+        className="stateBorder STOPPED"
+      />
+      <div
+        className="state STOPPED"
+      />
+    </div>
+    <div
+      className="actions"
+    >
+      <p
+        className="warning"
+      >
+        WARNING
+      </p>
+      <ActionButton
+        Icon={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "compare": null,
+            "displayName": "ArchiveIcon",
+            "muiName": "SvgIcon",
+            "type": Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "render": [Function],
+            },
+          }
+        }
+        key="Some label"
+        label="Some label"
+        onClick={[MockFunction]}
+      />
+      <ActionButton
+        Icon={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "compare": null,
+            "displayName": "ArchiveIcon",
+            "muiName": "SvgIcon",
+            "type": Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "render": [Function],
+            },
+          }
+        }
+        key="Some label 2"
+        label="Some label 2"
+        to="/home-2"
+      />
+    </div>
+    <div
+      className="nameSection"
+    >
+      <p
+        className="name"
+      >
+        ServerName
+      </p>
+      <div
+        className="localTag"
+      >
+        Local
+      </div>
+    </div>
+    <div
+      className="url"
+    >
+      <p
+        className="text"
+        title="ServerUrl"
+      >
+        ServerUrl
+      </p>
+      <CopyToClipboard
+        className="copy"
+      >
+        ServerUrl
+      </CopyToClipboard>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Server component should be a link when onOpenUrl is set 1`] = `
+<Link
+  to="some.url"
+>
+  <div
+    className="container"
+  >
+    <div
+      className="bg"
+    >
+      <div
+        className="bgBand"
+      />
+    </div>
+    <div
+      className="label STOPPED noOffset"
+    >
+      STOPPED
+    </div>
+    <div
+      className="triangle down"
+    >
+      <div
+        className="stateBorder STOPPED"
+      />
+      <div
+        className="state STOPPED"
+      />
+    </div>
+    <div
+      className="actions"
+    >
+      <p
+        className="warning"
+      >
+        WARNING
+      </p>
+      <ActionButton
+        Icon={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "compare": null,
+            "displayName": "ArchiveIcon",
+            "muiName": "SvgIcon",
+            "type": Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "render": [Function],
+            },
+          }
+        }
+        key="Some label"
+        label="Some label"
+        onClick={[MockFunction]}
+      />
+      <ActionButton
+        Icon={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "compare": null,
+            "displayName": "ArchiveIcon",
+            "muiName": "SvgIcon",
+            "type": Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "render": [Function],
+            },
+          }
+        }
+        key="Some label 2"
+        label="Some label 2"
+        to="/home-2"
+      />
+    </div>
+    <div
+      className="nameSection"
+    >
+      <p
+        className="name"
+      >
+        ServerName
+      </p>
+      <div
+        className="localTag"
+      >
+        Local
+      </div>
+    </div>
+    <div
+      className="url"
+    >
+      <p
+        className="text"
+        title="ServerUrl"
+      >
+        ServerUrl
+      </p>
+      <CopyToClipboard
+        className="copy"
+      >
+        ServerUrl
+      </CopyToClipboard>
+    </div>
+  </div>
+</Link>
+`;

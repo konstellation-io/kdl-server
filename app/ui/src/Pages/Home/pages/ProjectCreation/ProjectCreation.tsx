@@ -3,7 +3,7 @@ import {
   GET_NEW_PROJECT,
   GetNewProject,
 } from 'Graphql/client/queries/getNewProject.graphql';
-import ROUTE, { buildRoute } from 'Constants/routes';
+import ROUTE, { RouteServerParams, buildRoute } from 'Constants/routes';
 import React, { useEffect } from 'react';
 
 import { RepositoryType } from 'Graphql/types/globalTypes';
@@ -20,6 +20,7 @@ function ProjectCreation() {
     create: { data: dataCreateProject },
   } = useProject();
 
+  const { serverId } = useParams<RouteServerParams>();
   const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
 
   useEffect(() => {
@@ -60,12 +61,13 @@ function ProjectCreation() {
           <Button
             label="GO TO SERVER"
             className={styles.button}
-            to={ROUTE.HOME}
+            to={buildRoute.server(ROUTE.HOME, serverId)}
           />
           <Button
             label="GO TO PROJECT"
             to={buildRoute.project(
               ROUTE.PROJECT,
+              serverId,
               dataCreateProject?.createProject.id || ''
             )}
             disabled={!dataCreateProject}

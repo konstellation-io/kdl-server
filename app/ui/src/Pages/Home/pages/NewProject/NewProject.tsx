@@ -3,7 +3,7 @@ import {
   GET_NEW_PROJECT,
   GetNewProject,
 } from 'Graphql/client/queries/getNewProject.graphql';
-import ROUTE from 'Constants/routes';
+import ROUTE, { RouteServerParams, buildRoute } from 'Constants/routes';
 import React, { useEffect } from 'react';
 import RepositoryTypeComponent, {
   LOCATION,
@@ -23,6 +23,7 @@ import Summary from './pages/Summary/Summary';
 import cx from 'classnames';
 import styles from './NewProject.module.scss';
 import useNewProject from '../../apollo/hooks/useNewProject';
+import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 
 enum Steps {
@@ -69,7 +70,10 @@ export const repoTypeToStepName: {
 
 function NewProject() {
   const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
+
+  const { serverId } = useParams<RouteServerParams>();
   const { clearAll } = useNewProject('information');
+  const cancelRoute = buildRoute.server(ROUTE.HOME, serverId);
   const type = data?.newProject.repository.values.type || null;
 
   const stepsWithData: (
@@ -113,7 +117,7 @@ function NewProject() {
     switch (actStep) {
       case 0:
         return [
-          <ActionButton key="cancel" label="CANCEL" to={ROUTE.HOME} />,
+          <ActionButton key="cancel" label="CANCEL" to={cancelRoute} />,
           <ActionButton
             key="next"
             label="NEXT"
@@ -127,7 +131,7 @@ function NewProject() {
           <ActionButton
             key="create"
             label="CREATE"
-            to={ROUTE.CREATION_PROJECT}
+            to={buildRoute.server(ROUTE.CREATION_PROJECT, serverId)}
             primary
           />,
         ];

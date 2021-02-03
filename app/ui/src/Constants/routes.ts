@@ -14,14 +14,20 @@ enum ROUTE {
   CREATION_PROJECT = '/new-project/create',
 }
 
+export type RouteServerParams = {
+  serverId: string;
+};
+
 export type RouteProjectParams = {
   serverId: string;
   projectId: string;
 };
 
 export const buildRoute = {
-  project: (route: ROUTE, projectId: string) =>
-    route.replace(':projectId', projectId),
+  server: (route: ROUTE, serverId: string) =>
+    route.replace(':serverId', serverId),
+  project: (route: ROUTE, serverId: string, projectId: string) =>
+    buildRoute.server(route, serverId).replace(':projectId', projectId),
 };
 
 export default ROUTE;

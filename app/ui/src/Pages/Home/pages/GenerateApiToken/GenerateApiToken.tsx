@@ -1,8 +1,8 @@
 import { Button, TextInput } from 'kwc';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import ROUTE from 'Constants/routes';
+import ROUTE, { RouteServerParams, buildRoute } from 'Constants/routes';
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import { ActionButton } from 'Hooks/useStepper/useStepper';
 import CodeIcon from '@material-ui/icons/Code';
@@ -24,6 +24,7 @@ type FormData = {
 
 function GenerateApiToken() {
   const history = useHistory();
+  const { serverId } = useParams<RouteServerParams>();
   const [copied, setCopied] = useState(false);
   const [showCopyAlert, setShowCopyAlert] = useState(false);
 
@@ -65,7 +66,8 @@ function GenerateApiToken() {
   }
 
   function handleAcceptClick() {
-    if (copied) history.push(ROUTE.USER_API_TOKENS);
+    if (copied)
+      history.push(buildRoute.server(ROUTE.USER_API_TOKENS, serverId));
     else setShowCopyAlert(true);
   }
 
@@ -82,7 +84,11 @@ function GenerateApiToken() {
       title="Please, write a name to generate your API token"
       subtitle="A new API token will be generated labeled with this name. You cannot set a custom token."
       actions={[
-        <ActionButton key="cancel" label="CANCEL" to={ROUTE.USER_API_TOKENS} />,
+        <ActionButton
+          key="cancel"
+          label="CANCEL"
+          to={buildRoute.server(ROUTE.USER_API_TOKENS, serverId)}
+        />,
         <ActionButton
           key="accept"
           label="ACCEPT"

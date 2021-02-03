@@ -1,0 +1,23 @@
+domain: kdl.local
+tls: 
+  enabled: false
+ingress:
+  type: nginx
+
+kdlServer:
+  image:
+    repository: konstellation/kdl-server
+    tag: latest
+    pullPolicy: IfNotPresent
+
+oauth2Proxy:
+  image:
+    repository: terminus7/oauth2-proxy
+    tag: latest
+    pullPolicy: IfNotPresent
+
+giteaOauth2Setup:
+  image:
+    repository: terminus7/gitea-oauth2-setup
+    tag: 1.1.5
+    pullPolicy: IfNotPresent

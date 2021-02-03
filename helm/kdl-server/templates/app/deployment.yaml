@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kdl-server
+spec:
+  selector:
+    matchLabels:
+      app: kdl-server
+  template:
+    metadata:
+      labels:
+        app: kdl-server
+      annotations:
+        helm.sh/restart-deployment: {{ randAlphaNum 5 | quote }}
+    spec:
+      initContainers:
+        - name: gitea-oauth2-setup
+          image: "terminus7/gitea-oauth2-setup:{{ .Values.giteaOauth2Setup.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          envFrom:
+            - secretRef:
+                name: gitea-admin-secrets
+            - secretRef:
+                name: kdl-server-oauth2-secrets
+            - configMapRef:
+                name: gitea-configmap
+            - configMapRef:
+                name: kdl-server-configmap
+      containers:
+        - name: kdl-server
+          image: {{ .Values.kdlServer.image.repository }}:{{ .Values.kdlServer.image.tag }}
+          imagePullPolicy: {{ .Values.kdlServer.image.pullPolicy }}
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          envFrom:
+            - configMapRef:
+                name: kdl-server-configmap
+          ports:
+            - containerPort: 3000
+        - name: kdl-server-proxy
+          image: "terminus7/oauth2-proxy:{{ .Values.oauth2Proxy.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          args:
+            - "-config"
+            - "/etc/oauth2_proxy.cfg"
+            - "-email-domain"
+            - "*"
+            - "-upstream"
+            - "http://127.0.0.1:8080/"
+            - "-pass-user-headers"
+            - "-skip-provider-button"
+          env:
+            - name: OAUTH2_PROXY_HTTP_ADDRESS
+              value: "0.0.0.0:3000"
+
+            - name: OAUTH2_PROXY_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: kdl-server-oauth2-secrets
+                  key: KDL-SERVER_OAUTH2_CLIENT_ID
+
+            - name: OAUTH2_PROXY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: kdl-server-oauth2-secrets
+                  key: KDL-SERVER_OAUTH2_CLIENT_SECRET
+
+          volumeMounts:
+            - name: oauth2-config
+              mountPath: /etc/oauth2_proxy.cfg
+              subPath: oauth2_proxy.cfg
+          ports:
+            - name: http
+              containerPort: 4180
+              protocol: TCP
+      volumes:
+        - name: oauth2-config
+          configMap:
+            name: kdl-server-oauth2-proxy

@@ -61,7 +61,7 @@ setup_env() {
 
 build_server() {
   setup_env
-  build_image kdl-admin-api admin-api
+  build_image kdl-server app
 }
 
 build_image() {

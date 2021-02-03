@@ -45,7 +45,6 @@ function useBreadcrumbs() {
   } = useQuery<GetOpenedProject>(GET_OPENED_PROJECT);
 
   const projectSections: EnhancedRouteConfiguration[] = useProjectNavigation(
-    '',
     projectData?.openedProject?.id || ''
   );
 

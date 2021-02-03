@@ -1,5 +1,5 @@
 import { Button, ErrorMessage, SpinnerCircular } from 'kwc';
-import ROUTE, { RouteServerParams, buildRoute } from 'Constants/routes';
+import ROUTE from 'Constants/routes';
 
 import { GetMe } from 'Graphql/queries/types/GetMe';
 import Message from 'Components/Message/Message';
@@ -8,13 +8,11 @@ import Token from './components/token/Token';
 import { loader } from 'graphql.macro';
 import styles from './UserApiTokens.module.scss';
 import useAPIToken from 'Graphql/hooks/useAPIToken';
-import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 
 const GetMeQuery = loader('Graphql/queries/getMe.graphql');
 
 function UserApiTokens() {
-  const { serverId } = useParams<RouteServerParams>();
   const { data, loading, error } = useQuery<GetMe>(GetMeQuery);
   const { removeApiTokenById } = useAPIToken();
 
@@ -47,7 +45,7 @@ function UserApiTokens() {
           label="GENERATE"
           className={styles.generateButton}
           height={30}
-          to={buildRoute.server(ROUTE.GENERATE_USER_API_TOKEN, serverId)}
+          to={ROUTE.GENERATE_USER_API_TOKEN}
           border
         />
       </div>

@@ -46,9 +46,11 @@ func TestInteractor_Create(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
-	const projectID = "project.1234"
-	const projectName = "project-x"
-	const projectDesc = "description"
+	const (
+		projectID   = "project.1234"
+		projectName = "project-x"
+		projectDesc = "description"
+	)
 
 	ctx := context.Background()
 	p := entity.NewProject(projectName, projectDesc)

@@ -14,7 +14,6 @@ describe('route utils - buildRoute', () => {
   });
 
   test('right project routes', () => {
-    const serverId = 'someServer';
     const projectId = 'someProject';
 
     const route1 = buildRoute(ROUTE.NEW_SERVER, projectId);

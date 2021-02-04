@@ -67,6 +67,7 @@ github.com/klauspost/compress v1.9.5 h1:U+CaK85mrNNb4k8BNOfgJtJ/gr6kswUCFj6miSzV
 github.com/klauspost/compress v1.9.5/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0guNDohfE1A=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.2/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
+github.com/konstellation-io/kdl-server v0.0.0 h1:wt6GC6SMnxSSXd9X+NmEyCf1m42htoSFDsjhZUcaWwk=
 github.com/konstellation-io/kre/libs/simplelogger v0.0.0-20210127163202-65666c1e48f8 h1:5sZzkp2NoFbARje6wnm0RRIQs08jgJZF0WkEj8Z+TEE=
 github.com/konstellation-io/kre/libs/simplelogger v0.0.0-20210127163202-65666c1e48f8/go.mod h1:NBvrtiOd/pwGYVmJBDwGzr/SiHp5gZToELhUiJ1CmIk=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=

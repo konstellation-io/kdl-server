@@ -67,6 +67,7 @@ func (m *MongoDB) Disconnect() {
 	err := m.client.Disconnect(ctx)
 	if err != nil {
 		m.logger.Errorf("Error disconnecting from MongoDB: %s", err)
+		return
 	}
 
 	m.logger.Info("Connection to MongoDB closed.")

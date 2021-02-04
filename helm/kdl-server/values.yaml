@@ -1,6 +1,6 @@
 domain: kdl.local
 tls: 
-  enabled: false
+  enabled: true
 ingress:
   type: nginx
 

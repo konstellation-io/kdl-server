@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CircledInfoMessage component Component match snapshot 1`] = `
+<div
+  className="circledMessage success"
+>
+  some text
+  <div
+    id="children"
+  >
+    Children
+  </div>
+</div>
+`;

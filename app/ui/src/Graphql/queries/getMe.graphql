@@ -1,0 +1,12 @@
+query GetMe {
+  me {
+    id
+    email
+    apiTokens {
+      id
+      name
+      creationDate
+      lastUsedDate
+    }
+  }
+}

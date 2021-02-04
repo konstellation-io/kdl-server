@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Panel component Component match snapshot 1`] = `
+<TransitionGroup
+  childFactory={[Function]}
+  className="group default noShrink"
+  component="div"
+>
+  <CSSTransition
+    classNames={
+      Object {
+        "enter": "enter",
+        "exit": "exit",
+      }
+    }
+    key="true"
+    timeout={500}
+  >
+    <div
+      className="container default"
+    >
+      <header>
+        <div
+          className="separator"
+        />
+        <p
+          className="title"
+        >
+          Some title
+        </p>
+        <P
+          Icon={
+            Object {
+              "$$typeof": Symbol(react.memo),
+              "compare": null,
+              "displayName": "CloseIcon",
+              "muiName": "SvgIcon",
+              "type": Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "render": [Function],
+              },
+            }
+          }
+          label=""
+          onClick={[MockFunction]}
+        />
+      </header>
+      <div
+        className="content"
+      >
+        <div>
+          Children
+        </div>
+      </div>
+    </div>
+  </CSSTransition>
+</TransitionGroup>
+`;

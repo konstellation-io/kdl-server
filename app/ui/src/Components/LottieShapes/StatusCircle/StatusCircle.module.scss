@@ -1,0 +1,32 @@
+@import 'Styles/variables';
+@import 'Styles/colors';
+@import 'Styles/mixins';
+
+.loaderContainer {
+  position: relative;
+}
+
+.innerContainer {
+  @include center;
+
+  background-color: transparent;
+  color: font-color(light);
+  font-size: 11px;
+}
+
+.initializing {
+  opacity: 0;
+  animation-name: showText;
+  animation-duration: 1s;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes showText {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

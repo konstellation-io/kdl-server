@@ -1,0 +1,8 @@
+mutation RegenerateSSHKey {
+  regenerateSSHKey {
+    public
+    private
+    creationDate
+    lastActivity
+  }
+}

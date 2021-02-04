@@ -1,0 +1,17 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  @include font-caption;
+  color: font-color(lowlight);
+
+  display: flex;
+  align-items: center;
+  padding: 0 3 * $grid-unit;
+}
+
+.label {
+  color: font-color(regular);
+  margin-right: 2 * $grid-unit;
+}

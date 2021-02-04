@@ -1,0 +1,52 @@
+@import 'Styles/colors';
+@import 'Styles/variables';
+@import 'Styles/mixins';
+
+.container {
+  height: 100%;
+
+  .section {
+    @include font-title;
+    color: font-color(lowlight);
+  }
+
+  .field {
+    margin-top: 5 * $grid-unit;
+  }
+
+  .descriptionContainer,
+  .url,
+  .name {
+    margin: 0;
+  }
+  .name {
+    @include font-headline;
+    color: font-color(light);
+  }
+  .url {
+    @include font-body;
+    color: font-color(light);
+    margin-left: $grid-unit;
+  }
+  .label {
+    @include font-caption;
+    color: font-color(regular);
+    margin: 0;
+  }
+  .repository {
+    display: flex;
+    flex-direction: column;
+    .urlContainer {
+      display: flex;
+      align-items: center;
+    }
+  }
+  .descriptionContainer {
+    @include font-body;
+    margin: 2.5 * $grid-unit 0;
+    background-color: palette(base, 600);
+    color: font-color(lowlight);
+    padding: 3 * $grid-unit;
+    white-space: pre-line;
+  }
+}

@@ -1,0 +1,22 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.container {
+  @include shadow(2);
+
+  height: 5 * $grid-unit;
+  flex-shrink: 0;
+}
+
+.actions {
+  background-color: palette(base, 400);
+  padding: 0 calc(50% - (#{$column-page-content-width / 2}));
+  justify-content: flex-end;
+
+  &.center {
+    padding: 0;
+    justify-content: center;
+  }
+}

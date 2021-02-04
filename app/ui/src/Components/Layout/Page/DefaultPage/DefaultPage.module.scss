@@ -1,0 +1,58 @@
+@import 'Styles/colors';
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/shadows';
+
+$sidebar-width: 40 * $grid-unit;
+
+.container {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background-color: palette(base, 700);
+}
+
+.actions div {
+  padding: 0;
+  flex-direction: row;
+}
+
+.sidebar {
+  @include shadow(4);
+  z-index: 1;
+
+  width: $sidebar-width;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: palette(base, 500);
+  padding: 10 * $grid-unit 5 * $grid-unit 0 3 * $grid-unit;
+
+  h1 {
+    text-align: left;
+  }
+
+  .subtitle {
+    margin-top: 3 * $grid-unit;
+  }
+
+  .bottom {
+    margin-top: auto;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: 1440px - $sidebar-width;
+  background-color: palette(base, 800);
+  overflow: auto;
+}
+
+.children {
+  flex-grow: 1;
+  overflow: auto;
+}

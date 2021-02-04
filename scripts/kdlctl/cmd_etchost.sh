@@ -21,8 +21,7 @@ show_etchost_help() {
 
 update_etc_hosts() {
   MINIKUBE_IP=$(minikube ip -p "$MINIKUBE_PROFILE")
-  echo "$MINIKUBE_IP api.kdl.local
-$MINIKUBE_IP app.kdl.local
+  echo "$MINIKUBE_IP app.kdl.local
 " > /tmp/kdl.hostctl
 
   SUDO=''
@@ -43,7 +42,6 @@ show_etc_hosts() {
   echo
   echo_info "👇 Add the following lines to your /etc/hosts"
   echo
-  echo "$MINIKUBE_IP api.kdl.local"
   echo "$MINIKUBE_IP app.kdl.local"
   echo
 }

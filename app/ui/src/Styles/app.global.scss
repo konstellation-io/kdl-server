@@ -1,0 +1,12 @@
+@import '~kwc/styles/app.global.scss';
+
+h3 {
+  @include font-small;
+  color: font-color(lowlight);
+
+  margin-top: 2 * $grid-unit;
+}
+
+#chartjs-tooltip {
+  z-index: 3;
+}

@@ -1,0 +1,43 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  .repoContainer {
+    background-color: palette(base, 800);
+    width: 27 * $grid-unit;
+    padding: 4.5 * $grid-unit;
+    border: 1px solid transparent;
+    transition: border ease 0.4s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+
+    .title {
+      @include font-body;
+      color: font-color(light);
+      margin-top: 6 * $grid-unit;
+      margin-bottom: 0;
+    }
+
+    .subtitle {
+      @include font-small;
+      color: font-color(regular);
+      margin-top: $grid-unit;
+    }
+    &.selected {
+      border: 1px solid palette(highlight);
+    }
+    &:nth-child(2) {
+      margin-left: $grid-unit * 2;
+    }
+  }
+  .selectedLabel {
+    @include font-small;
+    color: font-color(highlight);
+    width: 200px;
+  }
+}

@@ -1,0 +1,21 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.STARTED,
+.SIGNED_IN {
+  color: palette(success);
+}
+
+.STOPPED {
+  color: palette(feedback);
+}
+
+.ARCHIVED {
+  color: palette(base, 300);
+}
+
+.SIGNED_OUT {
+  background-color: palette(lowlight);
+}

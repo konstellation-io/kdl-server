@@ -1,0 +1,9 @@
+@import 'Styles/variables';
+
+.container {
+  width: 5 * $grid-unit;
+
+  &:hover {
+    background-color: transparent;
+  }
+}

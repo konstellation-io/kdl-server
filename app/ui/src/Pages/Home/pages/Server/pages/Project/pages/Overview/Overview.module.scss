@@ -1,0 +1,11 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  padding: 5 * $grid-unit 6.5 * $grid-unit;
+
+  h1 {
+    text-align: left;
+  }
+}

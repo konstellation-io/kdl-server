@@ -1,0 +1,89 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2 * $grid-unit 0 3.5 * $grid-unit 0;
+
+  .accessLevel {
+    @include font-caption;
+    color: font-color(regular);
+
+    margin-top: 3 * $grid-unit;
+  }
+  .email {
+    @include font-title;
+    color: font-color(light);
+
+    margin: 0;
+  }
+  .added {
+    @include font-caption;
+    color: font-color(light);
+    text-transform: uppercase;
+
+    display: flex;
+    align-items: center;
+
+    .addedValue {
+      margin-left: $grid-unit;
+    }
+  }
+}
+
+.form {
+  flex-grow: 1;
+  background-color: palette(base, 800);
+  padding: 4 * $grid-unit 3 * $grid-unit;
+
+  .lastActivityTitle {
+    @include font-caption;
+    color: font-color(regular);
+
+    margin: 0;
+  }
+  .lastActivity {
+    @include font-small;
+    color: font-color(light);
+
+    display: flex;
+    align-items: center;
+
+    .lastActivityValue {
+      margin-left: $grid-unit;
+    }
+  }
+  .formAccessLevel {
+    margin-top: 2 * $grid-unit;
+  }
+  .removeButtonContainer {
+    width: 29 * $grid-unit;
+    margin-top: 2 * $grid-unit;
+
+    .removeButton {
+      color: palette(error);
+    }
+  }
+}
+
+.actions > div {
+  background-color: palette(base, 800);
+  padding: 0;
+  justify-content: flex-start;
+}

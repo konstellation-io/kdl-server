@@ -3,7 +3,7 @@ name: Pre Release
 on:
   workflow_run:
     workflows:
-      - "KDL Server admin-api Tests"
+      - "KDL Server app-api Tests"
     branches: [main]
     types: 
       - completed

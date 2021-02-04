@@ -1,0 +1,47 @@
+@import 'Styles/variables';
+@import 'Styles/colors';
+@import 'Styles/mixins';
+
+.container {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  background-color: palette(base, 900);
+
+  .wrapper {
+    background-color: palette(base, 800);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 8.5 * $grid-unit 22 * $grid-unit 0 22 * $grid-unit;
+    width: 79 * $grid-unit;
+    height: 100%;
+
+    .subtitle {
+      @include font-small;
+      color: font-color(lowlight);
+      margin-top: 1.75 * $grid-unit;
+    }
+
+    .infoMessage {
+      @include font-small;
+      color: font-color(lowlight);
+      text-align: left;
+      margin-top: 2 $grid-unit;
+    }
+
+    .buttonsContainer {
+      display: flex;
+      margin-top: 3.75 * $grid-unit;
+      width: 100%;
+      & a:last-child .button {
+        margin-left: 2 * $grid-unit;
+      }
+      .button {
+        color: font-color(light);
+        background-color: palette(lowlight, 800);
+      }
+    }
+  }
+}

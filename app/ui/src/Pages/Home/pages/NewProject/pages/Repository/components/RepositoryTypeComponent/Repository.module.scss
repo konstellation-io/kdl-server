@@ -1,0 +1,131 @@
+@import 'Styles/colors';
+@import 'Styles/mixins';
+@import 'Styles/variables';
+
+@function get-square-center($square-size, $inner-square-size) {
+  @return (4 * $square-size - $inner-square-size) / 6;
+}
+
+$side-s1: 18.6%;
+$side-s2: 65.5%;
+$side-s3: 79%;
+$side-s4: 94%;
+
+.square {
+  position: relative;
+
+  user-select: none;
+  transform: rotateZ(45deg);
+
+  transition: transform ease 0.3s;
+
+  &.out {
+    .s1 {
+      top: -20%;
+      left: 50%;
+    }
+  }
+
+  div {
+    @include center;
+    pointer-events: none;
+  }
+
+  .s1 {
+    width: $side-s1;
+    height: $side-s1;
+  }
+  .s2 {
+    width: $side-s2;
+    height: $side-s2;
+  }
+  .s3 {
+    width: $side-s3;
+    height: $side-s3;
+  }
+  .s4 {
+    width: $side-s4;
+    height: $side-s4;
+  }
+
+  .s3,
+  .s4 {
+    transition: width ease 0.3s, height ease 0.3s, box-shadow ease 0.3s;
+  }
+
+  .s1 {
+    background-color: palette(base, 900);
+    border: solid 1px palette(highlight, 700);
+    box-shadow: 0 0 5px palette(highlight, 800);
+
+    transition: width ease 0.3s, height ease 0.3s, box-shadow ease 0.3s,
+      transform ease 0.5s, top ease 0.5s, left ease 0.5s,
+      background-color ease 0.3s;
+  }
+
+  .s2 {
+    background-color: palette(base);
+    box-shadow: inset 0 0 6px palette(base, 900);
+
+    transition: width ease 0.3s, height ease 0.3s, box-shadow ease 0.3s,
+      background-color ease 0.3s;
+  }
+  .s3 {
+    border: solid 1px palette(highlight, 600);
+    box-shadow: 0 0 6px palette(highlight, 700),
+      inset 0 0 20px palette(feedback, 900);
+  }
+  .s4 {
+    border: solid 1px palette(highlight, 800);
+    box-shadow: 0 0 10px palette(highlight, 900);
+  }
+}
+
+.hoverContainer {
+  pointer-events: all;
+}
+
+.square.notAnimate {
+  pointer-events: none;
+}
+
+.square:hover,
+.hoverContainer:hover {
+  .square {
+    transform: scale(1.1) rotateZ(45deg);
+
+    &.out {
+      transform: scale(1.1) rotateZ(45deg);
+
+      .s1 {
+        top: -35%;
+        transform: rotateZ(-4500deg);
+      }
+    }
+  }
+
+  .s4 {
+    width: $side-s4 * 1.1;
+    height: $side-s4 * 1.1;
+  }
+
+  .s3 {
+    width: $side-s3 * 1.05;
+    height: $side-s3 * 1.05;
+  }
+
+  .s2 {
+    width: $side-s2 * 0.98;
+    height: $side-s2 * 0.98;
+  }
+
+  .s1 {
+    background-color: palette(highlight);
+    transform: rotateZ(-4500deg);
+  }
+
+  .s1 {
+    top: calc(50% - #{$side-s1 / 2});
+    left: calc(50% - #{$side-s1 / 2});
+  }
+}

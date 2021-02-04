@@ -96,6 +96,7 @@ deploy_helm_chart() {
     --wait \
     --install "${RELEASE_NAME}" \
     --namespace "${NAMESPACE}" \
+    --set domain=$DOMAIN \
     --set science-toolkit.domain=$DOMAIN \
     --set science-toolkit.tls.enabled=$ENABLE_TLS \
     --set science-toolkit.minio.securityContext.runAsUser=0 \

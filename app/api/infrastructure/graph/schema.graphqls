@@ -1,0 +1,208 @@
+type Query {
+  me: User!
+  projects: [Project!]!
+  project(id: ID!): Project!
+  users: [User!]!
+  sshKey: SSHKey!
+  qualityProjectDesc(description: String!): QualityProjectDesc!
+  knowledgeGraph(description: String!): KnowledgeGraph!
+}
+
+type Mutation {
+  addUser(input: AddUserInput!): User!
+  removeUsers(input: RemoveUsersInput!): [User!]!
+  updateAccessLevel(input: UpdateAccessLevelInput!): [User!]!
+  regenerateSSHKey: SSHKey!
+  createProject(input: CreateProjectInput!): Project!
+  updateProject(input: UpdateProjectInput!): Project!
+  addMembers(input: AddMembersInput!): [Member!]!
+  removeMember(input: RemoveMemberInput!): Member!
+  updateMember(input: UpdateMemberInput!): Member!
+  addApiToken(input: ApiTokenInput): ApiToken
+  removeApiToken(input: RemoveApiTokenInput): ApiToken!
+  setStarredKGItem(input: SetBoolFieldInput!): KnowledgeGraphItem!
+  setDiscardedKGItem(input: SetBoolFieldInput!): KnowledgeGraphItem!
+  setActiveProjectTools(input: SetBoolFieldInput!): Project!
+}
+
+type QualityProjectDesc {
+  quality: Float
+}
+
+type KnowledgeGraph {
+  items: [KnowledgeGraphItem!]!
+}
+
+type KnowledgeGraphItem {
+  id: ID!
+  category: KnowledgeGraphItemCat!
+  title: String!
+  abstract: String!
+  authors: [String!]!
+  score: Float!
+  date: String!
+  url: String!
+
+  isStarred: Boolean!
+  isDiscarded: Boolean!
+
+  # optional fields
+  externalId: ID # for example: arxivId
+  framework: String
+}
+
+type SSHKey {
+  public: String!
+  private: String!
+  creationDate: String!
+  lastActivity: String
+}
+
+type User {
+  id: ID!
+  email: String!
+  creationDate: String!
+  accessLevel: AccessLevel!
+  lastActivity: String
+  apiTokens: [ApiToken!]!
+}
+
+type ApiToken {
+  id: ID!
+  name: String!
+  creationDate: String!
+  lastUsedDate: String!
+  token: String!
+}
+
+type Member {
+  id: ID!
+  email: String!
+  accessLevel: AccessLevel!
+  addedDate: String!
+  lastActivity: String
+}
+
+type Tool {
+  id: ID!
+  toolName: ToolName!
+  url: String!
+}
+
+enum ToolName {
+  GITEA,
+  MINIO,
+  JUPYTER,
+  VSCODE,
+  DRONE,
+  MLFLOW,
+}
+
+enum AccessLevel {
+  VIEWER
+  MANAGER
+  ADMIN
+}
+
+input ApiTokenInput {
+  userId: ID!
+  name: String
+}
+
+input UpdateProjectInput {
+  id: ID!
+  name: String
+  repository: UpdateProjectRepositoryInput
+}
+
+input AddMembersInput {
+  projectId: ID!
+  memberIds: [ID!]!
+}
+
+input RemoveMemberInput {
+  projectId: ID!
+  memberId: ID!
+}
+
+input RemoveApiTokenInput {
+  apiTokenId: ID!
+}
+
+input UpdateMemberInput {
+  projectId: ID!
+  memberId: ID!
+  accessLevel: AccessLevel!
+}
+
+input UpdateProjectRepositoryInput {
+  url: String!
+}
+
+input RemoveUsersInput {
+  userIds: [ID!]!
+}
+
+input AddUserInput {
+  email: String!
+  accessLevel: AccessLevel!
+}
+
+input UpdateAccessLevelInput {
+  userIds: [ID!]!
+  accessLevel: AccessLevel!
+}
+
+input CreateProjectInput {
+  name: String!
+  description: String!
+  repository: RepositoryInput!
+}
+
+input SetBoolFieldInput {
+  id: ID!
+  value: Boolean!
+}
+
+type Project {
+  id: ID!
+  name: String!
+  description: String!
+  favorite: Boolean!
+  repository: Repository
+  state: ProjectState!
+  creationDate: String!
+  lastActivationDate: String!
+  error: String
+  members: [Member!]!
+  tools: [Tool!]!
+  areToolsActive: Boolean
+}
+
+input RepositoryInput {
+  type: RepositoryType!
+  url: String!
+}
+
+type Repository {
+  id: ID!
+  type: RepositoryType!
+  url: String!
+  connected: Boolean!
+}
+
+enum RepositoryType {
+  INTERNAL
+  EXTERNAL
+}
+
+enum ProjectState {
+  STARTED
+  STOPPED
+  ARCHIVED
+}
+
+enum KnowledgeGraphItemCat {
+  Paper
+  Code
+}

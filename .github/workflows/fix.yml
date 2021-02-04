@@ -3,7 +3,7 @@ name: Fix
 on:
   workflow_run:
     workflows:
-      - "KDL Server admin-api Testss"
+      - "KDL Server app-api Tests"
     branches: ["release-*"]
     types: 
       - completed

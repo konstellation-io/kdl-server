@@ -1,0 +1,51 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 2 * $grid-unit;
+  margin-right: $grid-unit;
+  cursor: pointer;
+
+  transition: background-color ease 0.3s;
+
+  &:hover {
+    background-color: palette(base, 400);
+  }
+
+  .crumbContainer {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+
+    .crumbText {
+      @include font-body;
+      color: font-color(light);
+      margin-left: $grid-unit;
+    }
+    .crumbBar {
+      margin-left: 2 * $grid-unit;
+    }
+  }
+  .content {
+    position: absolute;
+    top: 5 * $grid-unit;
+    left: 0;
+    z-index: 3;
+    background-color: palette(base);
+    cursor: initial;
+    min-width: 100%;
+  }
+  .rightIcon {
+    margin-left: 2 * $grid-unit;
+    transition: transform ease 0.3s;
+    &.opened {
+      transform: scaleY(-1);
+    }
+  }
+}

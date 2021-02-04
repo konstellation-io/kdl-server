@@ -1,0 +1,366 @@
+@import 'Styles/colors';
+@import 'Styles/mixins';
+@import 'Styles/variables';
+@import 'Styles/borders';
+@import 'Styles/shadows';
+
+$label-height: 3 * $grid-unit;
+$shape-height: 20 * $grid-unit;
+
+$min-shape-width: 50 * $grid-unit;
+$max-shape-width: 100 * $grid-unit;
+$shape-width: 40vw;
+
+$band-height: 5 * $grid-unit;
+$big-square-base: 10 * $grid-unit;
+$small-square-base: 30px;
+
+.container {
+  position: relative;
+  margin: 0 0 2 * $grid-unit 5 * $grid-unit;
+  flex-shrink: 0;
+  pointer-events: none;
+
+  &.archived {
+    .name,
+    .description {
+      color: font-color(regular);
+    }
+
+    .favorite,
+    .warning {
+      display: none;
+    }
+  }
+
+  &:hover {
+    .bg {
+      box-shadow: inset 0 0 0 3px transparent,
+        0 2px 3 * $grid-unit 0 palette(highlight, 900);
+      background-color: palette(highlight, 900);
+      border-color: palette(highlight);
+    }
+    .content * {
+      color: palette(highlight);
+    }
+  }
+}
+
+.sup,
+.inf {
+  position: relative;
+  height: $shape-height / 2;
+  width: $shape-width;
+  min-width: $min-shape-width;
+  max-width: $max-shape-width;
+}
+
+.bg {
+  background-color: palette(base, 400);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 4px palette(base);
+  border: solid 1px palette(base, 800);
+  pointer-events: all;
+  cursor: pointer;
+
+  transition: background-color ease 0.4s, box-shadow ease 0.4s,
+    border-color ease 0.4s;
+}
+.bgBand {
+  position: absolute;
+  left: 0;
+  background-color: palette(base);
+  height: $band-height / 2;
+  width: 100%;
+}
+.content {
+  position: absolute;
+  top: 0;
+  left: 8 * $grid-unit;
+  display: flex;
+  align-items: center;
+  height: calc(100% - #{$band-height / 2});
+  width: calc(100% - #{12 * $grid-unit});
+}
+
+.sup {
+  .bg {
+    transform: skew(-45deg);
+  }
+  .bgBand {
+    bottom: 0;
+  }
+  .content {
+    left: 5 * $grid-unit;
+  }
+}
+
+.inf {
+  .bg {
+    transform: skew(45deg);
+  }
+  .bgBand {
+    top: 0;
+  }
+  .content {
+    top: $band-height / 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+.name {
+  @include font-subheader;
+  color: font-color(light);
+
+  margin: 0 2 * $grid-unit 0 0;
+
+  transition: color ease 0.4s;
+}
+
+.description {
+  @include font-small;
+  color: font-color(regular);
+
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+  pointer-events: all;
+  cursor: pointer;
+
+  margin: 0;
+  transition: color ease 0.4s;
+}
+
+.favorite {
+  position: relative;
+  width: 5 * $grid-unit;
+  height: 5 * $grid-unit;
+  text-align: center;
+  line-height: 5.5 * $grid-unit;
+  color: font-color(lowlight);
+  pointer-events: all;
+  cursor: pointer;
+
+  transition: color ease 0.4s;
+
+  .fav {
+    @include center;
+
+    opacity: 1;
+    transition: opacity ease 0.4s;
+
+    &.isFav {
+      color: palette(highlight);
+    }
+  }
+  .favBg {
+    @include center;
+
+    opacity: 0;
+    transition: opacity ease 0.2s;
+  }
+
+  &:hover {
+    .fav {
+      opacity: 0;
+      display: none;
+    }
+    .favBg {
+      opacity: 1;
+      path {
+        color: font-color(light) !important;
+      }
+    }
+  }
+}
+
+.band {
+  $side: $band-height / 2;
+
+  position: absolute;
+  top: ($shape-height - $band-height) / 2;
+  left: ($big-square-base + $grid-unit) / 2 - 1px;
+  display: flex;
+  align-items: center;
+  height: $band-height;
+  width: calc(#{$shape-width} - #{8 * $grid-unit});
+  min-width: $min-shape-width - 8 * $grid-unit;
+  max-width: $max-shape-width - 8 * $grid-unit;
+  padding-right: 3 * $grid-unit;
+
+  background-color: palette(base);
+
+  clip-path: polygon(0 100%, 0 0, 100% 0, calc(100% - #{$side}) 50%, 100% 100%);
+}
+
+.internalTag {
+  @include font-small;
+  color: font-color(lowlight) !important;
+  line-height: 3 * $grid-unit;
+
+  background-color: palette(base);
+  height: 3 * $grid-unit;
+  border-radius: $grid-unit / 2;
+  padding: 0 $grid-unit;
+  margin-left: 2 * $grid-unit;
+}
+
+.warning {
+  @include font-button;
+  color: palette(alert);
+  margin-right: 2 * $grid-unit;
+}
+
+.label {
+  @include font-button;
+  color: font-color(dark);
+  text-align: center;
+  line-height: $label-height;
+
+  height: $label-height;
+  min-width: 150px;
+  padding: 0 5 * $grid-unit;
+  margin-right: auto;
+
+  border-bottom-right-radius: 3 * $grid-unit;
+  border-top-right-radius: 3 * $grid-unit;
+
+  transition: background-color ease 0.4s;
+  z-index: 1;
+
+  &.STARTED {
+    background-color: palette(success);
+  }
+
+  &.STOPPED {
+    background-color: palette(feedback);
+  }
+
+  &.ARCHIVED {
+    background-color: palette(base, 300);
+  }
+}
+
+.square {
+  position: absolute;
+  top: $big-square-base / 2;
+  left: -3 * $grid-unit + 2px;
+  width: $big-square-base;
+  height: $big-square-base;
+  z-index: 1;
+
+  background-color: palette(base);
+  transform: rotate(45deg);
+
+  .state {
+    @include center;
+
+    width: $small-square-base;
+    height: $small-square-base;
+
+    transition: border ease 0.4s, background-color ease 0.4s;
+
+    &.STARTED {
+      background-color: palette(success);
+    }
+
+    &.STOPPED {
+      background-color: transparent;
+      border: solid 1px palette(feedback);
+    }
+
+    &.ARCHIVED {
+      background-color: transparent;
+      border: solid 1px palette(base, 300);
+    }
+  }
+}
+
+.addProjectContainer {
+  position: relative;
+  margin: 0 0 2 * $grid-unit 5 * $grid-unit;
+  flex-shrink: 0;
+
+  &:hover {
+    .addProjectBg > div {
+      border: 1px solid palette(highlight);
+    }
+    .addProjectLabel {
+      color: font-color(highlight);
+    }
+  }
+
+  .addProjectBg {
+    cursor: pointer;
+
+    .addProjectBgUpper,
+    .addProjectBgLower {
+      height: $shape-height / 2;
+      width: $shape-width;
+      min-width: $min-shape-width;
+      max-width: $max-shape-width;
+
+      transition: border ease 0.4s, background-color ease 0.4s;
+      border: 1px dashed font-color(regular);
+    }
+
+    .addProjectBgUpper {
+      transform: skew(-45deg);
+      border-bottom-width: 0 !important;
+      border-top-color: palette(base, 400);
+    }
+    .addProjectBgLower {
+      transform: skew(45deg);
+      border-bottom-color: palette(base, 400);
+      border-top-width: 0 !important;
+    }
+  }
+
+  .addProjectLabel {
+    @include center;
+
+    @include font-button;
+    color: font-color(regular);
+
+    position: absolute;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+
+    transition: color ease 0.4s;
+
+    p {
+      margin-left: 2 * $grid-unit;
+    }
+  }
+}
+
+.creationDate {
+  @include font-caption;
+  color: font-color(lowlight);
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin-top: 0.5 * $grid-unit;
+
+  p {
+    margin: 0;
+    padding: 0;
+  }
+
+  .creationDateLabel {
+    color: font-color(regular);
+    margin-right: $grid-unit;
+
+    transition: color ease 0.2s;
+  }
+  .date {
+    transition: color ease 0.2s;
+  }
+}

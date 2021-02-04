@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ActionsBar component Component match snapshot 1`] = `
+<div
+  className="container some-class"
+>
+  <ft
+    className="actions"
+  >
+    <div
+      id="child-1"
+    >
+      Child 1
+    </div>
+    <div
+      id="child-2"
+    >
+      Child 2
+    </div>
+  </ft>
+</div>
+`;

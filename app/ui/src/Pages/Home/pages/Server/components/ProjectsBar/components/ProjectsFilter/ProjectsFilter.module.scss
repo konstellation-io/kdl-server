@@ -1,0 +1,22 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  @include font-caption;
+  color: font-color(lowlight);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  border-right: solid 1px palette(base, 400);
+}
+
+.formSelect {
+  width: 17 * $grid-unit;
+  & > div > div {
+    background-color: transparent !important;
+  }
+}

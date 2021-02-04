@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DefaultPage component Component match snapshot 1`] = `
+<div
+  className="container"
+>
+  <Sidebar
+    subtitle="Some subtitle"
+    title="Some title"
+  />
+  <div
+    className="content"
+  >
+    <div
+      className="children"
+    >
+      <div
+        id="children"
+      >
+        Children
+      </div>
+    </div>
+    <ActionsBar
+      className="actions"
+    >
+      <div
+        key="k1"
+      >
+        Action 1
+      </div>
+      <div
+        key="k2"
+      />
+    </ActionsBar>
+  </div>
+</div>
+`;

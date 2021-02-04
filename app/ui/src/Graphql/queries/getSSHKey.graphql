@@ -1,0 +1,8 @@
+query GetSSHKey {
+  sshKey {
+    public
+    private
+    creationDate
+    lastActivity
+  }
+}

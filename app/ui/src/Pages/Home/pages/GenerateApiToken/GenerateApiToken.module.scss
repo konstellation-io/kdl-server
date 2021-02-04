@@ -1,0 +1,95 @@
+@import 'Styles/variables';
+@import 'Styles/colors';
+@import 'Styles/mixins';
+@import 'Styles/animations';
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .tokenGenerationContainer {
+    height: 20%;
+    max-height: 22 * $grid-unit;
+    padding: 7 * $grid-unit 0 4 * $grid-unit 8 * $grid-unit;
+    display: flex;
+    align-items: center;
+    .generateButton {
+      margin-left: 4 * $grid-unit;
+      width: 19 * $grid-unit;
+    }
+    div:first-child {
+      width: 40%;
+    }
+  }
+
+  .enter {
+    animation: slideInTop 0.4s forwards;
+  }
+
+  .resultContainer {
+    padding: 4 * $grid-unit 0 0 8 * $grid-unit;
+    background-color: palette(base, 600);
+    flex-grow: 1;
+    overflow: hidden;
+
+    .resultWrapper {
+      width: 70%;
+      display: flex;
+      flex-direction: column;
+      .infoMessage {
+        @include font-body;
+        color: font-color(light);
+        margin-top: 0;
+      }
+      .token {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        margin-top: 3 * $grid-unit;
+
+        .tokenCopied {
+          @include font-small;
+
+          position: absolute;
+          top: 0;
+          margin-bottom: $grid-unit;
+
+          transition: top ease 0.4s, color ease 0.4s;
+
+          &.copied {
+            color: palette(success);
+            top: -4 * $grid-unit;
+          }
+          &.notCopied {
+            color: palette(error);
+            top: -4 * $grid-unit;
+          }
+        }
+        .label {
+          @include font-caption;
+          color: font-color(regular);
+          background-color: palette(base, 600);
+          padding-bottom: $grid-unit;
+          z-index: 1;
+        }
+        .tokenValue {
+          @include font-body;
+          color: font-color(light);
+          text-align: left;
+          border: 1px solid palette(lowlight);
+          padding: 2.5 * $grid-unit 3 * $grid-unit;
+          word-break: break-word;
+          background-color: palette(base, 600);
+          z-index: 1;
+        }
+        .copyButton {
+          width: fit-content;
+          align-self: flex-end;
+          color: font-color(light);
+          background-color: palette(lowlight);
+        }
+      }
+    }
+  }
+}

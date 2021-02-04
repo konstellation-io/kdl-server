@@ -1,0 +1,104 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.container {
+  padding: 2 * $grid-unit 3.5 * $grid-unit;
+}
+
+.title {
+  @include font-title;
+  color: font-color(light);
+  text-align: left;
+
+  width: 110 * $grid-unit;
+}
+
+.subtitle {
+  @include font-body;
+  color: font-color(lowlight);
+
+  display: flex;
+  align-items: center;
+  margin-top: 0.5 * $grid-unit;
+
+  .subtitleText {
+    margin-right: $grid-unit;
+  }
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  margin: 3 * $grid-unit 0;
+
+  .formUrl {
+    flex-grow: 1;
+  }
+
+  .testButton {
+    flex-shrink: 0;
+    margin-left: 2 * $grid-unit;
+    width: 12 * $grid-unit;
+  }
+}
+
+.actions > div {
+  background-color: palette(base, 800);
+  padding: 0;
+  justify-content: flex-start;
+}
+
+.connectionOk {
+  @include circle-before(palette(success));
+
+  color: palette(success);
+  padding: 3px 0 0 2 * $grid-unit;
+}
+
+.arrow {
+  @include l-shape-arrow(
+    6.5 * $grid-unit,
+    2 * $grid-unit,
+    2 * $grid-unit,
+    0.5 * $grid-unit,
+    palette(alert)
+  );
+}
+.warningBox {
+  @include border-box(palette(alert, 900));
+  max-width: 345px;
+  max-height: 226px;
+  position: absolute;
+  top: 35px;
+  left: 46px;
+
+  .title {
+    @include font-small;
+    color: palette(white);
+    margin: 0;
+  }
+  .message {
+    @include font-small;
+    color: font-color(regular);
+    margin-top: 2 * $grid-unit;
+  }
+  .checkContainer {
+    display: flex;
+    align-items: center;
+    margin-top: 3 * $grid-unit;
+
+    .checkLabel {
+      @include font-small;
+      color: font-color(lowlight);
+      margin-left: 2 * $grid-unit;
+    }
+  }
+}

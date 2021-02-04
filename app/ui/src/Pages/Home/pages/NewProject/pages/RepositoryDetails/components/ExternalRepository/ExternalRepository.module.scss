@@ -1,0 +1,70 @@
+@import 'Styles/colors';
+@import 'Styles/variables';
+@import 'Styles/mixins';
+
+.container {
+  height: 100%;
+
+  .title {
+    @include font-title;
+    color: font-color(light);
+    margin-top: 0;
+  }
+
+  .subtitle {
+    @include font-body;
+    color: font-color(lowlight);
+  }
+
+  .formUrlRow {
+    margin-top: 3.75 * $grid-unit;
+    display: flex;
+    align-items: center;
+    .formUrl {
+      width: 60%;
+    }
+    .testButton {
+      width: 10 * $grid-unit;
+      margin-left: 2.5 * $grid-unit;
+    }
+  }
+  .arrow {
+    @include l-shape-arrow(
+      6.5 * $grid-unit,
+      2 * $grid-unit,
+      2 * $grid-unit,
+      0.5 * $grid-unit,
+      palette(alert)
+    );
+  }
+  .warningBox {
+    @include border-box(palette(alert, 900));
+    max-width: 345px;
+    max-height: 226px;
+    position: absolute;
+    top: 35px;
+    left: 46px;
+
+    .title {
+      @include font-small;
+      color: palette(white);
+      margin: 0;
+    }
+    .message {
+      @include font-small;
+      color: font-color(regular);
+      margin-top: 2 * $grid-unit;
+    }
+    .checkContainer {
+      display: flex;
+      align-items: center;
+      margin-top: 3 * $grid-unit;
+
+      .checkLabel {
+        @include font-small;
+        color: font-color(lowlight);
+        margin-left: 2 * $grid-unit;
+      }
+    }
+  }
+}

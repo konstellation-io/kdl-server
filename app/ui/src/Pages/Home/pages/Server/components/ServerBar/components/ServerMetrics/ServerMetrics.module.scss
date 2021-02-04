@@ -1,0 +1,36 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  z-index: 3;
+  background-color: palette(base, 900);
+  .charts {
+    display: flex;
+    overflow: hidden;
+  }
+  .serverUrl {
+    height: 5 * $grid-unit;
+    padding: 0 2 * $grid-unit;
+    display: flex;
+    align-items: center;
+    .label {
+      @include font-caption;
+      color: font-color(regular);
+    }
+    .url {
+      @include font-body;
+      color: font-color(lowlight);
+      margin-left: $grid-unit;
+    }
+  }
+  .buttons {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+}

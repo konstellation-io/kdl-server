@@ -1,0 +1,47 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  display: flex;
+  align-items: center;
+
+  &.connected .icon {
+    color: palette(success);
+  }
+
+  .icon {
+    color: palette(alert);
+    margin-right: 3 * $grid-unit;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.time {
+  @include font-caption;
+  color: font-color(regular);
+
+  display: flex;
+  align-items: center;
+
+  p {
+    margin-left: 1.5 * $grid-unit;
+  }
+}
+
+.connection {
+  @include font-body;
+  color: font-color(light);
+
+  @include circle-before(palette(alert));
+
+  padding-left: 3 * $grid-unit - 2px;
+  margin: $grid-unit 0 0 3px;
+
+  &.connected:before {
+    background-color: palette(success);
+  }
+}

@@ -2,7 +2,6 @@ package mongodb
 
 import (
 	"context"
-	"os"
 	"time"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/logging"
@@ -26,13 +25,12 @@ func NewMongoDB(logger logging.Logger) *MongoDB {
 	}
 }
 
-func (m *MongoDB) Connect(address string) (*mongo.Client, error) {
+func (m *MongoDB) Connect(uri string) (*mongo.Client, error) {
 	m.logger.Info("MongoDB connecting...")
 
-	client, err := mongo.NewClient(options.Client().ApplyURI(address))
+	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 	if err != nil {
-		m.logger.Error(err.Error())
-		os.Exit(1)
+		return nil, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)

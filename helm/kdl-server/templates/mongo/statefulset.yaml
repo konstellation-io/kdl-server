@@ -26,8 +26,6 @@ spec:
         - name: kdl-mongo
           image: mongo:4.2.8
           imagePullPolicy: IfNotPresent
-          args:
-            - "--replSet=rs0"
           envFrom:
             - secretRef:
                 name: kdl-mongo-secret

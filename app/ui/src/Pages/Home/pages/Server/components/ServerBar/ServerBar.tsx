@@ -20,6 +20,7 @@ function ServerBar() {
   const { goBack, goForward } = useHistory();
   const isHome = useRouteMatch({
     path: ROUTE.HOME,
+    exact: true,
     strict: true,
   });
   const { updateFilters } = useProjectFilters();

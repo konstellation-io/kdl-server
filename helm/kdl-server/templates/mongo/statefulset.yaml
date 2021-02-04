@@ -1,0 +1,55 @@
+{{ if .Capabilities.APIVersions.Has "apps/v1" }}
+apiVersion: apps/v1
+  {{ else if .Capabilities.APIVersions.Has "apps/v1beta1" }}
+apiVersion: apps/v1beta1
+  {{ end }}
+kind: StatefulSet
+metadata:
+  name: kdl-mongo
+  labels:
+    app: kdl-mongo
+    kdl-app: kdl-mongo
+spec:
+  replicas: 1
+  serviceName: kdl-mongo
+  selector:
+    matchLabels:
+      app: kdl-mongo
+      kdl-app: kdl-mongo
+  template:
+    metadata:
+      labels:
+        app: kdl-mongo
+        kdl-app: kdl-mongo
+    spec:
+      containers:
+        - name: kdl-mongo
+          image: mongo:4.2.8
+          imagePullPolicy: IfNotPresent
+          args:
+            - "--replSet=rs0"
+          envFrom:
+            - secretRef:
+                name: kdl-mongo-secret
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: {{ .Release.Name }}-mongo-pvc
+              mountPath: "/data/db"
+            - name: init-scripts
+              mountPath: /docker-entrypoint-initdb.d/
+      volumes:
+        - name: init-scripts
+          configMap:
+            name: kdl-mongo-init-script
+            defaultMode: 0777
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ .Release.Name }}-mongo-pvc
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: {{ .Values.mongodb.persistentVolume.storageClass }}
+        resources:
+          requests:
+            storage:  {{ .Values.mongodb.persistentVolume.size }}

@@ -1,6 +1,6 @@
 {
   "name": "konstellation-dev-lab",
-  "version": "0.1.0",
+  "version": "v1.22.5",
   "private": true,
   "dependencies": {
     "@apollo/client": "3.3.7",

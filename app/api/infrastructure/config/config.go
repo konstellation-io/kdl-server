@@ -1,13 +1,15 @@
 package config
 
 import (
-	"github.com/kelseyhightower/envconfig"
-	"gopkg.in/yaml.v3"
 	"log"
 	"os"
+
+	"github.com/kelseyhightower/envconfig"
+	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
+	LogLevel        string `yaml:"logLevel" envconfig:"KDL_SERVER_LOG_LEVEL"`
 	Port            string `yaml:"port" envconfig:"KDL_SERVER_PORT"`
 	StaticFilesPath string `yaml:"staticFilesPath" envconfig:"KDL_SERVER_STATIC_FILES_PATH"`
 	MongoDB         struct {
@@ -25,6 +27,7 @@ func NewConfig() *Config {
 
 	cfg := &Config{}
 	decoder := yaml.NewDecoder(f)
+
 	err = decoder.Decode(cfg)
 	if err != nil {
 		log.Fatalf("Error loading config.yml: %s", err)

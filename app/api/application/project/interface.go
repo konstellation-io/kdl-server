@@ -1,9 +1,10 @@
 package project
 
-//go:generate mockgen -source=${GOFILE} -destination=mocks_${GOFILE} -package=project
+//go:generate mockgen -source=${GOFILE} -destination=mocks_${GOFILE} -package=${GOPACKAGE}
 
 import (
 	"context"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 )
 
@@ -13,5 +14,5 @@ type Repository interface {
 }
 
 type UseCase interface {
-	Create(ctx context.Context, project entity.Project) (entity.Project, error)
+	Create(ctx context.Context, name, description string) (entity.Project, error)
 }

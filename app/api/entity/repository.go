@@ -12,6 +12,7 @@ func (e RepositoryType) IsValid() bool {
 	case RepositoryTypeInternal, RepositoryTypeExternal:
 		return true
 	}
+
 	return false
 }
 

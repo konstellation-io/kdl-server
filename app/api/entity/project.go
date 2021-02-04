@@ -13,6 +13,7 @@ func (e ProjectState) IsValid() bool {
 	case ProjectStateStarted, ProjectStateStopped, ProjectStateArchived:
 		return true
 	}
+
 	return false
 }
 
@@ -24,17 +25,17 @@ type Project struct {
 	ID                 string
 	Name               string
 	Description        string
-	Favorite           bool
-	Repository         *Repository
-	State              ProjectState
 	CreationDate       string
 	LastActivationDate string
+	Favorite           bool
+	AreToolsActive     bool
 	Error              *string
+	Repository         *Repository
 	Members            []Member
 	Tools              []Tool
-	AreToolsActive     bool
+	State              ProjectState
 }
 
-func NewProject(name string, description string) Project {
+func NewProject(name, description string) Project {
 	return Project{Name: name, Description: description}
 }

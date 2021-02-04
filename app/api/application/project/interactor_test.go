@@ -2,25 +2,14 @@ package project_test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/golang/mock/gomock"
 	"github.com/konstellation-io/kdl-server/app/api/application/project"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/logging"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
-
-// TODO move to a helper package
-func AddLoggerExpects(logger *logging.MockLogger) {
-	logger.EXPECT().Debug(gomock.Any()).Return().AnyTimes()
-	logger.EXPECT().Info(gomock.Any()).Return().AnyTimes()
-	logger.EXPECT().Warn(gomock.Any()).Return().AnyTimes()
-	logger.EXPECT().Error(gomock.Any()).Return().AnyTimes()
-	logger.EXPECT().Debugf(gomock.Any(), gomock.Any()).Return().AnyTimes()
-	logger.EXPECT().Infof(gomock.Any(), gomock.Any()).Return().AnyTimes()
-	logger.EXPECT().Warnf(gomock.Any(), gomock.Any()).Return().AnyTimes()
-	logger.EXPECT().Errorf(gomock.Any(), gomock.Any()).Return().AnyTimes()
-}
 
 type projectSuite struct {
 	ctrl       *gomock.Controller
@@ -37,7 +26,7 @@ func newProjectSuite(t *testing.T) *projectSuite {
 	ctrl := gomock.NewController(t)
 
 	logger := logging.NewMockLogger(ctrl)
-	AddLoggerExpects(logger)
+	logging.AddLoggerExpects(logger)
 
 	repo := project.NewMockRepository(ctrl)
 
@@ -57,19 +46,24 @@ func TestInteractor_Create(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
-	const projectID = "project.1234"
+	const (
+		projectID   = "project.1234"
+		projectName = "project-x"
+		projectDesc = "description"
+	)
+
 	ctx := context.Background()
-	p := entity.NewProject("project-x", "description")
+	p := entity.NewProject(projectName, projectDesc)
 	expectedProject := entity.Project{
 		ID:          projectID,
-		Name:        "project-x",
-		Description: "description",
+		Name:        projectName,
+		Description: projectDesc,
 	}
 
 	s.mocks.repo.EXPECT().Create(ctx, p).Return(projectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, projectID).Return(expectedProject, nil)
 
-	createdProject, err := s.interactor.Create(ctx, p)
+	createdProject, err := s.interactor.Create(ctx, projectName, projectDesc)
 
 	require.Nil(t, err)
 	require.Equal(t, expectedProject, createdProject)

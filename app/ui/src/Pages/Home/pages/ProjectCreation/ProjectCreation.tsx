@@ -3,14 +3,13 @@ import {
   GET_NEW_PROJECT,
   GetNewProject,
 } from 'Graphql/client/queries/getNewProject.graphql';
-import ROUTE, { RouteServerParams, buildRoute } from 'Constants/routes';
+import ROUTE, { buildRoute } from 'Constants/routes';
 import React, { useEffect } from 'react';
 
 import { RepositoryType } from 'Graphql/types/globalTypes';
 import StatusCircle from 'Components/LottieShapes/StatusCircle/StatusCircle';
 import { repoTypeToStepName } from '../NewProject/NewProject';
 import styles from './ProjectCreation.module.scss';
-import { useParams } from 'react-router-dom';
 import useProject from 'Graphql/hooks/useProject';
 import { useQuery } from '@apollo/client';
 
@@ -20,7 +19,6 @@ function ProjectCreation() {
     create: { data: dataCreateProject },
   } = useProject();
 
-  const { serverId } = useParams<RouteServerParams>();
   const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
 
   useEffect(() => {
@@ -61,13 +59,12 @@ function ProjectCreation() {
           <Button
             label="GO TO SERVER"
             className={styles.button}
-            to={buildRoute.server(ROUTE.HOME, serverId)}
+            to={ROUTE.HOME}
           />
           <Button
             label="GO TO PROJECT"
-            to={buildRoute.project(
+            to={buildRoute(
               ROUTE.PROJECT,
-              serverId,
               dataCreateProject?.createProject.id || ''
             )}
             disabled={!dataCreateProject}

@@ -57,21 +57,22 @@
     ]
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "5.11.4",
-    "@testing-library/react": "11.1.0",
-    "@testing-library/user-event": "12.1.10",
     "@types/classnames": "2.2.11",
     "@types/d3-array": "2.9.0",
     "@types/d3-color": "2.0.1",
     "@types/d3-format": "2.0.0",
-    "@types/jest": "26.0.15",
     "@types/lodash.capitalize": "4.2.6",
-    "@types/node": "12.0.0",
-    "@types/react": "16.9.53",
-    "@types/react-dom": "16.9.8",
     "@types/react-gravatar": "2.6.8",
     "@types/react-router-dom": "5.1.7",
     "@types/react-table": "7.0.28",
-    "@types/react-tabs": "2.3.2"
+    "@types/react-tabs": "2.3.2",
+    "@testing-library/jest-dom": "5.11.4",
+    "@testing-library/react": "11.1.0",
+    "@testing-library/user-event": "12.1.10",
+    "@types/jest": "26.0.15",
+    "@types/node": "12.0.0",
+    "@types/react": "16.9.53",
+    "@types/react-dom": "16.9.8",
+    "prettier": "2.1.2"
   }
 }

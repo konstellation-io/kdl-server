@@ -18,7 +18,7 @@ const ProjectSelector: FC<Props & BottomComponentProps> = ({
     <ul>
       {options.map(({ id, name }: GetProjects_projects) => (
         <NavLink
-          to={buildRoute.project(ROUTE.PROJECT, 'serverId', id)}
+          to={buildRoute(ROUTE.PROJECT, id)}
           key={id}
           onClick={closeComponent}
           activeClassName={styles.selectedProject}
@@ -32,7 +32,7 @@ const ProjectSelector: FC<Props & BottomComponentProps> = ({
       Icon={IconAdd}
       label="NEW PROJECT"
       className={styles.addProjectButton}
-      to={buildRoute.server(ROUTE.NEW_PROJECT, 'serverId')}
+      to={ROUTE.NEW_PROJECT}
     />
   </div>
 );

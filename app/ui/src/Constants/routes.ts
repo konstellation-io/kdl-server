@@ -11,23 +11,14 @@ enum ROUTE {
   PROJECT_OVERVIEW = '/project/:projectId/overview',
   PROJECT_TOOLS = '/project/:projectId/tools',
   PROJECT_KG = '/project/:projectId/knowledge-graph',
-  CREATION_PROJECT = '/new-project/create',
+  PROJECT_CREATION = '/new-project/create',
 }
 
-export type RouteServerParams = {
-  serverId: string;
-};
-
 export type RouteProjectParams = {
-  serverId: string;
   projectId: string;
 };
 
-export const buildRoute = {
-  server: (route: ROUTE, serverId: string) =>
-    route.replace(':serverId', serverId),
-  project: (route: ROUTE, serverId: string, projectId: string) =>
-    buildRoute.server(route, serverId).replace(':projectId', projectId),
-};
+export const buildRoute = (route: ROUTE, projectId: string) =>
+  route.replace(':projectId', projectId);
 
 export default ROUTE;

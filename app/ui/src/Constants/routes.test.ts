@@ -3,10 +3,8 @@ import { buildRoute } from './routes';
 
 describe('route utils - buildRoute', () => {
   test('right server routes', () => {
-    const serverId = 'someServer';
-
-    const route1 = buildRoute.server(ROUTE.NEW_SERVER, serverId);
-    const route2 = buildRoute.server(ROUTE.USERS, serverId);
+    const route1 = ROUTE.NEW_SERVER;
+    const route2 = ROUTE.USERS;
 
     const expectedRoute1 = '/new-server';
     const expectedRoute2 = '/server/someServer/users';
@@ -16,11 +14,10 @@ describe('route utils - buildRoute', () => {
   });
 
   test('right project routes', () => {
-    const serverId = 'someServer';
     const projectId = 'someProject';
 
-    const route1 = buildRoute.project(ROUTE.NEW_SERVER, serverId, projectId);
-    const route2 = buildRoute.project(ROUTE.PROJECT, serverId, projectId);
+    const route1 = buildRoute(ROUTE.NEW_SERVER, projectId);
+    const route2 = buildRoute(ROUTE.PROJECT, projectId);
 
     const expectedRoute1 = '/new-server';
     const expectedRoute2 = '/server/someServer/project/someProject';

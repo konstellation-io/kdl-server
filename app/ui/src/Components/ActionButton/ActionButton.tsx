@@ -1,9 +1,14 @@
-import React, { MouseEvent } from 'react';
-
-import { Action } from './Server';
+import React, {FunctionComponent, MouseEvent} from 'react';
 import styles from './Server.module.scss';
 import { useHistory } from 'react-router-dom';
+import {SvgIconProps} from "@material-ui/core/SvgIcon";
 
+type Action = {
+  label: string;
+  Icon: FunctionComponent<SvgIconProps>;
+  onClick?: Function;
+  to?: string;
+};
 function ActionButton({ label, Icon, onClick, to }: Action) {
   const history = useHistory();
 

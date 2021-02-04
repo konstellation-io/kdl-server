@@ -45,6 +45,10 @@ spec:
                 name: kdl-server-configmap
             - secretRef:
                 name: kdl-server-secrets
+          volumeMounts:
+            - name: kdl-server-configmap
+              mountPath: /public/config.json
+              subPath: config.cfg
           ports:
             - containerPort: 3000
         - name: kdl-server-proxy
@@ -87,3 +91,6 @@ spec:
         - name: oauth2-config
           configMap:
             name: kdl-server-oauth2-proxy
+        - name: kdl-server-configmap
+          configMap:
+            name: kdl-server-configmap

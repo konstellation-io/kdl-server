@@ -13,7 +13,7 @@ type Config struct {
 	Port            string `yaml:"port" envconfig:"KDL_SERVER_PORT"`
 	StaticFilesPath string `yaml:"staticFilesPath" envconfig:"KDL_SERVER_STATIC_FILES_PATH"`
 	MongoDB         struct {
-		URI    string `yaml:"uri" envconfig:"KDL_MONGODB_URI"`
+		URI    string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
 		DBName string `yaml:"dbName"`
 	} `yaml:"mongodb"`
 }

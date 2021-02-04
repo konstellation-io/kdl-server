@@ -3,7 +3,6 @@ package project
 import (
 	"context"
 	"errors"
-
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -22,26 +21,63 @@ func NewMongoDBRepo(client *mongo.Client, dbName string) *MongoDBRepo {
 }
 
 func (p MongoDBRepo) Get(ctx context.Context, id string) (entity.Project, error) {
-	project := entity.Project{}
+	project := projectDTO{}
 
 	idFromHex, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return project, err
+		return entity.Project{}, err
 	}
 
 	err = p.collection.FindOne(ctx, bson.M{"_id": idFromHex}).Decode(&project)
 	if errors.Is(err, mongo.ErrNoDocuments) {
-		return project, entity.ErrProjectNotFound
+		return entity.Project{}, entity.ErrProjectNotFound
 	}
 
-	return project, err
+	return p.dtoToEntity(project), err
 }
 
 func (p MongoDBRepo) Create(ctx context.Context, project entity.Project) (string, error) {
-	result, err := p.collection.InsertOne(ctx, project)
+	dto, err := p.entityToDTO(project)
+	if err != nil {
+		return "", err
+	}
+	dto.ID = primitive.NewObjectID()
+
+	result, err := p.collection.InsertOne(ctx, dto)
 	if err != nil {
 		return "", err
 	}
 
-	return result.InsertedID.(primitive.ObjectID).String(), nil
+	return result.InsertedID.(primitive.ObjectID).Hex(), nil
+}
+
+type projectDTO struct {
+	ID          primitive.ObjectID `bson:"_id"`
+	Name        string             `bson:"name"`
+	Description string             `bson:"description"`
+}
+
+func (p MongoDBRepo) entityToDTO(project entity.Project) (projectDTO, error) {
+	dto := projectDTO{
+		Name:        project.Name,
+		Description: project.Description,
+	}
+
+	if project.ID != "" {
+		idFromHex, err := primitive.ObjectIDFromHex(project.ID)
+		if err != nil {
+			return dto, err
+		}
+		dto.ID = idFromHex
+	}
+
+	return dto, nil
+}
+
+func (p MongoDBRepo) dtoToEntity(project projectDTO) entity.Project {
+	return entity.Project{
+		ID:          project.ID.Hex(),
+		Name:        project.Name,
+		Description: project.Description,
+	}
 }

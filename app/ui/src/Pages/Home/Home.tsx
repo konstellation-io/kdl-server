@@ -28,7 +28,7 @@ function Home() {
 
   const client = useRef(
     new ApolloClient({
-      uri: `${CONFIG.KDL_ADMIN_API_HOST}/graphql`,
+      uri: `${CONFIG.KDL_ADMIN_API_HOST}/api/v1/query`,
       credentials: 'include',
       cache,
     })

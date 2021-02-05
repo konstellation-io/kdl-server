@@ -10,13 +10,13 @@ import (
 )
 
 func Start(logger logging.Logger, port, staticFilesPath string, resolvers generated.ResolverRoot) {
-	const apiQueryPath = "/api/v1/query"
+	const apiQueryPath = "/api/query"
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers}))
 	fs := http.FileServer(http.Dir(staticFilesPath))
 
 	http.Handle("/", fs)
-	http.Handle("/api/v1/playground", playground.Handler("GraphQL playground", apiQueryPath))
+	http.Handle("/api/playground", playground.Handler("GraphQL playground", apiQueryPath))
 	http.Handle(apiQueryPath, srv)
 
 	logger.Infof("Server running at port %s", port)

@@ -30,7 +30,7 @@ function ServerBar() {
 
   function getBackBehavior() {
     let handleGoBack = goBack;
-    if (isElectron && isHome?.isExact) {
+    if (isElectron && isHome) {
       const { ipcRenderer } = window.require('electron');
       handleGoBack = () => ipcRenderer.send('closeServer');
     }

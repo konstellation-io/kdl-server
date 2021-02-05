@@ -8,7 +8,7 @@ To create new tests install [GoMock](https://github.com/golang/mock). Mocks used
 **mockgen**, when you need a new mock, add the following:
 
 ```go
-//go:generate mockgen -source=${GOFILE} -destination=$PWD/mocks/${GOFILE} -package=mocks
+//go:generate mockgen -source=${GOFILE} -destination=mocks_${GOFILE} -package=${GOPACKAGE}
 ```
 
 To generate the mocks execute:

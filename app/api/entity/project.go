@@ -1,5 +1,7 @@
 package entity
 
+import "time"
+
 type ProjectState string
 
 const (
@@ -25,7 +27,7 @@ type Project struct {
 	ID                 string
 	Name               string
 	Description        string
-	CreationDate       string
+	CreationDate       time.Time
 	LastActivationDate string
 	Favorite           bool
 	AreToolsActive     bool

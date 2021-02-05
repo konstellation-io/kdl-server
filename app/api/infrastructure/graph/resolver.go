@@ -1,6 +1,9 @@
 package graph
 
-import "github.com/konstellation-io/kdl-server/app/api/application/project"
+import (
+	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
+)
 
 //go:generate go run github.com/99designs/gqlgen
 
@@ -9,9 +12,10 @@ import "github.com/konstellation-io/kdl-server/app/api/application/project"
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	projectInteractor *project.Interactor
+	projects project.UseCase
+	users    user.UseCase
 }
 
-func NewResolver(projectInteractor *project.Interactor) *Resolver {
-	return &Resolver{projectInteractor: projectInteractor}
+func NewResolver(projectInteractor project.UseCase, userInteractor user.UseCase) *Resolver {
+	return &Resolver{projects: projectInteractor, users: userInteractor}
 }

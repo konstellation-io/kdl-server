@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/logging"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
 	"go.mongodb.org/mongo-driver/mongo"

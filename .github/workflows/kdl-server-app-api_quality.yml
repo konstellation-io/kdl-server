@@ -1,4 +1,4 @@
-name: KDL Server app-api Tests
+name: KDL Server App API Quality
 
 on:
   push:

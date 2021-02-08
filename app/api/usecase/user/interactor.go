@@ -25,27 +25,27 @@ func NewInteractor(logger logging.Logger, repo Repository, sshGenerator sshhelpe
 }
 
 // Create generates a new SSH key and create the user into Gitea. It also stores the user ssh key into the DB.
-func (i Interactor) Create(ctx context.Context, email string, accessLevel entity.AccessLevel) (entity.User, error) {
+func (i Interactor) Create(ctx context.Context, email, username, password string, accessLevel entity.AccessLevel) (entity.User, error) {
 	// Create SSH public and private keys
 	keys, err := i.sshGenerator.NewKeys()
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	err = i.giteaClient.CreateUser(email)
+	user, err := i.giteaClient.CreateUser(email, username, password)
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	user := entity.User{
-		Email:        email,
+	entityUser := entity.User{
+		Email:        user.Email,
 		AccessLevel:  accessLevel,
 		CreationDate: i.clock.Now(),
 		SSHKey:       keys,
 	}
 
 	// Store the user into the DB
-	insertedID, err := i.repo.Create(ctx, user)
+	insertedID, err := i.repo.Create(ctx, entityUser)
 	if err != nil {
 		return entity.User{}, err
 	}

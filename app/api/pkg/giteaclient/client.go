@@ -1,51 +1,77 @@
 package giteaclient
 
 import (
+	"bytes"
 	"crypto/tls"
-	"errors"
+	"encoding/json"
 	"fmt"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
 
 // TODO get from configurations
 const url = "http://gitea:3000"
-const user = "toolkit-admin"
-const password = "a123456"
+const adminUser = "toolkit-admin"
+const adminPassword = "a123456"
 
 type GiteaClientHTTP struct {
 	logger logging.Logger
+}
+
+// NewUser data to be returned when create a new user
+type NewUser struct {
+	AvatarURL    string `json:"avatar_url"`
+	CreationDate string `json:"created"`
+	Email        string `json:"email"`
+	FullName     string `json:"full_name"`
+	UserID       int    `json:"id"`
+	IsAdmin      bool   `json:"is_admin"`
+	Language     string `json:"language"`
+	LastLogin    string `json:"last_login"`
+	Login        string `json:"login"`
 }
 
 func NewGiteaClientHTTP(logger logging.Logger) *GiteaClientHTTP {
 	return &GiteaClientHTTP{logger: logger}
 }
 
-func (g *GiteaClientHTTP) CreateUser(email string) error {
-	check := checkGitea(url, user, password)
-	g.logger.Infof("gitea check[%t]", check)
-
-	g.logger.Errorf("User[%s] cannot be created", email)
-	return errors.New("gitea create client not implemented")
-}
-
-func checkGitea(url, username, password string) bool {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/v1/user", url), nil)
-	if err != nil {
-		log.Printf("error calling Gitea: %s", err)
-		log.Println("Connection with Gitea fail, retrying.")
-		return false
+func (g *GiteaClientHTTP) CreateUser(email, username, password string) (*NewUser, error) {
+	payload := map[string]interface{}{
+		"email":                email,
+		"full_name":            username,
+		"login_name":           username,
+		"must_change_password": false,
+		"password":             password,
+		"send_notify":          false,
+		"source_id":            0,
+		"username":             username,
 	}
-	req.SetBasicAuth(username, password)
+	payloadData, err := json.Marshal(&payload)
+	if err != nil {
+		g.logger.Errorf("payload conversion error: %w \n", err)
+		return nil, err
+	}
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/v1/admin/users", url), bytes.NewBuffer(payloadData))
+	if err != nil {
+		g.logger.Errorf("error creating user in Gitea: %w \n", err)
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.SetBasicAuth(adminUser, adminPassword)
+
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Println(err)
-		return false
+		g.logger.Errorf("error with http client to create user: %w \n", err)
+		return nil, err
 	}
-	log.Printf("Gitea response status: %d \n", resp.StatusCode)
 
-	return resp.StatusCode == http.StatusOK
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
 
+	u := &NewUser{}
+	err = json.Unmarshal(body, u)
+
+	return u, err
 }

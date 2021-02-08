@@ -13,7 +13,7 @@ import (
 )
 
 func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error) {
-	user, err := r.users.Create(ctx, input.Email, input.AccessLevel)
+	user, err := r.users.Create(ctx, input.Email, input.Username, input.Password, input.AccessLevel)
 	if err != nil {
 		return nil, err
 	}

@@ -145,6 +145,8 @@ input RemoveUsersInput {
 
 input AddUserInput {
   email: String!
+  username: String!
+  password: String!
   accessLevel: AccessLevel!
 }
 

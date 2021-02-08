@@ -15,5 +15,5 @@ type Repository interface {
 }
 
 type UseCase interface {
-	Create(ctx context.Context, email string, accessLevel entity.AccessLevel) (entity.User, error)
+	Create(ctx context.Context, email, username, password string, accessLevel entity.AccessLevel) (entity.User, error)
 }

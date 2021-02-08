@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 	"net/http"
 	"os"
 	"strings"
@@ -40,6 +41,7 @@ func main() {
 	logger := simplelogger.New(level)
 	realClock := clock.NewRealClock()
 	sshHelper := sshhelper.NewGenerator(logger)
+	giteaClientHTTP := giteaclient.NewGiteaClientHTTP(logger)
 
 	mongo := mongodb.NewMongoDB(logger)
 
@@ -61,7 +63,7 @@ func main() {
 
 	resolvers := graph.NewResolver(
 		project.NewInteractor(logger, projectRepo, realClock),
-		user.NewInteractor(logger, userRepo, sshHelper, realClock),
+		user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaClientHTTP),
 	)
 
 	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, resolvers)

@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"context"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 	"testing"
 	"time"
 
@@ -25,6 +26,7 @@ type userMocks struct {
 	repo         *user.MockRepository
 	sshGenerator *sshhelper.MockSSHKeyGenerator
 	clock        *clock.MockClock
+	giteaClient  *giteaclient.MockGiteaClient
 }
 
 func newUserSuite(t *testing.T) *userSuite {
@@ -37,8 +39,9 @@ func newUserSuite(t *testing.T) *userSuite {
 
 	clockMock := clock.NewMockClock(ctrl)
 	sshGenerator := sshhelper.NewMockSSHKeyGenerator(ctrl)
+	giteaClientMock := giteaclient.NewMockGiteaClient(ctrl)
 
-	interactor := user.NewInteractor(logger, repo, sshGenerator, clockMock)
+	interactor := user.NewInteractor(logger, repo, sshGenerator, clockMock, giteaClientMock)
 
 	return &userSuite{
 		ctrl:       ctrl,
@@ -48,6 +51,7 @@ func newUserSuite(t *testing.T) *userSuite {
 			repo:         repo,
 			sshGenerator: sshGenerator,
 			clock:        clockMock,
+			giteaClient:  giteaClientMock,
 		},
 	}
 }
@@ -92,6 +96,7 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
+	s.mocks.giteaClient.EXPECT().CreateUser(email).Return(nil)
 
 	createdUser, err := s.interactor.Create(ctx, email, accessLevel)
 

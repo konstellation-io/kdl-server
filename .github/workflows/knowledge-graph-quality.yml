@@ -12,10 +12,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - name: Install OS dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
@@ -24,13 +20,15 @@ jobs:
     - name: Install dependencies
       working-directory: kg
       run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential
         python -m pip install --upgrade pip
         pip install pipenv
         pipenv install --system --dev 
     - name: Run test
       working-directory: kg
       run: |
-        python -m pytest -m "not int" --cov=src --cov-report xml
+        pytest --cov=src --cov-report xml tests/unit
     - name: Archive code coverage results
       uses: actions/upload-artifact@v2
       with:

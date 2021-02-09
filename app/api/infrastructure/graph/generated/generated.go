@@ -1021,6 +1021,8 @@ input RemoveUsersInput {
 
 input AddUserInput {
   email: String!
+  username: String!
+  password: String!
   accessLevel: AccessLevel!
 }
 
@@ -5252,6 +5254,22 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "username":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			it.Username, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			it.Password, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

@@ -2,17 +2,18 @@ package user_test
 
 import (
 	"context"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/require"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
-	"github.com/stretchr/testify/require"
 )
 
 type userSuite struct {
@@ -63,6 +64,8 @@ func TestInteractor_Create(t *testing.T) {
 	const (
 		id            = "user.1234"
 		email         = "user@email.com"
+		password      = "p4$sword"
+		username      = "john"
 		accessLevel   = entity.AccessLevelAdmin
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"
@@ -78,6 +81,7 @@ func TestInteractor_Create(t *testing.T) {
 	}
 
 	u := entity.User{
+		Username:     username,
 		Email:        email,
 		AccessLevel:  accessLevel,
 		SSHKey:       sshKey,
@@ -86,19 +90,23 @@ func TestInteractor_Create(t *testing.T) {
 
 	expectedUser := entity.User{
 		ID:           id,
+		Username:     username,
 		Email:        email,
 		AccessLevel:  accessLevel,
 		SSHKey:       sshKey,
 		CreationDate: now,
 	}
 
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
-	s.mocks.giteaClient.EXPECT().CreateUser(email).Return(nil)
+	s.mocks.giteaClient.EXPECT().CreateUser(email, username, password).Return(nil)
+	s.mocks.giteaClient.EXPECT().AddSSHKey(username, sshKey.Public).Return(nil)
 
-	createdUser, err := s.interactor.Create(ctx, email, accessLevel)
+	createdUser, err := s.interactor.Create(ctx, email, username, password, accessLevel)
 
 	require.Nil(t, err)
 	require.Equal(t, expectedUser, createdUser)

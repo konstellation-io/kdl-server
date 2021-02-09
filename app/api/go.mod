@@ -3,6 +3,7 @@ module github.com/konstellation-io/kdl-server/app/api
 go 1.15
 
 require (
+	code.gitea.io/sdk/gitea v0.13.2
 	github.com/99designs/gqlgen v0.13.0
 	github.com/golang/mock v1.4.4
 	github.com/kelseyhightower/envconfig v1.4.0

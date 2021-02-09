@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -41,7 +42,14 @@ func main() {
 	logger := simplelogger.New(level)
 	realClock := clock.NewRealClock()
 	sshHelper := sshhelper.NewGenerator(logger)
-	giteaClientHTTP := giteaclient.NewGiteaClientHTTP(logger)
+
+	giteaClientHTTP, err := giteaclient.NewGiteaClientHTTP(
+		logger, cfg.Gitea.URL, cfg.Gitea.AdminUser, cfg.Gitea.AdminPass,
+	)
+	if err != nil {
+		logger.Errorf("Error connecting to Gitea: %s", err)
+		os.Exit(1)
+	}
 
 	mongo := mongodb.NewMongoDB(logger)
 

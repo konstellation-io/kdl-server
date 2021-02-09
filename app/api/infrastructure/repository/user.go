@@ -24,6 +24,7 @@ const (
 
 type userDTO struct {
 	ID            primitive.ObjectID `bson:"_id"`
+	Username      string             `bson:"username"`
 	Email         string             `bson:"email"`
 	CreationDate  time.Time          `bson:"creation_date"`
 	AccessLevel   string             `bson:"access_level"`
@@ -57,6 +58,12 @@ func (m *userMongoDBRepo) EnsureIndexes() error {
 				Unique: &unique,
 			},
 		},
+		{
+			Keys: bson.M{"username": 1},
+			Options: &options.IndexOptions{
+				Unique: &unique,
+			},
+		},
 	})
 
 	m.logger.Infof("Indexes %s created for \"%s\" collection", result, userCollName)
@@ -66,26 +73,27 @@ func (m *userMongoDBRepo) EnsureIndexes() error {
 
 // Get retrieves the user using the identifier.
 func (m *userMongoDBRepo) Get(ctx context.Context, id string) (entity.User, error) {
-	m.logger.Infof("Getting user \"%s\" from database...", id)
-
-	dto := userDTO{}
-
 	idFromHex, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	err = m.collection.FindOne(ctx, bson.M{"_id": idFromHex}).Decode(&dto)
-	if errors.Is(err, mongo.ErrNoDocuments) {
-		return entity.User{}, entity.ErrUserNotFound
-	}
+	return m.getByProp(ctx, "_id", idFromHex)
+}
 
-	return m.dtoToEntity(dto), err
+// GetByUsername retrieves the user using their user name.
+func (m *userMongoDBRepo) GetByUsername(ctx context.Context, username string) (entity.User, error) {
+	return m.getByProp(ctx, "username", username)
+}
+
+// GetByUsername retrieves the user using their user email.
+func (m *userMongoDBRepo) GetByEmail(ctx context.Context, email string) (entity.User, error) {
+	return m.getByProp(ctx, "email", email)
 }
 
 // Create inserts into the database a new entity.
 func (m *userMongoDBRepo) Create(ctx context.Context, u entity.User) (string, error) {
-	m.logger.Infof("Creating a new user \"%s\" into database...", u.Email)
+	m.logger.Debugf("Inserting a new user \"%s\" into %s collection...", u.Email, userCollName)
 
 	dto, err := m.entityToDTO(u)
 	if err != nil {
@@ -106,8 +114,23 @@ func (m *userMongoDBRepo) Create(ctx context.Context, u entity.User) (string, er
 	return result.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
+// GetByUsername retrieves the user using their user email.
+func (m *userMongoDBRepo) getByProp(ctx context.Context, prop string, value interface{}) (entity.User, error) {
+	m.logger.Debugf("Getting by %s \"%s\" from database...", prop, value)
+
+	dto := userDTO{}
+
+	err := m.collection.FindOne(ctx, bson.M{prop: value}).Decode(&dto)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return entity.User{}, entity.ErrUserNotFound
+	}
+
+	return m.dtoToEntity(dto), err
+}
+
 func (m *userMongoDBRepo) entityToDTO(u entity.User) (userDTO, error) {
 	dto := userDTO{
+		Username:      u.Username,
 		Email:         u.Email,
 		AccessLevel:   string(u.AccessLevel),
 		PrivateSSHKey: u.SSHKey.Private,
@@ -130,6 +153,7 @@ func (m *userMongoDBRepo) entityToDTO(u entity.User) (userDTO, error) {
 func (m *userMongoDBRepo) dtoToEntity(dto userDTO) entity.User {
 	return entity.User{
 		ID:           dto.ID.Hex(),
+		Username:     dto.Username,
 		Email:        dto.Email,
 		AccessLevel:  entity.AccessLevel(dto.AccessLevel),
 		CreationDate: dto.CreationDate,

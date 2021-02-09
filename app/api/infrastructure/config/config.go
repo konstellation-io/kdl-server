@@ -8,6 +8,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// Config holds the configuration values of the application.
 type Config struct {
 	LogLevel        string `yaml:"logLevel" envconfig:"KDL_SERVER_LOG_LEVEL"`
 	Port            string `yaml:"port" envconfig:"KDL_SERVER_PORT"`
@@ -16,6 +17,11 @@ type Config struct {
 		URI    string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
 		DBName string `yaml:"dbName"`
 	} `yaml:"mongodb"`
+	Gitea struct {
+		URL       string `yaml:"url"`
+		AdminUser string `envconfig:"GITEA_ADMIN_USER"`
+		AdminPass string `envconfig:"GITEA_ADMIN_PASSWORD"`
+	} `yaml:"gitea"`
 }
 
 // NewConfig will read the config.yml file and override values with env vars.

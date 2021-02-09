@@ -1,77 +1,58 @@
 package giteaclient
 
 import (
-	"bytes"
-	"crypto/tls"
-	"encoding/json"
-	"fmt"
+	"code.gitea.io/sdk/gitea"
+
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
-	"io/ioutil"
-	"log"
-	"net/http"
 )
 
-// TODO get from configurations
-const url = "http://gitea:3000"
-const adminUser = "toolkit-admin"
-const adminPassword = "a123456"
-
-type GiteaClientHTTP struct {
+type giteaClient struct {
 	logger logging.Logger
+	client *gitea.Client
 }
 
-// NewUser data to be returned when create a new user
-type NewUser struct {
-	AvatarURL    string `json:"avatar_url"`
-	CreationDate string `json:"created"`
-	Email        string `json:"email"`
-	FullName     string `json:"full_name"`
-	UserID       int    `json:"id"`
-	IsAdmin      bool   `json:"is_admin"`
-	Language     string `json:"language"`
-	LastLogin    string `json:"last_login"`
-	Login        string `json:"login"`
-}
-
-func NewGiteaClientHTTP(logger logging.Logger) *GiteaClientHTTP {
-	return &GiteaClientHTTP{logger: logger}
-}
-
-func (g *GiteaClientHTTP) CreateUser(email, username, password string) (*NewUser, error) {
-	payload := map[string]interface{}{
-		"email":                email,
-		"full_name":            username,
-		"login_name":           username,
-		"must_change_password": false,
-		"password":             password,
-		"send_notify":          false,
-		"source_id":            0,
-		"username":             username,
-	}
-	payloadData, err := json.Marshal(&payload)
+// NewGiteaClientHTTP is a constructor function.
+func NewGiteaClientHTTP(logger logging.Logger, url, adminUser, adminPassword string) (GiteaClient, error) {
+	client, err := gitea.NewClient(url, gitea.SetBasicAuth(adminUser, adminPassword))
 	if err != nil {
-		g.logger.Errorf("payload conversion error: %w \n", err)
-		return nil, err
-	}
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/v1/admin/users", url), bytes.NewBuffer(payloadData))
-	if err != nil {
-		g.logger.Errorf("error creating user in Gitea: %w \n", err)
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(adminUser, adminPassword)
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		g.logger.Errorf("error with http client to create user: %w \n", err)
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+	return &giteaClient{logger: logger, client: client}, nil
+}
 
-	u := &NewUser{}
-	err = json.Unmarshal(body, u)
+// CreateUser creates a new user in Gitea.
+func (g *giteaClient) CreateUser(email, username, password string) error {
+	mustChangePassword := true
+	user, _, err := g.client.AdminCreateUser(gitea.CreateUserOption{
+		Email:              email,
+		Password:           password,
+		Username:           username,
+		MustChangePassword: &mustChangePassword,
+	})
 
-	return u, err
+	if err != nil {
+		return err
+	}
+
+	g.logger.Infof("Created user \"%s\" in Gitea with id \"%d\"", user.UserName, user.ID)
+
+	return nil
+}
+
+// AddSSHKey adds a new public SSH key to a user.
+func (g *giteaClient) AddSSHKey(username, publicSSHKey string) error {
+	key, _, err := g.client.AdminCreateUserPublicKey(username, gitea.CreateKeyOption{
+		Title:    "kdl-ssh-key",
+		Key:      publicSSHKey,
+		ReadOnly: true,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	g.logger.Infof("Created public SSH key for user \"%s\" in Gitea with id \"%d\"", username, key.ID)
+
+	return nil
 }

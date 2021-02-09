@@ -33,15 +33,29 @@ func (m *MockGiteaClient) EXPECT() *MockGiteaClientMockRecorder {
 }
 
 // CreateUser mocks base method
-func (m *MockGiteaClient) CreateUser(email string) error {
+func (m *MockGiteaClient) CreateUser(email, username, password string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUser", email)
+	ret := m.ctrl.Call(m, "CreateUser", email, username, password)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateUser indicates an expected call of CreateUser
-func (mr *MockGiteaClientMockRecorder) CreateUser(email interface{}) *gomock.Call {
+func (mr *MockGiteaClientMockRecorder) CreateUser(email, username, password interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockGiteaClient)(nil).CreateUser), email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockGiteaClient)(nil).CreateUser), email, username, password)
+}
+
+// AddSSHKey mocks base method
+func (m *MockGiteaClient) AddSSHKey(username, publicSSHKey string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddSSHKey", username, publicSSHKey)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddSSHKey indicates an expected call of AddSSHKey
+func (mr *MockGiteaClientMockRecorder) AddSSHKey(username, publicSSHKey interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddSSHKey", reflect.TypeOf((*MockGiteaClient)(nil).AddSSHKey), username, publicSSHKey)
 }

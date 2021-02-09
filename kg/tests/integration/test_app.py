@@ -1,3 +1,10 @@
+"""
+You have to set up a server to run these tests:
+```
+python src/app.py
+```
+"""
+
 import pytest
 from grpc_requests import StubClient
 
@@ -19,5 +26,5 @@ class TestKnowledgeGraphService:
     @pytest.mark.int
     def test_GetGraph(self):
         client = self.set_client()
-        res = client.request("kg.KGService", "GetGraph", {"description": "test"})
-        assert res == {'items': [{'id': 'test'}]}
+        res = client.request("kg.KGService", "GetGraph", {"description": "test"}, raw_output=True)
+        #assert type(res) == type(GetGraphRes)

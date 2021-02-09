@@ -1,28 +1,26 @@
 import { Button, ErrorMessage, HorizontalBar, SpinnerCircular } from 'kwc';
 import Card, { CardState } from 'Components/Layout/Card/Card';
+import { EnhancedTool, EnhancedToolGroups } from './config';
+import {
+  GetProjectTools,
+  GetProjectToolsVariables,
+} from 'Graphql/queries/types/GetProjectTools';
 import React, { useEffect } from 'react';
 
 import IconOk from '@material-ui/icons/Check';
 import IconStart from '@material-ui/icons/PlayArrow';
 import IconStop from '@material-ui/icons/Stop';
 import IconWarn from '@material-ui/icons/Warning';
+import { RouteProjectParams } from 'Constants/routes';
+import Tool from './components/Tool/Tool';
 import ToolGroup from './ToolGroup';
 import cx from 'classnames';
-import styles from './Tools.module.scss';
-import useExternalBrowserWindows, {
-  channelName,
-} from './useExternalBrowserWindows';
-import { useParams } from 'react-router-dom';
-import { RouteProjectParams } from 'Constants/routes';
-import { useQuery } from '@apollo/client';
 import { loader } from 'graphql.macro';
-import {
-  GetProjectTools,
-  GetProjectToolsVariables,
-} from 'Graphql/queries/types/GetProjectTools';
-import { EnhancedTool, EnhancedToolGroups } from './config';
-import Tool from './components/Tool/Tool';
 import { mapTools } from './mappingFunctions';
+import styles from './Tools.module.scss';
+import useExternalBrowserWindows from './useExternalBrowserWindows';
+import { useParams } from 'react-router-dom';
+import { useQuery } from '@apollo/client';
 import useTool from 'Graphql/hooks/useTool';
 
 const GetProjectToolsQuery = loader('Graphql/queries/getProjectTools.graphql');

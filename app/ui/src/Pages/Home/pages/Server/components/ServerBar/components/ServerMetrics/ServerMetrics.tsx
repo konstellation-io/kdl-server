@@ -1,14 +1,14 @@
+import { BUTTON_ALIGN, Button } from 'kwc';
 import React, { FC } from 'react';
 
-import MetricChart from './MetricChart';
-import styles from './ServerMetrics.module.scss';
+import { BottomComponentProps } from '../Breadcrumbs/components/Crumb/Crumb';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
-import { Button, BUTTON_ALIGN } from 'kwc';
 import IconArrowForward from '@material-ui/icons/ArrowForward';
 import IconUsers from '@material-ui/icons/Person';
-import ROUTE, { buildRoute } from 'Constants/routes';
+import MetricChart from './MetricChart';
+import ROUTE from 'Constants/routes';
+import styles from './ServerMetrics.module.scss';
 import { useHistory } from 'react-router';
-import { BottomComponentProps } from '../Breadcrumbs/components/Crumb/Crumb';
 
 export type MetricData = {
   x: Date;

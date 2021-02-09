@@ -56,12 +56,6 @@ const columns: Column<Data>[] = [
   },
 ];
 
-type TableColCheckProps = {
-  indeterminate?: boolean;
-  checked?: boolean;
-  onChange?: (arg: { target: { checked: boolean } }) => void;
-  className?: string;
-};
 function TableColCheck({
   indeterminate,
   checked,
@@ -98,19 +92,22 @@ function UsersTable({ users, contextMenuActions }: Props) {
   const { updateSelection } = useUserSettings();
 
   const { data: localData } = useQuery<GetUserSettings>(GET_USER_SETTINGS);
-  const filters = localData?.userSettings.filters || {
-    email: null,
-    accessLevel: null,
-  };
   const userSelection = get(
     localData?.userSettings,
     'userSelection',
     UserSelection.NONE
   );
-
+    
   const data = useMemo(
-    () => users.filter((user) => rowNotFiltered(user, filters)),
-    [filters, users]
+      () => {
+      const filters = localData?.userSettings.filters || {
+        email: null,
+        accessLevel: null,
+      };
+
+      return users.filter((user) => rowNotFiltered(user, filters))
+    },
+    [localData, users]
   );
 
   const actSelectedUsers = localData?.userSettings.selectedUserIds || [];

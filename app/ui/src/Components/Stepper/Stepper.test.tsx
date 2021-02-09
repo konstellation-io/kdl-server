@@ -3,7 +3,7 @@ import CreateIcon from '@material-ui/icons/Create';
 import NotInterestedIcon from '@material-ui/icons/NotInterested';
 import React from 'react';
 import ScheduleIcon from '@material-ui/icons/Schedule';
-import Step from './Step';
+import StepNode from './StepNode';
 import Stepper from './Stepper';
 import { shallow } from 'enzyme';
 
@@ -40,20 +40,20 @@ describe('Stepper component', () => {
   });
 
   it('show right elements', () => {
-    expect(component.find(Step).length).toBe(2);
+    expect(component.find(StepNode).length).toBe(2);
   });
 
   it('does not call onStepClick when step is disabled', () => {
-    component.find(Step).first().props().onClick();
+    component.find(StepNode).first().props().onClick();
     expect(onStepClickMock).toHaveBeenCalledTimes(0);
 
-    component.find(Step).last().props().onClick();
+    component.find(StepNode).last().props().onClick();
     expect(onStepClickMock).toHaveBeenCalledTimes(1);
   });
 });
 
 describe('Step component', () => {
-  const component = shallow(<Step {...steps[0]} onClick={onStepClickMock} />);
+  const component = shallow(<StepNode {...steps[0]} onClick={onStepClickMock} />);
 
   test('Component match snapshot', () => {
     expect(component).toMatchSnapshot();

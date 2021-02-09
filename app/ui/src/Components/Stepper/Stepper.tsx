@@ -1,5 +1,5 @@
 import React from 'react';
-import Step from './Step';
+import StepNode from './StepNode';
 import styles from './Stepper.module.scss';
 
 export type Step = {
@@ -21,7 +21,7 @@ function Stepper({ steps, onStepClick }: Props) {
   return (
     <div className={styles.container}>
       {steps.map((step, idx) => (
-        <Step
+        <StepNode
           {...step}
           key={idx}
           onClick={() => {

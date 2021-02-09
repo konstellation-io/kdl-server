@@ -7,22 +7,25 @@ import (
 	"encoding/pem"
 	"time"
 
+	"golang.org/x/crypto/ssh"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
-	"golang.org/x/crypto/ssh"
 )
 
-type Generator struct {
+type generator struct {
 	logger logging.Logger
 }
 
-func NewGenerator(logger logging.Logger) *Generator {
-	return &Generator{
+// NewGenerator is a constructor function.
+func NewGenerator(logger logging.Logger) SSHKeyGenerator {
+	return &generator{
 		logger: logger,
 	}
 }
 
-func (g *Generator) NewKeys() (entity.SSHKey, error) {
+// NewKeys returns a new private and public SSH keys.
+func (g *generator) NewKeys() (entity.SSHKey, error) {
 	bitSize := 4096
 
 	privateKey, err := g.generatePrivateKey(bitSize)
@@ -45,7 +48,7 @@ func (g *Generator) NewKeys() (entity.SSHKey, error) {
 }
 
 // generatePrivateKey creates a RSA Private Key of specified byte size.
-func (g *Generator) generatePrivateKey(bitSize int) (*rsa.PrivateKey, error) {
+func (g *generator) generatePrivateKey(bitSize int) (*rsa.PrivateKey, error) {
 	// Private Key generation
 	privateKey, err := rsa.GenerateKey(rand.Reader, bitSize)
 	if err != nil {
@@ -64,7 +67,7 @@ func (g *Generator) generatePrivateKey(bitSize int) (*rsa.PrivateKey, error) {
 }
 
 // encodePrivateKeyToPEM encodes Private Key from RSA to PEM format.
-func (g *Generator) encodePrivateKeyToPEM(privateKey *rsa.PrivateKey) []byte {
+func (g *generator) encodePrivateKeyToPEM(privateKey *rsa.PrivateKey) []byte {
 	// Get ASN.1 DER format
 	privDER := x509.MarshalPKCS1PrivateKey(privateKey)
 
@@ -83,7 +86,7 @@ func (g *Generator) encodePrivateKeyToPEM(privateKey *rsa.PrivateKey) []byte {
 
 // generatePublicKey take a rsa.PublicKey and return bytes suitable for writing to .pub file
 // returns in the format "ssh-rsa ...".
-func (g *Generator) generatePublicKey(privatekey *rsa.PublicKey) ([]byte, error) {
+func (g *generator) generatePublicKey(privatekey *rsa.PublicKey) ([]byte, error) {
 	publicRsaKey, err := ssh.NewPublicKey(privatekey)
 	if err != nil {
 		return nil, err

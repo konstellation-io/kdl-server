@@ -6,8 +6,15 @@ import (
 )
 
 var (
+	// ErrProjectNotFound error definition.
 	ErrProjectNotFound = errors.New("project not found")
-	ErrUserNotFound    = errors.New("user not found")
-	ErrDuplicatedUser  = errors.New("user is duplicated")
-	ErrNotImplemented  = fmt.Errorf("not implemented")
+
+	// ErrUserNotFound error definition.
+	ErrUserNotFound = errors.New("user not found")
+
+	// ErrDuplicatedUser error definition.
+	ErrDuplicatedUser = errors.New("user is duplicated")
+
+	// ErrNotImplemented error definition.
+	ErrNotImplemented = fmt.Errorf("not implemented")
 )

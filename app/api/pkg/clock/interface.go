@@ -4,6 +4,7 @@ package clock
 
 import "time"
 
+// Clock defines operation with the time.
 type Clock interface {
 	Now() time.Time
 }

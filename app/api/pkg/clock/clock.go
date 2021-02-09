@@ -4,13 +4,14 @@ import (
 	"time"
 )
 
-type RealClock struct {
-}
+type realClock struct{}
 
+// NewRealClock is a constructor function.
 func NewRealClock() Clock {
-	return &RealClock{}
+	return &realClock{}
 }
 
-func (r *RealClock) Now() time.Time {
+// Now returns the current UTC time.
+func (r *realClock) Now() time.Time {
 	return time.Now().UTC()
 }

@@ -4,6 +4,7 @@ package sshhelper
 
 import "github.com/konstellation-io/kdl-server/app/api/entity"
 
+// SSHKeyGenerator define all functions to manage SSH keys.
 type SSHKeyGenerator interface {
 	NewKeys() (entity.SSHKey, error)
 }

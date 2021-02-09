@@ -1,3 +1,4 @@
 package mongodb
 
-const Err11000DupKeyError = 11000 // E11000 duplicate key error
+// Err11000DupKeyError code error for E11000.
+const Err11000DupKeyError = 11000

@@ -2,6 +2,7 @@ package logging
 
 import "github.com/golang/mock/gomock"
 
+// AddLoggerExpects add stubs for all logging functions.
 func AddLoggerExpects(logger *MockLogger) {
 	logger.EXPECT().Debug(gomock.Any()).Return().AnyTimes()
 	logger.EXPECT().Info(gomock.Any()).Return().AnyTimes()

@@ -1,0 +1,33 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+grpcio = "*"
+numpy = "*"
+scipy = "*"
+spacy = "*"
+torch = "*"
+pandas = "*"
+transformers = "*"
+gensim = "*"
+
+[dev-packages]
+ipdb = "*"
+pytest = "*"
+pytest-grpc = "*"
+pytest-mypy = "*"
+pytest-flake8 = "*"
+pydocstyle = "*"
+flake8 = "*"
+mypy = "*"
+mypy-protobuf = "*"
+coverage = "*"
+ipython = "*"
+grpcio-tools = "*"
+grpc-stubs = "*"
+grpc-requests = "*"
+
+[requires]
+python_version = "3.9"

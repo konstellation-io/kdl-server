@@ -1,0 +1,5 @@
+[flake8]
+doctest = True
+max-line-length = 115
+exclude = tests/*,.git,__pycache__,proto,.github/
+max-complexity = 10

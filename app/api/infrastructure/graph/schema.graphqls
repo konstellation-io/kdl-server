@@ -60,6 +60,7 @@ type SSHKey {
 
 type User {
   id: ID!
+  username: String!
   email: String!
   creationDate: String!
   accessLevel: AccessLevel!

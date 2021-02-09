@@ -14,8 +14,8 @@ jobs:
     steps:
     - name: Install OS dependencies
       run: |
-        apt-get update
-        apt-get install -y build-essential
+        sudo apt-get update
+        sudo apt-get install -y build-essential
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
       uses: actions/setup-python@v2

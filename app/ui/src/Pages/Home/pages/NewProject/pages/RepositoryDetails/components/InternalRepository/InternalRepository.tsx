@@ -28,7 +28,6 @@ type Props = {
   showErrors: boolean;
 };
 function InternalRepository({ showErrors }: Props) {
-  const SERVER_URL = CONFIG.SERVER_URL;
   const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
   const { updateValue, updateError, clearError } = useNewProject(
     'internalRepository'
@@ -40,21 +39,20 @@ function InternalRepository({ showErrors }: Props) {
   const slugError = errors?.slug;
 
   useEffect(() => {
-    updateValue('url', `${SERVER_URL}.${slug}`);
-  }, [updateValue, slug, SERVER_URL]);
+    updateValue('url', `${CONFIG.SERVER_URL}.${slug}`);
+  }, [updateValue, slug]);
 
   if (!data) return <SpinnerCircular />;
 
   const slugOk = validateProjectSlug(slug);
 
-  // TODO: change server url
   return (
     <div className={styles.repositoryInternal}>
       <div className={styles.url}>
         <p className={styles.urlTitle}>repository url</p>
         <div className={styles.serverUrlContainer}>
           <IconLink className="icon-regular" />
-          <span className={styles.urlContent}>{`${SERVER_URL}/`}</span>
+          <span className={styles.urlContent}>{`${CONFIG.SERVER_URL}/`}</span>
         </div>
       </div>
       <TextInput

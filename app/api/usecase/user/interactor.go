@@ -3,6 +3,8 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
 
 	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 
@@ -19,6 +21,7 @@ type Interactor struct {
 	sshGenerator sshhelper.SSHKeyGenerator
 	clock        clock.Clock
 	giteaClient  giteaclient.GiteaClient
+	k8sClient    k8s.K8sClient
 }
 
 // NewInteractor factory function.
@@ -28,11 +31,25 @@ func NewInteractor(
 	sshGenerator sshhelper.SSHKeyGenerator,
 	c clock.Clock,
 	giteaClient giteaclient.GiteaClient,
+	k8sClient k8s.K8sClient,
 ) *Interactor {
-	return &Interactor{logger: logger, repo: repo, sshGenerator: sshGenerator, clock: c, giteaClient: giteaClient}
+	return &Interactor{
+		logger:       logger,
+		repo:         repo,
+		sshGenerator: sshGenerator,
+		clock:        c,
+		giteaClient:  giteaClient,
+		k8sClient:    k8sClient,
+	}
 }
 
-// Create generates a new SSH key and create the user into Gitea. It also stores the user ssh key into the DB.
+// Create add a new user to the server.
+// - If the user already exists (email and username must be unique) returns entity.ErrDuplicatedUser.
+// - Generates a new SSH public/private keys.
+// - Creates the user into Gitea.
+// - Adds the public SSH key to the user in Gitea.
+// - Stores the user and ssh keys into the DB.
+// - Creates a new secret in Kubernetes with the generated SSH keys.
 func (i Interactor) Create(ctx context.Context, email, username, password string, accessLevel entity.AccessLevel) (entity.User, error) {
 	i.logger.Infof("Creating user \"%s\" with email \"%s\"", username, email)
 
@@ -87,6 +104,15 @@ func (i Interactor) Create(ctx context.Context, email, username, password string
 	}
 
 	i.logger.Infof("The user \"%s\" (%s) was created with ID \"%s\"", user.Username, user.Email, insertedID)
+
+	secretName := fmt.Sprintf("%s-ssh-keys", user.Username)
+	err = i.k8sClient.CreateSecret(secretName, map[string]string{
+		"KDL_USER_PUBLIC_SSH_KEY":  keys.Public,
+		"KDL_USER_PRIVATE_SSH_KEY": keys.Private,
+	})
+	if err != nil {
+		return entity.User{}, err
+	}
 
 	return i.repo.Get(ctx, insertedID)
 }

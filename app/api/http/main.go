@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
 	"net/http"
 	"os"
 	"strings"
@@ -51,6 +52,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	k8sClient, err := k8s.NewK8sClient(logger, cfg.Kubernetes.Namespace)
+	if err != nil {
+		logger.Errorf("Error creating k8s client: %s", err)
+		os.Exit(1)
+	}
+
 	mongo := mongodb.NewMongoDB(logger)
 
 	mongodbClient, err := mongo.Connect(cfg.MongoDB.URI)
@@ -71,7 +78,7 @@ func main() {
 
 	resolvers := graph.NewResolver(
 		project.NewInteractor(logger, projectRepo, realClock),
-		user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaClientHTTP),
+		user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaClientHTTP, k8sClient),
 	)
 
 	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, resolvers)

@@ -22,6 +22,9 @@ type Config struct {
 		AdminUser string `envconfig:"GITEA_ADMIN_USER"`
 		AdminPass string `envconfig:"GITEA_ADMIN_PASSWORD"`
 	} `yaml:"gitea"`
+	Kubernetes struct {
+		Namespace string `envconfig:"POD_NAMESPACE"`
+	} `yaml:"kubernetes"`
 }
 
 // NewConfig will read the config.yml file and override values with env vars.

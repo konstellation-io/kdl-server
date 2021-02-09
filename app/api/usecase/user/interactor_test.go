@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"context"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
 	"testing"
 	"time"
 
@@ -23,11 +24,12 @@ type userSuite struct {
 }
 
 type userMocks struct {
-	logger       *logging.MockLogger
-	repo         *user.MockRepository
-	sshGenerator *sshhelper.MockSSHKeyGenerator
-	clock        *clock.MockClock
-	giteaClient  *giteaclient.MockGiteaClient
+	logger        *logging.MockLogger
+	repo          *user.MockRepository
+	sshGenerator  *sshhelper.MockSSHKeyGenerator
+	clock         *clock.MockClock
+	giteaClient   *giteaclient.MockGiteaClient
+	k8sClientMock *k8s.MockK8sClient
 }
 
 func newUserSuite(t *testing.T) *userSuite {
@@ -41,18 +43,20 @@ func newUserSuite(t *testing.T) *userSuite {
 	clockMock := clock.NewMockClock(ctrl)
 	sshGenerator := sshhelper.NewMockSSHKeyGenerator(ctrl)
 	giteaClientMock := giteaclient.NewMockGiteaClient(ctrl)
+	k8sClientMock := k8s.NewMockK8sClient(ctrl)
 
-	interactor := user.NewInteractor(logger, repo, sshGenerator, clockMock, giteaClientMock)
+	interactor := user.NewInteractor(logger, repo, sshGenerator, clockMock, giteaClientMock, k8sClientMock)
 
 	return &userSuite{
 		ctrl:       ctrl,
 		interactor: interactor,
 		mocks: userMocks{
-			logger:       logger,
-			repo:         repo,
-			sshGenerator: sshGenerator,
-			clock:        clockMock,
-			giteaClient:  giteaClientMock,
+			logger:        logger,
+			repo:          repo,
+			sshGenerator:  sshGenerator,
+			clock:         clockMock,
+			giteaClient:   giteaClientMock,
+			k8sClientMock: k8sClientMock,
 		},
 	}
 }
@@ -69,7 +73,13 @@ func TestInteractor_Create(t *testing.T) {
 		accessLevel   = entity.AccessLevelAdmin
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"
+		secretName    = "john-ssh-keys"
 	)
+
+	secretValues := map[string]string{
+		"KDL_USER_PUBLIC_SSH_KEY":  publicSSHKey,
+		"KDL_USER_PRIVATE_SSH_KEY": privateSSHKey,
+	}
 
 	ctx := context.Background()
 	now := time.Now().UTC()
@@ -105,6 +115,7 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
 	s.mocks.giteaClient.EXPECT().CreateUser(email, username, password).Return(nil)
 	s.mocks.giteaClient.EXPECT().AddSSHKey(username, sshKey.Public).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateSecret(secretName, secretValues)
 
 	createdUser, err := s.interactor.Create(ctx, email, username, password, accessLevel)
 

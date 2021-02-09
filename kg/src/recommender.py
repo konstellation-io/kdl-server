@@ -31,12 +31,6 @@ class Recommender:
         self.dataset = dataset
         self.dataset_vecs = vectors
 
-        if not len(self.dataset) == len(self.dataset_vecs):
-            message = f"The specified dataset (n={len(self.dataset)}) " \
-                      f"and the vectors (available for {len(self.dataset_vecs)} documents) do not match. " \
-                      "Please check the inputs specified in Config"
-            raise AssertionError(message)
-
         log.info("Recommender successfully loaded.")
 
     def _load_tokenizer(self) -> transformers.PreTrainedTokenizer:

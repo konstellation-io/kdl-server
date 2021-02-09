@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass, fields
+from dataclasses import dataclass, fields
 
 import proto.knowledge_graph_pb2 as kg_pb
 
@@ -17,28 +17,33 @@ class RecommendedItem:
     framework: str = ""
 
     def __init__(self, field_dict):
+        self.fields = self.__get_fields()
+        self.mandatory_fields = self._get_mandatory_field()
+
+        # Checks that all required fields are present
+        if not set(self.mandatory_fields).issubset(field_dict.keys()):
+            missing_fields = set(field_dict).difference(self.mandatory_fields)
+            raise Exception(f"Missing mandatory fields: {missing_fields}")
+
         for key, value in field_dict.items():
-            if key not in self.fields():
+            if key not in self.fields:
                 continue
             setattr(self, key, value)
 
-    def fields(self) -> list[str]:
+    def __get_fields(self) -> list[str]:
         return [field.name for field in fields(self)]
 
-    def mandatory_fields(self):
-        return [field.name for field in fields(self) if field]
+    def _get_mandatory_field(self):
+        return [field.name for field in fields(self) if field.default is None]
 
     def to_grpc(self) -> kg_pb.GraphItem:
         item = kg_pb.GraphItem()
-        for field in self.fields():
+        for field in self.fields:
             setattr(item, field, getattr(self, field))
 
         return item
 
-    # Magic methods for order and iteration
-    def __iter__(self):
-        return iter(asdict(self))
-
+    # Order methods
     def __eq__(self, other):
         return self.score == other.score
 
@@ -65,7 +70,7 @@ class RecommendedList:
             item_list.append(RecommendedItem(item))
 
         self.items = item_list
-        self.items.sort()
+        self.items.sort(reverse=True)
 
     def to_grpc(self) -> kg_pb.GetGraphRes:
         res = kg_pb.GetGraphRes()

@@ -6,7 +6,7 @@ import pandas as pd
 import transformers
 
 
-class AssetsLoader:
+class AssetLoader:
 
     def __init__(self, path: str):
         self.log = logging.getLogger("AssetLoader")
@@ -14,6 +14,14 @@ class AssetsLoader:
         self.dataset = self._load_dataset()
         self.model = self._load_model()
         self.vectors = self._load_dataset_vectors()
+        self._asset_checks()
+
+    def _asset_checks(self):
+        if not len(self.dataset) == len(self.vectors):
+            message = f"The specified dataset (n={len(self.dataset)}) " \
+                      f"and the vectors (available for {len(self.vectors)} documents) do not match. " \
+                      "Please check the inputs."
+            raise AssertionError(message)
 
     def _load_dataset(self) -> pd.DataFrame:
         """

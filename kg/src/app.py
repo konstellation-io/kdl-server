@@ -6,8 +6,8 @@ import grpc
 import config
 import proto.knowledge_graph_pb2 as kg_pb2
 import proto.knowledge_graph_pb2_grpc as kg_grpc_pb2
-from assets import AssetsLoader
 from recommender import Recommender
+from tools.assets import AssetLoader
 
 
 class KnowledgeGraphService(kg_grpc_pb2.KGServiceServicer):
@@ -17,7 +17,7 @@ class KnowledgeGraphService(kg_grpc_pb2.KGServiceServicer):
 
     def __init__(self):
         self.log = logging.getLogger("KGApp")
-        assets = AssetsLoader(config.ASSET_ROUTE)
+        assets = AssetLoader(config.ASSET_ROUTE)
         self.recommender = Recommender(assets.model, assets.vectors, assets.dataset)
 
     def GetGraph(self, request: kg_pb2.GetGraphReq, context: grpc.ServicerContext) -> kg_pb2.GetGraphRes:
@@ -50,7 +50,6 @@ class Server:
         grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=self.workers))
         kg_grpc_pb2.add_KGServiceServicer_to_server(self.service(), grpc_server)
         address = f"{self.host}:{self.port}"
-        # TODO maybe fix this once dockerized
         grpc_server.add_insecure_port(address)
 
         return grpc_server

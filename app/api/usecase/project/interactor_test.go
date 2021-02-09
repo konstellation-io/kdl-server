@@ -78,6 +78,6 @@ func TestInteractor_Create(t *testing.T) {
 
 	createdProject, err := s.interactor.Create(ctx, projectName, projectDesc)
 
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.Equal(t, expectedProject, createdProject)
 }

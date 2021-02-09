@@ -108,6 +108,47 @@ func TestInteractor_Create(t *testing.T) {
 
 	createdUser, err := s.interactor.Create(ctx, email, username, password, accessLevel)
 
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.Equal(t, expectedUser, createdUser)
+}
+
+func TestInteractor_Create_UserDuplEmail(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		email       = "user@email.com"
+		password    = "p4$sword"
+		username    = "john"
+		accessLevel = entity.AccessLevelAdmin
+	)
+
+	ctx := context.Background()
+
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, nil)
+
+	createdUser, err := s.interactor.Create(ctx, email, username, password, accessLevel)
+	require.Equal(t, createdUser, entity.User{})
+	require.Equal(t, err, entity.ErrDuplicatedUser)
+}
+
+func TestInteractor_Create_UserDuplUsername(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		email       = "user@email.com"
+		password    = "p4$sword"
+		username    = "john"
+		accessLevel = entity.AccessLevelAdmin
+	)
+
+	ctx := context.Background()
+
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, nil)
+
+	createdUser, err := s.interactor.Create(ctx, email, username, password, accessLevel)
+	require.Equal(t, createdUser, entity.User{})
+	require.Equal(t, err, entity.ErrDuplicatedUser)
 }

@@ -29,6 +29,6 @@ RUN chown -R kdl:0 /kg \
     && chown -R kdl:0 /var/log/app \
     && chmod -R g+w /var/log/app
 
-USER kg
+USER kdl
 
 CMD ["sh","-c","/usr/bin/python3 /kg/src/app.py 2>&1 | tee -a /var/log/app/app.log"]

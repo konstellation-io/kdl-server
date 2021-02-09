@@ -8,7 +8,17 @@ import React from 'react';
 import { generateSlug } from 'Utils/string';
 import styles from './Information.module.scss';
 import useNewProject from 'Pages/Home/apollo/hooks/useNewProject';
-import { useQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
+import DescriptionScore from './components/DescriptionScore/DescriptionScore';
+import {
+  GetQualityProjectDesc,
+  GetQualityProjectDescVariables,
+} from 'Graphql/queries/types/GetQualityProjectDesc';
+import { loader } from 'graphql.macro';
+
+const GetQualityProjectDescQuery = loader(
+  'Graphql/queries/getQualityProjectDesc.graphql'
+);
 
 const limits = {
   maxHeight: 500,
@@ -19,6 +29,11 @@ type Props = {
   showErrors: boolean;
 };
 function Information({ showErrors }: Props) {
+  const [getQualityProjectDesc, { data: descriptionScore }] = useLazyQuery<
+    GetQualityProjectDesc,
+    GetQualityProjectDescVariables
+  >(GetQualityProjectDescQuery);
+
   const { updateValue, updateError, clearError } = useNewProject('information');
   const { updateValue: updateInternalRepositoryValue } = useNewProject(
     'internalRepository'
@@ -66,12 +81,16 @@ function Information({ showErrors }: Props) {
               ? 'Please, write a description is important for the project'
               : ''
           );
+          getQualityProjectDesc({ variables: { description } });
         }}
         limits={limits}
         showClearButton
         textArea
         lockHorizontalGrowth
         error={showErrors ? errorDescription : ''}
+      />
+      <DescriptionScore
+        score={descriptionScore?.qualityProjectDesc.quality || 0}
       />
     </div>
   );

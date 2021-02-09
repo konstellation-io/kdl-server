@@ -1,0 +1,5 @@
+query GetQualityProjectDesc($description: String!) {
+  qualityProjectDesc(description: $description) {
+    quality
+  }
+}

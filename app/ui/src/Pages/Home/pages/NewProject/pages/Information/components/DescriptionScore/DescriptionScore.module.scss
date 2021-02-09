@@ -1,0 +1,64 @@
+@import 'Styles/colors';
+@import 'Styles/variables';
+@import 'Styles/mixins';
+
+.container {
+  display: flex;
+  align-items: center;
+
+  .scoreLabel {
+    @include font-small;
+    width: 5 * $grid-unit;
+    transition: color ease 0.4s;
+    text-align: right;
+
+    &.LOW {
+      color: palette(error);
+    }
+    &.MEDIUM {
+      color: palette(alert);
+    }
+    &.HIGH {
+      color: palette(feedback);
+    }
+    &.VERY_HIGH {
+      color: palette(success);
+    }
+  }
+
+  .scoreLevels {
+    display: flex;
+    align-items: center;
+    margin-left: $grid-unit / 2;
+
+    .scoreLevel {
+      height: $grid-unit / 2;
+      width: $grid-unit * 2;
+      background-color: palette(lowlight, 900);
+      transition: background-color ease 0.4s;
+
+      &:not(first-child) {
+        margin-left: $grid-unit / 4;
+      }
+
+      &.LOW {
+        background-color: palette(error);
+      }
+      &.MEDIUM {
+        background-color: palette(alert);
+      }
+      &.HIGH {
+        background-color: palette(feedback);
+      }
+      &.VERY_HIGH {
+        background-color: palette(success);
+      }
+    }
+  }
+
+  .hintLabel {
+    @include font-small;
+    color: font-color(lowlight);
+    margin-left: $grid-unit * 1.5;
+  }
+}

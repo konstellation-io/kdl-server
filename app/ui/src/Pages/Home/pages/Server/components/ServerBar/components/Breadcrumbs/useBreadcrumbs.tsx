@@ -11,6 +11,8 @@ import useProjectNavigation, {
   EnhancedRouteConfiguration,
   projectRoutesConfiguration,
 } from 'Hooks/useProjectNavigation';
+
+import { CONFIG } from 'index';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { GetProjects } from 'Graphql/queries/types/GetProjects';
 import ProjectIcon from 'Components/Icons/ProjectIcon/ProjectIcon';
@@ -18,13 +20,10 @@ import ProjectSelector from '../ProjectSelector/ProjectSelector';
 import ROUTE from 'Constants/routes';
 import React from 'react';
 import SectionSelector from '../SectionSelector/SectionSelector';
-import ServerIcon, {
-  RemoteServerStates,
-} from 'Components/Icons/ServerIcon/ServerIcon';
+import ServerIcon from 'Components/Icons/ServerIcon/ServerIcon';
 import ServerMetrics from 'Pages/Home/pages/Server/components/ServerBar/components/ServerMetrics/ServerMetrics';
 import { loader } from 'graphql.macro';
 import { useQuery } from '@apollo/client';
-import { CONFIG } from 'index';
 
 const GetProjectsQuery = loader('Graphql/queries/getProjects.graphql');
 
@@ -54,24 +53,13 @@ function useBreadcrumbs() {
   if (loading || !projectsData) return { loading, crumbs };
   if (error) throw Error('cannot retrieve data at useBreadcrumbs');
 
-  // TODO: server env var
-  // const {
-  //   name: serverName,
-  //   id: serverId,
-  //   url: serverUrl,
-  //   state: serverState,
-  // } = serverData.openedServer;
-
   const openedProject = projectData?.openedProject;
 
   // Add server crumb
   crumbs.push({
     crumbText: CONFIG.SERVER_NAME,
     LeftIconComponent: (
-      <ServerIcon
-        className="icon-regular"
-        state={RemoteServerStates.SIGNED_IN}
-      />
+      <ServerIcon className="icon-regular" />
     ),
     BottomComponent: (props: BottomComponentProps) => (
       <ServerMetrics serverUrl={CONFIG.SERVER_URL} {...props} />

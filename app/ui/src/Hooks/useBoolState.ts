@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-// TODO: use this hook in more places
 function useBoolState(defaultValue = false) {
   const [value, setValue] = useState(defaultValue);
 

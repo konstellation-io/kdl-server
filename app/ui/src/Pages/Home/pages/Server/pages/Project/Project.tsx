@@ -20,7 +20,6 @@ function Project() {
   const { updateOpenedProject } = useOpenedProject();
 
   useEffect(() => {
-    // console.log(data);
     // const openedProject = data?.projects.find((p) => p.id === projectId);
     // FIXME: uncomment prev line and remove next line
     const openedProject = data?.projects[0];

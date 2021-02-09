@@ -1,5 +1,5 @@
 import { ApolloClient, ApolloProvider } from '@apollo/client';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
 
 import { CONFIG } from 'index';
@@ -26,13 +26,11 @@ function Home() {
     []
   );
 
-  const client = useRef(
-    new ApolloClient({
-      uri: `${CONFIG.KDL_ADMIN_API_URL}/api/query`,
-      credentials: 'include',
-      cache,
-    })
-  );
+  const client = new ApolloClient({
+    uri: `${CONFIG.KDL_ADMIN_API_URL}/api/query`,
+    credentials: 'include',
+    cache,
+  });
 
   const routesWithTopBar = [
     ROUTE.USERS,
@@ -43,7 +41,7 @@ function Home() {
   ];
 
   return (
-    <ApolloProvider client={client.current}>
+    <ApolloProvider client={client}>
       <Router history={history}>
         <Route path={routesWithTopBar} component={ServerBar} />
         <Switch>

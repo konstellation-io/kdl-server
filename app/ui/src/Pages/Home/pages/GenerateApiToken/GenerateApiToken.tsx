@@ -1,19 +1,19 @@
 import { Button, TextInput } from 'kwc';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import ROUTE from 'Constants/routes';
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
 
 import { ActionButton } from 'Hooks/useStepper/useStepper';
 import CodeIcon from '@material-ui/icons/Code';
 import DefaultPage from 'Components/Layout/Page/DefaultPage/DefaultPage';
 import { GetMe } from 'Graphql/queries/types/GetMe';
+import ROUTE from 'Constants/routes';
 import { copyAndToast } from 'Utils/clipboard';
 import cx from 'classnames';
 import { loader } from 'graphql.macro';
 import styles from './GenerateApiToken.module.scss';
 import useAPIToken from 'Graphql/hooks/useAPIToken';
 import { useForm } from 'react-hook-form';
+import { useHistory } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 
 const GetMeQuery = loader('Graphql/queries/getMe.graphql');

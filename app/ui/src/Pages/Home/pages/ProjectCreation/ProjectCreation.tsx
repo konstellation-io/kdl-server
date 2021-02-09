@@ -57,7 +57,7 @@ function ProjectCreation() {
         </p>
         <div className={styles.buttonsContainer}>
           <Button
-            label="GO TO SERVER"
+            label="GO TO HOME"
             className={styles.button}
             to={ROUTE.HOME}
           />

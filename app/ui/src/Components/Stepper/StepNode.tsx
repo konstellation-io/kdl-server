@@ -1,9 +1,9 @@
 import React, { MouseEvent } from 'react';
 
+import IconActive from '@material-ui/icons/Create';
 import IconCompleted from '@material-ui/icons/Check';
 import IconDisabled from '@material-ui/icons/NotInterested';
 import IconIncomplete from '@material-ui/icons/Schedule';
-import IconActive from '@material-ui/icons/Create';
 import cx from 'classnames';
 import styles from './Stepper.module.scss';
 
@@ -16,7 +16,7 @@ type Props = {
   disabled: boolean;
   onClick: (e: MouseEvent<HTMLDivElement>) => void;
 };
-function Step({ label, completed, active, visited, onClick, disabled }: Props) {
+function StepNode({ label, completed, active, visited, onClick, disabled }: Props) {
   let Icon;
   switch (true) {
     case completed:
@@ -50,4 +50,4 @@ function Step({ label, completed, active, visited, onClick, disabled }: Props) {
   );
 }
 
-export default Step;
+export default StepNode;

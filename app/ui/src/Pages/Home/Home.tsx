@@ -2,20 +2,20 @@ import { ApolloClient, ApolloProvider } from '@apollo/client';
 import React, { useEffect, useRef } from 'react';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
 
+import { CONFIG } from 'index';
+import GenerateApiToken from './pages/GenerateApiToken/GenerateApiToken';
 import NewProject from './pages/NewProject/NewProject';
 import NewUser from './pages/NewUser/NewUser';
-import ProjectCreation from './pages/ProjectCreation/ProjectCreation';
-import ROUTE from 'Constants/routes';
-import cache from './apollo/cache';
-import GenerateApiToken from './pages/GenerateApiToken/GenerateApiToken';
-import history from 'browserHistory';
-import Users from './pages/Server/pages/Users/Users';
-import Projects from './pages/Server/pages/Projects/Projects';
 import Project from './pages/Server/pages/Project/Project';
-import UserSshKey from './pages/Server/pages/UserSshKey/UserSshKey';
-import UserApiTokens from './pages/Server/pages/UserApiToken/UserApiTokens';
+import ProjectCreation from './pages/ProjectCreation/ProjectCreation';
+import Projects from './pages/Server/pages/Projects/Projects';
+import ROUTE from 'Constants/routes';
 import ServerBar from './pages/Server/components/ServerBar/ServerBar';
-import { CONFIG } from 'index';
+import UserApiTokens from './pages/Server/pages/UserApiToken/UserApiTokens';
+import UserSshKey from './pages/Server/pages/UserSshKey/UserSshKey';
+import Users from './pages/Server/pages/Users/Users';
+import cache from './apollo/cache';
+import history from 'browserHistory';
 
 function Home() {
   // Resets cache on exit client
@@ -28,7 +28,7 @@ function Home() {
 
   const client = useRef(
     new ApolloClient({
-      uri: `${CONFIG.KDL_ADMIN_API_HOST}/api/query`,
+      uri: `${CONFIG.KDL_ADMIN_API_URL}/api/query`,
       credentials: 'include',
       cache,
     })

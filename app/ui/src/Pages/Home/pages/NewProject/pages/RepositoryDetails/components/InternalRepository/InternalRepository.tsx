@@ -4,11 +4,12 @@ import {
   GetNewProject,
 } from 'Graphql/client/queries/getNewProject.graphql';
 import React, { useEffect } from 'react';
+
+import { CONFIG } from 'index';
+import IconLink from '@material-ui/icons/Link';
 import styles from './InternalRepository.module.scss';
 import useNewProject from '../../../../../../apollo/hooks/useNewProject';
 import { useQuery } from '@apollo/client';
-import IconLink from '@material-ui/icons/Link';
-import { CONFIG } from 'index';
 
 function validateProjectSlug(value: string): string {
   const error = CHECK.getValidationError([
@@ -40,7 +41,7 @@ function InternalRepository({ showErrors }: Props) {
 
   useEffect(() => {
     updateValue('url', `${SERVER_URL}.${slug}`);
-  }, [updateValue, slug]);
+  }, [updateValue, slug, SERVER_URL]);
 
   if (!data) return <SpinnerCircular />;
 

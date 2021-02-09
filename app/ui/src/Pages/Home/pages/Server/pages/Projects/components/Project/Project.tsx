@@ -1,4 +1,3 @@
-import { Link, useParams } from 'react-router-dom';
 import { ProjectState, RepositoryType } from 'Graphql/types/globalTypes';
 import ROUTE, { buildRoute } from 'Constants/routes';
 import React, { FC, MouseEvent } from 'react';
@@ -6,6 +5,7 @@ import React, { FC, MouseEvent } from 'react';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import IconFav from '@material-ui/icons/Star';
 import IconNoFav from '@material-ui/icons/StarBorder';
+import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import { formatDate } from 'Utils/format';
 import styles from './Project.module.scss';

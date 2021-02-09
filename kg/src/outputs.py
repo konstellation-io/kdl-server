@@ -17,8 +17,8 @@ class RecommendedItem:
     framework: str = ""
 
     def __init__(self, field_dict):
-        self.fields = self.__get_fields()
-        self.mandatory_fields = self._get_mandatory_field()
+        self.fields = self._get_fields()
+        self.mandatory_fields = self._get_mandatory_fields()
 
         # Checks that all required fields are present
         if not set(self.mandatory_fields).issubset(field_dict.keys()):
@@ -30,10 +30,10 @@ class RecommendedItem:
                 continue
             setattr(self, key, value)
 
-    def __get_fields(self) -> list[str]:
+    def _get_fields(self) -> list[str]:
         return [field.name for field in fields(self)]
 
-    def _get_mandatory_field(self):
+    def _get_mandatory_fields(self):
         return [field.name for field in fields(self) if field.default is None]
 
     def to_grpc(self) -> kg_pb.GraphItem:
@@ -70,7 +70,7 @@ class RecommendedList:
             item_list.append(RecommendedItem(item))
 
         self.items = item_list
-        self.items.sort(reverse=True)
+        self.items.sort()
 
     def to_grpc(self) -> kg_pb.GetGraphRes:
         res = kg_pb.GetGraphRes()

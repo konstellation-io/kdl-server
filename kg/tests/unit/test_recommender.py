@@ -19,9 +19,16 @@ class TestRecommender:
         v1 = np.array([[2, 1], [4, 1]])
         v2 = np.array([[2, 1], [66, 1]])
         distance = Recommender._compute_cosine_distances(v1, v2)
-        assert type(distance) == np.ndarray
+        assert isinstance(distance, np.ndarray)
 
-        assert distance[1][1] == 0.026294477258404503
+        assert round(distance[1][1], 4) == 0.0263
+
+    def test_computes_cosine_distances_zero(self):
+        v1 = np.array([[2, 1], [4, 1]])
+        v2 = np.array([[2, 1], [4, 1]])
+        distance = Recommender._compute_cosine_distances(v1, v2)
+
+        assert round(distance[1][1], 4) == 0
 
     def test_compute_cosine_distances_error(self):
         v1 = np.array([[2, 1], [4, 1]])

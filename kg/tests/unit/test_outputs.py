@@ -1,51 +1,58 @@
-from outputs import RecommendedItem
+from outputs import RecommendedItem, RecommendedList
+from proto.knowledge_graph_pb2 import GetGraphRes, GraphItem
+
+VALUES_1 = {"id": "12345",
+            "category": "paper",
+            "title": "title test 1",
+            "abstract": "test abstract",
+            "authors": "test author",
+            "score": 0.1,
+            "date": "2020-01-01",
+            "url": "http://test"}
+
+VALUES_2 = {"id": "6789",
+            "category": "paper",
+            "title": "title test 2",
+            "abstract": "test abstract 2",
+            "authors": "test author 2",
+            "score": 0.2,
+            "date": "2020-01-01",
+            "url": "http://test"}
 
 
 class TestRecommendedItem:
 
     def test_creation(self):
-        test_values = {"id": "12345",
-                       "category": "paper",
-                       "title": "title test",
-                       "abstract": "test abastract",
-                       "authors": "test author",
-                       "score": 0.1,
-                       "date": "2020-01-01",
-                       "url": "http://test"}
-        item = RecommendedItem(test_values)
+        item = RecommendedItem(VALUES_1)
 
-        assert test_values['id'] == item.id
-        assert test_values['score'] == item.score
+        assert VALUES_1['id'] == item.id
+        assert VALUES_1['score'] == item.score
         assert isinstance(item.score, float)
 
-    def test_creation_missing_fields(self):
-        test_values = {"id": "12345",
-                       "category": "paper",
-                       "score": 0.1,
-                       "date": "2020-01-01"}
-
-        item = RecommendedItem(test_values)
-
     def test_get_fields(self):
-        pass
-
-    def test_get_mandatory_fields(self):
-        pass
-
-    def test_creation_wrong_type(self):
-        pass
+        fields = RecommendedItem(VALUES_1)._get_fields()
+        assert isinstance(fields, list)
 
     def test_order(self):
-        pass
+        item1 = RecommendedItem(VALUES_1)
+        item2 = RecommendedItem(VALUES_2)
+        assert item2 >= item1
 
     def test_to_grpc(self):
-        pass
+        item = RecommendedItem(VALUES_1)
+        item_proto = item.to_grpc()
+        assert isinstance(item_proto, GraphItem)
+        assert item_proto.title == "title test 1"
 
 
 class TestRecommendedList:
 
     def test_creation(self):
-        pass
+        rec_list = RecommendedList([VALUES_2, VALUES_1])
+        assert len(rec_list.items) == 2
+        assert rec_list.items[0].title == "title test 1"
 
     def test_to_grpc(self):
-        pass
+        rec_list = RecommendedList([VALUES_2, VALUES_1]).to_grpc()
+        assert isinstance(rec_list, GetGraphRes)
+        assert isinstance(rec_list.items[0], GraphItem)

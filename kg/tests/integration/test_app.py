@@ -8,7 +8,7 @@ python src/app.py
 import pytest
 from grpc_requests import StubClient
 
-from src.proto.knowledge_graph_pb2 import DESCRIPTOR
+from src.proto.knowledge_graph_pb2 import DESCRIPTOR, GetGraphRes
 
 
 class TestKnowledgeGraphService:
@@ -27,4 +27,4 @@ class TestKnowledgeGraphService:
     def test_GetGraph(self):
         client = self.set_client()
         res = client.request("kg.KGService", "GetGraph", {"description": "test"}, raw_output=True)
-        #assert type(res) == type(GetGraphRes)
+        assert isinstance(res.__class__, type(GetGraphRes))

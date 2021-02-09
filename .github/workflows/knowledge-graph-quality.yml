@@ -24,7 +24,8 @@ jobs:
         sudo apt-get install -y build-essential
         python -m pip install --upgrade pip
         pip install pipenv
-        pipenv install --system --dev 
+        pipenv install --system --dev
+        pip install pytest-cov
     - name: Run test
       working-directory: kg
       run: |
@@ -33,7 +34,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: coverage-report
-        path: coverage.xml
+        path: kg/coverage.xml
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -51,3 +52,22 @@ jobs:
       working-directory: kg
       run: |
         flake8
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Download code coverage results
+        uses: actions/download-artifact@v2
+        with:
+          name: coverage-report
+          path: kg/coverage.xml
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          projectBaseDir: kg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_KG }}

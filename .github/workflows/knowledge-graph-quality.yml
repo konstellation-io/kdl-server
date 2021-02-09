@@ -12,6 +12,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+    - name: Install OS dependencies
+      run: |
+        apt-get update
+        apt-get install -y build-essential
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
@@ -20,7 +24,6 @@ jobs:
     - name: Install dependencies
       working-directory: kg
       run: |
-        apt-get install -y build-essential
         python -m pip install --upgrade pip
         pip install pipenv
         pipenv install --system --dev 

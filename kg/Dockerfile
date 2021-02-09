@@ -31,4 +31,4 @@ RUN chown -R kdl:0 /kg \
 
 USER kdl
 
-CMD ["sh","-c","/usr/bin/python3 /kg/src/app.py 2>&1 | tee -a /var/log/app/app.log"]
+CMD ["sh","-c","/usr/local/bin/python3 /kg/src/app.py 2>&1 | tee -a /var/log/app/app.log"]

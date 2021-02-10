@@ -7,7 +7,7 @@ import {
 import AddProject from './components/Project/AddProject';
 import { GetProjects } from 'Graphql/queries/types/GetProjects';
 import Project from './components/Project/Project';
-import ProjectsBar from '../../Components/ProjectsBar/ProjectsBar';
+import ProjectsBar from 'Components/ProjectsBar/ProjectsBar';
 import React from 'react';
 import { loader } from 'graphql.macro';
 import styles from './Projects.module.scss';

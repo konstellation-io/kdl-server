@@ -10,7 +10,7 @@ import { RouteProjectParams } from 'Constants/routes';
 import cx from 'classnames';
 import styles from './ProjectNavigation.module.scss';
 import useProjectNavigation from 'Hooks/useProjectNavigation';
-import useWorkspace, { CONFIG } from '../../../../Hooks/useWorkspace';
+import useWorkspace, { CONFIG } from 'Hooks/useWorkspace';
 
 const NavButtonLink: FC<any> = ({ children, ...props }) => (
   <NavLink {...props} activeClassName={styles.active} exact>

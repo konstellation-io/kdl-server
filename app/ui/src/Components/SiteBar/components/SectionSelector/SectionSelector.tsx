@@ -5,7 +5,7 @@ import { EnhancedRouteConfiguration } from 'Hooks/useProjectNavigation';
 import { BottomComponentProps } from '../Breadcrumbs/components/Crumb/Crumb';
 import NavigationButton, {
   IconSize,
-} from '../../../../Pages/Project/components/ProjectNavigation/NavigationButton';
+} from 'Pages/Project/components/ProjectNavigation/NavigationButton';
 
 type Props = {
   options: EnhancedRouteConfiguration[];

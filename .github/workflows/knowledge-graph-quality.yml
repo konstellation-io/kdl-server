@@ -68,6 +68,10 @@ jobs:
         with:
           name: coverage-report
           path: kg
+      - name: Fix code coverage paths
+        working-directory: ./engine/admin-ui
+        run: |
+          sed -i 's|/home/runner/work/kdl-server/kdl-server/|/github/workspace/|g' coverage.xml
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         with:

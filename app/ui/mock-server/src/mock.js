@@ -15,6 +15,9 @@ module.exports = {
       ...project,
       id,
     }),
+    qualityProjectDesc: () => ({
+      quality: Math.round((Math.random() * 1000) % 100),
+    }),
   }),
   Mutation: () => ({
     updateProject: (_, { input: { id, name } }) => ({

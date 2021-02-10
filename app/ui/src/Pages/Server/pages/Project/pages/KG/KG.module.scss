@@ -1,0 +1,9 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}

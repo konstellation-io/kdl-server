@@ -1,5 +1,5 @@
 import { AccessLevel } from 'Graphql/types/globalTypes';
-import { UserSelection } from 'Pages/Home/apollo/models/UserSettings';
+import { UserSelection } from '../models/UserSettings';
 import { gql } from '@apollo/client';
 
 export interface GetUserSettings_filters {

@@ -1,4 +1,4 @@
-import { MemberDetails } from 'Pages/Home/apollo/models/MemberDetails';
+import { MemberDetails } from '../models/MemberDetails';
 import { gql } from '@apollo/client';
 
 export interface GetMemberDetails {

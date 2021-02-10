@@ -1,4 +1,4 @@
-import { ProjectFilters } from 'Pages/Home/apollo/models/ProjectFilters';
+import { ProjectFilters } from '../models/ProjectFilters';
 import { gql } from '@apollo/client';
 
 export interface GetProjectFilters {

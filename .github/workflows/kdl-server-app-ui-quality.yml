@@ -1,0 +1,55 @@
+name: KDL Server App UI Quality
+
+on:
+  push:
+    branches-ignore:
+      - "v*"
+    tags-ignore:
+      - v*
+    paths:
+      - "app/api/**/*"
+      - ".github/workflows/kdl-server-app-ui*"
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "14"
+      - name: Run tests
+        run: |
+          yarn install
+          yarn run test:cov:sonar
+        working-directory: ./app/ui
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: |
+            ./app/ui/coverage
+            ./app/ui/test-report.xml
+  
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    needs: 
+      - test
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Download code coverage results
+        uses: actions/download-artifact@v2
+        with:
+          name: coverage-report
+          path: app/ui
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          projectBaseDir: app/ui
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_APP_UI }}

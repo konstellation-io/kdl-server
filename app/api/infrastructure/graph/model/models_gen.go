@@ -22,14 +22,6 @@ type AddUserInput struct {
 	AccessLevel entity.AccessLevel `json:"accessLevel"`
 }
 
-type APIToken struct {
-	ID           string `json:"id"`
-	Name         string `json:"name"`
-	CreationDate string `json:"creationDate"`
-	LastUsedDate string `json:"lastUsedDate"`
-	Token        string `json:"token"`
-}
-
 type APITokenInput struct {
 	UserID string  `json:"userId"`
 	Name   *string `json:"name"`

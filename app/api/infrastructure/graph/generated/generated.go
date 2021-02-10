@@ -169,8 +169,8 @@ type MutationResolver interface {
 	AddMembers(ctx context.Context, input model.AddMembersInput) ([]entity.Member, error)
 	RemoveMember(ctx context.Context, input model.RemoveMemberInput) (*entity.Member, error)
 	UpdateMember(ctx context.Context, input model.UpdateMemberInput) (*entity.Member, error)
-	AddAPIToken(ctx context.Context, input *model.APITokenInput) (*model.APIToken, error)
-	RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*model.APIToken, error)
+	AddAPIToken(ctx context.Context, input *model.APITokenInput) (*entity.APIToken, error)
+	RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error)
 	SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*model.KnowledgeGraphItem, error)
 	SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*model.KnowledgeGraphItem, error)
 	SetActiveProjectTools(ctx context.Context, input model.SetBoolFieldInput) (*entity.Project, error)
@@ -195,7 +195,6 @@ type UserResolver interface {
 	CreationDate(ctx context.Context, obj *entity.User) (string, error)
 
 	LastActivity(ctx context.Context, obj *entity.User) (*string, error)
-	APITokens(ctx context.Context, obj *entity.User) ([]model.APIToken, error)
 }
 
 type executableSchema struct {
@@ -975,12 +974,12 @@ type Tool {
 }
 
 enum ToolName {
-  GITEA,
-  MINIO,
-  JUPYTER,
-  VSCODE,
-  DRONE,
-  MLFLOW,
+  GITEA
+  MINIO
+  JUPYTER
+  VSCODE
+  DRONE
+  MLFLOW
 }
 
 enum AccessLevel {
@@ -1394,7 +1393,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _ApiToken_id(ctx context.Context, field graphql.CollectedField, obj *model.APIToken) (ret graphql.Marshaler) {
+func (ec *executionContext) _ApiToken_id(ctx context.Context, field graphql.CollectedField, obj *entity.APIToken) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1429,7 +1428,7 @@ func (ec *executionContext) _ApiToken_id(ctx context.Context, field graphql.Coll
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ApiToken_name(ctx context.Context, field graphql.CollectedField, obj *model.APIToken) (ret graphql.Marshaler) {
+func (ec *executionContext) _ApiToken_name(ctx context.Context, field graphql.CollectedField, obj *entity.APIToken) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1464,7 +1463,7 @@ func (ec *executionContext) _ApiToken_name(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ApiToken_creationDate(ctx context.Context, field graphql.CollectedField, obj *model.APIToken) (ret graphql.Marshaler) {
+func (ec *executionContext) _ApiToken_creationDate(ctx context.Context, field graphql.CollectedField, obj *entity.APIToken) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1499,7 +1498,7 @@ func (ec *executionContext) _ApiToken_creationDate(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ApiToken_lastUsedDate(ctx context.Context, field graphql.CollectedField, obj *model.APIToken) (ret graphql.Marshaler) {
+func (ec *executionContext) _ApiToken_lastUsedDate(ctx context.Context, field graphql.CollectedField, obj *entity.APIToken) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1534,7 +1533,7 @@ func (ec *executionContext) _ApiToken_lastUsedDate(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ApiToken_token(ctx context.Context, field graphql.CollectedField, obj *model.APIToken) (ret graphql.Marshaler) {
+func (ec *executionContext) _ApiToken_token(ctx context.Context, field graphql.CollectedField, obj *entity.APIToken) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2595,9 +2594,9 @@ func (ec *executionContext) _Mutation_addApiToken(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.APIToken)
+	res := resTmp.(*entity.APIToken)
 	fc.Result = res
-	return ec.marshalOApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPIToken(ctx, field.Selections, res)
+	return ec.marshalOApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPIToken(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_removeApiToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2637,9 +2636,9 @@ func (ec *executionContext) _Mutation_removeApiToken(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.APIToken)
+	res := resTmp.(*entity.APIToken)
 	fc.Result = res
-	return ec.marshalNApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPIToken(ctx, field.Selections, res)
+	return ec.marshalNApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPIToken(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_setStarredKGItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4148,14 +4147,14 @@ func (ec *executionContext) _User_apiTokens(ctx context.Context, field graphql.C
 		Object:     "User",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().APITokens(rctx, obj)
+		return obj.APITokens, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4167,9 +4166,9 @@ func (ec *executionContext) _User_apiTokens(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]model.APIToken)
+	res := resTmp.([]entity.APIToken)
 	fc.Result = res
-	return ec.marshalNApiToken2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPITokenᚄ(ctx, field.Selections, res)
+	return ec.marshalNApiToken2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPITokenᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -5649,7 +5648,7 @@ func (ec *executionContext) unmarshalInputUpdateProjectRepositoryInput(ctx conte
 
 var apiTokenImplementors = []string{"ApiToken"}
 
-func (ec *executionContext) _ApiToken(ctx context.Context, sel ast.SelectionSet, obj *model.APIToken) graphql.Marshaler {
+func (ec *executionContext) _ApiToken(ctx context.Context, sel ast.SelectionSet, obj *entity.APIToken) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, apiTokenImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -6361,19 +6360,10 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 				return res
 			})
 		case "apiTokens":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._User_apiTokens(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
+			out.Values[i] = ec._User_apiTokens(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6656,11 +6646,11 @@ func (ec *executionContext) unmarshalNAddUserInput2githubᚗcomᚋkonstellation�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNApiToken2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPIToken(ctx context.Context, sel ast.SelectionSet, v model.APIToken) graphql.Marshaler {
+func (ec *executionContext) marshalNApiToken2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPIToken(ctx context.Context, sel ast.SelectionSet, v entity.APIToken) graphql.Marshaler {
 	return ec._ApiToken(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNApiToken2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPITokenᚄ(ctx context.Context, sel ast.SelectionSet, v []model.APIToken) graphql.Marshaler {
+func (ec *executionContext) marshalNApiToken2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPITokenᚄ(ctx context.Context, sel ast.SelectionSet, v []entity.APIToken) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -6684,7 +6674,7 @@ func (ec *executionContext) marshalNApiToken2ᚕgithubᚗcomᚋkonstellationᚑi
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNApiToken2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPIToken(ctx, sel, v[i])
+			ret[i] = ec.marshalNApiToken2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPIToken(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6697,7 +6687,7 @@ func (ec *executionContext) marshalNApiToken2ᚕgithubᚗcomᚋkonstellationᚑi
 	return ret
 }
 
-func (ec *executionContext) marshalNApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPIToken(ctx context.Context, sel ast.SelectionSet, v *model.APIToken) graphql.Marshaler {
+func (ec *executionContext) marshalNApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPIToken(ctx context.Context, sel ast.SelectionSet, v *entity.APIToken) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -7441,7 +7431,7 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalOApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPIToken(ctx context.Context, sel ast.SelectionSet, v *model.APIToken) graphql.Marshaler {
+func (ec *executionContext) marshalOApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPIToken(ctx context.Context, sel ast.SelectionSet, v *entity.APIToken) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

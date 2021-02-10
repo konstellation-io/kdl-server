@@ -55,11 +55,11 @@ func (r *mutationResolver) UpdateMember(ctx context.Context, input model.UpdateM
 	panic(entity.ErrNotImplemented)
 }
 
-func (r *mutationResolver) AddAPIToken(ctx context.Context, input *model.APITokenInput) (*model.APIToken, error) {
+func (r *mutationResolver) AddAPIToken(ctx context.Context, input *model.APITokenInput) (*entity.APIToken, error) {
 	panic(entity.ErrNotImplemented)
 }
 
-func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*model.APIToken, error) {
+func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error) {
 	panic(entity.ErrNotImplemented)
 }
 
@@ -120,11 +120,12 @@ func (r *userResolver) CreationDate(ctx context.Context, obj *entity.User) (stri
 }
 
 func (r *userResolver) LastActivity(ctx context.Context, obj *entity.User) (*string, error) {
-	panic(entity.ErrNotImplemented)
-}
+	if obj.LastActivity == nil {
+		return nil, nil
+	}
 
-func (r *userResolver) APITokens(ctx context.Context, obj *entity.User) ([]model.APIToken, error) {
-	panic(entity.ErrNotImplemented)
+	lastActivity := obj.LastActivity.Format(time.RFC3339)
+	return &lastActivity, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

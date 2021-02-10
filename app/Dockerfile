@@ -7,7 +7,7 @@ WORKDIR /app
 COPY api/go.* ./
 RUN go mod download
 COPY api .
-RUN go build -o kdl-server .
+RUN go build -o kdl-server http/main.go
 
 # Build UI
 FROM node:14 as ui-builder

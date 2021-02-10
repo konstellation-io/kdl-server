@@ -17,15 +17,9 @@ type AddMembersInput struct {
 
 type AddUserInput struct {
 	Email       string             `json:"email"`
+	Username    string             `json:"username"`
+	Password    string             `json:"password"`
 	AccessLevel entity.AccessLevel `json:"accessLevel"`
-}
-
-type APIToken struct {
-	ID           string `json:"id"`
-	Name         string `json:"name"`
-	CreationDate string `json:"creationDate"`
-	LastUsedDate string `json:"lastUsedDate"`
-	Token        string `json:"token"`
 }
 
 type APITokenInput struct {
@@ -40,7 +34,7 @@ type CreateProjectInput struct {
 }
 
 type KnowledgeGraph struct {
-	Items []*KnowledgeGraphItem `json:"items"`
+	Items []KnowledgeGraphItem `json:"items"`
 }
 
 type KnowledgeGraphItem struct {
@@ -80,13 +74,6 @@ type RepositoryInput struct {
 	URL  string                `json:"url"`
 }
 
-type SSHKey struct {
-	Public       string  `json:"public"`
-	Private      string  `json:"private"`
-	CreationDate string  `json:"creationDate"`
-	LastActivity *string `json:"lastActivity"`
-}
-
 type SetBoolFieldInput struct {
 	ID    string `json:"id"`
 	Value bool   `json:"value"`
@@ -111,15 +98,6 @@ type UpdateProjectInput struct {
 
 type UpdateProjectRepositoryInput struct {
 	URL string `json:"url"`
-}
-
-type User struct {
-	ID           string             `json:"id"`
-	Email        string             `json:"email"`
-	CreationDate string             `json:"creationDate"`
-	AccessLevel  entity.AccessLevel `json:"accessLevel"`
-	LastActivity *string            `json:"lastActivity"`
-	APITokens    []*APIToken        `json:"apiTokens"`
 }
 
 type KnowledgeGraphItemCat string

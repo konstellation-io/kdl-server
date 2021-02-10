@@ -37,7 +37,10 @@ type Config struct {
 
 type ResolverRoot interface {
 	Mutation() MutationResolver
+	Project() ProjectResolver
 	Query() QueryResolver
+	SSHKey() SSHKeyResolver
+	User() UserResolver
 }
 
 type DirectiveRoot struct {
@@ -152,33 +155,46 @@ type ComplexityRoot struct {
 		Email        func(childComplexity int) int
 		ID           func(childComplexity int) int
 		LastActivity func(childComplexity int) int
+		Username     func(childComplexity int) int
 	}
 }
 
 type MutationResolver interface {
-	AddUser(ctx context.Context, input model.AddUserInput) (*model.User, error)
-	RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]*model.User, error)
-	UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]*model.User, error)
-	RegenerateSSHKey(ctx context.Context) (*model.SSHKey, error)
+	AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error)
+	RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error)
+	UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]entity.User, error)
+	RegenerateSSHKey(ctx context.Context) (*entity.SSHKey, error)
 	CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error)
 	UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error)
-	AddMembers(ctx context.Context, input model.AddMembersInput) ([]*entity.Member, error)
+	AddMembers(ctx context.Context, input model.AddMembersInput) ([]entity.Member, error)
 	RemoveMember(ctx context.Context, input model.RemoveMemberInput) (*entity.Member, error)
 	UpdateMember(ctx context.Context, input model.UpdateMemberInput) (*entity.Member, error)
-	AddAPIToken(ctx context.Context, input *model.APITokenInput) (*model.APIToken, error)
-	RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*model.APIToken, error)
+	AddAPIToken(ctx context.Context, input *model.APITokenInput) (*entity.APIToken, error)
+	RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error)
 	SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*model.KnowledgeGraphItem, error)
 	SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*model.KnowledgeGraphItem, error)
 	SetActiveProjectTools(ctx context.Context, input model.SetBoolFieldInput) (*entity.Project, error)
 }
+type ProjectResolver interface {
+	CreationDate(ctx context.Context, obj *entity.Project) (string, error)
+}
 type QueryResolver interface {
-	Me(ctx context.Context) (*model.User, error)
-	Projects(ctx context.Context) ([]*entity.Project, error)
+	Me(ctx context.Context) (*entity.User, error)
+	Projects(ctx context.Context) ([]entity.Project, error)
 	Project(ctx context.Context, id string) (*entity.Project, error)
-	Users(ctx context.Context) ([]*model.User, error)
-	SSHKey(ctx context.Context) (*model.SSHKey, error)
+	Users(ctx context.Context) ([]entity.User, error)
+	SSHKey(ctx context.Context) (*entity.SSHKey, error)
 	QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error)
 	KnowledgeGraph(ctx context.Context, description string) (*model.KnowledgeGraph, error)
+}
+type SSHKeyResolver interface {
+	CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error)
+	LastActivity(ctx context.Context, obj *entity.SSHKey) (*string, error)
+}
+type UserResolver interface {
+	CreationDate(ctx context.Context, obj *entity.User) (string, error)
+
+	LastActivity(ctx context.Context, obj *entity.User) (*string, error)
 }
 
 type executableSchema struct {
@@ -794,6 +810,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.LastActivity(childComplexity), true
 
+	case "User.username":
+		if e.complexity.User.Username == nil {
+			break
+		}
+
+		return e.complexity.User.Username(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -920,6 +943,7 @@ type SSHKey {
 
 type User {
   id: ID!
+  username: String!
   email: String!
   creationDate: String!
   accessLevel: AccessLevel!
@@ -950,12 +974,12 @@ type Tool {
 }
 
 enum ToolName {
-  GITEA,
-  MINIO,
-  JUPYTER,
-  VSCODE,
-  DRONE,
-  MLFLOW,
+  GITEA
+  MINIO
+  JUPYTER
+  VSCODE
+  DRONE
+  MLFLOW
 }
 
 enum AccessLevel {
@@ -1005,6 +1029,8 @@ input RemoveUsersInput {
 
 input AddUserInput {
   email: String!
+  username: String!
+  password: String!
   accessLevel: AccessLevel!
 }
 
@@ -1367,7 +1393,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _ApiToken_id(ctx context.Context, field graphql.CollectedField, obj *model.APIToken) (ret graphql.Marshaler) {
+func (ec *executionContext) _ApiToken_id(ctx context.Context, field graphql.CollectedField, obj *entity.APIToken) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1402,7 +1428,7 @@ func (ec *executionContext) _ApiToken_id(ctx context.Context, field graphql.Coll
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ApiToken_name(ctx context.Context, field graphql.CollectedField, obj *model.APIToken) (ret graphql.Marshaler) {
+func (ec *executionContext) _ApiToken_name(ctx context.Context, field graphql.CollectedField, obj *entity.APIToken) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1437,7 +1463,7 @@ func (ec *executionContext) _ApiToken_name(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ApiToken_creationDate(ctx context.Context, field graphql.CollectedField, obj *model.APIToken) (ret graphql.Marshaler) {
+func (ec *executionContext) _ApiToken_creationDate(ctx context.Context, field graphql.CollectedField, obj *entity.APIToken) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1472,7 +1498,7 @@ func (ec *executionContext) _ApiToken_creationDate(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ApiToken_lastUsedDate(ctx context.Context, field graphql.CollectedField, obj *model.APIToken) (ret graphql.Marshaler) {
+func (ec *executionContext) _ApiToken_lastUsedDate(ctx context.Context, field graphql.CollectedField, obj *entity.APIToken) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1507,7 +1533,7 @@ func (ec *executionContext) _ApiToken_lastUsedDate(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ApiToken_token(ctx context.Context, field graphql.CollectedField, obj *model.APIToken) (ret graphql.Marshaler) {
+func (ec *executionContext) _ApiToken_token(ctx context.Context, field graphql.CollectedField, obj *entity.APIToken) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1572,9 +1598,9 @@ func (ec *executionContext) _KnowledgeGraph_items(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.KnowledgeGraphItem)
+	res := resTmp.([]model.KnowledgeGraphItem)
 	fc.Result = res
-	return ec.marshalNKnowledgeGraphItem2ᚕᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItemᚄ(ctx, field.Selections, res)
+	return ec.marshalNKnowledgeGraphItem2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItemᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _KnowledgeGraphItem_id(ctx context.Context, field graphql.CollectedField, obj *model.KnowledgeGraphItem) (ret graphql.Marshaler) {
@@ -2200,9 +2226,9 @@ func (ec *executionContext) _Mutation_addUser(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(*entity.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_removeUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2242,9 +2268,9 @@ func (ec *executionContext) _Mutation_removeUsers(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.User)
+	res := resTmp.([]entity.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUserᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateAccessLevel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2284,9 +2310,9 @@ func (ec *executionContext) _Mutation_updateAccessLevel(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.User)
+	res := resTmp.([]entity.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUserᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_regenerateSSHKey(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2319,9 +2345,9 @@ func (ec *executionContext) _Mutation_regenerateSSHKey(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.SSHKey)
+	res := resTmp.(*entity.SSHKey)
 	fc.Result = res
-	return ec.marshalNSSHKey2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSSHKey(ctx, field.Selections, res)
+	return ec.marshalNSSHKey2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐSSHKey(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createProject(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2445,9 +2471,9 @@ func (ec *executionContext) _Mutation_addMembers(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*entity.Member)
+	res := resTmp.([]entity.Member)
 	fc.Result = res
-	return ec.marshalNMember2ᚕᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMemberᚄ(ctx, field.Selections, res)
+	return ec.marshalNMember2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMemberᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_removeMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2568,9 +2594,9 @@ func (ec *executionContext) _Mutation_addApiToken(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.APIToken)
+	res := resTmp.(*entity.APIToken)
 	fc.Result = res
-	return ec.marshalOApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPIToken(ctx, field.Selections, res)
+	return ec.marshalOApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPIToken(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_removeApiToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2610,9 +2636,9 @@ func (ec *executionContext) _Mutation_removeApiToken(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.APIToken)
+	res := resTmp.(*entity.APIToken)
 	fc.Result = res
-	return ec.marshalNApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPIToken(ctx, field.Selections, res)
+	return ec.marshalNApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPIToken(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_setStarredKGItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2959,14 +2985,14 @@ func (ec *executionContext) _Project_creationDate(ctx context.Context, field gra
 		Object:     "Project",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CreationDate, nil
+		return ec.resolvers.Project().CreationDate(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3214,9 +3240,9 @@ func (ec *executionContext) _Query_me(ctx context.Context, field graphql.Collect
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(*entity.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_projects(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3249,9 +3275,9 @@ func (ec *executionContext) _Query_projects(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*entity.Project)
+	res := resTmp.([]entity.Project)
 	fc.Result = res
-	return ec.marshalNProject2ᚕᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProjectᚄ(ctx, field.Selections, res)
+	return ec.marshalNProject2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProjectᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_project(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3326,9 +3352,9 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.User)
+	res := resTmp.([]entity.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUserᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_sshKey(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3361,9 +3387,9 @@ func (ec *executionContext) _Query_sshKey(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.SSHKey)
+	res := resTmp.(*entity.SSHKey)
 	fc.Result = res
-	return ec.marshalNSSHKey2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSSHKey(ctx, field.Selections, res)
+	return ec.marshalNSSHKey2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐSSHKey(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_qualityProjectDesc(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3661,7 +3687,7 @@ func (ec *executionContext) _Repository_connected(ctx context.Context, field gra
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _SSHKey_public(ctx context.Context, field graphql.CollectedField, obj *model.SSHKey) (ret graphql.Marshaler) {
+func (ec *executionContext) _SSHKey_public(ctx context.Context, field graphql.CollectedField, obj *entity.SSHKey) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3696,7 +3722,7 @@ func (ec *executionContext) _SSHKey_public(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _SSHKey_private(ctx context.Context, field graphql.CollectedField, obj *model.SSHKey) (ret graphql.Marshaler) {
+func (ec *executionContext) _SSHKey_private(ctx context.Context, field graphql.CollectedField, obj *entity.SSHKey) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3731,7 +3757,7 @@ func (ec *executionContext) _SSHKey_private(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _SSHKey_creationDate(ctx context.Context, field graphql.CollectedField, obj *model.SSHKey) (ret graphql.Marshaler) {
+func (ec *executionContext) _SSHKey_creationDate(ctx context.Context, field graphql.CollectedField, obj *entity.SSHKey) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3742,14 +3768,14 @@ func (ec *executionContext) _SSHKey_creationDate(ctx context.Context, field grap
 		Object:     "SSHKey",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CreationDate, nil
+		return ec.resolvers.SSHKey().CreationDate(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3766,7 +3792,7 @@ func (ec *executionContext) _SSHKey_creationDate(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _SSHKey_lastActivity(ctx context.Context, field graphql.CollectedField, obj *model.SSHKey) (ret graphql.Marshaler) {
+func (ec *executionContext) _SSHKey_lastActivity(ctx context.Context, field graphql.CollectedField, obj *entity.SSHKey) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3777,14 +3803,14 @@ func (ec *executionContext) _SSHKey_lastActivity(ctx context.Context, field grap
 		Object:     "SSHKey",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.LastActivity, nil
+		return ec.resolvers.SSHKey().LastActivity(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3903,7 +3929,7 @@ func (ec *executionContext) _Tool_url(ctx context.Context, field graphql.Collect
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *entity.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3938,7 +3964,42 @@ func (ec *executionContext) _User_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_email(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_username(ctx context.Context, field graphql.CollectedField, obj *entity.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Username, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_email(ctx context.Context, field graphql.CollectedField, obj *entity.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3973,7 +4034,7 @@ func (ec *executionContext) _User_email(ctx context.Context, field graphql.Colle
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_creationDate(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_creationDate(ctx context.Context, field graphql.CollectedField, obj *entity.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3984,14 +4045,14 @@ func (ec *executionContext) _User_creationDate(ctx context.Context, field graphq
 		Object:     "User",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CreationDate, nil
+		return ec.resolvers.User().CreationDate(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4008,7 +4069,7 @@ func (ec *executionContext) _User_creationDate(ctx context.Context, field graphq
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_accessLevel(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_accessLevel(ctx context.Context, field graphql.CollectedField, obj *entity.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4043,7 +4104,7 @@ func (ec *executionContext) _User_accessLevel(ctx context.Context, field graphql
 	return ec.marshalNAccessLevel2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAccessLevel(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_lastActivity(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_lastActivity(ctx context.Context, field graphql.CollectedField, obj *entity.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4054,14 +4115,14 @@ func (ec *executionContext) _User_lastActivity(ctx context.Context, field graphq
 		Object:     "User",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.LastActivity, nil
+		return ec.resolvers.User().LastActivity(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4075,7 +4136,7 @@ func (ec *executionContext) _User_lastActivity(ctx context.Context, field graphq
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_apiTokens(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_apiTokens(ctx context.Context, field graphql.CollectedField, obj *entity.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -4105,9 +4166,9 @@ func (ec *executionContext) _User_apiTokens(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.APIToken)
+	res := resTmp.([]entity.APIToken)
 	fc.Result = res
-	return ec.marshalNApiToken2ᚕᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPITokenᚄ(ctx, field.Selections, res)
+	return ec.marshalNApiToken2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPITokenᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -5239,6 +5300,22 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "username":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			it.Username, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "accessLevel":
 			var err error
 
@@ -5571,7 +5648,7 @@ func (ec *executionContext) unmarshalInputUpdateProjectRepositoryInput(ctx conte
 
 var apiTokenImplementors = []string{"ApiToken"}
 
-func (ec *executionContext) _ApiToken(ctx context.Context, sel ast.SelectionSet, obj *model.APIToken) graphql.Marshaler {
+func (ec *executionContext) _ApiToken(ctx context.Context, sel ast.SelectionSet, obj *entity.APIToken) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, apiTokenImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -5870,51 +5947,60 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 		case "id":
 			out.Values[i] = ec._Project_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Project_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "description":
 			out.Values[i] = ec._Project_description(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "favorite":
 			out.Values[i] = ec._Project_favorite(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "repository":
 			out.Values[i] = ec._Project_repository(ctx, field, obj)
 		case "state":
 			out.Values[i] = ec._Project_state(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "creationDate":
-			out.Values[i] = ec._Project_creationDate(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Project_creationDate(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "lastActivationDate":
 			out.Values[i] = ec._Project_lastActivationDate(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "error":
 			out.Values[i] = ec._Project_error(ctx, field, obj)
 		case "members":
 			out.Values[i] = ec._Project_members(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "tools":
 			out.Values[i] = ec._Project_tools(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "areToolsActive":
 			out.Values[i] = ec._Project_areToolsActive(ctx, field, obj)
@@ -6125,7 +6211,7 @@ func (ec *executionContext) _Repository(ctx context.Context, sel ast.SelectionSe
 
 var sSHKeyImplementors = []string{"SSHKey"}
 
-func (ec *executionContext) _SSHKey(ctx context.Context, sel ast.SelectionSet, obj *model.SSHKey) graphql.Marshaler {
+func (ec *executionContext) _SSHKey(ctx context.Context, sel ast.SelectionSet, obj *entity.SSHKey) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, sSHKeyImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -6137,20 +6223,38 @@ func (ec *executionContext) _SSHKey(ctx context.Context, sel ast.SelectionSet, o
 		case "public":
 			out.Values[i] = ec._SSHKey_public(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "private":
 			out.Values[i] = ec._SSHKey_private(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "creationDate":
-			out.Values[i] = ec._SSHKey_creationDate(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SSHKey_creationDate(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "lastActivity":
-			out.Values[i] = ec._SSHKey_lastActivity(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SSHKey_lastActivity(ctx, field, obj)
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6201,7 +6305,7 @@ func (ec *executionContext) _Tool(ctx context.Context, sel ast.SelectionSet, obj
 
 var userImplementors = []string{"User"}
 
-func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *model.User) graphql.Marshaler {
+func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *entity.User) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -6213,29 +6317,52 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._User_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "username":
+			out.Values[i] = ec._User_username(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "email":
 			out.Values[i] = ec._User_email(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "creationDate":
-			out.Values[i] = ec._User_creationDate(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_creationDate(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "accessLevel":
 			out.Values[i] = ec._User_accessLevel(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "lastActivity":
-			out.Values[i] = ec._User_lastActivity(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_lastActivity(ctx, field, obj)
+				return res
+			})
 		case "apiTokens":
 			out.Values[i] = ec._User_apiTokens(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -6519,11 +6646,11 @@ func (ec *executionContext) unmarshalNAddUserInput2githubᚗcomᚋkonstellation�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNApiToken2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPIToken(ctx context.Context, sel ast.SelectionSet, v model.APIToken) graphql.Marshaler {
+func (ec *executionContext) marshalNApiToken2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPIToken(ctx context.Context, sel ast.SelectionSet, v entity.APIToken) graphql.Marshaler {
 	return ec._ApiToken(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNApiToken2ᚕᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPITokenᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.APIToken) graphql.Marshaler {
+func (ec *executionContext) marshalNApiToken2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPITokenᚄ(ctx context.Context, sel ast.SelectionSet, v []entity.APIToken) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -6547,7 +6674,7 @@ func (ec *executionContext) marshalNApiToken2ᚕᚖgithubᚗcomᚋkonstellation�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPIToken(ctx, sel, v[i])
+			ret[i] = ec.marshalNApiToken2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPIToken(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6560,7 +6687,7 @@ func (ec *executionContext) marshalNApiToken2ᚕᚖgithubᚗcomᚋkonstellation�
 	return ret
 }
 
-func (ec *executionContext) marshalNApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPIToken(ctx context.Context, sel ast.SelectionSet, v *model.APIToken) graphql.Marshaler {
+func (ec *executionContext) marshalNApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPIToken(ctx context.Context, sel ast.SelectionSet, v *entity.APIToken) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -6668,7 +6795,7 @@ func (ec *executionContext) marshalNKnowledgeGraphItem2githubᚗcomᚋkonstellat
 	return ec._KnowledgeGraphItem(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNKnowledgeGraphItem2ᚕᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.KnowledgeGraphItem) graphql.Marshaler {
+func (ec *executionContext) marshalNKnowledgeGraphItem2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItemᚄ(ctx context.Context, sel ast.SelectionSet, v []model.KnowledgeGraphItem) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -6692,7 +6819,7 @@ func (ec *executionContext) marshalNKnowledgeGraphItem2ᚕᚖgithubᚗcomᚋkons
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNKnowledgeGraphItem2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItem(ctx, sel, v[i])
+			ret[i] = ec.marshalNKnowledgeGraphItem2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItem(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6766,43 +6893,6 @@ func (ec *executionContext) marshalNMember2ᚕgithubᚗcomᚋkonstellationᚑio�
 	return ret
 }
 
-func (ec *executionContext) marshalNMember2ᚕᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMemberᚄ(ctx context.Context, sel ast.SelectionSet, v []*entity.Member) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNMember2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMember(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
 func (ec *executionContext) marshalNMember2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMember(ctx context.Context, sel ast.SelectionSet, v *entity.Member) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -6817,7 +6907,7 @@ func (ec *executionContext) marshalNProject2githubᚗcomᚋkonstellationᚑioᚋ
 	return ec._Project(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProject2ᚕᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProjectᚄ(ctx context.Context, sel ast.SelectionSet, v []*entity.Project) graphql.Marshaler {
+func (ec *executionContext) marshalNProject2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProjectᚄ(ctx context.Context, sel ast.SelectionSet, v []entity.Project) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -6841,7 +6931,7 @@ func (ec *executionContext) marshalNProject2ᚕᚖgithubᚗcomᚋkonstellation�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNProject2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx, sel, v[i])
+			ret[i] = ec.marshalNProject2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6925,11 +7015,11 @@ func (ec *executionContext) marshalNRepositoryType2githubᚗcomᚋkonstellation�
 	return res
 }
 
-func (ec *executionContext) marshalNSSHKey2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSSHKey(ctx context.Context, sel ast.SelectionSet, v model.SSHKey) graphql.Marshaler {
+func (ec *executionContext) marshalNSSHKey2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐSSHKey(ctx context.Context, sel ast.SelectionSet, v entity.SSHKey) graphql.Marshaler {
 	return ec._SSHKey(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNSSHKey2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSSHKey(ctx context.Context, sel ast.SelectionSet, v *model.SSHKey) graphql.Marshaler {
+func (ec *executionContext) marshalNSSHKey2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐSSHKey(ctx context.Context, sel ast.SelectionSet, v *entity.SSHKey) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -7061,11 +7151,11 @@ func (ec *executionContext) unmarshalNUpdateProjectInput2githubᚗcomᚋkonstell
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUser2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx context.Context, sel ast.SelectionSet, v entity.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []entity.User) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -7089,7 +7179,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋkonstellationᚑio
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUser(ctx, sel, v[i])
+			ret[i] = ec.marshalNUser2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -7102,7 +7192,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋkonstellationᚑio
 	return ret
 }
 
-func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx context.Context, sel ast.SelectionSet, v *entity.User) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -7341,7 +7431,7 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalOApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAPIToken(ctx context.Context, sel ast.SelectionSet, v *model.APIToken) graphql.Marshaler {
+func (ec *executionContext) marshalOApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPIToken(ctx context.Context, sel ast.SelectionSet, v *entity.APIToken) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

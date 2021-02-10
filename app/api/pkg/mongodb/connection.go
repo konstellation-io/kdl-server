@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/logging"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,11 +13,13 @@ import (
 
 const timeout = 20 * time.Second
 
+// MongoDB will manage the connection with the database.
 type MongoDB struct {
 	logger logging.Logger
 	client *mongo.Client
 }
 
+// NewMongoDB is a constructor function.
 func NewMongoDB(logger logging.Logger) *MongoDB {
 	return &MongoDB{
 		logger,
@@ -25,6 +27,7 @@ func NewMongoDB(logger logging.Logger) *MongoDB {
 	}
 }
 
+// Connect open a database connection and check if it is connecting using ping.
 func (m *MongoDB) Connect(uri string) (*mongo.Client, error) {
 	m.logger.Info("MongoDB connecting...")
 
@@ -54,6 +57,7 @@ func (m *MongoDB) Connect(uri string) (*mongo.Client, error) {
 	return client, nil
 }
 
+// Disconnect closes the connection with the database.
 func (m *MongoDB) Disconnect() {
 	m.logger.Info("MongoDB disconnecting...")
 
@@ -67,6 +71,7 @@ func (m *MongoDB) Disconnect() {
 	err := m.client.Disconnect(ctx)
 	if err != nil {
 		m.logger.Errorf("Error disconnecting from MongoDB: %s", err)
+		return
 	}
 
 	m.logger.Info("Connection to MongoDB closed.")

@@ -31,6 +31,8 @@ function verifyConfirmation(value: boolean) {
 
 type FormData = {
   email: string;
+  username: string;
+  password: string;
   accessLevel: AccessLevel;
   confirmation: boolean;
 };
@@ -50,6 +52,8 @@ function NewUser() {
   } = useForm<FormData>({
     defaultValues: {
       email: '',
+      username: '',
+      password: '',
       accessLevel: AccessLevel.VIEWER,
       confirmation: false,
     },
@@ -59,12 +63,22 @@ function NewUser() {
     add: { loading, error: errorAddUser },
   } = useUser(() => history.push(ROUTE.USERS));
 
+  function submit({ email, username, password, accessLevel, confirmation }: FormData) {
+    if (confirmation) {
+      addNewUser({ email, username, password, accessLevel });
+    }
+  }
+
   useEffect(() => {
+    register('username', { required: true });
+    register('password', { required: true });
     register('email', { validate: verifyEmail });
     register('confirmation', { validate: verifyConfirmation });
     register('accessLevel', { required: true, validate: verifyAccessLevel });
 
     return () => {
+      unregister('username');
+      unregister('password');
       unregister('email');
       unregister('confirmation');
       unregister('accessLevel');
@@ -89,7 +103,7 @@ function NewUser() {
       primary
       key="add"
       label="ADD"
-      onClick={handleSubmit(addNewUser)}
+      onClick={handleSubmit(submit)}
       loading={loading}
       className={styles.buttonSave}
       tabIndex={0}
@@ -121,8 +135,31 @@ function NewUser() {
               clearErrors('email');
               setValue('email', value);
             }}
-            onEnterKeyPress={handleSubmit(addNewUser)}
+            onEnterKeyPress={handleSubmit(submit)}
             autoFocus
+          />
+          <TextInput
+            whiteColor
+            label="username"
+            placeholder="New user name"
+            error={get(errors.username, 'message') as string}
+            onChange={(value: string) => {
+              clearErrors('username');
+              setValue('username', value);
+            }}
+            onEnterKeyPress={handleSubmit(submit)}
+          />
+          <TextInput
+            whiteColor
+            label="password"
+            placeholder="New password"
+            error={get(errors.password, 'message') as string}
+            onChange={(value: string) => {
+              clearErrors('password');
+              setValue('password', value);
+            }}
+            onEnterKeyPress={handleSubmit(submit)}
+            hidden
           />
           <Select
             label="User type"

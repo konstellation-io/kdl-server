@@ -60,6 +60,7 @@ type SSHKey {
 
 type User {
   id: ID!
+  username: String!
   email: String!
   creationDate: String!
   accessLevel: AccessLevel!
@@ -90,12 +91,12 @@ type Tool {
 }
 
 enum ToolName {
-  GITEA,
-  MINIO,
-  JUPYTER,
-  VSCODE,
-  DRONE,
-  MLFLOW,
+  GITEA
+  MINIO
+  JUPYTER
+  VSCODE
+  DRONE
+  MLFLOW
 }
 
 enum AccessLevel {
@@ -145,6 +146,8 @@ input RemoveUsersInput {
 
 input AddUserInput {
   email: String!
+  username: String!
+  password: String!
   accessLevel: AccessLevel!
 }
 

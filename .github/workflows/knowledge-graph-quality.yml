@@ -29,7 +29,8 @@ jobs:
     - name: Run test
       working-directory: kg
       run: |
-        pytest --cov=src --cov-report xml tests/unit
+        coverage run --source=. -m py.test tests/unit/
+        coverage xml -o ./coverage.xml
     - name: Archive code coverage results
       uses: actions/upload-artifact@v2
       with:
@@ -66,7 +67,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: coverage-report
-          path: coverage.xml
+          path: kg
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         with:

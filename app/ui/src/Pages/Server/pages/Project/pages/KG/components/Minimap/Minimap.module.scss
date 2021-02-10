@@ -1,0 +1,43 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  position: absolute;
+  bottom: 50px;
+  right: 100px;
+
+  background-color: palette(base, 700);
+  border: solid 2px palette(base, 900);
+}
+
+.bar {
+  height: 5 * $grid-unit;
+  background-color: palette(base, 900);
+}
+
+.circle {
+  fill: palette(base, 800);
+}
+
+.guide {
+  fill-opacity: 0;
+  stroke: palette(base, 900);
+  stroke-width: 1px;
+}
+
+.resourceG,
+.resource,
+.resourceGroup,
+.resourceNode,
+.resourcesWrapper {
+  opacity: 1;
+}
+
+.zoomArea {
+  fill-opacity: 0;
+  stroke: palette(highlight);
+  fill: palette(highlight);
+  fill-opacity: 0.04;
+  stroke-width: 1px;
+}

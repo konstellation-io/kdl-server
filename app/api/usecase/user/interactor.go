@@ -116,3 +116,9 @@ func (i Interactor) Create(ctx context.Context, email, username, password string
 
 	return i.repo.Get(ctx, insertedID)
 }
+
+// Find all users existing in the server.
+func (i Interactor) FindAll(ctx context.Context) ([]entity.User, error) {
+	i.logger.Info("Finding all users in the server")
+	return i.repo.FindAll(ctx)
+}

@@ -15,9 +15,11 @@ type Repository interface {
 	GetByUsername(ctx context.Context, username string) (entity.User, error)
 	GetByEmail(ctx context.Context, email string) (entity.User, error)
 	Create(ctx context.Context, user entity.User) (string, error)
+	FindAll(ctx context.Context) ([]entity.User, error)
 }
 
 // UseCase interface to manage all operations related with users.
 type UseCase interface {
 	Create(ctx context.Context, email, username, password string, accessLevel entity.AccessLevel) (entity.User, error)
+	FindAll(ctx context.Context) ([]entity.User, error)
 }

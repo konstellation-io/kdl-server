@@ -2,7 +2,6 @@ package user_test
 
 import (
 	"context"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
 	"testing"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
@@ -73,7 +73,7 @@ func TestInteractor_Create(t *testing.T) {
 		accessLevel   = entity.AccessLevelAdmin
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"
-		secretName    = "john-ssh-keys"
+		secretName    = "john-ssh-keys" //nolint:gosec // it is a unit test
 	)
 
 	secretValues := map[string]string{

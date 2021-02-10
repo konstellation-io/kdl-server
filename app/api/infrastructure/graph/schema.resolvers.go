@@ -125,6 +125,7 @@ func (r *userResolver) LastActivity(ctx context.Context, obj *entity.User) (*str
 	}
 
 	lastActivity := obj.LastActivity.Format(time.RFC3339)
+
 	return &lastActivity, nil
 }
 

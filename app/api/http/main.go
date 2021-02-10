@@ -1,26 +1,25 @@
 package main
 
 import (
-	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
 	"net/http"
 	"os"
 	"strings"
 
-	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
-
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/repository"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/repository"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 	"github.com/konstellation-io/kre/libs/simplelogger"
 )
 

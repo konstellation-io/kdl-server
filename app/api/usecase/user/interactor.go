@@ -4,12 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
-
-	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 )
@@ -110,6 +109,7 @@ func (i Interactor) Create(ctx context.Context, email, username, password string
 		"KDL_USER_PUBLIC_SSH_KEY":  keys.Public,
 		"KDL_USER_PRIVATE_SSH_KEY": keys.Private,
 	})
+
 	if err != nil {
 		return entity.User{}, err
 	}

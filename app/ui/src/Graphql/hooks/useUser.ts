@@ -23,8 +23,9 @@ const GetUsersQuery = loader('Graphql/queries/getUsers.graphql');
 
 type NewUserParams = {
   email: string;
+  username: string;
+  password: string;
   accessLevel: AccessLevel;
-  confirmation: boolean;
 };
 
 export default function useUser(onCompleteAddUser?: () => void) {
@@ -34,7 +35,7 @@ export default function useUser(onCompleteAddUser?: () => void) {
   >(AddUserMutation, {
     onCompleted: onCompleteAddUser,
     onError: (e) => console.error(`addUser: ${e}`),
-    update: updateCacheAdd,
+    update: updateCacheAdd
   });
 
   const [mutationRemoveUsers] = useMutation<RemoveUsers, RemoveUsersVariables>(

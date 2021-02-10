@@ -91,12 +91,12 @@ type Tool {
 }
 
 enum ToolName {
-  GITEA,
-  MINIO,
-  JUPYTER,
-  VSCODE,
-  DRONE,
-  MLFLOW,
+  GITEA
+  MINIO
+  JUPYTER
+  VSCODE
+  DRONE
+  MLFLOW
 }
 
 enum AccessLevel {

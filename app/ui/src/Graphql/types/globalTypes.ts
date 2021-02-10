@@ -40,6 +40,8 @@ export interface AddMembersInput {
 
 export interface AddUserInput {
   email: string;
+  username: string;
+  password: string;
   accessLevel: AccessLevel;
 }
 

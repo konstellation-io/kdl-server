@@ -6,14 +6,14 @@ ENV UID=10001
 RUN adduser \
     --disabled-password \
     --gecos "" \
-    --home "/nonexistent" \
+    --home "/kg" \
     --shell "/sbin/nologin" \
     --no-create-home \
     --uid "${UID}" \
     "${USER}"
 
-RUN apt-get update && \
-    apt-get install -y build-essential
+RUN apt-get update \
+    && apt-get install -y build-essential wget
 
 WORKDIR /kg
 
@@ -22,6 +22,10 @@ RUN python3 -m pip install pipenv && \
     pipenv install --system --deploy
 
 COPY src src
+
+RUN wget https://kdl-kg-assets.s3.eu-central-1.amazonaws.com/assets.tar.gz \
+    && tar zxvf assets.tar.gz \
+    && rm -rf assets.tar.gz
 
 RUN chown -R kdl:0 /kg \
     && chmod -R g+w /kg \
@@ -32,3 +36,4 @@ RUN chown -R kdl:0 /kg \
 USER kdl
 
 CMD ["sh","-c","/usr/local/bin/python3 /kg/src/app.py 2>&1 | tee -a /var/log/app/app.log"]
+# CMD ["sh","-c","sleep 30000"]

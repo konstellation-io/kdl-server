@@ -12,6 +12,7 @@ torch = "*"
 pandas = "*"
 transformers = "*"
 gensim = "*"
+grpcio-tools = "*"
 
 [dev-packages]
 ipdb = "*"
@@ -26,7 +27,6 @@ mypy = "*"
 mypy-protobuf = "*"
 coverage = "*"
 ipython = "*"
-grpcio-tools = "*"
 grpc-stubs = "*"
 grpc-requests = "*"
 

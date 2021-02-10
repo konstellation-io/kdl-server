@@ -14,6 +14,6 @@ show_login_help() {
 
 local_login() {
   # Open browser automatically
-  LINK=http://kdlapp.kdl.$(minikube -p kdl-local ip).nip.io
+  LINK=https://kdlapp.kdl.$(minikube -p kdl-local ip).nip.io
   nohup xdg-open "$LINK" >/dev/null 2>&1 &
 }

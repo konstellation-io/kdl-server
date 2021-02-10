@@ -28,7 +28,7 @@ function Home() {
 
   const client = useRef(
     new ApolloClient({
-      uri: `${CONFIG.KDL_ADMIN_API_URL}/api/query`,
+      uri: `${CONFIG.SERVER_URL}/api/query`,
       credentials: 'include',
       cache,
     })

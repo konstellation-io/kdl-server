@@ -44,6 +44,7 @@ build_docker_images() {
   # Server
   if [ "$BUILD_SERVER" = "1" ] || [ "$BUILD_ALL" = "1" ]; then
     build_server
+    build_kg
   fi
 
   setup_env
@@ -62,6 +63,11 @@ setup_env() {
 build_server() {
   setup_env
   build_image kdl-server app
+}
+
+build_kg() {
+  setup_env
+  build_image kdl-kg kg
 }
 
 build_image() {

@@ -10,6 +10,15 @@ type SSHKey struct {
 	LastActivity *time.Time
 }
 
+// APIToken entity definition.
+type APIToken struct {
+	ID           string
+	Name         string
+	CreationDate string
+	LastUsedDate string
+	Token        string
+}
+
 // User entity definition.
 type User struct {
 	ID           string
@@ -18,4 +27,6 @@ type User struct {
 	CreationDate time.Time
 	AccessLevel  AccessLevel
 	SSHKey       SSHKey
+	LastActivity *time.Time
+	APITokens    []APIToken
 }

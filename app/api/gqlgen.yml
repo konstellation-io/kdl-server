@@ -54,3 +54,6 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+
+  ApiToken:
+    model: github.com/konstellation-io/kdl-server/app/api/entity.APIToken

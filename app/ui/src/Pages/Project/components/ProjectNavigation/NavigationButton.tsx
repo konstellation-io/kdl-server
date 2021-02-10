@@ -10,12 +10,13 @@ export enum IconSize {
 type Props = {
   label: string;
   Icon: any;
+  title?: string;
   iconSize?: IconSize;
 };
 
-function NavigationButton({ label, Icon, iconSize = IconSize.REGULAR }: Props) {
+function NavigationButton({ label, title, Icon, iconSize = IconSize.REGULAR }: Props) {
   return (
-    <div className={styles.navButton} title={label}>
+    <div className={styles.navButton} title={title || label}>
       <Icon className={cx(iconSize, styles.icon)} />
       <span className={styles.label}>{label}</span>
     </div>

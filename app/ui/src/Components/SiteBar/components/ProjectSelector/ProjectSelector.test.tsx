@@ -1,7 +1,7 @@
 import ProjectSelector from './ProjectSelector';
 import React from 'react';
 import { shallow } from 'enzyme';
-import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
+import { GetProjects_projects } from 'app/ui/src/Graphql/queries/types/GetProjects';
 import { ProjectState } from '../../../../../../../../Graphql/types/globalTypes';
 import { NavLink } from 'react-router-dom';
 

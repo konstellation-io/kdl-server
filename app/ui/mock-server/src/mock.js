@@ -1,6 +1,10 @@
 const { MockList } = require('apollo-server');
 const casual = require('casual');
 
+const projectsIds = Array(8)
+  .fill(0)
+  .map(() => casual.uuid);
+
 module.exports = {
   Query: () => ({
     me: () => ({
@@ -9,7 +13,10 @@ module.exports = {
       username: 'admin',
       apiTokens: () => new MockList([4, 8]),
     }),
-    projects: () => new MockList([4, 8]),
+    projects: () =>
+      projectsIds.map((id) => ({
+        id,
+      })),
     users: () => new MockList([20, 30]),
     project: ({ project }, { id }) => ({
       ...project,

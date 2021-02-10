@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import ArrowsNavigator from './components/ArrowsNavigator/ArrowsNavigator';
 import Breadcrumbs from './components/Breadcrumbs/Breadcrumbs';
 import SettingsMenu from '../SettingsMenu/SettingsMenu';
-import styles from './ServerBar.module.scss';
+import styles from './SiteBar.module.scss';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import useProjectFilters from 'Graphql/client/hooks/useProjectFilters';
@@ -13,7 +13,7 @@ type FormData = {
   projectName: string;
 };
 
-function ServerBar() {
+function SiteBar() {
   const { goBack, goForward } = useHistory();
   const { updateFilters } = useProjectFilters();
   const { setValue, unregister, register, watch } = useForm<FormData>({
@@ -49,4 +49,4 @@ function ServerBar() {
   );
 }
 
-export default ServerBar;
+export default SiteBar;

@@ -1,6 +1,7 @@
 import { NavLink, useParams } from 'react-router-dom';
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
+import useWorkspace, { CONFIG } from 'Hooks/useWorkspace';
 
 import IconCollapse from '@material-ui/icons/KeyboardBackspace';
 import IconSettings from '@material-ui/icons/Settings';
@@ -10,7 +11,6 @@ import { RouteProjectParams } from 'Constants/routes';
 import cx from 'classnames';
 import styles from './ProjectNavigation.module.scss';
 import useProjectNavigation from 'Hooks/useProjectNavigation';
-import useWorkspace, { CONFIG } from 'Hooks/useWorkspace';
 
 const NavButtonLink: FC<any> = ({ children, ...props }) => (
   <NavLink {...props} activeClassName={styles.active} exact>
@@ -20,8 +20,9 @@ const NavButtonLink: FC<any> = ({ children, ...props }) => (
 
 function ProjectNavigation() {
   const { projectId } = useParams<RouteProjectParams>();
-  const { navigationOpened, saveConfiguration } = useWorkspace(projectId);
-  const [opened, setOpened] = useState(navigationOpened);
+  const [ { navigationOpened }, saveConfiguration ] = useWorkspace(projectId);
+  const [ opened, setOpened ] = useState(navigationOpened);
+
   const { togglePanel } = usePanel(PanelType.PRIMARY, {
     id: PANEL_ID.SETTINGS,
     title: 'Settings',
@@ -29,9 +30,14 @@ function ProjectNavigation() {
   });
 
   function onToggleOpened() {
-    saveConfiguration(CONFIG.NAVIGATION_OPENED, !opened);
     setOpened(!opened);
   }
+
+  // Update local storage
+  useEffect(
+    () => () => saveConfiguration(CONFIG.NAVIGATION_OPENED, !opened),
+    [opened, saveConfiguration]
+  );
 
   const projectRoutes = useProjectNavigation(projectId);
 
@@ -54,7 +60,11 @@ function ProjectNavigation() {
           })}
           onClick={onToggleOpened}
         >
-          <NavigationButton label="COLLAPSE" Icon={IconCollapse} />
+          <NavigationButton
+            label="COLLAPSE"
+            title={opened ? "COLLAPSE" : "EXPAND"}
+            Icon={IconCollapse}
+          />
         </div>
       </div>
     </div>

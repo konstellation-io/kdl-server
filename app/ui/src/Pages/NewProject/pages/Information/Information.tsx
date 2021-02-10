@@ -4,7 +4,7 @@ import {
 } from 'Graphql/client/queries/getNewProject.graphql';
 import { SpinnerCircular, TextInput } from 'kwc';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { generateSlug } from 'Utils/string';
 import styles from './Information.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
@@ -39,6 +39,12 @@ function Information({ showErrors }: Props) {
     'internalRepository'
   );
   const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
+  const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    if (descriptionScore !== undefined)
+      setScore(descriptionScore.qualityProjectDesc.quality || 0);
+  }, [descriptionScore]);
 
   if (!data) return <SpinnerCircular />;
 
@@ -89,9 +95,7 @@ function Information({ showErrors }: Props) {
         lockHorizontalGrowth
         error={showErrors ? errorDescription : ''}
       />
-      <DescriptionScore
-        score={descriptionScore?.qualityProjectDesc.quality || 0}
-      />
+      <DescriptionScore score={score} />
     </div>
   );
 }

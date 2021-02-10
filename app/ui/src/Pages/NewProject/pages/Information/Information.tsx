@@ -4,11 +4,21 @@ import {
 } from 'Graphql/client/queries/getNewProject.graphql';
 import { SpinnerCircular, TextInput } from 'kwc';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { generateSlug } from 'Utils/string';
 import styles from './Information.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
-import { useQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
+import DescriptionScore from './components/DescriptionScore/DescriptionScore';
+import {
+  GetQualityProjectDesc,
+  GetQualityProjectDescVariables,
+} from 'Graphql/queries/types/GetQualityProjectDesc';
+import { loader } from 'graphql.macro';
+
+const GetQualityProjectDescQuery = loader(
+  'Graphql/queries/getQualityProjectDesc.graphql'
+);
 
 const limits = {
   maxHeight: 500,
@@ -19,11 +29,22 @@ type Props = {
   showErrors: boolean;
 };
 function Information({ showErrors }: Props) {
+  const [getQualityProjectDesc, { data: descriptionScore }] = useLazyQuery<
+    GetQualityProjectDesc,
+    GetQualityProjectDescVariables
+  >(GetQualityProjectDescQuery);
+
   const { updateValue, updateError, clearError } = useNewProject('information');
   const { updateValue: updateInternalRepositoryValue } = useNewProject(
     'internalRepository'
   );
   const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
+  const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    if (descriptionScore !== undefined)
+      setScore(descriptionScore.qualityProjectDesc.quality || 0);
+  }, [descriptionScore]);
 
   if (!data) return <SpinnerCircular />;
 
@@ -66,6 +87,7 @@ function Information({ showErrors }: Props) {
               ? 'Please, write a description is important for the project'
               : ''
           );
+          getQualityProjectDesc({ variables: { description } });
         }}
         limits={limits}
         showClearButton
@@ -73,6 +95,7 @@ function Information({ showErrors }: Props) {
         lockHorizontalGrowth
         error={showErrors ? errorDescription : ''}
       />
+      <DescriptionScore score={score} />
     </div>
   );
 }

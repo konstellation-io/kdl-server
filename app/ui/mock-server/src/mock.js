@@ -6,7 +6,7 @@ module.exports = {
     me: () => ({
       id: casual.uuid,
       email: 'admin@intelygenz.com',
-      name: 'admin',
+      username: 'admin',
       apiTokens: () => new MockList([4, 8]),
     }),
     projects: () => new MockList([4, 8]),
@@ -72,7 +72,7 @@ module.exports = {
   User: () => ({
     id: casual.uuid,
     email: casual.email,
-    name: casual.username,
+    username: casual.username,
     creationDate: new Date().toUTCString(),
     accessLevel: casual.random_element(['ADMIN', 'VIEWER', 'MANAGER']),
     lastActivity: new Date().toUTCString(),

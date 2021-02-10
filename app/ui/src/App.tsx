@@ -6,15 +6,15 @@ import { CONFIG } from 'index';
 import GenerateApiToken from 'Pages/GenerateApiToken/GenerateApiToken';
 import NewProject from 'Pages/NewProject/NewProject';
 import NewUser from 'Pages/NewUser/NewUser';
-import Project from 'Pages/Server/pages/Project/Project';
+import Project from 'Pages/Project/Project';
 import ProjectCreation from 'Pages/ProjectCreation/ProjectCreation';
-import Projects from 'Pages/Server/pages/Projects/Projects';
+import Projects from 'Pages/Projects/Projects';
 import ROUTE from 'Constants/routes';
 import React from 'react';
-import ServerBar from 'Pages/Server/components/ServerBar/ServerBar';
-import UserApiTokens from 'Pages/Server/pages/UserApiToken/UserApiTokens';
-import UserSshKey from 'Pages/Server/pages/UserSshKey/UserSshKey';
-import Users from 'Pages/Server/pages/Users/Users';
+import SiteBar from 'Components/SiteBar/SiteBar';
+import UserApiTokens from 'Pages/UserApiToken/UserApiTokens';
+import UserSshKey from 'Pages/UserSshKey/UserSshKey';
+import Users from 'Pages/Users/Users';
 import cache from 'Graphql/client/cache';
 import history from 'browserHistory';
 import styles from './App.module.scss';
@@ -30,7 +30,7 @@ const routesWithTopBar = [
 function Routes() {
   return (
     <Router history={history}>
-      <Route path={routesWithTopBar} component={ServerBar} />
+      <Route path={routesWithTopBar} component={SiteBar} />
       <Switch>
         <Redirect exact from={ROUTE.HOME} to={ROUTE.PROJECTS} />
 
@@ -50,7 +50,7 @@ function Routes() {
           path={ROUTE.PROJECT_CREATION}
           component={ProjectCreation}
         />
-        
+
         <Route exact path={ROUTE.PROJECTS} component={Projects} />
         <Route path={ROUTE.PROJECT} component={Project} />
       </Switch>

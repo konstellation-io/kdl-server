@@ -5,7 +5,7 @@ import {
   GetProjectTools,
   GetProjectToolsVariables,
 } from 'Graphql/queries/types/GetProjectTools';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import IconOk from '@material-ui/icons/Check';
 import IconStart from '@material-ui/icons/PlayArrow';
@@ -18,7 +18,6 @@ import cx from 'classnames';
 import { loader } from 'graphql.macro';
 import { mapTools } from './mappingFunctions';
 import styles from './Tools.module.scss';
-import useExternalBrowserWindows from './useExternalBrowserWindows';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import useTool from 'Graphql/hooks/useTool';
@@ -33,22 +32,10 @@ function Tools() {
   >(GetProjectToolsQuery, {
     variables: { id: projectId },
   });
-  const { openWindow } = useExternalBrowserWindows();
   const {
     updateProjectActiveTools,
     projectActiveTools: { loading: toggleActiveProjectToolsLoading },
   } = useTool(projectId);
-
-  useEffect(() => {
-    // ipcMain.on(channelName, onMessage);
-    // return () => {
-    //   ipcMain.removeListener(channelName, onMessage);
-    // };
-  }, []);
-
-  // const onMessage = (event: IpcMainEvent, args: any) => {
-  //   console.log(`Message received on the main window: ${args}`);
-  // };
 
   if (!data || loading) return <SpinnerCircular />;
   if (error) return <ErrorMessage />;
@@ -61,8 +48,9 @@ function Tools() {
     updateProjectActiveTools(!areToolsActive);
   }
 
-  function handleToolClick({ url, toolName, img }: EnhancedTool) {
-    openWindow(url, `${projectId}-${toolName}`, img);
+  function handleToolClick({ url }: EnhancedTool) {
+    // TODO: how open the tool?
+    window.open(url);
   }
 
   function renderCard(tool: EnhancedTool) {

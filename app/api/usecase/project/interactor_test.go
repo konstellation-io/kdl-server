@@ -2,6 +2,7 @@ package project_test
 
 import (
 	"context"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 	"testing"
 	"time"
 
@@ -21,9 +22,10 @@ type projectSuite struct {
 }
 
 type projectMocks struct {
-	logger *logging.MockLogger
-	repo   *project.MockRepository
-	clock  *clock.MockClock
+	logger      *logging.MockLogger
+	repo        *project.MockRepository
+	clock       *clock.MockClock
+	giteaClient *giteaclient.MockGiteaClient
 }
 
 func newProjectSuite(t *testing.T) *projectSuite {
@@ -36,15 +38,18 @@ func newProjectSuite(t *testing.T) *projectSuite {
 
 	clockMock := clock.NewMockClock(ctrl)
 
-	interactor := project.NewInteractor(logger, repo, clockMock)
+	giteaClient := giteaclient.NewMockGiteaClient(ctrl)
+
+	interactor := project.NewInteractor(logger, repo, clockMock, giteaClient)
 
 	return &projectSuite{
 		ctrl:       ctrl,
 		interactor: interactor,
 		mocks: projectMocks{
-			logger: logger,
-			repo:   repo,
-			clock:  clockMock,
+			logger:      logger,
+			repo:        repo,
+			clock:       clockMock,
+			giteaClient: giteaClient,
 		},
 	}
 }
@@ -72,6 +77,7 @@ func TestInteractor_Create(t *testing.T) {
 		CreationDate: now,
 	}
 
+	s.mocks.giteaClient.EXPECT().CreateRepo(projectName, projectDesc)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().Create(ctx, p).Return(projectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, projectID).Return(expectedProject, nil)

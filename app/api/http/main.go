@@ -76,7 +76,7 @@ func main() {
 	}
 
 	resolvers := graph.NewResolver(
-		project.NewInteractor(logger, projectRepo, realClock),
+		project.NewInteractor(logger, projectRepo, realClock, giteaClientHTTP),
 		user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaClientHTTP, k8sClient),
 	)
 

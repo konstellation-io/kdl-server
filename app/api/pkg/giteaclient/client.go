@@ -6,6 +6,8 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
+const kdlOrganization = "kdl"
+
 type giteaClient struct {
 	logger logging.Logger
 	client *gitea.Client
@@ -53,6 +55,22 @@ func (g *giteaClient) AddSSHKey(username, publicSSHKey string) error {
 	}
 
 	g.logger.Infof("Created public SSH key for user \"%s\" in Gitea with id \"%d\"", username, key.ID)
+
+	return nil
+}
+
+// CreateRepo creates a repository in the KDL organization.
+func (g *giteaClient) CreateRepo(name, desc string) error {
+	repo, _, err := g.client.AdminCreateRepo(kdlOrganization, gitea.CreateRepoOption{
+		Name:        name,
+		Description: desc,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	g.logger.Infof("Created repository \"%s\" in organization \"%s\" in Gitea with id \"%d\"", name, kdlOrganization, repo.ID)
 
 	return nil
 }

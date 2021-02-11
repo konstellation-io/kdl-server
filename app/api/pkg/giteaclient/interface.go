@@ -6,4 +6,5 @@ package giteaclient
 type GiteaClient interface {
 	CreateUser(email, username, password string) error
 	AddSSHKey(username, publicSSHKey string) error
+	CreateRepo(name, desc string) error
 }

@@ -4,12 +4,12 @@ import Slider from '@material-ui/core/Slider';
 import cx from 'classnames';
 
 type Props = {
-  values: number[];
+  scores: number[];
   onChange: (_: React.ChangeEvent<{}>, values: number | number[]) => void;
   min?: number;
   max?: number;
 };
-const ScoreFilter: FC<Props> = ({ values, onChange, min = 0, max = 100 }) => (
+const ScoreFilter: FC<Props> = ({ scores, onChange, min = 0, max = 100 }) => (
   <div className={styles.container}>
     <span className={styles.leftLabel}>SCORE</span>
     <span className={cx(styles.percentageLabel, styles.minLabel)}>{min}%</span>
@@ -25,7 +25,7 @@ const ScoreFilter: FC<Props> = ({ values, onChange, min = 0, max = 100 }) => (
       min={min}
       max={max}
       onChange={onChange}
-      value={values}
+      value={scores}
     />
     <span className={cx(styles.percentageLabel, styles.maxLabel)}>{max}%</span>
   </div>

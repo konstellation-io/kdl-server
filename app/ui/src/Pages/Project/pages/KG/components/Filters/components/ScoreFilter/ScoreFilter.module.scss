@@ -65,17 +65,11 @@
     }
   }
 
-  .focusVisible {
+  .focusVisible .focusVisible:hover {
     box-shadow: unset !important;
-    &:hover {
-      box-shadow: unset !important;
-    }
   }
 
-  .active {
+  .active .active:hover {
     box-shadow: unset !important;
-    &:hover {
-      box-shadow: unset !important;
-    }
   }
 }

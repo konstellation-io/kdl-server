@@ -1,0 +1,81 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  display: flex;
+  align-items: center;
+  width: $grid-unit * 39;
+  background-color: palette(base, 900);
+  padding: $grid-unit * 1.5 $grid-unit * 1.25 $grid-unit * 1.5 $grid-unit * 2;
+
+  .leftLabel {
+    @include font-caption;
+    color: font-color(regular);
+  }
+
+  .percentageLabel {
+    @include font-caption;
+    color: font-color(lowlight);
+    width: $grid-unit * 5;
+
+    &.minLabel {
+      text-align: right;
+    }
+
+    &.maxLabel {
+      margin-left: $grid-unit * 1.5;
+      text-align: left;
+    }
+  }
+
+  .slider {
+    margin-left: $grid-unit;
+    width: $grid-unit * 18.125;
+  }
+  .rail {
+    color: palette(base, 400);
+    opacity: 1;
+  }
+  .track {
+    color: palette(highlight, 700);
+  }
+
+  .thumb {
+    color: palette(highlight, 600);
+    width: $grid-unit * 2;
+    height: $grid-unit * 2;
+    margin-top: -7px;
+    transition: unset;
+
+    &:hover {
+      box-shadow: unset !important;
+    }
+
+    &::after {
+      width: $grid-unit * 1.75;
+      height: $grid-unit * 1.75;
+      top: unset;
+      bottom: unset;
+      right: unset;
+      left: unset;
+      background-color: palette(highlight);
+      border: 3px solid palette(base, 900);
+      box-shadow: unset !important;
+    }
+  }
+
+  .focusVisible {
+    box-shadow: unset !important;
+    &:hover {
+      box-shadow: unset !important;
+    }
+  }
+
+  .active {
+    box-shadow: unset !important;
+    &:hover {
+      box-shadow: unset !important;
+    }
+  }
+}

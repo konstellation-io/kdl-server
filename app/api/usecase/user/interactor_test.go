@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
@@ -28,7 +28,7 @@ type userMocks struct {
 	repo          *user.MockRepository
 	sshGenerator  *sshhelper.MockSSHKeyGenerator
 	clock         *clock.MockClock
-	giteaClient   *giteaclient.MockGiteaClient
+	giteaService  *giteaservice.MockGiteaClient
 	k8sClientMock *k8s.MockK8sClient
 }
 
@@ -42,10 +42,10 @@ func newUserSuite(t *testing.T) *userSuite {
 
 	clockMock := clock.NewMockClock(ctrl)
 	sshGenerator := sshhelper.NewMockSSHKeyGenerator(ctrl)
-	giteaClientMock := giteaclient.NewMockGiteaClient(ctrl)
+	giteaServiceMock := giteaservice.NewMockGiteaClient(ctrl)
 	k8sClientMock := k8s.NewMockK8sClient(ctrl)
 
-	interactor := user.NewInteractor(logger, repo, sshGenerator, clockMock, giteaClientMock, k8sClientMock)
+	interactor := user.NewInteractor(logger, repo, sshGenerator, clockMock, giteaServiceMock, k8sClientMock)
 
 	return &userSuite{
 		ctrl:       ctrl,
@@ -55,7 +55,7 @@ func newUserSuite(t *testing.T) *userSuite {
 			repo:          repo,
 			sshGenerator:  sshGenerator,
 			clock:         clockMock,
-			giteaClient:   giteaClientMock,
+			giteaService:  giteaServiceMock,
 			k8sClientMock: k8sClientMock,
 		},
 	}
@@ -113,8 +113,9 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
-	s.mocks.giteaClient.EXPECT().CreateUser(email, username, password).Return(nil)
-	s.mocks.giteaClient.EXPECT().AddSSHKey(username, sshKey.Public).Return(nil)
+	s.mocks.giteaService.EXPECT().CreateUser(email, username, password).Return(nil)
+	s.mocks.giteaService.EXPECT().AddSSHKey(username, sshKey.Public).Return(nil)
+	s.mocks.giteaService.EXPECT().AddTeamMember(username, accessLevel).Return(nil)
 	s.mocks.k8sClientMock.EXPECT().CreateSecret(secretName, secretValues)
 
 	createdUser, err := s.interactor.Create(ctx, email, username, password, accessLevel)

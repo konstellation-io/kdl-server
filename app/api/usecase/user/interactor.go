@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
@@ -19,7 +19,7 @@ type Interactor struct {
 	repo         Repository
 	sshGenerator sshhelper.SSHKeyGenerator
 	clock        clock.Clock
-	giteaClient  giteaclient.GiteaClient
+	giteaService giteaservice.GiteaClient
 	k8sClient    k8s.K8sClient
 }
 
@@ -29,7 +29,7 @@ func NewInteractor(
 	repo Repository,
 	sshGenerator sshhelper.SSHKeyGenerator,
 	c clock.Clock,
-	giteaClient giteaclient.GiteaClient,
+	giteaService giteaservice.GiteaClient,
 	k8sClient k8s.K8sClient,
 ) *Interactor {
 	return &Interactor{
@@ -37,7 +37,7 @@ func NewInteractor(
 		repo:         repo,
 		sshGenerator: sshGenerator,
 		clock:        c,
-		giteaClient:  giteaClient,
+		giteaService: giteaService,
 		k8sClient:    k8sClient,
 	}
 }
@@ -47,6 +47,7 @@ func NewInteractor(
 // - Generates a new SSH public/private keys.
 // - Creates the user into Gitea.
 // - Adds the public SSH key to the user in Gitea.
+// - Add the user to the KDL team.
 // - Stores the user and ssh keys into the DB.
 // - Creates a new secret in Kubernetes with the generated SSH keys.
 func (i Interactor) Create(ctx context.Context, email, username, password string, accessLevel entity.AccessLevel) (entity.User, error) {
@@ -77,18 +78,25 @@ func (i Interactor) Create(ctx context.Context, email, username, password string
 		return entity.User{}, err
 	}
 
-	// Create the user in Gitea and upload their SSH keys
-	err = i.giteaClient.CreateUser(email, username, password)
+	// Creates the user into Gitea.
+	err = i.giteaService.CreateUser(email, username, password)
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	err = i.giteaClient.AddSSHKey(username, keys.Public)
+	// Adds the public SSH key to the user in Gitea.
+	err = i.giteaService.AddSSHKey(username, keys.Public)
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	// Store the user into the DB
+	// Add the user to the KDL team.
+	err = i.giteaService.AddTeamMember(username, accessLevel)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	// Stores the user and ssh keys into the DB.
 	user := entity.User{
 		Username:     username,
 		Email:        email,

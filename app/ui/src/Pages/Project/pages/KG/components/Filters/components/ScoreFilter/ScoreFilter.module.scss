@@ -65,11 +65,11 @@
     }
   }
 
-  .focusVisible .focusVisible:hover {
+  .focusVisible, .focusVisible:hover {
     box-shadow: unset !important;
   }
 
-  .active .active:hover {
+  .active, .active:hover {
     box-shadow: unset !important;
   }
 }

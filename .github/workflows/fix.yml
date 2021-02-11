@@ -3,7 +3,9 @@ name: Fix
 on:
   workflow_run:
     workflows:
-      - "KDL Server app-api Tests"
+      - "KDL Server App API Quality"
+      - "KDL Server App UI Quality"
+      - "Knowledge Graph Quality"
     branches: ["release-*"]
     types: 
       - completed

@@ -5,13 +5,12 @@ import ScoreFilter from './components/ScoreFilter/ScoreFilter';
 type Props = {};
 function Filters({}: Props) {
   const [scores, setScores] = useState<number[]>([20, 80]);
-  function handleSliderChange(
+
+  const handleSliderChange = (
     _: React.ChangeEvent<{}>,
     numbers: number | number[]
-  ) {
-    const newScores = numbers as number[];
-    setScores(newScores);
-  }
+  ) => setScores(numbers as number[]);
+
   return (
     <div className={styles.container}>
       <ScoreFilter scores={scores} onChange={handleSliderChange} />

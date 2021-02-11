@@ -2,10 +2,10 @@ package project
 
 import (
 	"context"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 

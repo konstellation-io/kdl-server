@@ -2,17 +2,17 @@ package project_test
 
 import (
 	"context"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 	"testing"
 	"time"
 
-	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
-
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/require"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
-	"github.com/stretchr/testify/require"
 )
 
 type projectSuite struct {

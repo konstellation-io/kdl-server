@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import styles from './Filters.module.scss';
+
 import ScoreFilter from './components/ScoreFilter/ScoreFilter';
+import TopicFilter from './components/TopicFilter/TopicFilter';
+import styles from './Filters.module.scss';
 
-const MAX_SCORE = 100;
-
-type Props = {};
-function Filters({}: Props) {
+function Filters() {
   const [scores, setScores] = useState<[number, number]>([20, 80]);
 
   const handleSliderChange = (
@@ -15,12 +14,16 @@ function Filters({}: Props) {
 
   return (
     <div className={styles.container}>
-      <ScoreFilter
-        scores={scores}
-        onChange={handleSliderChange}
-        max={MAX_SCORE}
-      />
-      <div className={styles.topic}>TOPIC</div>
+      <ScoreFilter scores={scores} onChange={handleSliderChange} />
+      <div className={styles.topic}>
+        <TopicFilter
+          topics={[
+            { id: '1', name: 'name', papersTopicCount: 3 },
+            { id: '2', name: 'name2', papersTopicCount: 4 },
+          ]}
+          selectedTopics={['1']}
+        />
+      </div>
     </div>
   );
 }

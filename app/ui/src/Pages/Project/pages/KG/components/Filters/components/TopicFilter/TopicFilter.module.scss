@@ -1,0 +1,11 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  display: flex;
+  align-items: center;
+  background-color: palette(base, 900);
+  padding: $grid-unit * 1.5 $grid-unit * 1.25 $grid-unit * 1.5 $grid-unit * 2;
+
+}

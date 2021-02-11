@@ -4,7 +4,10 @@ import ScoreFilter from './components/ScoreFilter/ScoreFilter';
 
 type Props = {};
 function Filters({}: Props) {
+  const max = 100;
   const [scores, setScores] = useState<number[]>([20, 80]);
+  const topScore = max - scores[0];
+  const bottomScore = max - scores[1];
 
   const handleSliderChange = (
     _: React.ChangeEvent<{}>,
@@ -13,7 +16,7 @@ function Filters({}: Props) {
 
   return (
     <div className={styles.container}>
-      <ScoreFilter scores={scores} onChange={handleSliderChange} />
+      <ScoreFilter scores={scores} onChange={handleSliderChange} max={max} />
       <div className={styles.topic}>TOPIC</div>
     </div>
   );

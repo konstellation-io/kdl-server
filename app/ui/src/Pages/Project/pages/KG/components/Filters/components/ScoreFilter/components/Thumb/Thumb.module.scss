@@ -1,0 +1,14 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.labelContainer {
+  display: flex;
+  .label {
+    @include font-small;
+    color: font-color(highlight);
+    position: absolute;
+    top: -$grid-unit * 1.75;
+  }
+}

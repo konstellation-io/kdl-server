@@ -1,13 +1,15 @@
 @import 'Styles/variables';
 @import 'Styles/mixins';
 @import 'Styles/colors';
+@import 'Styles/shadows';
 
 .container {
   display: flex;
   align-items: center;
   width: $grid-unit * 39;
+  height: $grid-unit * 5;
   background-color: palette(base, 900);
-  padding: $grid-unit * 1.5 $grid-unit * 1.25 $grid-unit * 1.5 $grid-unit * 2;
+  padding: $grid-unit $grid-unit * 1.25 $grid-unit $grid-unit * 2;
 
   .leftLabel {
     @include font-caption;
@@ -19,11 +21,11 @@
     color: font-color(lowlight);
     width: $grid-unit * 5;
 
-    &.minLabel {
+    &.maxLabel {
       text-align: right;
     }
 
-    &.maxLabel {
+    &.minLabel {
       margin-left: $grid-unit * 1.5;
       text-align: left;
     }
@@ -61,15 +63,11 @@
       left: unset;
       background-color: palette(highlight);
       border: 3px solid palette(base, 900);
-      box-shadow: unset !important;
+      @include glow(3, palette(highlight))
     }
   }
 
-  .focusVisible, .focusVisible:hover {
-    box-shadow: unset !important;
-  }
-
-  .active, .active:hover {
+  .focusVisible, .active, .focusVisible:hover, .active:hover  {
     box-shadow: unset !important;
   }
 }

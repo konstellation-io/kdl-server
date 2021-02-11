@@ -56,7 +56,6 @@ show_root_help() {
       build   calls docker to build all images inside minikube.
       deploy  calls helm to create install/upgrade a kdl release on minikube.
       restart restarts kdl or versions, useful after build command.
-      etchost updates /etc/hosts with minikube IP for all kdl domains. (needs hostctl binary and it will ask for sudo password)
 
     $(help_global_options)
 "

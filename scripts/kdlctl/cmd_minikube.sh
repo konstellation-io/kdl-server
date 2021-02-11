@@ -43,7 +43,6 @@ minikube_start() {
       run minikube addons enable registry -p "$MINIKUBE_PROFILE"
       run minikube addons enable storage-provisioner -p "$MINIKUBE_PROFILE"
       run minikube addons enable metrics-server -p "$MINIKUBE_PROFILE"
-      cmd_etchost
     ;;
   esac
   MINIKUBE_CHECK=1

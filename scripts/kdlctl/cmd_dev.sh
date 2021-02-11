@@ -18,12 +18,6 @@ cmd_dev() {
         shift
       ;;
 
-      --etchost)
-        # Automatic update of /etc/hosts
-        update_etc_hosts
-        exit 0
-      ;;
-
       *)
         shift
       ;;
@@ -44,11 +38,6 @@ cmd_dev() {
   IP=$(minikube -p $MINIKUBE_PROFILE ip)
   export DOMAIN=kdl.$IP.nip.io
   deploy
-  # cmd_login
-
-  # if [ "$MINIKUBE_RESET" = "1" ]; then
-  #   show_etc_hosts
-  # fi
 }
 
 show_dev_help() {

@@ -184,7 +184,8 @@ type Project {
 
 input RepositoryInput {
   type: RepositoryType!
-  url: String!
+  internalRepoName: String
+  externalRepoUrl: String
 }
 
 type Repository {

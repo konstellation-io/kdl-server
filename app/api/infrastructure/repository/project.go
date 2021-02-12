@@ -78,7 +78,7 @@ func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 		CreationDate:     p.CreationDate,
 		RepositoryType:   p.Repository.Type,
 		InternalRepoName: p.Repository.InternalRepoName,
-		ExternalRepoURL:  p.Repository.URL,
+		ExternalRepoURL:  p.Repository.ExternalRepoURL,
 	}
 
 	if p.ID != "" {
@@ -101,7 +101,7 @@ func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 		CreationDate: dto.CreationDate,
 		Repository: entity.Repository{
 			Type:             dto.RepositoryType,
-			URL:              dto.ExternalRepoURL,
+			ExternalRepoURL:  dto.ExternalRepoURL,
 			InternalRepoName: dto.InternalRepoName,
 		},
 	}

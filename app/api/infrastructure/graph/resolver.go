@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
@@ -11,11 +12,12 @@ import (
 
 // Resolver serves as dependency injection for the app, add any dependencies app require here.
 type Resolver struct {
+	cfg      config.Config
 	projects project.UseCase
 	users    user.UseCase
 }
 
 // NewResolver is a constructor function.
-func NewResolver(projectInteractor project.UseCase, userInteractor user.UseCase) *Resolver {
-	return &Resolver{projects: projectInteractor, users: userInteractor}
+func NewResolver(cfg config.Config, projectInteractor project.UseCase, userInteractor user.UseCase) *Resolver {
+	return &Resolver{cfg: cfg, projects: projectInteractor, users: userInteractor}
 }

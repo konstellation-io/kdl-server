@@ -189,10 +189,9 @@ input RepositoryInput {
 }
 
 type Repository {
-  id: ID!
   type: RepositoryType!
   url: String!
-  connected: Boolean!
+  error: String
 }
 
 enum RepositoryType {

@@ -45,6 +45,8 @@ spec:
                 name: kdl-server-configmap
             - secretRef:
                 name: kdl-server-secrets
+            - configMapRef:
+                name: gitea-configmap
             - secretRef:
                 name: gitea-admin-secrets
           volumeMounts:

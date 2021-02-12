@@ -39,6 +39,7 @@ type ResolverRoot interface {
 	Mutation() MutationResolver
 	Project() ProjectResolver
 	Query() QueryResolver
+	Repository() RepositoryResolver
 	SSHKey() SSHKeyResolver
 	User() UserResolver
 }
@@ -129,10 +130,9 @@ type ComplexityRoot struct {
 	}
 
 	Repository struct {
-		Connected func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Type      func(childComplexity int) int
-		URL       func(childComplexity int) int
+		Error func(childComplexity int) int
+		Type  func(childComplexity int) int
+		URL   func(childComplexity int) int
 	}
 
 	SSHKey struct {
@@ -186,6 +186,9 @@ type QueryResolver interface {
 	SSHKey(ctx context.Context) (*entity.SSHKey, error)
 	QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error)
 	KnowledgeGraph(ctx context.Context, description string) (*model.KnowledgeGraph, error)
+}
+type RepositoryResolver interface {
+	URL(ctx context.Context, obj *entity.Repository) (string, error)
 }
 type SSHKeyResolver interface {
 	CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error)
@@ -691,19 +694,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Users(childComplexity), true
 
-	case "Repository.connected":
-		if e.complexity.Repository.Connected == nil {
+	case "Repository.error":
+		if e.complexity.Repository.Error == nil {
 			break
 		}
 
-		return e.complexity.Repository.Connected(childComplexity), true
-
-	case "Repository.id":
-		if e.complexity.Repository.ID == nil {
-			break
-		}
-
-		return e.complexity.Repository.ID(childComplexity), true
+		return e.complexity.Repository.Error(childComplexity), true
 
 	case "Repository.type":
 		if e.complexity.Repository.Type == nil {
@@ -1072,10 +1068,9 @@ input RepositoryInput {
 }
 
 type Repository {
-  id: ID!
   type: RepositoryType!
   url: String!
-  connected: Boolean!
+  error: String
 }
 
 enum RepositoryType {
@@ -3548,41 +3543,6 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Repository_id(ctx context.Context, field graphql.CollectedField, obj *entity.Repository) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Repository",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Repository_type(ctx context.Context, field graphql.CollectedField, obj *entity.Repository) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3629,14 +3589,14 @@ func (ec *executionContext) _Repository_url(ctx context.Context, field graphql.C
 		Object:     "Repository",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.URL, nil
+		return ec.resolvers.Repository().URL(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3653,7 +3613,7 @@ func (ec *executionContext) _Repository_url(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Repository_connected(ctx context.Context, field graphql.CollectedField, obj *entity.Repository) (ret graphql.Marshaler) {
+func (ec *executionContext) _Repository_error(ctx context.Context, field graphql.CollectedField, obj *entity.Repository) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3671,21 +3631,18 @@ func (ec *executionContext) _Repository_connected(ctx context.Context, field gra
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Connected, nil
+		return obj.Error, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _SSHKey_public(ctx context.Context, field graphql.CollectedField, obj *entity.SSHKey) (ret graphql.Marshaler) {
@@ -6187,26 +6144,27 @@ func (ec *executionContext) _Repository(ctx context.Context, sel ast.SelectionSe
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Repository")
-		case "id":
-			out.Values[i] = ec._Repository_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "type":
 			out.Values[i] = ec._Repository_type(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "url":
-			out.Values[i] = ec._Repository_url(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "connected":
-			out.Values[i] = ec._Repository_connected(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Repository_url(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "error":
+			out.Values[i] = ec._Repository_error(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

@@ -18,9 +18,10 @@ type Config struct {
 		DBName string `yaml:"dbName"`
 	} `yaml:"mongodb"`
 	Gitea struct {
-		URL       string `yaml:"url"`
-		AdminUser string `envconfig:"GITEA_ADMIN_USER"`
-		AdminPass string `envconfig:"GITEA_ADMIN_PASSWORD"`
+		InternalURL string `yaml:"internal_url" envconfig:"GITEA_INTERNAL_URL"`
+		URL         string `envconfig:"GITEA_URL"`
+		AdminUser   string `envconfig:"GITEA_ADMIN_USER"`
+		AdminPass   string `envconfig:"GITEA_ADMIN_PASSWORD"`
 	} `yaml:"gitea"`
 	Kubernetes struct {
 		Namespace string `envconfig:"POD_NAMESPACE"`
@@ -28,21 +29,21 @@ type Config struct {
 }
 
 // NewConfig will read the config.yml file and override values with env vars.
-func NewConfig() *Config {
+func NewConfig() Config {
 	f, err := os.Open("config.yml")
 	if err != nil {
 		log.Fatalf("Error opening config.yml: %s", err)
 	}
 
-	cfg := &Config{}
+	cfg := Config{}
 	decoder := yaml.NewDecoder(f)
 
-	err = decoder.Decode(cfg)
+	err = decoder.Decode(&cfg)
 	if err != nil {
 		log.Fatalf("Error loading config.yml: %s", err)
 	}
 
-	err = envconfig.Process("", cfg)
+	err = envconfig.Process("", &cfg)
 	if err != nil {
 		panic(err)
 	}

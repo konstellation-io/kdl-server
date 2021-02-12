@@ -44,7 +44,7 @@ func main() {
 	sshHelper := sshhelper.NewGenerator(logger)
 
 	giteaService, err := giteaservice.NewGiteaService(
-		logger, cfg.Gitea.URL, cfg.Gitea.AdminUser, cfg.Gitea.AdminPass,
+		logger, cfg.Gitea.InternalURL, cfg.Gitea.AdminUser, cfg.Gitea.AdminPass,
 	)
 	if err != nil {
 		logger.Errorf("Error connecting to Gitea: %s", err)
@@ -76,6 +76,7 @@ func main() {
 	}
 
 	resolvers := graph.NewResolver(
+		cfg,
 		project.NewInteractor(logger, projectRepo, realClock, giteaService),
 		user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaService, k8sClient),
 	)

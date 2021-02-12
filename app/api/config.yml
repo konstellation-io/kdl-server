@@ -5,4 +5,4 @@ mongodb:
   uri: "mongodb://admin:123456@mongodb:27017/admin"
   dbName: "kdl"
 gitea:
-  url: "http://gitea:3000"
+  internal_url: "http://gitea:3000"

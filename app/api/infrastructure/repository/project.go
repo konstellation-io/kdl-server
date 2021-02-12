@@ -17,10 +17,13 @@ import (
 const projectCollName = "projects"
 
 type projectDTO struct {
-	ID           primitive.ObjectID `bson:"_id"`
-	Name         string             `bson:"name"`
-	Description  string             `bson:"description"`
-	CreationDate time.Time          `bson:"creation_date"`
+	ID               primitive.ObjectID    `bson:"_id"`
+	Name             string                `bson:"name"`
+	Description      string                `bson:"description"`
+	CreationDate     time.Time             `bson:"creation_date"`
+	RepositoryType   entity.RepositoryType `bson:"repo_type"`
+	InternalRepoName string                `bson:"internal_repo_name"`
+	ExternalRepoURL  string                `bson:"external_repo_url"`
 }
 
 type projectMongoDBRepo struct {
@@ -70,9 +73,12 @@ func (m *projectMongoDBRepo) Create(ctx context.Context, p entity.Project) (stri
 
 func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 	dto := projectDTO{
-		Name:         p.Name,
-		Description:  p.Description,
-		CreationDate: p.CreationDate,
+		Name:             p.Name,
+		Description:      p.Description,
+		CreationDate:     p.CreationDate,
+		RepositoryType:   p.Repository.Type,
+		InternalRepoName: p.Repository.InternalRepoName,
+		ExternalRepoURL:  p.Repository.URL,
 	}
 
 	if p.ID != "" {
@@ -93,5 +99,10 @@ func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 		Name:         dto.Name,
 		Description:  dto.Description,
 		CreationDate: dto.CreationDate,
+		Repository: entity.Repository{
+			Type:             dto.RepositoryType,
+			URL:              dto.ExternalRepoURL,
+			InternalRepoName: dto.InternalRepoName,
+		},
 	}
 }

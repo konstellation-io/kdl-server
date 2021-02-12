@@ -16,5 +16,5 @@ type Repository interface {
 
 // UseCase interface to manage all operations related with projects.
 type UseCase interface {
-	Create(ctx context.Context, name, description string) (entity.Project, error)
+	Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error)
 }

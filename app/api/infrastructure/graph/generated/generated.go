@@ -1067,7 +1067,8 @@ type Project {
 
 input RepositoryInput {
   type: RepositoryType!
-  url: String!
+  internalRepoName: String
+  externalRepoUrl: String
 }
 
 type Repository {
@@ -2934,9 +2935,9 @@ func (ec *executionContext) _Project_repository(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*entity.Repository)
+	res := resTmp.(entity.Repository)
 	fc.Result = res
-	return ec.marshalORepository2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepository(ctx, field.Selections, res)
+	return ec.marshalORepository2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepository(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Project_state(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
@@ -5476,11 +5477,19 @@ func (ec *executionContext) unmarshalInputRepositoryInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "url":
+		case "internalRepoName":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			it.URL, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("internalRepoName"))
+			it.InternalRepoName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "externalRepoUrl":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalRepoUrl"))
+			it.ExternalRepoURL, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7508,11 +7517,8 @@ func (ec *executionContext) unmarshalORemoveApiTokenInput2ᚖgithubᚗcomᚋkons
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalORepository2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepository(ctx context.Context, sel ast.SelectionSet, v *entity.Repository) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Repository(ctx, sel, v)
+func (ec *executionContext) marshalORepository2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepository(ctx context.Context, sel ast.SelectionSet, v entity.Repository) graphql.Marshaler {
+	return ec._Repository(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

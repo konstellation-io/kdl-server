@@ -10,6 +10,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
 func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error) {
@@ -34,7 +35,13 @@ func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.SSHKey
 }
 
 func (r *mutationResolver) CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error) {
-	createdProject, err := r.projects.Create(ctx, input.Name, input.Description)
+	createdProject, err := r.projects.Create(ctx, project.CreateProjectOption{
+		Name:             input.Name,
+		Description:      input.Description,
+		RepoType:         input.Repository.Type,
+		InternalRepoName: input.Repository.InternalRepoName,
+		ExternalRepoURL:  input.Repository.ExternalRepoURL,
+	})
 
 	return &createdProject, err
 }

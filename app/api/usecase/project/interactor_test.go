@@ -60,29 +60,45 @@ func TestInteractor_Create(t *testing.T) {
 
 	const (
 		projectID   = "project.1234"
-		projectName = "project-x"
-		projectDesc = "description"
+		projectName = "The Project X"
+		projectDesc = "The Project X Description"
 	)
+
+	var internalRepoName = "project-x"
 
 	ctx := context.Background()
 	now := time.Now().UTC()
 
-	p := entity.NewProject(projectName, projectDesc)
-	p.CreationDate = now
+	createProject := entity.NewProject(projectName, projectDesc)
+	createProject.CreationDate = now
+	createProject.Repository = entity.Repository{
+		Type:             entity.RepositoryTypeInternal,
+		InternalRepoName: internalRepoName,
+	}
 
 	expectedProject := entity.Project{
 		ID:           projectID,
 		Name:         projectName,
 		Description:  projectDesc,
 		CreationDate: now,
+		Repository: entity.Repository{
+			Type:             entity.RepositoryTypeInternal,
+			InternalRepoName: internalRepoName,
+		},
 	}
 
-	s.mocks.giteaService.EXPECT().CreateRepo(projectName, projectDesc)
+	s.mocks.giteaService.EXPECT().CreateRepo(internalRepoName).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
-	s.mocks.repo.EXPECT().Create(ctx, p).Return(projectID, nil)
+	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(projectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, projectID).Return(expectedProject, nil)
 
-	createdProject, err := s.interactor.Create(ctx, projectName, projectDesc)
+	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
+		Name:             projectName,
+		Description:      projectDesc,
+		RepoType:         entity.RepositoryTypeInternal,
+		InternalRepoName: &internalRepoName,
+		ExternalRepoURL:  nil,
+	})
 
 	require.NoError(t, err)
 	require.Equal(t, expectedProject, createdProject)

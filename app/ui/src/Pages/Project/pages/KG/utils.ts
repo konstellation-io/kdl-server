@@ -1,3 +1,5 @@
+import { CoordData, CoordOptions } from './components/KGVisualization/KGViz';
+
 import { D } from './components/KGVisualization/KGVisualization';
 
 export type Coord = {
@@ -30,9 +32,8 @@ export function getHash(text: string) {
 export function groupData(
   data: D[],
   coord: (
-    { category, score, name }: { category: string, score: number, name?: string },
-    jittered?: boolean,
-    offset?: number
+    { category, score, name }: CoordData,
+    options: CoordOptions
   ) => Coord,
   elementsCollide: (a: Coord, b: Coord) => boolean,
 ) {
@@ -40,7 +41,7 @@ export function groupData(
 
   data
     .forEach(d => {
-      const { x, y } = coord(d, true);
+      const { x, y } = coord(d, { jittered: true});
       const newD: DComplete = { ...d, x, y };
       let collisionEl;
       let collisionIdx = 0;

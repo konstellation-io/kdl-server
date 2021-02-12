@@ -1,4 +1,4 @@
-import { BaseType, EnterElement, Selection, select } from 'd3-selection';
+import { BaseType, EnterElement, Local, Selection, local, select } from 'd3-selection';
 import { Coord, GroupD, getHash, groupData } from '../../utils';
 import { D, ResourceType } from './KGVisualization';
 import { MINIMAP_HEIGHT, MINIMAP_WIDTH } from '../Minimap/Minimap';
@@ -8,6 +8,7 @@ import { scaleBand, scaleLinear } from '@visx/scale';
 import MinimapViz from '../Minimap/MinimapViz';
 import { ZoomValues } from './useZoom';
 import { range } from 'd3-array';
+import { stringToId } from 'Utils/d3';
 import styles from './KGVisualization.module.scss';
 
 const px = (value: number | string) => `${value}px`;
@@ -26,6 +27,7 @@ const GUIDE_STROKE = 1;
 const SECTION_INTERVAL = 4;
 const AXIS_PADDING = 8;
 const AXIS_FONT_SIZE = 12;
+const SECTION_BOX_HEIGHT = 32;
 
 export const N_GUIDES = 2;
 
@@ -48,6 +50,17 @@ const colorScale = scaleLinear({
 
 const section = (d: D) => d.category;
 
+export type CoordData = {
+  category: string,
+  score: number,
+  name?: string
+};
+export type CoordOptions = {
+  jittered?: boolean,
+  offset?: number,
+  bisector?: boolean
+};
+
 type Props = {
   width: number;
   parent: SVGSVGElement;
@@ -56,6 +69,7 @@ type Props = {
   showTooltip: (p: any) => void;
   hideTooltip: () => void;
   minimapRef: SVGSVGElement;
+  tooltipOpen: boolean;
   x: number;
   y: number;
   k: number;
@@ -69,8 +83,10 @@ class KGViz {
   center: Coord;
   rScale = scaleLinear<number>();
   sectionScale = scaleBand();
+  sectionDomain: string[];
   groupedData: GroupD[];
   minimap: MinimapViz;
+  sectionOrientation: Local<string>;
   size: {
     innerWidth: number,
     innerHeight: number,
@@ -89,6 +105,7 @@ class KGViz {
     this.mainG = select(wrapper);
     this.props = props;
     this.groupedData = [];
+    this.sectionDomain = [];
 
     const innerWidth = (1 - 2 * PADDING) * props.width;
     const innerHeight = (1 - 2 * PADDING) * props.height;
@@ -126,6 +143,8 @@ class KGViz {
       initialZoomValues: props.initialZoomValues
     });
 
+    this.sectionOrientation = local<string>();
+
     this.updateSizes();
     this.cleanup();
     this.initialize();
@@ -135,13 +154,10 @@ class KGViz {
     this.wrapper.selectAll('*').remove();
   };
 
-  updateScales = (data: D[]) => {
-    const sectionDomain = Array.from(new Set(data.map(section)));
-    this.sectionScale.domain(sectionDomain);
-  }
-
   updateScalesAndData = (data: D[]) => {
-    this.updateScales(data);
+    this.sectionDomain = Array.from(new Set(data.map(section)));
+    this.sectionScale.domain(this.sectionDomain);
+
     this.groupedData = groupData(data, this.coord, this.elementsCollide);
   }
 
@@ -153,16 +169,16 @@ class KGViz {
     const {
       resources,
       sections,
+      sectionGuides,
       wrapper,
       center,
       groupedData,
+      positionSectionBoxes,
+      sectionDomain,
       size: {
         guideStroke,
         axisPadding,
         axisFontSize
-      },
-      props: {
-        data
       }
     } = this;
 
@@ -183,11 +199,13 @@ class KGViz {
     );
 
     // Sections
-    const sectionDomain = Array.from(new Set(data.map(section)));
     const newSections = mainG.append('g')
       .classed(styles.sectionsWrapper, true)
       .selectAll(`.${styles.grid}`).data(sectionDomain).enter();
     sections.create(newSections);
+
+    sectionGuides.create();
+    positionSectionBoxes();
 
     // InnerCircle
     const innerCircle = mainG.append('g');
@@ -242,13 +260,34 @@ class KGViz {
     resources.create(newResources);
   };
 
-  updateZoomArea = (zoomValues: ZoomValues) => {
-    this.minimap.update(this.groupedData, zoomValues);
+  highlightResource = (resourceName: string | null) => {
+    const { mainG } = this;
 
-    this.resetTooltip();
+    const allResources = mainG.selectAll<BaseType, GroupD>(`.${styles.resource}`);
+    allResources
+      .classed(styles.highlight, false)
+      .classed(styles.unhighlight, true);
+    
+    allResources.filter(d => d.elements.some((el: D) => el.name === resourceName))
+      .classed(styles.highlight, true)
+      .classed(styles.unhighlight, false);
   };
 
-  update = (zoomValues: ZoomValues, data: D[]) => {    
+  updateZoomArea = (zoomValues: ZoomValues) => {
+    const {
+      minimap,
+      groupedData,
+      resetTooltip,
+      positionSectionBoxes
+    } = this;
+    
+    minimap.update(groupedData, zoomValues);
+
+    resetTooltip();
+    positionSectionBoxes();
+  };
+
+  update = (zoomValues: ZoomValues, data: D[]) => {
     this.props.k = zoomValues.k;
     this.updateSizes();
     
@@ -259,9 +298,12 @@ class KGViz {
     const {
       resources,
       sections,
+      sectionGuides,
       mainG,
       groupedData,
       resetTooltip,
+      positionSectionBoxes,
+      sectionDomain,
       size: {
         guideStroke,
         axisPadding,
@@ -276,7 +318,6 @@ class KGViz {
       .attr('stroke-width', guideStroke);
     
     // Sections
-    const sectionDomain = Array.from(new Set(data.map(section)));
     const allSections = mainG
       .selectAll(`.${styles.sectionsWrapper}`)
       .selectAll(`.${styles.grid}`)
@@ -286,6 +327,11 @@ class KGViz {
     sections.create(newSections);
     sections.update(allSections);
     sections.remove(oldSections);
+    
+    // Regenerate section boxes
+    sectionGuides.destroy();
+    sectionGuides.create();
+    positionSectionBoxes();
     
     // Axis
     mainG.select(`.${styles.axis}`).selectAll('text')
@@ -472,10 +518,10 @@ class KGViz {
         .classed(styles.grid, true)
         .attr('stroke-width', guideStroke)
         .attr('stroke-dasharray', `${sectionInterval} ${sectionInterval}`)
-        .attr('x1', category => coord({ category, score: MAX_SCORE }, false, -RESOURCE_R).x)
-        .attr('y1', category => coord({ category, score: MAX_SCORE }, false, -RESOURCE_R).y)
-        .attr('x2', category => coord({ category, score: MIN_SCORE }, false, RESOURCE_R).x)
-        .attr('y2', category => coord({ category, score: MIN_SCORE }, false, RESOURCE_R).y);
+        .attr('x1', category => coord({ category, score: MAX_SCORE }, {offset: -RESOURCE_R}).x)
+        .attr('y1', category => coord({ category, score: MAX_SCORE }, {offset: -RESOURCE_R}).y)
+        .attr('x2', category => coord({ category, score: MIN_SCORE }, {offset: RESOURCE_R}).x)
+        .attr('y2', category => coord({ category, score: MIN_SCORE }, {offset: RESOURCE_R}).y);
     },
     update: (container: Selection<BaseType, string, BaseType, unknown>) => {
       const {
@@ -489,10 +535,10 @@ class KGViz {
       container
         .attr('stroke-dasharray', `${sectionInterval} ${sectionInterval}`)
         .attr('stroke-width', guideStroke)
-        .attr('x1', category => coord({ category, score: MAX_SCORE }, false, -RESOURCE_R).x)
-        .attr('y1', category => coord({ category, score: MAX_SCORE }, false, -RESOURCE_R).y)
-        .attr('x2', category => coord({ category, score: MIN_SCORE }, false, RESOURCE_R).x)
-        .attr('y2', category => coord({ category, score: MIN_SCORE }, false, RESOURCE_R).y);
+        .attr('x1', category => coord({ category, score: MAX_SCORE }, {offset: -RESOURCE_R}).x)
+        .attr('y1', category => coord({ category, score: MAX_SCORE }, {offset: -RESOURCE_R}).y)
+        .attr('x2', category => coord({ category, score: MIN_SCORE }, {offset: RESOURCE_R}).x)
+        .attr('y2', category => coord({ category, score: MIN_SCORE }, {offset: RESOURCE_R}).y);
     },
     remove: (container: Selection<BaseType, unknown, BaseType, unknown>) => {
       container.interrupt().transition();
@@ -504,6 +550,35 @@ class KGViz {
     }
   };
 
+  sectionGuides = {
+    create: () => {
+      const {
+        mainG,
+        sectionDomain,
+        sectionOrientation,
+        coord
+      } = this;
+
+      const sectionAndNames = mainG.append('g').classed(styles.sectionAndNamesG, true);
+      sectionAndNames.selectAll(`.${styles.sectionAndNamesGuide}`)
+        .data(sectionDomain)
+        .enter()
+        .append('g')
+          .classed(styles.sectionAndNamesGuide, true)
+          .attr('transform', function(d) {
+            const { x, y, angle } = coord(
+              { category: d, score: 0 },
+              { bisector: true }
+            );
+            sectionOrientation.set(this, angle > 90 && angle < 270 ? 'left' : 'right');
+            return `translate(${x}, ${y})`;
+          });
+    },
+    destroy: () => {
+      this.mainG.select(`.${styles.sectionAndNamesG}`).remove();
+    }
+  };
+
   resetTooltip = () => {
     const {
       mainG,
@@ -512,16 +587,19 @@ class KGViz {
         resourceStroke
       },
       props: {
-        hideTooltip
+        hideTooltip,
+        tooltipOpen
       }
     } = this;
 
     // Resets tooltip
-    hideTooltip();
+    if (tooltipOpen) hideTooltip();
+
     mainG.selectAll(`.${styles.tooltipRect}`)
       .attr('width', 2 * resourceR + resourceStroke / 2)
       .attr('fill-opacity', 0)
-      .interrupt().transition();
+    // TODO: does the next line make performance wrost?
+    //   .interrupt().transition();
   }
 
   updateSizes = () => {
@@ -541,24 +619,27 @@ class KGViz {
   }
 
   coord = (
-    { category, score, name }: { category: string, score: number, name?: string },
-    jittered?: boolean,
-    offset?: number
+    { category, score, name }: CoordData,
+    { jittered = false, offset = 0, bisector = false }: CoordOptions
   ) => {
     const { rScale, sectionScale } = this;
 
     const distance = rScale(score) + (offset || 0);
     let angle = sectionScale(category) || 0;
 
-    if (jittered) {
+    if (jittered && !bisector) {
       const randomNumber = Math.abs(getHash(name || '') % 1000 / 1000);
       angle += sectionScale.bandwidth() * randomNumber
+    }
+
+    if (bisector) {
+      angle += sectionScale.bandwidth() / 2;
     }
 
     const x = Math.cos(angle * Math.PI / 180) * distance;
     const y = Math.sin(angle * Math.PI / 180) * distance;
 
-    return { x, y };
+    return { x, y, angle };
   }
 
   elementsCollide = (a: Coord, b: Coord) => (
@@ -633,6 +714,26 @@ class KGViz {
       });
     }
   };
+
+  positionSectionBoxes = () => {
+    const {
+      wrapper,
+      sectionOrientation
+    } = this;
+
+    wrapper.selectAll<SVGGElement, string>(`.${styles.sectionAndNamesGuide}`)
+      .each(function(sectionName) {
+        // FIXME: make sure the next this is properly typed
+        // @ts-ignore
+        const { left, top } = this.getBoundingClientRect();
+        const orientation = sectionOrientation.get(this);
+        
+        select(`#kg_${stringToId(sectionName)}`)
+          .style('left', orientation === 'right' ? px(left) : 'auto')
+          .style('right', orientation === 'left' ? px(window.innerWidth - left) : 'auto')
+          .style('top', px(top - SECTION_BOX_HEIGHT / 2));
+      });
+  }
 }
 
 export default KGViz;

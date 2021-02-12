@@ -1,0 +1,70 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  position: fixed;
+  opacity: 1;
+  z-index: 1;
+  width: 33 * $grid-unit;
+
+  &:hover {
+    z-index: 2;
+  }
+}
+
+.section {
+  @include font-small;
+  color: font-color(lowlight);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  height: 4 * $grid-unit;
+  border-radius: 0.75 * $grid-unit;
+  padding: 0 $grid-unit;
+
+  background-color: palette(lowlight, 900);
+  cursor: pointer;
+
+  transition: border-radius ease 0.3s;
+
+  &.opened {
+    border-radius: 0.75 * $grid-unit 0.75 * $grid-unit 0 0;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 0 0.75 * $grid-unit 0.75 * $grid-unit;
+  max-height: 50 * $grid-unit;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.name {
+  @include font-small;
+  color: font-color(lowlight);
+
+  background-color: palette(base, 400);
+  line-height: 2 * $grid-unit;
+  padding: 0.4 * $grid-unit 2 * $grid-unit 0.4 * $grid-unit 1.5 * $grid-unit;
+  display: flex;
+  cursor: pointer;
+
+  transition: background-color ease 0.2s, color ease 0.2s;
+
+  &:hover {
+    background-color: palette(highlight);
+    color: font-color(dark);
+  }
+
+  .nameIndex {
+    width: 3 * $grid-unit;
+    flex-shrink: 0;
+  }
+}

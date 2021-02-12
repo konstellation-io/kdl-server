@@ -8,6 +8,13 @@ $tooltipWidth: 300px;
   position: absolute;
 }
 
+.sectionAndNamesG {
+  opacity: 1;
+}
+.sectionAndNamesGuide {
+  opacity: 1;
+}
+
 .outerCircle {
   fill-opacity: 0;
   stroke: palette(lowlight, 900);
@@ -51,12 +58,13 @@ $tooltipWidth: 300px;
   stroke: palette(lowlight, 700);
 }
 
+.resourceWrapper,
 .resourcesWrapper {
-  opacity: 1;
+  pointer-events: none;
 }
 
 .resourceG {
-  opacity: 1;
+  pointer-events: all;
 }
 
 .resource {
@@ -69,6 +77,15 @@ $tooltipWidth: 300px;
   &.resourceNode {
     fill: palette(base);
     stroke: palette(feedback, 900);
+  }
+
+  &.unhighlight {
+    transition: stroke ease 0.4s;
+  }
+
+  &.highlight {
+    stroke: palette(highlight);
+    filter: url(#resourceGlow);
   }
 }
 
@@ -89,9 +106,15 @@ $tooltipWidth: 300px;
   pointer-events: none;
 
   height: 4 * $grid-unit;
-  width: fit-content;
+  width: 0px;
   overflow: hidden;
   color: font-color(dark);
+
+  transition: width linear 0.4s;
+
+  &.open {
+    width: $tooltipWidth;
+  }
 }
 
 .tooltipRect {
@@ -125,17 +148,6 @@ $tooltipWidth: 300px;
   flex-shrink: 0;
 }
 
-.enter {
-  animation: appear 0.4s forwards;
-}
-.enterDone {
-  max-width: $tooltipWidth;
-  opacity: 1;
-}
-.exit {
-  animation: disappear 0.4s forwards;
-}
-
 .tooltipGroup {
   overflow: hidden;
   width: $tooltipWidth;
@@ -149,23 +161,6 @@ $tooltipWidth: 300px;
   padding-right: 1 * $grid-unit;
 }
 
-@keyframes appear {
-  from {
-    max-width: 4 * $grid-unit;
-    opacity: 0;
-  }
-  to {
-    max-width: $tooltipWidth;
-    opacity: 1;
-  }
-}
-@keyframes disappear {
-  from {
-    max-width: $tooltipWidth;
-    opacity: 1;
-  }
-  to {
-    max-width: 4 * $grid-unit;
-    opacity: 0;
-  }
+.glowFilter {
+  flood-color: palette(highlight);
 }

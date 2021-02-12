@@ -97,10 +97,6 @@ func (m *userMongoDBRepo) FindAll(ctx context.Context) ([]entity.User, error) {
 
 	cursor, err := m.collection.Find(ctx, bson.M{})
 	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return []entity.User{}, entity.ErrListUsersEmpty
-		}
-
 		return []entity.User{}, err
 	}
 

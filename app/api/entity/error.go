@@ -12,9 +12,6 @@ var (
 	// ErrUserNotFound error definition.
 	ErrUserNotFound = errors.New("user not found")
 
-	// ErrListUsersEmpty error definition.
-	ErrListUsersEmpty = errors.New("user list empty")
-
 	// ErrDuplicatedUser error definition.
 	ErrDuplicatedUser = errors.New("user is duplicated")
 

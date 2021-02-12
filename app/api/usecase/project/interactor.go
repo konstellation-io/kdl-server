@@ -41,3 +41,9 @@ func (i Interactor) Create(ctx context.Context, name, description string) (entit
 
 	return i.repo.Get(ctx, insertedID)
 }
+
+// Find all projects existing in the server.
+func (i Interactor) FindAll(ctx context.Context) ([]entity.Project, error) {
+	i.logger.Info("Finding all projects in the server")
+	return i.repo.FindAll(ctx)
+}

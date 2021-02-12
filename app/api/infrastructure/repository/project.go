@@ -68,6 +68,33 @@ func (m *projectMongoDBRepo) Create(ctx context.Context, p entity.Project) (stri
 	return result.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
+// FindAll retrieves all the existing projects.
+func (m *projectMongoDBRepo) FindAll(ctx context.Context) ([]entity.Project, error) {
+	m.logger.Debugf("Getting all projects from \"%s\" collection...", projectCollName)
+
+	cursor, err := m.collection.Find(ctx, bson.M{})
+	if err != nil {
+		return []entity.Project{}, err
+	}
+
+	projects := make([]entity.Project, cursor.RemainingBatchLength())
+	index := 0
+
+	for cursor.Next(ctx) {
+		dto := projectDTO{}
+
+		err := cursor.Decode(&dto)
+		if err != nil {
+			return []entity.Project{}, err
+		}
+
+		projects[index] = m.dtoToEntity(dto)
+		index++
+	}
+
+	return projects, nil
+}
+
 func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 	dto := projectDTO{
 		Name:         p.Name,

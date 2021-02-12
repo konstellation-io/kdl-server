@@ -12,6 +12,12 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
 )
 
+type mutationResolver struct{ *Resolver }
+type projectResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }
+type sSHKeyResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }
+
 func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error) {
 	user, err := r.users.Create(ctx, input.Email, input.Username, input.Password, input.AccessLevel)
 	if err != nil {
@@ -84,7 +90,7 @@ func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
 }
 
 func (r *queryResolver) Projects(ctx context.Context) ([]entity.Project, error) {
-	panic(entity.ErrNotImplemented)
+	return r.projects.FindAll(ctx)
 }
 
 func (r *queryResolver) Project(ctx context.Context, id string) (*entity.Project, error) {
@@ -143,9 +149,3 @@ func (r *Resolver) SSHKey() generated.SSHKeyResolver { return &sSHKeyResolver{r}
 
 // User returns generated.UserResolver implementation.
 func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
-
-type mutationResolver struct{ *Resolver }
-type projectResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
-type sSHKeyResolver struct{ *Resolver }
-type userResolver struct{ *Resolver }

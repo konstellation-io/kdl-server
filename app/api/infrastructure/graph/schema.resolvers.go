@@ -92,12 +92,7 @@ func (r *queryResolver) Project(ctx context.Context, id string) (*entity.Project
 }
 
 func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
-	users, err := r.users.FindAll(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return users, nil
+	return r.users.FindAll(ctx)
 }
 
 func (r *queryResolver) SSHKey(ctx context.Context) (*entity.SSHKey, error) {

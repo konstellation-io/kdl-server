@@ -10,6 +10,7 @@ import (
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
@@ -26,6 +27,7 @@ type projectMocks struct {
 	repo         *project.MockRepository
 	clock        *clock.MockClock
 	giteaService *giteaservice.MockGiteaClient
+	minioService *minioservice.MockMinioService
 }
 
 func newProjectSuite(t *testing.T) *projectSuite {
@@ -40,7 +42,9 @@ func newProjectSuite(t *testing.T) *projectSuite {
 
 	giteaService := giteaservice.NewMockGiteaClient(ctrl)
 
-	interactor := project.NewInteractor(logger, repo, clockMock, giteaService)
+	minioService := minioservice.NewMockMinioService(ctrl)
+
+	interactor := project.NewInteractor(logger, repo, clockMock, giteaService, minioService)
 
 	return &projectSuite{
 		ctrl:       ctrl,
@@ -50,6 +54,7 @@ func newProjectSuite(t *testing.T) *projectSuite {
 			repo:         repo,
 			clock:        clockMock,
 			giteaService: giteaService,
+			minioService: minioService,
 		},
 	}
 }

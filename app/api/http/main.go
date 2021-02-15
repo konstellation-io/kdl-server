@@ -12,6 +12,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/repository"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
@@ -51,6 +52,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	minioService, err := minioservice.NewMinioService(
+		logger, cfg.Minio.URL, cfg.Minio.AccessKey, cfg.Minio.SecretKey,
+	)
+	if err != nil {
+		logger.Errorf("Error connecting to Minio: %s", err)
+		os.Exit(1)
+	}
+
 	k8sClient, err := k8s.NewK8sClient(logger, cfg.Kubernetes.Namespace)
 	if err != nil {
 		logger.Errorf("Error creating k8s client: %s", err)
@@ -77,7 +86,7 @@ func main() {
 
 	resolvers := graph.NewResolver(
 		cfg,
-		project.NewInteractor(logger, projectRepo, realClock, giteaService),
+		project.NewInteractor(logger, projectRepo, realClock, giteaService, minioService),
 		user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaService, k8sClient),
 	)
 

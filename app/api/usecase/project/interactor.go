@@ -7,6 +7,7 @@ import (
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
@@ -60,11 +61,16 @@ type Interactor struct {
 	repo         Repository
 	clock        clock.Clock
 	giteaService giteaservice.GiteaClient
+	minioService minioservice.MinioService
 }
 
 // NewInteractor is a constructor function.
-func NewInteractor(logger logging.Logger, repo Repository, c clock.Clock, giteaService giteaservice.GiteaClient) *Interactor {
-	return &Interactor{logger: logger, repo: repo, clock: c, giteaService: giteaService}
+func NewInteractor(logger logging.Logger,
+	repo Repository,
+	c clock.Clock,
+	giteaService giteaservice.GiteaClient,
+	minioService minioservice.MinioService) *Interactor {
+	return &Interactor{logger: logger, repo: repo, clock: c, giteaService: giteaService, minioService: minioService}
 }
 
 // Create stores into the DB a new project.
@@ -98,6 +104,12 @@ func (i *Interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 
 	// Store the project into the database
 	insertedID, err := i.repo.Create(ctx, project)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	// Create Minio bucket
+	err = i.minioService.CreateBucket(opt.Name)
 	if err != nil {
 		return entity.Project{}, err
 	}

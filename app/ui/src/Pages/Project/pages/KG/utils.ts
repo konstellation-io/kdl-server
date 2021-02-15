@@ -29,6 +29,7 @@ export function getHash(text: string) {
   return hash;
 }
 
+// TODO: improve performance and fix collisions
 export function groupData(
   data: D[],
   coord: (
@@ -65,7 +66,6 @@ export function groupData(
         groupedData.push({ elements: [newD], x, y });
       }
     });
-
 
   return groupedData;
 }

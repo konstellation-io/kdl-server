@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Button } from 'kwc';
 import FilterGlow from './FilterGlow/FilterGlow';
 import IconOpen from '@material-ui/icons/ArrowForward';
 import KGViz from './KGViz';
@@ -8,7 +7,6 @@ import Minimap from '../Minimap/Minimap';
 import { ParentSize } from '@visx/responsive';
 import SectionList from './SectionList/SectionList';
 import cx from 'classnames';
-import data from './data';
 import { orderBy } from 'lodash';
 import styles from './KGVisualization.module.scss';
 import { useTooltip } from '@visx/tooltip';
@@ -25,18 +23,23 @@ export type D = {
   score: number;
 };
 
-function KGVisualizationWrapper() {
+type WrapperProps = {
+  data: D[];
+  selectedResource: string;
+  onResourceSelection: (name: string) => void;
+};
+function KGVisualizationWrapper(props: WrapperProps) {
   return (
     <ParentSize className={styles.container} debounceTime={10}>
       {
         ({ width, height }) => (
           width && height && (
-            <KGVisualization width={width} height={height} />
+            <KGVisualization width={width} height={height} {...props} />
           )
         )
       }
     </ParentSize>
-  )
+  );
 }
 
 function getSectionsAndNames(newData: D[]) {
@@ -55,10 +58,8 @@ function getSectionsAndNames(newData: D[]) {
 type Props = {
   width: number;
   height: number;
-};
-function KGVisualization({ width, height }: Props) {
-  const [mockData, setMockData] = useState(data.filter(d => d.score > 0.25));
-  
+} & WrapperProps;
+function KGVisualization({ width, height, data, selectedResource, onResourceSelection }: Props) {
   const [hoveredPaper, setHoveredPaper] = useState<string | null>(null);
   const [tooltipActive, setTooltipActive] = useState<{
     data: D;
@@ -87,7 +88,7 @@ function KGVisualization({ width, height }: Props) {
   });
   const viz = useRef<KGViz | null>(null);  
 
-  const sectionsAndNames = useMemo(() => getSectionsAndNames(mockData), [mockData]);
+  const sectionsAndNames = useMemo(() => getSectionsAndNames(data), [data]);
 
   // TODO: Do not use useTooltip from Visx
   // useTooltip removes tooltip location and data when hiding it instead of just changing the tooltipOpen
@@ -110,7 +111,9 @@ function KGVisualization({ width, height }: Props) {
   // We want to completelly update the visualization when there are changes
   // that affects the data
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(update, [zoomValues?.k, mockData]);
+  useEffect(update, [zoomValues?.k, data]);
+  
+  useEffect(updateSelectedResource, [selectedResource]);
 
   // We want to update only the minimap when draging the visualization
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -125,13 +128,15 @@ function KGVisualization({ width, height }: Props) {
       const vizProps = {
         parent: svgRef.current,
         minimapRef: minimapRef.current,
-        data: mockData,
+        data,
         width,
         height,
         tooltipOpen,
         showTooltip,
         hideTooltip,
         initialZoomValues,
+        onResourceSelection,
+        centerText: selectedResource,
         ...zoomValues
       };
       viz.current = new KGViz(gRef.current, vizProps);
@@ -140,9 +145,15 @@ function KGVisualization({ width, height }: Props) {
 
   function update() {
     if (viz.current !== null && zoomValues !== null) {
-      viz.current.update(zoomValues, mockData);
+      viz.current.update(zoomValues, data);
     } else {
       initialize();
+    }
+  }
+
+  function updateSelectedResource() {
+    if (viz.current !== null) {
+      viz.current.updateCenterText(selectedResource);
     }
   }
   
@@ -158,11 +169,6 @@ function KGVisualization({ width, height }: Props) {
         <g ref={gRef} transform={`translate(${zoomValues?.x || 0}, ${zoomValues?.y || 0}) scale(${zoomValues?.k || 1})`} />
         <FilterGlow />
       </svg>
-      <div style={{ position: 'absolute', bottom: 30, left: 50}}>
-        <Button label="FILTER" onClick={() => {
-          setMockData(mockData.filter(d => d.score <= 0.6));
-        }} primary />
-      </div>
       <div className={styles.sectionTags}>
         { Object.keys(sectionsAndNames).map(section =>
           <SectionList
@@ -170,6 +176,7 @@ function KGVisualization({ width, height }: Props) {
             key={section}
             names={sectionsAndNames[section]}
             setHoveredPaper={setHoveredPaper}
+            onResourceSelection={onResourceSelection}
           />
         )}
       </div>

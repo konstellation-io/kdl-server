@@ -15,7 +15,7 @@ const px = (value: number | string) => `${value}px`;
 export const PADDING = 0.15;
 export const OUTER_R = 370;
 
-const MIN_SCORE = 0.25;
+const MIN_SCORE = 0;
 const MAX_SCORE = 1;
 
 const TOOLTIP_WIDTH = 300;
@@ -56,6 +56,8 @@ type Props = {
   y: number;
   k: number;
   initialZoomValues: ZoomValues;
+  onResourceSelection: (name: string) => void;
+  centerText: string;
 };
 
 class KGViz {
@@ -123,7 +125,12 @@ class KGViz {
 
     this.sectionOrientation = local<string>();
 
-    this.resources = new Resources(this.onShowTooltip, this.onHideTooltip, this.wrapper);
+    this.resources = new Resources(
+      this.onShowTooltip,
+      this.onHideTooltip,
+      this.wrapper,
+      this.props.onResourceSelection
+    );
 
     this.sectionOrientation = local<string>();
 
@@ -162,6 +169,9 @@ class KGViz {
         guideStroke,
         axisPadding,
         axisFontSize
+      },
+      props: {
+        centerText
       },
       resources
     } = this;
@@ -204,7 +214,7 @@ class KGViz {
       .attr('height', 2 * INNER_R)
       .append('xhtml:div')
         .classed(styles.innerCircleText, true)
-        .html('Project Name 1');
+        .html(centerText);
 
     // OuterCircle
     mainG.append('circle')
@@ -219,13 +229,13 @@ class KGViz {
       .text('100%');
     axis.append('text')
       .attr('x', (OUTER_R - INNER_R) / 3)
-      .text('75%');
+      .text('66%');
     axis.append('text')
       .attr('x', (OUTER_R - INNER_R) * 2 / 3)
-      .text('50%');
+      .text('33%');
     axis.append('text')
       .attr('x', OUTER_R - INNER_R)
-      .text('25%');
+      .text('0%');
     axis.selectAll('text')
       .attr('dx', axisPadding)
       .attr('dy', -axisPadding)
@@ -237,6 +247,12 @@ class KGViz {
 
   highlightResource = (resourceName: string | null) => {
     this.resources.highlightResource(resourceName);
+  };
+
+  updateCenterText = (newCenterText: string) => {
+    const { mainG } = this;
+
+    mainG.select(`.${styles.innerCircleText}`).html(newCenterText);
   };
 
   updateZoomArea = (zoomValues: ZoomValues) => {
@@ -372,7 +388,7 @@ class KGViz {
           .classed(styles.sectionAndNamesGuide, true)
           .attr('transform', function(d) {
             const { x, y, angle } = coord(
-              { category: d, score: 0 },
+              { category: d, score: -0.25 },
               { bisector: true }
             );
             sectionOrientation.set(this, angle > 90 && angle < 270 ? 'left' : 'right');

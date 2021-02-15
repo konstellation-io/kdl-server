@@ -37,14 +37,17 @@ export default class Resources {
   fontSize: number = 0;
   onShowTooltip: (e: MouseEvent, d: GroupD, element: BaseType) => void;
   onHideTooltip: (element: BaseType) => void;
+  onResourceSelection: (name: string) => void;
 
   constructor(
     onShowTooltip: (e: MouseEvent, d: GroupD, element: BaseType) => void,
     onHideTooltip: (element: BaseType) => void,
-    container: Selection<SVGGElement, unknown, null, undefined>
+    container: Selection<SVGGElement, unknown, null, undefined>,
+    onResourceSelection: (name: string) => void
   ) {
     this.onShowTooltip = onShowTooltip;
     this.onHideTooltip = onHideTooltip;
+    this.onResourceSelection = onResourceSelection;
     this.container = container.select('g');
   }
 
@@ -102,7 +105,8 @@ export default class Resources {
       resourceStroke,
       fontSize,
       onShowTooltip,
-      onHideTooltip
+      onHideTooltip,
+      onResourceSelection
     } = this;
 
     const resourceWrappers = selection
@@ -135,7 +139,7 @@ export default class Resources {
         .attr('height', 2 * resourceR + resourceStroke / 1.5)
         .attr('rx', resourceR + resourceStroke / 4)
         .attr('fill-opacity', 0)
-        .on('click', () => alert('Open Panel'))
+        .on('click', (_, d) => onResourceSelection(d.elements[0].name))
         .on('mouseover', function(e, d: GroupD) {
           onShowTooltip(e, d, this);
         })

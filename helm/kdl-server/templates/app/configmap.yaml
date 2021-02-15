@@ -9,6 +9,6 @@ data:
   config.cfg: |+
     {
       "SERVER_NAME": "{{ .Values.serverName }}",
-      "SERVER_URL": "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}"
+      "SERVER_URL": "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}",
+      "INTERNAL_REPO_BASE_URL": "{{ include "protocol" . }}://gitea.{{ .Values.domain }}/kdl"
     }
-

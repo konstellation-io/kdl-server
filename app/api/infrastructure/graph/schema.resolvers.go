@@ -82,7 +82,7 @@ func (r *mutationResolver) SetActiveProjectTools(ctx context.Context, input mode
 }
 
 func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project) (string, error) {
-	panic(entity.ErrNotImplemented)
+	return obj.CreationDate.Format(time.RFC3339), nil
 }
 
 func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {

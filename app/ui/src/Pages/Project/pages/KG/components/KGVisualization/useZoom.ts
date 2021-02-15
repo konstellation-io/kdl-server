@@ -1,5 +1,5 @@
 import { BaseType, Selection, select } from 'd3-selection';
-import { MutableRefObject, useEffect, useRef, useState } from 'react';
+import { MutableRefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { zoom, zoomIdentity } from 'd3-zoom';
 
 import { OUTER_R } from './KGViz';
@@ -17,16 +17,22 @@ export type ZoomValues = {
   k: number;
 };
 
+type Params = {
+  svgRef: MutableRefObject<Element | null>;
+  width: number;
+  height: number;
+  zoomStep?: number;
+};
 type UseZoom = {
   zoomValues: ZoomValues | null;
-  initialZoomValues: ZoomValues
+  initialZoomValues: ZoomValues,
+  zoomIn: () => void;
+  zoomOut: () => void;
 };
 
-const useZoom: (
-  svgRef: MutableRefObject<Element | null>,
-  width: number,
-  height: number
-) => UseZoom = (svgRef, width, height) => {
+const zm = zoom();
+
+const useZoom: (p: Params) => UseZoom = ({ svgRef, width, height, zoomStep = 0.25 }) => {
   const targetOuterR = Math.min(width * TARGET_OUTER_R_PERC, height * TARGET_OUTER_R_PERC);
   const scaleToTarget = targetOuterR / OUTER_R;
 
@@ -48,9 +54,8 @@ const useZoom: (
         initialZoomValues.current.y
       )
       .scale(initialZoomValues.current.k);
-
-    const zm = zoom()
-      .scaleExtent([MIN_ZOOM, MAX_ZOOM])
+      
+    zm.scaleExtent([MIN_ZOOM, MAX_ZOOM])
       .on('zoom', (event) => setTx(event.transform));
 
     const selection = select(svgRef.current);
@@ -64,7 +69,35 @@ const useZoom: (
     }
   }, [svgRef, width, height, scaleToTarget]);
 
-  return { zoomValues, initialZoomValues: initialZoomValues.current };
+  function updateZoom(multiplier: number) {
+    if (zoomValues) {
+      const dk = zoomValues.k * multiplier;
+      const newK = zoomValues.k + dk;
+
+      if (newK < MIN_ZOOM || newK > MAX_ZOOM) return;
+
+      const tx = zoomIdentity
+        .translate(
+          zoomValues.x - width / 2 * dk,
+          zoomValues.y - height / 2 * dk
+        )
+        .scale(newK);
+
+      const selection = select(svgRef.current);
+      (selection as Selection<Element, unknown, BaseType, unknown>)
+        .call(zm.transform, tx);
+    }
+  }
+
+  const zoomIn = () => updateZoom(zoomStep);
+  const zoomOut = () => updateZoom(-zoomStep);
+  
+  return {
+    zoomValues,
+    initialZoomValues: initialZoomValues.current,
+    zoomIn,
+    zoomOut
+  };
 }
 
 export default useZoom;

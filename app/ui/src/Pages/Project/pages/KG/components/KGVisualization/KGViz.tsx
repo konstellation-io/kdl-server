@@ -1,6 +1,5 @@
 import { BaseType, EnterElement, Local, Selection, local, select } from 'd3-selection';
 import { Coord, GroupD, getHash, groupData } from '../../utils';
-import { MINIMAP_HEIGHT, MINIMAP_WIDTH } from '../Minimap/Minimap';
 import Resources, { RESOURCE_R } from './Resources/Resources';
 import { scaleBand, scaleLinear } from '@visx/scale';
 
@@ -28,6 +27,8 @@ const AXIS_FONT_SIZE = 12;
 const SECTION_BOX_HEIGHT = 32;
 
 export const N_GUIDES = 2;
+
+export let minimapViz: MinimapViz;
 
 const section = (d: D) => d.category;
 
@@ -111,8 +112,6 @@ class KGViz {
     });
 
     this.minimap = new MinimapViz(props.minimapRef, {
-      width: MINIMAP_WIDTH,
-      height: MINIMAP_HEIGHT,
       areaWidth: props.width,
       areaHeight: props.height,
       x: props.x,
@@ -120,6 +119,7 @@ class KGViz {
       k: props.k,
       initialZoomValues: props.initialZoomValues
     });
+    minimapViz = this.minimap;
 
     this.sectionOrientation = local<string>();
 

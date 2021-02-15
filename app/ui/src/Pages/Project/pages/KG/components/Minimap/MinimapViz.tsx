@@ -9,10 +9,9 @@ import styles from './Minimap.module.scss';
 
 const RESOURCE_R = 18;
 
-const MINIMAP_OUTER_R = 68;
+const MINIMAP_OUTER_R = 0.4;
 const OUTER_R = 370;
 const INNER_R = 53.5;
-const MINIMAP_SCALE = MINIMAP_OUTER_R / OUTER_R;
 
 const COLOR_SCALE_COLORS = ['#00303B', '#D6FFFF'];
 const colorScale = scaleLinear({
@@ -21,8 +20,6 @@ const colorScale = scaleLinear({
 });
 
 type Props = {
-  width: number;
-  height: number;
   areaWidth: number;
   areaHeight: number;
   x: number;
@@ -37,13 +34,19 @@ class MinimapViz {
   center: Coord;
   container: any;
   zoom: ZoomValues;
+  data: GroupD[] = [];
+  minimapScale: number = 0;
 
   constructor(wrapper: SVGSVGElement, props: Props) {
     this.wrapper = select(wrapper);
+    const width = +this.wrapper.attr('width');
+    const height = +this.wrapper.attr('height');
+
+    this.minimapScale = MINIMAP_OUTER_R * height / OUTER_R;
     this.zoomArea = null;
     this.zoom = { x: 0, y: 0, k: 1 };
     this.props = props;
-    this.center = { x: props.width / 2, y: props.height / 2 };
+    this.center = { x: width / 2, y: height / 2 };
     this.cleanup();
   }
 
@@ -51,11 +54,23 @@ class MinimapViz {
     this.wrapper.selectAll('*').remove();
   };
 
+  resize = ({ width, height }: { width: number, height: number }) => {
+    this.cleanup();
+    this.center = { x: width / 2, y: height / 2 };
+    this.minimapScale = MINIMAP_OUTER_R * height / OUTER_R;
+
+    this.initialize(this.data);
+    this.update(this.data, this.zoom);
+  };
+
   initialize = (data: GroupD[]) => {
+    this.data = data;
+
     const {
       wrapper,
       center,
       resources,
+      minimapScale,
       props: {
         areaWidth,
         areaHeight
@@ -66,7 +81,7 @@ class MinimapViz {
     // Container
     this.container = wrapper.append('g')
       .classed(styles.container, true)
-      .attr('transform', `translate(${center.x}, ${center.y}) scale(${MINIMAP_SCALE})`);
+      .attr('transform', `translate(${center.x}, ${center.y}) scale(${minimapScale})`);
 
     // Circle
     this.container.append('circle')
@@ -101,11 +116,14 @@ class MinimapViz {
   };
 
   update = (data: GroupD[], zoom: ZoomValues) => {
+    this.data = data;
+
     const {
       container,
       resources,
       zoomArea,
       center,
+      minimapScale,
       props: {
         areaWidth,
         areaHeight
@@ -128,9 +146,9 @@ class MinimapViz {
     const phaseDx = areaWidth * phaseFactor
     const phaseDy = areaHeight * phaseFactor
 
-    const dk = MINIMAP_SCALE * (1 / zoom.k);
-    const dx = center.x - areaWidth * dk / 2 - (zoom.x - phaseDx) * MINIMAP_SCALE / zoom.k;
-    const dy = center.y - areaHeight * dk / 2 - (zoom.y - phaseDy) * MINIMAP_SCALE / zoom.k;
+    const dk = minimapScale * (1 / zoom.k);
+    const dx = center.x - areaWidth * dk / 2 - (zoom.x - phaseDx) * minimapScale / zoom.k;
+    const dy = center.y - areaHeight * dk / 2 - (zoom.y - phaseDy) * minimapScale / zoom.k;
     
     zoomArea && zoomArea
       .attr('x', dx)

@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './TopicList.module.scss';
 import { Check } from 'kwc';
-import { colorScale, getNumberColor } from '../../../../../../KGUtils';
+import { colorScale, getColorNumber } from '../../../../../../KGUtils';
 import { Topic } from '../../../../Filters';
 
 export interface TopicListProps {
@@ -29,7 +29,7 @@ function TopicList({ topics, selectedTopics, onSelectOption }: TopicListProps) {
               className={styles.paperCount}
               style={{
                 backgroundColor: colorScale(topic.papersTopicCount),
-                color: getNumberColor(topic.papersTopicCount),
+                color: getColorNumber(topic.papersTopicCount),
               }}
             >
               {topic.papersTopicCount}

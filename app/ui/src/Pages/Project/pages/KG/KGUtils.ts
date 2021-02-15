@@ -13,7 +13,7 @@ export const colorScale = scaleLinear({
   range: COLOR_SCALE_COLORS,
 });
 
-export function getNumberColor(elementsCount: number) {
+export function getColorNumber(elementsCount: number) {
   const c: RGBColor = color(colorScale(elementsCount).toString()) as RGBColor;
   return c.r * 0.299 + c.g * 0.587 + c.b * 0.114 > TEXT_COLOR_THRESHOLD
     ? TEXT_COLOR.DARK

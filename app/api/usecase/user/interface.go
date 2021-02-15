@@ -22,4 +22,5 @@ type Repository interface {
 type UseCase interface {
 	Create(ctx context.Context, email, username, password string, accessLevel entity.AccessLevel) (entity.User, error)
 	FindAll(ctx context.Context) ([]entity.User, error)
+	GetByEmail(ctx context.Context, email string) (entity.User, error)
 }

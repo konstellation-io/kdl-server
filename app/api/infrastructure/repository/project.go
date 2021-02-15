@@ -82,7 +82,7 @@ func (m *projectMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entit
 }
 
 func (m *projectMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity.Project, error) {
-	m.logger.Debugf("Finding projects with filters \"%s\"...", projectCollName, filters)
+	m.logger.Debugf("Finding projects with filters \"%s\"...", filters)
 
 	var dtos []projectDTO
 

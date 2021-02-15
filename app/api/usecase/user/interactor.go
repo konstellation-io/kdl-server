@@ -125,8 +125,14 @@ func (i Interactor) Create(ctx context.Context, email, username, password string
 	return i.repo.Get(ctx, insertedID)
 }
 
-// Find all users existing in the server.
+// FindAll returns all users existing in the server.
 func (i Interactor) FindAll(ctx context.Context) ([]entity.User, error) {
 	i.logger.Info("Finding all users in the server")
 	return i.repo.FindAll(ctx)
+}
+
+// GetByEmail returns the user with the desired email or returns entity.ErrUserNotFound if the user doesn't exist.
+func (i Interactor) GetByEmail(ctx context.Context, email string) (entity.User, error) {
+	i.logger.Infof("Getting user by email \"%s\"", email)
+	return i.repo.GetByEmail(ctx, email)
 }

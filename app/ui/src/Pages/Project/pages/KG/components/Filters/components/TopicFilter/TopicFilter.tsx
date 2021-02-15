@@ -39,8 +39,10 @@ function TopicFilter({
   }
 
   function getButtonLabel() {
-    const topicsCounter = topics.length;
-    return `${topicsCounter} TOPIC${topicsCounter !== 1 ? 'S' : ''}`;
+    const selectedTopicsCount = selectedTopics.length;
+    return `${selectedTopicsCount} TOPIC${
+      selectedTopicsCount !== 1 ? 'S' : ''
+    }`;
   }
 
   return (
@@ -50,7 +52,7 @@ function TopicFilter({
         label={getButtonLabel()}
         Icon={ExpandMoreIcon}
         iconSize={'icon-small'}
-        align={BUTTON_ALIGN.RIGHT}
+        align={BUTTON_ALIGN.LEFT}
         onClick={toggleFilter}
       />
       <AnimateHeight

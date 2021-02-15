@@ -54,12 +54,7 @@ function Filters() {
   } = useScoreFilter({ max: MAX_SCORE });
 
   useEffect(() => {
-    console.log(
-      'Filter papers in the KG using: ',
-      bottomScore,
-      topScore,
-      selectedTopics
-    );
+    // TODO: filter papers using the score values and selected topics
   }, [bottomScore, topScore, selectedTopics]);
 
   return (

@@ -13,11 +13,14 @@
     align-items: center;
     flex-direction: row-reverse;
     padding-right: $grid-unit * 2;
+    width: 18 * $grid-unit;
+
     svg {
       transition: transform ease 0.3s;
       margin-left: $grid-unit * 4;
       margin-right: 0;
     }
+
     &.opened > svg {
       transform: scaleY(-1);
     }
@@ -31,6 +34,7 @@
     background-color: palette(base, 900);
     cursor: initial;
     padding: $grid-unit * 1.75 $grid-unit * 1.75 0 $grid-unit * 1.75;
+    width: 46 * $grid-unit;
   }
 
   .resetButton {

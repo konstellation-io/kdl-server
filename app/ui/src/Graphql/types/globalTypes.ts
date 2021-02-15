@@ -71,7 +71,8 @@ export interface RemoveUsersInput {
 
 export interface RepositoryInput {
   type: RepositoryType;
-  url: string;
+  internalRepoName?: string | null;
+  externalRepoUrl?: string | null;
 }
 
 export interface SetBoolFieldInput {

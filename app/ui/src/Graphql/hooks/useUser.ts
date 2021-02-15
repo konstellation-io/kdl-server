@@ -35,7 +35,7 @@ export default function useUser(onCompleteAddUser?: () => void) {
   >(AddUserMutation, {
     onCompleted: onCompleteAddUser,
     onError: (e) => console.error(`addUser: ${e}`),
-    update: updateCacheAdd
+    update: updateCacheAdd,
   });
 
   const [mutationRemoveUsers] = useMutation<RemoveUsers, RemoveUsersVariables>(

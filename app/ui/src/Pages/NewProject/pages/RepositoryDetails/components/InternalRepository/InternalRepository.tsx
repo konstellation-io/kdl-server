@@ -39,7 +39,7 @@ function InternalRepository({ showErrors }: Props) {
   const slugError = errors?.slug;
 
   useEffect(() => {
-    updateValue('url', `${CONFIG.SERVER_URL}.${slug}`);
+    updateValue('url', `${slug}`);
   }, [updateValue, slug]);
 
   if (!data) return <SpinnerCircular />;

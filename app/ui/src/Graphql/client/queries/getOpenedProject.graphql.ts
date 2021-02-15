@@ -15,10 +15,9 @@ export const GET_OPENED_PROJECT = gql`
       creationDate
       lastActivationDate
       repository {
-        id
         type
         url
-        connected
+        error
       }
       state
       error

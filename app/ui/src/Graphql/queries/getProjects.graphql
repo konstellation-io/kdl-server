@@ -7,10 +7,9 @@ query GetProjects {
     creationDate
     lastActivationDate
     repository {
-      id
       type
       url
-      connected
+      error
     }
     state
     error

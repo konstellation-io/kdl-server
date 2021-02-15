@@ -6,9 +6,8 @@ import {
 import ROUTE, { buildRoute } from 'Constants/routes';
 import React, { useEffect } from 'react';
 
-import { RepositoryType } from 'Graphql/types/globalTypes';
+import { RepositoryInput, RepositoryType } from 'Graphql/types/globalTypes';
 import StatusCircle from 'Components/LottieShapes/StatusCircle/StatusCircle';
-import { repoTypeToStepName } from '../NewProject/NewProject';
 import styles from './ProjectCreation.module.scss';
 import useProject from 'Graphql/hooks/useProject';
 import { useQuery } from '@apollo/client';
@@ -25,14 +24,22 @@ function ProjectCreation() {
     if (data) {
       const { repository, information } = data.newProject;
       const type = repository.values.type || RepositoryType.EXTERNAL;
-      const repoTypeDetails = data.newProject[repoTypeToStepName[type]];
+
+      const inputRepository: RepositoryInput = {
+        type,
+      };
+
+      if (type === RepositoryType.INTERNAL) {
+        const { internalRepository } = data.newProject;
+        inputRepository.internalRepoName = internalRepository.values.slug;
+      } else {
+        const { externalRepository } = data.newProject;
+        inputRepository.externalRepoUrl = externalRepository.values.url;
+      }
 
       addNewProject({
         ...information.values,
-        repository: {
-          type,
-          url: repoTypeDetails.values.url,
-        },
+        repository: inputRepository,
       });
     }
     // We want to execute this on on component mount

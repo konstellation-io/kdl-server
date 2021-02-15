@@ -21,7 +21,6 @@ BUILD_RUNNERS=0
 SKIP_FRONTEND_BUILD=0
 SKIP_OPERATOR_BUILD=0
 OPERATOR_SDK_INSTALLED=0
-HOSTCTL_INSTALLED=0
 MINIKUBE_RESET=0
 MONORUNTIME_MODE=0
 MONGO_POD=""
@@ -35,7 +34,6 @@ MONGO_PASS=123456
 . ./scripts/kdlctl/common_functions.sh
 . ./scripts/kdlctl/cmd_help.sh
 . ./scripts/kdlctl/cmd_minikube.sh
-. ./scripts/kdlctl/cmd_etchost.sh
 . ./scripts/kdlctl/cmd_dev.sh
 . ./scripts/kdlctl/cmd_build.sh
 . ./scripts/kdlctl/cmd_deploy.sh
@@ -75,12 +73,6 @@ case $COMMAND in
   start)
     minikube_start
     echo_done "Start done"
-    exit 0
-  ;;
-
-  etchost)
-    cmd_etchost
-    echo_done "Done"
     exit 0
   ;;
 

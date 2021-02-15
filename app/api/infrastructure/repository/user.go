@@ -91,6 +91,33 @@ func (m *userMongoDBRepo) GetByEmail(ctx context.Context, email string) (entity.
 	return m.getByProp(ctx, "email", email)
 }
 
+// FindAll retrieves all the existing users.
+func (m *userMongoDBRepo) FindAll(ctx context.Context) ([]entity.User, error) {
+	m.logger.Debugf("Getting all users from \"%s\" collection...", userCollName)
+
+	cursor, err := m.collection.Find(ctx, bson.M{})
+	if err != nil {
+		return []entity.User{}, err
+	}
+
+	users := make([]entity.User, cursor.RemainingBatchLength())
+	index := 0
+
+	for cursor.Next(ctx) {
+		dto := userDTO{}
+
+		err := cursor.Decode(&dto)
+		if err != nil {
+			return []entity.User{}, err
+		}
+
+		users[index] = m.dtoToEntity(dto)
+		index++
+	}
+
+	return users, nil
+}
+
 // Create inserts into the database a new entity.
 func (m *userMongoDBRepo) Create(ctx context.Context, u entity.User) (string, error) {
 	m.logger.Debugf("Inserting a new user \"%s\" into %s collection...", u.Email, userCollName)

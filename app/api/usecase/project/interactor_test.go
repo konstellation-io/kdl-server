@@ -5,13 +5,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
-
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/require"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
-	"github.com/stretchr/testify/require"
 )
 
 type projectSuite struct {
@@ -21,9 +22,10 @@ type projectSuite struct {
 }
 
 type projectMocks struct {
-	logger *logging.MockLogger
-	repo   *project.MockRepository
-	clock  *clock.MockClock
+	logger       *logging.MockLogger
+	repo         *project.MockRepository
+	clock        *clock.MockClock
+	giteaService *giteaservice.MockGiteaClient
 }
 
 func newProjectSuite(t *testing.T) *projectSuite {
@@ -36,15 +38,18 @@ func newProjectSuite(t *testing.T) *projectSuite {
 
 	clockMock := clock.NewMockClock(ctrl)
 
-	interactor := project.NewInteractor(logger, repo, clockMock)
+	giteaService := giteaservice.NewMockGiteaClient(ctrl)
+
+	interactor := project.NewInteractor(logger, repo, clockMock, giteaService)
 
 	return &projectSuite{
 		ctrl:       ctrl,
 		interactor: interactor,
 		mocks: projectMocks{
-			logger: logger,
-			repo:   repo,
-			clock:  clockMock,
+			logger:       logger,
+			repo:         repo,
+			clock:        clockMock,
+			giteaService: giteaService,
 		},
 	}
 }
@@ -72,6 +77,7 @@ func TestInteractor_Create(t *testing.T) {
 		CreationDate: now,
 	}
 
+	s.mocks.giteaService.EXPECT().CreateRepo(projectName, projectDesc)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().Create(ctx, p).Return(projectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, projectID).Return(expectedProject, nil)

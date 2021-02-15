@@ -2,3 +2,5 @@
 .vscode
 
 app/ui/node_modules
+
+helm/kdl-server/charts/*.tgz

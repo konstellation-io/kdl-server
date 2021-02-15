@@ -9,11 +9,11 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/repository"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/giteaclient"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
@@ -43,7 +43,7 @@ func main() {
 	realClock := clock.NewRealClock()
 	sshHelper := sshhelper.NewGenerator(logger)
 
-	giteaClientHTTP, err := giteaclient.NewGiteaClientHTTP(
+	giteaService, err := giteaservice.NewGiteaService(
 		logger, cfg.Gitea.URL, cfg.Gitea.AdminUser, cfg.Gitea.AdminPass,
 	)
 	if err != nil {
@@ -76,8 +76,8 @@ func main() {
 	}
 
 	resolvers := graph.NewResolver(
-		project.NewInteractor(logger, projectRepo, realClock),
-		user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaClientHTTP, k8sClient),
+		project.NewInteractor(logger, projectRepo, realClock, giteaService),
+		user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaService, k8sClient),
 	)
 
 	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, resolvers)

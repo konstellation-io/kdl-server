@@ -33,8 +33,11 @@
     z-index: 1;
     background-color: palette(base, 900);
     cursor: initial;
-    padding: $grid-unit * 1.75 $grid-unit * 1.75 0 $grid-unit * 1.75;
     width: 46 * $grid-unit;
+
+    .contentWrapper {
+      padding: $grid-unit * 1.75 $grid-unit * 1.75 0 $grid-unit * 1.75;
+    }
   }
 
   .resetButton {

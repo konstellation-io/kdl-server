@@ -1,16 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './TopicFilter.module.scss';
-import { Button, BUTTON_ALIGN, useClickOutside } from 'kwc';
+import { Button, BUTTON_ALIGN, TextInput, useClickOutside } from 'kwc';
 import cx from 'classnames';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import AnimateHeight from 'react-animate-height';
 import TopicList, { TopicListProps } from './components/TopicList/TopicList';
-import TopicListFilter, {
-  TopicListFilterProps,
-} from './components/TopicListFilter/TopicListFilter';
+import SearchIcon from '@material-ui/icons/Search';
 
-interface Props extends TopicListProps, TopicListFilterProps {
+interface Props extends TopicListProps {
   onResetClick: () => void;
+  onFilterChange: (text: string) => void;
 }
 
 function TopicFilter({
@@ -32,6 +31,7 @@ function TopicFilter({
     if (contentRef && opened) addClickOutsideEvents();
     else removeClickOutsideEvents();
     return () => removeClickOutsideEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contentRef, opened]);
 
   function toggleFilter() {
@@ -60,18 +60,27 @@ function TopicFilter({
         duration={300}
         className={styles.content}
       >
-        <TopicListFilter onFilterChange={onFilterChange} />
-        <TopicList
-          topics={topics}
-          selectedTopics={selectedTopics}
-          onSelectOption={onSelectOption}
-        />
-        <Button
-          label="RESET TO DEFAULT"
-          align={BUTTON_ALIGN.LEFT}
-          className={styles.resetButton}
-          onClick={onResetClick}
-        />
+        <div className={styles.contentWrapper}>
+          <TextInput
+            placeholder="Find a topic"
+            onChange={onFilterChange}
+            Icon={SearchIcon}
+            showClearButton
+            hideBottomText
+            hideLabel
+          />
+          <TopicList
+            topics={topics}
+            selectedTopics={selectedTopics}
+            onSelectOption={onSelectOption}
+          />
+          <Button
+            label="RESET TO DEFAULT"
+            align={BUTTON_ALIGN.LEFT}
+            className={styles.resetButton}
+            onClick={onResetClick}
+          />
+        </div>
       </AnimateHeight>
     </div>
   );

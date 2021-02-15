@@ -33,7 +33,6 @@ function useScoreFilter({
     topScore,
     bottomScore,
     scores,
-    setEdgeScores,
     handleSliderChange,
     handleSliderChangeCommitted,
   };

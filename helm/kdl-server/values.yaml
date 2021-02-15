@@ -1,5 +1,5 @@
 domain: kdl.local
-serverName: localENV
+serverName: Local Server
 tls: 
   enabled: true
 ingress:

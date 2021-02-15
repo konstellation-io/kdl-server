@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './KGVisualization.module.scss';
+import styles from './FilterGlow.module.scss';
 
 function FilterGlow() {
   return (

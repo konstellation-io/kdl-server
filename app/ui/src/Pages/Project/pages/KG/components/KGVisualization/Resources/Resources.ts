@@ -1,10 +1,10 @@
 import { BaseType, EnterElement, Selection, select } from 'd3-selection';
-import { D, ResourceType } from './KGVisualization';
+import { D, ResourceType } from '../KGVisualization';
 import { RGBColor, color } from 'd3-color';
 
-import { GroupD } from './../../utils';
+import { GroupD } from '../../../utils';
 import { scaleLinear } from '@visx/scale';
-import styles from './KGVisualization.module.scss';
+import styles from './Resources.module.scss';
 
 export const RESOURCE_R = 14;
 const RESOURCE_STROKE = 4;

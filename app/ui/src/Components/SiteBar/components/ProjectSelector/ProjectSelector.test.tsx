@@ -1,9 +1,9 @@
+import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
+import { NavLink } from 'react-router-dom';
 import ProjectSelector from './ProjectSelector';
+import { ProjectState } from 'Graphql/types/globalTypes';
 import React from 'react';
 import { shallow } from 'enzyme';
-import { GetProjects_projects } from 'app/ui/src/Graphql/queries/types/GetProjects';
-import { ProjectState } from '../../../../../../../../Graphql/types/globalTypes';
-import { NavLink } from 'react-router-dom';
 
 const project: GetProjects_projects = {
   id: 'foo',

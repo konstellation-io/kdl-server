@@ -1,5 +1,5 @@
 import { NavLink, useParams } from 'react-router-dom';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import useWorkspace, { CONFIG } from 'Hooks/useWorkspace';
 
@@ -20,8 +20,8 @@ const NavButtonLink: FC<any> = ({ children, ...props }) => (
 
 function ProjectNavigation() {
   const { projectId } = useParams<RouteProjectParams>();
-  const [ { navigationOpened }, saveConfiguration ] = useWorkspace(projectId);
-  const [ opened, setOpened ] = useState(navigationOpened);
+  const [{ navigationOpened }, saveConfiguration] = useWorkspace(projectId);
+  const [opened, setOpened] = useState(navigationOpened);
 
   const { togglePanel } = usePanel(PanelType.PRIMARY, {
     id: PANEL_ID.SETTINGS,
@@ -31,13 +31,8 @@ function ProjectNavigation() {
 
   function onToggleOpened() {
     setOpened(!opened);
+    saveConfiguration(CONFIG.NAVIGATION_OPENED, !opened);
   }
-
-  // Update local storage
-  useEffect(
-    () => () => saveConfiguration(CONFIG.NAVIGATION_OPENED, !opened),
-    [opened, saveConfiguration]
-  );
 
   const projectRoutes = useProjectNavigation(projectId);
 
@@ -62,7 +57,7 @@ function ProjectNavigation() {
         >
           <NavigationButton
             label="COLLAPSE"
-            title={opened ? "COLLAPSE" : "EXPAND"}
+            title={opened ? 'COLLAPSE' : 'EXPAND'}
             Icon={IconCollapse}
           />
         </div>

@@ -78,44 +78,22 @@ func (m *userMongoDBRepo) Get(ctx context.Context, id string) (entity.User, erro
 		return entity.User{}, err
 	}
 
-	return m.getByProp(ctx, "_id", idFromHex)
+	return m.findOne(ctx, bson.M{"_id": idFromHex})
 }
 
 // GetByUsername retrieves the user using their user name.
 func (m *userMongoDBRepo) GetByUsername(ctx context.Context, username string) (entity.User, error) {
-	return m.getByProp(ctx, "username", username)
+	return m.findOne(ctx, bson.M{"username": username})
 }
 
 // GetByUsername retrieves the user using their user email.
 func (m *userMongoDBRepo) GetByEmail(ctx context.Context, email string) (entity.User, error) {
-	return m.getByProp(ctx, "email", email)
+	return m.findOne(ctx, bson.M{"email": email})
 }
 
 // FindAll retrieves all the existing users.
 func (m *userMongoDBRepo) FindAll(ctx context.Context) ([]entity.User, error) {
-	m.logger.Debugf("Getting all users from \"%s\" collection...", userCollName)
-
-	cursor, err := m.collection.Find(ctx, bson.M{})
-	if err != nil {
-		return []entity.User{}, err
-	}
-
-	users := make([]entity.User, cursor.RemainingBatchLength())
-	index := 0
-
-	for cursor.Next(ctx) {
-		dto := userDTO{}
-
-		err := cursor.Decode(&dto)
-		if err != nil {
-			return []entity.User{}, err
-		}
-
-		users[index] = m.dtoToEntity(dto)
-		index++
-	}
-
-	return users, nil
+	return m.find(ctx, bson.M{})
 }
 
 // Create inserts into the database a new entity.
@@ -141,18 +119,30 @@ func (m *userMongoDBRepo) Create(ctx context.Context, u entity.User) (string, er
 	return result.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
-// GetByUsername retrieves the user using their user email.
-func (m *userMongoDBRepo) getByProp(ctx context.Context, prop string, value interface{}) (entity.User, error) {
-	m.logger.Debugf("Getting by %s \"%s\" from database...", prop, value)
+func (m *userMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.User, error) {
+	m.logger.Debugf("Finding one user by \"%s\" from database...", filters)
 
 	dto := userDTO{}
 
-	err := m.collection.FindOne(ctx, bson.M{prop: value}).Decode(&dto)
+	err := m.collection.FindOne(ctx, filters).Decode(&dto)
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		return entity.User{}, entity.ErrUserNotFound
 	}
 
 	return m.dtoToEntity(dto), err
+}
+
+func (m *userMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity.User, error) {
+	m.logger.Debugf("Finding users with filters \"%s\"...", filters)
+
+	var dtos []userDTO
+
+	err := mongodb.Find(ctx, filters, m.collection, &dtos)
+	if err != nil {
+		return nil, err
+	}
+
+	return m.dtosToEntities(dtos), nil
 }
 
 func (m *userMongoDBRepo) entityToDTO(u entity.User) (userDTO, error) {
@@ -189,4 +179,14 @@ func (m *userMongoDBRepo) dtoToEntity(dto userDTO) entity.User {
 			Private: dto.PrivateSSHKey,
 		},
 	}
+}
+
+func (m *userMongoDBRepo) dtosToEntities(dtos []userDTO) []entity.User {
+	result := make([]entity.User, len(dtos))
+
+	for i, dto := range dtos {
+		result[i] = m.dtoToEntity(dto)
+	}
+
+	return result
 }

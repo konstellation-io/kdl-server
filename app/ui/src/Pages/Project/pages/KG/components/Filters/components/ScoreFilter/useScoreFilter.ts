@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 export interface ScoreFilterProps {
   max?: number;
@@ -19,7 +19,24 @@ function useScoreFilter({
     setBottomScore(max - numbers[1]);
   }
 
-  return { setScores, topScore, bottomScore, scores, setEdgeScores };
+  const handleSliderChange = (
+    _: React.ChangeEvent<{}>,
+    numbers: number | number[]
+  ) => setScores(numbers as [number, number]);
+
+  const handleSliderChangeCommitted = (
+    _: React.ChangeEvent<{}>,
+    numbers: number | number[]
+  ) => setEdgeScores(numbers as [number, number]);
+
+  return {
+    topScore,
+    bottomScore,
+    scores,
+    setEdgeScores,
+    handleSliderChange,
+    handleSliderChangeCommitted,
+  };
 }
 
 export default useScoreFilter;

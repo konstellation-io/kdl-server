@@ -12,6 +12,8 @@ export interface Topic {
   papersTopicCount: number;
 }
 
+const MAX_SCORE = 100;
+
 const _topics = [
   {
     id: '1',
@@ -34,6 +36,7 @@ function Filters() {
   const max = 100;
 
   // TODO: get topics from the source and pass them to the hook
+
   const {
     resetTopics,
     handleSelectTopic,
@@ -43,31 +46,21 @@ function Filters() {
   } = useTopicFilter(_topics);
 
   const {
-    setScores,
     scores,
     bottomScore,
     topScore,
-    setEdgeScores,
-  } = useScoreFilter({ max });
+    handleSliderChange,
+    handleSliderChangeCommitted,
+  } = useScoreFilter({ max: MAX_SCORE });
 
   useEffect(() => {
     console.log(
-      'filter papers in the KG using: ',
+      'Filter papers in the KG using: ',
       bottomScore,
       topScore,
       selectedTopics
     );
   }, [bottomScore, topScore, selectedTopics]);
-
-  const handleSliderChange = (
-    _: React.ChangeEvent<{}>,
-    numbers: number | number[]
-  ) => setScores(numbers as [number, number]);
-
-  const handleSliderChangeCommitted = (
-    _: React.ChangeEvent<{}>,
-    numbers: number | number[]
-  ) => setEdgeScores(numbers as [number, number]);
 
   return (
     <div className={styles.container}>

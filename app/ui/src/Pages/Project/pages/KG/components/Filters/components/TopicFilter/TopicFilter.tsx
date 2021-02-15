@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './TopicFilter.module.scss';
-import { Button, BUTTON_ALIGN } from 'kwc';
+import { Button, BUTTON_ALIGN, useClickOutside } from 'kwc';
 import cx from 'classnames';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import AnimateHeight from 'react-animate-height';
@@ -20,7 +20,20 @@ function TopicFilter({
   onFilterChange,
   onResetClick,
 }: Props) {
+  const contentRef = useRef(null);
   const [opened, setOpened] = useState(false);
+
+  const { addClickOutsideEvents, removeClickOutsideEvents } = useClickOutside({
+    componentRef: contentRef,
+    action: () => setOpened(false),
+  });
+
+  useEffect(() => {
+    if (contentRef && opened) addClickOutsideEvents();
+    else removeClickOutsideEvents();
+    return () => removeClickOutsideEvents();
+  }, [contentRef, opened]);
+
   function toggleFilter() {
     setOpened(!opened);
   }
@@ -31,7 +44,7 @@ function TopicFilter({
   }
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} ref={contentRef}>
       <Button
         className={cx(styles.button, { [styles.opened]: opened })}
         label={getButtonLabel()}

@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 
@@ -87,11 +89,12 @@ func startHTTPServer(logger logging.Logger, port, staticFilesPath string, resolv
 	const apiQueryPath = "/api/query"
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers}))
+	pg := playground.Handler("GraphQL playground", apiQueryPath)
 	fs := http.FileServer(http.Dir(staticFilesPath))
 
-	http.Handle("/", fs)
-	http.Handle("/api/playground", playground.Handler("GraphQL playground", apiQueryPath))
-	http.Handle(apiQueryPath, srv)
+	http.Handle("/", middleware.AuthMiddleware(fs))
+	http.Handle("/api/playground", middleware.AuthMiddleware(pg))
+	http.Handle(apiQueryPath, middleware.AuthMiddleware(srv))
 
 	logger.Infof("Server running at port %s", port)
 

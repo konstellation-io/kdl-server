@@ -7,6 +7,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
@@ -80,7 +82,14 @@ func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project)
 }
 
 func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
-	panic(entity.ErrNotImplemented)
+	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
+
+	u, err := r.users.GetByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	return &u, nil
 }
 
 func (r *queryResolver) Projects(ctx context.Context) ([]entity.Project, error) {

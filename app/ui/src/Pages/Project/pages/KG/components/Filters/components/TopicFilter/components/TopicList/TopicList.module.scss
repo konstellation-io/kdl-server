@@ -1,0 +1,33 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.listContainer {
+  list-style-type: none;
+  padding: 0;
+
+  .lineWrapper {
+    display: flex;
+    align-items: center;
+    padding: $grid-unit $grid-unit $grid-unit 0;
+    cursor: pointer;
+    width: max-content;
+
+    .lineText {
+      @include font-small;
+      color: font-color(lowlight);
+      margin-left: $grid-unit * 1.5;
+    }
+
+    .paperCount {
+      margin-left: $grid-unit * 2;
+      border-radius: 100%;
+      font-weight: bold;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}

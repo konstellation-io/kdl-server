@@ -101,16 +101,16 @@ class KGViz {
       bubbleCollision: 0,
       tooltipWidth: 0,
       axisPadding: 0,
-      axisFontSize: 0
+      axisFontSize: 0,
     };
-    
+
     this.rScale = scaleLinear({
       range: [INNER_R + RESOURCE_R, OUTER_R - RESOURCE_R],
-      domain: [MAX_SCORE, MIN_SCORE]
+      domain: [MAX_SCORE, MIN_SCORE],
     });
     this.sectionScale = scaleBand({
       range: [0, 360],
-      padding: 0
+      padding: 0,
     });
 
     this.minimap = new MinimapViz(props.minimapRef, {
@@ -119,7 +119,7 @@ class KGViz {
       x: props.x,
       y: props.y,
       k: props.k,
-      initialZoomValues: props.initialZoomValues
+      initialZoomValues: props.initialZoomValues,
     });
     minimapViz = this.minimap;
 
@@ -148,7 +148,7 @@ class KGViz {
     this.sectionScale.domain(this.sectionDomain);
 
     this.groupedData = groupData(data, this.coord, this.elementsCollide);
-  }
+  };
 
   initialize = () => {
     this.updateScalesAndData(this.props.data);
@@ -176,24 +176,28 @@ class KGViz {
 
     // Add structural elements
     // center wrapper
-    this.mainG = wrapper.append('g')
+    this.mainG = wrapper
+      .append('g')
       .attr('transform', `translate(${center.x}, ${center.y})`);
-    
+
     const { mainG } = this;
 
     // Guides
     const guides = mainG.append('g');
-    range(1, N_GUIDES + 1).forEach(guide =>
-      guides.append('circle')
+    range(1, N_GUIDES + 1).forEach((guide) =>
+      guides
+        .append('circle')
         .classed(styles.guide, true)
-        .attr('r', INNER_R + (OUTER_R - INNER_R) * guide / 3)
+        .attr('r', INNER_R + ((OUTER_R - INNER_R) * guide) / 3)
         .attr('stroke-width', guideStroke)
     );
 
     // Sections
     const newSections = mainG.append('g')
       .classed(styles.sectionsWrapper, true)
-      .selectAll(`.${styles.grid}`).data(sectionDomain).enter();
+      .selectAll(`.${styles.grid}`)
+      .data(sectionDomain)
+      .enter();
     sections.create(newSections);
 
     sectionGuides.create();
@@ -201,13 +205,15 @@ class KGViz {
 
     // InnerCircle
     const innerCircle = mainG.append('g');
-    innerCircle.append('circle')
+    innerCircle
+      .append('circle')
       .classed(styles.innerCircle, true)
       .attr('r', INNER_R);
-    
-    innerCircle.append('foreignObject')
-      .attr('x', - INNER_R)
-      .attr('y', - INNER_R)
+
+    innerCircle
+      .append('foreignObject')
+      .attr('x', -INNER_R)
+      .attr('y', -INNER_R)
       .attr('width', 2 * INNER_R)
       .attr('height', 2 * INNER_R)
       .append('xhtml:div')
@@ -215,17 +221,16 @@ class KGViz {
         .html(centerText);
 
     // OuterCircle
-    mainG.append('circle')
-      .classed(styles.outerCircle, true)
-      .attr('r', OUTER_R);
-    
+    mainG.append('circle').classed(styles.outerCircle, true).attr('r', OUTER_R);
+
     // Radius axis
-    const axis = mainG.append('g')
+    const axis = mainG
+      .append('g')
       .classed(styles.axis, true)
       .attr('transform', `translate(${INNER_R + 1}, 0)`);
-    axis.append('text')
-      .text('100%');
-    axis.append('text')
+    axis.append('text').text('100%');
+    axis
+      .append('text')
       .attr('x', (OUTER_R - INNER_R) / 3)
       .text('66%');
     axis.append('text')
@@ -270,7 +275,7 @@ class KGViz {
   update = (zoomValues: ZoomValues, data: D[]) => {
     this.props.k = zoomValues.k;
     this.updateSizes();
-    
+
     this.updateScalesAndData(data);
 
     this.minimap.update(this.groupedData, zoomValues);
@@ -292,11 +297,10 @@ class KGViz {
     } = this;
 
     resetTooltip();
-    
+
     // Guides
-    mainG.selectAll(`.${styles.guide}`)
-      .attr('stroke-width', guideStroke);
-    
+    mainG.selectAll(`.${styles.guide}`).attr('stroke-width', guideStroke);
+
     // Sections
     const allSections = mainG
       .selectAll(`.${styles.sectionsWrapper}`)
@@ -314,7 +318,9 @@ class KGViz {
     positionSectionBoxes();
     
     // Axis
-    mainG.select(`.${styles.axis}`).selectAll('text')
+    mainG
+      .select(`.${styles.axis}`)
+      .selectAll('text')
       .attr('dx', axisPadding)
       .attr('dy', -axisPadding)
       .style('font-size', px(axisFontSize));
@@ -327,13 +333,11 @@ class KGViz {
     create: (container: Selection<EnterElement, string, BaseType, unknown>) => {
       const {
         coord,
-        size: {
-          guideStroke,
-          sectionInterval,
-        }
+        size: { guideStroke, sectionInterval },
       } = this;
 
-      container.append('line')
+      container
+        .append('line')
         .classed(styles.grid, true)
         .attr('stroke-width', guideStroke)
         .attr('stroke-dasharray', `${sectionInterval} ${sectionInterval}`)
@@ -345,10 +349,7 @@ class KGViz {
     update: (container: Selection<BaseType, string, BaseType, unknown>) => {
       const {
         coord,
-        size: {
-          sectionInterval,
-          guideStroke
-        }
+        size: { sectionInterval, guideStroke },
       } = this;
 
       container
@@ -361,12 +362,8 @@ class KGViz {
     },
     remove: (container: Selection<BaseType, unknown, BaseType, unknown>) => {
       container.interrupt().transition();
-      container
-        .transition()
-          .duration(400)
-          .attr('stroke-opacity', 0)
-          .remove();
-    }
+      container.transition().duration(400).attr('stroke-opacity', 0).remove();
+    },
   };
 
   sectionGuides = {
@@ -432,9 +429,9 @@ class KGViz {
       bubbleCollision: (RESOURCE_R + 2) * zoomScale,
       tooltipWidth: TOOLTIP_WIDTH * zoomScale,
       axisPadding: AXIS_PADDING * zoomScale,
-      axisFontSize: AXIS_FONT_SIZE * zoomScale
+      axisFontSize: AXIS_FONT_SIZE * zoomScale,
     };
-  }
+  };
 
   coord = (
     { category, score, name }: CoordData,
@@ -460,33 +457,26 @@ class KGViz {
     return { x, y, angle };
   }
 
-  elementsCollide = (a: Coord, b: Coord) => (
-    (
-      (b.x+this.size.bubbleCollision > a.x-this.size.bubbleCollision) &&
-      (b.x-this.size.bubbleCollision < a.x+this.size.bubbleCollision)
-    ) &&
-    (
-      (b.y+this.size.bubbleCollision > a.y-this.size.bubbleCollision) &&
-      (b.y-this.size.bubbleCollision < a.y+this.size.bubbleCollision)
-    )
-  );
+  elementsCollide = (a: Coord, b: Coord) =>
+    b.x + this.size.bubbleCollision > a.x - this.size.bubbleCollision &&
+    b.x - this.size.bubbleCollision < a.x + this.size.bubbleCollision &&
+    b.y + this.size.bubbleCollision > a.y - this.size.bubbleCollision &&
+    b.y - this.size.bubbleCollision < a.y + this.size.bubbleCollision;
 
   onShowTooltip = (e: MouseEvent, d: GroupD, element: BaseType) => {
     const {
       handleTooltip,
-      size: {
-        tooltipWidth
-      }
+      size: { tooltipWidth },
     } = this;
 
     handleTooltip(e, d.elements[0]);
-        
+
     select(element)
       .attr('fill-opacity', 1)
       .transition()
-        .duration(400)
-        .attr('width', tooltipWidth);
-  }
+      .duration(400)
+      .attr('width', tooltipWidth);
+  };
 
   onHideTooltip = (element: BaseType) => {
     const {
@@ -505,26 +495,26 @@ class KGViz {
 
     rect
       .transition()
-        .duration(400)
-        .attr('width', 2 * resourceR + resourceStroke / 2)
-        .transition()
-          .duration(0)
-          .attr('fill-opacity', 0);
-  }
+      .duration(400)
+      .attr('width', 2 * resourceR + resourceStroke / 2)
+      .transition()
+      .duration(0)
+      .attr('fill-opacity', 0);
+  };
 
   handleTooltip = (event: MouseEvent, d: D) => {
     const {
-      props: {
-        showTooltip,
-        parent
-      }
+      props: { showTooltip, parent },
     } = this;
     const wrapperNode = select(parent).node();
 
     if (wrapperNode) {
       const { x: dx, y: dy } = wrapperNode.getBoundingClientRect();
-      const { x: circleLeft, y: circleTop } = (event.target as HTMLElement).getBoundingClientRect();
-      
+      const {
+        x: circleLeft,
+        y: circleTop,
+      } = (event.target as HTMLElement).getBoundingClientRect();
+
       showTooltip({
         tooltipData: d,
         tooltipLeft: circleLeft - dx,

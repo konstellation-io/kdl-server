@@ -1,0 +1,12 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.filterInput {
+  label {
+    display: none;
+  }
+  div:last-child {
+    display: none;
+  }
+}

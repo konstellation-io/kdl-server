@@ -3,9 +3,37 @@
 @import 'Styles/colors';
 
 .container {
+  position: relative;
   display: flex;
   align-items: center;
   background-color: palette(base, 900);
-  padding: $grid-unit * 1.5 $grid-unit * 1.25 $grid-unit * 1.5 $grid-unit * 2;
 
+  .button {
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    padding-right: $grid-unit * 2;
+    svg {
+      transition: transform ease 0.3s;
+      margin-left: $grid-unit * 4;
+      margin-right: 0;
+    }
+    &.opened > svg {
+      transform: scaleY(-1);
+    }
+  }
+
+  .content {
+    position: absolute;
+    top: $grid-unit * 5;
+    right: 0;
+    z-index: 1;
+    background-color: palette(base, 900);
+    cursor: initial;
+    padding: $grid-unit * 1.75 $grid-unit * 1.75 0 $grid-unit * 1.75;
+  }
+
+  .resetButton {
+    width: 22 * $grid-unit;
+  }
 }

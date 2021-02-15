@@ -7,11 +7,21 @@ import Thumb, { ValueLabelProps } from './components/Thumb/Thumb';
 type Props = {
   scores: number[];
   onChange: (_: React.ChangeEvent<{}>, values: number | number[]) => void;
+  onChangeCommitted: (
+    _: React.ChangeEvent<{}>,
+    values: number | number[]
+  ) => void;
   min?: number;
   max?: number;
 };
 
-const ScoreFilter: FC<Props> = ({ scores, onChange, min = 0, max = 100 }) => (
+const ScoreFilter: FC<Props> = ({
+  scores,
+  onChange,
+  onChangeCommitted,
+  min = 0,
+  max = 100,
+}) => (
   <div className={styles.container}>
     <span className={styles.leftLabel}>SCORE</span>
     <span className={cx(styles.percentageLabel, styles.minLabel)}>{max}%</span>
@@ -26,6 +36,7 @@ const ScoreFilter: FC<Props> = ({ scores, onChange, min = 0, max = 100 }) => (
       }}
       min={min}
       max={max}
+      onChangeCommitted={onChangeCommitted}
       onChange={onChange}
       value={scores}
       ValueLabelComponent={(props: ValueLabelProps) => (

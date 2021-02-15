@@ -7,7 +7,7 @@ describe('route utils - buildRoute', () => {
 
     const route1 = buildRoute(ROUTE.PROJECT, projectId);
 
-    const expectedRoute1 = '/project/someProject';
+    const expectedRoute1 = '/projects/someProject';
 
     expect(route1).toBe(expectedRoute1);
   });

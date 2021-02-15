@@ -58,49 +58,6 @@ $tooltipWidth: 300px;
   stroke: palette(lowlight, 700);
 }
 
-.resourceWrapper,
-.resourcesWrapper {
-  pointer-events: none;
-}
-
-.resourceG {
-  pointer-events: all;
-}
-
-.resource {
-  pointer-events: none;
-
-  &.resourceGroup {
-    pointer-events: none;
-  }
-
-  &.resourceNode {
-    fill: palette(base);
-    stroke: palette(feedback, 900);
-  }
-
-  &.unhighlight {
-    transition: stroke ease 0.4s;
-  }
-
-  &.highlight {
-    stroke: palette(highlight);
-    filter: url(#resourceGlow);
-  }
-}
-
-.resourceLabel {
-  pointer-events: none;
-  font-weight: 600;
-  dominant-baseline: central;
-}
-
-.resourceImage {
-  pointer-events: none;
-
-  fill: font-color(light);
-}
-
 .tooltip {
   position: absolute;
   pointer-events: none;
@@ -114,16 +71,6 @@ $tooltipWidth: 300px;
 
   &.open {
     width: $tooltipWidth;
-  }
-}
-
-.tooltipRect {
-  fill: palette(highlight);
-  cursor: pointer;
-
-  &.resourceGroup {
-    pointer-events: none;
-    fill-opacity: 0;
   }
 }
 
@@ -159,8 +106,4 @@ $tooltipWidth: 300px;
   display: flex;
   align-items: center;
   padding-right: 1 * $grid-unit;
-}
-
-.glowFilter {
-  flood-color: palette(highlight);
 }

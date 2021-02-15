@@ -108,6 +108,21 @@ func (mr *MockRepositoryMockRecorder) Create(ctx, user interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockRepository)(nil).Create), ctx, user)
 }
 
+// FindAll mocks base method
+func (m *MockRepository) FindAll(ctx context.Context) ([]entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindAll", ctx)
+	ret0, _ := ret[0].([]entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindAll indicates an expected call of FindAll
+func (mr *MockRepositoryMockRecorder) FindAll(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockRepository)(nil).FindAll), ctx)
+}
+
 // MockUseCase is a mock of UseCase interface
 type MockUseCase struct {
 	ctrl     *gomock.Controller
@@ -144,4 +159,19 @@ func (m *MockUseCase) Create(ctx context.Context, email, username, password stri
 func (mr *MockUseCaseMockRecorder) Create(ctx, email, username, password, accessLevel interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUseCase)(nil).Create), ctx, email, username, password, accessLevel)
+}
+
+// FindAll mocks base method
+func (m *MockUseCase) FindAll(ctx context.Context) ([]entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindAll", ctx)
+	ret0, _ := ret[0].([]entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindAll indicates an expected call of FindAll
+func (mr *MockUseCaseMockRecorder) FindAll(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockUseCase)(nil).FindAll), ctx)
 }

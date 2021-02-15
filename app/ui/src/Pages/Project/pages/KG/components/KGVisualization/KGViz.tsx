@@ -1,7 +1,7 @@
 import { BaseType, EnterElement, Local, Selection, local, select } from 'd3-selection';
 import { Coord, GroupD, getHash, groupData } from '../../utils';
 import { MINIMAP_HEIGHT, MINIMAP_WIDTH } from '../Minimap/Minimap';
-import Resources, { RESOURCE_R } from './Resources';
+import Resources, { RESOURCE_R } from './Resources/Resources';
 import { scaleBand, scaleLinear } from '@visx/scale';
 
 import { D } from './KGVisualization';

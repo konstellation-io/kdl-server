@@ -56,7 +56,7 @@ function SectionList({ section, names, setHoveredPaper }: Props) {
             <div
               key={name}
               className={styles.name}
-              onMouseMove={() => onResourceHover(name)}
+              onMouseEnter={() => onResourceHover(name)}
               onClick={() => alert(name)}
             >
               <div className={styles.nameIndex}>{ idx+1 }</div>
@@ -65,8 +65,6 @@ function SectionList({ section, names, setHoveredPaper }: Props) {
           )}
         </div>
       </AnimateHeight>
-      {opened && <div>
-      </div>}
     </div>
   )
 }

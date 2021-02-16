@@ -41,7 +41,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: MINIO_URL
-              value: http://{{ .Release.Name }}-minio:9000
+              value: {{ .Release.Name }}-minio:9000
             - name: MINIO_SECRET_KEY
               valueFrom:
                 secretKeyRef:

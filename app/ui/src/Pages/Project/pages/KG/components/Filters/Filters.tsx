@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 
+import { KGFilters } from '../useKGFilters';
 import ScoreFilter from './components/ScoreFilter/ScoreFilter';
 import TopicFilter from './components/TopicFilter/TopicFilter';
 import styles from './Filters.module.scss';
@@ -7,43 +8,24 @@ import useScoreFilter from './components/ScoreFilter/useScoreFilter';
 import useTopicFilter from './components/TopicFilter/useTopicFilter';
 
 export interface Topic {
-  id: string;
   name: string;
   papersTopicCount: number;
 }
 
 const MAX_SCORE = 100;
 
-const _topics = [
-  {
-    id: '1',
-    name: 'International and Compliance',
-    papersTopicCount: 3,
-  },
-  {
-    id: '2',
-    name: 'Macro Economics & Super inflation',
-    papersTopicCount: 4,
-  },
-  {
-    id: '3',
-    name: 'Non-profit economics organizations',
-    papersTopicCount: 10,
-  },
-];
-
-function Filters() {
-  const max = 100;
-
-  // TODO: get topics from the source and pass them to the hook
-
+type Props = {
+  topics: Topic[];
+  onFiltersChange: (KGFilters: KGFilters) => void;
+};
+function Filters({ topics, onFiltersChange }: Props) {
   const {
     resetTopics,
     handleSelectTopic,
     filteredTopics,
     filterTopics,
     selectedTopics,
-  } = useTopicFilter(_topics);
+  } = useTopicFilter(topics);
 
   const {
     scores,
@@ -54,7 +36,10 @@ function Filters() {
   } = useScoreFilter({ max: MAX_SCORE });
 
   useEffect(() => {
-    // TODO: filter papers using the score values and selected topics
+    onFiltersChange({
+      score: [bottomScore, topScore],
+      topics: selectedTopics,
+    });
   }, [bottomScore, topScore, selectedTopics]);
 
   return (
@@ -63,7 +48,7 @@ function Filters() {
         scores={scores}
         onChange={handleSliderChange}
         onChangeCommitted={handleSliderChangeCommitted}
-        max={max}
+        max={MAX_SCORE}
       />
       <div className={styles.topic}>
         <TopicFilter

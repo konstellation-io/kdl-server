@@ -1,6 +1,8 @@
+import { CoordData, CoordOptions } from './components/KGVisualization/KGViz';
+import { D, TopicSections } from './components/KGVisualization/KGVisualization';
 import { RGBColor, color } from 'd3-color';
 
-import { D } from './components/KGVisualization/KGVisualization';
+import { orderBy } from 'lodash';
 import { scaleLinear } from '@visx/scale';
 
 const TEXT_COLOR_THRESHOLD = 120;
@@ -16,14 +18,14 @@ export type Coord = {
 };
 
 interface DComplete extends D {
-  x: number,
-  y: number
+  x: number;
+  y: number;
 }
 
 export interface GroupD {
-  x: number,
-  y: number,
-  elements: DComplete[]
+  x: number;
+  y: number;
+  elements: DComplete[];
 }
 
 export const colorScale = scaleLinear({
@@ -42,7 +44,7 @@ export function getHash(text: string) {
   let hash = 0;
 
   for (let i = 0; i < text.length; i++) {
-    hash = ((hash<<5)-hash) + text.charCodeAt(i);
+    hash = (hash << 5) - hash + text.charCodeAt(i);
     hash = hash & hash;
   }
 
@@ -51,42 +53,50 @@ export function getHash(text: string) {
 
 export function groupData(
   data: D[],
-  coord: (
-    { category, score, name }: { category: string, score: number, name?: string },
-    jittered?: boolean,
-    offset?: number
-  ) => Coord,
-  elementsCollide: (a: Coord, b: Coord) => boolean,
+  coord: ({ category, score, name }: CoordData, options: CoordOptions) => Coord,
+  elementsCollide: (a: Coord, b: Coord) => boolean
 ) {
   const groupedData: GroupD[] = [];
 
-  data
-    .forEach(d => {
-      const { x, y } = coord(d, true);
-      const newD: DComplete = { ...d, x, y };
-      let collisionEl;
-      let collisionIdx = 0;
+  data.forEach((d) => {
+    const { x, y } = coord(d, { jittered: true });
+    const newD: DComplete = { ...d, x, y };
+    let collisionEl;
+    let collisionIdx = 0;
 
-      for (let idx = 0; idx < groupedData.length; idx++) {
-        const nd = groupedData[idx];
-        if (nd && elementsCollide({x: nd.x, y: nd.y}, { x, y })) {
-          collisionEl = nd;
-          collisionIdx = idx;
-          break;
-        }
+    for (let idx = 0; idx < groupedData.length; idx++) {
+      const nd = groupedData[idx];
+      if (nd && elementsCollide({ x: nd.x, y: nd.y }, { x, y })) {
+        collisionEl = nd;
+        collisionIdx = idx;
+        break;
       }
+    }
 
-      if (collisionEl) {
-        groupedData[collisionIdx] = {
-          elements: [...groupedData[collisionIdx].elements, newD],
-          x: (x + collisionEl.x) / 2,
-          y: (y + collisionEl.y) / 2,
-        }
-      } else {
-        groupedData.push({ elements: [newD], x, y });
-      }
-    });
+    if (collisionEl) {
+      groupedData[collisionIdx] = {
+        elements: [...groupedData[collisionIdx].elements, newD],
+        x: (x + collisionEl.x) / 2,
+        y: (y + collisionEl.y) / 2,
+      };
+    } else {
+      groupedData.push({ elements: [newD], x, y });
+    }
+  });
 
 
   return groupedData;
+}
+
+export function getSectionsAndNames(newData: D[]) {
+  const result: TopicSections = {};
+
+  const sortedData = orderBy(newData, ['score'], ['desc']);
+
+  sortedData.forEach(({ name, category }) => {
+    if (category in result) result[category].push(name);
+    else result[category] = [name];
+  });
+
+  return result;
 }

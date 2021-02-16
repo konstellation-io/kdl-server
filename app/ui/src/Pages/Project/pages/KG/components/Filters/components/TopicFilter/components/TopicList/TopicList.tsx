@@ -9,19 +9,18 @@ export interface TopicListProps {
   selectedTopics: string[];
   onSelectOption: (topic: Topic) => void;
 }
-
 function TopicList({ topics, selectedTopics, onSelectOption }: TopicListProps) {
   return (
     <ul className={styles.listContainer}>
       {topics.map((topic) => {
         return (
           <li
-            key={topic.id}
+            key={topic.name}
             className={styles.lineWrapper}
             onClick={() => onSelectOption(topic)}
           >
             <Check
-              checked={selectedTopics.includes(topic.id)}
+              checked={selectedTopics.includes(topic.name)}
               onChange={() => onSelectOption(topic)}
             />
             <span className={styles.lineText}>{topic.name}</span>

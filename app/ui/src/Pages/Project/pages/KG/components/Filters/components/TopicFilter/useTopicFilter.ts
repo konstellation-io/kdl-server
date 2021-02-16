@@ -1,19 +1,27 @@
 import { Topic } from '../../Filters';
-import { useState } from 'react';
-
-const initialSelectedTopics: string[] = [];
+import { useEffect, useMemo, useState } from 'react';
 
 function useTopicFilter(topics: Topic[]) {
+  const initialSelectedTopics = useMemo(getInitialSelectedTopics, [topics]);
   const [filteredTopics, setFilteredTopics] = useState<Topic[]>(topics);
   const [selectedTopics, setSelectedTopics] = useState<string[]>(
     initialSelectedTopics
   );
 
-  function handleSelectTopic(topic: Topic) {
-    const alreadySelected = selectedTopics.includes(topic.id);
-    let newSelectedTopics = [...selectedTopics, topic.id];
+  useEffect(() => {
+    setFilteredTopics(topics);
+    setSelectedTopics(initialSelectedTopics);
+  }, [topics]);
+
+  function getInitialSelectedTopics() {
+    return topics.map(({ name }) => name);
+  }
+
+  function handleSelectTopic({ name: topicName }: Topic) {
+    const alreadySelected = selectedTopics.includes(topicName);
+    let newSelectedTopics = [...selectedTopics, topicName];
     if (alreadySelected)
-      newSelectedTopics = selectedTopics.filter((id) => id !== topic.id);
+      newSelectedTopics = selectedTopics.filter((name) => name !== topicName);
 
     setSelectedTopics(newSelectedTopics);
   }

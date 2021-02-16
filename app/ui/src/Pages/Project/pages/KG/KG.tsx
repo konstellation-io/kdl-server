@@ -1,55 +1,53 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
-import { Button } from 'kwc';
-import Filters from './components/Filters/Filters';
-import KGVisualization from './components/KGVisualization/KGVisualization';
+import Filters, { Topic } from './components/Filters/Filters';
+import KGVisualization, {
+  TopicSections,
+} from './components/KGVisualization/KGVisualization';
 import NavigationMenu from './components/NavigationMenu/NavigationMenu';
-import data from './components/KGVisualization/data';
+import staticData from './components/KGVisualization/data';
 import styles from './KG.module.scss';
-
-const DEFAULT_SCORE_FILTER: [number, number] = [0, 1];
+import { getSectionsAndNames } from './KGUtils';
+import useKGFilters, { KGFilters } from './components/useKGFilters';
 
 function KG() {
-  const [selectedResource, setSelectedResource] = useState('Project Name 1');
-  const [mockData, setMockData] = useState(data);
-  const [scoreFilter, setScoreFilter] = useState<[number, number]>(DEFAULT_SCORE_FILTER);
-  
-  const [min, max] = scoreFilter;
+  // TODO: Change the following with the GraphQL query
+  const [resources, setResources] = useState(staticData);
 
-  useEffect(() => {
-    setMockData(prev => prev.filter(d => d.score >= min && d.score <= max));
-  }, [min, max]);
+  const [sections, topics]: [TopicSections, Topic[]] = useMemo(() => {
+    const sections = getSectionsAndNames(resources);
+    const topics = Object.keys(sections).map((sectionName) => ({
+      name: sectionName,
+      papersTopicCount: sections[sectionName].length,
+    }));
+    return [sections, topics];
+  }, [resources]);
+  const [selectedResource, setSelectedResource] = useState('Project Name 1');
+  const { setFilters, filteredResources, filteredSections } = useKGFilters(
+    sections,
+    resources
+  );
 
   function onResourceSelection(name: string) {
     alert(`Resource selected: ${name}`);
+  }
+
+  function handleFiltersChange(newFilters: KGFilters) {
+    setFilters(newFilters);
   }
 
   return (
     <div className={styles.container}>
       <div className={styles.kgTopBar}>
         <NavigationMenu />
-        <Filters />
+        <Filters topics={topics} onFiltersChange={handleFiltersChange} />
       </div>
       <KGVisualization
-        data={mockData}
+        data={filteredResources}
+        sections={filteredSections}
         selectedResource={selectedResource}
         onResourceSelection={onResourceSelection}
       />
-      <div style={{ position: 'absolute', bottom: 80, left: 50}}>
-        <Button label="FILTER LOW" onClick={() => {
-          setScoreFilter([min + 0.1, max]);
-        }} primary />
-      </div>
-      <div style={{ position: 'absolute', bottom: 30, left: 50}}>
-        <Button label="FILTER HIGH" onClick={() => {
-          setScoreFilter([min, max - 0.1]);
-        }} primary />
-      </div>
-      <div style={{ position: 'absolute', bottom: 130, left: 50}}>
-        <Button label="CHANGE RESOURCE" onClick={() => {
-          setSelectedResource('Another interesting paper');
-        }} primary />
-      </div>
     </div>
   );
 }

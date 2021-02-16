@@ -7,59 +7,54 @@ import Minimap from '../Minimap/Minimap';
 import { ParentSize } from '@visx/responsive';
 import SectionList from './SectionList/SectionList';
 import cx from 'classnames';
-import { orderBy } from 'lodash';
 import styles from './KGVisualization.module.scss';
 import { useTooltip } from '@visx/tooltip';
 import useZoom from './useZoom';
 
 export enum ResourceType {
   CODE = 'code',
-  PAPER = 'paper'
+  PAPER = 'paper',
 }
 export type D = {
   category: string;
-  type: ResourceType; 
+  type: ResourceType;
   name: string;
   score: number;
 };
 
+export interface TopicSections {
+  [key: string]: string[];
+}
+
 type WrapperProps = {
   data: D[];
+  sections: TopicSections;
   selectedResource: string;
   onResourceSelection: (name: string) => void;
 };
 function KGVisualizationWrapper(props: WrapperProps) {
   return (
     <ParentSize className={styles.container} debounceTime={10}>
-      {
-        ({ width, height }) => (
-          width && height && (
-            <KGVisualization width={width} height={height} {...props} />
-          )
-        )
+      {({ width, height }) =>
+        width &&
+        height && <KGVisualization width={width} height={height} {...props} />
       }
     </ParentSize>
   );
-}
-
-function getSectionsAndNames(newData: D[]) {
-  const result: { [key: string]: string[] } = {};
-
-  const sortedData = orderBy(newData, ['score'], ['desc']);
-
-  sortedData.forEach(({ name, category }) => {
-    if (category in result) result[category].push(name);
-    else result[category] = [name];
-  });
-
-  return result;
 }
 
 type Props = {
   width: number;
   height: number;
 } & WrapperProps;
-function KGVisualization({ width, height, data, selectedResource, onResourceSelection }: Props) {
+function KGVisualization({
+  width,
+  height,
+  data,
+  sections,
+  selectedResource,
+  onResourceSelection,
+}: Props) {
   const [hoveredPaper, setHoveredPaper] = useState<string | null>(null);
   const [tooltipActive, setTooltipActive] = useState<{
     data: D;
@@ -68,7 +63,7 @@ function KGVisualization({ width, height, data, selectedResource, onResourceSele
   }>({
     data: { category: '', type: ResourceType.CODE, name: '', score: 0 },
     left: 0,
-    top: 0
+    top: 0,
   });
   const {
     showTooltip,
@@ -84,11 +79,9 @@ function KGVisualization({ width, height, data, selectedResource, onResourceSele
   const { zoomValues, initialZoomValues, zoomIn, zoomOut } = useZoom({
     svgRef,
     width,
-    height
+    height,
   });
-  const viz = useRef<KGViz | null>(null);  
-
-  const sectionsAndNames = useMemo(() => getSectionsAndNames(data), [data]);
+  const viz = useRef<KGViz | null>(null);
 
   // TODO: Do not use useTooltip from Visx
   // useTooltip removes tooltip location and data when hiding it instead of just changing the tooltipOpen
@@ -100,9 +93,9 @@ function KGVisualization({ width, height, data, selectedResource, onResourceSele
         data: tooltipData,
         left: tooltipLeft,
         top: tooltipTop,
-      })
+      });
     }
-  }, [tooltipData, tooltipLeft, tooltipTop])
+  }, [tooltipData, tooltipLeft, tooltipTop]);
 
   // We want to restart the visualization when resizing
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,7 +105,7 @@ function KGVisualization({ width, height, data, selectedResource, onResourceSele
   // that affects the data
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(update, [zoomValues?.k, data]);
-  
+
   useEffect(updateSelectedResource, [selectedResource]);
 
   // We want to update only the minimap when draging the visualization
@@ -121,10 +114,15 @@ function KGVisualization({ width, height, data, selectedResource, onResourceSele
 
   useEffect(() => {
     viz.current !== null && viz.current.highlightResource(hoveredPaper);
-  }, [hoveredPaper])
+  }, [hoveredPaper]);
 
   function initialize() {
-    if (svgRef.current !== null && gRef.current !== null && minimapRef.current !== null && zoomValues !== null) {
+    if (
+      svgRef.current !== null &&
+      gRef.current !== null &&
+      minimapRef.current !== null &&
+      zoomValues !== null
+    ) {
       const vizProps = {
         parent: svgRef.current,
         minimapRef: minimapRef.current,
@@ -137,7 +135,7 @@ function KGVisualization({ width, height, data, selectedResource, onResourceSele
         initialZoomValues,
         onResourceSelection,
         centerText: selectedResource,
-        ...zoomValues
+        ...zoomValues,
       };
       viz.current = new KGViz(gRef.current, vizProps);
     }
@@ -156,40 +154,43 @@ function KGVisualization({ width, height, data, selectedResource, onResourceSele
       viz.current.updateCenterText(selectedResource);
     }
   }
-  
+
   function updateZoomArea() {
     if (viz.current !== null && zoomValues !== null) {
       viz.current.updateZoomArea(zoomValues);
     }
-  }  
-  
+  }
+
   return (
     <>
       <svg ref={svgRef} width={width} height={height} className={styles.svg}>
-        <g ref={gRef} transform={`translate(${zoomValues?.x || 0}, ${zoomValues?.y || 0}) scale(${zoomValues?.k || 1})`} />
+        <g
+          ref={gRef}
+          transform={`translate(${zoomValues?.x || 0}, ${
+            zoomValues?.y || 0
+          }) scale(${zoomValues?.k || 1})`}
+        />
         <FilterGlow />
       </svg>
       <div className={styles.sectionTags}>
-        { Object.keys(sectionsAndNames).map(section =>
+        {Object.keys(sections).map((section) => (
           <SectionList
             section={section}
             key={section}
-            names={sectionsAndNames[section]}
+            names={sections[section]}
             setHoveredPaper={setHoveredPaper}
             onResourceSelection={onResourceSelection}
           />
-        )}
+        ))}
       </div>
       <div
         style={{ top: tooltipActive.top - 2, left: tooltipActive.left - 2 }}
-        className={ cx(styles.tooltip, {[styles.open]: tooltipOpen}) }
+        className={cx(styles.tooltip, { [styles.open]: tooltipOpen })}
       >
         <div className={styles.tooltipWrapper}>
-          <div className={ styles.tooltipText }>
-            {tooltipActive.data.name}
-          </div>
-          <IconOpen className={cx(styles.tooltipIcon, "icon-regular")} />
-          <div className={styles.tooltipBg}/>
+          <div className={styles.tooltipText}>{tooltipActive.data.name}</div>
+          <IconOpen className={cx(styles.tooltipIcon, 'icon-regular')} />
+          <div className={styles.tooltipBg} />
         </div>
       </div>
       <Minimap
@@ -200,7 +201,7 @@ function KGVisualization({ width, height, data, selectedResource, onResourceSele
         zoomOut={zoomOut}
       />
     </>
-  )
+  );
 }
 
 export default KGVisualizationWrapper;

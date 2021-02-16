@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+const normalizer = 100;
+
 export interface ScoreFilterProps {
   max?: number;
   initialMin?: number;
@@ -15,8 +17,8 @@ function useScoreFilter({
   const [bottomScore, setBottomScore] = useState(max - scores[1]);
 
   function setEdgeScores(numbers: [number, number]) {
-    setTopScore(max - numbers[0]);
-    setBottomScore(max - numbers[1]);
+    setTopScore((max - numbers[0]) / normalizer);
+    setBottomScore((max - numbers[1]) / normalizer);
   }
 
   const handleSliderChange = (

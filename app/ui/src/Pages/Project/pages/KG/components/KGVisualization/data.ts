@@ -1,3 +1,5 @@
+// import randomSentence from 'random-sentence';
+
 enum ResourceType {
   CODE = 'code',
   PAPER = 'paper'
@@ -99,7 +101,29 @@ const data = [
     name: 'Scale Equivariance Improves Siamese Tracking',
     type: ResourceType.PAPER,
     score: 0.73
-  }
+  },
 ];
+
+// const categories = [
+//   'Topic A',
+//   'Topic B',
+//   'Topic C',
+//   'Topic D',
+//   'Topic E',
+//   'Topic F',
+//   'Topic G',
+//   'Topic H',
+// ];
+// const types = [
+//   ResourceType.CODE,
+//   ResourceType.PAPER
+// ];
+
+// const data = Array(100).fill(1).map(_ => ({
+//   category: categories[Math.floor(Math.random() * categories.length)],
+//   name: randomSentence({words: 5}),
+//   type: types[Math.floor(Math.random() * types.length)],
+//   score: Math.random()
+// }));
 
 export default data;

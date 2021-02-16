@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from 'kwc';
-import FilterGlow from './FilterGlow';
+import FilterGlow from './FilterGlow/FilterGlow';
 import IconOpen from '@material-ui/icons/ArrowForward';
 import KGViz from './KGViz';
 import Minimap from '../Minimap/Minimap';
@@ -80,7 +80,11 @@ function KGVisualization({ width, height }: Props) {
   const minimapRef = useRef<SVGSVGElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const gRef = useRef<SVGGElement>(null);
-  const { zoomValues, initialZoomValues } = useZoom(svgRef, width, height);
+  const { zoomValues, initialZoomValues, zoomIn, zoomOut } = useZoom({
+    svgRef,
+    width,
+    height
+  });
   const viz = useRef<KGViz | null>(null);  
 
   const sectionsAndNames = useMemo(() => getSectionsAndNames(mockData), [mockData]);
@@ -183,6 +187,10 @@ function KGVisualization({ width, height }: Props) {
       </div>
       <Minimap
         minimapRef={minimapRef}
+        zoomValues={zoomValues}
+        initialZoomValues={initialZoomValues}
+        zoomIn={zoomIn}
+        zoomOut={zoomOut}
       />
     </>
   )

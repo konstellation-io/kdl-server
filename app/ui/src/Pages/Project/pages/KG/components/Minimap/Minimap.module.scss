@@ -4,8 +4,9 @@
 
 .container {
   position: absolute;
-  bottom: 50px;
-  right: 100px;
+  bottom: 3 * $grid-unit;
+  right: 4 * $grid-unit;
+  min-width: 206px;
 
   background-color: palette(base, 700);
   border: solid 2px palette(base, 900);
@@ -13,9 +14,17 @@
   z-index: 1;
 }
 
+.minimap {
+  transition: height ease 0.4s, width ease 0.4s;
+}
+
 .bar {
   height: 5 * $grid-unit;
   background-color: palette(base, 900);
+}
+
+.active {
+  color: font-color(light);
 }
 
 .circle {
@@ -42,4 +51,45 @@
   fill: palette(highlight);
   fill-opacity: 0.04;
   stroke-width: 1px;
+}
+
+.bar {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  .actions,
+  .zoom {
+    display: flex;
+    align-items: center;
+  }
+
+  .actions {
+    border-right: solid 2px palette(base);
+  }
+
+  .zoom {
+    flex-grow: 1;
+    justify-content: flex-end;
+  }
+
+  .textButton {
+    flex-shrink: 1;
+    flex-grow: 1;
+    width: 100%;
+    max-width: 7 * $grid-unit;
+
+    > div {
+      padding: inherit;
+    }
+  }
+
+  .zoomValue {
+    @include font-button;
+    color: font-color(light);
+
+    text-align: center;
+    width: 6 * $grid-unit;
+    flex-shrink: 0;
+  }
 }

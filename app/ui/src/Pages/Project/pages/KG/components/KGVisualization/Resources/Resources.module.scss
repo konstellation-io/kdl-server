@@ -1,0 +1,56 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.resourcesWrapper,
+.resourceWrapper {
+  pointer-events: none;
+}
+
+.resourceG {
+  pointer-events: all;
+}
+
+.resource {
+  pointer-events: none;
+
+  &.resourceGroup {
+    pointer-events: none;
+  }
+
+  &.resourceNode {
+    fill: palette(base);
+    stroke: palette(feedback, 900);
+  }
+
+  &.unhighlight {
+    transition: stroke ease 0.4s;
+  }
+
+  &.highlight {
+    stroke: palette(highlight);
+    filter: url(#resourceGlow);
+  }
+}
+
+.resourceLabel {
+  pointer-events: none;
+  font-weight: 600;
+  dominant-baseline: central;
+}
+
+.resourceImage {
+  pointer-events: none;
+
+  fill: font-color(light);
+}
+
+.tooltipRect {
+  fill: palette(highlight);
+  cursor: pointer;
+
+  &.resourceGroup {
+    pointer-events: none;
+    fill-opacity: 0;
+  }
+}

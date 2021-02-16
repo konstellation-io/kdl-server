@@ -1,5 +1,5 @@
 import { BaseType, EnterElement, Selection, select } from 'd3-selection';
-import { Coord, GroupD } from '../../utils';
+import { Coord, GroupD } from '../../KGUtils';
 
 import { N_GUIDES } from '../KGVisualization/KGViz';
 import { ZoomValues } from '../KGVisualization/useZoom';

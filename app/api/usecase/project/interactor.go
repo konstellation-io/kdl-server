@@ -98,18 +98,19 @@ func (i *Interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 			Type:             entity.RepositoryTypeInternal,
 			InternalRepoName: *opt.InternalRepoName,
 		}
+
+		// Create Minio bucket
+		err = i.minioService.CreateBucket(*opt.InternalRepoName)
+		if err != nil {
+			return entity.Project{}, err
+		}
+
 	case entity.RepositoryTypeExternal:
 		return entity.Project{}, ErrRepoTypeNotImplemented
 	}
 
 	// Store the project into the database
 	insertedID, err := i.repo.Create(ctx, project)
-	if err != nil {
-		return entity.Project{}, err
-	}
-
-	// Create Minio bucket
-	err = i.minioService.CreateBucket(opt.Name)
 	if err != nil {
 		return entity.Project{}, err
 	}

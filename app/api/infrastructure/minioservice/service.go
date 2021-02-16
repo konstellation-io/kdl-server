@@ -40,7 +40,7 @@ func (m *minioService) CreateBucket(bucketName string) error {
 	}
 
 	if !exists {
-		err = m.client.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{Region: "us-east-1", ObjectLocking: true})
+		err = m.client.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
 		if err != nil {
 			return err
 		}

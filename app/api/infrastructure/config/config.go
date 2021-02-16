@@ -26,6 +26,11 @@ type Config struct {
 	Kubernetes struct {
 		Namespace string `envconfig:"POD_NAMESPACE"`
 	} `yaml:"kubernetes"`
+	Minio struct {
+		URL       string `envconfig:"MINIO_URL"`
+		AccessKey string `envconfig:"MINIO_ACCESS_KEY"`
+		SecretKey string `envconfig:"MINIO_SECRET_KEY"`
+	}
 }
 
 // NewConfig will read the config.yml file and override values with env vars.

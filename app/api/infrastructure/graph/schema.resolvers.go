@@ -131,6 +131,7 @@ func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (s
 	case entity.RepositoryTypeExternal:
 		return obj.ExternalRepoURL, nil
 	}
+
 	return "", nil
 }
 
@@ -174,9 +175,9 @@ func (r *Resolver) SSHKey() generated.SSHKeyResolver { return &sSHKeyResolver{r}
 // User returns generated.UserResolver implementation.
 func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
 
-type mutationResolver struct{ *Resolver }
-type projectResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
-type repositoryResolver struct{ *Resolver }
-type sSHKeyResolver struct{ *Resolver }
-type userResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }   //nolint:gocritic // type at end of file is ok
+type projectResolver struct{ *Resolver }    //nolint:gocritic // type at end of file is ok
+type queryResolver struct{ *Resolver }      //nolint:gocritic // type at end of file is ok
+type repositoryResolver struct{ *Resolver } //nolint:gocritic // type at end of file is ok
+type sSHKeyResolver struct{ *Resolver }     //nolint:gocritic // type at end of file is ok
+type userResolver struct{ *Resolver }       //nolint:gocritic // type at end of file is ok

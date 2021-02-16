@@ -5,6 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
+
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
@@ -36,19 +38,12 @@ func NewProjectMongoDBRepo(logger logging.Logger, client *mongo.Client, dbName s
 
 // Get retrieves the project using the identifier.
 func (m *projectMongoDBRepo) Get(ctx context.Context, id string) (entity.Project, error) {
-	dto := projectDTO{}
-
 	idFromHex, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return entity.Project{}, err
 	}
 
-	err = m.collection.FindOne(ctx, bson.M{"_id": idFromHex}).Decode(&dto)
-	if errors.Is(err, mongo.ErrNoDocuments) {
-		return entity.Project{}, entity.ErrProjectNotFound
-	}
-
-	return m.dtoToEntity(dto), err
+	return m.findOne(ctx, bson.M{"_id": idFromHex})
 }
 
 // Create inserts into the database a new entity.
@@ -66,6 +61,37 @@ func (m *projectMongoDBRepo) Create(ctx context.Context, p entity.Project) (stri
 	}
 
 	return result.InsertedID.(primitive.ObjectID).Hex(), nil
+}
+
+// FindAll retrieves all the existing projects.
+func (m *projectMongoDBRepo) FindAll(ctx context.Context) ([]entity.Project, error) {
+	return m.find(ctx, bson.M{})
+}
+
+func (m *projectMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.Project, error) {
+	m.logger.Debugf("Finding one project by \"%s\" from database...", filters)
+
+	dto := projectDTO{}
+
+	err := m.collection.FindOne(ctx, filters).Decode(&dto)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return entity.Project{}, entity.ErrProjectNotFound
+	}
+
+	return m.dtoToEntity(dto), err
+}
+
+func (m *projectMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity.Project, error) {
+	m.logger.Debugf("Finding projects with filters \"%s\"...", filters)
+
+	var dtos []projectDTO
+
+	err := mongodb.Find(ctx, filters, m.collection, &dtos)
+	if err != nil {
+		return nil, err
+	}
+
+	return m.dtosToEntities(dtos), nil
 }
 
 func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
@@ -94,4 +120,14 @@ func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 		Description:  dto.Description,
 		CreationDate: dto.CreationDate,
 	}
+}
+
+func (m *projectMongoDBRepo) dtosToEntities(dtos []projectDTO) []entity.Project {
+	result := make([]entity.Project, len(dtos))
+
+	for i, dto := range dtos {
+		result[i] = m.dtoToEntity(dto)
+	}
+
+	return result
 }

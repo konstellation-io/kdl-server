@@ -12,9 +12,11 @@ import (
 type Repository interface {
 	Get(ctx context.Context, id string) (entity.Project, error)
 	Create(ctx context.Context, project entity.Project) (string, error)
+	FindAll(ctx context.Context) ([]entity.Project, error)
 }
 
 // UseCase interface to manage all operations related with projects.
 type UseCase interface {
 	Create(ctx context.Context, name, description string) (entity.Project, error)
+	FindAll(ctx context.Context) ([]entity.Project, error)
 }

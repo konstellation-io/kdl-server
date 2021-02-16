@@ -125,6 +125,10 @@ class KGViz {
 
     this.resources = new Resources(this.onShowTooltip, this.onHideTooltip, this.wrapper);
 
+    this.sectionOrientation = local<string>();
+
+    this.resources = new Resources(this.onShowTooltip, this.onHideTooltip, this.wrapper);
+
     this.updateSizes();
     this.cleanup();
     this.initialize();

@@ -1,5 +1,5 @@
 import { BaseType, Selection, select } from 'd3-selection';
-import { MutableRefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { zoom, zoomIdentity } from 'd3-zoom';
 
 import { OUTER_R } from './KGViz';

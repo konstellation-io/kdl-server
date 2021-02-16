@@ -12,8 +12,9 @@ type Props = {
   section: string;
   names: string[];
   setHoveredPaper: (name: string | null) => void;
+  onResourceSelection: (name: string) => void;
 };
-function SectionList({ section, names, setHoveredPaper }: Props) {
+function SectionList({ section, names, setHoveredPaper, onResourceSelection }: Props) {
   const {
     value: opened,
     activate: open,
@@ -57,7 +58,7 @@ function SectionList({ section, names, setHoveredPaper }: Props) {
               key={name}
               className={styles.name}
               onMouseEnter={() => onResourceHover(name)}
-              onClick={() => alert(name)}
+              onClick={() => onResourceSelection(name)}
             >
               <div className={styles.nameIndex}>{ idx+1 }</div>
               <div className={styles.nameValue}>{ name }</div>

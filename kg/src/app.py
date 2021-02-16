@@ -16,13 +16,15 @@ class KnowledgeGraphService(kg_grpc_pb2.KGServiceServicer):
     """
 
     def __init__(self):
-        self.log = logging.getLogger("KGApp")
+        self.log = logging.getLogger(self.__class__.__name__)
         assets = AssetLoader(config.ASSET_ROUTE)
         self.recommender = Recommender(assets.model, assets.vectors, assets.dataset)
 
     def GetGraph(self, request: kg_pb2.GetGraphReq, context: grpc.ServicerContext) -> kg_pb2.GetGraphRes:
         self.log.debug(f"Input description:\n {request.description}")
-        recommended_items = self.recommender.get_top_items(request.description, n_hits=config.N_HITS)
+        recommended_items = self.recommender.get_top_items(
+            request.description, n_hits=config.N_HITS
+        )
         self.log.debug(f"Output items:\n {recommended_items}")
         return recommended_items.to_grpc()
 
@@ -35,13 +37,19 @@ class Server:
     Server class for the KnowledgeGraph Service.
     """
 
-    def __init__(self, service, host: str = config.HOST, port: int = config.PORT, workers: int = config.WORKERS):
-        self.log = logging.getLogger("KGServer")
+    def __init__(
+        self,
+        service,
+        host: str = config.HOST,
+        port: int = config.PORT,
+        workers: int = config.WORKERS,
+    ):
+        self.log = logging.getLogger(self.__class__.__name__)
         self.host = host
         self.port = port
         self.service = service
         self.workers = workers
-        self.server = self.set_up()
+        self.grpc = self.set_up()
 
     def set_up(self) -> grpc.Server:
         """
@@ -59,15 +67,16 @@ class Server:
         Starts the gRPC server.
         """
         self.log.info(
-            f"Starting service: {self.service} server with {self.workers} workers on {self.host}:{self.port}")
-        self.server.start()
-        self.server.wait_for_termination()
+            f"Starting service: {self.service} server with {self.workers} workers on {self.host}:{self.port}"
+        )
+        self.grpc.start()
+        self.grpc.wait_for_termination()
 
     def stop(self):
         """
         Stops the gRPC server
         """
-        self.server.stop(30)
+        self.grpc.stop(30)
 
 
 if __name__ == "__main__":

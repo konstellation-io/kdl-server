@@ -1,7 +1,6 @@
 # Knowledge Graph gRPC server
 
 ## Configuration
-
 Most of the configuration is done through environment variables:
 ```bash
 # Mandatory
@@ -13,7 +12,7 @@ KG_HOST="localhost" # Address for the server defaults to localhost
 KG_PORT=5555 # KG server port defaults to 5555
 
 # Recommender Settings
-KG_N_HITS=10 # Number of outputs that the recommender outputs defaults to 10
+KG_N_HITS=1000 # Number of outputs that the recommender outputs defaults to 1000
 
 # Log file
 KG_LOG_FILE="/var/log/kg.log" # Log file path defaults to /var/log/kg.log
@@ -29,10 +28,21 @@ pipenv install
 
 and then run:
 ```
-python src/app.py
+pipenv run python src/app.py
+```
+
+to run in minikube create dev environment:
+```
+kdlctl.sh dev
 ```
 
 ## Requests to the server
+To use this examples you will have to install [grpcurl](https://github.com/fullstorydev/grpcurl)
+```
+grpcurl -import-path .. -proto knowledge_graph.proto \
+ -plaintext -d '{"description": "test"}'\
+ localhost:5555 kg.KGService.GetGraph
+```
 
 
 ## Testing and linters
@@ -45,7 +55,7 @@ pipenv install --dev
 
 and then run:
 ```
-python -m pytest -m "not int"
+pipenv run python -m pytest -m "not int"
 ```
 
 ### Linting and Type Checking
@@ -60,11 +70,11 @@ mypy [file-to-analyze]
 ### Integration tests
 To run the integration tests you have to set up a server:
 ```
-python src/app.py
+pipenv run python src/app.py
 ```
 and then run:
 ```
-python -m pytest int
+pipenv run python -m pytest int
 ```
 
 ## Caveats with PyTorch versions

@@ -1,6 +1,7 @@
-from dataclasses import dataclass, fields
+from dataclasses import MISSING, dataclass, fields
 
 import proto.knowledge_graph_pb2 as kg_pb
+from exceptions import MissingFieldException
 
 
 @dataclass(init=False, order=False)
@@ -13,7 +14,9 @@ class RecommendedItem:
     score: str
     date: str
     url: str
-    externalId: str = ""
+
+    # Optional fields
+    externalId: str = ""  # Keeping camelCase for consistency.
     framework: str = ""
 
     def __init__(self, field_dict):
@@ -23,7 +26,7 @@ class RecommendedItem:
         # Checks that all required fields are present
         if not set(self.mandatory_fields).issubset(field_dict.keys()):
             missing_fields = set(field_dict).difference(self.mandatory_fields)
-            raise Exception(f"Missing mandatory fields: {missing_fields}")
+            raise MissingFieldException(f"Missing mandatory fields: {missing_fields}")
 
         for key, value in field_dict.items():
             if key not in self.fields:
@@ -31,12 +34,21 @@ class RecommendedItem:
             setattr(self, key, value)
 
     def _get_fields(self) -> list[str]:
+        """
+        Returns a list of all field names.
+        """
         return [field.name for field in fields(self)]
 
-    def _get_mandatory_fields(self):
-        return [field.name for field in fields(self) if field.default is None]
+    def _get_mandatory_fields(self) -> list[str]:
+        """
+        Returns a list of all mandatory field names.
+        """
+        return [field.name for field in fields(self) if field.default is MISSING]
 
     def to_grpc(self) -> kg_pb.GraphItem:
+        """
+        Outputs RecommenderItem in a GraphItem type.
+        """
         item = kg_pb.GraphItem()
         for field in self.fields:
             setattr(item, field, getattr(self, field))
@@ -62,6 +74,10 @@ class RecommendedItem:
 
 @dataclass(init=False)
 class RecommendedList:
+    """
+    Recommended list is a list of RecommendedItems sorted by score with methods to convert to gRPC.
+    """
+
     items: list[RecommendedItem]
 
     def __init__(self, entry: list[dict]):
@@ -73,6 +89,9 @@ class RecommendedList:
         self.items.sort()
 
     def to_grpc(self) -> kg_pb.GetGraphRes:
+        """
+        Outputs a RecommendedList in GetGraphRes type.
+        """
         res = kg_pb.GetGraphRes()
         res.items.extend([item.to_grpc() for item in self.items])
 

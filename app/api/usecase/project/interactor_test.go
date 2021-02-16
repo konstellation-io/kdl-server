@@ -93,6 +93,7 @@ func TestInteractor_Create(t *testing.T) {
 	}
 
 	s.mocks.giteaService.EXPECT().CreateRepo(internalRepoName).Return(nil)
+	s.mocks.minioService.EXPECT().CreateBucket(internalRepoName).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(projectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, projectID).Return(expectedProject, nil)

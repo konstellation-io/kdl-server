@@ -33,7 +33,7 @@ function ProjectInfo({ project }: Props) {
           <p>
             {!repoError
               ? 'Connection established'
-              : 'You are not connected from the repository'}
+              : 'You are not connected to the repository'}
           </p>
         </div>
       </div>

@@ -8,13 +8,13 @@ import {
 } from 'Graphql/client/queries/getNewProject.graphql';
 import React, { FC } from 'react';
 
+import { CONFIG } from '../../../../index';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
 import IconLink from '@material-ui/icons/Link';
 import { RepositoryType } from 'Graphql/types/globalTypes';
 import { SpinnerCircular } from 'kwc';
 import styles from './Summary.module.scss';
 import { useQuery } from '@apollo/client';
-import { CONFIG } from '../../../../index';
 
 type FieldProps = {
   children: JSX.Element | JSX.Element[];
@@ -54,7 +54,7 @@ function Summary() {
 
   function getRepositoryUrl() {
     let { url } = repoTypeDetails.values;
-    return isExternalRepo ? url : `${CONFIG.SERVER_URL}.${url}`;
+    return isExternalRepo ? url : `${CONFIG.SERVER_URL}/${url}`;
   }
 
   function getRepositoryCheckMessage() {

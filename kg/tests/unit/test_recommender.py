@@ -75,5 +75,4 @@ class TestRecommender:
         papers = Recommender.get_top_items(mock_recommender, "test")
 
         assert isinstance(papers, outputs.RecommendedList)
-        assert isinstance(papers.items[0], outputs.RecommendedItem)
         assert papers.items[0].title == "test title"

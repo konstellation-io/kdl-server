@@ -29,7 +29,7 @@ class Recommender:
         vectors: np.ndarray,
         dataset: pd.DataFrame,
     ):
-        self.log = logging.getLogger(self.__class__.__name__)
+        self.log = logging.getLogger("Recommender")
         self.log.info("Initializing Recommender")
 
         self.model = model

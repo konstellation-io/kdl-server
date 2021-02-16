@@ -16,7 +16,7 @@ class AssetLoader:
     """
 
     def __init__(self, path: str):
-        self.log = logging.getLogger(self.__class__.__name__)
+        self.log = logging.getLogger("AssetLoader")
         self.path = path
         self.dataset = self._load_dataset()
         self.model = self._load_model()

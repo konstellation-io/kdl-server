@@ -28,6 +28,7 @@ LOG_CONFIG = {
             "level": LOG_LEVEL,
             "formatter": "standard",
             "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
         },
         "file": {
             "level": LOG_LEVEL,
@@ -37,11 +38,7 @@ LOG_CONFIG = {
         },
     },
     "loggers": {
-        "": {"handlers": ["default"], "propagate": False},
-        "": {"handlers": ["default"], "propagate": False},
-        "": {"handlers": ["default"], "propagate": False},
-        "Server": {"handlers": ["default"], "propagate": False},
-
+        "": {"handlers": ["default", "file"], "level": LOG_LEVEL, "propagate": False},
     },
 }
 

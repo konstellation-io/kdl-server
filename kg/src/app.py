@@ -16,7 +16,7 @@ class KnowledgeGraphService(kg_grpc_pb2.KGServiceServicer):
     """
 
     def __init__(self):
-        self.log = logging.getLogger(self.__class__.__name__)
+        self.log = logging.getLogger("KnowledgeGraphService")
         assets = AssetLoader(config.ASSET_ROUTE)
         self.recommender = Recommender(
             model=assets.model,
@@ -49,7 +49,7 @@ class Server:
         port: int = config.PORT,
         workers: int = config.WORKERS,
     ):
-        self.log = logging.getLogger(self.__class__.__name__)
+        self.log = logging.getLogger("Server")
         self.host = host
         self.port = port
         self.service = service

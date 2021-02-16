@@ -9,37 +9,36 @@ from scipy import spatial
 
 import outputs
 
-log = logging.getLogger("Recommender")
-
 
 class Recommender:
     """
     Recommender class initialized with a model, paper vectors an a dataframe of the papers dataset.
 
     Examples:
-        r = Recommender()
+        r = Recommender(model=model,
+                        tokenizer=tokenizer,
+                        vectors=vectors,
+                        dataset=dataset)
         list_of_papers = r.get_top_items("Lorem ipsum")
     """
 
-    def __init__(self, model: transformers.PreTrainedModel, vectors: np.ndarray, dataset: pd.DataFrame):
-        log.info("Initializing Recommender")
-        self.model_name = "distilbert-base-uncased"
+    def __init__(
+        self,
+        model: transformers.PreTrainedModel,
+        tokenizer: transformers.PreTrainedTokenizer,
+        vectors: np.ndarray,
+        dataset: pd.DataFrame,
+    ):
+        self.log = logging.getLogger(self.__class__.__name__)
+        self.log.info("Initializing Recommender")
 
         self.model = model
-        self.tokenizer = self._load_tokenizer()
+        self.tokenizer = tokenizer
 
         self.dataset = dataset
-        self.dataset_vecs = vectors
+        self.vectors = vectors
 
-        log.info("Recommender successfully loaded.")
-
-    def _load_tokenizer(self) -> transformers.PreTrainedTokenizer:
-        """
-        Loads a tokenizer for Transformer model.
-        """
-        log.debug(f"Loading tokenizer for {self.model_name}")
-        tokenizer = transformers.AutoTokenizer.from_pretrained(self.model_name)
-        return tokenizer
+        self.log.info("Recommender successfully loaded.")
 
     @staticmethod
     def _preprocess(text: str):
@@ -52,7 +51,8 @@ class Recommender:
         """
         Tokenizes input text
         """
-        tokens = self.tokenizer(text, truncation=True, max_length=512, return_tensors='pt')
+        tokens = self.tokenizer(text, truncation=True, max_length=512, return_tensors="pt")
+
         return tokens
 
     @staticmethod
@@ -60,16 +60,18 @@ class Recommender:
         """
         Computes pairwise cosine distances between vectors_1 (array) and vectors_2 (array).
         """
-        assert vectors_1.shape[1] == vectors_2.shape[1], \
-            "Vectors in the two input arrays should have the same number of dimensions"
-        distances = spatial.distance.cdist(vectors_1, vectors_2, metric='cosine')
+        assert (
+            vectors_1.shape[1] == vectors_2.shape[1]
+        ), "Vectors in the two input arrays should have the same number of dimensions"
+        distances = spatial.distance.cdist(vectors_1, vectors_2, metric="cosine")
+
         return distances
 
     def _compute_query_vector(self, raw_query_text: str) -> torch.Tensor:
         """
         Computes a vector for a given query input.
         """
-        log.debug(f"Computing vector for query text ('{raw_query_text[:120]}...'")
+        self.log.debug(f"Computing vector for query text ('{raw_query_text[:120]}...'")
 
         processed_query = self._preprocess(raw_query_text)
         tokens = self._tokenize(processed_query)
@@ -86,11 +88,11 @@ class Recommender:
         query_vec = self._compute_query_vector(raw_query_text)
         query_vec = query_vec.reshape(1, len(query_vec))
 
-        distances = self._compute_cosine_distances(query_vec, self.dataset_vecs)
+        distances = self._compute_cosine_distances(query_vec, self.vectors)
 
         df_subset = copy.copy(self.dataset)
-        df_subset['score'] = distances[0]
-        df_subset = df_subset.sort_values(by=['score'], ascending=True).head(n_hits)
+        df_subset["score"] = distances[0]
+        df_subset = df_subset.sort_values(by=["score"], ascending=True).head(n_hits)
         recommended_list = outputs.RecommendedList(list(df_subset.T.to_dict().values()))
 
         return recommended_list

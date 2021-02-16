@@ -18,7 +18,12 @@ class KnowledgeGraphService(kg_grpc_pb2.KGServiceServicer):
     def __init__(self):
         self.log = logging.getLogger(self.__class__.__name__)
         assets = AssetLoader(config.ASSET_ROUTE)
-        self.recommender = Recommender(assets.model, assets.vectors, assets.dataset)
+        self.recommender = Recommender(
+            model=assets.model,
+            tokenizer=assets.tokenizer,
+            vectors=assets.vectors,
+            dataset=assets.dataset,
+        )
 
     def GetGraph(self, request: kg_pb2.GetGraphReq, context: grpc.ServicerContext) -> kg_pb2.GetGraphRes:
         self.log.debug(f"Input description:\n {request.description}")

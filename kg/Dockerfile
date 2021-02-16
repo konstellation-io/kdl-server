@@ -6,7 +6,7 @@ ENV UID=10001
 RUN adduser \
     --disabled-password \
     --gecos "" \
-    --home "/kg" \
+    --home "/nonexistant" \
     --shell "/sbin/nologin" \
     --no-create-home \
     --uid "${UID}" \
@@ -36,4 +36,3 @@ RUN chown -R kdl:0 /kg \
 USER kdl
 
 CMD ["sh","-c","/usr/local/bin/python3 /kg/src/app.py 2>&1 | tee -a /var/log/app/app.log"]
-# CMD ["sh","-c","sleep 30000"]

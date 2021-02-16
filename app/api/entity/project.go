@@ -41,7 +41,7 @@ type Project struct {
 	Favorite           bool
 	AreToolsActive     bool
 	Error              *string
-	Repository         *Repository
+	Repository         Repository
 	Members            []Member
 	Tools              []Tool
 	State              ProjectState

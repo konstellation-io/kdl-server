@@ -28,8 +28,8 @@ func (e RepositoryType) String() string {
 
 // Repository entity definition.
 type Repository struct {
-	ID        string
-	Type      RepositoryType
-	URL       string
-	Connected bool
+	Type             RepositoryType
+	ExternalRepoURL  string
+	InternalRepoName string
+	Error            *string
 }

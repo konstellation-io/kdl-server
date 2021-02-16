@@ -11,10 +11,9 @@ import { RepositoryType, ProjectState } from './../../types/globalTypes';
 
 export interface GetProjects_projects_repository {
   __typename: 'Repository';
-  id: string;
   type: RepositoryType;
   url: string;
-  connected: boolean;
+  error: string | null;
 }
 
 export interface GetProjects_projects {

@@ -103,18 +103,18 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // Create mocks base method
-func (m *MockUseCase) Create(ctx context.Context, name, description string) (entity.Project, error) {
+func (m *MockUseCase) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, name, description)
+	ret := m.ctrl.Call(m, "Create", ctx, opt)
 	ret0, _ := ret[0].(entity.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Create indicates an expected call of Create
-func (mr *MockUseCaseMockRecorder) Create(ctx, name, description interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) Create(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUseCase)(nil).Create), ctx, name, description)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUseCase)(nil).Create), ctx, opt)
 }
 
 // FindAll mocks base method

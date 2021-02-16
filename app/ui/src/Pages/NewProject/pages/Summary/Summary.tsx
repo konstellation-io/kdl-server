@@ -8,6 +8,7 @@ import {
 } from 'Graphql/client/queries/getNewProject.graphql';
 import React, { FC } from 'react';
 
+import { CONFIG } from '../../../../index';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
 import IconLink from '@material-ui/icons/Link';
 import { RepositoryType } from 'Graphql/types/globalTypes';
@@ -50,7 +51,11 @@ function Summary() {
   const repoTypeDetails = isExternalRepo
     ? data.newProject.externalRepository
     : data.newProject.internalRepository;
-  const { url } = repoTypeDetails.values;
+
+  function getRepositoryUrl() {
+    let { url } = repoTypeDetails.values;
+    return isExternalRepo ? url : `${CONFIG.SERVER_URL}/${url}`;
+  }
 
   function getRepositoryCheckMessage() {
     const hasConnectionError =
@@ -77,8 +82,8 @@ function Summary() {
           <div className={styles.repository}>
             <div className={styles.urlContainer}>
               <IconLink className="icon-regular" />
-              <p className={styles.url}>{url}</p>
-              <CopyToClipboard>{url}</CopyToClipboard>
+              <p className={styles.url}>{getRepositoryUrl()}</p>
+              <CopyToClipboard>{getRepositoryUrl()}</CopyToClipboard>
             </div>
             {isExternalRepo && getRepositoryCheckMessage()}
           </div>

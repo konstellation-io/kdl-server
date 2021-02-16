@@ -184,14 +184,14 @@ type Project {
 
 input RepositoryInput {
   type: RepositoryType!
-  url: String!
+  internalRepoName: String
+  externalRepoUrl: String
 }
 
 type Repository {
-  id: ID!
   type: RepositoryType!
   url: String!
-  connected: Boolean!
+  error: String
 }
 
 enum RepositoryType {

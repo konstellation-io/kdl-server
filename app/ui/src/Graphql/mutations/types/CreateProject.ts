@@ -15,10 +15,8 @@ import {
 
 export interface CreateProject_createProject_repository {
   __typename: 'Repository';
-  id: string;
   type: RepositoryType;
   url: string;
-  connected: boolean;
 }
 
 export interface CreateProject_createProject {

@@ -70,8 +70,9 @@ type RemoveUsersInput struct {
 }
 
 type RepositoryInput struct {
-	Type entity.RepositoryType `json:"type"`
-	URL  string                `json:"url"`
+	Type             entity.RepositoryType `json:"type"`
+	InternalRepoName *string               `json:"internalRepoName"`
+	ExternalRepoURL  *string               `json:"externalRepoUrl"`
 }
 
 type SetBoolFieldInput struct {

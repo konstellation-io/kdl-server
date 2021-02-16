@@ -62,17 +62,17 @@ func (mr *MockGiteaClientMockRecorder) AddSSHKey(username, publicSSHKey interfac
 }
 
 // CreateRepo mocks base method
-func (m *MockGiteaClient) CreateRepo(name, desc string) error {
+func (m *MockGiteaClient) CreateRepo(name string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateRepo", name, desc)
+	ret := m.ctrl.Call(m, "CreateRepo", name)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateRepo indicates an expected call of CreateRepo
-func (mr *MockGiteaClientMockRecorder) CreateRepo(name, desc interface{}) *gomock.Call {
+func (mr *MockGiteaClientMockRecorder) CreateRepo(name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRepo", reflect.TypeOf((*MockGiteaClient)(nil).CreateRepo), name, desc)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRepo", reflect.TypeOf((*MockGiteaClient)(nil).CreateRepo), name)
 }
 
 // AddTeamMember mocks base method

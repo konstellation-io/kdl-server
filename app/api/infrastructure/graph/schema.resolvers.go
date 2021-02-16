@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
@@ -12,6 +13,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
 func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error) {
@@ -36,7 +38,13 @@ func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.SSHKey
 }
 
 func (r *mutationResolver) CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error) {
-	createdProject, err := r.projects.Create(ctx, input.Name, input.Description)
+	createdProject, err := r.projects.Create(ctx, project.CreateProjectOption{
+		Name:             input.Name,
+		Description:      input.Description,
+		RepoType:         input.Repository.Type,
+		InternalRepoName: input.Repository.InternalRepoName,
+		ExternalRepoURL:  input.Repository.ExternalRepoURL,
+	})
 
 	return &createdProject, err
 }
@@ -116,6 +124,16 @@ func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) 
 	panic(entity.ErrNotImplemented)
 }
 
+func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (string, error) {
+	switch obj.Type {
+	case entity.RepositoryTypeInternal:
+		return fmt.Sprintf("%s/kdl/%s", r.cfg.Gitea.URL, obj.InternalRepoName), nil
+	case entity.RepositoryTypeExternal:
+		return obj.ExternalRepoURL, nil
+	}
+	return "", nil
+}
+
 func (r *sSHKeyResolver) CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error) {
 	panic(entity.ErrNotImplemented)
 }
@@ -147,6 +165,9 @@ func (r *Resolver) Project() generated.ProjectResolver { return &projectResolver
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+// Repository returns generated.RepositoryResolver implementation.
+func (r *Resolver) Repository() generated.RepositoryResolver { return &repositoryResolver{r} }
+
 // SSHKey returns generated.SSHKeyResolver implementation.
 func (r *Resolver) SSHKey() generated.SSHKeyResolver { return &sSHKeyResolver{r} }
 
@@ -156,5 +177,6 @@ func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
 type mutationResolver struct{ *Resolver }
 type projectResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type repositoryResolver struct{ *Resolver }
 type sSHKeyResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }

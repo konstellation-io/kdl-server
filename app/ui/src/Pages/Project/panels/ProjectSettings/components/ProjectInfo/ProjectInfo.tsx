@@ -10,12 +10,10 @@ type Props = {
   project: GetProjects_projects;
 };
 function ProjectInfo({ project }: Props) {
-  const connectedToRepo = project.repository?.connected;
+  const repoError = project.repository?.error;
 
   return (
-    <div
-      className={cx(styles.container, { [styles.connected]: connectedToRepo })}
-    >
+    <div className={cx(styles.container, { [styles.connected]: !repoError })}>
       <div className={styles.icon}>
         <IconCloud className="icon-big" />
       </div>
@@ -29,13 +27,13 @@ function ProjectInfo({ project }: Props) {
         </div>
         <div
           className={cx(styles.connection, {
-            [styles.connected]: connectedToRepo,
+            [styles.connected]: !repoError,
           })}
         >
           <p>
-            {connectedToRepo
+            {!repoError
               ? 'Connection established'
-              : 'You are not connected from the repository'}
+              : 'You are not connected to the repository'}
           </p>
         </div>
       </div>

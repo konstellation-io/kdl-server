@@ -7,10 +7,9 @@ mutation CreateProject($input: CreateProjectInput!) {
     creationDate
     lastActivationDate
     repository {
-      id
       type
       url
-      connected
+      error
     }
     state
     error

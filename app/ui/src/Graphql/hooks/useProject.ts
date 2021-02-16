@@ -12,7 +12,7 @@ import {
   UpdateProjectVariables,
 } from '../mutations/types/UpdateProject';
 
-import { RepositoryType } from '../types/globalTypes';
+import { CreateProjectInput } from '../types/globalTypes';
 import { loader } from 'graphql.macro';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 
@@ -20,15 +20,6 @@ const GetProjectsQuery = loader('Graphql/queries/getProjects.graphql');
 
 const CreateProjectMutation = loader('Graphql/mutations/createProject.graphql');
 const UpdateProjectMutation = loader('Graphql/mutations/updateProject.graphql');
-
-type NewProjectParams = {
-  repository: {
-    type: RepositoryType;
-    url: string;
-  };
-  name: string;
-  description: string;
-};
 
 export default function useProject() {
   const [mutationCreateProject, { data }] = useMutation<
@@ -75,7 +66,7 @@ export default function useProject() {
     }
   }
 
-  function addNewProject(newProject: NewProjectParams) {
+  function addNewProject(newProject: CreateProjectInput) {
     mutationCreateProject(mutationPayloadHelper(newProject));
   }
 

@@ -1,6 +1,8 @@
 import os
 
 import pytest
+
+from exceptions import MissingEnvVarException
 from tools.config import get_environ
 
 
@@ -14,7 +16,7 @@ class TestConfigTools:
         del os.environ['TEST']
 
     def test_get_environ_mandatory(self):
-        with pytest.raises(Exception):
+        with pytest.raises(MissingEnvVarException):
             get_environ('TEST', mandatory=True)
 
     def test_default(self):

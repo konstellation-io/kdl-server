@@ -1,5 +1,7 @@
 import os
 
+from exceptions import MissingEnvVarException
+
 
 def get_environ(variable: str, mandatory: bool = False, default: str = None) -> str:
     """
@@ -8,7 +10,7 @@ def get_environ(variable: str, mandatory: bool = False, default: str = None) -> 
     env_variable = os.environ.get(variable)
 
     if mandatory and env_variable is None:
-        raise Exception(f"Environment variable {variable} not found")
+        raise MissingEnvVarException(variable)
     elif env_variable is None and default is not None:
         return default
     elif env_variable is not None:

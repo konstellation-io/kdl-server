@@ -6,6 +6,10 @@ from exceptions import MissingFieldException
 
 @dataclass(init=False, order=False)
 class RecommendedItem:
+    """
+    Recommended Item class can be of the type paper or repository.
+    """
+
     id: str
     category: str
     title: str

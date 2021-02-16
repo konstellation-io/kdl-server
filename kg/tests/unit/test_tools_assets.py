@@ -18,7 +18,7 @@ class TestAssetLoader:
         AssetLoader._asset_checks(assets_mock)
 
     def test_asset_loader_mismatch_lengths(self):
-        with pytest.raises(AssertionError):
+        with pytest.raises(AssetLoadingException):
             assets_mock = Mock()
             assets_mock.dataset = pd.DataFrame(data=[1, 2, 3, 4])
             assets_mock.vectors = np.ndarray([1, 2, 3])

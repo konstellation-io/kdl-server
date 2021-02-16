@@ -4,6 +4,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import transformers
+from transformers import PreTrainedModel, PreTrainedTokenizer
+
+from exceptions import AssetLoadingException
 
 
 class AssetLoader:
@@ -18,10 +21,12 @@ class AssetLoader:
 
     def _asset_checks(self):
         if not len(self.dataset) == len(self.vectors):
-            message = f"The specified dataset (n={len(self.dataset)}) " \
-                      f"and the vectors (available for {len(self.vectors)} documents) do not match. " \
-                      "Please check the inputs."
-            raise AssertionError(message)
+            message = (
+                f"The specified dataset (n={len(self.dataset)}) "
+                f"and the vectors (available for {len(self.vectors)} documents) do not match. "
+                "Please check the inputs."
+            )
+            raise AssetLoadingException(message)
 
     def _load_dataset(self) -> pd.DataFrame:
         """

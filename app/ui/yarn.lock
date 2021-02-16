@@ -7326,6 +7326,11 @@ is-nil@^1.0.0, is-nil@^1.0.1:
   resolved "https://registry.yarnpkg.com/is-nil/-/is-nil-1.0.1.tgz#2daba29e0b585063875e7b539d071f5b15937969"
   integrity sha1-LauingtYUGOHXntTnQcfWxWTeWk=
 
+is-number-object@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/is-number-object/-/is-number-object-1.0.4.tgz#36ac95e741cf18b283fc1ddf5e83da798e3ec197"
+  integrity sha512-zohwelOAur+5uXtk8O3GPQ1eAcu4ZX3UwxQhUlfFFMNpUd83gXgjbhJh6HmB6LUNV/ieOLQuDwJO3dWJosUeMw==
+
 is-number@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/is-number/-/is-number-3.0.0.tgz#24fd6201a4782cf50561c810276afc7d12d71195"
@@ -10714,6 +10719,19 @@ raf@^3.4.1:
   dependencies:
     performance-now "^2.1.0"
 
+railroad-diagrams@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/railroad-diagrams/-/railroad-diagrams-1.0.0.tgz#eb7e6267548ddedfb899c1b90e57374559cddb7e"
+  integrity sha1-635iZ1SN3t+4mcG5Dlc3RVnN234=
+
+randexp@0.4.6:
+  version "0.4.6"
+  resolved "https://registry.yarnpkg.com/randexp/-/randexp-0.4.6.tgz#e986ad5e5e31dae13ddd6f7b3019aa7c87f60ca3"
+  integrity sha512-80WNmd9DA0tmZrw9qQa62GPPWfuXJknrmVmLcxvq4uZBdYqb1wYoKTmnlGUchvVWe0XiLupYkBoXVOxz3C8DYQ==
+  dependencies:
+    discontinuous-range "1.0.0"
+    ret "~0.1.10"
+
 random-char@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/random-char/-/random-char-1.0.4.tgz#5fe2c95134cafcc5d7bc8f46831dc36fdbbd5c66"
@@ -10751,7 +10769,7 @@ random-natural@^1.0.3:
     max-safe-int "^1.0.0"
     random-integral "^1.0.3"
 
-random-sentence@^1.0.4:
+random-sentence@1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/random-sentence/-/random-sentence-1.0.4.tgz#497f63dfc36249b438e19492ee2df0f4e363e996"
   integrity sha1-SX9j38NiSbQ44ZSS7i3w9ONj6ZY=

@@ -24,6 +24,7 @@ OPERATOR_SDK_INSTALLED=0
 MINIKUBE_RESET=0
 MONORUNTIME_MODE=0
 MONGO_POD=""
+ENABLE_TLS=false
 
 # Admin MongoDB credentials
 MONGO_DB=kdl
@@ -53,6 +54,10 @@ case $* in
     show_help "$@"
     exit
   ;;
+  *--tls*)
+    export ENABLE_TLS=true
+    shift
+    ;;
 esac
 
 if [ -z "$*" ] || { [ "$VERBOSE" = "0" ] && [ "$#" = "1" ]; }; then

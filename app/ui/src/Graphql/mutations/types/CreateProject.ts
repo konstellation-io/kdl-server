@@ -17,6 +17,7 @@ export interface CreateProject_createProject_repository {
   __typename: 'Repository';
   type: RepositoryType;
   url: string;
+  error: string | null;
 }
 
 export interface CreateProject_createProject {

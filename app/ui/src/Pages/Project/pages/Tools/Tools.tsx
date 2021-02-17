@@ -5,12 +5,12 @@ import {
   GetProjectTools,
   GetProjectToolsVariables,
 } from 'Graphql/queries/types/GetProjectTools';
-import React from 'react';
 
 import IconOk from '@material-ui/icons/Check';
 import IconStart from '@material-ui/icons/PlayArrow';
 import IconStop from '@material-ui/icons/Stop';
 import IconWarn from '@material-ui/icons/Warning';
+import React from 'react';
 import { RouteProjectParams } from 'Constants/routes';
 import Tool from './components/Tool/Tool';
 import ToolGroup from './ToolGroup';
@@ -41,7 +41,7 @@ function Tools() {
   if (error) return <ErrorMessage />;
 
   const {
-    project: { tools: projectTools, areToolsActive },
+    project: { toolUrls, areToolsActive },
   } = data;
 
   function toggleActive() {
@@ -80,7 +80,7 @@ function Tools() {
     );
   }
 
-  const tools = mapTools(projectTools);
+  const tools = mapTools(toolUrls);
   const firstRow = tools.filter(({ row }) => row === 0);
   const secondRow = tools.filter(({ row }) => row === 1);
 

@@ -54,7 +54,7 @@ function Summary() {
 
   function getRepositoryUrl() {
     let { url } = repoTypeDetails.values;
-    return isExternalRepo ? url : `${CONFIG.SERVER_URL}/${url}`;
+    return isExternalRepo ? url : `${CONFIG.INTERNAL_REPO_BASE_URL}/${url}`;
   }
 
   function getRepositoryCheckMessage() {

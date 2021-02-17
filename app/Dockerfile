@@ -38,7 +38,8 @@ RUN apk add -U --no-cache ca-certificates
 RUN mkdir -p /var/log/app
 
 WORKDIR /app
-COPY --from=api-builder /app/ .
+COPY --from=api-builder /app/kdl-server .
+COPY --from=api-builder /app/config.yml .
 COPY --from=ui-builder /app/build /public
 RUN apk add libcap && setcap 'cap_net_bind_service=+ep' /app/kdl-server
 RUN chown -R kdl:0 /app \

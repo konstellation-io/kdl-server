@@ -44,8 +44,8 @@ function TopicFilter({ topics, onUpdate }: Props) {
 
   function getButtonLabel() {
     const selectedTopicsCount = selectedTopics.length;
-    return `${selectedTopicsCount} TOPIC${
-      selectedTopicsCount !== 1 ? 'S' : ''
+    return `${selectedTopicsCount} ${
+      selectedTopicsCount === 1 ? 'TOPIC' : 'TOPICS'
     }`;
   }
 

@@ -6,7 +6,7 @@ import { KGFilters } from '../useKGFilters';
 
 export interface Topic {
   name: string;
-  papersTopicCount: number;
+  nResources: number;
 }
 
 const MAX_SCORE = 100;

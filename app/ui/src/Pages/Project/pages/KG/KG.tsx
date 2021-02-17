@@ -1,28 +1,27 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import Filters, { Topic } from './components/Filters/Filters';
 import KGVisualization, {
   TopicSections,
 } from './components/KGVisualization/KGVisualization';
 import NavigationMenu from './components/NavigationMenu/NavigationMenu';
-import staticData from './components/KGVisualization/data';
+import resources from './components/KGVisualization/data';
 import styles from './KG.module.scss';
 import { getSectionsAndNames } from './KGUtils';
 import useKGFilters from './components/useKGFilters';
+import { useQuery } from '@apollo/client';
+
+const selectedResource = 'Project Name 1';
 
 function KG() {
-  // TODO: Change the following with the GraphQL query
-  const [resources] = useState(staticData);
-
   const [sections, topics]: [TopicSections, Topic[]] = useMemo(() => {
     const sections = getSectionsAndNames(resources);
     const topics = Object.keys(sections).map((sectionName) => ({
       name: sectionName,
-      papersTopicCount: sections[sectionName].length,
+      nResources: sections[sectionName].length,
     }));
     return [sections, topics];
-  }, [resources]);
-  const [selectedResource] = useState('Project Name 1');
+  }, []);
 
   const {
     handleFiltersChange,

@@ -27,11 +27,11 @@ function TopicList({ topics, selectedTopics, onSelectOption }: TopicListProps) {
             <span
               className={styles.paperCount}
               style={{
-                backgroundColor: colorScale(topic.papersTopicCount),
-                color: getColorNumber(topic.papersTopicCount),
+                backgroundColor: colorScale(topic.nResources),
+                color: getColorNumber(topic.nResources),
               }}
             >
-              {topic.papersTopicCount}
+              {topic.nResources}
             </span>
           </li>
         );

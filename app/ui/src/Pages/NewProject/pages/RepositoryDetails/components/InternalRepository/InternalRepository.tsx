@@ -52,7 +52,7 @@ function InternalRepository({ showErrors }: Props) {
         <p className={styles.urlTitle}>repository url</p>
         <div className={styles.serverUrlContainer}>
           <IconLink className="icon-regular" />
-          <span className={styles.urlContent}>{`${CONFIG.SERVER_URL}/`}</span>
+          <span className={styles.urlContent}>{`${CONFIG.INTERNAL_REPO_BASE_URL}/`}</span>
         </div>
       </div>
       <TextInput

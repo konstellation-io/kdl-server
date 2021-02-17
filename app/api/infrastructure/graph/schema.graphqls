@@ -84,19 +84,13 @@ type Member {
   lastActivity: String
 }
 
-type Tool {
-  id: ID!
-  toolName: ToolName!
-  url: String!
-}
-
-enum ToolName {
-  GITEA
-  MINIO
-  JUPYTER
-  VSCODE
-  DRONE
-  MLFLOW
+type ToolsUrls {
+  gitea: String!
+  minio: String!
+  jupyter: String!
+  vscode: String!
+  drone: String!
+  mlflow: String!
 }
 
 enum AccessLevel {
@@ -178,7 +172,7 @@ type Project {
   lastActivationDate: String!
   error: String
   members: [Member!]!
-  tools: [Tool!]!
+  toolsUrls: ToolsUrls!
   areToolsActive: Boolean
 }
 

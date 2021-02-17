@@ -93,11 +93,12 @@ func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project)
 func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*entity.ToolUrls, error) {
 	userEmail := ctx.Value(middleware.LoggedUserEmailKey).(string)
 	u, err := r.users.GetByEmail(ctx, userEmail)
+
 	if err != nil {
 		return nil, err
 	}
-	userName := u.Username
-	slugUserName := slug.Make(userName)
+
+	slugUserName := slug.Make(u.Username)
 
 	return &entity.ToolUrls{
 		Gitea:   r.cfg.Gitea.URL,
@@ -195,9 +196,9 @@ func (r *Resolver) SSHKey() generated.SSHKeyResolver { return &sSHKeyResolver{r}
 // User returns generated.UserResolver implementation.
 func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
 
-type mutationResolver struct{ *Resolver }
-type projectResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
-type repositoryResolver struct{ *Resolver }
-type sSHKeyResolver struct{ *Resolver }
-type userResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }   //nolint:gocritic // type at end of file is ok
+type projectResolver struct{ *Resolver }    //nolint:gocritic // type at end of file is ok
+type queryResolver struct{ *Resolver }      //nolint:gocritic // type at end of file is ok
+type repositoryResolver struct{ *Resolver } //nolint:gocritic // type at end of file is ok
+type sSHKeyResolver struct{ *Resolver }     //nolint:gocritic // type at end of file is ok
+type userResolver struct{ *Resolver }       //nolint:gocritic // type at end of file is ok

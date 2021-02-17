@@ -1,7 +1,7 @@
 package entity
 
-// ToolsUrls entity definition.
-type ToolsUrls struct {
+// ToolUrls entity definition.
+type ToolUrls struct {
 	Gitea   string
 	Minio   string
 	Jupyter string

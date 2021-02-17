@@ -84,7 +84,7 @@ type Member {
   lastActivity: String
 }
 
-type ToolsUrls {
+type ToolUrls {
   gitea: String!
   minio: String!
   jupyter: String!
@@ -172,7 +172,7 @@ type Project {
   lastActivationDate: String!
   error: String
   members: [Member!]!
-  toolsUrls: ToolsUrls!
+  toolUrls: ToolUrls!
   areToolsActive: Boolean
 }
 

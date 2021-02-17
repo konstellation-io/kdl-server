@@ -43,7 +43,7 @@ type Project struct {
 	Error              *string
 	Repository         Repository
 	Members            []Member
-	ToolsURLs          ToolsUrls
+	ToolURLs           ToolUrls
 	State              ProjectState
 }
 

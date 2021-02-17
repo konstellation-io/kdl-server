@@ -8,9 +8,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
-
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
@@ -143,6 +142,17 @@ func (r *sSHKeyResolver) LastActivity(ctx context.Context, obj *entity.SSHKey) (
 	panic(entity.ErrNotImplemented)
 }
 
+func (r *toolsUrlsResolver) Mlflow(ctx context.Context, obj *entity.ToolsUrls) (string, error) {
+	obj.Gitea = r.cfg.Gitea.URL
+	obj.Minio = "kasdf"
+	obj.Jupyter = "kasdf"
+	obj.Vscode = "kasdf"
+	obj.Drone = "kasdf"
+	obj.Mlflox = "kasdf"
+
+	return obj.Gitea, nil
+}
+
 func (r *userResolver) CreationDate(ctx context.Context, obj *entity.User) (string, error) {
 	return obj.CreationDate.Format(time.RFC3339), nil
 }
@@ -172,12 +182,26 @@ func (r *Resolver) Repository() generated.RepositoryResolver { return &repositor
 // SSHKey returns generated.SSHKeyResolver implementation.
 func (r *Resolver) SSHKey() generated.SSHKeyResolver { return &sSHKeyResolver{r} }
 
+// ToolsUrls returns generated.ToolsUrlsResolver implementation.
+func (r *Resolver) ToolsUrls() generated.ToolsUrlsResolver { return &toolsUrlsResolver{r} }
+
 // User returns generated.UserResolver implementation.
 func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
 
-type mutationResolver struct{ *Resolver }   //nolint:gocritic // type at end of file is ok
-type projectResolver struct{ *Resolver }    //nolint:gocritic // type at end of file is ok
-type queryResolver struct{ *Resolver }      //nolint:gocritic // type at end of file is ok
-type repositoryResolver struct{ *Resolver } //nolint:gocritic // type at end of file is ok
-type sSHKeyResolver struct{ *Resolver }     //nolint:gocritic // type at end of file is ok
-type userResolver struct{ *Resolver }       //nolint:gocritic // type at end of file is ok
+type mutationResolver struct{ *Resolver }
+type projectResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }
+type repositoryResolver struct{ *Resolver }
+type sSHKeyResolver struct{ *Resolver }
+type toolsUrlsResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *projectResolver) ToolsUrls(ctx context.Context, obj *entity.Project) (*entity.ToolsUrls, error) {
+	panic(fmt.Errorf("not implemented"))
+}

@@ -9,7 +9,7 @@ VALUES_1 = {"id": "12345",
             "title": "title test 1",
             "abstract": "test abstract",
             "authors": "test author",
-            "score": 0.1,
+            "score": 0.9,
             "date": "2020-01-01",
             "url": "http://test"}
 
@@ -101,8 +101,12 @@ class TestRecommendedItem:
     def test_order(self):
         item1 = RecommendedItem(VALUES_1)
         item2 = RecommendedItem(VALUES_2)
-        assert item2 >= item1
-        assert item2 != item1
+        assert item1 >= item2
+        assert item1 > item2
+        assert item1 != item2
+        assert item1 == item1
+        assert item2 <= item1
+        assert item2 < item1
 
     def test_to_grpc(self):
         item = RecommendedItem(VALUES_1)

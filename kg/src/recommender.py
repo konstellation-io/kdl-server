@@ -1,5 +1,6 @@
 import copy
 import logging
+import math
 
 import numpy as np
 import pandas as pd
@@ -55,26 +56,6 @@ class Recommender:
 
         return tokens
 
-    @staticmethod
-    def _compute_cosine_distances(vectors_1: np.ndarray, vectors_2: np.ndarray) -> np.ndarray:
-        """
-        Computes pairwise cosine distances between vectors_1 (array) and vectors_2 (array).
-        Args:
-            vectors_1: numpy array representing
-            the query vector shape(1, vector_dimensions).
-            vectors_2: numpy array representing the
-             dataset vectors shape(dataset_papers, vector_dimensions).
-        Returns:
-            distances: numpy array with the distance("relevance") between the
-             input description and each paper. shape(1, dataset_papers)
-        """
-        assert (
-            vectors_1.shape[1] == vectors_2.shape[1]
-        ), "Vectors in the two input arrays should have the same number of dimensions"
-        distances = spatial.distance.cdist(vectors_1, vectors_2, metric="cosine")
-
-        return distances
-
     def _compute_query_vector(self, raw_query_text: str) -> torch.Tensor:
         """
         Computes a vector for a given query input.
@@ -89,6 +70,37 @@ class Recommender:
 
         return query_vector
 
+    @staticmethod
+    def _compute_cosine_distances(vectors_1: np.ndarray, vectors_2: np.ndarray) -> np.ndarray:
+        """
+        Computes pairwise cosine distances between vectors_1 (array) and vectors_2 (array).
+        Args:
+            vectors_1: numpy array representing
+            the query vector shape(1, vector_dimensions).
+            vectors_2: numpy array representing the
+            dataset vectors shape(dataset_papers, vector_dimensions).
+        Returns:
+            distances: numpy array with the distance("relevance") between the
+             input description and each paper. shape(dataset_papers, 1)
+        """
+        assert (
+            vectors_1.shape[1] == vectors_2.shape[1]
+        ), "Vectors in the two input arrays should have the same number of dimensions"
+        distances = spatial.distance.cdist(vectors_1, vectors_2, metric="cosine")
+
+        return distances
+
+    @staticmethod
+    def _compute_scores(distance: float, shift: float = 0.75, scale: int = 20) -> float:
+        """
+        Computes a score from the cosine distance of the vectors.
+        Args:
+            distance: distance between specific paper and description.
+        Returns:
+            score: converted score
+        """
+        return 1 / (1 + math.exp(scale * (distance - 1 + shift)))
+
     def get_top_items(self, raw_query_text: str, n_hits: int = 1000) -> outputs.RecommendedList:
         """
         Gets top paper/repo matches for a given query text.
@@ -97,10 +109,11 @@ class Recommender:
         query_vec = query_vec.reshape(1, len(query_vec))
 
         distances = self._compute_cosine_distances(query_vec, self.vectors)
-
         df_subset = copy.copy(self.dataset)
-        df_subset["score"] = distances[0]
-        df_subset = df_subset.sort_values(by=["score"], ascending=True).head(n_hits)
+        df_subset["distance"] = distances[0]
+        df_subset = df_subset.sort_values(by=["distance"], ascending=True).head(n_hits)
+        df_subset["score"] = df_subset.distance.apply(self._compute_scores)
+
         recommended_list = outputs.RecommendedList(list(df_subset.T.to_dict().values()))
 
         return recommended_list

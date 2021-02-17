@@ -42,13 +42,16 @@ class TestRecommender:
         with pytest.raises(AssertionError):
             Recommender._compute_cosine_distances(v1, v2)
 
+    def test_compute_score(self):
+        pass
+
     def test_get_top_items(self):
         columns = ["id",
                    "category",
                    "title",
                    "abstract",
                    "authors",
-                   "score",
+                   "distance",
                    "date",
                    "url",
                    "externalId",
@@ -59,7 +62,7 @@ class TestRecommender:
                  "test title",
                  "test abstract",
                  "test author",
-                 0,
+                 0.5,
                  "2020-01-05",
                  "http://test",
                  "",

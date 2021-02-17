@@ -90,7 +90,7 @@ class RecommendedList:
             item_list.append(RecommendedItem(item))
 
         self.items = item_list
-        self.items.sort()
+        self.items.sort(reverse=True)
 
     def to_grpc(self) -> kg_pb.GetGraphRes:
         """

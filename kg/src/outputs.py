@@ -20,7 +20,7 @@ class RecommendedItem:
     url: str
 
     # Optional fields
-    externalId: str = ""  # Keeping camelCase for consistency.
+    external_id: str = ""  # Keeping camelCase for consistency.
     framework: str = ""
 
     def __init__(self, field_dict):

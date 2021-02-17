@@ -16,7 +16,7 @@ message GraphItem {
   float score = 6;
   string date = 7;
   string url = 8;
-  string externalId = 9;
+  string external_id = 9;
   string framework = 10;
 }
 

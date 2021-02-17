@@ -41,7 +41,7 @@ VALUES_OPTIONAL = {"id": "6789",
                    "date": "2020-01-01",
                    "url": "http://test",
                    "framework": "pytorch",
-                   "externalId": "arxivId"}
+                   "external_id": "arxivId"}
 
 VALUES_MISSING = {
     "id": "12435"
@@ -64,7 +64,7 @@ class TestRecommendedItem:
     def test_creation_optional_fields(self):
         item = RecommendedItem(VALUES_OPTIONAL)
         assert item.framework == "pytorch"
-        assert item.externalId == "arxivId"
+        assert item.external_id == "arxivId"
 
     def test_creation_missing_fields(self):
         with pytest.raises(MissingFieldException):
@@ -79,7 +79,7 @@ class TestRecommendedItem:
                            'score',
                            'date',
                            'url',
-                           'externalId',
+                           'external_id',
                            'framework']
         fields = RecommendedItem(VALUES_1)._get_fields()
         assert isinstance(fields, list)

@@ -65,23 +65,24 @@ function TopicFilter({ topics, onUpdate }: Props) {
         className={styles.content}
       >
         <div className={styles.contentWrapper}>
-          <TextInput
-            placeholder="Find a topic"
-            onChange={filterTopics}
-            Icon={SearchIcon}
-            showClearButton
-            hideBottomText
-            hideLabel
-          />
-          <TopicList
-            topics={filteredTopics}
-            selectedTopics={selectedTopics}
-            onSelectOption={handleSelectTopic}
-          />
+          <div className={styles.searchListContainer}>
+            <TextInput
+              placeholder="Find a topic"
+              onChange={filterTopics}
+              Icon={SearchIcon}
+              showClearButton
+              hideBottomText
+              hideLabel
+            />
+            <TopicList
+              topics={filteredTopics}
+              selectedTopics={selectedTopics}
+              onSelectOption={handleSelectTopic}
+            />
+          </div>
           <Button
             label="RESET TO DEFAULT"
             align={BUTTON_ALIGN.LEFT}
-            className={styles.resetButton}
             onClick={resetTopics}
           />
         </div>

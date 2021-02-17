@@ -1,8 +1,10 @@
+import { Topic } from '../../Filters';
 import { useEffect, useMemo, useState } from 'react';
 
-import { Topic } from '../../Filters';
-
-function useTopicFilter(topics: Topic[]) {
+function useTopicFilter(
+  topics: Topic[],
+  onUpdate: (selectedTopics: string[]) => void
+) {
   const initialSelectedTopics = useMemo(getInitialSelectedTopics, [topics]);
   const [filteredTopics, setFilteredTopics] = useState<Topic[]>(topics);
   const [selectedTopics, setSelectedTopics] = useState<string[]>(
@@ -12,7 +14,8 @@ function useTopicFilter(topics: Topic[]) {
   useEffect(() => {
     setFilteredTopics(topics);
     setSelectedTopics(initialSelectedTopics);
-  }, [topics, initialSelectedTopics]);
+    onUpdate(initialSelectedTopics);
+  }, [topics, initialSelectedTopics, onUpdate]);
 
   function getInitialSelectedTopics() {
     return topics.map(({ name }) => name);
@@ -25,6 +28,7 @@ function useTopicFilter(topics: Topic[]) {
       newSelectedTopics = selectedTopics.filter((name) => name !== topicName);
 
     setSelectedTopics(newSelectedTopics);
+    onUpdate(newSelectedTopics);
   }
 
   function filterTopics(text: string) {
@@ -36,6 +40,7 @@ function useTopicFilter(topics: Topic[]) {
 
   function resetTopics() {
     setSelectedTopics(initialSelectedTopics);
+    onUpdate(initialSelectedTopics);
     filterTopics('');
   }
 

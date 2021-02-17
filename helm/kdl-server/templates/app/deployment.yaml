@@ -41,6 +41,8 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: MINIO_URL
+              value: {{ include "protocol" . }}://minio.{{ .Values.domain }}-minio
+            - name: MINIO_ENDPOINT
               value: {{ .Release.Name }}-minio:9000
             - name: MINIO_SECRET_KEY
               valueFrom:
@@ -52,6 +54,14 @@ spec:
                 secretKeyRef:
                   key: accesskey
                   name: {{ .Release.Name }}-minio
+            - name: JUPYTER_URL
+              value: {{ include "protocol" . }}://USERNAME-jupyter.{{ .Values.domain }}
+            - name: VSCODE_URL
+              value: {{ include "protocol" . }}://USERNAME-code.{{ .Values.domain }}
+            - name: DRONE_URL
+              value: {{ include "protocol" . }}://drone.{{ .Values.domain }}
+            - name: MLFLOW_URL
+              value: {{ include "protocol" . }}://mlflow.{{ .Values.domain }}
           envFrom:
             - configMapRef:
                 name: kdl-server-configmap

@@ -3,23 +3,24 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { ToolName } from './../../types/globalTypes';
-
 // ====================================================
 // GraphQL query operation: GetProjectTools
 // ====================================================
 
-export interface GetProjectTools_project_tools {
-  __typename: 'Tool';
-  id: string;
-  toolName: ToolName;
-  url: string;
+export interface GetProjectTools_project_toolUrls {
+  __typename: 'ToolUrls';
+  gitea: string;
+  minio: string;
+  jupyter: string;
+  vscode: string;
+  drone: string;
+  mlflow: string;
 }
 
 export interface GetProjectTools_project {
   __typename: 'Project';
   id: string;
-  tools: GetProjectTools_project_tools[];
+  toolUrls: GetProjectTools_project_toolUrls;
   areToolsActive: boolean | null;
 }
 

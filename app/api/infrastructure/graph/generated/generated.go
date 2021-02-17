@@ -112,7 +112,7 @@ type ComplexityRoot struct {
 		Name               func(childComplexity int) int
 		Repository         func(childComplexity int) int
 		State              func(childComplexity int) int
-		Tools              func(childComplexity int) int
+		ToolUrls           func(childComplexity int) int
 	}
 
 	QualityProjectDesc struct {
@@ -142,10 +142,13 @@ type ComplexityRoot struct {
 		Public       func(childComplexity int) int
 	}
 
-	Tool struct {
-		ID       func(childComplexity int) int
-		ToolName func(childComplexity int) int
-		URL      func(childComplexity int) int
+	ToolUrls struct {
+		Drone   func(childComplexity int) int
+		Gitea   func(childComplexity int) int
+		Jupyter func(childComplexity int) int
+		Minio   func(childComplexity int) int
+		Mlflow  func(childComplexity int) int
+		Vscode  func(childComplexity int) int
 	}
 
 	User struct {
@@ -177,6 +180,8 @@ type MutationResolver interface {
 }
 type ProjectResolver interface {
 	CreationDate(ctx context.Context, obj *entity.Project) (string, error)
+
+	ToolUrls(ctx context.Context, obj *entity.Project) (*entity.ToolUrls, error)
 }
 type QueryResolver interface {
 	Me(ctx context.Context) (*entity.User, error)
@@ -616,12 +621,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.State(childComplexity), true
 
-	case "Project.tools":
-		if e.complexity.Project.Tools == nil {
+	case "Project.toolUrls":
+		if e.complexity.Project.ToolUrls == nil {
 			break
 		}
 
-		return e.complexity.Project.Tools(childComplexity), true
+		return e.complexity.Project.ToolUrls(childComplexity), true
 
 	case "QualityProjectDesc.quality":
 		if e.complexity.QualityProjectDesc.Quality == nil {
@@ -743,26 +748,47 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SSHKey.Public(childComplexity), true
 
-	case "Tool.id":
-		if e.complexity.Tool.ID == nil {
+	case "ToolUrls.drone":
+		if e.complexity.ToolUrls.Drone == nil {
 			break
 		}
 
-		return e.complexity.Tool.ID(childComplexity), true
+		return e.complexity.ToolUrls.Drone(childComplexity), true
 
-	case "Tool.toolName":
-		if e.complexity.Tool.ToolName == nil {
+	case "ToolUrls.gitea":
+		if e.complexity.ToolUrls.Gitea == nil {
 			break
 		}
 
-		return e.complexity.Tool.ToolName(childComplexity), true
+		return e.complexity.ToolUrls.Gitea(childComplexity), true
 
-	case "Tool.url":
-		if e.complexity.Tool.URL == nil {
+	case "ToolUrls.jupyter":
+		if e.complexity.ToolUrls.Jupyter == nil {
 			break
 		}
 
-		return e.complexity.Tool.URL(childComplexity), true
+		return e.complexity.ToolUrls.Jupyter(childComplexity), true
+
+	case "ToolUrls.minio":
+		if e.complexity.ToolUrls.Minio == nil {
+			break
+		}
+
+		return e.complexity.ToolUrls.Minio(childComplexity), true
+
+	case "ToolUrls.mlflow":
+		if e.complexity.ToolUrls.Mlflow == nil {
+			break
+		}
+
+		return e.complexity.ToolUrls.Mlflow(childComplexity), true
+
+	case "ToolUrls.vscode":
+		if e.complexity.ToolUrls.Vscode == nil {
+			break
+		}
+
+		return e.complexity.ToolUrls.Vscode(childComplexity), true
 
 	case "User.apiTokens":
 		if e.complexity.User.APITokens == nil {
@@ -963,19 +989,13 @@ type Member {
   lastActivity: String
 }
 
-type Tool {
-  id: ID!
-  toolName: ToolName!
-  url: String!
-}
-
-enum ToolName {
-  GITEA
-  MINIO
-  JUPYTER
-  VSCODE
-  DRONE
-  MLFLOW
+type ToolUrls {
+  gitea: String!
+  minio: String!
+  jupyter: String!
+  vscode: String!
+  drone: String!
+  mlflow: String!
 }
 
 enum AccessLevel {
@@ -1057,7 +1077,7 @@ type Project {
   lastActivationDate: String!
   error: String
   members: [Member!]!
-  tools: [Tool!]!
+  toolUrls: ToolUrls!
   areToolsActive: Boolean
 }
 
@@ -3107,7 +3127,7 @@ func (ec *executionContext) _Project_members(ctx context.Context, field graphql.
 	return ec.marshalNMember2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMemberᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Project_tools(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
+func (ec *executionContext) _Project_toolUrls(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3118,14 +3138,14 @@ func (ec *executionContext) _Project_tools(ctx context.Context, field graphql.Co
 		Object:     "Project",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Tools, nil
+		return ec.resolvers.Project().ToolUrls(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3137,9 +3157,9 @@ func (ec *executionContext) _Project_tools(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]entity.Tool)
+	res := resTmp.(*entity.ToolUrls)
 	fc.Result = res
-	return ec.marshalNTool2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolᚄ(ctx, field.Selections, res)
+	return ec.marshalNToolUrls2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolUrls(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Project_areToolsActive(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
@@ -3782,7 +3802,7 @@ func (ec *executionContext) _SSHKey_lastActivity(ctx context.Context, field grap
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tool_id(ctx context.Context, field graphql.CollectedField, obj *entity.Tool) (ret graphql.Marshaler) {
+func (ec *executionContext) _ToolUrls_gitea(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3790,7 +3810,7 @@ func (ec *executionContext) _Tool_id(ctx context.Context, field graphql.Collecte
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "Tool",
+		Object:     "ToolUrls",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -3800,7 +3820,7 @@ func (ec *executionContext) _Tool_id(ctx context.Context, field graphql.Collecte
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		return obj.Gitea, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3814,10 +3834,10 @@ func (ec *executionContext) _Tool_id(ctx context.Context, field graphql.Collecte
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tool_toolName(ctx context.Context, field graphql.CollectedField, obj *entity.Tool) (ret graphql.Marshaler) {
+func (ec *executionContext) _ToolUrls_minio(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3825,7 +3845,7 @@ func (ec *executionContext) _Tool_toolName(ctx context.Context, field graphql.Co
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "Tool",
+		Object:     "ToolUrls",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -3835,7 +3855,7 @@ func (ec *executionContext) _Tool_toolName(ctx context.Context, field graphql.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ToolName, nil
+		return obj.Minio, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3847,12 +3867,12 @@ func (ec *executionContext) _Tool_toolName(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(entity.ToolName)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNToolName2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolName(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Tool_url(ctx context.Context, field graphql.CollectedField, obj *entity.Tool) (ret graphql.Marshaler) {
+func (ec *executionContext) _ToolUrls_jupyter(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3860,7 +3880,7 @@ func (ec *executionContext) _Tool_url(ctx context.Context, field graphql.Collect
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "Tool",
+		Object:     "ToolUrls",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -3870,7 +3890,112 @@ func (ec *executionContext) _Tool_url(ctx context.Context, field graphql.Collect
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.URL, nil
+		return obj.Jupyter, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ToolUrls_vscode(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ToolUrls",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Vscode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ToolUrls_drone(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ToolUrls",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Drone, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ToolUrls_mlflow(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ToolUrls",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Mlflow, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5963,11 +6088,20 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "tools":
-			out.Values[i] = ec._Project_tools(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
+		case "toolUrls":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Project_toolUrls(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "areToolsActive":
 			out.Values[i] = ec._Project_areToolsActive(ctx, field, obj)
 		default:
@@ -6233,29 +6367,44 @@ func (ec *executionContext) _SSHKey(ctx context.Context, sel ast.SelectionSet, o
 	return out
 }
 
-var toolImplementors = []string{"Tool"}
+var toolUrlsImplementors = []string{"ToolUrls"}
 
-func (ec *executionContext) _Tool(ctx context.Context, sel ast.SelectionSet, obj *entity.Tool) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, toolImplementors)
+func (ec *executionContext) _ToolUrls(ctx context.Context, sel ast.SelectionSet, obj *entity.ToolUrls) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, toolUrlsImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("Tool")
-		case "id":
-			out.Values[i] = ec._Tool_id(ctx, field, obj)
+			out.Values[i] = graphql.MarshalString("ToolUrls")
+		case "gitea":
+			out.Values[i] = ec._ToolUrls_gitea(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "toolName":
-			out.Values[i] = ec._Tool_toolName(ctx, field, obj)
+		case "minio":
+			out.Values[i] = ec._ToolUrls_minio(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "url":
-			out.Values[i] = ec._Tool_url(ctx, field, obj)
+		case "jupyter":
+			out.Values[i] = ec._ToolUrls_jupyter(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "vscode":
+			out.Values[i] = ec._ToolUrls_vscode(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "drone":
+			out.Values[i] = ec._ToolUrls_drone(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "mlflow":
+			out.Values[i] = ec._ToolUrls_mlflow(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -7046,61 +7195,18 @@ func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel
 	return ret
 }
 
-func (ec *executionContext) marshalNTool2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐTool(ctx context.Context, sel ast.SelectionSet, v entity.Tool) graphql.Marshaler {
-	return ec._Tool(ctx, sel, &v)
+func (ec *executionContext) marshalNToolUrls2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolUrls(ctx context.Context, sel ast.SelectionSet, v entity.ToolUrls) graphql.Marshaler {
+	return ec._ToolUrls(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNTool2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolᚄ(ctx context.Context, sel ast.SelectionSet, v []entity.Tool) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNTool2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐTool(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) unmarshalNToolName2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolName(ctx context.Context, v interface{}) (entity.ToolName, error) {
-	tmp, err := graphql.UnmarshalString(v)
-	res := entity.ToolName(tmp)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNToolName2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolName(ctx context.Context, sel ast.SelectionSet, v entity.ToolName) graphql.Marshaler {
-	res := graphql.MarshalString(string(v))
-	if res == graphql.Null {
+func (ec *executionContext) marshalNToolUrls2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolUrls(ctx context.Context, sel ast.SelectionSet, v *entity.ToolUrls) graphql.Marshaler {
+	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
+		return graphql.Null
 	}
-	return res
+	return ec._ToolUrls(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNUpdateAccessLevelInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUpdateAccessLevelInput(ctx context.Context, v interface{}) (model.UpdateAccessLevelInput, error) {

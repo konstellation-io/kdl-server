@@ -28,8 +28,21 @@ type Config struct {
 	} `yaml:"kubernetes"`
 	Minio struct {
 		URL       string `envconfig:"MINIO_URL"`
+		Endpoint  string `envconfig:"MINIO_ENDPOINT"`
 		AccessKey string `envconfig:"MINIO_ACCESS_KEY"`
 		SecretKey string `envconfig:"MINIO_SECRET_KEY"`
+	}
+	Jupyter struct {
+		URL string `envconfig:"JUPYTER_URL"`
+	}
+	Vscode struct {
+		URL string `envconfig:"VSCODE_URL"`
+	}
+	Drone struct {
+		URL string `envconfig:"DRONE_URL"`
+	}
+	Mlflow struct {
+		URL string `envconfig:"MLFLOW_URL"`
 	}
 }
 

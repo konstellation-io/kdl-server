@@ -105,38 +105,14 @@ module.exports = {
     error: casual.random_element([null, casual.error]),
     state: casual.random_element(['STARTED', 'STOPPED', 'ARCHIVED']),
     members: () => new MockList([4, 6]),
-    tools: () => [
-      {
-        id: casual.uuid,
-        toolName: 'GITEA',
-        url: 'https://gitea.io/en-us/',
-      },
-      {
-        id: casual.uuid,
-        toolName: 'MINIO',
-        url: 'https://min.io/',
-      },
-      {
-        id: casual.uuid,
-        toolName: 'JUPYTER',
-        url: 'https://jupyter.org/',
-      },
-      {
-        id: casual.uuid,
-        toolName: 'VSCODE',
-        url: 'https://code.visualstudio.com/',
-      },
-      {
-        id: casual.uuid,
-        toolName: 'DRONE',
-        url: 'https://www.drone.io/',
-      },
-      {
-        id: casual.uuid,
-        toolName: 'MLFLOW',
-        url: 'https://mlflow.org/',
-      },
-    ],
+    toolUrls: () => ({
+      gitea: 'https://gitea.io/en-us/',
+      minio: 'https://min.io/',
+      jupyter: 'https://jupyter.org/',
+      vscode: 'https://code.visualstudio.com/',
+      drone: 'https://www.drone.io/',
+      mlflow: 'https://mlflow.org/',
+    }),
   }),
   Repository: () => ({
     id: casual.uuid,

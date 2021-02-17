@@ -1,10 +1,13 @@
 query GetProjectTools($id: ID!) {
   project(id: $id) {
     id
-    tools {
-      id
-      toolName
-      url
+    toolUrls {
+      gitea
+      minio
+      jupyter
+      vscode
+      drone
+      mlflow
     }
     areToolsActive
   }

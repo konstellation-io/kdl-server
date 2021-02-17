@@ -6,11 +6,12 @@ package graph
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
-	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
-
+	"github.com/gosimple/slug"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
@@ -87,6 +88,20 @@ func (r *mutationResolver) SetActiveProjectTools(ctx context.Context, input mode
 
 func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project) (string, error) {
 	return obj.CreationDate.Format(time.RFC3339), nil
+}
+
+func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*entity.ToolUrls, error) {
+	userName := ctx.Value(middleware.LoggedUserNameKey).(string)
+	slugUserName := slug.Make(userName)
+
+	return &entity.ToolUrls{
+		Gitea:   r.cfg.Gitea.URL,
+		Minio:   r.cfg.Minio.URL,
+		Jupyter: strings.Replace(r.cfg.Jupyter.URL, "USERNAME", slugUserName, 1),
+		Vscode:  strings.Replace(r.cfg.Vscode.URL, "USERNAME", slugUserName, 1),
+		Drone:   r.cfg.Drone.URL,
+		Mlflow:  r.cfg.Mlflow.URL,
+	}, nil
 }
 
 func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {

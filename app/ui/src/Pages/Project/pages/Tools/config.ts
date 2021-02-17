@@ -1,14 +1,22 @@
-import { ToolProps } from './components/Tool/Tool';
-import GiteaImg from './img/gitea.png';
-import MinioImg from './img/minio.png';
-import JupyterImg from './img/jupyter.png';
-import VSCodeImg from './img/vscode.png';
 import DroneImg from './img/drone.png';
+import GiteaImg from './img/gitea.png';
+import JupyterImg from './img/jupyter.png';
+import MinioImg from './img/minio.png';
 import MlFlowImg from './img/mlflow.png';
-import { ToolName } from 'Graphql/types/globalTypes';
+import { ToolProps } from './components/Tool/Tool';
+import VSCodeImg from './img/vscode.png';
+
+enum ToolName {
+  GITEA = 'gitea',
+  MINIO = 'minio',
+  JUPYTER = 'jupyter',
+  VSCODE = 'vscode',
+  DRONE = 'drone',
+  MLFLOW = 'mlflow',
+}
 
 export interface Tool extends ToolProps {
-  toolName: ToolName;
+  name: ToolName;
   isUserLocalTool: boolean;
 }
 
@@ -34,7 +42,7 @@ export const toolsGroups: ToolGroup[] = [
       {
         img: GiteaImg,
         title: 'Gitea',
-        toolName: ToolName.GITEA,
+        name: ToolName.GITEA,
         description: 'Nam dapibus nisl vitae elit fringilla.',
         isUserLocalTool: true,
       },
@@ -47,7 +55,7 @@ export const toolsGroups: ToolGroup[] = [
       {
         img: MinioImg,
         title: 'Minio',
-        toolName: ToolName.MINIO,
+        name: ToolName.MINIO,
         description: 'Nam dapibus nisl vitae elit fringilla.',
         isUserLocalTool: true,
       },
@@ -60,7 +68,7 @@ export const toolsGroups: ToolGroup[] = [
       {
         img: JupyterImg,
         title: 'Jupyter',
-        toolName: ToolName.JUPYTER,
+        name: ToolName.JUPYTER,
         description: 'Nam dapibus nisl vitae elit fringilla.',
         isUserLocalTool: false,
       },
@@ -73,14 +81,14 @@ export const toolsGroups: ToolGroup[] = [
       {
         img: VSCodeImg,
         title: 'VSCode',
-        toolName: ToolName.VSCODE,
+        name: ToolName.VSCODE,
         description: 'Nam dapibus nisl vitae elit fringilla.',
         isUserLocalTool: false,
       },
       {
         img: DroneImg,
         title: 'Drone',
-        toolName: ToolName.DRONE,
+        name: ToolName.DRONE,
         description: 'Nam dapibus nisl vitae elit fringilla.',
         isUserLocalTool: true,
       },
@@ -93,7 +101,7 @@ export const toolsGroups: ToolGroup[] = [
       {
         img: MlFlowImg,
         title: 'MlFlow',
-        toolName: ToolName.MLFLOW,
+        name: ToolName.MLFLOW,
         description: 'Nam dapibus nisl vitae elit fringilla.',
         isUserLocalTool: true,
       },

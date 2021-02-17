@@ -55,7 +55,7 @@ func main() {
 	}
 
 	minioService, err := minioservice.NewMinioService(
-		logger, cfg.Minio.URL, cfg.Minio.AccessKey, cfg.Minio.SecretKey,
+		logger, cfg.Minio.Endpoint, cfg.Minio.AccessKey, cfg.Minio.SecretKey,
 	)
 	if err != nil {
 		logger.Errorf("Error connecting to Minio: %s", err)

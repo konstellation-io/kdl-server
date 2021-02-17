@@ -6,6 +6,7 @@ require (
 	code.gitea.io/sdk/gitea v0.13.2
 	github.com/99designs/gqlgen v0.13.0
 	github.com/golang/mock v1.4.4
+	github.com/gosimple/slug v1.9.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/konstellation-io/kre/libs/simplelogger v0.0.0-20210127163202-65666c1e48f8
 	github.com/minio/minio-go/v7 v7.0.8

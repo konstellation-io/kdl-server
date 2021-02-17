@@ -142,7 +142,7 @@ func (r *sSHKeyResolver) LastActivity(ctx context.Context, obj *entity.SSHKey) (
 	panic(entity.ErrNotImplemented)
 }
 
-func (r *toolsUrlsResolver) Mlflow(ctx context.Context, obj *entity.ToolsUrls) (string, error) {
+func (r *toolUrlsResolver) Mlflow(ctx context.Context, obj *entity.ToolUrls) (string, error) {
 	obj.Gitea = r.cfg.Gitea.URL
 	obj.Minio = "kasdf"
 	obj.Jupyter = "kasdf"
@@ -182,8 +182,8 @@ func (r *Resolver) Repository() generated.RepositoryResolver { return &repositor
 // SSHKey returns generated.SSHKeyResolver implementation.
 func (r *Resolver) SSHKey() generated.SSHKeyResolver { return &sSHKeyResolver{r} }
 
-// ToolsUrls returns generated.ToolsUrlsResolver implementation.
-func (r *Resolver) ToolsUrls() generated.ToolsUrlsResolver { return &toolsUrlsResolver{r} }
+// ToolUrls returns generated.ToolUrlsResolver implementation.
+func (r *Resolver) ToolUrls() generated.ToolUrlsResolver { return &toolUrlsResolver{r} }
 
 // User returns generated.UserResolver implementation.
 func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
@@ -193,7 +193,7 @@ type projectResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type repositoryResolver struct{ *Resolver }
 type sSHKeyResolver struct{ *Resolver }
-type toolsUrlsResolver struct{ *Resolver }
+type toolUrlsResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
 
 // !!! WARNING !!!
@@ -202,6 +202,6 @@ type userResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *projectResolver) ToolsUrls(ctx context.Context, obj *entity.Project) (*entity.ToolsUrls, error) {
+func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*entity.ToolUrls, error) {
 	panic(fmt.Errorf("not implemented"))
 }

@@ -2,7 +2,7 @@ import { BaseType, EnterElement, Selection, select } from 'd3-selection';
 import { D, ResourceType } from '../KGVisualization';
 import { RGBColor, color } from 'd3-color';
 
-import { GroupD } from '../../../utils';
+import { GroupD } from '../../../KGUtils';
 import { scaleLinear } from '@visx/scale';
 import styles from './Resources.module.scss';
 

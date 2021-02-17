@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import FilterGlow from './FilterGlow/FilterGlow';
 import IconOpen from '@material-ui/icons/ArrowForward';

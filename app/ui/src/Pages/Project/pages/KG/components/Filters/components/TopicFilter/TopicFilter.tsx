@@ -4,21 +4,17 @@ import { Button, BUTTON_ALIGN, TextInput, useClickOutside } from 'kwc';
 import cx from 'classnames';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import AnimateHeight from 'react-animate-height';
-import TopicList, { TopicListProps } from './components/TopicList/TopicList';
+import TopicList from './components/TopicList/TopicList';
 import SearchIcon from '@material-ui/icons/Search';
+import useTopicFilter from './useTopicFilter';
+import { Topic } from '../../Filters';
 
-interface Props extends TopicListProps {
-  onResetClick: () => void;
-  onFilterChange: (text: string) => void;
+interface Props {
+  topics: Topic[];
+  onUpdate: (topicsName: string[]) => void;
 }
 
-function TopicFilter({
-  topics,
-  selectedTopics,
-  onSelectOption,
-  onFilterChange,
-  onResetClick,
-}: Props) {
+function TopicFilter({ topics, onUpdate }: Props) {
   const contentRef = useRef(null);
   const [opened, setOpened] = useState(false);
 
@@ -26,6 +22,14 @@ function TopicFilter({
     componentRef: contentRef,
     action: () => setOpened(false),
   });
+
+  const {
+    resetTopics,
+    handleSelectTopic,
+    filteredTopics,
+    filterTopics,
+    selectedTopics,
+  } = useTopicFilter(topics, onUpdate);
 
   useEffect(() => {
     if (contentRef && opened) addClickOutsideEvents();
@@ -40,8 +44,8 @@ function TopicFilter({
 
   function getButtonLabel() {
     const selectedTopicsCount = selectedTopics.length;
-    return `${selectedTopicsCount} TOPIC${
-      selectedTopicsCount !== 1 ? 'S' : ''
+    return `${selectedTopicsCount} ${
+      selectedTopicsCount === 1 ? 'TOPIC' : 'TOPICS'
     }`;
   }
 
@@ -61,24 +65,25 @@ function TopicFilter({
         className={styles.content}
       >
         <div className={styles.contentWrapper}>
-          <TextInput
-            placeholder="Find a topic"
-            onChange={onFilterChange}
-            Icon={SearchIcon}
-            showClearButton
-            hideBottomText
-            hideLabel
-          />
-          <TopicList
-            topics={topics}
-            selectedTopics={selectedTopics}
-            onSelectOption={onSelectOption}
-          />
+          <div className={styles.searchListContainer}>
+            <TextInput
+              placeholder="Find a topic"
+              onChange={filterTopics}
+              Icon={SearchIcon}
+              showClearButton
+              hideBottomText
+              hideLabel
+            />
+            <TopicList
+              topics={filteredTopics}
+              selectedTopics={selectedTopics}
+              onSelectOption={handleSelectTopic}
+            />
+          </div>
           <Button
             label="RESET TO DEFAULT"
             align={BUTTON_ALIGN.LEFT}
-            className={styles.resetButton}
-            onClick={onResetClick}
+            onClick={resetTopics}
           />
         </div>
       </AnimateHeight>

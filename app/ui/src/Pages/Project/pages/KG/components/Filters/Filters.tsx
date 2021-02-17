@@ -1,63 +1,35 @@
-import React, { useEffect } from 'react';
-
-import { KGFilters } from '../useKGFilters';
-import ScoreFilter from './components/ScoreFilter/ScoreFilter';
-import TopicFilter from './components/TopicFilter/TopicFilter';
+import React, { useCallback } from 'react';
 import styles from './Filters.module.scss';
-import useScoreFilter from './components/ScoreFilter/useScoreFilter';
-import useTopicFilter from './components/TopicFilter/useTopicFilter';
+import ScoreFilter, { Scores } from './components/ScoreFilter/ScoreFilter';
+import TopicFilter from './components/TopicFilter/TopicFilter';
+import { KGFilters } from '../useKGFilters';
 
 export interface Topic {
   name: string;
-  papersTopicCount: number;
+  nResources: number;
 }
 
 const MAX_SCORE = 100;
 
 type Props = {
   topics: Topic[];
-  onFiltersChange: (KGFilters: KGFilters) => void;
+  onFiltersChange: (kgFilters: KGFilters) => void;
 };
 function Filters({ topics, onFiltersChange }: Props) {
-  const {
-    resetTopics,
-    handleSelectTopic,
-    filteredTopics,
-    filterTopics,
-    selectedTopics,
-  } = useTopicFilter(topics);
-
-  const {
-    scores,
-    bottomScore,
-    topScore,
-    handleSliderChange,
-    handleSliderChangeCommitted,
-  } = useScoreFilter({ max: MAX_SCORE });
-
-  useEffect(() => {
-    onFiltersChange({
-      score: [bottomScore, topScore],
-      topics: selectedTopics,
-    });
-  }, [bottomScore, topScore, selectedTopics, onFiltersChange]);
+  const handleScoreUpdate = useCallback(
+    (score: Scores) => onFiltersChange({ score }),
+    [onFiltersChange]
+  );
+  const handleTopicsUpdate = useCallback(
+    (topics: string[]) => onFiltersChange({ topics }),
+    [onFiltersChange]
+  );
 
   return (
     <div className={styles.container}>
-      <ScoreFilter
-        scores={scores}
-        onChange={handleSliderChange}
-        onChangeCommitted={handleSliderChangeCommitted}
-        max={MAX_SCORE}
-      />
+      <ScoreFilter onUpdate={handleScoreUpdate} max={MAX_SCORE} />
       <div className={styles.topic}>
-        <TopicFilter
-          onFilterChange={filterTopics}
-          onSelectOption={handleSelectTopic}
-          onResetClick={resetTopics}
-          topics={filteredTopics}
-          selectedTopics={selectedTopics}
-        />
+        <TopicFilter topics={topics} onUpdate={handleTopicsUpdate} />
       </div>
     </div>
   );

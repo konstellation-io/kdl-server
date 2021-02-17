@@ -8,7 +8,7 @@ describe('formatDate', () => {
     const date = new Date(Date.parse('01 Jan 1970 00:00:00 GMT'));
 
     expect(formatDate(date)).toBe('Jan 1, 1970');
-    expect(formatDate(date, true)).toBe('Jan 1, 1970 1:00 AM');
+    expect(formatDate(date, true)).toBe('Jan 1, 1970 12:00 AM');
   });
 });
 

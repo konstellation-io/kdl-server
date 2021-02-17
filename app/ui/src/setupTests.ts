@@ -4,5 +4,8 @@ import 'jest-canvas-mock';
 
 import Adapter from 'enzyme-adapter-react-16';
 import { configure } from 'enzyme';
+import moment from 'moment-timezone';
 
 configure({ adapter: new Adapter() });
+
+moment.tz.setDefault('UTC');

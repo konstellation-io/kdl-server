@@ -109,3 +109,37 @@ func TestInteractor_Create(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, expectedProject, createdProject)
 }
+
+func TestInteractor_FindAll(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+	expectedProjects := []entity.Project{
+		entity.NewProject("project-x", "Project X"),
+	}
+
+	s.mocks.repo.EXPECT().FindAll(ctx).Return(expectedProjects, nil)
+
+	p, err := s.interactor.FindAll(ctx)
+
+	require.NoError(t, err)
+	require.Equal(t, p, expectedProjects)
+}
+
+func TestInteractor_GetByID(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	const projectID = "project.1234"
+
+	ctx := context.Background()
+	expectedProject := entity.NewProject("project-x", "Project X")
+
+	s.mocks.repo.EXPECT().Get(ctx, projectID).Return(expectedProject, nil)
+
+	p, err := s.interactor.GetByID(ctx, projectID)
+
+	require.NoError(t, err)
+	require.Equal(t, p, expectedProject)
+}

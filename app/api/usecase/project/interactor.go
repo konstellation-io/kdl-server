@@ -125,3 +125,9 @@ func (i Interactor) FindAll(ctx context.Context) ([]entity.Project, error) {
 	i.logger.Info("Finding all projects in the server")
 	return i.repo.FindAll(ctx)
 }
+
+// GetByID returns the project with the desired identifier.
+func (i Interactor) GetByID(ctx context.Context, id string) (entity.Project, error) {
+	i.logger.Infof("Getting project with id \"%s\"", id)
+	return i.repo.Get(ctx, id)
+}

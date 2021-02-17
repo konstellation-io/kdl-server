@@ -59,6 +59,14 @@ class Recommender:
     def _compute_cosine_distances(vectors_1: np.ndarray, vectors_2: np.ndarray) -> np.ndarray:
         """
         Computes pairwise cosine distances between vectors_1 (array) and vectors_2 (array).
+        Args:
+            vectors_1: numpy array representing
+            the query vector shape(1, vector_dimensions).
+            vectors_2: numpy array representing the
+             dataset vectors shape(dataset_papers, vector_dimensions).
+        Returns:
+            distances: numpy array with the distance("relevance") between the
+             input description and each paper. shape(1, dataset_papers)
         """
         assert (
             vectors_1.shape[1] == vectors_2.shape[1]

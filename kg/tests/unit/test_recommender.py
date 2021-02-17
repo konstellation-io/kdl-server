@@ -37,9 +37,9 @@ class TestRecommender:
 
     def test_compute_cosine_distances_error(self):
         v1 = np.array([[2, 1], [4, 1]])
-        v2 = np.array([[2, 1], [66]])
+        v2 = np.array([[2, 1, 3], [4, 5, 3]])
 
-        with pytest.raises(IndexError):
+        with pytest.raises(AssertionError):
             Recommender._compute_cosine_distances(v1, v2)
 
     def test_get_top_items(self):

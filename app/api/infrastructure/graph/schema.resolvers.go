@@ -91,14 +91,8 @@ func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project)
 }
 
 func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*entity.ToolUrls, error) {
-	userEmail := ctx.Value(middleware.LoggedUserEmailKey).(string)
-	u, err := r.users.GetByEmail(ctx, userEmail)
-
-	if err != nil {
-		return nil, err
-	}
-
-	slugUserName := slug.Make(u.Username)
+	userName := ctx.Value(middleware.LoggedUserNameKey).(string)
+	slugUserName := slug.Make(userName)
 
 	return &entity.ToolUrls{
 		Gitea:   r.cfg.Gitea.URL,

@@ -1,5 +1,6 @@
 .idea
 .vscode
+.certs
 
 app/ui/node_modules
 

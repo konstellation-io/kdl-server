@@ -19,4 +19,5 @@ type Repository interface {
 type UseCase interface {
 	Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error)
 	FindAll(ctx context.Context) ([]entity.Project, error)
+	GetByID(ctx context.Context, id string) (entity.Project, error)
 }

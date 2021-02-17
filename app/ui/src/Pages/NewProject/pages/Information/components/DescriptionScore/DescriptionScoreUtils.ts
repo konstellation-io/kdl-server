@@ -8,7 +8,7 @@ export enum ScoreLevels {
 export function getScoreLevel(score: number) {
   let selectedLevel: ScoreLevels;
 
-  switch(true) {
+  switch (true) {
     case score >= 25 && score < 50:
       selectedLevel = ScoreLevels.MEDIUM;
       break;

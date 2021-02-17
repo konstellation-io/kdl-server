@@ -7,7 +7,7 @@ import { OUTER_R } from './KGViz';
 export const PADDING = 0.15;
 
 const MIN_ZOOM = 0.1; // x0.1
-const MAX_ZOOM = 50;  // x50
+const MAX_ZOOM = 50; // x50
 
 const TARGET_OUTER_R_PERC = (1 - 2 * PADDING) / 2;
 
@@ -25,38 +25,44 @@ type Params = {
 };
 type UseZoom = {
   zoomValues: ZoomValues | null;
-  initialZoomValues: ZoomValues,
+  initialZoomValues: ZoomValues;
   zoomIn: () => void;
   zoomOut: () => void;
 };
 
 const zm = zoom();
 
-const useZoom: (p: Params) => UseZoom = ({ svgRef, width, height, zoomStep = 0.25 }) => {
-  const targetOuterR = Math.min(width * TARGET_OUTER_R_PERC, height * TARGET_OUTER_R_PERC);
+const useZoom: (p: Params) => UseZoom = ({
+  svgRef,
+  width,
+  height,
+  zoomStep = 0.25,
+}) => {
+  const targetOuterR = Math.min(
+    width * TARGET_OUTER_R_PERC,
+    height * TARGET_OUTER_R_PERC
+  );
   const scaleToTarget = targetOuterR / OUTER_R;
 
-  const [ zoomValues, setTx ] = useState<ZoomValues | null>(null);
+  const [zoomValues, setTx] = useState<ZoomValues | null>(null);
   const initialZoomValues = useRef<ZoomValues>({ x: 0, y: 0, k: 0 });
 
   useEffect(() => {
     // Initialize the element to match the screen and be centered
     initialZoomValues.current = {
-      x: width / 2 * (1 - scaleToTarget),
-      y: height / 2 * (1 - scaleToTarget),
-      k: scaleToTarget
+      x: (width / 2) * (1 - scaleToTarget),
+      y: (height / 2) * (1 - scaleToTarget),
+      k: scaleToTarget,
     };
 
     // Sets zoom transform to scale chart properly
     const tx = zoomIdentity
-      .translate(
-        initialZoomValues.current.x,
-        initialZoomValues.current.y
-      )
+      .translate(initialZoomValues.current.x, initialZoomValues.current.y)
       .scale(initialZoomValues.current.k);
-      
-    zm.scaleExtent([MIN_ZOOM, MAX_ZOOM])
-      .on('zoom', (event) => setTx(event.transform));
+
+    zm.scaleExtent([MIN_ZOOM, MAX_ZOOM]).on('zoom', (event) =>
+      setTx(event.transform)
+    );
 
     const selection = select(svgRef.current);
 
@@ -66,7 +72,7 @@ const useZoom: (p: Params) => UseZoom = ({ svgRef, width, height, zoomStep = 0.2
 
     return () => {
       selection.on('zoom', null);
-    }
+    };
   }, [svgRef, width, height, scaleToTarget]);
 
   function updateZoom(multiplier: number) {
@@ -78,26 +84,28 @@ const useZoom: (p: Params) => UseZoom = ({ svgRef, width, height, zoomStep = 0.2
 
       const tx = zoomIdentity
         .translate(
-          zoomValues.x - width / 2 * dk,
-          zoomValues.y - height / 2 * dk
+          zoomValues.x - (width / 2) * dk,
+          zoomValues.y - (height / 2) * dk
         )
         .scale(newK);
 
       const selection = select(svgRef.current);
-      (selection as Selection<Element, unknown, BaseType, unknown>)
-        .call(zm.transform, tx);
+      (selection as Selection<Element, unknown, BaseType, unknown>).call(
+        zm.transform,
+        tx
+      );
     }
   }
 
   const zoomIn = () => updateZoom(zoomStep);
   const zoomOut = () => updateZoom(-zoomStep);
-  
+
   return {
     zoomValues,
     initialZoomValues: initialZoomValues.current,
     zoomIn,
-    zoomOut
+    zoomOut,
   };
-}
+};
 
 export default useZoom;

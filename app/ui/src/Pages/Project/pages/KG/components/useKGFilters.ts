@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
 import { D, TopicSections } from './KGVisualization/KGVisualization';
+import { useMemo, useState } from 'react';
 
 export interface KGFilters {
   score: [number, number];
@@ -20,7 +20,7 @@ function useKGFilters(sections: TopicSections, resources: D[]) {
       const isInCategory = selectedTopics.includes(category);
       return isInScoreRange && isInCategory;
     });
-  }, [filters]);
+  }, [filters, resources]);
 
   const filteredSections = useMemo<TopicSections>(() => {
     const selectedTopics = filters.topics;
@@ -32,7 +32,7 @@ function useKGFilters(sections: TopicSections, resources: D[]) {
         );
       });
     return Object.fromEntries(selectedSections);
-  }, [filteredResources]);
+  }, [filteredResources, filters.topics, sections]);
 
   return {
     setFilters,

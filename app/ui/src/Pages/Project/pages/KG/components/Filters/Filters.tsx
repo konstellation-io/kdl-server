@@ -40,7 +40,7 @@ function Filters({ topics, onFiltersChange }: Props) {
       score: [bottomScore, topScore],
       topics: selectedTopics,
     });
-  }, [bottomScore, topScore, selectedTopics]);
+  }, [bottomScore, topScore, selectedTopics, onFiltersChange]);
 
   return (
     <div className={styles.container}>

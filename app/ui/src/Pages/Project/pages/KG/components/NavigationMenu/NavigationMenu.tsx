@@ -1,8 +1,6 @@
 import React from 'react';
-import styles from './NavigationMenu.module.scss';
 
-type Props = {};
-function NavigationMenu({}: Props) {
+function NavigationMenu() {
   return (
     <div>
       

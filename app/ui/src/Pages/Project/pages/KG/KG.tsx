@@ -1,18 +1,18 @@
-import React, { useMemo, useState } from 'react';
-
 import Filters, { Topic } from './components/Filters/Filters';
 import KGVisualization, {
   TopicSections,
 } from './components/KGVisualization/KGVisualization';
+import React, { useCallback, useMemo, useState } from 'react';
+import useKGFilters, { KGFilters } from './components/useKGFilters';
+
 import NavigationMenu from './components/NavigationMenu/NavigationMenu';
+import { getSectionsAndNames } from './KGUtils';
 import staticData from './components/KGVisualization/data';
 import styles from './KG.module.scss';
-import { getSectionsAndNames } from './KGUtils';
-import useKGFilters, { KGFilters } from './components/useKGFilters';
 
 function KG() {
   // TODO: Change the following with the GraphQL query
-  const [resources, setResources] = useState(staticData);
+  const [resources] = useState(staticData);
 
   const [sections, topics]: [TopicSections, Topic[]] = useMemo(() => {
     const sections = getSectionsAndNames(resources);
@@ -22,7 +22,7 @@ function KG() {
     }));
     return [sections, topics];
   }, [resources]);
-  const [selectedResource, setSelectedResource] = useState('Project Name 1');
+  const [selectedResource] = useState('Project Name 1');
   const { setFilters, filteredResources, filteredSections } = useKGFilters(
     sections,
     resources
@@ -32,9 +32,7 @@ function KG() {
     alert(`Resource selected: ${name}`);
   }
 
-  function handleFiltersChange(newFilters: KGFilters) {
-    setFilters(newFilters);
-  }
+  const handleFiltersChange = useCallback((newFilters: KGFilters) => setFilters(newFilters), [setFilters]);
 
   return (
     <div className={styles.container}>

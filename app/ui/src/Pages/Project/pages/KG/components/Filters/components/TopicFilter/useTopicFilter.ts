@@ -1,5 +1,6 @@
-import { Topic } from '../../Filters';
 import { useEffect, useMemo, useState } from 'react';
+
+import { Topic } from '../../Filters';
 
 function useTopicFilter(topics: Topic[]) {
   const initialSelectedTopics = useMemo(getInitialSelectedTopics, [topics]);
@@ -11,7 +12,7 @@ function useTopicFilter(topics: Topic[]) {
   useEffect(() => {
     setFilteredTopics(topics);
     setSelectedTopics(initialSelectedTopics);
-  }, [topics]);
+  }, [topics, initialSelectedTopics]);
 
   function getInitialSelectedTopics() {
     return topics.map(({ name }) => name);

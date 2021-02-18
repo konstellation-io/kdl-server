@@ -1,0 +1,32 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+grpcio = "==1.35.0"
+grpcio-tools = "==1.35.0"
+numpy = "==1.20.1"
+scipy = "==1.6.0"
+torch = "==1.7.1"
+pandas = "==1.2.2"
+transformers = "==4.3.2"
+
+[dev-packages]
+ipdb = "==0.13.4"
+pytest = "==6.2.2"
+pytest-grpc = "==0.8.0"
+pytest-mypy = "==0.8.0"
+pytest-flake8 = "==1.0.7"
+pytest-cov = "==2.11.1"
+pydocstyle = "==5.1.1"
+flake8 = "==3.8.4"
+mypy = "==0.800"
+mypy-protobuf = "==2.4"
+coverage = "==5.4"
+ipython = "==7.20.0"
+grpc-stubs = "==1.24.5"
+grpc-requests = "==0.0.9"
+
+[requires]
+python_version = "3.9"

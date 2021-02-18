@@ -1,5 +1,12 @@
 # Knowledge Graph gRPC server
 
+## Generate protobuf code
+To generate the golang and python code you have to run the following script:
+```bash
+# from kg directory
+bash scripts/generate_proto.sh
+```
+
 ## Configuration
 Most of the configuration is done through environment variables:
 ```bash

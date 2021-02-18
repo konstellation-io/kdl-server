@@ -8,6 +8,7 @@ require (
 	github.com/drone/drone-go v1.5.0
 	github.com/go-ini/ini v1.62.0 // indirect
 	github.com/golang/mock v1.4.4
+	github.com/golang/protobuf v1.4.1
 	github.com/gosimple/slug v1.9.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/konstellation-io/kre/libs/simplelogger v0.0.0-20210127163202-65666c1e48f8

@@ -39,7 +39,9 @@ type Config struct {
 		URL string `envconfig:"VSCODE_URL"`
 	}
 	Drone struct {
-		URL string `envconfig:"DRONE_URL"`
+		URL         string `envconfig:"DRONE_URL"`
+		InternalURL string `envconfig:"DRONE_INTERNAL_URL"`
+		Token       string `envconfig:"DRONE_TOKEN"`
 	}
 	Mlflow struct {
 		URL string `envconfig:"MLFLOW_URL"`

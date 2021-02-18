@@ -11,6 +11,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
@@ -62,6 +63,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	droneService := droneservice.NewDroneService(logger, cfg.Drone.InternalURL, cfg.Drone.Token)
+
 	k8sClient, err := k8s.NewK8sClient(logger, cfg.Kubernetes.Namespace)
 	if err != nil {
 		logger.Errorf("Error creating k8s client: %s", err)
@@ -88,7 +91,7 @@ func main() {
 
 	resolvers := graph.NewResolver(
 		cfg,
-		project.NewInteractor(logger, projectRepo, realClock, giteaService, minioService),
+		project.NewInteractor(logger, projectRepo, realClock, giteaService, minioService, droneService),
 		user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaService, k8sClient),
 	)
 

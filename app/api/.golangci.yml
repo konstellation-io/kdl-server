@@ -17,7 +17,6 @@ linters-settings:
       - performance
       - style
     disabled-checks:
-      - typeDefFirst # gqlgen generates type definitions for resolvers at the end
       - hugeParam # premature optimization
       - dupImport # https://github.com/go-critic/go-critic/issues/845
   gocyclo:

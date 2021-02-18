@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 
 import AnimateHeight from 'react-animate-height';
 import IconClose from '@material-ui/icons/Close';
+import IconOpen from '@material-ui/icons/SubdirectoryArrowRight';
 import cx from 'classnames';
 import { stringToId } from 'Utils/d3';
 import styles from './SectionList.module.scss';
@@ -17,7 +18,7 @@ type Props = {
 function SectionList({ section, names, setHoveredPaper, onResourceSelection }: Props) {
   const {
     value: opened,
-    activate: open,
+    toggle,
     deactivate: close
   } = useBoolState(false);
   
@@ -37,16 +38,18 @@ function SectionList({ section, names, setHoveredPaper, onResourceSelection }: P
   useEffect(() => {
     if (opened) addClickOutsideEvents();
     else removeClickOutsideEvents();
-  }, [opened, addClickOutsideEvents, removeClickOutsideEvents])
+  }, [opened, addClickOutsideEvents, removeClickOutsideEvents]);
+
+  const Icon = opened ? IconClose : IconOpen;
   
   return (
     <div
       id={`kg_${stringToId(section)}`}
       className={ cx(styles.container, {[styles.opened]: opened}) }
     >
-      <div className={ cx(styles.section, {[styles.opened]: opened}) } ref={componentRef} onClick={open}>
+      <div className={ cx(styles.section, {[styles.opened]: opened}) } ref={componentRef} onClick={toggle}>
         <span>{`${section} (${names.length})`}</span>
-        <IconClose className="icon-small" />
+        <Icon className="icon-small" />
       </div>
       <AnimateHeight
         height={opened ? 'auto' : 0}

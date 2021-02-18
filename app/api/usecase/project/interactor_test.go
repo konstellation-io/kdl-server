@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
@@ -28,6 +29,7 @@ type projectMocks struct {
 	clock        *clock.MockClock
 	giteaService *giteaservice.MockGiteaClient
 	minioService *minioservice.MockMinioService
+	droneService *droneservice.MockDroneService
 }
 
 func newProjectSuite(t *testing.T) *projectSuite {
@@ -44,7 +46,9 @@ func newProjectSuite(t *testing.T) *projectSuite {
 
 	minioService := minioservice.NewMockMinioService(ctrl)
 
-	interactor := project.NewInteractor(logger, repo, clockMock, giteaService, minioService)
+	droneService := droneservice.NewMockDroneService(ctrl)
+
+	interactor := project.NewInteractor(logger, repo, clockMock, giteaService, minioService, droneService)
 
 	return &projectSuite{
 		ctrl:       ctrl,
@@ -55,6 +59,7 @@ func newProjectSuite(t *testing.T) *projectSuite {
 			clock:        clockMock,
 			giteaService: giteaService,
 			minioService: minioService,
+			droneService: droneService,
 		},
 	}
 }
@@ -94,6 +99,7 @@ func TestInteractor_Create(t *testing.T) {
 
 	s.mocks.giteaService.EXPECT().CreateRepo(internalRepoName).Return(nil)
 	s.mocks.minioService.EXPECT().CreateBucket(internalRepoName).Return(nil)
+	s.mocks.droneService.EXPECT().ActivateRepository(internalRepoName).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(projectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, projectID).Return(expectedProject, nil)

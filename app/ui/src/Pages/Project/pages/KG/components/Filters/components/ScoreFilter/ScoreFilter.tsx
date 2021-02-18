@@ -1,24 +1,25 @@
-import React, { FC, useCallback } from 'react';
+import React, { Dispatch, FC, SetStateAction, useCallback } from 'react';
 import styles from './ScoreFilter.module.scss';
 import stylesThumb from './components/Thumb/Thumb.module.scss';
 import Slider from '@material-ui/core/Slider';
 import cx from 'classnames';
 import Thumb, { ValueLabelProps } from './components/Thumb/Thumb';
-import useScoreFilter from './useScoreFilter';
+import useScoreFilter, { PreviewScore } from './useScoreFilter';
 
 export type Scores = [number, number];
 type Props = {
   min?: number;
   max?: number;
   onUpdate: (scores: Scores) => void;
+  onChange: Dispatch<SetStateAction<PreviewScore | null>>;
 };
 
-const ScoreFilter: FC<Props> = ({ onUpdate, min = 0, max = 100 }) => {
+const ScoreFilter: FC<Props> = ({ onUpdate, onChange, min = 0, max = 100 }) => {
   const {
     scores,
     handleSliderChange,
     handleSliderChangeCommitted,
-  } = useScoreFilter({ max, onUpdate });
+  } = useScoreFilter({ max, onUpdate, onChange });
 
   const thumb = useCallback(
     (props: ValueLabelProps) => <Thumb {...props} max={max} />,

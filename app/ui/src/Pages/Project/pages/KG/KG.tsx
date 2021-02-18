@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import Filters, { Topic } from './components/Filters/Filters';
 import KGVisualization, {
@@ -9,7 +9,7 @@ import resources from './components/KGVisualization/data';
 import styles from './KG.module.scss';
 import { getSectionsAndNames } from './KGUtils';
 import useKGFilters from './components/useKGFilters';
-import { useQuery } from '@apollo/client';
+import { PreviewScore } from './components/Filters/components/ScoreFilter/useScoreFilter';
 
 const selectedResource = 'Project Name 1';
 
@@ -22,7 +22,7 @@ function KG() {
     }));
     return [sections, topics];
   }, []);
-
+  const [_, setPreviewScore] = useState<PreviewScore | null>(null);
   const {
     handleFiltersChange,
     filteredResources,
@@ -37,7 +37,11 @@ function KG() {
     <div className={styles.container}>
       <div className={styles.kgTopBar}>
         <NavigationMenu />
-        <Filters topics={topics} onFiltersChange={handleFiltersChange} />
+        <Filters
+          topics={topics}
+          onFiltersChange={handleFiltersChange}
+          onChange={setPreviewScore}
+        />
       </div>
       <KGVisualization
         data={filteredResources}

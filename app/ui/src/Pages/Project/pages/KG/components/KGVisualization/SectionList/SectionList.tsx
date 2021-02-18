@@ -42,7 +42,7 @@ function SectionList({ section, names, setHoveredPaper, onResourceSelection }: P
   return (
     <div
       id={`kg_${stringToId(section)}`}
-      className={ styles.container }
+      className={ cx(styles.container, {[styles.opened]: opened}) }
     >
       <div className={ cx(styles.section, {[styles.opened]: opened}) } ref={componentRef} onClick={open}>
         <span>{`${section} (${names.length})`}</span>

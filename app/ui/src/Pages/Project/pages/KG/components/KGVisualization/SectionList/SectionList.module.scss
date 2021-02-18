@@ -8,8 +8,12 @@
   z-index: 1;
   width: 33 * $grid-unit;
 
-  &:hover {
+  &.opened {
     z-index: 2;
+  }
+
+  &:hover {
+    z-index: 999;
   }
 }
 

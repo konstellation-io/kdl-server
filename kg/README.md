@@ -48,35 +48,46 @@ grpcurl -import-path .. -proto knowledge_graph.proto \
 ## Testing and linters
 
 ### Unit tests
+
 To run the unit tests you have to install the development dependencies:
-```
+
+```bash
 pipenv install --dev
 ```
 
 and then run:
-```
+
+```bash
 pipenv run python -m pytest -m "not int"
 ```
 
 ### Linting and Type Checking
+
 To check the code quality run the following tools
+
 ```bash
 # flake8 checks code conventions (pep8...) and code style, docs...
 flake8
+
 # mypy is not fully fuctional but it's useful, it simulates static typing
 mypy [file-to-analyze]
 ```
 
 ### Integration tests
+
 To run the integration tests you have to set up a server:
-```
+
+```bash
 pipenv run python src/app.py
 ```
+
 and then run:
-```
+
+```bash
 pipenv run python -m pytest int
 ```
 
 ## Caveats with PyTorch versions
+
 The current installed version is a gpu+cpu version if you have any problems with your environment change the version
 to cpu only.

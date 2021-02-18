@@ -39,6 +39,7 @@ jobs:
         with:
           version: v1.37
           working-directory: ./app/api
+          args: --timeout 5m
       
   sonarcloud:
     name: SonarCloud

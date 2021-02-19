@@ -3,10 +3,6 @@
 package model
 
 import (
-	"fmt"
-	"io"
-	"strconv"
-
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 )
 
@@ -31,25 +27,6 @@ type CreateProjectInput struct {
 	Name        string           `json:"name"`
 	Description string           `json:"description"`
 	Repository  *RepositoryInput `json:"repository"`
-}
-
-type KnowledgeGraph struct {
-	Items []KnowledgeGraphItem `json:"items"`
-}
-
-type KnowledgeGraphItem struct {
-	ID          string                `json:"id"`
-	Category    KnowledgeGraphItemCat `json:"category"`
-	Title       string                `json:"title"`
-	Abstract    string                `json:"abstract"`
-	Authors     []string              `json:"authors"`
-	Score       float64               `json:"score"`
-	Date        string                `json:"date"`
-	URL         string                `json:"url"`
-	IsStarred   bool                  `json:"isStarred"`
-	IsDiscarded bool                  `json:"isDiscarded"`
-	ExternalID  *string               `json:"externalId"`
-	Framework   *string               `json:"framework"`
 }
 
 type QualityProjectDesc struct {
@@ -99,45 +76,4 @@ type UpdateProjectInput struct {
 
 type UpdateProjectRepositoryInput struct {
 	URL string `json:"url"`
-}
-
-type KnowledgeGraphItemCat string
-
-const (
-	KnowledgeGraphItemCatPaper KnowledgeGraphItemCat = "Paper"
-	KnowledgeGraphItemCatCode  KnowledgeGraphItemCat = "Code"
-)
-
-var AllKnowledgeGraphItemCat = []KnowledgeGraphItemCat{
-	KnowledgeGraphItemCatPaper,
-	KnowledgeGraphItemCatCode,
-}
-
-func (e KnowledgeGraphItemCat) IsValid() bool {
-	switch e {
-	case KnowledgeGraphItemCatPaper, KnowledgeGraphItemCatCode:
-		return true
-	}
-	return false
-}
-
-func (e KnowledgeGraphItemCat) String() string {
-	return string(e)
-}
-
-func (e *KnowledgeGraphItemCat) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = KnowledgeGraphItemCat(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid KnowledgeGraphItemCat", str)
-	}
-	return nil
-}
-
-func (e KnowledgeGraphItemCat) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
 }

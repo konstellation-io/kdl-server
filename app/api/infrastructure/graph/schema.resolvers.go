@@ -17,6 +17,14 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
+func (r *knowledgeGraphItemResolver) Authors(ctx context.Context, obj *entity.KnowledgeGraphItem) ([]string, error) {
+	return strings.Split(obj.Authors, ","), nil
+}
+
+func (r *knowledgeGraphItemResolver) Score(ctx context.Context, obj *entity.KnowledgeGraphItem) (float64, error) {
+	return float64(obj.Score), nil
+}
+
 func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error) {
 	user, err := r.users.Create(ctx, input.Email, input.Username, input.Password, input.AccessLevel)
 	if err != nil {
@@ -74,11 +82,11 @@ func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.Remo
 	panic(entity.ErrNotImplemented)
 }
 
-func (r *mutationResolver) SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*model.KnowledgeGraphItem, error) {
+func (r *mutationResolver) SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error) {
 	panic(entity.ErrNotImplemented)
 }
 
-func (r *mutationResolver) SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*model.KnowledgeGraphItem, error) {
+func (r *mutationResolver) SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error) {
 	panic(entity.ErrNotImplemented)
 }
 
@@ -140,8 +148,13 @@ func (r *queryResolver) QualityProjectDesc(ctx context.Context, description stri
 	panic(entity.ErrNotImplemented)
 }
 
-func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) (*model.KnowledgeGraph, error) {
-	panic(entity.ErrNotImplemented)
+func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) (*entity.KnowledgeGraph, error) {
+	kg, err := r.kg.Get(ctx, description)
+	if err != nil {
+		return nil, err
+	}
+
+	return &kg, nil
 }
 
 func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (string, error) {
@@ -177,6 +190,11 @@ func (r *userResolver) LastActivity(ctx context.Context, obj *entity.User) (*str
 	return &lastActivity, nil
 }
 
+// KnowledgeGraphItem returns generated.KnowledgeGraphItemResolver implementation.
+func (r *Resolver) KnowledgeGraphItem() generated.KnowledgeGraphItemResolver {
+	return &knowledgeGraphItemResolver{r}
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
@@ -195,6 +213,7 @@ func (r *Resolver) SSHKey() generated.SSHKeyResolver { return &sSHKeyResolver{r}
 // User returns generated.UserResolver implementation.
 func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
 
+type knowledgeGraphItemResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type projectResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

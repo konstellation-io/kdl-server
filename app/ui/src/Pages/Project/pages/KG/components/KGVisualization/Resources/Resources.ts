@@ -35,6 +35,7 @@ export default class Resources {
   container: Selection<SVGGElement, unknown, null, undefined>;
   data: GroupD[] = [];
   resourceR: number = 0;
+  enableAnimations: boolean = false;
   resourceStroke: number = 0;
   fontSize: number = 0;
   onShowTooltip: (e: MouseEvent, d: GroupD, element: BaseType) => void;
@@ -63,8 +64,10 @@ export default class Resources {
 
   init = (
     container: Selection<SVGGElement, unknown, null, undefined>,
-    data: GroupD[]
+    data: GroupD[],
+    enableAnimations: boolean
   ) => {
+    this.enableAnimations = enableAnimations;
     this.data = data;
     this.container = container;
 
@@ -77,22 +80,31 @@ export default class Resources {
     create(resourcesSelection.enter());
   };
 
-  performUpdate = (data: GroupD[]) => {
+  performUpdate = (data: GroupD[], enableAnimations: boolean) => {
+    this.enableAnimations = enableAnimations;
     const { container, bindData, create, update, remove } = this;
+    
+    if (!enableAnimations) {      
+      container
+      .select(`.${styles.resourcesWrapper}`).remove();
+      this.init(container, data, enableAnimations);
+    } else {
+      // When zooming interrupts previous zoom animation, interrupt node removal and rescale elements.
+      container.selectAll('.removing').interrupt().transition();
 
-    // When zooming interrupts previous zoom animation, interrupt node removal and rescale elements.
-    container.selectAll('.removing').interrupt().transition();
-    container
-      .selectAll(`.${styles.resourceG}`)
-      .transition()
-      .delay(100)
-      .attr('transform', 'scale(1)');
-
-    const resourcesSelection = bindData(data);
-
-    create(resourcesSelection.enter());
-    update(resourcesSelection);
-    remove(resourcesSelection.exit());
+      const resources = container
+        .selectAll(`.${styles.resourceG}`);
+      
+      resources.transition()
+        .delay(100)
+        .attr('transform', 'scale(1)');
+  
+      const resourcesSelection = bindData(data);
+  
+      create(resourcesSelection.enter());
+      update(resourcesSelection);
+      remove(resourcesSelection.exit());
+    }
   };
 
   bindData = (data: GroupD[]) => {
@@ -112,6 +124,7 @@ export default class Resources {
       onShowTooltip,
       onHideTooltip,
       onResourceSelection,
+      enableAnimations
     } = this;
 
     const resourceWrappers = selection
@@ -119,16 +132,18 @@ export default class Resources {
       .classed(styles.resourceWrapper, true)
       .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
       .on('mouseenter', function () {
-        // Move to front
-        select(this).each(function () {
-          this.parentNode && this.parentNode.appendChild(this);
-        });
+        select(this).raise();
       });
     const resourcesG = resourceWrappers
       .append('g')
       .classed(styles.resourceG, true)
       .attr('transform', 'scale(0)');
-    resourcesG.transition().duration(400).attr('transform', 'scale(1)');
+    
+    if (enableAnimations) {
+      resourcesG.transition().duration(400).attr('transform', 'scale(1)');
+    } else {
+      resourcesG.attr('transform', 'scale(1)');
+    }
 
     // Tooltip
     resourcesG
@@ -237,15 +252,22 @@ export default class Resources {
   };
 
   remove = (selection: Selection<BaseType, unknown, BaseType, unknown>) => {
+    const { enableAnimations } = this;
+
     const resourcesG = selection.selectAll(`.${styles.resourceG}`);
     resourcesG.interrupt().transition();
-    resourcesG
-      .classed('removing', true)
-      .transition()
-      .duration(400)
-      .attr('transform', 'scale(0)');
     selection.interrupt().transition();
-    selection.classed('removing', true).transition().delay(400).remove();
+
+    resourcesG.classed('removing', true);
+    selection.classed('removing', true);
+
+    if (enableAnimations) {
+      resourcesG.transition().duration(400).attr('transform', 'scale(0)');
+      selection.transition().duration(400).remove();
+    } else {
+      resourcesG.attr('transform', 'scale(0)');
+      selection.remove();
+    }
   };
 
   highlightResource = (resourceName: string | null) => {

@@ -68,11 +68,12 @@ class KGViz {
   center: Coord;
   rScale = scaleLinear<number>();
   sectionScale = scaleBand();
-  sectionDomain: string[];
-  groupedData: GroupD[];
+  sectionDomain: string[] = [];
+  groupedData: GroupD[] = [];
   minimap: MinimapViz;
   sectionOrientation: Local<string>;
   resources: Resources;
+  enableAnimations: boolean = false;
   size: {
     innerWidth: number,
     innerHeight: number,
@@ -88,8 +89,6 @@ class KGViz {
     this.wrapper = select(wrapper);
     this.mainG = select(wrapper);
     this.props = props;
-    this.groupedData = [];
-    this.sectionDomain = [];
 
     const innerWidth = (1 - 2 * PADDING) * props.width;
     const innerHeight = (1 - 2 * PADDING) * props.height;
@@ -145,6 +144,7 @@ class KGViz {
   };
 
   updateScalesAndData = (data: D[]) => {
+    this.enableAnimations = data.length < 500;
     this.sectionDomain = Array.from(new Set(data.map(section)));
     this.sectionScale.domain(this.sectionDomain);
 
@@ -164,6 +164,7 @@ class KGViz {
       groupedData,
       positionSectionBoxes,
       sectionDomain,
+      enableAnimations,
       size: {
         guideStroke,
         axisPadding,
@@ -246,7 +247,7 @@ class KGViz {
       .style('font-size', px(axisFontSize));
 
     // Data elements
-    resources.init(mainG, groupedData);
+    resources.init(mainG, groupedData, enableAnimations);
   };
 
   highlightResource = (resourceName: string | null) => {
@@ -290,6 +291,7 @@ class KGViz {
       positionSectionBoxes,
       sectionDomain,
       resources,
+      enableAnimations,
       size: {
         guideStroke,
         axisPadding,
@@ -327,7 +329,7 @@ class KGViz {
       .style('font-size', px(axisFontSize));
 
     // Data
-    resources.performUpdate(groupedData);
+    resources.performUpdate(groupedData, enableAnimations);
   }
 
   sections = {
@@ -363,7 +365,16 @@ class KGViz {
     },
     remove: (container: Selection<BaseType, unknown, BaseType, unknown>) => {
       container.interrupt().transition();
-      container.transition().duration(400).attr('stroke-opacity', 0).remove();
+      if (this.enableAnimations) {
+        container
+          .transition().duration(400)
+          .attr('stroke-opacity', 0)
+          .remove();
+      } else {
+        container
+          .attr('stroke-opacity', 0)
+          .remove();
+      }
     },
   };
 

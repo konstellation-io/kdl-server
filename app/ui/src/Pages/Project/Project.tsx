@@ -41,7 +41,7 @@ function Project() {
     <div className={styles.container}>
       <ProjectNavigation />
       <div className={styles.contentLayer}>
-        <ProjectContentRoutes />
+        <ProjectContentRoutes openedProject={project} />
       </div>
       <div className={styles.panelLayer}>
         <ProjectPanels openedProject={project} />

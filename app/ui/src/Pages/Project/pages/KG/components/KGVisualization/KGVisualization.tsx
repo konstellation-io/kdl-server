@@ -10,14 +10,11 @@ import cx from 'classnames';
 import styles from './KGVisualization.module.scss';
 import { useTooltip } from '@visx/tooltip';
 import useZoom from './useZoom';
+import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 
-export enum ResourceType {
-  CODE = 'code',
-  PAPER = 'paper',
-}
 export type D = {
   category: string;
-  type: ResourceType;
+  type: KnowledgeGraphItemCat;
   name: string;
   score: number;
 };
@@ -61,7 +58,12 @@ function KGVisualization({
     left: number;
     top: number;
   }>({
-    data: { category: '', type: ResourceType.CODE, name: '', score: 0 },
+    data: {
+      category: '',
+      type: KnowledgeGraphItemCat.Code,
+      name: '',
+      score: 0,
+    },
     left: 0,
     top: 0,
   });

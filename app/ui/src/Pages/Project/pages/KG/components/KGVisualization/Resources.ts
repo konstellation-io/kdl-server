@@ -1,10 +1,11 @@
 import { BaseType, EnterElement, Selection, select } from 'd3-selection';
-import { D, ResourceType } from './KGVisualization';
+import { D } from './KGVisualization';
 import { RGBColor, color } from 'd3-color';
 
 import { GroupD } from './../../KGUtils';
 import { scaleLinear } from '@visx/scale';
 import styles from './KGVisualization.module.scss';
+import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 
 export const RESOURCE_R = 14;
 const RESOURCE_STROKE = 4;
@@ -167,7 +168,7 @@ export default class Resources {
       .attr('viewBox', `0 0 24 24`)
       .append('path')
       .attr('d', (d: GroupD) =>
-        d.elements[0].type === ResourceType.CODE ? PATH.CODE : PATH.DOC
+        d.elements[0].type === KnowledgeGraphItemCat.Code ? PATH.CODE : PATH.DOC
       );
 
     resourcesG

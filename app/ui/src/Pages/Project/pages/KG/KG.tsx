@@ -5,15 +5,39 @@ import KGVisualization, {
   TopicSections,
 } from './components/KGVisualization/KGVisualization';
 import NavigationMenu from './components/NavigationMenu/NavigationMenu';
-import resources from './components/KGVisualization/data';
 import styles from './KG.module.scss';
-import { getSectionsAndNames } from './KGUtils';
+import { getSectionsAndNames, mapItem } from './KGUtils';
 import useKGFilters from './components/useKGFilters';
 import { useQuery } from '@apollo/client';
+import { loader } from 'graphql.macro';
+import {
+  GetKnowledgeGraph,
+  GetKnowledgeGraphVariables,
+} from 'Graphql/queries/types/GetKnowledgeGraph';
+
+import { ProjectRoute } from '../../ProjectPanels';
 
 const selectedResource = 'Project Name 1';
 
-function KG() {
+const GetKnowledgeGraphQuery = loader(
+  'Graphql/queries/getKnowledgeGraph.graphql'
+);
+
+function KG({ openedProject }: ProjectRoute) {
+  const { data } = useQuery<GetKnowledgeGraph, GetKnowledgeGraphVariables>(
+    GetKnowledgeGraphQuery,
+    {
+      variables: { description: openedProject?.description || '' },
+    }
+  );
+
+  const resources = useMemo(() => {
+    if (data?.knowledgeGraph) {
+      return data.knowledgeGraph.items.map(mapItem);
+    }
+    return [];
+  }, [data]);
+
   const [sections, topics]: [TopicSections, Topic[]] = useMemo(() => {
     const sections = getSectionsAndNames(resources);
     const topics = Object.keys(sections).map((sectionName) => ({
@@ -21,7 +45,7 @@ function KG() {
       nResources: sections[sectionName].length,
     }));
     return [sections, topics];
-  }, []);
+  }, [resources]);
 
   const {
     handleFiltersChange,

@@ -25,6 +25,18 @@ module.exports = {
     qualityProjectDesc: () => ({
       quality: Math.round((Math.random() * 1000) % 100),
     }),
+    knowledgeGraph: () => {
+      const itemsCount = casual.integer(1, 1000);
+      const arrayOfItems = Array(itemsCount).fill(0);
+      return {
+        items: () =>
+          arrayOfItems.map(() => ({
+            title: casual.title,
+            type: casual.random_element(['Code', 'Paper']),
+            score: casual.random,
+          })),
+      };
+    },
   }),
   Mutation: () => ({
     updateProject: (_, { input: { id, name } }) => ({

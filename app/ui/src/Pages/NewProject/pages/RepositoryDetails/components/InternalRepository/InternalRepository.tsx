@@ -10,6 +10,7 @@ import IconLink from '@material-ui/icons/Link';
 import styles from './InternalRepository.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 import { useQuery } from '@apollo/client';
+import { replaceAll } from 'Utils/string';
 
 function validateProjectSlug(value: string): string {
   const error = CHECK.getValidationError([
@@ -17,7 +18,7 @@ function validateProjectSlug(value: string): string {
     CHECK.matches(value, /^[a-z]/, 'Name must start with a lowercase letter'),
     CHECK.matches(value, /.{3,}/, 'Name must contain at least 3 characters'),
     CHECK.isAlphanumeric(
-      value.replaceAll('-', ''),
+      replaceAll(value, /-/, ''),
       'Name only can contain lowercase alphanumeric and hyphens'
     ),
     CHECK.isSlug(value),
@@ -52,7 +53,9 @@ function InternalRepository({ showErrors }: Props) {
         <p className={styles.urlTitle}>repository url</p>
         <div className={styles.serverUrlContainer}>
           <IconLink className="icon-regular" />
-          <span className={styles.urlContent}>{`${CONFIG.INTERNAL_REPO_BASE_URL}/`}</span>
+          <span
+            className={styles.urlContent}
+          >{`${CONFIG.INTERNAL_REPO_BASE_URL}/`}</span>
         </div>
       </div>
       <TextInput
@@ -62,7 +65,9 @@ function InternalRepository({ showErrors }: Props) {
           updateValue('slug', value);
           clearError('slug');
         }}
-        onBlur={() => updateError('slug', slugOk)}
+        onBlur={() => {
+          updateError('slug', slugOk);
+        }}
         formValue={slug}
         error={showErrors ? slugError : ''}
         helpText="Please write in a URL compatible way"

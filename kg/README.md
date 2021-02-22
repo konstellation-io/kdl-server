@@ -94,6 +94,15 @@ and then run:
 pipenv run python -m pytest int
 ```
 
+## Data assets retrieval
+First you have to install [dvc](https://dvc.org/doc/install)
+
+After that you have to run the following command:
+```
+dvc pull
+```
+The assets will download into a folder named "assets".
+
 ## Caveats with PyTorch versions
 
 The current installed version is a gpu+cpu version if you have any problems with your environment change the version

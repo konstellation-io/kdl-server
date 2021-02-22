@@ -2,6 +2,8 @@ package kgservice
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -11,9 +13,8 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
-const (
-	kgPaper = "paper"
-	kgRepo  = "code"
+var (
+	ErrInvalidCategory = errors.New("invalid knowledge graph item category")
 )
 
 type kgService struct {
@@ -47,23 +48,10 @@ func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.K
 	items := make([]entity.KnowledgeGraphItem, len(res.Items))
 
 	for i, value := range res.Items {
-		externalID := &value.ExternalId
-		if value.ExternalId == "" {
-			externalID = nil
-		}
-
-		framework := &value.Framework
-		if value.Framework == "" {
-			framework = nil
-		}
-
-		var cat entity.KnowledgeGraphItemCat
-
-		switch value.Category {
-		case kgPaper:
-			cat = entity.KnowledgeGraphItemCatPaper
-		case kgRepo:
-			cat = entity.KnowledgeGraphItemCatCode
+		cat := entity.KnowledgeGraphItemCat(strings.Title(value.Category))
+		if !cat.IsValid() {
+			err = fmt.Errorf("%w: category \"%s\"", ErrInvalidCategory, value.Category)
+			return entity.KnowledgeGraph{}, err
 		}
 
 		items[i] = entity.KnowledgeGraphItem{
@@ -77,10 +65,18 @@ func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.K
 			URL:         value.Url,
 			IsStarred:   false,
 			IsDiscarded: false,
-			ExternalID:  externalID,
-			Framework:   framework,
+			ExternalID:  stringToPointer(value.ExternalId),
+			Framework:   stringToPointer(value.Framework),
 		}
 	}
 
 	return entity.KnowledgeGraph{Items: items}, nil
+}
+
+func stringToPointer(s string) *string {
+	if s == "" {
+		return nil
+	}
+
+	return &s
 }

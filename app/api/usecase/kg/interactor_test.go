@@ -2,13 +2,14 @@ package kg_test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/golang/mock/gomock"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/kgservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/kg"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 type kgSuite struct {
@@ -49,14 +50,16 @@ func TestInteractor_Get(t *testing.T) {
 	const (
 		description = "awesome amazing"
 	)
+
 	ctx := context.Background()
 	aux := "afsd"
+	authors := []string{"a", "b"}
 	kgItems := []entity.KnowledgeGraphItem{{
 		ID:          "1234",
 		Category:    entity.KnowledgeGraphItemCatPaper,
 		Title:       "title",
 		Abstract:    "abstract",
-		Authors:     "a,b",
+		Authors:     authors,
 		Date:        "date",
 		URL:         "url",
 		ExternalID:  &aux,

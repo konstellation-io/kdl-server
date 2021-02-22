@@ -2,6 +2,7 @@ package kgservice
 
 import (
 	"context"
+	"strings"
 
 	"google.golang.org/grpc"
 
@@ -66,15 +67,14 @@ func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.K
 		}
 
 		items[i] = entity.KnowledgeGraphItem{
-			ID:       value.Id,
-			Category: cat,
-			Title:    value.Title,
-			Abstract: value.Abstract,
-			Authors:  value.Authors,
-			Score:    value.Score,
-			Date:     value.Date,
-			URL:      value.Url,
-			// TODO check if this has to be implemented for demo
+			ID:          value.Id,
+			Category:    cat,
+			Title:       value.Title,
+			Abstract:    value.Abstract,
+			Authors:     strings.Split(value.Authors, ","),
+			Score:       float64(value.Score),
+			Date:        value.Date,
+			URL:         value.Url,
 			IsStarred:   false,
 			IsDiscarded: false,
 			ExternalID:  externalID,

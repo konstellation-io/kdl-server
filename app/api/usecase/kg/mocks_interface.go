@@ -35,10 +35,10 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // Get mocks base method
-func (m *MockUseCase) Get(ctx context.Context, description string) (*entity.KnowledgeGraph, error) {
+func (m *MockUseCase) Get(ctx context.Context, description string) (entity.KnowledgeGraph, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", ctx, description)
-	ret0, _ := ret[0].(*entity.KnowledgeGraph)
+	ret0, _ := ret[0].(entity.KnowledgeGraph)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

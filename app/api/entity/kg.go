@@ -29,12 +29,12 @@ type KnowledgeGraphItem struct {
 	Category    KnowledgeGraphItemCat
 	Title       string
 	Abstract    string
-	Authors     string
+	Authors     []string
 	Date        string
 	URL         string
 	ExternalID  *string
 	Framework   *string
-	Score       float32
+	Score       float64
 	IsStarred   bool
 	IsDiscarded bool
 }

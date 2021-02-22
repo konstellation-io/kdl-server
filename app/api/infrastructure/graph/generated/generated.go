@@ -36,7 +36,6 @@ type Config struct {
 }
 
 type ResolverRoot interface {
-	KnowledgeGraphItem() KnowledgeGraphItemResolver
 	Mutation() MutationResolver
 	Project() ProjectResolver
 	Query() QueryResolver
@@ -163,10 +162,6 @@ type ComplexityRoot struct {
 	}
 }
 
-type KnowledgeGraphItemResolver interface {
-	Authors(ctx context.Context, obj *entity.KnowledgeGraphItem) ([]string, error)
-	Score(ctx context.Context, obj *entity.KnowledgeGraphItem) (float64, error)
-}
 type MutationResolver interface {
 	AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error)
 	RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error)
@@ -1775,14 +1770,14 @@ func (ec *executionContext) _KnowledgeGraphItem_authors(ctx context.Context, fie
 		Object:     "KnowledgeGraphItem",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.KnowledgeGraphItem().Authors(rctx, obj)
+		return obj.Authors, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1810,14 +1805,14 @@ func (ec *executionContext) _KnowledgeGraphItem_score(ctx context.Context, field
 		Object:     "KnowledgeGraphItem",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.KnowledgeGraphItem().Score(rctx, obj)
+		return obj.Score, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5830,70 +5825,52 @@ func (ec *executionContext) _KnowledgeGraphItem(ctx context.Context, sel ast.Sel
 		case "id":
 			out.Values[i] = ec._KnowledgeGraphItem_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "category":
 			out.Values[i] = ec._KnowledgeGraphItem_category(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "title":
 			out.Values[i] = ec._KnowledgeGraphItem_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "abstract":
 			out.Values[i] = ec._KnowledgeGraphItem_abstract(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "authors":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._KnowledgeGraphItem_authors(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
+			out.Values[i] = ec._KnowledgeGraphItem_authors(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "score":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._KnowledgeGraphItem_score(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
+			out.Values[i] = ec._KnowledgeGraphItem_score(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "date":
 			out.Values[i] = ec._KnowledgeGraphItem_date(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "url":
 			out.Values[i] = ec._KnowledgeGraphItem_url(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "isStarred":
 			out.Values[i] = ec._KnowledgeGraphItem_isStarred(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "isDiscarded":
 			out.Values[i] = ec._KnowledgeGraphItem_isDiscarded(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "externalId":
 			out.Values[i] = ec._KnowledgeGraphItem_externalId(ctx, field, obj)

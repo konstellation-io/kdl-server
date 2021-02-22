@@ -65,9 +65,7 @@ function InternalRepository({ showErrors }: Props) {
           updateValue('slug', value);
           clearError('slug');
         }}
-        onBlur={() => {
-          updateError('slug', slugOk);
-        }}
+        onBlur={() => updateError('slug', slugOk)}
         formValue={slug}
         error={showErrors ? slugError : ''}
         helpText="Please write in a URL compatible way"

@@ -1,4 +1,4 @@
-query GetProjectTools($id: ID!) {
+query GetUserTools($id: ID!) {
   project(id: $id) {
     id
     toolUrls {
@@ -9,6 +9,9 @@ query GetProjectTools($id: ID!) {
       drone
       mlflow
     }
+  }
+  me {
+    id
     areToolsActive
   }
 }

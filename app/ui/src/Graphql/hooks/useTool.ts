@@ -1,26 +1,27 @@
-import { useMutation } from '@apollo/client';
+import {
+  SetActiveUserTools,
+  SetActiveUserToolsVariables,
+} from '../mutations/types/SetActiveUserTools';
+
 import { loader } from 'graphql.macro';
 import { mutationPayloadHelper } from 'Utils/formUtils';
-import {
-  SetActiveProjectTools,
-  SetActiveProjectToolsVariables,
-} from '../mutations/types/SetActiveProjectTools';
+import { useMutation } from '@apollo/client';
 
 const SetActiveProjectToolsMutation = loader(
-  'Graphql/mutations/setActiveProjectTools.graphql'
+  'Graphql/mutations/setActiveUserTools.graphql'
 );
 
 export default function useTool(projectId: string) {
   const [mutationSetActiveProjectTools, { loading }] = useMutation<
-    SetActiveProjectTools,
-    SetActiveProjectToolsVariables
+    SetActiveUserTools,
+    SetActiveUserToolsVariables
   >(SetActiveProjectToolsMutation, {
     onError: (e) => console.error(`setActiveProjectTools: ${e}`),
   });
 
   function updateProjectActiveTools(areToolsActive: boolean) {
     mutationSetActiveProjectTools(
-      mutationPayloadHelper({ id: projectId, value: areToolsActive })
+      mutationPayloadHelper({ active: areToolsActive })
     );
   }
 

@@ -1,6 +1,0 @@
-mutation SetActiveProjectTools($input: SetBoolFieldInput!) {
-  setActiveProjectTools(input: $input) {
-    id
-    areToolsActive
-  }
-}

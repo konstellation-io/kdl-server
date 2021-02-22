@@ -1,15 +1,14 @@
-import React, { useMemo } from 'react';
-
 import Filters, { Topic } from './components/Filters/Filters';
 import KGVisualization, {
   TopicSections,
 } from './components/KGVisualization/KGVisualization';
+import React, { useMemo } from 'react';
+
 import NavigationMenu from './components/NavigationMenu/NavigationMenu';
+import { getSectionsAndNames } from './KGUtils';
 import resources from './components/KGVisualization/data';
 import styles from './KG.module.scss';
-import { getSectionsAndNames } from './KGUtils';
 import useKGFilters from './components/useKGFilters';
-import { useQuery } from '@apollo/client';
 
 const selectedResource = 'Project Name 1';
 

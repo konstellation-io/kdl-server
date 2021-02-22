@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: GetProjectTools
+// GraphQL query operation: GetUserTools
 // ====================================================
 
-export interface GetProjectTools_project_toolUrls {
+export interface GetUserTools_project_toolUrls {
   __typename: 'ToolUrls';
   gitea: string;
   minio: string;
@@ -17,17 +17,23 @@ export interface GetProjectTools_project_toolUrls {
   mlflow: string;
 }
 
-export interface GetProjectTools_project {
+export interface GetUserTools_project {
   __typename: 'Project';
   id: string;
-  toolUrls: GetProjectTools_project_toolUrls;
-  areToolsActive: boolean | null;
+  toolUrls: GetUserTools_project_toolUrls;
 }
 
-export interface GetProjectTools {
-  project: GetProjectTools_project;
+export interface GetUserTools_me {
+  __typename: 'User';
+  id: string;
+  areToolsActive: boolean;
 }
 
-export interface GetProjectToolsVariables {
+export interface GetUserTools {
+  project: GetUserTools_project;
+  me: GetUserTools_me;
+}
+
+export interface GetUserToolsVariables {
   id: string;
 }

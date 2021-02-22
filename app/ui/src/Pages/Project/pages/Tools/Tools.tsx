@@ -2,9 +2,9 @@ import { Button, ErrorMessage, HorizontalBar, SpinnerCircular } from 'kwc';
 import Card, { CardState } from 'Components/Layout/Card/Card';
 import { EnhancedTool, EnhancedToolGroups } from './config';
 import {
-  GetProjectTools,
-  GetProjectToolsVariables,
-} from 'Graphql/queries/types/GetProjectTools';
+  GetUserTools,
+  GetUserToolsVariables,
+} from 'Graphql/queries/types/GetUserTools';
 
 import IconOk from '@material-ui/icons/Check';
 import IconStart from '@material-ui/icons/PlayArrow';
@@ -22,14 +22,14 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import useTool from 'Graphql/hooks/useTool';
 
-const GetProjectToolsQuery = loader('Graphql/queries/getProjectTools.graphql');
+const GetUserToolsQuery = loader('Graphql/queries/getUserTools.graphql');
 
 function Tools() {
   const { projectId } = useParams<RouteProjectParams>();
   const { data, loading, error } = useQuery<
-    GetProjectTools,
-    GetProjectToolsVariables
-  >(GetProjectToolsQuery, {
+    GetUserTools,
+    GetUserToolsVariables
+  >(GetUserToolsQuery, {
     variables: { id: projectId },
   });
   const {
@@ -41,7 +41,8 @@ function Tools() {
   if (error) return <ErrorMessage />;
 
   const {
-    project: { toolUrls, areToolsActive },
+    project: { toolUrls },
+    me: { areToolsActive },
   } = data;
 
   function toggleActive() {

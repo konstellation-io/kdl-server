@@ -42,7 +42,7 @@
     "test": "react-scripts test",
     "test:cov:sonar": "react-scripts test --silent --env=jsdom --coverage --watchAll=false --testResultsProcessor jest-sonar-reporter",
     "eject": "react-scripts eject",
-    "prettier": "prettier --write --single-quote \"src/**/*.ts\"",
+    "prettier": "prettier --write --single-quote \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "gen:types": "apollo client:codegen types --globalTypesFile=src/Graphql/types/globalTypes.ts --target typescript --includes=./src/Graphql/**/*.graphql --localSchemaFile=../api/infrastructure/graph/schema.graphqls && yarn prettier"
   },
   "eslintConfig": {

@@ -97,18 +97,15 @@ function UsersTable({ users, contextMenuActions }: Props) {
     'userSelection',
     UserSelection.NONE
   );
-    
-  const data = useMemo(
-      () => {
-      const filters = localData?.userSettings.filters || {
-        email: null,
-        accessLevel: null,
-      };
 
-      return users.filter((user) => rowNotFiltered(user, filters))
-    },
-    [localData, users]
-  );
+  const data = useMemo(() => {
+    const filters = localData?.userSettings.filters || {
+      email: null,
+      accessLevel: null,
+    };
+
+    return users.filter((user) => rowNotFiltered(user, filters));
+  }, [localData, users]);
 
   const actSelectedUsers = localData?.userSettings.selectedUserIds || [];
   const initialStateSelectedRowIds = Object.fromEntries(

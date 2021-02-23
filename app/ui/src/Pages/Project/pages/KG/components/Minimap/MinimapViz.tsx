@@ -16,7 +16,7 @@ const INNER_R = 53.5;
 const COLOR_SCALE_COLORS = ['#00303B', '#D6FFFF'];
 const colorScale = scaleLinear({
   domain: [1, 10],
-  range: COLOR_SCALE_COLORS
+  range: COLOR_SCALE_COLORS,
 });
 
 type Props = {
@@ -42,7 +42,7 @@ class MinimapViz {
     const width = +this.wrapper.attr('width');
     const height = +this.wrapper.attr('height');
 
-    this.minimapScale = MINIMAP_OUTER_R * height / OUTER_R;
+    this.minimapScale = (MINIMAP_OUTER_R * height) / OUTER_R;
     this.zoomArea = null;
     this.zoom = { x: 0, y: 0, k: 1 };
     this.props = props;
@@ -54,10 +54,10 @@ class MinimapViz {
     this.wrapper.selectAll('*').remove();
   };
 
-  resize = ({ width, height }: { width: number, height: number }) => {
+  resize = ({ width, height }: { width: number; height: number }) => {
     this.cleanup();
     this.center = { x: width / 2, y: height / 2 };
-    this.minimapScale = MINIMAP_OUTER_R * height / OUTER_R;
+    this.minimapScale = (MINIMAP_OUTER_R * height) / OUTER_R;
 
     this.initialize(this.data);
     this.update(this.data, this.zoom);
@@ -71,47 +71,51 @@ class MinimapViz {
       center,
       resources,
       minimapScale,
-      props: {
-        areaWidth,
-        areaHeight
-      }
+      props: { areaWidth, areaHeight },
     } = this;
 
     // Add structural elements
     // Container
-    this.container = wrapper.append('g')
+    this.container = wrapper
+      .append('g')
       .classed(styles.container, true)
-      .attr('transform', `translate(${center.x}, ${center.y}) scale(${minimapScale})`);
+      .attr(
+        'transform',
+        `translate(${center.x}, ${center.y}) scale(${minimapScale})`
+      );
 
     // Circle
-    this.container.append('circle')
+    this.container
+      .append('circle')
       .classed(styles.circle, true)
       .attr('r', OUTER_R);
-    
+
     // Guides
     const guides = this.container.append('g');
-    range(1, N_GUIDES + 1).forEach(guide =>
-      guides.append('circle')
+    range(1, N_GUIDES + 1).forEach((guide) =>
+      guides
+        .append('circle')
         .classed(styles.guide, true)
-        .attr('r', INNER_R + (OUTER_R - INNER_R) * guide / 3)
+        .attr('r', INNER_R + ((OUTER_R - INNER_R) * guide) / 3)
     );
 
     // Data
     const resourcesWrapper = this.container
       .append('g')
       .classed(styles.resourcesWrapper, true);
-    
+
     const newResources = resourcesWrapper
       .selectAll(`.${styles.resourceG}`)
       .data(data)
       .enter();
-    
+
     // Zoom Area
-    this.zoomArea = wrapper.append('rect')
+    this.zoomArea = wrapper
+      .append('rect')
       .classed(styles.zoomArea, true)
       .attr('width', areaWidth)
       .attr('height', areaHeight);
-    
+
     resources.create(newResources);
   };
 
@@ -124,38 +128,40 @@ class MinimapViz {
       zoomArea,
       center,
       minimapScale,
-      props: {
-        areaWidth,
-        areaHeight
-      }
+      props: { areaWidth, areaHeight },
     } = this;
     this.zoom = zoom;
-    
+
     // Data
     const allResources = container
       .select(`.${styles.resourcesWrapper}`)
       .selectAll(`.${styles.resourceG}`)
       .data(data, (d: GroupD) => `${d.x}${d.y}`);
-    const newResources = allResources
-      .enter();
-    const oldResources = allResources
-      .exit();
-    
-    // Zoom area    
+    const newResources = allResources.enter();
+    const oldResources = allResources.exit();
+
+    // Zoom area
     const phaseFactor = (1 - zoom.k) / 2;
-    const phaseDx = areaWidth * phaseFactor
-    const phaseDy = areaHeight * phaseFactor
+    const phaseDx = areaWidth * phaseFactor;
+    const phaseDy = areaHeight * phaseFactor;
 
     const dk = minimapScale * (1 / zoom.k);
-    const dx = center.x - areaWidth * dk / 2 - (zoom.x - phaseDx) * minimapScale / zoom.k;
-    const dy = center.y - areaHeight * dk / 2 - (zoom.y - phaseDy) * minimapScale / zoom.k;
-    
-    zoomArea && zoomArea
-      .attr('x', dx)
-      .attr('y', dy)
-      .attr('width', areaWidth * dk)
-      .attr('height', areaHeight * dk);
-    
+    const dx =
+      center.x -
+      (areaWidth * dk) / 2 -
+      ((zoom.x - phaseDx) * minimapScale) / zoom.k;
+    const dy =
+      center.y -
+      (areaHeight * dk) / 2 -
+      ((zoom.y - phaseDy) * minimapScale) / zoom.k;
+
+    zoomArea &&
+      zoomArea
+        .attr('x', dx)
+        .attr('y', dy)
+        .attr('width', areaWidth * dk)
+        .attr('height', areaHeight * dk);
+
     resources.create(newResources);
     resources.remove(oldResources);
     resources.update(allResources);
@@ -165,10 +171,11 @@ class MinimapViz {
     create: (container: Selection<EnterElement, GroupD, BaseType, unknown>) => {
       const resourcesG = container
         .append('g')
-          .classed(styles.resourceG, true)
-          .attr('transform', d => `translate(${d.x}, ${d.y})`);
-      
-      resourcesG.append('circle')
+        .classed(styles.resourceG, true)
+        .attr('transform', (d) => `translate(${d.x}, ${d.y})`);
+
+      resourcesG
+        .append('circle')
         .classed(styles.resource, true)
         .classed(styles.resourceGroup, (d: GroupD) => d.elements.length > 1)
         .classed(styles.resourceNode, (d: GroupD) => d.elements.length === 1)
@@ -176,11 +183,11 @@ class MinimapViz {
         .attr('r', RESOURCE_R);
     },
     update: (container: Selection<BaseType, GroupD, BaseType, unknown>) => {
-      container.attr('transform', d => `translate(${d.x}, ${d.y})`);
+      container.attr('transform', (d) => `translate(${d.x}, ${d.y})`);
     },
     remove: (container: Selection<BaseType, unknown, BaseType, unknown>) => {
       container.remove();
-    }
+    },
   };
 }
 

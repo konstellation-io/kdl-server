@@ -55,9 +55,7 @@ function useBreadcrumbs() {
   // Add server crumb
   crumbs.push({
     crumbText: CONFIG.SERVER_NAME,
-    LeftIconComponent: (
-      <ServerIcon className="icon-regular" />
-    ),
+    LeftIconComponent: <ServerIcon className="icon-regular" />,
     BottomComponent: (props: BottomComponentProps) => (
       <ServerMetrics serverUrl={CONFIG.SERVER_URL} {...props} />
     ),

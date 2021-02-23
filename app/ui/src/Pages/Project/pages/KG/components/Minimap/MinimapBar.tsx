@@ -15,33 +15,45 @@ type Props = {
   zoomIn: () => void;
   zoomOut: () => void;
 };
-function MinimapBar({ minimapVisible, toggleMinimap, expanded, toggleExpanded, zoomValue, zoomIn, zoomOut }: Props) {
+function MinimapBar({
+  minimapVisible,
+  toggleMinimap,
+  expanded,
+  toggleExpanded,
+  zoomValue,
+  zoomIn,
+  zoomOut,
+}: Props) {
   return (
-    <div className={ styles.bar }>
-      <div className={ styles.actions }>
+    <div className={styles.bar}>
+      <div className={styles.actions}>
         <Button
           label=""
           Icon={IconMap}
           onClick={toggleMinimap}
-          className={cx({[styles.active]: minimapVisible})}
+          className={cx({ [styles.active]: minimapVisible })}
         />
         <Button
           label=""
           Icon={expanded ? IconShrink : IconExpand}
           onClick={toggleExpanded}
-          className={cx({[styles.active]: expanded})}
+          className={cx({ [styles.active]: expanded })}
           disabled={!minimapVisible}
         />
       </div>
-      <div className={ styles.zoom }>
-        <div className={ styles.textButton }><Button label="+" onClick={zoomIn} /></div>
-        <div className={ styles.textButton }><Button label="-" onClick={zoomOut} /></div>
-        <div className={ styles.zoomValue}>
+      <div className={styles.zoom}>
+        <div className={styles.textButton}>
+          <Button label="+" onClick={zoomIn} />
+        </div>
+        <div className={styles.textButton}>
+          <Button label="-" onClick={zoomOut} />
+        </div>
+        <div className={styles.zoomValue}>
           {`${Math.round(zoomValue * 100)}%`}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default MinimapBar;

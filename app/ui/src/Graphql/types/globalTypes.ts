@@ -13,6 +13,11 @@ export enum AccessLevel {
   VIEWER = 'VIEWER',
 }
 
+export enum KnowledgeGraphItemCat {
+  Code = 'Code',
+  Paper = 'Paper',
+}
+
 export enum ProjectState {
   ARCHIVED = 'ARCHIVED',
   STARTED = 'STARTED',

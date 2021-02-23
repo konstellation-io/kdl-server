@@ -14,7 +14,12 @@ type Props = {
   iconSize?: IconSize;
 };
 
-function NavigationButton({ label, title, Icon, iconSize = IconSize.REGULAR }: Props) {
+function NavigationButton({
+  label,
+  title,
+  Icon,
+  iconSize = IconSize.REGULAR,
+}: Props) {
   return (
     <div className={styles.navButton} title={title || label}>
       <Icon className={cx(iconSize, styles.icon)} />

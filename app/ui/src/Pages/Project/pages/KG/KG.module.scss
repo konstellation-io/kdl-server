@@ -12,10 +12,15 @@
     position: absolute;
     width: 100%;
     top: $grid-unit * 3;
-    z-index: 2;
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 $grid-unit * 3.5 0 $grid-unit * 4.5;
+    pointer-events: none;
+
+    > div {
+      pointer-events: all;
+    }
   }
 }

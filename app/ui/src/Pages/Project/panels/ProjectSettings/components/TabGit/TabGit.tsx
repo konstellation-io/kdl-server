@@ -1,4 +1,7 @@
-import RepositoryTypeComponent, { LOCATION, SIZE } from 'Pages/NewProject/pages/Repository/components/RepositoryTypeComponent/RepositoryTypeComponent';
+import RepositoryTypeComponent, {
+  LOCATION,
+  SIZE,
+} from 'Pages/NewProject/pages/Repository/components/RepositoryTypeComponent/RepositoryTypeComponent';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 
 import { Button } from 'kwc';

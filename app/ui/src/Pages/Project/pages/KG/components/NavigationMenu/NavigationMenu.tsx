@@ -1,11 +1,7 @@
 import React from 'react';
 
 function NavigationMenu() {
-  return (
-    <div>
-      
-    </div>
-  )
+  return <div></div>;
 }
 
 export default NavigationMenu;

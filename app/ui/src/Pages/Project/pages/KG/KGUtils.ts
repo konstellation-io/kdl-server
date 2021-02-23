@@ -4,6 +4,7 @@ import { RGBColor, color } from 'd3-color';
 
 import { orderBy } from 'lodash';
 import { scaleLinear } from '@visx/scale';
+import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
 
 const TEXT_COLOR_THRESHOLD = 120;
 const TEXT_COLOR = {
@@ -84,7 +85,6 @@ export function groupData(
     }
   });
 
-
   return groupedData;
 }
 
@@ -99,4 +99,17 @@ export function getSectionsAndNames(newData: D[]) {
   });
 
   return result;
+}
+
+export function buildKGItem({
+  score,
+  category,
+  title,
+}: GetKnowledgeGraph_knowledgeGraph_items): D {
+  return {
+    category: 'Others',
+    name: title,
+    type: category,
+    score,
+  };
 }

@@ -25,10 +25,10 @@ import styles from './Project.module.scss';
 import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
 import { useQuery } from '@apollo/client';
 
-type Props = {
+export interface ProjectRoute {
   openedProject: GetProjects_projects;
-};
-function ProjectPanels({ openedProject }: Props) {
+}
+function ProjectPanels({ openedProject }: ProjectRoute) {
   const {
     data: panel1Data,
     loading: panel1Loading,

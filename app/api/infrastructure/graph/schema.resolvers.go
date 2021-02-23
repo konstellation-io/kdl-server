@@ -27,15 +27,15 @@ func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput
 }
 
 func (r *mutationResolver) RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
 func (r *mutationResolver) UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]entity.User, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
 func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.SSHKey, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
 func (r *mutationResolver) CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error) {
@@ -51,39 +51,48 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 }
 
 func (r *mutationResolver) UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
 func (r *mutationResolver) AddMembers(ctx context.Context, input model.AddMembersInput) ([]entity.Member, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
 func (r *mutationResolver) RemoveMember(ctx context.Context, input model.RemoveMemberInput) (*entity.Member, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
 func (r *mutationResolver) UpdateMember(ctx context.Context, input model.UpdateMemberInput) (*entity.Member, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
 func (r *mutationResolver) AddAPIToken(ctx context.Context, input *model.APITokenInput) (*entity.APIToken, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
 func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
 func (r *mutationResolver) SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*model.KnowledgeGraphItem, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
 func (r *mutationResolver) SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*model.KnowledgeGraphItem, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
-func (r *mutationResolver) SetActiveProjectTools(ctx context.Context, input model.SetBoolFieldInput) (*entity.Project, error) {
-	panic(entity.ErrNotImplemented)
+func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error) {
+	username := ctx.Value(middleware.LoggedUserNameKey).(string)
+
+	if input.Active {
+		u, err := r.users.StartTools(ctx, username)
+		return &u, err
+	}
+
+	u, err := r.users.StopTools(ctx, username)
+
+	return &u, err
 }
 
 func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project) (string, error) {
@@ -98,9 +107,9 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 		Gitea:   r.cfg.Gitea.URL,
 		Minio:   r.cfg.Minio.URL,
 		Jupyter: strings.Replace(r.cfg.Jupyter.URL, "USERNAME", slugUserName, 1),
-		Vscode:  strings.Replace(r.cfg.Vscode.URL, "USERNAME", slugUserName, 1),
+		VSCode:  strings.Replace(r.cfg.VSCode.URL, "USERNAME", slugUserName, 1),
 		Drone:   r.cfg.Drone.URL,
-		Mlflow:  r.cfg.Mlflow.URL,
+		MLFlow:  r.cfg.MLFlow.URL,
 	}, nil
 }
 
@@ -133,15 +142,15 @@ func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
 }
 
 func (r *queryResolver) SSHKey(ctx context.Context) (*entity.SSHKey, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
 func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
 func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) (*model.KnowledgeGraph, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
 func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (string, error) {
@@ -156,11 +165,11 @@ func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (s
 }
 
 func (r *sSHKeyResolver) CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error) {
-	panic(entity.ErrNotImplemented)
+	return "", entity.ErrNotImplemented
 }
 
 func (r *sSHKeyResolver) LastActivity(ctx context.Context, obj *entity.SSHKey) (*string, error) {
-	panic(entity.ErrNotImplemented)
+	return nil, entity.ErrNotImplemented
 }
 
 func (r *userResolver) CreationDate(ctx context.Context, obj *entity.User) (string, error) {
@@ -175,6 +184,12 @@ func (r *userResolver) LastActivity(ctx context.Context, obj *entity.User) (*str
 	lastActivity := obj.LastActivity.Format(time.RFC3339)
 
 	return &lastActivity, nil
+}
+
+func (r *userResolver) AreToolsActive(ctx context.Context, obj *entity.User) (bool, error) {
+	username := ctx.Value(middleware.LoggedUserNameKey).(string)
+
+	return r.users.AreToolsRunning(username)
 }
 
 // Mutation returns generated.MutationResolver implementation.

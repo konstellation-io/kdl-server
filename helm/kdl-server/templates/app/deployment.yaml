@@ -81,6 +81,8 @@ spec:
                 name: gitea-configmap
             - secretRef:
                 name: gitea-admin-secrets
+            - configMapRef:
+                name: dashboard-configmap
           volumeMounts:
             - name: kdl-server-configmap
               mountPath: /public/config.json

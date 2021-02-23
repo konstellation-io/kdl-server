@@ -75,6 +75,10 @@ type RepositoryInput struct {
 	ExternalRepoURL  *string               `json:"externalRepoUrl"`
 }
 
+type SetActiveUserToolsInput struct {
+	Active bool `json:"active"`
+}
+
 type SetBoolFieldInput struct {
 	ID    string `json:"id"`
 	Value bool   `json:"value"`

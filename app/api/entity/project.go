@@ -39,7 +39,6 @@ type Project struct {
 	CreationDate       time.Time
 	LastActivationDate string
 	Favorite           bool
-	AreToolsActive     bool
 	Error              *string
 	Repository         Repository
 	Members            []Member

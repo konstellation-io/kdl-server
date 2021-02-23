@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -10,12 +11,14 @@ import (
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
+
+var errUnexpected = errors.New("some error")
 
 type userSuite struct {
 	ctrl       *gomock.Controller
@@ -163,4 +166,178 @@ func TestInteractor_Create_UserDuplUsername(t *testing.T) {
 	createdUser, err := s.interactor.Create(ctx, email, username, password, accessLevel)
 	require.Equal(t, createdUser, entity.User{})
 	require.Equal(t, err, entity.ErrDuplicatedUser)
+}
+
+func TestInteractor_AreToolsRunning(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		username         = "john"
+		expectedResponse = true
+	)
+
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(username).Return(expectedResponse, nil)
+
+	running, err := s.interactor.AreToolsRunning(username)
+
+	require.NoError(t, err)
+	require.Equal(t, expectedResponse, running)
+}
+
+// nolint:dupl // similar code but no equal
+func TestInteractor_StopTools(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		username     = "john"
+		toolsRunning = true
+	)
+
+	ctx := context.Background()
+	expectedUser := entity.User{Username: username}
+
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(username).Return(toolsRunning, nil)
+	s.mocks.k8sClientMock.EXPECT().DeleteUserToolsCR(ctx, username).Return(nil)
+
+	returnedUser, err := s.interactor.StopTools(ctx, username)
+
+	require.NoError(t, err)
+	require.Equal(t, expectedUser, returnedUser)
+}
+
+func TestInteractor_StopTools_Err(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		username     = "john"
+		toolsRunning = false
+	)
+
+	ctx := context.Background()
+	u := entity.User{Username: username}
+	emptyUser := entity.User{}
+
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(u, nil)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(username).Return(toolsRunning, nil)
+
+	returnedUser, err := s.interactor.StopTools(ctx, username)
+
+	require.Equal(t, user.ErrStopUserTools, err)
+	require.Equal(t, returnedUser, emptyUser)
+}
+
+// nolint:dupl // similar code but no equal
+func TestInteractor_StartTools(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		username     = "john"
+		toolsRunning = false
+	)
+
+	ctx := context.Background()
+	expectedUser := entity.User{Username: username}
+
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(username).Return(toolsRunning, nil)
+	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username).Return(nil)
+
+	returnedUser, err := s.interactor.StartTools(ctx, username)
+
+	require.NoError(t, err)
+	require.Equal(t, expectedUser, returnedUser)
+}
+
+func TestInteractor_StartTools_Err(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		username     = "john"
+		toolsRunning = true
+	)
+
+	ctx := context.Background()
+	u := entity.User{Username: username}
+	emptyUser := entity.User{}
+
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(u, nil)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(username).Return(toolsRunning, nil)
+
+	returnedUser, err := s.interactor.StartTools(ctx, username)
+
+	require.Equal(t, user.ErrStartUserTools, err)
+	require.Equal(t, returnedUser, emptyUser)
+}
+
+func TestInteractor_FindAll(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+	expectedUsers := []entity.User{{Username: "john"}}
+
+	s.mocks.repo.EXPECT().FindAll(ctx).Return(expectedUsers, nil)
+
+	users, err := s.interactor.FindAll(ctx)
+
+	require.NoError(t, err)
+	require.Equal(t, expectedUsers, users)
+}
+
+func TestInteractor_FindAll_Err(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	var emptyUsers []entity.User
+
+	someErr := errUnexpected
+	ctx := context.Background()
+
+	s.mocks.repo.EXPECT().FindAll(ctx).Return(emptyUsers, someErr)
+
+	users, err := s.interactor.FindAll(ctx)
+
+	require.Equal(t, someErr, err)
+	require.Equal(t, emptyUsers, users)
+}
+
+func TestInteractor_GetByEmail(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const email = "john@email.com"
+
+	ctx := context.Background()
+	expectedUser := entity.User{Username: "john"}
+
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(expectedUser, nil)
+
+	u, err := s.interactor.GetByEmail(ctx, email)
+
+	require.NoError(t, err)
+	require.Equal(t, expectedUser, u)
+}
+
+func TestInteractor_GetByEmail_Err(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const email = "john@email.com"
+
+	ctx := context.Background()
+	someErr := entity.ErrUserNotFound
+	emptyUser := entity.User{}
+
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(emptyUser, someErr)
+
+	u, err := s.interactor.GetByEmail(ctx, email)
+
+	require.Equal(t, someErr, err)
+	require.Equal(t, emptyUser, u)
 }

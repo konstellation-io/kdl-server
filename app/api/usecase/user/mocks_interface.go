@@ -190,3 +190,48 @@ func (mr *MockUseCaseMockRecorder) GetByEmail(ctx, email interface{}) *gomock.Ca
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmail", reflect.TypeOf((*MockUseCase)(nil).GetByEmail), ctx, email)
 }
+
+// StartTools mocks base method
+func (m *MockUseCase) StartTools(ctx context.Context, username string) (entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StartTools", ctx, username)
+	ret0, _ := ret[0].(entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StartTools indicates an expected call of StartTools
+func (mr *MockUseCaseMockRecorder) StartTools(ctx, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartTools", reflect.TypeOf((*MockUseCase)(nil).StartTools), ctx, username)
+}
+
+// StopTools mocks base method
+func (m *MockUseCase) StopTools(ctx context.Context, username string) (entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StopTools", ctx, username)
+	ret0, _ := ret[0].(entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StopTools indicates an expected call of StopTools
+func (mr *MockUseCaseMockRecorder) StopTools(ctx, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopTools", reflect.TypeOf((*MockUseCase)(nil).StopTools), ctx, username)
+}
+
+// AreToolsRunning mocks base method
+func (m *MockUseCase) AreToolsRunning(username string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AreToolsRunning", username)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AreToolsRunning indicates an expected call of AreToolsRunning
+func (mr *MockUseCaseMockRecorder) AreToolsRunning(username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AreToolsRunning", reflect.TypeOf((*MockUseCase)(nil).AreToolsRunning), username)
+}

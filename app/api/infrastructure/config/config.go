@@ -15,7 +15,11 @@ type Config struct {
 	StaticFilesPath string `yaml:"staticFilesPath" envconfig:"KDL_SERVER_STATIC_FILES_PATH"`
 	BaseDomainName  string `envconfig:"TOOLKIT_BASE_DOMAIN_NAME"`
 	TLS             bool   `envconfig:"TOOLKIT_TLS"`
-	MongoDB         struct {
+	Storage         struct {
+		Size      string `envconfig:"TOOLKIT_VSCODE_STORAGE_SIZE"`
+		ClassName string `envconfig:"TOOLKIT_VSCODE_STORAGE_CLASSNAME"`
+	}
+	MongoDB struct {
 		URI    string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
 		DBName string `yaml:"dbName"`
 	} `yaml:"mongodb"`
@@ -41,10 +45,6 @@ type Config struct {
 		URL     string `envconfig:"VSCODE_URL"`
 		Ingress struct {
 			Type string `envconfig:"TOOLKIT_INGRESS_TYPE"`
-		}
-		Storage struct {
-			Size      string `envconfig:"TOOLKIT_VSCODE_STORAGE_SIZE"`
-			ClassName string `envconfig:"TOOLKIT_VSCODE_STORAGE_CLASSNAME"`
 		}
 		SharedVolume struct {
 			Name string `envconfig:"TOOLKIT_SHARED_VOLUME"`

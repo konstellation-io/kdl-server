@@ -167,8 +167,8 @@ func (k *k8sClient) createUserToolsCRD(username, slugUsername, resName string) e
 				"username":     username,
 				"usernameSlug": slugUsername,
 				"storage": map[string]string{
-					"size":      k.cfg.VSCode.Storage.Size,
-					"className": k.cfg.VSCode.Storage.ClassName,
+					"size":      k.cfg.Storage.Size,
+					"className": k.cfg.Storage.ClassName,
 				},
 				"sharedVolume": map[string]string{
 					"name": k.cfg.VSCode.SharedVolume.Name,

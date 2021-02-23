@@ -101,7 +101,7 @@ export function getSectionsAndNames(newData: D[]) {
   return result;
 }
 
-export function mapItem({
+export function buildKGItem({
   score,
   category,
   title,

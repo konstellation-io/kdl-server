@@ -55,9 +55,8 @@ function SectionList({
       <AnimateHeight height={opened ? 'auto' : 0} duration={300}>
         <div className={styles.list} onMouseLeave={onListLeave}>
           {names.map((name, idx) => (
-            // TODO: Remove the idx, probably we don't need this in order to build a unique key
             <div
-              key={`${name}-${idx}`}
+              key={name}
               className={styles.name}
               onMouseEnter={() => onResourceHover(name)}
               onClick={() => onResourceSelection(name)}

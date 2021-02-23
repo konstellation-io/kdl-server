@@ -6,7 +6,7 @@ import KGVisualization, {
 } from './components/KGVisualization/KGVisualization';
 import NavigationMenu from './components/NavigationMenu/NavigationMenu';
 import styles from './KG.module.scss';
-import { getSectionsAndNames, mapItem } from './KGUtils';
+import { buildKGItem, getSectionsAndNames } from './KGUtils';
 import useKGFilters from './components/useKGFilters';
 import { useQuery } from '@apollo/client';
 import { loader } from 'graphql.macro';
@@ -27,13 +27,14 @@ function KG({ openedProject }: ProjectRoute) {
   const { data } = useQuery<GetKnowledgeGraph, GetKnowledgeGraphVariables>(
     GetKnowledgeGraphQuery,
     {
-      variables: { description: openedProject?.description || '' },
+      variables: { description: openedProject.description },
     }
   );
 
+  // TODO: Check this var when we have integration with the server
   const resources = useMemo(() => {
     if (data?.knowledgeGraph) {
-      return data.knowledgeGraph.items.map(mapItem);
+      return data.knowledgeGraph.items.map(buildKGItem);
     }
     return [];
   }, [data]);

@@ -116,7 +116,7 @@ func startHTTPServer(logger logging.Logger, port, staticFilesPath string, resolv
 	pg := playground.Handler("GraphQL playground", apiQueryPath)
 	fs := http.FileServer(http.Dir(staticFilesPath))
 
-	http.Handle("/", middleware.AuthMiddleware(fs))
+	http.Handle("/", fs)
 	http.Handle("/api/playground", middleware.AuthMiddleware(pg))
 	http.Handle(apiQueryPath, middleware.AuthMiddleware(srv))
 

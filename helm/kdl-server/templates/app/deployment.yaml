@@ -100,6 +100,7 @@ spec:
             - "--upstream=http://127.0.0.1:8080/"
             - "--pass-user-headers=true"
             - "--skip-provider-button=true"
+            - "--skip-auth-route=/config.json"
           env:
             - name: OAUTH2_PROXY_HTTP_ADDRESS
               value: "0.0.0.0:3000"

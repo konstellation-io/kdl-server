@@ -1,5 +1,6 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback } from 'react';
 import styles from './ScoreFilter.module.scss';
+import stylesThumb from './components/Thumb/Thumb.module.scss';
 import Slider from '@material-ui/core/Slider';
 import cx from 'classnames';
 import Thumb, { ValueLabelProps } from './components/Thumb/Thumb';
@@ -19,6 +20,12 @@ const ScoreFilter: FC<Props> = ({ onUpdate, min = 0, max = 100 }) => {
     handleSliderChangeCommitted,
   } = useScoreFilter({ max, onUpdate });
 
+  const thumb = useCallback(
+    (props: ValueLabelProps) => <Thumb {...props} max={max} />,
+    [max]
+  );
+  const isOverlapping = scores[1] - scores[0] < 20;
+
   return (
     <div className={styles.container}>
       <span className={styles.leftLabel}>SCORE</span>
@@ -26,7 +33,9 @@ const ScoreFilter: FC<Props> = ({ onUpdate, min = 0, max = 100 }) => {
         {max}%
       </span>
       <Slider
-        className={styles.slider}
+        className={cx(styles.slider, {
+          [stylesThumb.overlapping]: isOverlapping,
+        })}
         classes={{
           rail: styles.rail,
           track: styles.track,
@@ -39,9 +48,7 @@ const ScoreFilter: FC<Props> = ({ onUpdate, min = 0, max = 100 }) => {
         onChangeCommitted={handleSliderChangeCommitted}
         onChange={handleSliderChange}
         value={scores}
-        ValueLabelComponent={(props: ValueLabelProps) => (
-          <Thumb {...props} max={max} />
-        )}
+        ValueLabelComponent={thumb}
       />
       <span className={cx(styles.percentageLabel, styles.maxLabel)}>
         {min}%

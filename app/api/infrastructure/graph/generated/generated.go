@@ -84,24 +84,23 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddAPIToken           func(childComplexity int, input *model.APITokenInput) int
-		AddMembers            func(childComplexity int, input model.AddMembersInput) int
-		AddUser               func(childComplexity int, input model.AddUserInput) int
-		CreateProject         func(childComplexity int, input model.CreateProjectInput) int
-		RegenerateSSHKey      func(childComplexity int) int
-		RemoveAPIToken        func(childComplexity int, input *model.RemoveAPITokenInput) int
-		RemoveMember          func(childComplexity int, input model.RemoveMemberInput) int
-		RemoveUsers           func(childComplexity int, input model.RemoveUsersInput) int
-		SetActiveProjectTools func(childComplexity int, input model.SetBoolFieldInput) int
-		SetDiscardedKGItem    func(childComplexity int, input model.SetBoolFieldInput) int
-		SetStarredKGItem      func(childComplexity int, input model.SetBoolFieldInput) int
-		UpdateAccessLevel     func(childComplexity int, input model.UpdateAccessLevelInput) int
-		UpdateMember          func(childComplexity int, input model.UpdateMemberInput) int
-		UpdateProject         func(childComplexity int, input model.UpdateProjectInput) int
+		AddAPIToken        func(childComplexity int, input *model.APITokenInput) int
+		AddMembers         func(childComplexity int, input model.AddMembersInput) int
+		AddUser            func(childComplexity int, input model.AddUserInput) int
+		CreateProject      func(childComplexity int, input model.CreateProjectInput) int
+		RegenerateSSHKey   func(childComplexity int) int
+		RemoveAPIToken     func(childComplexity int, input *model.RemoveAPITokenInput) int
+		RemoveMember       func(childComplexity int, input model.RemoveMemberInput) int
+		RemoveUsers        func(childComplexity int, input model.RemoveUsersInput) int
+		SetActiveUserTools func(childComplexity int, input model.SetActiveUserToolsInput) int
+		SetDiscardedKGItem func(childComplexity int, input model.SetBoolFieldInput) int
+		SetStarredKGItem   func(childComplexity int, input model.SetBoolFieldInput) int
+		UpdateAccessLevel  func(childComplexity int, input model.UpdateAccessLevelInput) int
+		UpdateMember       func(childComplexity int, input model.UpdateMemberInput) int
+		UpdateProject      func(childComplexity int, input model.UpdateProjectInput) int
 	}
 
 	Project struct {
-		AreToolsActive     func(childComplexity int) int
 		CreationDate       func(childComplexity int) int
 		Description        func(childComplexity int) int
 		Error              func(childComplexity int) int
@@ -146,19 +145,20 @@ type ComplexityRoot struct {
 		Drone   func(childComplexity int) int
 		Gitea   func(childComplexity int) int
 		Jupyter func(childComplexity int) int
+		MLFlow  func(childComplexity int) int
 		Minio   func(childComplexity int) int
-		Mlflow  func(childComplexity int) int
-		Vscode  func(childComplexity int) int
+		VSCode  func(childComplexity int) int
 	}
 
 	User struct {
-		APITokens    func(childComplexity int) int
-		AccessLevel  func(childComplexity int) int
-		CreationDate func(childComplexity int) int
-		Email        func(childComplexity int) int
-		ID           func(childComplexity int) int
-		LastActivity func(childComplexity int) int
-		Username     func(childComplexity int) int
+		APITokens      func(childComplexity int) int
+		AccessLevel    func(childComplexity int) int
+		AreToolsActive func(childComplexity int) int
+		CreationDate   func(childComplexity int) int
+		Email          func(childComplexity int) int
+		ID             func(childComplexity int) int
+		LastActivity   func(childComplexity int) int
+		Username       func(childComplexity int) int
 	}
 }
 
@@ -176,7 +176,7 @@ type MutationResolver interface {
 	RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error)
 	SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error)
 	SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error)
-	SetActiveProjectTools(ctx context.Context, input model.SetBoolFieldInput) (*entity.Project, error)
+	SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error)
 }
 type ProjectResolver interface {
 	CreationDate(ctx context.Context, obj *entity.Project) (string, error)
@@ -203,6 +203,8 @@ type UserResolver interface {
 	CreationDate(ctx context.Context, obj *entity.User) (string, error)
 
 	LastActivity(ctx context.Context, obj *entity.User) (*string, error)
+
+	AreToolsActive(ctx context.Context, obj *entity.User) (bool, error)
 }
 
 type executableSchema struct {
@@ -472,17 +474,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RemoveUsers(childComplexity, args["input"].(model.RemoveUsersInput)), true
 
-	case "Mutation.setActiveProjectTools":
-		if e.complexity.Mutation.SetActiveProjectTools == nil {
+	case "Mutation.setActiveUserTools":
+		if e.complexity.Mutation.SetActiveUserTools == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_setActiveProjectTools_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_setActiveUserTools_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.SetActiveProjectTools(childComplexity, args["input"].(model.SetBoolFieldInput)), true
+		return e.complexity.Mutation.SetActiveUserTools(childComplexity, args["input"].(model.SetActiveUserToolsInput)), true
 
 	case "Mutation.setDiscardedKGItem":
 		if e.complexity.Mutation.SetDiscardedKGItem == nil {
@@ -543,13 +545,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateProject(childComplexity, args["input"].(model.UpdateProjectInput)), true
-
-	case "Project.areToolsActive":
-		if e.complexity.Project.AreToolsActive == nil {
-			break
-		}
-
-		return e.complexity.Project.AreToolsActive(childComplexity), true
 
 	case "Project.creationDate":
 		if e.complexity.Project.CreationDate == nil {
@@ -769,6 +764,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ToolUrls.Jupyter(childComplexity), true
 
+	case "ToolUrls.mlflow":
+		if e.complexity.ToolUrls.MLFlow == nil {
+			break
+		}
+
+		return e.complexity.ToolUrls.MLFlow(childComplexity), true
+
 	case "ToolUrls.minio":
 		if e.complexity.ToolUrls.Minio == nil {
 			break
@@ -776,19 +778,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ToolUrls.Minio(childComplexity), true
 
-	case "ToolUrls.mlflow":
-		if e.complexity.ToolUrls.Mlflow == nil {
-			break
-		}
-
-		return e.complexity.ToolUrls.Mlflow(childComplexity), true
-
 	case "ToolUrls.vscode":
-		if e.complexity.ToolUrls.Vscode == nil {
+		if e.complexity.ToolUrls.VSCode == nil {
 			break
 		}
 
-		return e.complexity.ToolUrls.Vscode(childComplexity), true
+		return e.complexity.ToolUrls.VSCode(childComplexity), true
 
 	case "User.apiTokens":
 		if e.complexity.User.APITokens == nil {
@@ -803,6 +798,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.AccessLevel(childComplexity), true
+
+	case "User.areToolsActive":
+		if e.complexity.User.AreToolsActive == nil {
+			break
+		}
+
+		return e.complexity.User.AreToolsActive(childComplexity), true
 
 	case "User.creationDate":
 		if e.complexity.User.CreationDate == nil {
@@ -927,7 +929,7 @@ type Mutation {
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
   setStarredKGItem(input: SetBoolFieldInput!): KnowledgeGraphItem!
   setDiscardedKGItem(input: SetBoolFieldInput!): KnowledgeGraphItem!
-  setActiveProjectTools(input: SetBoolFieldInput!): Project!
+  setActiveUserTools(input: SetActiveUserToolsInput!): User!
 }
 
 type QualityProjectDesc {
@@ -971,6 +973,7 @@ type User {
   accessLevel: AccessLevel!
   lastActivity: String
   apiTokens: [ApiToken!]!
+  areToolsActive: Boolean!
 }
 
 type ApiToken {
@@ -1066,6 +1069,10 @@ input SetBoolFieldInput {
   value: Boolean!
 }
 
+input SetActiveUserToolsInput {
+  active: Boolean!
+}
+
 type Project {
   id: ID!
   name: String!
@@ -1078,7 +1085,6 @@ type Project {
   error: String
   members: [Member!]!
   toolUrls: ToolUrls!
-  areToolsActive: Boolean
 }
 
 input RepositoryInput {
@@ -1221,13 +1227,13 @@ func (ec *executionContext) field_Mutation_removeUsers_args(ctx context.Context,
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_setActiveProjectTools_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_setActiveUserTools_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.SetBoolFieldInput
+	var arg0 model.SetActiveUserToolsInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNSetBoolFieldInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSetBoolFieldInput(ctx, tmp)
+		arg0, err = ec.unmarshalNSetActiveUserToolsInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSetActiveUserToolsInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2741,7 +2747,7 @@ func (ec *executionContext) _Mutation_setDiscardedKGItem(ctx context.Context, fi
 	return ec.marshalNKnowledgeGraphItem2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItem(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_setActiveProjectTools(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_setActiveUserTools(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2758,7 +2764,7 @@ func (ec *executionContext) _Mutation_setActiveProjectTools(ctx context.Context,
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_setActiveProjectTools_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_setActiveUserTools_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -2766,7 +2772,7 @@ func (ec *executionContext) _Mutation_setActiveProjectTools(ctx context.Context,
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SetActiveProjectTools(rctx, args["input"].(model.SetBoolFieldInput))
+		return ec.resolvers.Mutation().SetActiveUserTools(rctx, args["input"].(model.SetActiveUserToolsInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2778,9 +2784,9 @@ func (ec *executionContext) _Mutation_setActiveProjectTools(ctx context.Context,
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*entity.Project)
+	res := resTmp.(*entity.User)
 	fc.Result = res
-	return ec.marshalNProject2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Project_id(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
@@ -3160,38 +3166,6 @@ func (ec *executionContext) _Project_toolUrls(ctx context.Context, field graphql
 	res := resTmp.(*entity.ToolUrls)
 	fc.Result = res
 	return ec.marshalNToolUrls2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolUrls(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Project_areToolsActive(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Project",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AreToolsActive, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _QualityProjectDesc_quality(ctx context.Context, field graphql.CollectedField, obj *model.QualityProjectDesc) (ret graphql.Marshaler) {
@@ -3925,7 +3899,7 @@ func (ec *executionContext) _ToolUrls_vscode(ctx context.Context, field graphql.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Vscode, nil
+		return obj.VSCode, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3995,7 +3969,7 @@ func (ec *executionContext) _ToolUrls_mlflow(ctx context.Context, field graphql.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Mlflow, nil
+		return obj.MLFlow, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4252,6 +4226,41 @@ func (ec *executionContext) _User_apiTokens(ctx context.Context, field graphql.C
 	res := resTmp.([]entity.APIToken)
 	fc.Result = res
 	return ec.marshalNApiToken2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPITokenᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_areToolsActive(ctx context.Context, field graphql.CollectedField, obj *entity.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.User().AreToolsActive(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -5581,6 +5590,26 @@ func (ec *executionContext) unmarshalInputRepositoryInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputSetActiveUserToolsInput(ctx context.Context, obj interface{}) (model.SetActiveUserToolsInput, error) {
+	var it model.SetActiveUserToolsInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "active":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("active"))
+			it.Active, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputSetBoolFieldInput(ctx context.Context, obj interface{}) (model.SetBoolFieldInput, error) {
 	var it model.SetBoolFieldInput
 	var asMap = obj.(map[string]interface{})
@@ -6008,8 +6037,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "setActiveProjectTools":
-			out.Values[i] = ec._Mutation_setActiveProjectTools(ctx, field)
+		case "setActiveUserTools":
+			out.Values[i] = ec._Mutation_setActiveUserTools(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -6102,8 +6131,6 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 				}
 				return res
 			})
-		case "areToolsActive":
-			out.Values[i] = ec._Project_areToolsActive(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6480,6 +6507,20 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "areToolsActive":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_areToolsActive(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7149,6 +7190,11 @@ func (ec *executionContext) marshalNSSHKey2ᚖgithubᚗcomᚋkonstellationᚑio�
 		return graphql.Null
 	}
 	return ec._SSHKey(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNSetActiveUserToolsInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSetActiveUserToolsInput(ctx context.Context, v interface{}) (model.SetActiveUserToolsInput, error) {
+	res, err := ec.unmarshalInputSetActiveUserToolsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNSetBoolFieldInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSetBoolFieldInput(ctx context.Context, v interface{}) (model.SetBoolFieldInput, error) {

@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
-
 import Filters, { Topic } from './components/Filters/Filters';
 import KGVisualization, {
   TopicSections,
 } from './components/KGVisualization/KGVisualization';
+import React, { useMemo } from 'react';
+
 import NavigationMenu from './components/NavigationMenu/NavigationMenu';
 import styles from './KG.module.scss';
 import { buildKGItem, getSectionsAndNames } from './KGUtils';

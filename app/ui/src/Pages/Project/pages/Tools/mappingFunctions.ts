@@ -1,8 +1,8 @@
 import { EnhancedTool, EnhancedToolGroups, toolsGroups } from './config';
 
-import { GetProjectTools_project_toolUrls } from 'Graphql/queries/types/GetProjectTools';
+import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTools';
 
-export function mapTools(projectTools: GetProjectTools_project_toolUrls) {
+export function mapTools(projectTools: GetUserTools_project_toolUrls) {
   const mappedToolsGroups: EnhancedToolGroups[] = toolsGroups.map(
     (toolGroup) => {
       const tools: EnhancedTool[] = toolGroup.tools.map((tool) => {

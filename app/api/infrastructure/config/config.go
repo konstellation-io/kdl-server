@@ -13,7 +13,13 @@ type Config struct {
 	LogLevel        string `yaml:"logLevel" envconfig:"KDL_SERVER_LOG_LEVEL"`
 	Port            string `yaml:"port" envconfig:"KDL_SERVER_PORT"`
 	StaticFilesPath string `yaml:"staticFilesPath" envconfig:"KDL_SERVER_STATIC_FILES_PATH"`
-	MongoDB         struct {
+	BaseDomainName  string `envconfig:"TOOLKIT_BASE_DOMAIN_NAME"`
+	TLS             bool   `envconfig:"TOOLKIT_TLS"`
+	Storage         struct {
+		Size      string `envconfig:"TOOLKIT_VSCODE_STORAGE_SIZE"`
+		ClassName string `envconfig:"TOOLKIT_VSCODE_STORAGE_CLASSNAME"`
+	}
+	MongoDB struct {
 		URI    string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
 		DBName string `yaml:"dbName"`
 	} `yaml:"mongodb"`
@@ -35,15 +41,21 @@ type Config struct {
 	Jupyter struct {
 		URL string `envconfig:"JUPYTER_URL"`
 	}
-	Vscode struct {
-		URL string `envconfig:"VSCODE_URL"`
+	VSCode struct {
+		URL     string `envconfig:"VSCODE_URL"`
+		Ingress struct {
+			Type string `envconfig:"TOOLKIT_INGRESS_TYPE"`
+		}
+		SharedVolume struct {
+			Name string `envconfig:"TOOLKIT_SHARED_VOLUME"`
+		}
 	}
 	Drone struct {
 		URL         string `envconfig:"DRONE_URL"`
 		InternalURL string `envconfig:"DRONE_INTERNAL_URL"`
 		Token       string `envconfig:"DRONE_TOKEN"`
 	}
-	Mlflow struct {
+	MLFlow struct {
 		URL string `envconfig:"MLFLOW_URL"`
 	}
 	KGservice struct {

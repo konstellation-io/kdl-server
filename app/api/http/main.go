@@ -19,10 +19,10 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/repository"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
@@ -69,7 +69,7 @@ func main() {
 
 	droneService := droneservice.NewDroneService(logger, cfg.Drone.InternalURL, cfg.Drone.Token)
 
-	k8sClient, err := k8s.NewK8sClient(logger, cfg.Kubernetes.Namespace)
+	k8sClient, err := k8s.NewK8sClient(logger, cfg)
 	if err != nil {
 		logger.Errorf("Error creating k8s client: %s", err)
 		os.Exit(1)

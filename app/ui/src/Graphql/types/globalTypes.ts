@@ -71,9 +71,8 @@ export interface RepositoryInput {
   externalRepoUrl?: string | null;
 }
 
-export interface SetBoolFieldInput {
-  id: string;
-  value: boolean;
+export interface SetActiveUserToolsInput {
+  active: boolean;
 }
 
 export interface UpdateAccessLevelInput {

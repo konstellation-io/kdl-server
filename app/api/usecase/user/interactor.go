@@ -7,14 +7,18 @@ import (
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 )
 
-// Interactor object implements the UseCase interface.
-type Interactor struct {
+var (
+	ErrStartUserTools = errors.New("cannot start running user tools")
+	ErrStopUserTools  = errors.New("cannot stop uninitialized user tools")
+)
+
+type interactor struct {
 	logger       logging.Logger
 	repo         Repository
 	sshGenerator sshhelper.SSHKeyGenerator
@@ -31,8 +35,8 @@ func NewInteractor(
 	c clock.Clock,
 	giteaService giteaservice.GiteaClient,
 	k8sClient k8s.K8sClient,
-) *Interactor {
-	return &Interactor{
+) UseCase {
+	return &interactor{
 		logger:       logger,
 		repo:         repo,
 		sshGenerator: sshGenerator,
@@ -50,7 +54,7 @@ func NewInteractor(
 // - Add the user to the KDL team.
 // - Stores the user and ssh keys into the DB.
 // - Creates a new secret in Kubernetes with the generated SSH keys.
-func (i Interactor) Create(ctx context.Context, email, username, password string, accessLevel entity.AccessLevel) (entity.User, error) {
+func (i *interactor) Create(ctx context.Context, email, username, password string, accessLevel entity.AccessLevel) (entity.User, error) {
 	i.logger.Infof("Creating user \"%s\" with email \"%s\"", username, email)
 
 	// Check if the user already exists
@@ -126,13 +130,72 @@ func (i Interactor) Create(ctx context.Context, email, username, password string
 }
 
 // FindAll returns all users existing in the server.
-func (i Interactor) FindAll(ctx context.Context) ([]entity.User, error) {
+func (i *interactor) FindAll(ctx context.Context) ([]entity.User, error) {
 	i.logger.Info("Finding all users in the server")
 	return i.repo.FindAll(ctx)
 }
 
 // GetByEmail returns the user with the desired email or returns entity.ErrUserNotFound if the user doesn't exist.
-func (i Interactor) GetByEmail(ctx context.Context, email string) (entity.User, error) {
+func (i *interactor) GetByEmail(ctx context.Context, email string) (entity.User, error) {
 	i.logger.Infof("Getting user by email \"%s\"", email)
 	return i.repo.GetByEmail(ctx, email)
+}
+
+// StartTools creates a user-tools CustomResource in K8s to initialize the VSCode and Jupyter for the given username.
+func (i *interactor) StartTools(ctx context.Context, username string) (entity.User, error) {
+	user, err := i.repo.GetByUsername(ctx, username)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	running, err := i.k8sClient.IsUserToolPODRunning(username)
+
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	if running {
+		return entity.User{}, ErrStartUserTools
+	}
+
+	i.logger.Infof("Creating user tools for user: \"%s\"", username)
+
+	err = i.k8sClient.CreateUserToolsCR(ctx, username)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	return user, nil
+}
+
+// StopTools removes a created user-tools CustomResource from K8s for the given username.
+func (i *interactor) StopTools(ctx context.Context, username string) (entity.User, error) {
+	user, err := i.repo.GetByUsername(ctx, username)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	running, err := i.k8sClient.IsUserToolPODRunning(username)
+
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	if !running {
+		return entity.User{}, ErrStopUserTools
+	}
+
+	i.logger.Infof("Deleting user tools for user: \"%s\"", username)
+
+	err = i.k8sClient.DeleteUserToolsCR(ctx, username)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	return user, nil
+}
+
+// AreToolsRunning checks if the user tools are running for the given username.
+func (i *interactor) AreToolsRunning(username string) (bool, error) {
+	return i.k8sClient.IsUserToolPODRunning(username)
 }

@@ -5,12 +5,15 @@ const projectsIds = Array(8)
   .fill(0)
   .map(() => casual.uuid);
 
+const meId = casual.uuid;
+
 module.exports = {
   Query: () => ({
     me: () => ({
-      id: casual.uuid,
+      id: meId,
       email: 'admin@intelygenz.com',
       username: 'admin',
+      areToolsActive: true,
       apiTokens: () => new MockList([4, 8]),
     }),
     projects: () =>
@@ -70,9 +73,9 @@ module.exports = {
       tools: [],
       areToolsActive: false,
     }),
-    setActiveProjectTools: (_, { input }) => ({
-      id: input.id,
-      areToolsActive: input.value,
+    setActiveUserTools: (_, { input }) => ({
+      id: meId,
+      areToolsActive: input.active,
     }),
   }),
   ApiToken: () => ({

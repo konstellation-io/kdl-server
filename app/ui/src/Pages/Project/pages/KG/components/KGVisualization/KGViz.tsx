@@ -12,6 +12,7 @@ import { scaleBand, scaleLinear } from '@visx/scale';
 
 import { D } from './KGVisualization';
 import MinimapViz from '../Minimap/MinimapViz';
+import { UpdateTooltip } from 'Hooks/useTextTooltip';
 import { ZoomValues } from './useZoom';
 import { range } from 'd3-array';
 import styles from './KGVisualization.module.scss';
@@ -55,7 +56,7 @@ type Props = {
   parent: SVGSVGElement;
   data: D[];
   height: number;
-  showTooltip: (p: any) => void;
+  updateTooltip: (p: UpdateTooltip) => void;
   hideTooltip: () => void;
   minimapRef: SVGSVGElement;
   tooltipOpen: boolean;
@@ -523,7 +524,7 @@ class KGViz {
 
   handleTooltip = (event: MouseEvent, d: D) => {
     const {
-      props: { showTooltip, parent },
+      props: { updateTooltip, parent },
     } = this;
     const wrapperNode = select(parent).node();
 
@@ -534,10 +535,11 @@ class KGViz {
         y: circleTop,
       } = (event.target as HTMLElement).getBoundingClientRect();
 
-      showTooltip({
-        tooltipData: d,
-        tooltipLeft: circleLeft - dx,
-        tooltipTop: circleTop - dy,
+      updateTooltip({
+        text: d.name,
+        left: circleLeft - dx,
+        top: circleTop - dy,
+        open: true
       });
     }
   };

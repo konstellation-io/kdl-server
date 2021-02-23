@@ -5,10 +5,20 @@
 
 .labelContainer {
   display: flex;
+
   .label {
+    transition: top 0.3s ease;
     @include font-small;
     color: font-color(highlight);
     position: absolute;
     top: -$grid-unit * 1.75;
+  }
+}
+
+.overlapping {
+  & > .labelContainer:last-child {
+    .label {
+      top: 100%;
+    }
   }
 }

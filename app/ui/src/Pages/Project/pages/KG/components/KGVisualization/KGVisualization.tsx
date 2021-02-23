@@ -1,14 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import FilterGlow from './FilterGlow/FilterGlow';
-import IconOpen from '@material-ui/icons/ArrowForward';
 import KGViz from './KGViz';
 import Minimap from '../Minimap/Minimap';
 import { ParentSize } from '@visx/responsive';
 import SectionList from './SectionList/SectionList';
-import cx from 'classnames';
+import Tooltip from './Tooltip';
 import styles from './KGVisualization.module.scss';
-import { useTooltip } from '@visx/tooltip';
+import useTextTooltip from 'Hooks/useTextTooltip';
 import useZoom from './useZoom';
 import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 
@@ -53,28 +52,8 @@ function KGVisualization({
   onResourceSelection,
 }: Props) {
   const [hoveredPaper, setHoveredPaper] = useState<string | null>(null);
-  const [tooltipActive, setTooltipActive] = useState<{
-    data: D;
-    left: number;
-    top: number;
-  }>({
-    data: {
-      category: '',
-      type: KnowledgeGraphItemCat.Code,
-      name: '',
-      score: 0,
-    },
-    left: 0,
-    top: 0,
-  });
-  const {
-    showTooltip,
-    tooltipOpen,
-    hideTooltip,
-    tooltipData,
-    tooltipTop = 0,
-    tooltipLeft = 0,
-  } = useTooltip<D>();
+  const { tooltipInfo, updateTooltip, hideTooltip } = useTextTooltip();
+
   const minimapRef = useRef<SVGSVGElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const gRef = useRef<SVGGElement>(null);
@@ -84,20 +63,6 @@ function KGVisualization({
     height,
   });
   const viz = useRef<KGViz | null>(null);
-
-  // TODO: Do not use useTooltip from Visx
-  // useTooltip removes tooltip location and data when hiding it instead of just changing the tooltipOpen
-  // state. updateTooltip cannot change only one value so I have to track previous tooltip data in order to
-  // hide it mainitaining previous data.
-  useEffect(() => {
-    if (tooltipData) {
-      setTooltipActive({
-        data: tooltipData,
-        left: tooltipLeft,
-        top: tooltipTop,
-      });
-    }
-  }, [tooltipData, tooltipLeft, tooltipTop]);
 
   // We want to restart the visualization when resizing
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -131,8 +96,8 @@ function KGVisualization({
         data,
         width,
         height,
-        tooltipOpen,
-        showTooltip,
+        tooltipOpen: tooltipInfo.open,
+        updateTooltip,
         hideTooltip,
         initialZoomValues,
         onResourceSelection,
@@ -185,16 +150,7 @@ function KGVisualization({
           />
         ))}
       </div>
-      <div
-        style={{ top: tooltipActive.top - 2, left: tooltipActive.left - 2 }}
-        className={cx(styles.tooltip, { [styles.open]: tooltipOpen })}
-      >
-        <div className={styles.tooltipWrapper}>
-          <div className={styles.tooltipText}>{tooltipActive.data.name}</div>
-          <IconOpen className={cx(styles.tooltipIcon, 'icon-regular')} />
-          <div className={styles.tooltipBg} />
-        </div>
-      </div>
+      <Tooltip {...tooltipInfo} />
       <Minimap
         minimapRef={minimapRef}
         zoomValues={zoomValues}

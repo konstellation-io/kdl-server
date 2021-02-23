@@ -174,8 +174,8 @@ type MutationResolver interface {
 	UpdateMember(ctx context.Context, input model.UpdateMemberInput) (*entity.Member, error)
 	AddAPIToken(ctx context.Context, input *model.APITokenInput) (*entity.APIToken, error)
 	RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error)
-	SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*model.KnowledgeGraphItem, error)
-	SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*model.KnowledgeGraphItem, error)
+	SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error)
+	SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error)
 	SetActiveProjectTools(ctx context.Context, input model.SetBoolFieldInput) (*entity.Project, error)
 }
 type ProjectResolver interface {
@@ -190,7 +190,7 @@ type QueryResolver interface {
 	Users(ctx context.Context) ([]entity.User, error)
 	SSHKey(ctx context.Context) (*entity.SSHKey, error)
 	QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error)
-	KnowledgeGraph(ctx context.Context, description string) (*model.KnowledgeGraph, error)
+	KnowledgeGraph(ctx context.Context, description string) (*entity.KnowledgeGraph, error)
 }
 type RepositoryResolver interface {
 	URL(ctx context.Context, obj *entity.Repository) (string, error)
@@ -1584,7 +1584,7 @@ func (ec *executionContext) _ApiToken_token(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KnowledgeGraph_items(ctx context.Context, field graphql.CollectedField, obj *model.KnowledgeGraph) (ret graphql.Marshaler) {
+func (ec *executionContext) _KnowledgeGraph_items(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraph) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1614,12 +1614,12 @@ func (ec *executionContext) _KnowledgeGraph_items(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]model.KnowledgeGraphItem)
+	res := resTmp.([]entity.KnowledgeGraphItem)
 	fc.Result = res
-	return ec.marshalNKnowledgeGraphItem2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItemᚄ(ctx, field.Selections, res)
+	return ec.marshalNKnowledgeGraphItem2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItemᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KnowledgeGraphItem_id(ctx context.Context, field graphql.CollectedField, obj *model.KnowledgeGraphItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _KnowledgeGraphItem_id(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1654,7 +1654,7 @@ func (ec *executionContext) _KnowledgeGraphItem_id(ctx context.Context, field gr
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KnowledgeGraphItem_category(ctx context.Context, field graphql.CollectedField, obj *model.KnowledgeGraphItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _KnowledgeGraphItem_category(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1684,12 +1684,12 @@ func (ec *executionContext) _KnowledgeGraphItem_category(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(model.KnowledgeGraphItemCat)
+	res := resTmp.(entity.KnowledgeGraphItemCat)
 	fc.Result = res
-	return ec.marshalNKnowledgeGraphItemCat2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItemCat(ctx, field.Selections, res)
+	return ec.marshalNKnowledgeGraphItemCat2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItemCat(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KnowledgeGraphItem_title(ctx context.Context, field graphql.CollectedField, obj *model.KnowledgeGraphItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _KnowledgeGraphItem_title(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1724,7 +1724,7 @@ func (ec *executionContext) _KnowledgeGraphItem_title(ctx context.Context, field
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KnowledgeGraphItem_abstract(ctx context.Context, field graphql.CollectedField, obj *model.KnowledgeGraphItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _KnowledgeGraphItem_abstract(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1759,7 +1759,7 @@ func (ec *executionContext) _KnowledgeGraphItem_abstract(ctx context.Context, fi
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KnowledgeGraphItem_authors(ctx context.Context, field graphql.CollectedField, obj *model.KnowledgeGraphItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _KnowledgeGraphItem_authors(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1794,7 +1794,7 @@ func (ec *executionContext) _KnowledgeGraphItem_authors(ctx context.Context, fie
 	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KnowledgeGraphItem_score(ctx context.Context, field graphql.CollectedField, obj *model.KnowledgeGraphItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _KnowledgeGraphItem_score(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1829,7 +1829,7 @@ func (ec *executionContext) _KnowledgeGraphItem_score(ctx context.Context, field
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KnowledgeGraphItem_date(ctx context.Context, field graphql.CollectedField, obj *model.KnowledgeGraphItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _KnowledgeGraphItem_date(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1864,7 +1864,7 @@ func (ec *executionContext) _KnowledgeGraphItem_date(ctx context.Context, field 
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KnowledgeGraphItem_url(ctx context.Context, field graphql.CollectedField, obj *model.KnowledgeGraphItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _KnowledgeGraphItem_url(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1899,7 +1899,7 @@ func (ec *executionContext) _KnowledgeGraphItem_url(ctx context.Context, field g
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KnowledgeGraphItem_isStarred(ctx context.Context, field graphql.CollectedField, obj *model.KnowledgeGraphItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _KnowledgeGraphItem_isStarred(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1934,7 +1934,7 @@ func (ec *executionContext) _KnowledgeGraphItem_isStarred(ctx context.Context, f
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KnowledgeGraphItem_isDiscarded(ctx context.Context, field graphql.CollectedField, obj *model.KnowledgeGraphItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _KnowledgeGraphItem_isDiscarded(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1969,7 +1969,7 @@ func (ec *executionContext) _KnowledgeGraphItem_isDiscarded(ctx context.Context,
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KnowledgeGraphItem_externalId(ctx context.Context, field graphql.CollectedField, obj *model.KnowledgeGraphItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _KnowledgeGraphItem_externalId(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2001,7 +2001,7 @@ func (ec *executionContext) _KnowledgeGraphItem_externalId(ctx context.Context, 
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KnowledgeGraphItem_framework(ctx context.Context, field graphql.CollectedField, obj *model.KnowledgeGraphItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _KnowledgeGraphItem_framework(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2694,9 +2694,9 @@ func (ec *executionContext) _Mutation_setStarredKGItem(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.KnowledgeGraphItem)
+	res := resTmp.(*entity.KnowledgeGraphItem)
 	fc.Result = res
-	return ec.marshalNKnowledgeGraphItem2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItem(ctx, field.Selections, res)
+	return ec.marshalNKnowledgeGraphItem2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_setDiscardedKGItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2736,9 +2736,9 @@ func (ec *executionContext) _Mutation_setDiscardedKGItem(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.KnowledgeGraphItem)
+	res := resTmp.(*entity.KnowledgeGraphItem)
 	fc.Result = res
-	return ec.marshalNKnowledgeGraphItem2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItem(ctx, field.Selections, res)
+	return ec.marshalNKnowledgeGraphItem2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_setActiveProjectTools(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3487,9 +3487,9 @@ func (ec *executionContext) _Query_knowledgeGraph(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.KnowledgeGraph)
+	res := resTmp.(*entity.KnowledgeGraph)
 	fc.Result = res
-	return ec.marshalNKnowledgeGraph2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraph(ctx, field.Selections, res)
+	return ec.marshalNKnowledgeGraph2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraph(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -5786,7 +5786,7 @@ func (ec *executionContext) _ApiToken(ctx context.Context, sel ast.SelectionSet,
 
 var knowledgeGraphImplementors = []string{"KnowledgeGraph"}
 
-func (ec *executionContext) _KnowledgeGraph(ctx context.Context, sel ast.SelectionSet, obj *model.KnowledgeGraph) graphql.Marshaler {
+func (ec *executionContext) _KnowledgeGraph(ctx context.Context, sel ast.SelectionSet, obj *entity.KnowledgeGraph) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, knowledgeGraphImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -5813,7 +5813,7 @@ func (ec *executionContext) _KnowledgeGraph(ctx context.Context, sel ast.Selecti
 
 var knowledgeGraphItemImplementors = []string{"KnowledgeGraphItem"}
 
-func (ec *executionContext) _KnowledgeGraphItem(ctx context.Context, sel ast.SelectionSet, obj *model.KnowledgeGraphItem) graphql.Marshaler {
+func (ec *executionContext) _KnowledgeGraphItem(ctx context.Context, sel ast.SelectionSet, obj *entity.KnowledgeGraphItem) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, knowledgeGraphItemImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -6893,11 +6893,11 @@ func (ec *executionContext) marshalNID2ᚕstringᚄ(ctx context.Context, sel ast
 	return ret
 }
 
-func (ec *executionContext) marshalNKnowledgeGraph2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraph(ctx context.Context, sel ast.SelectionSet, v model.KnowledgeGraph) graphql.Marshaler {
+func (ec *executionContext) marshalNKnowledgeGraph2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraph(ctx context.Context, sel ast.SelectionSet, v entity.KnowledgeGraph) graphql.Marshaler {
 	return ec._KnowledgeGraph(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNKnowledgeGraph2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraph(ctx context.Context, sel ast.SelectionSet, v *model.KnowledgeGraph) graphql.Marshaler {
+func (ec *executionContext) marshalNKnowledgeGraph2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraph(ctx context.Context, sel ast.SelectionSet, v *entity.KnowledgeGraph) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -6907,11 +6907,11 @@ func (ec *executionContext) marshalNKnowledgeGraph2ᚖgithubᚗcomᚋkonstellati
 	return ec._KnowledgeGraph(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNKnowledgeGraphItem2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItem(ctx context.Context, sel ast.SelectionSet, v model.KnowledgeGraphItem) graphql.Marshaler {
+func (ec *executionContext) marshalNKnowledgeGraphItem2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItem(ctx context.Context, sel ast.SelectionSet, v entity.KnowledgeGraphItem) graphql.Marshaler {
 	return ec._KnowledgeGraphItem(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNKnowledgeGraphItem2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItemᚄ(ctx context.Context, sel ast.SelectionSet, v []model.KnowledgeGraphItem) graphql.Marshaler {
+func (ec *executionContext) marshalNKnowledgeGraphItem2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItemᚄ(ctx context.Context, sel ast.SelectionSet, v []entity.KnowledgeGraphItem) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -6935,7 +6935,7 @@ func (ec *executionContext) marshalNKnowledgeGraphItem2ᚕgithubᚗcomᚋkonstel
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNKnowledgeGraphItem2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItem(ctx, sel, v[i])
+			ret[i] = ec.marshalNKnowledgeGraphItem2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItem(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6948,7 +6948,7 @@ func (ec *executionContext) marshalNKnowledgeGraphItem2ᚕgithubᚗcomᚋkonstel
 	return ret
 }
 
-func (ec *executionContext) marshalNKnowledgeGraphItem2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItem(ctx context.Context, sel ast.SelectionSet, v *model.KnowledgeGraphItem) graphql.Marshaler {
+func (ec *executionContext) marshalNKnowledgeGraphItem2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItem(ctx context.Context, sel ast.SelectionSet, v *entity.KnowledgeGraphItem) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -6958,14 +6958,20 @@ func (ec *executionContext) marshalNKnowledgeGraphItem2ᚖgithubᚗcomᚋkonstel
 	return ec._KnowledgeGraphItem(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNKnowledgeGraphItemCat2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItemCat(ctx context.Context, v interface{}) (model.KnowledgeGraphItemCat, error) {
-	var res model.KnowledgeGraphItemCat
-	err := res.UnmarshalGQL(v)
+func (ec *executionContext) unmarshalNKnowledgeGraphItemCat2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItemCat(ctx context.Context, v interface{}) (entity.KnowledgeGraphItemCat, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := entity.KnowledgeGraphItemCat(tmp)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNKnowledgeGraphItemCat2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐKnowledgeGraphItemCat(ctx context.Context, sel ast.SelectionSet, v model.KnowledgeGraphItemCat) graphql.Marshaler {
-	return v
+func (ec *executionContext) marshalNKnowledgeGraphItemCat2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItemCat(ctx context.Context, sel ast.SelectionSet, v entity.KnowledgeGraphItemCat) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalNMember2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMember(ctx context.Context, sel ast.SelectionSet, v entity.Member) graphql.Marshaler {

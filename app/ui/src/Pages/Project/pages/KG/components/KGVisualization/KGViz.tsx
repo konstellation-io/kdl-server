@@ -552,7 +552,7 @@ class KGViz {
         // @ts-ignore
         const { left, top } = this.getBoundingClientRect();
         const orientation = sectionOrientation.get(this);
-        const stringToId = replaceAll(sectionName, /\\s+/, '-');
+        const stringToId = replaceAll(sectionName, /\s+/, '-');
         select(`#kg_${stringToId}`)
           .style('left', orientation === 'right' ? px(left) : 'auto')
           .style(

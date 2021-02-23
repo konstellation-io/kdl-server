@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package kg;
+option go_package = "proto;kgpb";
+
+message GetGraphReq {
+  string description = 1;
+}
+
+message GraphItem {
+  string id = 1;
+  string category = 2;
+  string title = 3;
+  string abstract = 4;
+  string authors = 5;
+  float score = 6;
+  string date = 7;
+  string url = 8;
+  string external_id = 9;
+  string framework = 10;
+}
+
+message GetGraphRes {
+  repeated GraphItem items = 1;
+}
+
+service KGService {
+  rpc GetGraph (GetGraphReq) returns (GetGraphRes) {};
+};

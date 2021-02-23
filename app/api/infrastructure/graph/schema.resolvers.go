@@ -74,11 +74,11 @@ func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.Remo
 	panic(entity.ErrNotImplemented)
 }
 
-func (r *mutationResolver) SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*model.KnowledgeGraphItem, error) {
+func (r *mutationResolver) SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error) {
 	panic(entity.ErrNotImplemented)
 }
 
-func (r *mutationResolver) SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*model.KnowledgeGraphItem, error) {
+func (r *mutationResolver) SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error) {
 	panic(entity.ErrNotImplemented)
 }
 
@@ -140,8 +140,13 @@ func (r *queryResolver) QualityProjectDesc(ctx context.Context, description stri
 	panic(entity.ErrNotImplemented)
 }
 
-func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) (*model.KnowledgeGraph, error) {
-	panic(entity.ErrNotImplemented)
+func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) (*entity.KnowledgeGraph, error) {
+	kg, err := r.kg.Get(ctx, description)
+	if err != nil {
+		return nil, err
+	}
+
+	return &kg, nil
 }
 
 func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (string, error) {

@@ -58,6 +58,9 @@ type Config struct {
 	MLFlow struct {
 		URL string `envconfig:"MLFLOW_URL"`
 	}
+	KGservice struct {
+		URL string `envconfig:"KG_URL"`
+	}
 }
 
 // NewConfig will read the config.yml file and override values with env vars.

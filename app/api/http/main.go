@@ -5,6 +5,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/konstellation-io/kdl-server/app/api/usecase/kg"
+
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/kgservice"
+
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -71,6 +75,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	kgService, err := kgservice.NewKGService(logger, cfg.KGservice.URL)
+	if err != nil {
+		logger.Errorf("Error connecting to KG server: %s", err)
+		os.Exit(1)
+	}
+
 	mongo := mongodb.NewMongoDB(logger)
 
 	mongodbClient, err := mongo.Connect(cfg.MongoDB.URI)
@@ -93,6 +103,7 @@ func main() {
 		cfg,
 		project.NewInteractor(logger, projectRepo, realClock, giteaService, minioService, droneService),
 		user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaService, k8sClient),
+		kg.NewInteractor(logger, kgService),
 	)
 
 	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, resolvers)

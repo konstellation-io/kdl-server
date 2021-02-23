@@ -62,6 +62,8 @@ spec:
               value: {{ include "protocol" . }}://drone.{{ .Values.domain }}
             - name: MLFLOW_URL
               value: {{ include "protocol" . }}://mlflow.{{ .Values.domain }}
+            - name: KG_URL
+              value: kdl-kg:{{ .Values.kdlKG.port }}
             - name: DRONE_INTERNAL_URL
               valueFrom:
                 configMapKeyRef:

@@ -1,5 +1,12 @@
-import { BaseType, EnterElement, Local, Selection, local, select } from 'd3-selection';
-import { Coord, GroupD, getHash, groupData } from '../../KGUtils';
+import {
+  BaseType,
+  EnterElement,
+  Local,
+  local,
+  select,
+  Selection,
+} from 'd3-selection';
+import { Coord, getHash, GroupD, groupData } from '../../KGUtils';
 import Resources, { RESOURCE_R } from './Resources/Resources';
 import { scaleBand, scaleLinear } from '@visx/scale';
 
@@ -8,8 +15,8 @@ import MinimapViz from '../Minimap/MinimapViz';
 import { UpdateTooltip } from 'Hooks/useTextTooltip';
 import { ZoomValues } from './useZoom';
 import { range } from 'd3-array';
-import { stringToId } from 'Utils/d3';
 import styles from './KGVisualization.module.scss';
+import { stringToId } from '../../../../../../Utils/d3';
 
 const px = (value: number | string) => `${value}px`;
 
@@ -34,14 +41,14 @@ export let minimapViz: MinimapViz;
 const section = (d: D) => d.category;
 
 export type CoordData = {
-  category: string,
-  score: number,
-  name?: string
+  category: string;
+  score: number;
+  name?: string;
 };
 export type CoordOptions = {
-  jittered?: boolean,
-  offset?: number,
-  bisector?: boolean
+  jittered?: boolean;
+  offset?: number;
+  bisector?: boolean;
 };
 
 type Props = {
@@ -74,14 +81,14 @@ class KGViz {
   sectionOrientation: Local<string>;
   resources: Resources;
   size: {
-    innerWidth: number,
-    innerHeight: number,
-    sectionInterval: number,
-    guideStroke: number,
-    bubbleCollision: number,
-    tooltipWidth: number,
-    axisPadding: number,
-    axisFontSize: number
+    innerWidth: number;
+    innerHeight: number;
+    sectionInterval: number;
+    guideStroke: number;
+    bubbleCollision: number;
+    tooltipWidth: number;
+    axisPadding: number;
+    axisFontSize: number;
   };
 
   constructor(wrapper: SVGGElement, props: Props) {
@@ -164,15 +171,9 @@ class KGViz {
       groupedData,
       positionSectionBoxes,
       sectionDomain,
-      size: {
-        guideStroke,
-        axisPadding,
-        axisFontSize
-      },
-      props: {
-        centerText
-      },
-      resources
+      size: { guideStroke, axisPadding, axisFontSize },
+      props: { centerText },
+      resources,
     } = this;
 
     // Add structural elements
@@ -194,7 +195,8 @@ class KGViz {
     );
 
     // Sections
-    const newSections = mainG.append('g')
+    const newSections = mainG
+      .append('g')
       .classed(styles.sectionsWrapper, true)
       .selectAll(`.${styles.grid}`)
       .data(sectionDomain)
@@ -218,8 +220,8 @@ class KGViz {
       .attr('width', 2 * INNER_R)
       .attr('height', 2 * INNER_R)
       .append('xhtml:div')
-        .classed(styles.innerCircleText, true)
-        .html(centerText);
+      .classed(styles.innerCircleText, true)
+      .html(centerText);
 
     // OuterCircle
     mainG.append('circle').classed(styles.outerCircle, true).attr('r', OUTER_R);
@@ -234,13 +236,16 @@ class KGViz {
       .append('text')
       .attr('x', (OUTER_R - INNER_R) / 3)
       .text('66%');
-    axis.append('text')
-      .attr('x', (OUTER_R - INNER_R) * 2 / 3)
+    axis
+      .append('text')
+      .attr('x', ((OUTER_R - INNER_R) * 2) / 3)
       .text('33%');
-    axis.append('text')
+    axis
+      .append('text')
       .attr('x', OUTER_R - INNER_R)
       .text('0%');
-    axis.selectAll('text')
+    axis
+      .selectAll('text')
       .attr('dx', axisPadding)
       .attr('dy', -axisPadding)
       .style('font-size', px(axisFontSize));
@@ -260,13 +265,8 @@ class KGViz {
   };
 
   updateZoomArea = (zoomValues: ZoomValues) => {
-    const {
-      minimap,
-      groupedData,
-      resetTooltip,
-      positionSectionBoxes
-    } = this;
-    
+    const { minimap, groupedData, resetTooltip, positionSectionBoxes } = this;
+
     minimap.update(groupedData, zoomValues);
 
     resetTooltip();
@@ -290,11 +290,7 @@ class KGViz {
       positionSectionBoxes,
       sectionDomain,
       resources,
-      size: {
-        guideStroke,
-        axisPadding,
-        axisFontSize
-      }
+      size: { guideStroke, axisPadding, axisFontSize },
     } = this;
 
     resetTooltip();
@@ -312,12 +308,12 @@ class KGViz {
     sections.create(newSections);
     sections.update(allSections);
     sections.remove(oldSections);
-    
+
     // Regenerate section boxes
     sectionGuides.destroy();
     sectionGuides.create();
     positionSectionBoxes();
-    
+
     // Axis
     mainG
       .select(`.${styles.axis}`)
@@ -328,7 +324,7 @@ class KGViz {
 
     // Data
     resources.performUpdate(groupedData);
-  }
+  };
 
   sections = {
     create: (container: Selection<EnterElement, string, BaseType, unknown>) => {
@@ -342,10 +338,26 @@ class KGViz {
         .classed(styles.grid, true)
         .attr('stroke-width', guideStroke)
         .attr('stroke-dasharray', `${sectionInterval} ${sectionInterval}`)
-        .attr('x1', category => coord({ category, score: MAX_SCORE }, {offset: -RESOURCE_R}).x)
-        .attr('y1', category => coord({ category, score: MAX_SCORE }, {offset: -RESOURCE_R}).y)
-        .attr('x2', category => coord({ category, score: MIN_SCORE }, {offset: RESOURCE_R}).x)
-        .attr('y2', category => coord({ category, score: MIN_SCORE }, {offset: RESOURCE_R}).y);
+        .attr(
+          'x1',
+          (category) =>
+            coord({ category, score: MAX_SCORE }, { offset: -RESOURCE_R }).x
+        )
+        .attr(
+          'y1',
+          (category) =>
+            coord({ category, score: MAX_SCORE }, { offset: -RESOURCE_R }).y
+        )
+        .attr(
+          'x2',
+          (category) =>
+            coord({ category, score: MIN_SCORE }, { offset: RESOURCE_R }).x
+        )
+        .attr(
+          'y2',
+          (category) =>
+            coord({ category, score: MIN_SCORE }, { offset: RESOURCE_R }).y
+        );
     },
     update: (container: Selection<BaseType, string, BaseType, unknown>) => {
       const {
@@ -356,10 +368,26 @@ class KGViz {
       container
         .attr('stroke-dasharray', `${sectionInterval} ${sectionInterval}`)
         .attr('stroke-width', guideStroke)
-        .attr('x1', category => coord({ category, score: MAX_SCORE }, {offset: -RESOURCE_R}).x)
-        .attr('y1', category => coord({ category, score: MAX_SCORE }, {offset: -RESOURCE_R}).y)
-        .attr('x2', category => coord({ category, score: MIN_SCORE }, {offset: RESOURCE_R}).x)
-        .attr('y2', category => coord({ category, score: MIN_SCORE }, {offset: RESOURCE_R}).y);
+        .attr(
+          'x1',
+          (category) =>
+            coord({ category, score: MAX_SCORE }, { offset: -RESOURCE_R }).x
+        )
+        .attr(
+          'y1',
+          (category) =>
+            coord({ category, score: MAX_SCORE }, { offset: -RESOURCE_R }).y
+        )
+        .attr(
+          'x2',
+          (category) =>
+            coord({ category, score: MIN_SCORE }, { offset: RESOURCE_R }).x
+        )
+        .attr(
+          'y2',
+          (category) =>
+            coord({ category, score: MIN_SCORE }, { offset: RESOURCE_R }).y
+        );
     },
     remove: (container: Selection<BaseType, unknown, BaseType, unknown>) => {
       container.interrupt().transition();
@@ -369,55 +397,51 @@ class KGViz {
 
   sectionGuides = {
     create: () => {
-      const {
-        mainG,
-        sectionDomain,
-        sectionOrientation,
-        coord
-      } = this;
+      const { mainG, sectionDomain, sectionOrientation, coord } = this;
 
-      const sectionAndNames = mainG.append('g').classed(styles.sectionAndNamesG, true);
-      sectionAndNames.selectAll(`.${styles.sectionAndNamesGuide}`)
+      const sectionAndNames = mainG
+        .append('g')
+        .classed(styles.sectionAndNamesG, true);
+      sectionAndNames
+        .selectAll(`.${styles.sectionAndNamesGuide}`)
         .data(sectionDomain)
         .enter()
         .append('g')
-          .classed(styles.sectionAndNamesGuide, true)
-          .attr('transform', function(d) {
-            const { x, y, angle } = coord(
-              { category: d, score: -0.25 },
-              { bisector: true }
-            );
-            sectionOrientation.set(this, angle > 90 && angle < 270 ? 'left' : 'right');
-            return `translate(${x}, ${y})`;
-          });
+        .classed(styles.sectionAndNamesGuide, true)
+        .attr('transform', function (d) {
+          const { x, y, angle } = coord(
+            { category: d, score: -0.25 },
+            { bisector: true }
+          );
+          sectionOrientation.set(
+            this,
+            angle > 90 && angle < 270 ? 'left' : 'right'
+          );
+          return `translate(${x}, ${y})`;
+        });
     },
     destroy: () => {
       this.mainG.select(`.${styles.sectionAndNamesG}`).remove();
-    }
+    },
   };
 
   resetTooltip = () => {
     const {
       mainG,
-      resources: {
-        resourceR,
-        resourceStroke
-      },
-      props: {
-        hideTooltip,
-        tooltipOpen
-      }
+      resources: { resourceR, resourceStroke },
+      props: { hideTooltip, tooltipOpen },
     } = this;
 
     // Resets tooltip
     if (tooltipOpen) hideTooltip();
 
-    mainG.selectAll(`.${styles.tooltipRect}`)
+    mainG
+      .selectAll(`.${styles.tooltipRect}`)
       .attr('width', 2 * resourceR + resourceStroke / 2)
-      .attr('fill-opacity', 0)
+      .attr('fill-opacity', 0);
     // TODO: does the next line make performance wrost?
     //   .interrupt().transition();
-  }
+  };
 
   updateSizes = () => {
     const zoomScale = 1 / this.props.k;
@@ -444,19 +468,19 @@ class KGViz {
     let angle = sectionScale(category) || 0;
 
     if (jittered && !bisector) {
-      const randomNumber = Math.abs(getHash(name || '') % 1000 / 1000);
-      angle += sectionScale.bandwidth() * randomNumber
+      const randomNumber = Math.abs((getHash(name || '') % 1000) / 1000);
+      angle += sectionScale.bandwidth() * randomNumber;
     }
 
     if (bisector) {
       angle += sectionScale.bandwidth() / 2;
     }
 
-    const x = Math.cos(angle * Math.PI / 180) * distance;
-    const y = Math.sin(angle * Math.PI / 180) * distance;
+    const x = Math.cos((angle * Math.PI) / 180) * distance;
+    const y = Math.sin((angle * Math.PI) / 180) * distance;
 
     return { x, y, angle };
-  }
+  };
 
   elementsCollide = (a: Coord, b: Coord) =>
     b.x + this.size.bubbleCollision > a.x - this.size.bubbleCollision &&
@@ -481,13 +505,8 @@ class KGViz {
 
   onHideTooltip = (element: BaseType) => {
     const {
-      resources: {
-        resourceR,
-        resourceStroke
-      },
-      props: {
-        hideTooltip
-      }
+      resources: { resourceR, resourceStroke },
+      props: { hideTooltip },
     } = this;
 
     const rect = select(element);
@@ -526,24 +545,24 @@ class KGViz {
   };
 
   positionSectionBoxes = () => {
-    const {
-      wrapper,
-      sectionOrientation
-    } = this;
+    const { wrapper, sectionOrientation } = this;
 
-    wrapper.selectAll<SVGGElement, string>(`.${styles.sectionAndNamesGuide}`)
-      .each(function(sectionName) {
+    wrapper
+      .selectAll<SVGGElement, string>(`.${styles.sectionAndNamesGuide}`)
+      .each(function (sectionName) {
         // FIXME: make sure the next this is properly typed
         // @ts-ignore
         const { left, top } = this.getBoundingClientRect();
         const orientation = sectionOrientation.get(this);
-        
         select(`#kg_${stringToId(sectionName)}`)
           .style('left', orientation === 'right' ? px(left) : 'auto')
-          .style('right', orientation === 'left' ? px(window.innerWidth - left) : 'auto')
+          .style(
+            'right',
+            orientation === 'left' ? px(window.innerWidth - left) : 'auto'
+          )
           .style('top', px(top - SECTION_BOX_HEIGHT / 2));
       });
-  }
+  };
 }
 
 export default KGViz;

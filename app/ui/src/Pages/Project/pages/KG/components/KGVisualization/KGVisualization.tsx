@@ -9,14 +9,11 @@ import Tooltip from './Tooltip';
 import styles from './KGVisualization.module.scss';
 import useTextTooltip from 'Hooks/useTextTooltip';
 import useZoom from './useZoom';
+import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 
-export enum ResourceType {
-  CODE = 'code',
-  PAPER = 'paper',
-}
 export type D = {
   category: string;
-  type: ResourceType;
+  type: KnowledgeGraphItemCat;
   name: string;
   score: number;
 };
@@ -56,7 +53,7 @@ function KGVisualization({
 }: Props) {
   const [hoveredPaper, setHoveredPaper] = useState<string | null>(null);
   const { tooltipInfo, updateTooltip, hideTooltip } = useTextTooltip();
-  
+
   const minimapRef = useRef<SVGSVGElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const gRef = useRef<SVGGElement>(null);
@@ -65,7 +62,7 @@ function KGVisualization({
     width,
     height,
   });
-  const viz = useRef<KGViz | null>(null);  
+  const viz = useRef<KGViz | null>(null);
 
   // We want to restart the visualization when resizing
   // eslint-disable-next-line react-hooks/exhaustive-deps

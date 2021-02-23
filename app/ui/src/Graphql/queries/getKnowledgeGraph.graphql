@@ -1,0 +1,9 @@
+query GetKnowledgeGraph($description: String!) {
+  knowledgeGraph(description: $description) {
+    items {
+      category
+      score
+      title
+    }
+  }
+}

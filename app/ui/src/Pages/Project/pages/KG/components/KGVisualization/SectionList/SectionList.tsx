@@ -21,12 +21,12 @@ function SectionList({ section, names, setHoveredPaper, onResourceSelection }: P
     toggle,
     deactivate: close
   } = useBoolState(false);
-  
+
   const componentRef = useRef<HTMLDivElement>(null);
-  const {
-    addClickOutsideEvents,
-    removeClickOutsideEvents
-  } = useClickOutside({ componentRef, action: close });
+  const { addClickOutsideEvents, removeClickOutsideEvents } = useClickOutside({
+    componentRef,
+    action: close,
+  });
 
   function onResourceHover(name: string) {
     setHoveredPaper(name);

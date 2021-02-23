@@ -25,6 +25,9 @@ module.exports = {
     qualityProjectDesc: () => ({
       quality: Math.round((Math.random() * 1000) % 100),
     }),
+    knowledgeGraph: () => ({
+      items: () => new MockList([1, 1000]),
+    }),
   }),
   Mutation: () => ({
     updateProject: (_, { input: { id, name } }) => ({
@@ -125,5 +128,10 @@ module.exports = {
     private: casual.uuid,
     creationDate: new Date().toUTCString(),
     lastActivity: new Date().toUTCString(),
+  }),
+  KnowledgeGraphItem: () => ({
+    title: casual.short_description,
+    type: casual.random_element(['Code', 'Paper']),
+    score: casual.random,
   }),
 };

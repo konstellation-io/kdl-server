@@ -44,7 +44,7 @@ func (k *k8sClient) DeleteUserToolsCR(ctx context.Context, username string) erro
 	return k.waitUserToolsDeleted(ctx, resName)
 }
 
-// CreateUserToolsCR creates the Custom Resource in Kubernetes.
+// CreateUserToolsCR creates the user tools Custom Resource in Kubernetes.
 func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username string) error {
 	slugUsername := k.getSlugUsername(username)
 	resName := fmt.Sprintf("usertools-%s", slugUsername)
@@ -56,7 +56,7 @@ func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username string) erro
 
 	k.logger.Info("UserTools secrets created")
 
-	err = k.createUserToolsCRD(username, slugUsername, resName)
+	err = k.createUserToolsDefinition(username, slugUsername, resName)
 	if err != nil {
 		return err
 	}
@@ -146,8 +146,8 @@ func (k *k8sClient) createToolSecret(slugUsername, toolName, toolURLName string)
 	return nil
 }
 
-// CreateUserTools creates a new Custom Resource Definition of type UserTools for the given user.
-func (k *k8sClient) createUserToolsCRD(username, slugUsername, resName string) error {
+// createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
+func (k *k8sClient) createUserToolsDefinition(username, slugUsername, resName string) error {
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",

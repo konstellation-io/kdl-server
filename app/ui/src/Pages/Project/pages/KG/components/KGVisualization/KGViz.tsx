@@ -2,11 +2,11 @@ import {
   BaseType,
   EnterElement,
   Local,
-  Selection,
   local,
   select,
+  Selection,
 } from 'd3-selection';
-import { Coord, GroupD, getHash, groupData } from '../../KGUtils';
+import { Coord, getHash, GroupD, groupData } from '../../KGUtils';
 import Resources, { RESOURCE_R } from './Resources/Resources';
 import { scaleBand, scaleLinear } from '@visx/scale';
 
@@ -15,7 +15,7 @@ import MinimapViz from '../Minimap/MinimapViz';
 import { ZoomValues } from './useZoom';
 import { range } from 'd3-array';
 import styles from './KGVisualization.module.scss';
-import { replaceAll } from 'Utils/string';
+import { stringToId } from '../../../../../../Utils/d3';
 
 const px = (value: number | string) => `${value}px`;
 
@@ -552,8 +552,7 @@ class KGViz {
         // @ts-ignore
         const { left, top } = this.getBoundingClientRect();
         const orientation = sectionOrientation.get(this);
-        const stringToId = replaceAll(sectionName, /\\s+/, '-');
-        select(`#kg_${stringToId}`)
+        select(`#kg_${stringToId(sectionName)}`)
           .style('left', orientation === 'right' ? px(left) : 'auto')
           .style(
             'right',

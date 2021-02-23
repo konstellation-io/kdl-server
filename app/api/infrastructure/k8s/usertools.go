@@ -174,6 +174,9 @@ func (k *k8sClient) createUserToolsCRD(username, slugUsername, resName string) e
 					"name": k.cfg.VSCode.SharedVolume.Name,
 				},
 				"tls": k.cfg.TLS,
+				"kdl": map[string]interface{}{
+					"enabled": true,
+				},
 			},
 		},
 	}

@@ -18,16 +18,18 @@ const defaultValues: TextTooltipInfo = {
   top: 0,
   left: 0,
   text: '',
-  open: false
-}
+  open: false,
+};
 
 export function useTextTooltip() {
-  const [tooltipInfo, setTooltipInfo] = useState<TextTooltipInfo>(defaultValues);
+  const [tooltipInfo, setTooltipInfo] = useState<TextTooltipInfo>(
+    defaultValues
+  );
 
   function updateTooltip(newValues: UpdateTooltip) {
-    setTooltipInfo(prevValues => ({
+    setTooltipInfo((prevValues) => ({
       ...prevValues,
-      ...newValues
+      ...newValues,
     }));
   }
 
@@ -38,7 +40,7 @@ export function useTextTooltip() {
   return {
     tooltipInfo,
     updateTooltip,
-    hideTooltip
+    hideTooltip,
   };
 }
 export default useTextTooltip;

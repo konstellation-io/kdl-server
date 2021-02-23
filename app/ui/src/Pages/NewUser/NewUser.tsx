@@ -63,7 +63,13 @@ function NewUser() {
     add: { loading, error: errorAddUser },
   } = useUser(() => history.push(ROUTE.USERS));
 
-  function submit({ email, username, password, accessLevel, confirmation }: FormData) {
+  function submit({
+    email,
+    username,
+    password,
+    accessLevel,
+    confirmation,
+  }: FormData) {
     if (confirmation) {
       addNewUser({ email, username, password, accessLevel });
     }

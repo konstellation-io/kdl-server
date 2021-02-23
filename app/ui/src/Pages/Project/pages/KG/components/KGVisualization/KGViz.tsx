@@ -539,7 +539,7 @@ class KGViz {
         text: d.name,
         left: circleLeft - dx,
         top: circleTop - dy,
-        open: true
+        open: true,
       });
     }
   };

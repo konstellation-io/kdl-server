@@ -53,7 +53,9 @@ describe('Stepper component', () => {
 });
 
 describe('Step component', () => {
-  const component = shallow(<StepNode {...steps[0]} onClick={onStepClickMock} />);
+  const component = shallow(
+    <StepNode {...steps[0]} onClick={onStepClickMock} />
+  );
 
   test('Component match snapshot', () => {
     expect(component).toMatchSnapshot();

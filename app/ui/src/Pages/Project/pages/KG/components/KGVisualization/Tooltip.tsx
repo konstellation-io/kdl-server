@@ -11,7 +11,7 @@ const Tooltip: FC<TextTooltipInfo> = ({ top, left, text, open }) => (
     className={cx(styles.tooltip, { [styles.open]: open })}
   >
     <div className={styles.tooltipWrapper}>
-      <div className={styles.tooltipText}>{ text }</div>
+      <div className={styles.tooltipText}>{text}</div>
       <IconOpen className={cx(styles.tooltipIcon, 'icon-regular')} />
       <div className={styles.tooltipBg} />
     </div>

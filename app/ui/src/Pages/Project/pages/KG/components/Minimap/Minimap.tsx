@@ -12,12 +12,12 @@ export const MINIMAP_HEIGHT = 162;
 
 const defaultDimensions = {
   width: MINIMAP_WIDTH,
-  height: MINIMAP_HEIGHT
+  height: MINIMAP_HEIGHT,
 };
 
 const expandedDimensions = {
   width: MINIMAP_WIDTH * 2,
-  height: MINIMAP_HEIGHT * 2
+  height: MINIMAP_HEIGHT * 2,
 };
 
 interface Props {
@@ -28,19 +28,22 @@ interface Props {
   zoomOut: () => void;
 }
 
-function Minimap({ minimapRef, initialZoomValues, zoomValues, zoomIn, zoomOut }: Props) {
+function Minimap({
+  minimapRef,
+  initialZoomValues,
+  zoomValues,
+  zoomIn,
+  zoomOut,
+}: Props) {
   const [minimapDimensions, setMinimapDimensions] = useState(defaultDimensions);
 
   const {
     value: expanded,
     toggle: toggleExpanded,
-    deactivate: shrink
+    deactivate: shrink,
   } = useBoolState(false);
-  
-  const {
-    value: minimapVisible,
-    toggle: toggleMinimap
-  } = useBoolState(true);
+
+  const { value: minimapVisible, toggle: toggleMinimap } = useBoolState(true);
 
   useEffect(() => {
     setMinimapDimensions(expanded ? expandedDimensions : defaultDimensions);
@@ -67,8 +70,8 @@ function Minimap({ minimapRef, initialZoomValues, zoomValues, zoomIn, zoomOut }:
   const zoomValue = actZoom + (1 - initialZoomValues.k);
 
   return (
-    <div className={ styles.container }>
-      <AnimateHeight height={ minimapVisible ? 'auto' : 0 } duration={300}>
+    <div className={styles.container}>
+      <AnimateHeight height={minimapVisible ? 'auto' : 0} duration={300}>
         <svg
           ref={minimapRef}
           {...minimapDimensions}
@@ -85,7 +88,7 @@ function Minimap({ minimapRef, initialZoomValues, zoomValues, zoomIn, zoomOut }:
         zoomOut={zoomOut}
       />
     </div>
-  )
+  );
 }
 
 export default Minimap;

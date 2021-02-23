@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ScoreLevels, getScoreLevel, levels, scoreText } from './DescriptionScoreUtils';
+import {
+  ScoreLevels,
+  getScoreLevel,
+  levels,
+  scoreText,
+} from './DescriptionScoreUtils';
 
 import cx from 'classnames';
 import styles from './DescriptionScore.module.scss';

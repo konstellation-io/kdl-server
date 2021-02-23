@@ -63,11 +63,14 @@
       left: unset;
       background-color: palette(highlight);
       border: 3px solid palette(base, 900);
-      @include glow(3, palette(highlight))
+      @include glow(3, palette(highlight));
     }
   }
 
-  .focusVisible, .active, .focusVisible:hover, .active:hover  {
+  .focusVisible,
+  .active,
+  .focusVisible:hover,
+  .active:hover {
     box-shadow: unset !important;
   }
 }

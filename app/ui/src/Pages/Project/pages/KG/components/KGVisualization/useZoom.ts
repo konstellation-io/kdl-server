@@ -28,6 +28,7 @@ type UseZoom = {
   initialZoomValues: ZoomValues;
   zoomIn: () => void;
   zoomOut: () => void;
+  reallocateZoom: (dx: number, dy: number) => void;
 };
 
 const zm = zoom();
@@ -96,6 +97,26 @@ const useZoom: (p: Params) => UseZoom = ({
       );
     }
   }
+  
+  function reallocateZoom(dx: number, dy: number) {
+    if (zoomValues) {
+      const centerX = (width / 2) * (1 - zoomValues.k);
+      const centerY = (height / 2) * (1 - zoomValues.k);
+
+      const tx = zoomIdentity
+        .translate(
+          centerX - dx,
+          centerY - dy
+        )
+        .scale(zoomValues.k);
+
+      const selection = select(svgRef.current);
+      (selection as Selection<Element, unknown, BaseType, unknown>).call(
+        zm.transform,
+        tx
+      );
+    }
+  }
 
   const zoomIn = () => updateZoom(zoomStep);
   const zoomOut = () => updateZoom(-zoomStep);
@@ -105,6 +126,7 @@ const useZoom: (p: Params) => UseZoom = ({
     initialZoomValues: initialZoomValues.current,
     zoomIn,
     zoomOut,
+    reallocateZoom
   };
 };
 

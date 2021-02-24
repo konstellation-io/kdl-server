@@ -16,6 +16,12 @@
 
 .minimap {
   transition: height ease 0.4s, width ease 0.4s;
+
+  cursor: pointer;
+
+  &:active {
+    cursor: all-scroll;
+  }
 }
 
 .bar {

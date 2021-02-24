@@ -1,21 +1,20 @@
 import Filters, { Topic } from './components/Filters/Filters';
-import KGVisualization, {
-  TopicSections,
-} from './components/KGVisualization/KGVisualization';
-import React, { useMemo } from 'react';
-
-import NavigationMenu from './components/NavigationMenu/NavigationMenu';
-import styles from './KG.module.scss';
-import { buildKGItem, getSectionsAndNames } from './KGUtils';
-import useKGFilters from './components/useKGFilters';
-import { useQuery } from '@apollo/client';
-import { loader } from 'graphql.macro';
 import {
   GetKnowledgeGraph,
   GetKnowledgeGraphVariables,
 } from 'Graphql/queries/types/GetKnowledgeGraph';
+import KGVisualization, {
+  TopicSections,
+} from './components/KGVisualization/KGVisualization';
+import React, { useMemo } from 'react';
+import { buildKGItem, getSectionsAndNames } from './KGUtils';
 
+import NavigationMenu from './components/NavigationMenu/NavigationMenu';
 import { ProjectRoute } from '../../ProjectPanels';
+import { loader } from 'graphql.macro';
+import styles from './KG.module.scss';
+import useKGFilters from './components/useKGFilters';
+import { useQuery } from '@apollo/client';
 
 const selectedResource = 'Project Name 1';
 

@@ -67,6 +67,7 @@ type Props = {
   initialZoomValues: ZoomValues;
   onResourceSelection: (name: string) => void;
   centerText: string;
+  reallocateZoom: (dx: number, dy: number) => void;
 };
 
 class KGViz {
@@ -129,6 +130,7 @@ class KGViz {
       y: props.y,
       k: props.k,
       initialZoomValues: props.initialZoomValues,
+      reallocateZoom: props.reallocateZoom
     });
     minimapViz = this.minimap;
     
@@ -259,22 +261,22 @@ class KGViz {
     mainG.select(`.${styles.innerCircleText}`).html(newCenterText);
   };
 
-  updateZoomArea = (zoomValues: ZoomValues) => {
+  updateZoomArea = (zoomValues: ZoomValues, reallocateZoom: (dx: number, dy: number) => void) => {
     const { sections, minimap, groupedData, resetTooltip } = this;
 
-    minimap.update(groupedData, zoomValues);
+    minimap.update(groupedData, zoomValues, reallocateZoom);
 
     resetTooltip();
     sections.positionSectionBoxes();
   };
 
-  update = (zoomValues: ZoomValues, data: D[]) => {
+  update = (zoomValues: ZoomValues, data: D[], reallocateZoom: (dx: number, dy: number) => void) => {
     this.props.k = zoomValues.k;
     this.updateSizes();
 
     this.updateScalesAndData(data);
 
-    this.minimap.update(this.groupedData, zoomValues);
+    this.minimap.update(this.groupedData, zoomValues, reallocateZoom);
 
     const {
       sections,

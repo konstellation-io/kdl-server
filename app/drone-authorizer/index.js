@@ -16,7 +16,16 @@ async function authorizeDroneApp() {
   const url = getEnvVar("DRONE_URL")
 
   console.log("Gitea login...")
-  const browser = await puppeteer.launch()
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-notifications'
+    ]
+  }
+)
   const page = await browser.newPage()
   await page.goto(url)
 

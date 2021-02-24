@@ -1,105 +1,103 @@
+import { D } from './KGVisualization';
+import { KnowledgeGraphItemCat } from './../../../../../../Graphql/types/globalTypes';
 // import randomSentence from 'random-sentence';
 
-enum ResourceType {
-  CODE = 'code',
-  PAPER = 'paper',
-}
 
-const data = [
+const data: D[] = [
   {
     category: 'Topic A',
     name: 'FaceX-Zoo: A PyTorch Toolbox for Face Recognition',
-    type: ResourceType.CODE,
+    type: KnowledgeGraphItemCat.Code,
     score: 1,
   },
   {
     category: 'Topic A',
     name: 'RepVGG: Making VGG-style ConvNets Great Again',
-    type: ResourceType.PAPER,
+    type: KnowledgeGraphItemCat.Paper,
     score: 0.9,
   },
   {
     category: 'Topic A',
     name: 'PP-OCR: A Practical Ultra Lightweight OCR System',
-    type: ResourceType.PAPER,
+    type: KnowledgeGraphItemCat.Paper,
     score: 0.91,
   },
   {
     category: 'Topic A',
     name: 'ArtEmis: Affective Language for Visual Art',
-    type: ResourceType.CODE,
+    type: KnowledgeGraphItemCat.Code,
     score: 0.85,
   },
   {
     category: 'Topic A',
     name: 'Free Lunch for Few-shot Learning: Distribution Calibration',
-    type: ResourceType.CODE,
+    type: KnowledgeGraphItemCat.Code,
     score: 0.87,
   },
   {
     category: 'Topic A',
     name: 'Reformer: The Efficient Transformer',
-    type: ResourceType.PAPER,
+    type: KnowledgeGraphItemCat.Paper,
     score: 0.7,
   },
   {
     category: 'Topic A',
     name: 'Image Matching across Wide Baselines: From Paper to Practice',
-    type: ResourceType.CODE,
+    type: KnowledgeGraphItemCat.Code,
     score: 0.65,
   },
   {
     category: 'Topic B',
     name: 'Wasserstein GAN',
-    type: ResourceType.CODE,
+    type: KnowledgeGraphItemCat.Code,
     score: 0.9,
   },
   {
     category: 'Topic C',
     name: 'Improved Training of Wasserstein GANs',
-    type: ResourceType.CODE,
+    type: KnowledgeGraphItemCat.Code,
     score: 0.52,
   },
   {
     category: 'Topic D',
     name: 'Scikit-learn: Machine Learning in Python',
-    type: ResourceType.CODE,
+    type: KnowledgeGraphItemCat.Code,
     score: 0.12,
   },
   {
     category: 'Topic E',
     name: 'Nearest Neighbor Median Shift Clustering for Binary Data',
-    type: ResourceType.CODE,
+    type: KnowledgeGraphItemCat.Code,
     score: 0.76,
   },
   {
     category: 'Topic F',
     name: 'Path Aggregation Network for Instance Segmentation',
-    type: ResourceType.PAPER,
+    type: KnowledgeGraphItemCat.Paper,
     score: 0.86,
   },
   {
     category: 'Topic G',
     name: 'Refining activation downsampling with SoftPool',
-    type: ResourceType.PAPER,
+    type: KnowledgeGraphItemCat.Paper,
     score: 0.26,
   },
   {
     category: 'Topic G',
     name: 'Scaled-YOLOv4: Scaling Cross Stage Partial Network',
-    type: ResourceType.PAPER,
+    type: KnowledgeGraphItemCat.Paper,
     score: 0.54,
   },
   {
     category: 'Topic G',
     name: 'Real-Time High-Resolution Background Matting',
-    type: ResourceType.CODE,
+    type: KnowledgeGraphItemCat.Code,
     score: 0.95,
   },
   {
     category: 'Topic H',
     name: 'Scale Equivariance Improves Siamese Tracking',
-    type: ResourceType.PAPER,
+    type: KnowledgeGraphItemCat.Paper,
     score: 0.73,
   },
 ];
@@ -115,8 +113,8 @@ const data = [
 //   'Topic H',
 // ];
 // const types = [
-//   ResourceType.CODE,
-//   ResourceType.PAPER
+//   KnowledgeGraphItemCat.Code,
+//   KnowledgeGraphItemCat.Paper
 // ];
 
 // const data = Array(100).fill(1).map(_ => ({

@@ -1,0 +1,15 @@
+{
+  "name": "drone-authorizer",
+  "version": "1.0.0",
+  "description": "This application uses a headless browser to automate the oAuth2 authorization with Drone process.",
+  "main": "index.js",
+  "dependencies": {
+    "puppeteer": "^7.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "authorize": "node index.js"
+  },
+  "author": "Konstellation",
+  "license": "MIT"
+}

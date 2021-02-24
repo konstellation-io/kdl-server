@@ -14,14 +14,9 @@ $panel-width-big: 110 * $grid-unit;
   &.noShrink {
     flex-shrink: 0;
   }
-
-  &.dark .container {
-    background-color: black;
-  }
 }
 
 .container {
-  background-color: palette(base, 800);
   height: 100%;
   overflow: hidden;
   display: flex;
@@ -40,6 +35,16 @@ $panel-width-big: 110 * $grid-unit;
       max-width: $panel-width-big;
       width: $panel-width-big;
     }
+  }
+
+  &.themeDefault {
+    background-color: palette(base, 800);
+  }
+  &.themeDark {
+    background-color: black;
+  }
+  &.themeLight {
+    background-color: palette(lowlight, 900);
   }
 }
 

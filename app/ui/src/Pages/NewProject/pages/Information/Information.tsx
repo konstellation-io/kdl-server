@@ -2,19 +2,19 @@ import {
   GET_NEW_PROJECT,
   GetNewProject,
 } from 'Graphql/client/queries/getNewProject.graphql';
-import { SpinnerCircular, TextInput } from 'kwc';
-
-import React, { useEffect, useState } from 'react';
-import { generateSlug } from 'Utils/string';
-import styles from './Information.module.scss';
-import useNewProject from 'Graphql/client/hooks/useNewProject';
-import { useLazyQuery, useQuery } from '@apollo/client';
-import DescriptionScore from './components/DescriptionScore/DescriptionScore';
 import {
   GetQualityProjectDesc,
   GetQualityProjectDescVariables,
 } from 'Graphql/queries/types/GetQualityProjectDesc';
+import React, { useEffect, useState } from 'react';
+import { SpinnerCircular, TextInput } from 'kwc';
+import { useLazyQuery, useQuery } from '@apollo/client';
+
+import DescriptionScore from '../../../../Components/DescriptionScore/DescriptionScore';
+import { generateSlug } from 'Utils/string';
 import { loader } from 'graphql.macro';
+import styles from './Information.module.scss';
+import useNewProject from 'Graphql/client/hooks/useNewProject';
 
 const GetQualityProjectDescQuery = loader(
   'Graphql/queries/getQualityProjectDesc.graphql'

@@ -3,11 +3,11 @@ import {
   GetSecondaryPanel,
 } from 'Graphql/client/queries/getSecondaryPanel.graphql';
 import { PANEL_ID, PanelInfo } from '../models/Panel';
+import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
 import { primaryPanel, secondaryPanel } from '../cache';
 
 import { GET_PRIMARY_PANEL } from 'Graphql/client/queries/getPrimaryPanel.graphql';
 import { GetPrimaryPanel } from 'Graphql/client/queries/getPrimaryPanel.graphql';
-import { PANEL_SIZE } from 'Components/Layout/Panel/Panel';
 import { useQuery } from '@apollo/client';
 
 export enum PanelType {
@@ -20,6 +20,7 @@ type UsePanelOptions = {
   title: string;
   isDark?: boolean | null;
   size?: PANEL_SIZE;
+  theme?: PANEL_THEME;
   fixedWidth?: boolean | null;
 };
 function usePanel(
@@ -27,7 +28,7 @@ function usePanel(
   options: UsePanelOptions = {
     id: PANEL_ID.SETTINGS,
     title: '',
-    isDark: null,
+    theme: PANEL_THEME.DEFAULT,
     fixedWidth: null,
   }
 ) {
@@ -48,6 +49,7 @@ function usePanel(
     isDark: null,
     fixedWidth: null,
     size: PANEL_SIZE.DEFAULT,
+    theme: PANEL_THEME.DEFAULT,
     ...options,
   };
 

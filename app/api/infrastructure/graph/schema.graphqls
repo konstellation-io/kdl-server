@@ -107,6 +107,7 @@ input ApiTokenInput {
 input UpdateProjectInput {
   id: ID!
   name: String
+  description: String
   repository: UpdateProjectRepositoryInput
 }
 

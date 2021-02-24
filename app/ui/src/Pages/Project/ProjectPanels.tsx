@@ -20,6 +20,7 @@ import MemberDetails from './panels/MemberDetails/MemberDetails';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
 import Panel from 'Components/Layout/Panel/Panel';
 import ProjectSettings from './panels/ProjectSettings/ProjectSettings';
+import UpdateProjectDescription from './panels/UpdateProjectDescription/UpdateProjectDescription';
 import UpdateRepository from './panels/UpdateRepository/UpdateRepository';
 import styles from './Project.module.scss';
 import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
@@ -80,6 +81,9 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
     [PANEL_ID.REPOSITORY_INFO]: (
       <UpdateRepository project={openedProject} close={panel2Close} />
     ),
+    [PANEL_ID.PROJECT_DESCRIPTION]: (
+      <UpdateProjectDescription project={openedProject} close={panel2Close} />
+    ),
     [PANEL_ID.MEMBER_INFO]: (
       <MemberDetails
         member={memberDetailsData.memberDetails}
@@ -97,7 +101,7 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
         show={!!panel1Data.primaryPanel}
         close={panel1Close}
         noShrink={!!panel1Data.primaryPanel?.fixedWidth}
-        dark={!!panel1Data.primaryPanel?.isDark}
+        theme={panel1Data.primaryPanel?.theme}
         size={panel1Data.primaryPanel?.size}
       >
         {panels[panel1Data.primaryPanel?.id]}
@@ -107,7 +111,7 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
         show={!!panel2Data.secondaryPanel}
         close={panel2Close}
         noShrink={!!panel2Data.secondaryPanel?.fixedWidth}
-        dark={!!panel2Data.secondaryPanel?.isDark}
+        theme={panel2Data.secondaryPanel?.theme}
         size={panel2Data.secondaryPanel?.size}
       >
         {panels[panel2Data.secondaryPanel?.id]}

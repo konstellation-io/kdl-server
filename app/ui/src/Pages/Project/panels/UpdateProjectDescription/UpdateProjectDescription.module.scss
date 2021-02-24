@@ -1,0 +1,51 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.container {
+  padding: 2 * $grid-unit 3.5 * $grid-unit;
+}
+
+.formInput {
+  padding: 0 3 * $grid-unit;
+  height: 100%;
+
+  > div {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    textarea {
+      height: inherit;
+      max-height: none;
+    }
+  }
+}
+
+.score {
+  height: 5 * $grid-unit;
+  margin-left: 3 * $grid-unit;
+}
+
+.descriptionLabel {
+  @include font-caption;
+  color: font-color(regular);
+  text-transform: uppercase;
+}
+
+.actions {
+  margin-top: auto;
+
+  > div {
+    background-color: palette(base, 800);
+    padding: 0;
+    justify-content: flex-start;
+  }
+}

@@ -20,6 +20,7 @@ import { GetUsers } from 'Graphql/queries/types/GetUsers';
 import Member from './components/Member/Member';
 import { MemberDetails } from 'Graphql/client/models/MemberDetails';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
+import { PANEL_THEME } from 'Components/Layout/Panel/Panel';
 import { loader } from 'graphql.macro';
 import styles from './TabMembers.module.scss';
 import useMember from 'Graphql/hooks/useMember';
@@ -45,7 +46,7 @@ function TabMembers({ projectId }: Props) {
     id: PANEL_ID.MEMBER_INFO,
     title: 'Member details',
     fixedWidth: true,
-    isDark: true,
+    theme: PANEL_THEME.DARK,
   });
 
   const {

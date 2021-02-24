@@ -13,6 +13,7 @@ export interface UpdateProject_updateProject {
   __typename: 'Project';
   id: string;
   name: string;
+  description: string;
 }
 
 export interface UpdateProject {

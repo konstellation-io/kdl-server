@@ -33,9 +33,10 @@ module.exports = {
     }),
   }),
   Mutation: () => ({
-    updateProject: (_, { input: { id, name } }) => ({
+    updateProject: (_, { input: { id, name, description } }) => ({
       id,
       name,
+      description
     }),
     updateMember: (_, { input: { memberId, accessLevel } }) => ({
       id: memberId,

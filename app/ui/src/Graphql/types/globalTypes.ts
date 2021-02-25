@@ -89,6 +89,7 @@ export interface UpdateMemberInput {
 export interface UpdateProjectInput {
   id: string;
   name?: string | null;
+  description?: string | null;
   repository?: UpdateProjectRepositoryInput | null;
 }
 

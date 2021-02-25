@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import FilterGlow from './FilterGlow/FilterGlow';
 import KGViz from './KGViz';
+import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 import Minimap from '../Minimap/Minimap';
 import { ParentSize } from '@visx/responsive';
 import SectionList from './SectionList/SectionList';
@@ -9,7 +10,6 @@ import Tooltip from './Tooltip';
 import styles from './KGVisualization.module.scss';
 import useTextTooltip from 'Hooks/useTextTooltip';
 import useZoom from './useZoom';
-import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 
 export type D = {
   category: string;

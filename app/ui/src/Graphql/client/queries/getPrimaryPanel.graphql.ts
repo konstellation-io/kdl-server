@@ -11,7 +11,7 @@ export const GET_PRIMARY_PANEL = gql`
       id
       title
       fixedWidth
-      isDark
+      theme
       size
     }
   }

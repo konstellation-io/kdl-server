@@ -21,7 +21,10 @@ const GetProjectsQuery = loader('Graphql/queries/getProjects.graphql');
 const CreateProjectMutation = loader('Graphql/mutations/createProject.graphql');
 const UpdateProjectMutation = loader('Graphql/mutations/updateProject.graphql');
 
-export default function useProject() {
+type UseProjectParams = {
+  onUpdateCompleted?: () => void
+};
+export default function useProject(options?: UseProjectParams) {
   const [mutationCreateProject, { data }] = useMutation<
     CreateProject,
     CreateProjectVariables
@@ -35,6 +38,7 @@ export default function useProject() {
     UpdateProjectVariables
   >(UpdateProjectMutation, {
     onError: (e) => console.error(`updateProject: ${e}`),
+    onCompleted: options?.onUpdateCompleted
   });
 
   function updateCache(
@@ -74,6 +78,10 @@ export default function useProject() {
     mutationUpdateProject(mutationPayloadHelper({ id, name }));
   }
 
+  function updateProjectDescription(id: string, description: string) {
+    mutationUpdateProject(mutationPayloadHelper({ id, description }));
+  }
+
   function updateProjectRepositoryUrl(id: string, url: string) {
     mutationUpdateProject(mutationPayloadHelper({ id, repository: { url } }));
   }
@@ -81,6 +89,7 @@ export default function useProject() {
   return {
     addNewProject,
     updateProjectName,
+    updateProjectDescription,
     updateProjectRepositoryUrl,
     create: { data },
   };

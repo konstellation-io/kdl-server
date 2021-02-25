@@ -1,11 +1,13 @@
 import { BaseType, EnterElement, Selection, select } from 'd3-selection';
-import { D } from '../KGVisualization';
 import { RGBColor, color } from 'd3-color';
+import { SymbolType, symbol } from 'd3-shape';
 
+import { D } from '../KGVisualization';
 import { GroupD } from '../../../KGUtils';
+import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
+import SYMBOL from './symbols';
 import { scaleLinear } from '@visx/scale';
 import styles from './Resources.module.scss';
-import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 
 export const RESOURCE_R = 14;
 const RESOURCE_STROKE = 4;
@@ -23,13 +25,6 @@ const TEXT_COLOR = {
   LIGHT: '#CCF5FF',
 };
 
-const PATH = {
-  CODE:
-    'M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z',
-  DOC:
-    'M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z',
-};
-
 const px = (value: number | string) => `${value}px`;
 
 export default class Resources {
@@ -41,6 +36,10 @@ export default class Resources {
   onShowTooltip: (e: MouseEvent, d: GroupD, element: BaseType) => void;
   onHideTooltip: (element: BaseType) => void;
   onResourceSelection: (name: string) => void;
+  symbols = new Map<KnowledgeGraphItemCat, string | null>([
+    [KnowledgeGraphItemCat.Code, null],
+    [KnowledgeGraphItemCat.Paper, null],
+  ]);
 
   constructor(
     onShowTooltip: (e: MouseEvent, d: GroupD, element: BaseType) => void,
@@ -60,7 +59,19 @@ export default class Resources {
     this.resourceR = RESOURCE_R * zoomScale;
     this.resourceStroke = RESOURCE_STROKE * zoomScale;
     this.fontSize = FONT_SIZE * zoomScale;
+
+    this.symbols.set(
+      KnowledgeGraphItemCat.Code,
+      this.generateSymbol(SYMBOL.CODE)
+    );
+    this.symbols.set(
+      KnowledgeGraphItemCat.Paper,
+      this.generateSymbol(SYMBOL.DOC)
+    );
   };
+
+  generateSymbol = (symbolType: SymbolType) =>
+    symbol().type(symbolType).size(this.resourceR)();
 
   init = (
     container: Selection<SVGGElement, unknown, null, undefined>,
@@ -111,6 +122,7 @@ export default class Resources {
       resourceStroke,
       fontSize,
       onShowTooltip,
+      symbols,
       onHideTooltip,
       onResourceSelection,
     } = this;
@@ -160,20 +172,13 @@ export default class Resources {
       .attr('stroke-width', resourceStroke);
 
     resourcesG
-      .append('svg')
+      .append('path')
       .classed(styles.resourceImage, true)
-      .attr('x', -resourceR / 2)
-      .attr('y', -resourceR / 2)
+      .attr('transform', `translate(${-resourceR / 2},${-resourceR / 2})`)
       .attr('display', (d: GroupD) =>
         d.elements.length === 1 ? 'default' : 'none'
       )
-      .attr('width', resourceR)
-      .attr('height', resourceR)
-      .attr('viewBox', `0 0 24 24`)
-      .append('path')
-      .attr('d', (d: GroupD) =>
-        d.elements[0].type === KnowledgeGraphItemCat.Code ? PATH.CODE : PATH.DOC
-      );
+      .attr('d', (d: GroupD) => symbols.get(d.elements[0].type) || '');
 
     resourcesG
       .append('text')
@@ -202,6 +207,7 @@ export default class Resources {
       resourceR,
       resourceStroke,
       fontSize,
+      symbols,
     } = this;
 
     selection.attr('transform', (d) => `translate(${d.x}, ${d.y})`);
@@ -213,10 +219,8 @@ export default class Resources {
 
     selection
       .select(`.${styles.resourceImage}`)
-      .attr('x', -resourceR / 2)
-      .attr('y', -resourceR / 2)
-      .attr('width', resourceR)
-      .attr('height', resourceR);
+      .attr('transform', `translate(${-resourceR / 2},${-resourceR / 2})`)
+      .attr('d', (d: GroupD) => symbols.get(d.elements[0].type) || '');
 
     selection
       .select(`.${styles.resourceLabel}`)

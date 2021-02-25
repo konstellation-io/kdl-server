@@ -1,10 +1,4 @@
-import {
-  BaseType,
-  Local,
-  Selection,
-  local,
-  select,
-} from 'd3-selection';
+import { BaseType, Local, Selection, local, select } from 'd3-selection';
 import { Coord, GroupD, getHash, groupData } from '../../KGUtils';
 import Resources, { RESOURCE_R } from './Resources/Resources';
 import { scaleBand, scaleLinear } from '@visx/scale';
@@ -130,10 +124,10 @@ class KGViz {
       y: props.y,
       k: props.k,
       initialZoomValues: props.initialZoomValues,
-      reallocateZoom: props.reallocateZoom
+      reallocateZoom: props.reallocateZoom,
     });
     minimapViz = this.minimap;
-    
+
     this.sectionOrientation = local<string>();
 
     this.resources = new Resources(
@@ -143,9 +137,7 @@ class KGViz {
       this.props.onResourceSelection
     );
 
-    this.sections = new Sections(
-      this.wrapper
-    );
+    this.sections = new Sections(this.wrapper);
 
     this.updateSizes();
     this.cleanup();
@@ -199,7 +191,7 @@ class KGViz {
         .attr('stroke-width', guideStroke)
     );
 
-    // Sections 
+    // Sections
     sections.init(mainG, sectionDomain, coord, rDomain);
 
     // InnerCircle
@@ -223,7 +215,7 @@ class KGViz {
     mainG.append('circle').classed(styles.outerCircle, true).attr('r', OUTER_R);
 
     // Radius axis
-    const [maxR, minR] = rDomain.map(v => v * 100);
+    const [maxR, minR] = rDomain.map((v) => v * 100);
     const axis = mainG
       .append('g')
       .classed(styles.axis, true)
@@ -232,11 +224,11 @@ class KGViz {
     axis
       .append('text')
       .attr('x', (OUTER_R - INNER_R) / 3)
-      .text(`${Math.round(minR + (maxR-minR) * 2 / 3)}%`);
+      .text(`${Math.round(minR + ((maxR - minR) * 2) / 3)}%`);
     axis
       .append('text')
       .attr('x', ((OUTER_R - INNER_R) * 2) / 3)
-      .text(`${Math.round(minR + (maxR-minR) / 3)}%`);
+      .text(`${Math.round(minR + (maxR - minR) / 3)}%`);
     axis
       .append('text')
       .attr('x', OUTER_R - INNER_R)
@@ -261,7 +253,10 @@ class KGViz {
     mainG.select(`.${styles.innerCircleText}`).html(newCenterText);
   };
 
-  updateZoomArea = (zoomValues: ZoomValues, reallocateZoom: (dx: number, dy: number) => void) => {
+  updateZoomArea = (
+    zoomValues: ZoomValues,
+    reallocateZoom: (dx: number, dy: number) => void
+  ) => {
     const { sections, minimap, groupedData, resetTooltip } = this;
 
     minimap.update(groupedData, zoomValues, reallocateZoom);
@@ -270,7 +265,11 @@ class KGViz {
     sections.positionSectionBoxes();
   };
 
-  update = (zoomValues: ZoomValues, data: D[], reallocateZoom: (dx: number, dy: number) => void) => {
+  update = (
+    zoomValues: ZoomValues,
+    data: D[],
+    reallocateZoom: (dx: number, dy: number) => void
+  ) => {
     this.props.k = zoomValues.k;
     this.updateSizes();
 

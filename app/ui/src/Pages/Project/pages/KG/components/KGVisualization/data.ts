@@ -1,7 +1,5 @@
 import { D } from './KGVisualization';
-import { KnowledgeGraphItemCat } from './../../../../../../Graphql/types/globalTypes';
-// import randomSentence from 'random-sentence';
-
+import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 
 const data: D[] = [
   {
@@ -101,27 +99,5 @@ const data: D[] = [
     score: 0.73,
   },
 ];
-
-// const categories = [
-//   'Topic A',
-//   'Topic B',
-//   'Topic C',
-//   'Topic D',
-//   'Topic E',
-//   'Topic F',
-//   'Topic G',
-//   'Topic H',
-// ];
-// const types = [
-//   KnowledgeGraphItemCat.Code,
-//   KnowledgeGraphItemCat.Paper
-// ];
-
-// const data = Array(100).fill(1).map(_ => ({
-//   category: categories[Math.floor(Math.random() * categories.length)],
-//   name: randomSentence({words: 5}),
-//   type: types[Math.floor(Math.random() * types.length)],
-//   score: Math.random()
-// }));
 
 export default data;

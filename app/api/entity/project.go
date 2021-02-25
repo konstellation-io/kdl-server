@@ -42,7 +42,11 @@ type Project struct {
 	Error              *string
 	Repository         Repository
 	Members            []Member
-	State              ProjectState
+}
+
+// State is just a hardcoded field because we should think about it.
+func (p Project) State() ProjectState {
+	return ProjectStateStarted
 }
 
 // NewProject is a constructor function.

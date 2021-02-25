@@ -2972,14 +2972,14 @@ func (ec *executionContext) _Project_state(ctx context.Context, field graphql.Co
 		Object:     "Project",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
+		IsMethod:   true,
 		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.State, nil
+		return obj.State(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)

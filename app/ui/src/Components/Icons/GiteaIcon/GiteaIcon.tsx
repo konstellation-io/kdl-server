@@ -28,7 +28,7 @@ const GiteaIcon = (props: SvgIconProps) => (
       d="M76.558 68.116c12.976 6.396 13.013 4.102 4.891 20.908"
       fill="none"
       stroke="#609926"
-      stroke-width="2.68"
+      strokeWidth="2.68"
     />
   </SvgIcon>
 );

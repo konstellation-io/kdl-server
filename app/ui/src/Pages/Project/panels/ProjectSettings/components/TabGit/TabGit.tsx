@@ -1,3 +1,4 @@
+import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
 import RepositoryTypeComponent, {
   LOCATION,
   SIZE,
@@ -9,7 +10,6 @@ import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
 import { GetProjects_projects_repository } from 'Graphql/queries/types/GetProjects';
 import IconEdit from '@material-ui/icons/Edit';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
-import { PANEL_SIZE } from 'Components/Layout/Panel/Panel';
 import React from 'react';
 import { RepositoryType } from 'Graphql/types/globalTypes';
 import styles from './TabGit.module.scss';
@@ -22,7 +22,7 @@ function TabGit({ repository }: Props) {
   const { openPanel } = usePanel(PanelType.SECONDARY, {
     id: PANEL_ID.REPOSITORY_INFO,
     title: 'Edit Repository Information',
-    isDark: true,
+    theme: PANEL_THEME.DARK,
     size: PANEL_SIZE.BIG,
   });
 

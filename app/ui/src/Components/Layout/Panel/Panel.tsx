@@ -6,6 +6,12 @@ import IconClose from '@material-ui/icons/Close';
 import cx from 'classnames';
 import styles from './Panel.module.scss';
 
+export enum PANEL_THEME {
+  DEFAULT = 'themeDefault',
+  DARK = 'themeDark',
+  LIGHT = 'themeLight',
+}
+
 export enum PANEL_SIZE {
   DEFAULT = 'default',
   BIG = 'big',
@@ -18,7 +24,7 @@ type Props = {
   children?: JSX.Element | null | false;
   size?: PANEL_SIZE;
   noShrink?: boolean;
-  dark?: boolean;
+  theme?: PANEL_THEME;
 };
 const Panel: FC<Props> = ({
   show,
@@ -27,12 +33,11 @@ const Panel: FC<Props> = ({
   title = '',
   size = PANEL_SIZE.DEFAULT,
   noShrink = false,
-  dark = false,
+  theme = PANEL_THEME.DEFAULT,
 }) => (
   <TransitionGroup
     className={cx(styles.group, styles[size], {
       [styles.noShrink]: noShrink,
-      [styles.dark]: dark,
     })}
   >
     <CSSTransition
@@ -45,7 +50,7 @@ const Panel: FC<Props> = ({
     >
       <>
         {show && (
-          <div className={cx(styles.container, styles[size])}>
+          <div className={cx(styles.container, styles[size], styles[theme])}>
             <header>
               <div className={styles.separator} />
               <p className={styles.title}>{title}</p>

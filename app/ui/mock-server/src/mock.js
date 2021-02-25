@@ -29,13 +29,14 @@ module.exports = {
       quality: Math.round((Math.random() * 1000) % 100),
     }),
     knowledgeGraph: () => ({
-      items: () => new MockList([1, 1000]),
+      items: () => new MockList([1, 80]),
     }),
   }),
   Mutation: () => ({
-    updateProject: (_, { input: { id, name } }) => ({
+    updateProject: (_, { input: { id, name, description } }) => ({
       id,
       name,
+      description
     }),
     updateMember: (_, { input: { memberId, accessLevel } }) => ({
       id: memberId,

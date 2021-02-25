@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import FilterGlow from './FilterGlow/FilterGlow';
 import KGViz from './KGViz';
+import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 import Minimap from '../Minimap/Minimap';
 import { ParentSize } from '@visx/responsive';
 import SectionList from './SectionList/SectionList';
@@ -9,7 +10,6 @@ import Tooltip from './Tooltip';
 import styles from './KGVisualization.module.scss';
 import useTextTooltip from 'Hooks/useTextTooltip';
 import useZoom from './useZoom';
-import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 
 export type D = {
   category: string;
@@ -57,7 +57,7 @@ function KGVisualization({
   const minimapRef = useRef<SVGSVGElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const gRef = useRef<SVGGElement>(null);
-  const { zoomValues, initialZoomValues, zoomIn, zoomOut } = useZoom({
+  const { zoomValues, initialZoomValues, zoomIn, zoomOut, reallocateZoom } = useZoom({
     svgRef,
     width,
     height,
@@ -102,6 +102,7 @@ function KGVisualization({
         initialZoomValues,
         onResourceSelection,
         centerText: selectedResource,
+        reallocateZoom,
         ...zoomValues,
       };
       viz.current = new KGViz(gRef.current, vizProps);
@@ -110,7 +111,7 @@ function KGVisualization({
 
   function update() {
     if (viz.current !== null && zoomValues !== null) {
-      viz.current.update(zoomValues, data);
+      viz.current.update(zoomValues, data, reallocateZoom);
     } else {
       initialize();
     }
@@ -124,7 +125,7 @@ function KGVisualization({
 
   function updateZoomArea() {
     if (viz.current !== null && zoomValues !== null) {
-      viz.current.updateZoomArea(zoomValues);
+      viz.current.updateZoomArea(zoomValues, reallocateZoom);
     }
   }
 

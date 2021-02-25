@@ -1,5 +1,6 @@
 import { BaseType, EnterElement, Selection, select } from 'd3-selection';
 import { Coord, GroupD } from '../../KGUtils';
+import { DragBehavior, drag } from 'd3-drag';
 
 import { N_GUIDES } from '../KGVisualization/KGViz';
 import { ZoomValues } from '../KGVisualization/useZoom';
@@ -26,21 +27,25 @@ type Props = {
   y: number;
   k: number;
   initialZoomValues: ZoomValues;
+  reallocateZoom: (dx: number, dy: number) => void;
 };
 class MinimapViz {
   props: Props;
   wrapper: Selection<SVGSVGElement, unknown, null, undefined>;
   zoomArea: Selection<SVGRectElement, unknown, null, undefined> | null;
+  reallocateZoom: (dx: number, dy: number) => void;
   center: Coord;
   container: any;
   zoom: ZoomValues;
   data: GroupD[] = [];
+  dragEvent: DragBehavior<Element, unknown, unknown> = drag();
   minimapScale: number = 0;
 
   constructor(wrapper: SVGSVGElement, props: Props) {
     this.wrapper = select(wrapper);
     const width = +this.wrapper.attr('width');
     const height = +this.wrapper.attr('height');
+    this.reallocateZoom = props.reallocateZoom;
 
     this.minimapScale = (MINIMAP_OUTER_R * height) / OUTER_R;
     this.zoomArea = null;
@@ -48,6 +53,32 @@ class MinimapViz {
     this.props = props;
     this.center = { x: width / 2, y: height / 2 };
     this.cleanup();
+    
+    this.updateDragEvent();
+  }
+
+  updateDragEvent = () => {
+    const { wrapper, center, minimapScale, zoom, props: { initialZoomValues } } = this;
+
+    const dk = (1 + (zoom.k - initialZoomValues.k)) * (1 / minimapScale);    
+
+    this.dragEvent = drag()
+      .on('drag', ({x, y}) => {
+        const dx = x - center.x;
+        const dy = y - center.y;
+
+        this.reallocateZoom(dx * dk, dy * dk);
+      })
+
+    wrapper
+      .on('mousedown', (e) => {
+        const dx = e.offsetX - center.x;
+        const dy = e.offsetY - center.y;
+
+        this.reallocateZoom(dx * dk, dy * dk);
+      })
+      // @ts-ignore
+      .call(this.dragEvent);
   }
 
   cleanup = () => {
@@ -60,7 +91,7 @@ class MinimapViz {
     this.minimapScale = (MINIMAP_OUTER_R * height) / OUTER_R;
 
     this.initialize(this.data);
-    this.update(this.data, this.zoom);
+    this.update(this.data, this.zoom, this.reallocateZoom);
   };
 
   initialize = (data: GroupD[]) => {
@@ -71,6 +102,7 @@ class MinimapViz {
       center,
       resources,
       minimapScale,
+      updateDragEvent,
       props: { areaWidth, areaHeight },
     } = this;
 
@@ -117,21 +149,27 @@ class MinimapViz {
       .attr('height', areaHeight);
 
     resources.create(newResources);
+
+    updateDragEvent();
   };
 
-  update = (data: GroupD[], zoom: ZoomValues) => {
+  update = (data: GroupD[], zoom: ZoomValues, reallocateZoom: (dx: number, dy: number) => void) => {
     this.data = data;
-
+    this.reallocateZoom = reallocateZoom;
+    
     const {
       container,
       resources,
       zoomArea,
       center,
       minimapScale,
+      updateDragEvent,
       props: { areaWidth, areaHeight },
     } = this;
     this.zoom = zoom;
-
+    
+    updateDragEvent();
+    
     // Data
     const allResources = container
       .select(`.${styles.resourcesWrapper}`)

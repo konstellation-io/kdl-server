@@ -10,9 +10,10 @@
 }
 
 .description {
+  position: relative;
   background-color: palette(base, 800);
   flex-grow: 1;
-  padding: 2 * $grid-unit;
+  padding: $grid-unit 2 * $grid-unit;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -22,6 +23,11 @@
     color: font-color(regular);
 
     margin-bottom: 2 * $grid-unit;
+  }
+  .button {
+    position: absolute;
+    top: 0;
+    right: 0;
   }
   .content {
     @include font-body;

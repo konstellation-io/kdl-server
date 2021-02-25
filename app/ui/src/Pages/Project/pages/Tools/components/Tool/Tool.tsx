@@ -1,32 +1,38 @@
-import React, { FC } from 'react';
+import React, { useState } from 'react';
+import styles from './Tool.module.scss';
+import { SpinnerCircular } from 'kwc';
 import cx from 'classnames';
-import styles from '../../Tools.module.scss';
+import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTools';
 
-export interface ToolProps {
-  img: string;
-  title: string;
-  description: string;
-  disabled?: boolean;
-  onClick?: () => void;
-}
+type Props = {
+  isHidden: boolean;
+  name: keyof GetUserTools_project_toolUrls;
+  src: string;
+};
 
-const Tool: FC<ToolProps> = ({
-  img,
-  title,
-  description,
-  disabled = false,
-  onClick = () => {},
-}) => (
-  <div
-    className={cx(styles.cardContent, { [styles.disabled]: disabled })}
-    onClick={() => !disabled && onClick()}
-  >
-    <div className={styles.imgContainer}>
-      <img className={styles.toolImg} src={img} alt={`${title}_img`} />
+function Tool({ name, isHidden, src }: Props) {
+  const [loaded, setLoaded] = useState(false);
+
+  function handleFinishLoad() {
+    setLoaded(true);
+  }
+
+  return (
+    <div
+      className={cx(styles.container, {
+        [styles.hidden]: isHidden,
+      })}
+    >
+      {!loaded && <SpinnerCircular />}
+      <iframe
+        title={name}
+        src={src}
+        frameBorder="0"
+        className={styles.iframeContainer}
+        onLoad={handleFinishLoad}
+      />
     </div>
-    <p className={styles.toolTitle}>{title}</p>
-    <p className={styles.toolDescription}>{description}</p>
-  </div>
-);
+  );
+}
 
 export default Tool;

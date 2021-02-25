@@ -1,0 +1,21 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.container {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+  position: absolute;
+
+  &.hidden {
+    z-index: -1;
+  }
+
+  .iframeContainer {
+    height: 100%;
+    width: 100%;
+  }
+}
+

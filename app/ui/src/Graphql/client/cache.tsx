@@ -10,7 +10,7 @@ import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { MemberDetails } from './models/MemberDetails';
 import { NewProject } from './models/NewProject';
 import { PanelInfo } from './models/Panel';
-import { BrowserWindow } from './models/BrowserWindow';
+import { Tools } from './models/Tools';
 
 export const initialProjectFilters: ProjectFilters = {
   name: '',
@@ -60,6 +60,8 @@ const initialStateUserSettings: UserSettings = {
   },
 };
 
+export const initialTools: Tools = { currentTool: null, openedTools: [] };
+
 export const projectFilters = makeVar(initialProjectFilters);
 export const newProject = makeVar(initialNewProject);
 export const openedProject = makeVar<GetProjects_projects | null>(null);
@@ -67,7 +69,7 @@ export const userSettings = makeVar<UserSettings>(initialStateUserSettings);
 export const memberDetails = makeVar<MemberDetails | null>(null);
 export const primaryPanel = makeVar<PanelInfo | null>(null);
 export const secondaryPanel = makeVar<PanelInfo | null>(null);
-export const browserWindows = makeVar<BrowserWindow[]>([]);
+export const tools = makeVar<Tools>(initialTools);
 
 const cache = new InMemoryCache({
   typePolicies: {
@@ -80,7 +82,6 @@ const cache = new InMemoryCache({
         primaryPanel: { read: () => primaryPanel() },
         secondaryPanel: { read: () => secondaryPanel() },
         memberDetails: { read: () => memberDetails() },
-        browserWindows: { read: () => browserWindows() },
         projects: { merge: false },
         apiTokens: { merge: false },
         users: { merge: false },

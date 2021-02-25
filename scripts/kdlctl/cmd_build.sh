@@ -44,6 +44,7 @@ build_docker_images() {
   # Server
   if [ "$BUILD_SERVER" = "1" ] || [ "$BUILD_ALL" = "1" ]; then
     build_server
+    build_drone_authorizer
     build_kg
   fi
 
@@ -63,6 +64,11 @@ setup_env() {
 build_server() {
   setup_env
   build_image kdl-server app
+}
+
+build_drone_authorizer() {
+  setup_env
+  build_image drone-authorizer app/drone-authorizer
 }
 
 build_kg() {

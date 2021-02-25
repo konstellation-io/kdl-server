@@ -16,13 +16,6 @@
 .contentLayer {
   height: 100%;
   width: 100%;
-  .tool {
-    height: 100%;
-    width: 100%;
-    &.hidden {
-      display: none;
-    }
-  }
 }
 .panelLayer {
   position: absolute;

@@ -22,7 +22,8 @@ async function authorizeDroneApp() {
       '--no-sandbox',
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
-      '--disable-notifications'
+      '--disable-notifications',
+      '--ignore-certificate-errors'
     ]
   }
 )

@@ -3,7 +3,16 @@ import ROUTE from 'Constants/routes';
 import React, { useEffect } from 'react';
 import Tools from '../../pages/Tools/Tools';
 import useTools from 'Graphql/client/hooks/useTools';
+import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTools';
 
+const toolsRoutes: [ROUTE, keyof GetUserTools_project_toolUrls][] = [
+  [ROUTE.PROJECT_TOOL_GITEA, 'gitea'],
+  [ROUTE.PROJECT_TOOL_DRONE, 'drone'],
+  [ROUTE.PROJECT_TOOL_JUPYTER, 'jupyter'],
+  [ROUTE.PROJECT_TOOL_MINIO, 'minio'],
+  [ROUTE.PROJECT_TOOL_MLFLOW, 'mlflow'],
+  [ROUTE.PROJECT_TOOL_VSCODE, 'vscode'],
+];
 function ProjectToolsRoutes() {
   const { resetCurrentTool } = useTools();
 
@@ -16,36 +25,13 @@ function ProjectToolsRoutes() {
 
   return (
     <>
-      <Route
-        exact
-        path={ROUTE.PROJECT_TOOL_GITEA}
-        component={() => <Tools toolName="gitea" />}
-      />
-      <Route
-        exact
-        path={ROUTE.PROJECT_TOOL_DRONE}
-        component={() => <Tools toolName="drone" />}
-      />
-      <Route
-        exact
-        path={ROUTE.PROJECT_TOOL_JUPYTER}
-        component={() => <Tools toolName="jupyter" />}
-      />
-      <Route
-        exact
-        path={ROUTE.PROJECT_TOOL_MINIO}
-        component={() => <Tools toolName="minio" />}
-      />
-      <Route
-        exact
-        path={ROUTE.PROJECT_TOOL_MLFLOW}
-        component={() => <Tools toolName="mlflow" />}
-      />
-      <Route
-        exact
-        path={ROUTE.PROJECT_TOOL_VSCODE}
-        component={() => <Tools toolName="vscode" />}
-      />
+      {toolsRoutes.map(([route, toolName]) => (
+        <Route
+          exact
+          path={route}
+          component={() => <Tools toolName={toolName} />}
+        />
+      ))}
     </>
   );
 }

@@ -1,6 +1,11 @@
-import { ApolloClient, ApolloProvider } from '@apollo/client';
+import {
+  ApolloClient,
+  ApolloLink,
+  ApolloProvider,
+  HttpLink,
+} from '@apollo/client';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
-import { Slide, ToastContainer } from 'react-toastify';
+import { Slide, ToastContainer, toast } from 'react-toastify';
 
 import { CONFIG } from 'index';
 import GenerateApiToken from 'Pages/GenerateApiToken/GenerateApiToken';
@@ -17,6 +22,7 @@ import UserSshKey from 'Pages/UserSshKey/UserSshKey';
 import Users from 'Pages/Users/Users';
 import cache from 'Graphql/client/cache';
 import history from 'browserHistory';
+import { onError } from '@apollo/client/link/error';
 import styles from './App.module.scss';
 
 const routesWithTopBar = [
@@ -58,11 +64,37 @@ function Routes() {
   );
 }
 
+const errorLink = onError(
+  ({ graphQLErrors, networkError, forward, operation }) => {
+    let errorMsg = 'Unknown error';
+
+    if (graphQLErrors) {
+      graphQLErrors.forEach(({ message, locations, path }) =>
+        console.error(
+          `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+        )
+      );
+      errorMsg = 'There was an error requesting information from the server';
+    } else if (networkError) {
+      console.error(`[Network error]: ${networkError}`);
+      errorMsg = 'Could not connect to the Server';
+    }
+
+    toast.error(errorMsg, { autoClose: false });
+    forward(operation);
+  }
+);
+
 function App() {
-  const client = new ApolloClient({
+  const httpLink = new HttpLink({
     uri: `${CONFIG.SERVER_URL}/api/query`,
+  });
+
+  const client = new ApolloClient({
+    connectToDevTools: process.env.NODE_ENV === 'development',
     credentials: 'include',
     cache,
+    link: ApolloLink.from([errorLink, httpLink]),
   });
 
   return (

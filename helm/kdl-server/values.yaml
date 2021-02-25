@@ -37,6 +37,12 @@ giteaOauth2Setup:
     tag: 1.1.5
     pullPolicy: IfNotPresent
 
+droneAuthorizer:
+  image:
+    repository: konstellation/drone-authorizer
+    tag: latest
+    pullPolicy: IfNotPresent
+
 mongodb:
   service:
     name: "mongodb"

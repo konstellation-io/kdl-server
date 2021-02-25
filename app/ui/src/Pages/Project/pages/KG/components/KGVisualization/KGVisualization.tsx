@@ -57,7 +57,7 @@ function KGVisualization({
   const minimapRef = useRef<SVGSVGElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const gRef = useRef<SVGGElement>(null);
-  const { zoomValues, initialZoomValues, zoomIn, zoomOut } = useZoom({
+  const { zoomValues, initialZoomValues, zoomIn, zoomOut, reallocateZoom } = useZoom({
     svgRef,
     width,
     height,
@@ -102,6 +102,7 @@ function KGVisualization({
         initialZoomValues,
         onResourceSelection,
         centerText: selectedResource,
+        reallocateZoom,
         ...zoomValues,
       };
       viz.current = new KGViz(gRef.current, vizProps);
@@ -110,7 +111,7 @@ function KGVisualization({
 
   function update() {
     if (viz.current !== null && zoomValues !== null) {
-      viz.current.update(zoomValues, data);
+      viz.current.update(zoomValues, data, reallocateZoom);
     } else {
       initialize();
     }
@@ -124,7 +125,7 @@ function KGVisualization({
 
   function updateZoomArea() {
     if (viz.current !== null && zoomValues !== null) {
-      viz.current.updateZoomArea(zoomValues);
+      viz.current.updateZoomArea(zoomValues, reallocateZoom);
     }
   }
 

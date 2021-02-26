@@ -2,6 +2,7 @@ query GetMe {
   me {
     id
     email
+    areToolsActive
     apiTokens {
       id
       name

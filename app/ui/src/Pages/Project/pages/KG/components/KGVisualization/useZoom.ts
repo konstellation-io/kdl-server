@@ -97,17 +97,14 @@ const useZoom: (p: Params) => UseZoom = ({
       );
     }
   }
-  
+
   function reallocateZoom(dx: number, dy: number) {
     if (zoomValues) {
       const centerX = (width / 2) * (1 - zoomValues.k);
       const centerY = (height / 2) * (1 - zoomValues.k);
 
       const tx = zoomIdentity
-        .translate(
-          centerX - dx,
-          centerY - dy
-        )
+        .translate(centerX - dx, centerY - dy)
         .scale(zoomValues.k);
 
       const selection = select(svgRef.current);
@@ -126,7 +123,7 @@ const useZoom: (p: Params) => UseZoom = ({
     initialZoomValues: initialZoomValues.current,
     zoomIn,
     zoomOut,
-    reallocateZoom
+    reallocateZoom,
   };
 };
 

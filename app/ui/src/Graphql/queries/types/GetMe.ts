@@ -19,6 +19,7 @@ export interface GetMe_me {
   __typename: 'User';
   id: string;
   email: string;
+  areToolsActive: boolean;
   apiTokens: GetMe_me_apiTokens[];
 }
 

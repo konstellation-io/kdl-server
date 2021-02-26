@@ -38,7 +38,7 @@ function UpdateProjectDescription({ project, close }: Props) {
   });
 
   const { updateProjectDescription } = useProject({
-    onUpdateCompleted: () => setCompleted(true)
+    onUpdateCompleted: () => setCompleted(true),
   });
 
   const {
@@ -104,7 +104,7 @@ function UpdateProjectDescription({ project, close }: Props) {
         <Button
           label="SAVE"
           onClick={handleSubmit(submit)}
-          disabled={!completed && (descriptionValue === project.description)}
+          disabled={!completed && descriptionValue === project.description}
           success={completed}
           primary
         />

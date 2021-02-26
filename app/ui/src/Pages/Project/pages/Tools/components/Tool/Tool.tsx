@@ -23,7 +23,11 @@ function Tool({ name, isHidden, src }: Props) {
         [styles.hidden]: isHidden,
       })}
     >
-      {!loaded && <SpinnerCircular />}
+      {!loaded && (
+        <div className={styles.shield}>
+          <SpinnerCircular />
+        </div>
+      )}
       <iframe
         title={name}
         src={src}

@@ -1,16 +1,15 @@
-import ROUTE, { buildRoute } from '../Constants/routes';
-
-import IconHome from '@material-ui/icons/Dashboard';
-import IconKG from '@material-ui/icons/EmojiObjects';
-import IconSettings from '@material-ui/icons/Settings';
+import ROUTE, { buildRoute } from 'Constants/routes';
 import { OverridableComponent } from '@material-ui/core/OverridableComponent';
 import { SvgIconTypeMap } from '@material-ui/core';
 import { useMemo } from 'react';
-import GiteaIcon from '../Components/Icons/GiteaIcon/GiteaIcon';
-import MinioIcon from '../Components/Icons/MinioIcon/MinioIcon';
-import DroneIcon from '../Components/Icons/DroneIcon/DroneIcon';
-import VSIcon from '../Components/Icons/VSIcon/VSIcon';
-import JupyterIcon from '../Components/Icons/JupyterIcon/JupyterIcon';
+import IconHome from '@material-ui/icons/Dashboard';
+import IconKG from '@material-ui/icons/EmojiObjects';
+import IconSettings from '@material-ui/icons/Settings';
+import GiteaIcon from 'Components/Icons/GiteaIcon/GiteaIcon';
+import MinioIcon from 'Components/Icons/MinioIcon/MinioIcon';
+import DroneIcon from 'Components/Icons/DroneIcon/DroneIcon';
+import VSIcon from 'Components/Icons/VSIcon/VSIcon';
+import JupyterIcon from 'Components/Icons/JupyterIcon/JupyterIcon';
 
 export interface RouteConfiguration {
   id: string;

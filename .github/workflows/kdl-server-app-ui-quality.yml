@@ -7,7 +7,7 @@ on:
     tags-ignore:
       - v*
     paths:
-      - "app/api/**/*"
+      - "app/ui/**/*"
       - ".github/workflows/kdl-server-app-ui*"
 
 jobs:

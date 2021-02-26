@@ -1,4 +1,11 @@
-import { BaseType, EnterElement, Local, Selection, local, select } from 'd3-selection';
+import {
+  BaseType,
+  EnterElement,
+  Local,
+  Selection,
+  local,
+  select,
+} from 'd3-selection';
 import { CoordData, CoordOptions, CoordOut } from '../KGViz';
 import { px, stringToId } from 'Utils/d3';
 
@@ -16,12 +23,13 @@ export default class Sections {
   sectionStroke: number = 0;
   sectionInterval: number = 0;
   sectionOrientation: Local<string>;
-  coord: ({ category, score, name }: CoordData, options: CoordOptions) => CoordOut = () => ({x:0, y:0, angle: 0});
+  coord: (
+    { category, score, name }: CoordData,
+    options: CoordOptions
+  ) => CoordOut = () => ({ x: 0, y: 0, angle: 0 });
   scoreDomain: [number, number] = [0, 0];
 
-  constructor(
-    container: Selection<SVGGElement, unknown, null, undefined>
-  ) {
+  constructor(container: Selection<SVGGElement, unknown, null, undefined>) {
     this.container = container.select('g');
 
     this.sectionOrientation = local<string>();
@@ -37,7 +45,10 @@ export default class Sections {
   init = (
     container: Selection<SVGGElement, unknown, null, undefined>,
     data: string[],
-    coord: ({ category, score, name }: CoordData, options: CoordOptions) => CoordOut,
+    coord: (
+      { category, score, name }: CoordData,
+      options: CoordOptions
+    ) => CoordOut,
     scoreDomain: [number, number]
   ) => {
     this.data = data;
@@ -58,13 +69,24 @@ export default class Sections {
 
   performUpdate = (
     data: string[],
-    coord: ({ category, score, name }: CoordData, options: CoordOptions) => CoordOut,
+    coord: (
+      { category, score, name }: CoordData,
+      options: CoordOptions
+    ) => CoordOut,
     scoreDomain: [number, number]
   ) => {
     this.coord = coord;
+    this.data = data;
     this.scoreDomain = scoreDomain;
-    
-    const { bindData, create, update, remove, removeGuides, createGuides } = this;
+
+    const {
+      bindData,
+      create,
+      update,
+      remove,
+      removeGuides,
+      createGuides,
+    } = this;
 
     const resourcesSelection = bindData(data);
 
@@ -86,12 +108,7 @@ export default class Sections {
   };
 
   create = (container: Selection<EnterElement, string, BaseType, unknown>) => {
-    const {
-      coord,
-      scoreDomain,
-      sectionStroke,
-      sectionInterval
-    } = this;
+    const { coord, scoreDomain, sectionStroke, sectionInterval } = this;
 
     const [maxR, minR] = scoreDomain;
 
@@ -112,19 +129,23 @@ export default class Sections {
       )
       .attr(
         'x2',
-        (category) =>
-          coord({ category, score: minR }, { offset: RESOURCE_R }).x
+        (category) => coord({ category, score: minR }, { offset: RESOURCE_R }).x
       )
       .attr(
         'y2',
-        (category) =>
-          coord({ category, score: minR }, { offset: RESOURCE_R }).y
+        (category) => coord({ category, score: minR }, { offset: RESOURCE_R }).y
       );
-  }
+  };
 
   createGuides = () => {
-    const { container, data, sectionOrientation, coord, scoreDomain, positionSectionBoxes } = this;
-
+    const {
+      container,
+      data,
+      sectionOrientation,
+      coord,
+      scoreDomain,
+      positionSectionBoxes,
+    } = this;
     const minR = scoreDomain[1];
 
     const sectionAndNames = container
@@ -147,17 +168,12 @@ export default class Sections {
         );
         return `translate(${x}, ${y})`;
       });
-    
-      positionSectionBoxes();
-  }
+
+    positionSectionBoxes();
+  };
 
   update = (container: Selection<BaseType, string, BaseType, unknown>) => {
-    const {
-      coord,
-      sectionInterval,
-      scoreDomain,
-      sectionStroke
-    } = this;
+    const { coord, sectionInterval, scoreDomain, sectionStroke } = this;
 
     const [maxR, minR] = scoreDomain;
 
@@ -176,24 +192,22 @@ export default class Sections {
       )
       .attr(
         'x2',
-        (category) =>
-          coord({ category, score: minR }, { offset: RESOURCE_R }).x
+        (category) => coord({ category, score: minR }, { offset: RESOURCE_R }).x
       )
       .attr(
         'y2',
-        (category) =>
-          coord({ category, score: minR }, { offset: RESOURCE_R }).y
+        (category) => coord({ category, score: minR }, { offset: RESOURCE_R }).y
       );
-  }
+  };
 
   remove = (container: Selection<BaseType, unknown, BaseType, unknown>) => {
     container.interrupt().transition();
     container.transition().duration(400).attr('stroke-opacity', 0).remove();
-  }
+  };
 
-  removeGuides =  () => {
+  removeGuides = () => {
     this.container.select(`.${styles.sectionAndNamesG}`).remove();
-  }
+  };
 
   positionSectionBoxes = () => {
     const { container, sectionOrientation } = this;

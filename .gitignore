@@ -2,6 +2,6 @@
 .vscode
 .certs
 
-app/ui/node_modules
+node_modules
 
 helm/kdl-server/charts/*.tgz

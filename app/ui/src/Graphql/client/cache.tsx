@@ -7,10 +7,10 @@ import {
 import { UserSelection, UserSettings } from './models/UserSettings';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
+import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTools';
 import { MemberDetails } from './models/MemberDetails';
 import { NewProject } from './models/NewProject';
 import { PanelInfo } from './models/Panel';
-import { Tools } from './models/Tools';
 
 export const initialProjectFilters: ProjectFilters = {
   name: '',
@@ -60,7 +60,7 @@ const initialStateUserSettings: UserSettings = {
   },
 };
 
-export const initialTools: Tools = { currentTool: null, openedTools: [] };
+type ToolName = keyof GetUserTools_project_toolUrls;
 
 export const projectFilters = makeVar(initialProjectFilters);
 export const newProject = makeVar(initialNewProject);
@@ -69,7 +69,8 @@ export const userSettings = makeVar<UserSettings>(initialStateUserSettings);
 export const memberDetails = makeVar<MemberDetails | null>(null);
 export const primaryPanel = makeVar<PanelInfo | null>(null);
 export const secondaryPanel = makeVar<PanelInfo | null>(null);
-export const tools = makeVar<Tools>(initialTools);
+export const currentTool = makeVar<ToolName | null>(null);
+export const openedTools = makeVar<ToolName[]>([]);
 
 const cache = new InMemoryCache({
   typePolicies: {

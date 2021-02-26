@@ -11,7 +11,7 @@ const SetActiveProjectToolsMutation = loader(
   'Graphql/mutations/setActiveUserTools.graphql'
 );
 
-export default function useTool(projectId: string) {
+export default function useTool() {
   const [mutationSetActiveProjectTools, { loading }] = useMutation<
     SetActiveUserTools,
     SetActiveUserToolsVariables

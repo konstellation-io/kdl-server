@@ -1,30 +1,26 @@
+import { currentTool, openedTools } from 'Graphql/client/cache';
+
 import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTools';
-import { initialTools, tools } from 'Graphql/client/cache';
 
 function useTools() {
   function addTool(toolName: keyof GetUserTools_project_toolUrls) {
-    const { openedTools, currentTool } = tools();
-    if (currentTool === toolName) return;
+    if (currentTool() === toolName) return;
 
-    const toolAlreadyOpened = openedTools.includes(toolName);
+    const toolAlreadyOpened = openedTools().includes(toolName);
     if (!toolAlreadyOpened) {
-      const newOpenedTools = [...openedTools, toolName];
-      tools({ currentTool: toolName, openedTools: newOpenedTools });
-    } else {
-      tools({ currentTool: toolName, openedTools });
+      openedTools([...openedTools(), toolName]);
     }
+
+    currentTool(toolName);
   }
 
   function resetCurrentTool() {
-    const { openedTools } = tools();
-    tools({
-      currentTool: null,
-      openedTools,
-    });
+    currentTool(null);
   }
 
   function resetTools() {
-    tools(initialTools);
+    currentTool(null);
+    openedTools([]);
   }
 
   return { addTool, resetTools, resetCurrentTool };

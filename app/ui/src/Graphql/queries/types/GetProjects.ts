@@ -16,6 +16,16 @@ export interface GetProjects_projects_repository {
   error: string | null;
 }
 
+export interface GetProjects_projects_toolUrls {
+  __typename: 'ToolUrls';
+  drone: string;
+  gitea: string;
+  jupyter: string;
+  minio: string;
+  mlflow: string;
+  vscode: string;
+}
+
 export interface GetProjects_projects {
   __typename: 'Project';
   id: string;
@@ -27,6 +37,7 @@ export interface GetProjects_projects {
   repository: GetProjects_projects_repository | null;
   state: ProjectState;
   error: string | null;
+  toolUrls: GetProjects_projects_toolUrls;
 }
 
 export interface GetProjects {

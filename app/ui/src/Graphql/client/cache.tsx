@@ -7,10 +7,10 @@ import {
 import { UserSelection, UserSettings } from './models/UserSettings';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
+import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTools';
 import { MemberDetails } from './models/MemberDetails';
 import { NewProject } from './models/NewProject';
 import { PanelInfo } from './models/Panel';
-import { BrowserWindow } from './models/BrowserWindow';
 
 export const initialProjectFilters: ProjectFilters = {
   name: '',
@@ -60,6 +60,8 @@ const initialStateUserSettings: UserSettings = {
   },
 };
 
+type ToolName = keyof GetUserTools_project_toolUrls;
+
 export const projectFilters = makeVar(initialProjectFilters);
 export const newProject = makeVar(initialNewProject);
 export const openedProject = makeVar<GetProjects_projects | null>(null);
@@ -67,7 +69,8 @@ export const userSettings = makeVar<UserSettings>(initialStateUserSettings);
 export const memberDetails = makeVar<MemberDetails | null>(null);
 export const primaryPanel = makeVar<PanelInfo | null>(null);
 export const secondaryPanel = makeVar<PanelInfo | null>(null);
-export const browserWindows = makeVar<BrowserWindow[]>([]);
+export const currentTool = makeVar<ToolName | null>(null);
+export const openedTools = makeVar<ToolName[]>([]);
 
 const cache = new InMemoryCache({
   typePolicies: {
@@ -80,7 +83,6 @@ const cache = new InMemoryCache({
         primaryPanel: { read: () => primaryPanel() },
         secondaryPanel: { read: () => secondaryPanel() },
         memberDetails: { read: () => memberDetails() },
-        browserWindows: { read: () => browserWindows() },
         projects: { merge: false },
         apiTokens: { merge: false },
         users: { merge: false },

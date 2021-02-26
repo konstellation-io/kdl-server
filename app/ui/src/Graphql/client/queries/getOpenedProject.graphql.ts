@@ -21,6 +21,7 @@ export const GET_OPENED_PROJECT = gql`
       }
       state
       error
+      toolUrls
     }
   }
 `;

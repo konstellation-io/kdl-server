@@ -2,3 +2,4 @@
     remote = s3
 ['remote "s3"']
     url = s3://kdl-kg-assets/artifacts
+    endpointurl = https://kdl-kg-assets.s3.eu-central-1.amazonaws.com/artifacts/

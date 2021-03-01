@@ -36,8 +36,8 @@ const NavButtonLink: FC<any> = ({ children, ...props }) => {
 function ProjectNavigation() {
   const { projectId } = useParams<RouteProjectParams>();
   const [{ navigationOpened }, saveConfiguration] = useWorkspace(projectId);
-  const { updateProjectActiveTools } = useTool();
-  const { data, loading } = useQuery<GetMe>(GetMeQuery);
+  const { updateProjectActiveTools, projectActiveTools } = useTool();
+  const { data } = useQuery<GetMe>(GetMeQuery);
   const [opened, setOpened] = useState(navigationOpened);
   const areToolsActive = data?.me.areToolsActive;
 
@@ -59,8 +59,10 @@ function ProjectNavigation() {
   }
 
   function renderToggleToolsIcon() {
-    if (loading)
-      return <CircularProgress className={styles.loadingTools} size={16} />;
+    if (projectActiveTools.loading)
+      return () => (
+        <CircularProgress className={styles.loadingTools} size={16} />
+      );
     return PowerSettingsNewIcon;
   }
 

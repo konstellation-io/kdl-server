@@ -22,7 +22,7 @@ const CreateProjectMutation = loader('Graphql/mutations/createProject.graphql');
 const UpdateProjectMutation = loader('Graphql/mutations/updateProject.graphql');
 
 type UseProjectParams = {
-  onUpdateCompleted?: () => void
+  onUpdateCompleted?: () => void;
 };
 export default function useProject(options?: UseProjectParams) {
   const [mutationCreateProject, { data }] = useMutation<
@@ -38,7 +38,7 @@ export default function useProject(options?: UseProjectParams) {
     UpdateProjectVariables
   >(UpdateProjectMutation, {
     onError: (e) => console.error(`updateProject: ${e}`),
-    onCompleted: options?.onUpdateCompleted
+    onCompleted: options?.onUpdateCompleted,
   });
 
   function updateCache(

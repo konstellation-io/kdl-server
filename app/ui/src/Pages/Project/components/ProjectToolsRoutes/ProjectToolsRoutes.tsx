@@ -27,9 +27,10 @@ function ProjectToolsRoutes() {
     <>
       {toolsRoutes.map(([route, toolName]) => (
         <Route
-          exact
+          key={toolName}
           path={route}
           component={() => <Tools toolName={toolName} />}
+          exact
         />
       ))}
     </>

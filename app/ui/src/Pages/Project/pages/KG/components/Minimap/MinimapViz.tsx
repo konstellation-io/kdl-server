@@ -53,22 +53,27 @@ class MinimapViz {
     this.props = props;
     this.center = { x: width / 2, y: height / 2 };
     this.cleanup();
-    
+
     this.updateDragEvent();
   }
 
   updateDragEvent = () => {
-    const { wrapper, center, minimapScale, zoom, props: { initialZoomValues } } = this;
+    const {
+      wrapper,
+      center,
+      minimapScale,
+      zoom,
+      props: { initialZoomValues },
+    } = this;
 
-    const dk = (1 + (zoom.k - initialZoomValues.k)) * (1 / minimapScale);    
+    const dk = (1 + (zoom.k - initialZoomValues.k)) * (1 / minimapScale);
 
-    this.dragEvent = drag()
-      .on('drag', ({x, y}) => {
-        const dx = x - center.x;
-        const dy = y - center.y;
+    this.dragEvent = drag().on('drag', ({ x, y }) => {
+      const dx = x - center.x;
+      const dy = y - center.y;
 
-        this.reallocateZoom(dx * dk, dy * dk);
-      })
+      this.reallocateZoom(dx * dk, dy * dk);
+    });
 
     wrapper
       .on('mousedown', (e) => {
@@ -79,7 +84,7 @@ class MinimapViz {
       })
       // @ts-ignore
       .call(this.dragEvent);
-  }
+  };
 
   cleanup = () => {
     this.wrapper.selectAll('*').remove();
@@ -153,10 +158,14 @@ class MinimapViz {
     updateDragEvent();
   };
 
-  update = (data: GroupD[], zoom: ZoomValues, reallocateZoom: (dx: number, dy: number) => void) => {
+  update = (
+    data: GroupD[],
+    zoom: ZoomValues,
+    reallocateZoom: (dx: number, dy: number) => void
+  ) => {
     this.data = data;
     this.reallocateZoom = reallocateZoom;
-    
+
     const {
       container,
       resources,
@@ -167,9 +176,9 @@ class MinimapViz {
       props: { areaWidth, areaHeight },
     } = this;
     this.zoom = zoom;
-    
+
     updateDragEvent();
-    
+
     // Data
     const allResources = container
       .select(`.${styles.resourcesWrapper}`)

@@ -1,11 +1,13 @@
 import React, { FC } from 'react';
 import styles from './SectionSelector.module.scss';
+import projectNavigationStyles from 'Pages/Project/components/ProjectNavigation/ProjectNavigation.module.scss';
 import { NavLink } from 'react-router-dom';
 import { EnhancedRouteConfiguration } from 'Hooks/useProjectNavigation';
 import { BottomComponentProps } from '../Breadcrumbs/components/Crumb/Crumb';
 import NavigationButton, {
   IconSize,
 } from 'Pages/Project/components/ProjectNavigation/NavigationButton';
+import cx from 'classnames';
 
 type Props = {
   options: EnhancedRouteConfiguration[];
@@ -17,12 +19,14 @@ const SectionSelector: FC<Props & BottomComponentProps> = ({
 }) => (
   <div className={styles.container}>
     <ul>
-      {options.map(({ to, Icon, label }) => (
+      {options.map(({ to, Icon, label, disabled }) => (
         <NavLink
           to={to}
           key={label}
           activeClassName={styles.selectedSection}
-          className={styles.section}
+          className={cx(styles.section, {
+            [projectNavigationStyles.disabled]: disabled,
+          })}
           onClick={closeComponent}
         >
           <NavigationButton

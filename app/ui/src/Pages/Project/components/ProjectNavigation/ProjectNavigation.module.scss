@@ -31,6 +31,12 @@
   &.opened {
     max-width: 25 * $grid-unit;
   }
+
+  .loadingTools {
+    margin: 0 1.4 * $grid-unit;
+    color: palette(highlight);
+    flex-shrink: 0;
+  }
 }
 
 .navButton {

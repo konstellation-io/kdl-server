@@ -5,6 +5,7 @@ import useWorkspace, { CONFIG } from 'Hooks/useWorkspace';
 
 import IconCollapse from '@material-ui/icons/KeyboardBackspace';
 import IconSettings from '@material-ui/icons/Settings';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
 import NavigationButton from './NavigationButton';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
@@ -36,7 +37,7 @@ function ProjectNavigation() {
   const { projectId } = useParams<RouteProjectParams>();
   const [{ navigationOpened }, saveConfiguration] = useWorkspace(projectId);
   const { updateProjectActiveTools } = useTool();
-  const { data } = useQuery<GetMe>(GetMeQuery);
+  const { data, loading } = useQuery<GetMe>(GetMeQuery);
   const [opened, setOpened] = useState(navigationOpened);
   const areToolsActive = data?.me.areToolsActive;
 
@@ -57,6 +58,12 @@ function ProjectNavigation() {
     updateProjectActiveTools(!areToolsActive);
   }
 
+  function renderToggleToolsIcon() {
+    if (loading)
+      return <CircularProgress className={styles.loadingTools} size={16} />;
+    return PowerSettingsNewIcon;
+  }
+
   return (
     <div className={cx(styles.container, { [styles.opened]: opened })}>
       <div className={styles.top}>
@@ -73,7 +80,7 @@ function ProjectNavigation() {
         >
           <NavigationButton
             label={areToolsActive ? 'STOP' : 'START'}
-            Icon={PowerSettingsNewIcon}
+            Icon={renderToggleToolsIcon()}
           />
         </div>
         <div onClick={togglePanel}>

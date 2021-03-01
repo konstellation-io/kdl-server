@@ -60,7 +60,9 @@ function ProjectNavigation() {
 
   function renderToggleToolsIcon() {
     if (projectActiveTools.loading)
-      return <CircularProgress className={styles.loadingTools} size={16} />;
+      return () => (
+        <CircularProgress className={styles.loadingTools} size={16} />
+      );
     return PowerSettingsNewIcon;
   }
 

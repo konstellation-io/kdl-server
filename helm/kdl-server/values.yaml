@@ -5,6 +5,10 @@ tls:
 ingress:
   type: nginx
 
+science-toolkit:
+  kdl:
+    enabled: true
+
 kdlServer:
   image:
     repository: konstellation/kdl-server

@@ -17,9 +17,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='knowledge_graph.proto',
   package='kg',
   syntax='proto3',
-  serialized_options=b'Z\004kgpb',
+  serialized_options=b'Z\nproto;kgpb',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x15knowledge_graph.proto\x12\x02kg\"\"\n\x0bGetGraphReq\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\"\xad\x01\n\tGraphItem\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08\x63\x61tegory\x18\x02 \x01(\t\x12\r\n\x05title\x18\x03 \x01(\t\x12\x10\n\x08\x61\x62stract\x18\x04 \x01(\t\x12\x0f\n\x07\x61uthors\x18\x05 \x01(\t\x12\r\n\x05score\x18\x06 \x01(\x02\x12\x0c\n\x04\x64\x61te\x18\x07 \x01(\t\x12\x0b\n\x03url\x18\x08 \x01(\t\x12\x13\n\x0b\x65xternal_id\x18\t \x01(\t\x12\x11\n\tframework\x18\n \x01(\t\"+\n\x0bGetGraphRes\x12\x1c\n\x05items\x18\x01 \x03(\x0b\x32\r.kg.GraphItem2;\n\tKGService\x12.\n\x08GetGraph\x12\x0f.kg.GetGraphReq\x1a\x0f.kg.GetGraphRes\"\x00\x42\x06Z\x04kgpbb\x06proto3'
+  serialized_pb=b'\n\x15knowledge_graph.proto\x12\x02kg\"\"\n\x0bGetGraphReq\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\"\xc1\x01\n\tGraphItem\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08\x63\x61tegory\x18\x02 \x01(\t\x12\r\n\x05title\x18\x03 \x01(\t\x12\x10\n\x08\x61\x62stract\x18\x04 \x01(\t\x12\x0f\n\x07\x61uthors\x18\x05 \x03(\t\x12\r\n\x05score\x18\x06 \x01(\x02\x12\x0c\n\x04\x64\x61te\x18\x07 \x01(\t\x12\x0b\n\x03url\x18\x08 \x01(\t\x12\x13\n\x0b\x65xternal_id\x18\t \x01(\t\x12\x11\n\trepo_urls\x18\n \x03(\t\x12\x12\n\nframeworks\x18\x0b \x03(\t\"+\n\x0bGetGraphRes\x12\x1c\n\x05items\x18\x01 \x03(\x0b\x32\r.kg.GraphItem2;\n\tKGService\x12.\n\x08GetGraph\x12\x0f.kg.GetGraphReq\x1a\x0f.kg.GetGraphRes\"\x00\x42\x0cZ\nproto;kgpbb\x06proto3'
 )
 
 
@@ -95,8 +95,8 @@ _GRAPHITEM = _descriptor.Descriptor(
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
       name='authors', full_name='kg.GraphItem.authors', index=4,
-      number=5, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
+      number=5, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -129,9 +129,16 @@ _GRAPHITEM = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='framework', full_name='kg.GraphItem.framework', index=9,
-      number=10, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
+      name='repo_urls', full_name='kg.GraphItem.repo_urls', index=9,
+      number=10, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='frameworks', full_name='kg.GraphItem.frameworks', index=10,
+      number=11, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -148,7 +155,7 @@ _GRAPHITEM = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=66,
-  serialized_end=239,
+  serialized_end=259,
 )
 
 
@@ -179,8 +186,8 @@ _GETGRAPHRES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=241,
-  serialized_end=284,
+  serialized_start=261,
+  serialized_end=304,
 )
 
 _GETGRAPHRES.fields_by_name['items'].message_type = _GRAPHITEM
@@ -220,8 +227,8 @@ _KGSERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=286,
-  serialized_end=345,
+  serialized_start=306,
+  serialized_end=365,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetGraph',

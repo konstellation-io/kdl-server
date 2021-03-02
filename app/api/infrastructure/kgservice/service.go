@@ -59,14 +59,15 @@ func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.K
 			Category:    cat,
 			Title:       value.Title,
 			Abstract:    value.Abstract,
-			Authors:     strings.Split(value.Authors, ","),
+			Authors:     value.Authors,
 			Score:       float64(value.Score),
 			Date:        value.Date,
 			URL:         value.Url,
 			IsStarred:   false,
 			IsDiscarded: false,
+			RepoURLs:    value.RepoUrls,
 			ExternalID:  stringToPointer(value.ExternalId),
-			Framework:   stringToPointer(value.Framework),
+			Frameworks:  value.Frameworks,
 		}
 	}
 

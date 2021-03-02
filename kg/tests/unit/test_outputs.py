@@ -8,7 +8,7 @@ VALUES_1 = {"id": "12345",
             "category": "paper",
             "title": "title test 1",
             "abstract": "test abstract",
-            "authors": "test author",
+            "authors": ["test author", "test author 2"],
             "score": 0.9,
             "date": "2020-01-01",
             "url": "http://test"}
@@ -17,7 +17,7 @@ VALUES_2 = {"id": "6789",
             "category": "paper",
             "title": "title test 2",
             "abstract": "test abstract 2",
-            "authors": "test author 2",
+            "authors": ["test author 2", "test author 1"],
             "score": 0.2,
             "date": "2020-01-01",
             "url": "http://test"}
@@ -26,7 +26,7 @@ VALUES_EXTRA = {"id": "6789",
                 "category": "paper",
                 "title": "title test 2",
                 "abstract": "test abstract 2",
-                "authors": "test author 2",
+                "authors": ["test author 2", "test author"],
                 "score": 0.2,
                 "date": "2020-01-01",
                 "url": "http://test",
@@ -40,7 +40,8 @@ VALUES_OPTIONAL = {"id": "6789",
                    "score": 0.2,
                    "date": "2020-01-01",
                    "url": "http://test",
-                   "framework": "pytorch",
+                   "frameworks": ["pytorch"],
+                   "repo_urls": ["http://test.org", "test.com"],
                    "external_id": "arxivId"}
 
 VALUES_MISSING = {
@@ -63,7 +64,7 @@ class TestRecommendedItem:
 
     def test_creation_optional_fields(self):
         item = RecommendedItem(VALUES_OPTIONAL)
-        assert item.framework == "pytorch"
+        assert item.frameworks[0] == "pytorch"
         assert item.external_id == "arxivId"
 
     def test_creation_missing_fields(self):
@@ -80,7 +81,8 @@ class TestRecommendedItem:
                            'date',
                            'url',
                            'external_id',
-                           'framework']
+                           'frameworks',
+                           'repo_urls']
         fields = RecommendedItem(VALUES_1)._get_fields()
         assert isinstance(fields, list)
         assert fields == expected_fields

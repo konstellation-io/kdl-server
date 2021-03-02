@@ -12,12 +12,13 @@ message GraphItem {
   string category = 2;
   string title = 3;
   string abstract = 4;
-  string authors = 5;
+  repeated string authors = 5;
   float score = 6;
   string date = 7;
   string url = 8;
   string external_id = 9;
-  string framework = 10;
+  repeated string repo_urls = 10;
+  repeated string frameworks = 11;
 }
 
 message GetGraphRes {

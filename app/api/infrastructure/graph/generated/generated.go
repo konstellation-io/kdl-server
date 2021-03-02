@@ -66,10 +66,11 @@ type ComplexityRoot struct {
 		Category    func(childComplexity int) int
 		Date        func(childComplexity int) int
 		ExternalID  func(childComplexity int) int
-		Framework   func(childComplexity int) int
+		Frameworks  func(childComplexity int) int
 		ID          func(childComplexity int) int
 		IsDiscarded func(childComplexity int) int
 		IsStarred   func(childComplexity int) int
+		RepoURLs    func(childComplexity int) int
 		Score       func(childComplexity int) int
 		Title       func(childComplexity int) int
 		URL         func(childComplexity int) int
@@ -299,12 +300,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.KnowledgeGraphItem.ExternalID(childComplexity), true
 
-	case "KnowledgeGraphItem.framework":
-		if e.complexity.KnowledgeGraphItem.Framework == nil {
+	case "KnowledgeGraphItem.frameworks":
+		if e.complexity.KnowledgeGraphItem.Frameworks == nil {
 			break
 		}
 
-		return e.complexity.KnowledgeGraphItem.Framework(childComplexity), true
+		return e.complexity.KnowledgeGraphItem.Frameworks(childComplexity), true
 
 	case "KnowledgeGraphItem.id":
 		if e.complexity.KnowledgeGraphItem.ID == nil {
@@ -326,6 +327,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.KnowledgeGraphItem.IsStarred(childComplexity), true
+
+	case "KnowledgeGraphItem.repoUrls":
+		if e.complexity.KnowledgeGraphItem.RepoURLs == nil {
+			break
+		}
+
+		return e.complexity.KnowledgeGraphItem.RepoURLs(childComplexity), true
 
 	case "KnowledgeGraphItem.score":
 		if e.complexity.KnowledgeGraphItem.Score == nil {
@@ -954,8 +962,9 @@ type KnowledgeGraphItem {
   isDiscarded: Boolean!
 
   # optional fields
+  repoUrls: [String]
   externalId: ID # for example: arxivId
-  framework: String
+  frameworks: [String]
 }
 
 type SSHKey {
@@ -1015,6 +1024,7 @@ input ApiTokenInput {
 input UpdateProjectInput {
   id: ID!
   name: String
+  description: String
   repository: UpdateProjectRepositoryInput
 }
 
@@ -1975,6 +1985,38 @@ func (ec *executionContext) _KnowledgeGraphItem_isDiscarded(ctx context.Context,
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _KnowledgeGraphItem_repoUrls(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "KnowledgeGraphItem",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RepoURLs, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _KnowledgeGraphItem_externalId(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2007,7 +2049,7 @@ func (ec *executionContext) _KnowledgeGraphItem_externalId(ctx context.Context, 
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _KnowledgeGraphItem_framework(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _KnowledgeGraphItem_frameworks(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2025,7 +2067,7 @@ func (ec *executionContext) _KnowledgeGraphItem_framework(ctx context.Context, f
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Framework, nil
+		return obj.Frameworks, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2034,9 +2076,9 @@ func (ec *executionContext) _KnowledgeGraphItem_framework(ctx context.Context, f
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.([]string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Member_id(ctx context.Context, field graphql.CollectedField, obj *entity.Member) (ret graphql.Marshaler) {
@@ -5724,6 +5766,14 @@ func (ec *executionContext) unmarshalInputUpdateProjectInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "repository":
 			var err error
 
@@ -5901,10 +5951,12 @@ func (ec *executionContext) _KnowledgeGraphItem(ctx context.Context, sel ast.Sel
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "repoUrls":
+			out.Values[i] = ec._KnowledgeGraphItem_repoUrls(ctx, field, obj)
 		case "externalId":
 			out.Values[i] = ec._KnowledgeGraphItem_externalId(ctx, field, obj)
-		case "framework":
-			out.Values[i] = ec._KnowledgeGraphItem_framework(ctx, field, obj)
+		case "frameworks":
+			out.Values[i] = ec._KnowledgeGraphItem_frameworks(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7644,6 +7696,42 @@ func (ec *executionContext) unmarshalOString2string(ctx context.Context, v inter
 
 func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	return graphql.MarshalString(v)
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstring(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstring(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalOString2string(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

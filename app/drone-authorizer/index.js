@@ -26,7 +26,7 @@ async function retry(promiseFactory, retryCount, onRetry) {
 async function authorizeDroneApp() {
   const user = getEnvVar("GITEA_ADMIN_USER")
   const pass = getEnvVar("GITEA_ADMIN_PASSWORD")
-  const url = getEnvVar("DRONE_URL")
+  const url = new URL(getEnvVar("DRONE_URL")).toString()
 
   const browser = await puppeteer.launch({
       headless: true,
@@ -78,7 +78,7 @@ async function authorizeDroneApp() {
     page.waitForNavigation()
   ])
 
-  if (page.url() === url) {
+  if (new URL(page.url()).toString() === url) {
     console.log("Drone is already authorized.")
     await browser.close()
     return
@@ -103,4 +103,5 @@ authorizeDroneApp()
   })
   .catch(err => {
     console.error("Drone authorization failed: " + err)
+    process.exit(1)
   })

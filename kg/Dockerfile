@@ -21,11 +21,14 @@ COPY Pipfile* ./
 RUN python3 -m pip install pipenv && \
     pipenv install --system --deploy
 
+COPY assets.dvc assets.dvc
+COPY .dvc .dvc
 COPY src src
 
-RUN wget https://kdl-kg-assets.s3.eu-central-1.amazonaws.com/assets.tar.gz \
-    && tar zxvf assets.tar.gz \
-    && rm -rf assets.tar.gz
+RUN wget https://github.com/iterative/dvc/releases/download/1.11.16/dvc_1.11.16_amd64.deb \
+    && apt install -y ./dvc_1.11.16_amd64.deb \
+    && dvc get https://github.com/konstellation-io/kdl-server --rev 5f62b434d299f1240b02b749448b0b299d58b387  kg/assets \
+    && rm -rf dvc_1.11.16_amd64.deb
 
 RUN chown -R kdl:0 /kg \
     && chmod -R g+w /kg \

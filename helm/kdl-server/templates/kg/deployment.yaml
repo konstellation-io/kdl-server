@@ -20,5 +20,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: kdl-kg-configmap
+            - secretRef:
+                name: kdl-kg-s3-secret
           ports:
             - containerPort: {{ .Values.kdlKG.port }}

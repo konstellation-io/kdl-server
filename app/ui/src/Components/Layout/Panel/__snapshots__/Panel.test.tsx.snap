@@ -1,3 +1,56 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Panel component Component match snapshot 1`] = `ShallowWrapper {}`;
+exports[`Panel component Component match snapshot 1`] = `
+<TransitionGroup
+  childFactory={[Function]}
+  className="group default noShrink"
+  component="div"
+>
+  <CSSTransition
+    classNames={
+      Object {
+        "enter": "enter",
+        "exit": "exit",
+      }
+    }
+    key="true"
+    timeout={500}
+  >
+    <div
+      className="container default themeDefault"
+    >
+      <header>
+        <div
+          className="separator"
+        />
+        <p
+          className="title"
+        >
+          Some title
+        </p>
+        <T
+          Icon={
+            Object {
+              "$$typeof": Symbol(react.memo),
+              "compare": null,
+              "type": Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "render": [Function],
+              },
+            }
+          }
+          label=""
+          onClick={[MockFunction]}
+        />
+      </header>
+      <div
+        className="content"
+      >
+        <div>
+          Children
+        </div>
+      </div>
+    </div>
+  </CSSTransition>
+</TransitionGroup>
+`;

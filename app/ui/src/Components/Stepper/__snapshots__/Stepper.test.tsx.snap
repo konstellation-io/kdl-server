@@ -1,5 +1,50 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Step component Component match snapshot 1`] = `ShallowWrapper {}`;
+exports[`Step component Component match snapshot 1`] = `
+<div
+  className="step disabled"
+  onClick={[MockFunction]}
+>
+  <div
+    className="circle"
+  >
+    <Memo(ForwardRef(NotInterestedIcon))
+      className="icon-small"
+    />
+  </div>
+  <p
+    className="label"
+  >
+    Step 1
+  </p>
+</div>
+`;
 
-exports[`Stepper component Component match snapshot 1`] = `ShallowWrapper {}`;
+exports[`Stepper component Component match snapshot 1`] = `
+<div
+  className="container"
+>
+  <StepNode
+    active={false}
+    completed={false}
+    disabled={true}
+    error={false}
+    id={1}
+    key="0"
+    label="Step 1"
+    onClick={[Function]}
+    visited={false}
+  />
+  <StepNode
+    active={true}
+    completed={false}
+    disabled={false}
+    error={false}
+    id={2}
+    key="1"
+    label="Step 2"
+    onClick={[Function]}
+    visited={true}
+  />
+</div>
+`;

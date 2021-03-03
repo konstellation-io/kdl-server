@@ -12,6 +12,7 @@ import { AccessLevel } from './../../types/globalTypes';
 export interface GetUsers_users {
   __typename: 'User';
   id: string;
+  username: string;
   email: string;
   creationDate: string;
   accessLevel: AccessLevel;

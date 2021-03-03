@@ -1,6 +1,7 @@
 query GetUsers {
   users {
     id
+    username
     email
     creationDate
     accessLevel

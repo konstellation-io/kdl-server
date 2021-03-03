@@ -14,7 +14,7 @@
     display: flex;
     align-items: center;
     flex-direction: column;
-    padding: 8.5 * $grid-unit 22 * $grid-unit 0 22 * $grid-unit;
+    padding: 8.5 * $grid-unit 20 * $grid-unit 0 20 * $grid-unit;
     width: 79 * $grid-unit;
     height: 100%;
 
@@ -35,13 +35,16 @@
       display: flex;
       margin-top: 3.75 * $grid-unit;
       width: 100%;
-      & a:last-child .button {
-        margin-left: 2 * $grid-unit;
-      }
+      justify-content: space-between;
+
       .button {
         color: font-color(light);
         background-color: palette(lowlight, 800);
       }
     }
   }
+}
+
+.animation {
+  margin: 2 * $grid-unit 0;
 }

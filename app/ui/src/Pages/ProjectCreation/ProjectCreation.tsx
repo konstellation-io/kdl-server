@@ -4,21 +4,34 @@ import {
   GetNewProject,
 } from 'Graphql/client/queries/getNewProject.graphql';
 import ROUTE, { buildRoute } from 'Constants/routes';
-import React, { useEffect } from 'react';
-
+import React, { useEffect, useState } from 'react';
 import { RepositoryInput, RepositoryType } from 'Graphql/types/globalTypes';
-import StatusCircle from 'Components/LottieShapes/StatusCircle/StatusCircle';
+import StatusCircle, {
+  States,
+} from 'Components/LottieShapes/StatusCircle/StatusCircle';
+
 import styles from './ProjectCreation.module.scss';
 import useProject from 'Graphql/hooks/useProject';
 import { useQuery } from '@apollo/client';
 
 function ProjectCreation() {
+  const [animCanEnd, setAnimCanEnd] = useState(false);
+
   const {
     addNewProject,
     create: { data: dataCreateProject },
   } = useProject();
 
   const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
+
+  // Animation should last for at least 3 seconds
+  useEffect(() => {
+    let timeout = window.setTimeout(() => {
+      setAnimCanEnd(true);
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, []);
 
   useEffect(() => {
     if (data) {
@@ -48,6 +61,8 @@ function ProjectCreation() {
 
   if (!data) return <SpinnerCircular />;
 
+  const projectReady = animCanEnd && dataCreateProject;
+
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
@@ -56,7 +71,10 @@ function ProjectCreation() {
           In order to receive a login link to access
         </span>
         <div className={styles.animation}>
-          <StatusCircle label="CREATING..." key="ok" size={280} />
+          <StatusCircle
+            label={projectReady ? 'CREATED' : 'CREATING...'}
+            animation={projectReady ? States.SUCCESS : States.INITIALIZING}
+          />
         </div>
         <p className={styles.infoMessage}>
           If you don't want to wait, you may go to the project detail while it
@@ -74,7 +92,7 @@ function ProjectCreation() {
               ROUTE.PROJECT,
               dataCreateProject?.createProject.id || ''
             )}
-            disabled={!dataCreateProject}
+            disabled={!projectReady}
             className={styles.button}
           />
         </div>

@@ -33,7 +33,7 @@
   white-space: nowrap;
 
   tbody tr td:nth-child(1),
-  tbody tr td:nth-child(6) {
+  tbody tr td:nth-child(7) {
     width: 37px;
   }
 
@@ -69,7 +69,7 @@
     }
 
     td:nth-child(2),
-    td:nth-child(6) {
+    td:nth-child(7) {
       @include font-small;
       color: font-color(regular);
       line-height: inherit;
@@ -83,14 +83,17 @@
       width: 50%;
     }
     td:nth-child(4) {
+      @include font-small;
+    }
+    td:nth-child(5) {
       @include font-body;
       color: font-color(light);
       line-height: inherit;
     }
-    td:nth-child(5) {
+    td:nth-child(6) {
       width: 165px;
     }
-    td:nth-child(6) {
+    td:nth-child(7) {
       color: font-color(regular);
       line-height: 0;
       width: 1px;

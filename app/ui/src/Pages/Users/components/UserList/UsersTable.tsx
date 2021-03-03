@@ -24,6 +24,7 @@ import useUserSettings from 'Graphql/client/hooks/useUserSettings';
 type Data = {
   creationDate: string;
   email: string;
+  username: string;
   accessLevel: AccessLevel;
   lastActivity: string | null;
   selectedRowIds?: string[];
@@ -38,6 +39,10 @@ const columns: Column<Data>[] = [
   {
     Header: 'User email',
     accessor: 'email',
+  },
+  {
+    Header: 'Username',
+    accessor: 'username',
   },
   {
     Header: 'Access level',

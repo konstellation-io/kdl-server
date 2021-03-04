@@ -10,11 +10,15 @@ import React, { useEffect, useState } from 'react';
 import { SpinnerCircular, TextInput } from 'kwc';
 import { useLazyQuery, useQuery } from '@apollo/client';
 
-import DescriptionScore from '../../../../Components/DescriptionScore/DescriptionScore';
+import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
 import { generateSlug } from 'Utils/string';
 import { loader } from 'graphql.macro';
 import styles from './Information.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
+import {
+  validateProjectDescription,
+  validateProjectName,
+} from './InformationUtils';
 
 const GetQualityProjectDescQuery = loader(
   'Graphql/queries/getQualityProjectDesc.graphql'
@@ -63,9 +67,10 @@ function Information({ showErrors }: Props) {
         }}
         onBlur={() => {
           updateInternalRepositoryValue('slug', generateSlug(name));
+          const isValidName = validateProjectName(name);
           updateError(
             'name',
-            name.length === 0 ? 'This field is mandatory, please fill it.' : ''
+            isValidName === true ? '' : (isValidName as string)
           );
         }}
         formValue={name}
@@ -81,11 +86,10 @@ function Information({ showErrors }: Props) {
           clearError('description');
         }}
         onBlur={() => {
+          const isValidDescription = validateProjectDescription(description);
           updateError(
             'description',
-            description.length === 0
-              ? 'Please, write a description is important for the project'
-              : ''
+            isValidDescription === true ? '' : (isValidDescription as string)
           );
           getQualityProjectDesc({ variables: { description } });
         }}

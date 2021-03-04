@@ -1,4 +1,4 @@
-import { Button, CHECK, Check, Select, TextInput } from 'kwc';
+import { Button, Check, Select, TextInput } from 'kwc';
 import React, { useEffect } from 'react';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
@@ -10,24 +10,13 @@ import styles from './NewUser.module.scss';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import useUser from 'Graphql/hooks/useUser';
-
-function verifyEmail(value: string) {
-  return CHECK.getValidationError([
-    CHECK.isFieldNotEmpty(value),
-    CHECK.isEmailValid(value),
-  ]);
-}
-
-function verifyAccessLevel(value: string) {
-  return CHECK.getValidationError([
-    CHECK.isFieldNotEmpty(value),
-    CHECK.isFieldNotInList(value, Object.values(AccessLevel)),
-  ]);
-}
-
-function verifyConfirmation(value: boolean) {
-  return value ? true : 'You need to accept this';
-}
+import {
+  verifyAccessLevel,
+  verifyConfirmation,
+  verifyEmail,
+  verifyPassword,
+  verifyUsername,
+} from './NewUserUtils';
 
 type FormData = {
   email: string;
@@ -76,11 +65,11 @@ function NewUser() {
   }
 
   useEffect(() => {
-    register('username', { required: true });
-    register('password', { required: true });
+    register('username', { validate: verifyUsername });
+    register('password', { validate: verifyPassword });
     register('email', { validate: verifyEmail });
     register('confirmation', { validate: verifyConfirmation });
-    register('accessLevel', { required: true, validate: verifyAccessLevel });
+    register('accessLevel', { validate: verifyAccessLevel });
 
     return () => {
       unregister('username');
@@ -184,7 +173,7 @@ function NewUser() {
             <p className={styles.disclaimerTitle}>Please be careful</p>
             <p className={styles.disclaimerDesc}>
               Depending on the users role, they might be able to create new
-              proyects, use server resources or change the server users list.
+              projects, use server resources or change the server users list.
               Make sure to add users with their expected role.
             </p>
             <div className={styles.formConfirmation}>

@@ -4,6 +4,13 @@
 
 $tooltipWidth: 300px;
 
+.label1,
+.tick,
+.axisG,
+.label4 {
+  fill-opacity: 1;
+}
+
 .svg {
   position: absolute;
 }
@@ -42,11 +49,6 @@ $tooltipWidth: 300px;
 
 .sectionsWrapper {
   opacity: 1;
-}
-
-.guide {
-  fill-opacity: 0;
-  stroke: palette(lowlight, 900);
 }
 
 .axis {

@@ -1,9 +1,10 @@
 import React, { FC, useCallback } from 'react';
-import styles from './ScoreFilter.module.scss';
-import stylesThumb from './components/Thumb/Thumb.module.scss';
+import Thumb, { ValueLabelProps } from './components/Thumb/Thumb';
+
 import Slider from '@material-ui/core/Slider';
 import cx from 'classnames';
-import Thumb, { ValueLabelProps } from './components/Thumb/Thumb';
+import styles from './ScoreFilter.module.scss';
+import stylesThumb from './components/Thumb/Thumb.module.scss';
 import useScoreFilter from './useScoreFilter';
 
 export type Scores = [number, number];

@@ -1,6 +1,7 @@
 import { BaseType, Local, Selection, local, select } from 'd3-selection';
 import { Coord, GroupD, getHash, groupData } from '../../KGUtils';
 import Resources, { RESOURCE_R } from './Resources/Resources';
+import { max, min } from 'd3-array';
 import { scaleBand, scaleLinear } from '@visx/scale';
 
 import { D } from './KGVisualization';
@@ -9,14 +10,11 @@ import Sections from './Sections/Sections';
 import { UpdateTooltip } from 'Hooks/useTextTooltip';
 import { ZoomValues } from './useZoom';
 import { px } from 'Utils/d3';
-import { range } from 'd3-array';
+import radialAxis from './radialAxis';
 import styles from './KGVisualization.module.scss';
 
 export const PADDING = 0.15;
 export const OUTER_R = 370;
-
-const MIN_SCORE = 0;
-const MAX_SCORE = 1;
 
 const TOOLTIP_WIDTH = 300;
 const INNER_R = 53.5;
@@ -29,6 +27,7 @@ export const N_GUIDES = 2;
 export let minimapViz: MinimapViz;
 
 const section = (d: D) => d.category;
+const score = (d: D) => d.score;
 
 export type CoordData = {
   category: string;
@@ -44,6 +43,7 @@ export type CoordOut = {
   x: number;
   y: number;
   angle: number;
+  hash?: number;
 };
 
 type Props = {
@@ -70,7 +70,7 @@ class KGViz {
   mainG: Selection<SVGGElement, unknown, null, undefined>;
   center: Coord;
   rScale = scaleLinear<number>();
-  rDomain: [number, number] = [MAX_SCORE, MIN_SCORE];
+  rDomain: [number, number] = [0, 0];
   sectionScale = scaleBand();
   sectionDomain: string[];
   groupedData: GroupD[];
@@ -78,6 +78,8 @@ class KGViz {
   sectionOrientation: Local<string>;
   resources: Resources;
   sections: Sections;
+  axisG: any = null;
+  axis: any;
   size: {
     innerWidth: number;
     innerHeight: number;
@@ -110,12 +112,15 @@ class KGViz {
 
     this.rScale = scaleLinear({
       range: [INNER_R + RESOURCE_R, OUTER_R - RESOURCE_R],
-      domain: this.rDomain,
     });
     this.sectionScale = scaleBand({
       range: [0, 360],
       padding: 0,
     });
+
+    this.axis = radialAxis(this.rScale).tickFormat(
+      (t: string) => `${Math.round(+t * 100)}%`
+    );
 
     this.minimap = new MinimapViz(props.minimapRef, {
       areaWidth: props.width,
@@ -150,7 +155,13 @@ class KGViz {
 
   updateScalesAndData = (data: D[]) => {
     this.sectionDomain = Array.from(new Set(data.map(section)));
+
+    this.rDomain = [max(data, score) ?? 1, min(data, score) ?? 0];
+
     this.sectionScale.domain(this.sectionDomain);
+    this.rScale.domain(this.rDomain);
+
+    this.axis.scale(this.rScale);
 
     this.groupedData = groupData(data, this.coord, this.elementsCollide);
   };
@@ -169,7 +180,8 @@ class KGViz {
       coord,
       rDomain,
       resources,
-      size: { guideStroke, axisPadding, axisFontSize },
+      updateAxisLabels,
+      size: { axisPadding, axisFontSize },
       props: { centerText },
     } = this;
 
@@ -180,16 +192,6 @@ class KGViz {
       .attr('transform', `translate(${center.x}, ${center.y})`);
 
     const { mainG } = this;
-
-    // Guides
-    const guides = mainG.append('g');
-    range(1, N_GUIDES + 1).forEach((guide) =>
-      guides
-        .append('circle')
-        .classed(styles.guide, true)
-        .attr('r', INNER_R + ((OUTER_R - INNER_R) * guide) / 3)
-        .attr('stroke-width', guideStroke)
-    );
 
     // Sections
     sections.init(mainG, sectionDomain, coord, rDomain);
@@ -215,32 +217,40 @@ class KGViz {
     mainG.append('circle').classed(styles.outerCircle, true).attr('r', OUTER_R);
 
     // Radius axis
-    const [maxR, minR] = rDomain.map((v) => v * 100);
+    this.axisG = mainG.append('g').attr('transform', `translate(${0},${0})`);
+    this.axisG.call(this.axis);
+
     const axis = mainG
       .append('g')
       .classed(styles.axis, true)
       .attr('transform', `translate(${INNER_R + 1}, 0)`);
-    axis.append('text').text(`${Math.round(maxR)}%`);
+
+    axis.append('text').classed(styles.label1, true);
     axis
       .append('text')
-      .attr('x', (OUTER_R - INNER_R) / 3)
-      .text(`${Math.round(minR + ((maxR - minR) * 2) / 3)}%`);
-    axis
-      .append('text')
-      .attr('x', ((OUTER_R - INNER_R) * 2) / 3)
-      .text(`${Math.round(minR + (maxR - minR) / 3)}%`);
-    axis
-      .append('text')
-      .attr('x', OUTER_R - INNER_R)
-      .text(`${Math.round(minR)}%`);
+      .classed(styles.label4, true)
+      .attr('x', OUTER_R - INNER_R);
     axis
       .selectAll('text')
       .attr('dx', axisPadding)
       .attr('dy', -axisPadding)
       .style('font-size', px(axisFontSize));
 
+    updateAxisLabels();
+
     // Data elements
     resources.init(mainG, groupedData);
+  };
+
+  updateAxisLabels = () => {
+    const { rDomain, mainG } = this;
+
+    const [maxR, minR] = rDomain.map((v) => v * 100);
+
+    mainG.select(`.${styles.label1}`).text(`${Math.round(maxR)}%`);
+    mainG.select(`.${styles.label4}`).text(`${Math.round(minR)}%`);
+
+    this.axisG.transition().duration(700).call(this.axis);
   };
 
   highlightResource = (resourceName: string | null) => {
@@ -286,16 +296,16 @@ class KGViz {
       resources,
       coord,
       rDomain,
-      size: { guideStroke, axisPadding, axisFontSize },
+      updateAxisLabels,
+      size: { axisPadding, axisFontSize },
     } = this;
 
     resetTooltip();
 
-    // Guides
-    mainG.selectAll(`.${styles.guide}`).attr('stroke-width', guideStroke);
-
     // Sections
     sections.performUpdate(sectionDomain, coord, rDomain);
+
+    updateAxisLabels();
 
     // Axis
     mainG
@@ -350,10 +360,12 @@ class KGViz {
 
     const distance = rScale(score) + (offset || 0);
     let angle = sectionScale(category) || 0;
+    let hash = 0;
 
     if (jittered && !bisector) {
-      const randomNumber = Math.abs((getHash(name || '') % 1000) / 1000);
-      angle += sectionScale.bandwidth() * randomNumber;
+      hash = Math.abs((getHash(name || '') % 10000) / 10000);
+
+      angle += sectionScale.bandwidth() * hash;
     }
 
     if (bisector) {
@@ -363,7 +375,7 @@ class KGViz {
     const x = Math.cos((angle * Math.PI) / 180) * distance;
     const y = Math.sin((angle * Math.PI) / 180) * distance;
 
-    return { x, y, angle };
+    return { x, y, angle, hash };
   };
 
   elementsCollide = (a: Coord, b: Coord) =>

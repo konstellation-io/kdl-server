@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import { Scores } from './ScoreFilter';
 
 const normalizer = 100;

@@ -1,10 +1,14 @@
-import { CoordData, CoordOptions } from './components/KGVisualization/KGViz';
+import {
+  CoordData,
+  CoordOptions,
+  CoordOut,
+} from './components/KGVisualization/KGViz';
 import { D, TopicSections } from './components/KGVisualization/KGVisualization';
 import { RGBColor, color } from 'd3-color';
 
+import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
 import { orderBy } from 'lodash';
 import { scaleLinear } from '@visx/scale';
-import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
 
 const TEXT_COLOR_THRESHOLD = 120;
 const TEXT_COLOR = {
@@ -21,12 +25,14 @@ export type Coord = {
 interface DComplete extends D {
   x: number;
   y: number;
+  id: number;
 }
 
 export interface GroupD {
   x: number;
   y: number;
   elements: DComplete[];
+  id: number;
 }
 
 export const colorScale = scaleLinear({
@@ -54,14 +60,17 @@ export function getHash(text: string) {
 
 export function groupData(
   data: D[],
-  coord: ({ category, score, name }: CoordData, options: CoordOptions) => Coord,
+  coord: (
+    { category, score, name }: CoordData,
+    options: CoordOptions
+  ) => CoordOut,
   elementsCollide: (a: Coord, b: Coord) => boolean
 ) {
   const groupedData: GroupD[] = [];
 
   data.forEach((d) => {
-    const { x, y } = coord(d, { jittered: true });
-    const newD: DComplete = { ...d, x, y };
+    const { x, y, hash } = coord(d, { jittered: true });
+    const newD: DComplete = { ...d, x, y, id: hash || 0 };
     let collisionEl;
     let collisionIdx = 0;
 
@@ -75,13 +84,15 @@ export function groupData(
     }
 
     if (collisionEl) {
+      const newElements = [...groupedData[collisionIdx].elements, newD];
       groupedData[collisionIdx] = {
-        elements: [...groupedData[collisionIdx].elements, newD],
+        elements: newElements,
         x: (x + collisionEl.x) / 2,
         y: (y + collisionEl.y) / 2,
+        id: newElements.reduce((a, b) => a + b.id, 0),
       };
     } else {
-      groupedData.push({ elements: [newD], x, y });
+      groupedData.push({ elements: [newD], x, y, id: newD.id });
     }
   });
 

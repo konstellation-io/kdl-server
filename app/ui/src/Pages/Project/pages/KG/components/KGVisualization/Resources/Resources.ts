@@ -113,7 +113,7 @@ export default class Resources {
     return container
       .select(`.${styles.resourcesWrapper}`)
       .selectAll(`.${styles.resourceWrapper}`)
-      .data(data, (d) => `${(d as GroupD).x}${(d as GroupD).y}`);
+      .data(data, (d) => `${(d as GroupD).id}`);
   };
 
   create = (selection: Selection<EnterElement, GroupD, BaseType, unknown>) => {
@@ -210,7 +210,10 @@ export default class Resources {
       symbols,
     } = this;
 
-    selection.attr('transform', (d) => `translate(${d.x}, ${d.y})`);
+    selection
+      .transition()
+      .duration(400)
+      .attr('transform', (d) => `translate(${d.x}, ${d.y})`);
 
     selection
       .select(`.${styles.resource}`)

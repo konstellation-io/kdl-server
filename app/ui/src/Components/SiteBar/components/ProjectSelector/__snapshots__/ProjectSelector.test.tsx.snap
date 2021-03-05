@@ -1,3 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ProjectSelector component should render without crashing 1`] = `ShallowWrapper {}`;
+exports[`ProjectSelector component should render without crashing 1`] = `
+<div
+  className="container"
+>
+  <ul>
+    <NavLink
+      activeClassName="selectedProject"
+      className="project"
+      key="foo"
+      onClick={[MockFunction]}
+      to="/projects/foo"
+    >
+      <li
+        className="projectName"
+      >
+        bar
+      </li>
+    </NavLink>
+  </ul>
+  <T
+    Icon={
+      Object {
+        "$$typeof": Symbol(react.memo),
+        "compare": null,
+        "type": Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "render": [Function],
+        },
+      }
+    }
+    className="addProjectButton"
+    label="NEW PROJECT"
+    to="/new-project"
+  />
+</div>
+`;

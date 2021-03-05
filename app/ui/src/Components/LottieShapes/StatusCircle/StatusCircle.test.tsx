@@ -9,10 +9,6 @@ const component = shallow(
 );
 
 describe('StatusCircle component', () => {
-  it('Component match snapshot', () => {
-    expect(component).toMatchSnapshot();
-  });
-
   it('show right texts', () => {
     expect(component.contains('Some label')).toBeTruthy();
   });

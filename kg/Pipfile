@@ -11,7 +11,7 @@ scipy = "==1.6.0"
 torch = "==1.7.1"
 pandas = "==1.2.2"
 transformers = "==4.3.2"
-dvc = "==1.11.16"
+dvc = "==2.0.1"
 boto3 = "==1.17.16"
 
 [dev-packages]

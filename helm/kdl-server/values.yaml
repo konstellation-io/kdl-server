@@ -20,10 +20,6 @@ kdlKG:
     repository: konstellation/kdl-kg
     tag: latest
     pullPolicy: IfNotPresent
-  s3:
-    keyID: awsid
-    keySecret: secretkey
-    bucketName: kdl-kg-assets
   assetRoute: "/kg/assets"
   workers: 1
   bindAddress: 0.0.0.0

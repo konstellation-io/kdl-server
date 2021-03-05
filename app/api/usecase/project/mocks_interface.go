@@ -64,19 +64,61 @@ func (mr *MockRepositoryMockRecorder) Create(ctx, project interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockRepository)(nil).Create), ctx, project)
 }
 
-// FindAll mocks base method
-func (m *MockRepository) FindAll(ctx context.Context) ([]entity.Project, error) {
+// FindByUserID mocks base method
+func (m *MockRepository) FindByUserID(ctx context.Context, userID string) ([]entity.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindAll", ctx)
+	ret := m.ctrl.Call(m, "FindByUserID", ctx, userID)
 	ret0, _ := ret[0].([]entity.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FindAll indicates an expected call of FindAll
-func (mr *MockRepositoryMockRecorder) FindAll(ctx interface{}) *gomock.Call {
+// FindByUserID indicates an expected call of FindByUserID
+func (mr *MockRepositoryMockRecorder) FindByUserID(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockRepository)(nil).FindAll), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByUserID", reflect.TypeOf((*MockRepository)(nil).FindByUserID), ctx, userID)
+}
+
+// AddMembers mocks base method
+func (m *MockRepository) AddMembers(ctx context.Context, projectID string, members []entity.Member) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddMembers", ctx, projectID, members)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddMembers indicates an expected call of AddMembers
+func (mr *MockRepositoryMockRecorder) AddMembers(ctx, projectID, members interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMembers", reflect.TypeOf((*MockRepository)(nil).AddMembers), ctx, projectID, members)
+}
+
+// RemoveMember mocks base method
+func (m *MockRepository) RemoveMember(ctx context.Context, projectID, userID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveMember", ctx, projectID, userID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveMember indicates an expected call of RemoveMember
+func (mr *MockRepositoryMockRecorder) RemoveMember(ctx, projectID, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMember", reflect.TypeOf((*MockRepository)(nil).RemoveMember), ctx, projectID, userID)
+}
+
+// UpdateMemberAccessLevel mocks base method
+func (m *MockRepository) UpdateMemberAccessLevel(ctx context.Context, projectID, userID string, accessLevel entity.AccessLevel) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateMemberAccessLevel", ctx, projectID, userID, accessLevel)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateMemberAccessLevel indicates an expected call of UpdateMemberAccessLevel
+func (mr *MockRepositoryMockRecorder) UpdateMemberAccessLevel(ctx, projectID, userID, accessLevel interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMemberAccessLevel", reflect.TypeOf((*MockRepository)(nil).UpdateMemberAccessLevel), ctx, projectID, userID, accessLevel)
 }
 
 // MockUseCase is a mock of UseCase interface
@@ -117,19 +159,19 @@ func (mr *MockUseCaseMockRecorder) Create(ctx, opt interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUseCase)(nil).Create), ctx, opt)
 }
 
-// FindAll mocks base method
-func (m *MockUseCase) FindAll(ctx context.Context) ([]entity.Project, error) {
+// FindByUserID mocks base method
+func (m *MockUseCase) FindByUserID(ctx context.Context, userID string) ([]entity.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindAll", ctx)
+	ret := m.ctrl.Call(m, "FindByUserID", ctx, userID)
 	ret0, _ := ret[0].([]entity.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FindAll indicates an expected call of FindAll
-func (mr *MockUseCaseMockRecorder) FindAll(ctx interface{}) *gomock.Call {
+// FindByUserID indicates an expected call of FindByUserID
+func (mr *MockUseCaseMockRecorder) FindByUserID(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockUseCase)(nil).FindAll), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByUserID", reflect.TypeOf((*MockUseCase)(nil).FindByUserID), ctx, userID)
 }
 
 // GetByID mocks base method
@@ -145,4 +187,49 @@ func (m *MockUseCase) GetByID(ctx context.Context, id string) (entity.Project, e
 func (mr *MockUseCaseMockRecorder) GetByID(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockUseCase)(nil).GetByID), ctx, id)
+}
+
+// AddMembers mocks base method
+func (m *MockUseCase) AddMembers(ctx context.Context, projectID string, users []entity.User, loggedUser entity.User) (entity.Project, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddMembers", ctx, projectID, users, loggedUser)
+	ret0, _ := ret[0].(entity.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddMembers indicates an expected call of AddMembers
+func (mr *MockUseCaseMockRecorder) AddMembers(ctx, projectID, users, loggedUser interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMembers", reflect.TypeOf((*MockUseCase)(nil).AddMembers), ctx, projectID, users, loggedUser)
+}
+
+// RemoveMember mocks base method
+func (m *MockUseCase) RemoveMember(ctx context.Context, projectID string, user, loggedUser entity.User) (entity.Project, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveMember", ctx, projectID, user, loggedUser)
+	ret0, _ := ret[0].(entity.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemoveMember indicates an expected call of RemoveMember
+func (mr *MockUseCaseMockRecorder) RemoveMember(ctx, projectID, user, loggedUser interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMember", reflect.TypeOf((*MockUseCase)(nil).RemoveMember), ctx, projectID, user, loggedUser)
+}
+
+// UpdateMember mocks base method
+func (m *MockUseCase) UpdateMember(ctx context.Context, opt UpdateMemberOption) (entity.Project, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateMember", ctx, opt)
+	ret0, _ := ret[0].(entity.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateMember indicates an expected call of UpdateMember
+func (mr *MockUseCaseMockRecorder) UpdateMember(ctx, opt interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMember", reflect.TypeOf((*MockUseCase)(nil).UpdateMember), ctx, opt)
 }

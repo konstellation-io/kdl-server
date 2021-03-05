@@ -69,9 +69,11 @@ func TestInteractor_Create(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const (
-		projectID   = "project.1234"
-		projectName = "The Project X"
-		projectDesc = "The Project X Description"
+		projectID     = "project.1234"
+		projectName   = "The Project X"
+		projectDesc   = "The Project X Description"
+		ownerUserID   = "user.1234"
+		ownerUsername = "john"
 	)
 
 	var internalRepoName = "project-x"
@@ -81,6 +83,13 @@ func TestInteractor_Create(t *testing.T) {
 
 	createProject := entity.NewProject(projectName, projectDesc)
 	createProject.CreationDate = now
+	createProject.Members = []entity.Member{
+		{
+			UserID:      ownerUserID,
+			AccessLevel: entity.AccessLevelAdmin,
+			AddedDate:   now,
+		},
+	}
 	createProject.Repository = entity.Repository{
 		Type:             entity.RepositoryTypeInternal,
 		InternalRepoName: internalRepoName,
@@ -97,7 +106,7 @@ func TestInteractor_Create(t *testing.T) {
 		},
 	}
 
-	s.mocks.giteaService.EXPECT().CreateRepo(internalRepoName).Return(nil)
+	s.mocks.giteaService.EXPECT().CreateRepo(internalRepoName, ownerUsername).Return(nil)
 	s.mocks.minioService.EXPECT().CreateBucket(internalRepoName).Return(nil)
 	s.mocks.droneService.EXPECT().ActivateRepository(internalRepoName).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
@@ -110,24 +119,27 @@ func TestInteractor_Create(t *testing.T) {
 		RepoType:         entity.RepositoryTypeInternal,
 		InternalRepoName: &internalRepoName,
 		ExternalRepoURL:  nil,
+		Owner:            entity.User{ID: ownerUserID, Username: ownerUsername},
 	})
 
 	require.NoError(t, err)
 	require.Equal(t, expectedProject, createdProject)
 }
 
-func TestInteractor_FindAll(t *testing.T) {
+func TestInteractor_FindByUserID(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
+
+	const userID = "user.1234"
 
 	ctx := context.Background()
 	expectedProjects := []entity.Project{
 		entity.NewProject("project-x", "Project X"),
 	}
 
-	s.mocks.repo.EXPECT().FindAll(ctx).Return(expectedProjects, nil)
+	s.mocks.repo.EXPECT().FindByUserID(ctx, userID).Return(expectedProjects, nil)
 
-	p, err := s.interactor.FindAll(ctx)
+	p, err := s.interactor.FindByUserID(ctx, userID)
 
 	require.NoError(t, err)
 	require.Equal(t, p, expectedProjects)
@@ -145,6 +157,156 @@ func TestInteractor_GetByID(t *testing.T) {
 	s.mocks.repo.EXPECT().Get(ctx, projectID).Return(expectedProject, nil)
 
 	p, err := s.interactor.GetByID(ctx, projectID)
+
+	require.NoError(t, err)
+	require.Equal(t, p, expectedProject)
+}
+
+func TestInteractor_AddMembers(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+	now := time.Now().UTC()
+
+	loggedUser := entity.User{
+		ID:       "logged.user.1234",
+		Username: "logged_user",
+	}
+
+	adminMember := entity.Member{
+		UserID: loggedUser.ID, AccessLevel: entity.AccessLevelAdmin, AddedDate: time.Now().UTC(),
+	}
+
+	p := entity.NewProject("project-x", "Project X")
+	p.ID = "projectA"
+	p.Members = []entity.Member{adminMember}
+	p.Repository = entity.Repository{
+		Type:             entity.RepositoryTypeInternal,
+		InternalRepoName: "repo-A",
+	}
+
+	usersToAdd := []entity.User{
+		{ID: "userA", Username: "user_a"},
+		{ID: "userB", Username: "user_b"},
+	}
+
+	newMembers := []entity.Member{
+		{UserID: usersToAdd[0].ID, AccessLevel: project.MemberAccessLevelOnCreation, AddedDate: now},
+		{UserID: usersToAdd[1].ID, AccessLevel: project.MemberAccessLevelOnCreation, AddedDate: now},
+	}
+
+	expectedProject := entity.NewProject(p.Name, p.Description)
+	expectedProject.Repository = p.Repository
+	expectedProject.Members = []entity.Member{adminMember, newMembers[0], newMembers[1]}
+
+	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
+	gomock.InOrder(
+		s.mocks.giteaService.EXPECT().
+			AddCollaborator(p.Repository.InternalRepoName, usersToAdd[0].Username, project.MemberAccessLevelOnCreation).
+			Return(nil),
+		s.mocks.giteaService.EXPECT().
+			AddCollaborator(p.Repository.InternalRepoName, usersToAdd[1].Username, project.MemberAccessLevelOnCreation).
+			Return(nil),
+	)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.repo.EXPECT().AddMembers(ctx, p.ID, newMembers).Return(nil)
+	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
+
+	p, err := s.interactor.AddMembers(ctx, p.ID, usersToAdd, loggedUser)
+
+	require.NoError(t, err)
+	require.Equal(t, p, expectedProject)
+}
+
+func TestInteractor_RemoveMember(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	loggedUser := entity.User{
+		ID:       "logged.user.1234",
+		Username: "logged_user",
+	}
+
+	adminMember := entity.Member{
+		UserID: loggedUser.ID, AccessLevel: entity.AccessLevelAdmin, AddedDate: time.Now().UTC(),
+	}
+
+	usersToRemove := entity.User{ID: "userA", Username: "user_a"}
+
+	p := entity.NewProject("project-x", "Project X")
+	p.ID = "project1"
+	p.Members = []entity.Member{adminMember, {UserID: usersToRemove.ID}}
+	p.Repository = entity.Repository{
+		Type:             entity.RepositoryTypeInternal,
+		InternalRepoName: "repo-A",
+	}
+
+	expectedProject := entity.NewProject(p.Name, p.Description)
+	expectedProject.Repository = p.Repository
+	expectedProject.Members = []entity.Member{adminMember}
+
+	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
+	s.mocks.giteaService.EXPECT().
+		RemoveCollaborator(p.Repository.InternalRepoName, usersToRemove.Username).
+		Return(nil)
+
+	s.mocks.repo.EXPECT().RemoveMember(ctx, p.ID, usersToRemove.ID).Return(nil)
+	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
+
+	p, err := s.interactor.RemoveMember(ctx, p.ID, usersToRemove, loggedUser)
+
+	require.NoError(t, err)
+	require.Equal(t, p, expectedProject)
+}
+
+func TestInteractor_UpdateMember(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	const newAccessLevel = entity.AccessLevelManager
+
+	loggedUser := entity.User{
+		ID:       "logged.user.1234",
+		Username: "logged_user",
+	}
+
+	adminMember := entity.Member{
+		UserID: loggedUser.ID, AccessLevel: entity.AccessLevelAdmin, AddedDate: time.Now().UTC(),
+	}
+
+	usersToUpd := entity.User{ID: "userA", Username: "user_a"}
+
+	p := entity.NewProject("project-x", "Project X")
+	p.ID = "project.1234"
+	p.Members = []entity.Member{adminMember, {UserID: usersToUpd.ID}}
+	p.Repository = entity.Repository{
+		Type:             entity.RepositoryTypeInternal,
+		InternalRepoName: "repo-A",
+	}
+
+	expectedProject := entity.NewProject(p.Name, p.Description)
+	expectedProject.Repository = p.Repository
+	expectedProject.Members = []entity.Member{adminMember}
+
+	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
+	s.mocks.giteaService.EXPECT().
+		UpdateCollaboratorPermissions(p.Repository.InternalRepoName, usersToUpd.Username, newAccessLevel).
+		Return(nil)
+
+	s.mocks.repo.EXPECT().UpdateMemberAccessLevel(ctx, p.ID, usersToUpd.ID, newAccessLevel).Return(nil)
+	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
+
+	p, err := s.interactor.UpdateMember(ctx, project.UpdateMemberOption{
+		ProjectID:   p.ID,
+		User:        usersToUpd,
+		AccessLevel: newAccessLevel,
+		LoggedUser:  loggedUser,
+	})
 
 	require.NoError(t, err)
 	require.Equal(t, p, expectedProject)

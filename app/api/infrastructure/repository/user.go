@@ -119,6 +119,22 @@ func (m *userMongoDBRepo) Create(ctx context.Context, u entity.User) (string, er
 	return result.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
+// FindByIDs retrieves the users for the given user identifiers.
+func (m *userMongoDBRepo) FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error) {
+	objIDs := make([]primitive.ObjectID, len(userIDs))
+
+	for i, id := range userIDs {
+		objID, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+
+		objIDs[i] = objID
+	}
+
+	return m.find(ctx, bson.M{"_id": bson.M{"$in": objIDs}})
+}
+
 func (m *userMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.User, error) {
 	m.logger.Debugf("Finding one user by \"%s\" from database...", filters)
 

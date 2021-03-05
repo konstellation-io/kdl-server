@@ -18,6 +18,12 @@ import (
 
 const projectCollName = "projects"
 
+type memberDTO struct {
+	UserID      primitive.ObjectID `bson:"user_id"`
+	AccessLevel entity.AccessLevel `bson:"access_level"`
+	AddedDate   time.Time          `bson:"added_date"`
+}
+
 type projectDTO struct {
 	ID               primitive.ObjectID    `bson:"_id"`
 	Name             string                `bson:"name"`
@@ -26,6 +32,7 @@ type projectDTO struct {
 	RepositoryType   entity.RepositoryType `bson:"repo_type"`
 	InternalRepoName string                `bson:"internal_repo_name"`
 	ExternalRepoURL  string                `bson:"external_repo_url"`
+	Members          []memberDTO           `bson:"members"`
 }
 
 type projectMongoDBRepo struct {
@@ -51,6 +58,8 @@ func (m *projectMongoDBRepo) Get(ctx context.Context, id string) (entity.Project
 
 // Create inserts into the database a new entity.
 func (m *projectMongoDBRepo) Create(ctx context.Context, p entity.Project) (string, error) {
+	m.logger.Debugf("Creating new project \"%s\"...", p.Name)
+
 	dto, err := m.entityToDTO(p)
 	if err != nil {
 		return "", err
@@ -66,9 +75,98 @@ func (m *projectMongoDBRepo) Create(ctx context.Context, p entity.Project) (stri
 	return result.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
-// FindAll retrieves all the existing projects.
-func (m *projectMongoDBRepo) FindAll(ctx context.Context) ([]entity.Project, error) {
-	return m.find(ctx, bson.M{})
+// FindByUserID retrieves the projects of the given user.
+func (m *projectMongoDBRepo) FindByUserID(ctx context.Context, userID string) ([]entity.Project, error) {
+	objID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return m.find(ctx, bson.M{"members.user_id": objID})
+}
+
+// AddMembers creates a new user in the member list for the given project.
+func (m *projectMongoDBRepo) AddMembers(ctx context.Context, projectID string, members []entity.Member) error {
+	m.logger.Debugf("Adding %d new members to project \"%s\"...", len(members), projectID)
+
+	pID, err := primitive.ObjectIDFromHex(projectID)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": pID}
+
+	memberDTOS, err := m.membersToDTOs(members)
+	if err != nil {
+		return err
+	}
+
+	upd := bson.M{
+		"$push": bson.M{
+			"members": bson.M{
+				"$each": memberDTOS,
+			},
+		},
+	}
+
+	_, err = m.collection.UpdateOne(ctx, filter, upd)
+
+	return err
+}
+
+// RemoveMember deletes a user from the member list for the given project.
+func (m *projectMongoDBRepo) RemoveMember(ctx context.Context, projectID, userID string) error {
+	m.logger.Debugf("Removing member \"%s\" from project \"%s\"...", userID, projectID)
+
+	pObjID, err := primitive.ObjectIDFromHex(projectID)
+	if err != nil {
+		return err
+	}
+
+	uObjID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": pObjID}
+
+	upd := bson.M{
+		"$pull": bson.M{
+			"members": bson.M{
+				"user_id": uObjID,
+			},
+		},
+	}
+
+	_, err = m.collection.UpdateOne(ctx, filter, upd)
+
+	return err
+}
+
+func (m *projectMongoDBRepo) UpdateMemberAccessLevel(ctx context.Context, projectID, userID string, accessLevel entity.AccessLevel) error {
+	m.logger.Debugf("Updating member \"%s\" access level to \"%s\" from project \"%s\"...", userID, accessLevel, projectID)
+
+	pObjID, err := primitive.ObjectIDFromHex(projectID)
+	if err != nil {
+		return err
+	}
+
+	uObjID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": pObjID, "members.user_id": uObjID}
+
+	upd := bson.M{
+		"$set": bson.M{
+			"members.$.access_level": accessLevel,
+		},
+	}
+
+	_, err = m.collection.UpdateOne(ctx, filter, upd)
+
+	return err
 }
 
 func (m *projectMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.Project, error) {
@@ -110,17 +208,43 @@ func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 	if p.ID != "" {
 		idFromHex, err := primitive.ObjectIDFromHex(p.ID)
 		if err != nil {
-			return dto, err
+			return projectDTO{}, err
 		}
 
 		dto.ID = idFromHex
 	}
 
+	memberDTOS, err := m.membersToDTOs(p.Members)
+	if err != nil {
+		return projectDTO{}, err
+	}
+
+	dto.Members = memberDTOS
+
 	return dto, nil
 }
 
+func (m *projectMongoDBRepo) membersToDTOs(members []entity.Member) ([]memberDTO, error) {
+	dtos := make([]memberDTO, len(members))
+
+	for i, m := range members {
+		idFromHex, err := primitive.ObjectIDFromHex(m.UserID)
+		if err != nil {
+			return nil, err
+		}
+
+		dtos[i] = memberDTO{
+			UserID:      idFromHex,
+			AccessLevel: m.AccessLevel,
+			AddedDate:   m.AddedDate,
+		}
+	}
+
+	return dtos, nil
+}
+
 func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
-	return entity.Project{
+	p := entity.Project{
 		ID:           dto.ID.Hex(),
 		Name:         dto.Name,
 		Description:  dto.Description,
@@ -131,6 +255,18 @@ func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 			InternalRepoName: dto.InternalRepoName,
 		},
 	}
+
+	p.Members = make([]entity.Member, len(dto.Members))
+
+	for i, m := range dto.Members {
+		p.Members[i] = entity.Member{
+			UserID:      m.UserID.Hex(),
+			AccessLevel: m.AccessLevel,
+			AddedDate:   m.AddedDate,
+		}
+	}
+
+	return p
 }
 
 func (m *projectMongoDBRepo) dtosToEntities(dtos []projectDTO) []entity.Project {

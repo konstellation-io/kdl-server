@@ -13,6 +13,7 @@ require (
 	github.com/konstellation-io/kre/libs/simplelogger v0.0.0-20210127163202-65666c1e48f8
 	github.com/minio/minio-go/v7 v7.0.8
 	github.com/stretchr/testify v1.6.1
+	github.com/vektah/dataloaden v0.3.0 // indirect
 	github.com/vektah/gqlparser/v2 v2.1.0
 	go.mongodb.org/mongo-driver v1.4.5
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899

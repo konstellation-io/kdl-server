@@ -76,7 +76,7 @@ func (g *giteaService) AddSSHKey(username, publicSSHKey string) error {
 }
 
 // CreateRepo creates a repository in the KDL organization.
-func (g *giteaService) CreateRepo(name string) error {
+func (g *giteaService) CreateRepo(name, ownerUsername string) error {
 	repo, _, err := g.client.AdminCreateRepo(kdlOrganization, gitea.CreateRepoOption{
 		Name: name,
 	})
@@ -87,7 +87,7 @@ func (g *giteaService) CreateRepo(name string) error {
 
 	g.logger.Infof("Created repository \"%s\" in organization \"%s\" in Gitea with id \"%d\"", name, kdlOrganization, repo.ID)
 
-	return nil
+	return g.AddCollaborator(name, ownerUsername, entity.AccessLevelAdmin)
 }
 
 // AddTeamMember adds the specified user to a KDL team depending on his access level.
@@ -133,4 +133,52 @@ func (g *giteaService) AddTeamMember(username string, accessLevel entity.AccessL
 	g.logger.Infof("Added user \"%s\" to team \"%s\" in Gitea", username, targetTeamName)
 
 	return nil
+}
+
+// AddCollaborator adds a new collaborator to the given repository.
+func (g *giteaService) AddCollaborator(repoName, username string, accessLevel entity.AccessLevel) error {
+	var accessMode gitea.AccessMode
+
+	switch accessLevel {
+	case entity.AccessLevelAdmin:
+		accessMode = gitea.AccessModeAdmin
+	case entity.AccessLevelManager:
+		accessMode = gitea.AccessModeWrite
+	case entity.AccessLevelViewer:
+		accessMode = gitea.AccessModeRead
+	}
+
+	_, err := g.client.AddCollaborator(kdlOrganization, repoName, username, gitea.AddCollaboratorOption{
+		Permission: &accessMode,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	g.logger.Infof("Added \"%s\" collaborator to Gitea repository \"%s\" with access level \"%s\"", username, repoName, accessLevel)
+
+	return nil
+}
+
+// RemoveCollaborator removes a collaborator from the given repository.
+func (g *giteaService) RemoveCollaborator(repoName, username string) error {
+	_, err := g.client.DeleteCollaborator(kdlOrganization, repoName, username)
+	if err != nil {
+		return err
+	}
+
+	g.logger.Infof("Removed \"%s\" collaborator from Gitea repository \"%s\"", username, repoName)
+
+	return nil
+}
+
+// UpdateCollaboratorPermissions changes the permissions for the given collaborator.
+func (g *giteaService) UpdateCollaboratorPermissions(repoName, username string, newAccessLevel entity.AccessLevel) error {
+	err := g.RemoveCollaborator(repoName, username)
+	if err != nil {
+		return err
+	}
+
+	return g.AddCollaborator(repoName, username, newAccessLevel)
 }

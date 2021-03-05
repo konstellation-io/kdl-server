@@ -199,3 +199,13 @@ func (i *interactor) StopTools(ctx context.Context, username string) (entity.Use
 func (i *interactor) AreToolsRunning(username string) (bool, error) {
 	return i.k8sClient.IsUserToolPODRunning(username)
 }
+
+// FindByIDs retrieves the users for the given identifiers.
+func (i *interactor) FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error) {
+	return i.repo.FindByIDs(ctx, userIDs)
+}
+
+// GetByID retrieve the user for the given identifier.
+func (i *interactor) GetByID(ctx context.Context, userID string) (entity.User, error) {
+	return i.repo.Get(ctx, userID)
+}

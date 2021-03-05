@@ -36,6 +36,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Member() MemberResolver
 	Mutation() MutationResolver
 	Project() ProjectResolver
 	Query() QueryResolver
@@ -76,11 +77,9 @@ type ComplexityRoot struct {
 	}
 
 	Member struct {
-		AccessLevel  func(childComplexity int) int
-		AddedDate    func(childComplexity int) int
-		Email        func(childComplexity int) int
-		ID           func(childComplexity int) int
-		LastActivity func(childComplexity int) int
+		AccessLevel func(childComplexity int) int
+		AddedDate   func(childComplexity int) int
+		User        func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -162,6 +161,11 @@ type ComplexityRoot struct {
 	}
 }
 
+type MemberResolver interface {
+	User(ctx context.Context, obj *entity.Member) (*entity.User, error)
+
+	AddedDate(ctx context.Context, obj *entity.Member) (string, error)
+}
 type MutationResolver interface {
 	AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error)
 	RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error)
@@ -169,9 +173,9 @@ type MutationResolver interface {
 	RegenerateSSHKey(ctx context.Context) (*entity.SSHKey, error)
 	CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error)
 	UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error)
-	AddMembers(ctx context.Context, input model.AddMembersInput) ([]entity.Member, error)
-	RemoveMember(ctx context.Context, input model.RemoveMemberInput) (*entity.Member, error)
-	UpdateMember(ctx context.Context, input model.UpdateMemberInput) (*entity.Member, error)
+	AddMembers(ctx context.Context, input model.AddMembersInput) (*entity.Project, error)
+	RemoveMember(ctx context.Context, input model.RemoveMemberInput) (*entity.Project, error)
+	UpdateMember(ctx context.Context, input model.UpdateMemberInput) (*entity.Project, error)
 	AddAPIToken(ctx context.Context, input *model.APITokenInput) (*entity.APIToken, error)
 	RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error)
 	SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error)
@@ -362,26 +366,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Member.AddedDate(childComplexity), true
 
-	case "Member.email":
-		if e.complexity.Member.Email == nil {
+	case "Member.user":
+		if e.complexity.Member.User == nil {
 			break
 		}
 
-		return e.complexity.Member.Email(childComplexity), true
-
-	case "Member.id":
-		if e.complexity.Member.ID == nil {
-			break
-		}
-
-		return e.complexity.Member.ID(childComplexity), true
-
-	case "Member.lastActivity":
-		if e.complexity.Member.LastActivity == nil {
-			break
-		}
-
-		return e.complexity.Member.LastActivity(childComplexity), true
+		return e.complexity.Member.User(childComplexity), true
 
 	case "Mutation.addApiToken":
 		if e.complexity.Mutation.AddAPIToken == nil {
@@ -922,9 +912,9 @@ type Mutation {
   regenerateSSHKey: SSHKey!
   createProject(input: CreateProjectInput!): Project!
   updateProject(input: UpdateProjectInput!): Project!
-  addMembers(input: AddMembersInput!): [Member!]!
-  removeMember(input: RemoveMemberInput!): Member!
-  updateMember(input: UpdateMemberInput!): Member!
+  addMembers(input: AddMembersInput!): Project!
+  removeMember(input: RemoveMemberInput!): Project!
+  updateMember(input: UpdateMemberInput!): Project!
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
   setStarredKGItem(input: SetBoolFieldInput!): KnowledgeGraphItem!
@@ -985,11 +975,9 @@ type ApiToken {
 }
 
 type Member {
-  id: ID!
-  email: String!
+  user: User!
   accessLevel: AccessLevel!
   addedDate: String!
-  lastActivity: String
 }
 
 type ToolUrls {
@@ -1015,17 +1003,18 @@ input ApiTokenInput {
 input UpdateProjectInput {
   id: ID!
   name: String
+  description: String
   repository: UpdateProjectRepositoryInput
 }
 
 input AddMembersInput {
   projectId: ID!
-  memberIds: [ID!]!
+  userIds: [ID!]!
 }
 
 input RemoveMemberInput {
   projectId: ID!
-  memberId: ID!
+  userId: ID!
 }
 
 input RemoveApiTokenInput {
@@ -1034,7 +1023,7 @@ input RemoveApiTokenInput {
 
 input UpdateMemberInput {
   projectId: ID!
-  memberId: ID!
+  userId: ID!
   accessLevel: AccessLevel!
 }
 
@@ -2039,7 +2028,7 @@ func (ec *executionContext) _KnowledgeGraphItem_framework(ctx context.Context, f
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Member_id(ctx context.Context, field graphql.CollectedField, obj *entity.Member) (ret graphql.Marshaler) {
+func (ec *executionContext) _Member_user(ctx context.Context, field graphql.CollectedField, obj *entity.Member) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2050,14 +2039,14 @@ func (ec *executionContext) _Member_id(ctx context.Context, field graphql.Collec
 		Object:     "Member",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		return ec.resolvers.Member().User(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2069,44 +2058,9 @@ func (ec *executionContext) _Member_id(ctx context.Context, field graphql.Collec
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*entity.User)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Member_email(ctx context.Context, field graphql.CollectedField, obj *entity.Member) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Member",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Email, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Member_accessLevel(ctx context.Context, field graphql.CollectedField, obj *entity.Member) (ret graphql.Marshaler) {
@@ -2155,14 +2109,14 @@ func (ec *executionContext) _Member_addedDate(ctx context.Context, field graphql
 		Object:     "Member",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.AddedDate, nil
+		return ec.resolvers.Member().AddedDate(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2177,38 +2131,6 @@ func (ec *executionContext) _Member_addedDate(ctx context.Context, field graphql
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Member_lastActivity(ctx context.Context, field graphql.CollectedField, obj *entity.Member) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Member",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.LastActivity, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2493,9 +2415,9 @@ func (ec *executionContext) _Mutation_addMembers(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]entity.Member)
+	res := resTmp.(*entity.Project)
 	fc.Result = res
-	return ec.marshalNMember2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMemberᚄ(ctx, field.Selections, res)
+	return ec.marshalNProject2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_removeMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2535,9 +2457,9 @@ func (ec *executionContext) _Mutation_removeMember(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*entity.Member)
+	res := resTmp.(*entity.Project)
 	fc.Result = res
-	return ec.marshalNMember2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMember(ctx, field.Selections, res)
+	return ec.marshalNProject2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2577,9 +2499,9 @@ func (ec *executionContext) _Mutation_updateMember(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*entity.Member)
+	res := resTmp.(*entity.Project)
 	fc.Result = res
-	return ec.marshalNMember2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMember(ctx, field.Selections, res)
+	return ec.marshalNProject2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addApiToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -5364,11 +5286,11 @@ func (ec *executionContext) unmarshalInputAddMembersInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "memberIds":
+		case "userIds":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("memberIds"))
-			it.MemberIds, err = ec.unmarshalNID2ᚕstringᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIds"))
+			it.UserIds, err = ec.unmarshalNID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5520,11 +5442,11 @@ func (ec *executionContext) unmarshalInputRemoveMemberInput(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
-		case "memberId":
+		case "userId":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("memberId"))
-			it.MemberID, err = ec.unmarshalNID2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+			it.UserID, err = ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5680,11 +5602,11 @@ func (ec *executionContext) unmarshalInputUpdateMemberInput(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
-		case "memberId":
+		case "userId":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("memberId"))
-			it.MemberID, err = ec.unmarshalNID2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+			it.UserID, err = ec.unmarshalNID2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5721,6 +5643,14 @@ func (ec *executionContext) unmarshalInputUpdateProjectInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5927,28 +5857,39 @@ func (ec *executionContext) _Member(ctx context.Context, sel ast.SelectionSet, o
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Member")
-		case "id":
-			out.Values[i] = ec._Member_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "email":
-			out.Values[i] = ec._Member_email(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+		case "user":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Member_user(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "accessLevel":
 			out.Values[i] = ec._Member_accessLevel(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "addedDate":
-			out.Values[i] = ec._Member_addedDate(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "lastActivity":
-			out.Values[i] = ec._Member_lastActivity(ctx, field, obj)
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Member_addedDate(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7054,16 +6995,6 @@ func (ec *executionContext) marshalNMember2ᚕgithubᚗcomᚋkonstellationᚑio�
 	}
 	wg.Wait()
 	return ret
-}
-
-func (ec *executionContext) marshalNMember2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMember(ctx context.Context, sel ast.SelectionSet, v *entity.Member) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Member(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNProject2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx context.Context, sel ast.SelectionSet, v entity.Project) graphql.Marshaler {

@@ -8,7 +8,7 @@ import (
 
 type AddMembersInput struct {
 	ProjectID string   `json:"projectId"`
-	MemberIds []string `json:"memberIds"`
+	UserIds   []string `json:"userIds"`
 }
 
 type AddUserInput struct {
@@ -39,7 +39,7 @@ type RemoveAPITokenInput struct {
 
 type RemoveMemberInput struct {
 	ProjectID string `json:"projectId"`
-	MemberID  string `json:"memberId"`
+	UserID    string `json:"userId"`
 }
 
 type RemoveUsersInput struct {
@@ -68,14 +68,15 @@ type UpdateAccessLevelInput struct {
 
 type UpdateMemberInput struct {
 	ProjectID   string             `json:"projectId"`
-	MemberID    string             `json:"memberId"`
+	UserID      string             `json:"userId"`
 	AccessLevel entity.AccessLevel `json:"accessLevel"`
 }
 
 type UpdateProjectInput struct {
-	ID         string                        `json:"id"`
-	Name       *string                       `json:"name"`
-	Repository *UpdateProjectRepositoryInput `json:"repository"`
+	ID          string                        `json:"id"`
+	Name        *string                       `json:"name"`
+	Description *string                       `json:"description"`
+	Repository  *UpdateProjectRepositoryInput `json:"repository"`
 }
 
 type UpdateProjectRepositoryInput struct {

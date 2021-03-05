@@ -11,7 +11,7 @@ import { SpinnerCircular, TextInput } from 'kwc';
 import { useLazyQuery, useQuery } from '@apollo/client';
 
 import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
-import { generateSlug } from 'Utils/string';
+import { generateSlug, getErrorMsg } from 'Utils/string';
 import { loader } from 'graphql.macro';
 import styles from './Information.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
@@ -68,10 +68,7 @@ function Information({ showErrors }: Props) {
         onBlur={() => {
           updateInternalRepositoryValue('slug', generateSlug(name));
           const isValidName = validateProjectName(name);
-          updateError(
-            'name',
-            isValidName === true ? '' : (isValidName as string)
-          );
+          updateError('name', getErrorMsg(isValidName));
         }}
         formValue={name}
         autoFocus
@@ -87,10 +84,7 @@ function Information({ showErrors }: Props) {
         }}
         onBlur={() => {
           const isValidDescription = validateProjectDescription(description);
-          updateError(
-            'description',
-            isValidDescription === true ? '' : (isValidDescription as string)
-          );
+          updateError('description', getErrorMsg(isValidDescription));
           getQualityProjectDesc({ variables: { description } });
         }}
         limits={limits}

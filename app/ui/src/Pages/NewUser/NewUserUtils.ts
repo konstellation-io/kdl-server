@@ -17,10 +17,15 @@ export function verifyPassword(value: string) {
     CHECK.isFieldNotEmpty(value),
     CHECK.matches(
       value,
+      new RegExp(/.{6,}/g),
+      'The password length cannot be less than 6 characters'
+    ),
+    CHECK.matches(
+      value,
       new RegExp(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/g
       ),
-      'The password length cannot be less than 6 characters, should contain at least one digit, one special character (@$!%*?&), one lowercase character and one uppercase character.'
+      'The password should contain at least one digit, one special character (@$!%*?&), one lowercase character and one uppercase character'
     ),
   ]);
 }

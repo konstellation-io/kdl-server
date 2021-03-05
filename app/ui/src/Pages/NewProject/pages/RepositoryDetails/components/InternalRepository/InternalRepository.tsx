@@ -10,7 +10,7 @@ import IconLink from '@material-ui/icons/Link';
 import styles from './InternalRepository.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 import { useQuery } from '@apollo/client';
-import { replaceAll } from 'Utils/string';
+import { getErrorMsg, replaceAll } from 'Utils/string';
 
 function validateProjectSlug(value: string): string {
   const error = CHECK.getValidationError([
@@ -28,7 +28,7 @@ function validateProjectSlug(value: string): string {
     ),
     CHECK.isSlug(value),
   ]);
-  return error === true ? '' : (error as string);
+  return getErrorMsg(error);
 }
 type Props = {
   showErrors: boolean;

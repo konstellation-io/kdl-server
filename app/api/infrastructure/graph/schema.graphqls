@@ -15,9 +15,9 @@ type Mutation {
   regenerateSSHKey: SSHKey!
   createProject(input: CreateProjectInput!): Project!
   updateProject(input: UpdateProjectInput!): Project!
-  addMembers(input: AddMembersInput!): [Member!]!
-  removeMember(input: RemoveMemberInput!): Member!
-  updateMember(input: UpdateMemberInput!): Member!
+  addMembers(input: AddMembersInput!): Project!
+  removeMember(input: RemoveMemberInput!): Project!
+  updateMember(input: UpdateMemberInput!): Project!
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
   setStarredKGItem(input: SetBoolFieldInput!): KnowledgeGraphItem!
@@ -78,11 +78,9 @@ type ApiToken {
 }
 
 type Member {
-  id: ID!
-  email: String!
+  user: User!
   accessLevel: AccessLevel!
   addedDate: String!
-  lastActivity: String
 }
 
 type ToolUrls {
@@ -114,12 +112,12 @@ input UpdateProjectInput {
 
 input AddMembersInput {
   projectId: ID!
-  memberIds: [ID!]!
+  userIds: [ID!]!
 }
 
 input RemoveMemberInput {
   projectId: ID!
-  memberId: ID!
+  userId: ID!
 }
 
 input RemoveApiTokenInput {
@@ -128,7 +126,7 @@ input RemoveApiTokenInput {
 
 input UpdateMemberInput {
   projectId: ID!
-  memberId: ID!
+  userId: ID!
   accessLevel: AccessLevel!
 }
 

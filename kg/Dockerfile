@@ -1,5 +1,9 @@
 FROM python:3.9-slim
 
+ENV AWS_ACCESS_KEY_ID=KG_ACCESS_KEY_ID
+ENV AWS_SECRET_ACCESS_KEY=KG_AWS_SECRET_ACCESS_KEY
+ENV AWS_DEFAULT_REGION=KG_AWS_DEFAULT_REGION
+
 # Create kdl user.
 ENV USER=kdl
 ENV UID=10001
@@ -13,7 +17,7 @@ RUN adduser \
     "${USER}"
 
 RUN apt-get update \
-    && apt-get install -y build-essential wget
+    && apt-get install -y build-essential wget git
 
 WORKDIR /kg
 
@@ -21,14 +25,9 @@ COPY Pipfile* ./
 RUN python3 -m pip install pipenv && \
     pipenv install --system --deploy
 
-COPY assets.dvc assets.dvc
-COPY .dvc .dvc
 COPY src src
 
-RUN wget https://github.com/iterative/dvc/releases/download/1.11.16/dvc_1.11.16_amd64.deb \
-    && apt install -y ./dvc_1.11.16_amd64.deb \
-    && dvc get https://github.com/konstellation-io/kdl-server --rev 5f62b434d299f1240b02b749448b0b299d58b387  kg/assets \
-    && rm -rf dvc_1.11.16_amd64.deb
+RUN dvc get https://github.com/konstellation-io/kdl-server --rev 4f4d6676b2f5e757baea5dad09f6219a4c4b376c kg/assets
 
 RUN chown -R kdl:0 /kg \
     && chmod -R g+w /kg \

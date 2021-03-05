@@ -23,7 +23,7 @@ export function verifyPassword(value: string) {
     CHECK.matches(
       value,
       new RegExp(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/g
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/g
       ),
       'The password should contain at least one digit, one special character (@$!%*?&), one lowercase character and one uppercase character'
     ),

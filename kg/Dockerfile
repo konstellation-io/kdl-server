@@ -1,9 +1,5 @@
 FROM python:3.9-slim
 
-ENV AWS_ACCESS_KEY_ID=KG_ACCESS_KEY_ID
-ENV AWS_SECRET_ACCESS_KEY=KG_AWS_SECRET_ACCESS_KEY
-ENV AWS_DEFAULT_REGION=KG_AWS_DEFAULT_REGION
-
 # Create kdl user.
 ENV USER=kdl
 ENV UID=10001
@@ -27,7 +23,7 @@ RUN python3 -m pip install pipenv && \
 
 COPY src src
 
-RUN dvc get https://github.com/konstellation-io/kdl-server --rev 4f4d6676b2f5e757baea5dad09f6219a4c4b376c kg/assets
+RUN dvc get https://github.com/konstellation-io/kdl-server --rev b8ce1287463951d290158dc7c7e23b580e807d88 kg/assets
 
 RUN chown -R kdl:0 /kg \
     && chmod -R g+w /kg \

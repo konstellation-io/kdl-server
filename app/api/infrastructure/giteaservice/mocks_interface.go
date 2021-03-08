@@ -5,49 +5,36 @@
 package giteaservice
 
 import (
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 	entity "github.com/konstellation-io/kdl-server/app/api/entity"
-	reflect "reflect"
 )
 
-// MockGiteaClient is a mock of GiteaClient interface
+// MockGiteaClient is a mock of GiteaClient interface.
 type MockGiteaClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockGiteaClientMockRecorder
 }
 
-// MockGiteaClientMockRecorder is the mock recorder for MockGiteaClient
+// MockGiteaClientMockRecorder is the mock recorder for MockGiteaClient.
 type MockGiteaClientMockRecorder struct {
 	mock *MockGiteaClient
 }
 
-// NewMockGiteaClient creates a new mock instance
+// NewMockGiteaClient creates a new mock instance.
 func NewMockGiteaClient(ctrl *gomock.Controller) *MockGiteaClient {
 	mock := &MockGiteaClient{ctrl: ctrl}
 	mock.recorder = &MockGiteaClientMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockGiteaClient) EXPECT() *MockGiteaClientMockRecorder {
 	return m.recorder
 }
 
-// CreateUser mocks base method
-func (m *MockGiteaClient) CreateUser(email, username, password string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUser", email, username, password)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CreateUser indicates an expected call of CreateUser
-func (mr *MockGiteaClientMockRecorder) CreateUser(email, username, password interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockGiteaClient)(nil).CreateUser), email, username, password)
-}
-
-// AddSSHKey mocks base method
+// AddSSHKey mocks base method.
 func (m *MockGiteaClient) AddSSHKey(username, publicSSHKey string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddSSHKey", username, publicSSHKey)
@@ -55,7 +42,7 @@ func (m *MockGiteaClient) AddSSHKey(username, publicSSHKey string) error {
 	return ret0
 }
 
-// AddSSHKey indicates an expected call of AddSSHKey
+// AddSSHKey indicates an expected call of AddSSHKey.
 func (mr *MockGiteaClientMockRecorder) AddSSHKey(username, publicSSHKey interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddSSHKey", reflect.TypeOf((*MockGiteaClient)(nil).AddSSHKey), username, publicSSHKey)
@@ -64,7 +51,7 @@ func (mr *MockGiteaClientMockRecorder) AddSSHKey(username, publicSSHKey interfac
 // CreateRepo mocks base method
 func (m *MockGiteaClient) CreateRepo(name, ownerUsername string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateRepo", name, ownerUsername)
+	ret := m.ctrl.Call(m, "CreateRepo", name)
 	ret0, _ := ret[0].(error)
 	return ret0
 }

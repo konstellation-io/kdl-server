@@ -73,9 +73,10 @@ type UpdateMemberInput struct {
 }
 
 type UpdateProjectInput struct {
-	ID         string                        `json:"id"`
-	Name       *string                       `json:"name"`
-	Repository *UpdateProjectRepositoryInput `json:"repository"`
+	ID          string                        `json:"id"`
+	Name        *string                       `json:"name"`
+	Description *string                       `json:"description"`
+	Repository  *UpdateProjectRepositoryInput `json:"repository"`
 }
 
 type UpdateProjectRepositoryInput struct {

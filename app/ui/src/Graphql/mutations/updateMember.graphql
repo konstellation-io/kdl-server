@@ -1,6 +1,14 @@
 mutation UpdateMember($input: UpdateMemberInput!) {
   updateMember(input: $input) {
     id
-    accessLevel
+    members {
+      user {
+        id
+        email
+        lastActivity
+      }
+      accessLevel
+      addedDate
+    }
   }
 }

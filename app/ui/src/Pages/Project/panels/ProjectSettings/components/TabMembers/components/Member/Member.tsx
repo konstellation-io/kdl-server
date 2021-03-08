@@ -18,8 +18,8 @@ type Props = {
 function Member({ member, onOpen, active = false }: Props) {
   return (
     <div className={cx(styles.container, { [styles.active]: active })}>
-      <Gravatar email={member.email} size={24} style={gravatarStyle} />
-      <p className={styles.email}>{member.email}</p>
+      <Gravatar email={member.user.email} size={24} style={gravatarStyle} />
+      <p className={styles.email}>{member.user.email}</p>
       <p className={styles.level}>{member.accessLevel}</p>
       <div className={styles.button}>
         <Button Icon={IconOpen} label="" onClick={() => onOpen(member)} />

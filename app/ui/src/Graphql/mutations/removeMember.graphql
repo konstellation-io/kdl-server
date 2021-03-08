@@ -1,5 +1,14 @@
 mutation RemoveMember($input: RemoveMemberInput!) {
   removeMember(input: $input) {
     id
+    members {
+      user {
+        id
+        email
+        lastActivity
+      }
+      accessLevel
+      addedDate
+    }
   }
 }

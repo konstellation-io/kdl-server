@@ -3,7 +3,11 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { RepositoryType, ProjectState } from './../../types/globalTypes';
+import {
+  RepositoryType,
+  ProjectState,
+  AccessLevel,
+} from './../../types/globalTypes';
 
 // ====================================================
 // GraphQL query operation: GetProjects
@@ -26,6 +30,21 @@ export interface GetProjects_projects_toolUrls {
   vscode: string;
 }
 
+export interface GetProjects_projects_members_user {
+  __typename: 'User';
+  id: string;
+  accessLevel: AccessLevel;
+  email: string;
+  lastActivity: string | null;
+}
+
+export interface GetProjects_projects_members {
+  __typename: 'Member';
+  accessLevel: AccessLevel;
+  addedDate: string;
+  user: GetProjects_projects_members_user;
+}
+
 export interface GetProjects_projects {
   __typename: 'Project';
   id: string;
@@ -38,6 +57,7 @@ export interface GetProjects_projects {
   state: ProjectState;
   error: string | null;
   toolUrls: GetProjects_projects_toolUrls;
+  members: GetProjects_projects_members[];
 }
 
 export interface GetProjects {

@@ -31,6 +31,7 @@ function Project() {
   useEffect(() => {
     const currentProject = data?.projects.find((p) => p.id === projectId);
     if (currentProject) {
+      console.log('hola');
       updateOpenedProject(currentProject);
     }
     // updateOpenedProject does not change

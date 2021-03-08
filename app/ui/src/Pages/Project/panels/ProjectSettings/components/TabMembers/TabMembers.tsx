@@ -6,11 +6,8 @@ import {
   SpinnerCircular,
 } from 'kwc';
 import {
-  GET_MEMBER_DETAILS,
-  GetMemberDetails,
-} from 'Graphql/client/queries/getMemberDetails.graphql';
-import {
   GetProjectMembers,
+  GetProjectMembers_project_members,
   GetProjectMembersVariables,
 } from 'Graphql/queries/types/GetProjectMembers';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -18,14 +15,14 @@ import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 
 import { GetUsers } from 'Graphql/queries/types/GetUsers';
 import Member from './components/Member/Member';
-import { MemberDetails } from 'Graphql/client/models/MemberDetails';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
 import { PANEL_THEME } from 'Components/Layout/Panel/Panel';
 import { loader } from 'graphql.macro';
 import styles from './TabMembers.module.scss';
 import useMember from 'Graphql/hooks/useMember';
 import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
-import { useQuery } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
+import { memberDetails } from 'Graphql/client/cache';
 
 const GetUsersQuery = loader('Graphql/queries/getUsers.graphql');
 const GetMembersQuery = loader('Graphql/queries/getProjectMembers.graphql');
@@ -63,12 +60,11 @@ function TabMembers({ projectId }: Props) {
       id: projectId,
     },
   });
-  const { data: memberDetailsData } = useQuery<GetMemberDetails>(
-    GET_MEMBER_DETAILS
-  );
+
+  const memberDetailsData = useReactiveVar(memberDetails);
 
   const openDetails = useCallback(
-    (details: MemberDetails) => {
+    (details: GetProjectMembers_project_members) => {
       updateMemberDetails(details);
       openPanel();
     },
@@ -79,7 +75,7 @@ function TabMembers({ projectId }: Props) {
   useEffect(() => {
     if (dataMembers && memberDetailsData) {
       const selectedMember = dataMembers.project.members.find(
-        (m) => m.id === memberDetailsData.memberDetails?.id
+        (m) => m.user.id === memberDetailsData.user.id
       );
 
       if (selectedMember) updateMemberDetails(selectedMember);
@@ -93,12 +89,14 @@ function TabMembers({ projectId }: Props) {
     return <ErrorMessage />;
 
   const users = dataUsers.users.map((user) => user.email);
-  const members = dataMembers.project.members.map((member) => member.email);
+  const members = dataMembers.project.members.map(
+    (member) => member.user.email
+  );
   const allMembers = [...members, ...memberSelection];
 
   const options = users.filter((email) => !allMembers.includes(email));
 
-  function performAddmembers() {
+  function performAddMembers() {
     if (dataUsers) {
       const emailToId = Object.fromEntries(
         dataUsers.users.map((user) => [user.email, user.id])
@@ -138,13 +136,13 @@ function TabMembers({ projectId }: Props) {
         <Button
           label="ADD"
           height={44}
-          onClick={performAddmembers}
+          onClick={performAddMembers}
           disabled={!memberSelection.length}
         />
       </div>
       <div className={styles.members}>
         {dataMembers.project.members.map((member) => (
-          <Member key={member.id} member={member} onOpen={openDetails} />
+          <Member key={member.user.id} member={member} onOpen={openDetails} />
         ))}
       </div>
     </div>

@@ -21,5 +21,15 @@ query GetProjects {
       mlflow
       vscode
     }
+    members {
+      accessLevel
+      addedDate
+      user {
+        id
+        accessLevel
+        email
+        lastActivity
+      }
+    }
   }
 }

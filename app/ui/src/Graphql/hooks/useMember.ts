@@ -36,7 +36,6 @@ export default function useMember(projectId: string, options?: Options) {
     {
       onCompleted: options && options.onCompleteAdd,
       onError: (e) => console.error(`addMembers: ${e}`),
-      update: updateCacheAdd,
     }
   );
 
@@ -45,7 +44,6 @@ export default function useMember(projectId: string, options?: Options) {
     RemoveMemberVariables
   >(RemoveMemberMutation, {
     onError: (e) => console.error(`removeMember: ${e}`),
-    update: updateCacheRemove,
   });
 
   const [mutationUpdateMember] = useMutation<
@@ -56,84 +54,22 @@ export default function useMember(projectId: string, options?: Options) {
     onError: (e) => console.error(`updateMember: ${e}`),
   });
 
-  function updateCache(
-    cache: ApolloCache<RemoveMember | AddMembers>,
-    write: (project: GetProjectMembers_project) => void
-  ) {
-    const cacheResult = cache.readQuery<GetProjectMembers>({
-      variables: {
-        id: projectId,
-      },
-      query: GetMembersQuery,
-    });
-
-    if (cacheResult !== null) {
-      write(cacheResult.project);
-    }
-  }
-
-  function updateCacheAdd(
-    cache: ApolloCache<AddMembers>,
-    { data: dataAdd }: FetchResult<AddMembers>
-  ) {
-    if (dataAdd && dataAdd.addMembers) {
-      updateCache(cache, (project) =>
-        cache.writeQuery({
-          query: GetMembersQuery,
-          variables: {
-            id: projectId,
-          },
-          data: {
-            project: {
-              ...project,
-              members: [...project.members, ...dataAdd.addMembers],
-            },
-          },
-        })
-      );
-    }
-  }
-
-  function updateCacheRemove(
-    cache: ApolloCache<RemoveMember>,
-    { data: dataRemove }: FetchResult<RemoveMember>
-  ) {
-    if (dataRemove && dataRemove.removeMember) {
-      updateCache(cache, (project) =>
-        cache.writeQuery({
-          query: GetMembersQuery,
-          variables: {
-            id: projectId,
-          },
-          data: {
-            project: {
-              ...project,
-              members: project.members.filter(
-                (m) => m.id !== dataRemove.removeMember.id
-              ),
-            },
-          },
-        })
-      );
-    }
-  }
-
-  function addMembersById(memberIds: string[]) {
+  function addMembersById(userIds: string[]) {
     mutationAddMembers(
       mutationPayloadHelper({
         projectId,
-        memberIds,
+        userIds,
       })
     );
   }
 
-  function removeMemberById(memberId: string) {
-    mutationRemoveMember(mutationPayloadHelper({ projectId, memberId }));
+  function removeMemberById(userId: string) {
+    mutationRemoveMember(mutationPayloadHelper({ projectId, userId }));
   }
 
-  function updateMemberAccessLevel(memberId: string, accessLevel: AccessLevel) {
+  function updateMemberAccessLevel(userId: string, accessLevel: AccessLevel) {
     mutationUpdateMember(
-      mutationPayloadHelper({ projectId, memberId, accessLevel })
+      mutationPayloadHelper({ projectId, userId, accessLevel })
     );
   }
 

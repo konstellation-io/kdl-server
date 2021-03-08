@@ -1,5 +1,6 @@
 domain: kdl.local
 serverName: Local Server
+argocd: false
 tls: 
   enabled: true
 ingress:

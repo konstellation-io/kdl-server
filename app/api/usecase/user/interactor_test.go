@@ -118,7 +118,6 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
 	s.mocks.giteaService.EXPECT().CreateUser(email, username, password).Return(nil)
 	s.mocks.giteaService.EXPECT().AddSSHKey(username, sshKey.Public).Return(nil)
-	s.mocks.giteaService.EXPECT().AddTeamMember(username, accessLevel).Return(nil)
 	s.mocks.k8sClientMock.EXPECT().CreateSecret(secretName, secretValues)
 
 	createdUser, err := s.interactor.Create(ctx, email, username, password, accessLevel)

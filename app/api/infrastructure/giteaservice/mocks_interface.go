@@ -75,20 +75,6 @@ func (mr *MockGiteaClientMockRecorder) CreateRepo(name, ownerUsername interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRepo", reflect.TypeOf((*MockGiteaClient)(nil).CreateRepo), name, ownerUsername)
 }
 
-// AddTeamMember mocks base method
-func (m *MockGiteaClient) AddTeamMember(username string, accessLevel entity.AccessLevel) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddTeamMember", username, accessLevel)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// AddTeamMember indicates an expected call of AddTeamMember
-func (mr *MockGiteaClientMockRecorder) AddTeamMember(username, accessLevel interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddTeamMember", reflect.TypeOf((*MockGiteaClient)(nil).AddTeamMember), username, accessLevel)
-}
-
 // AddCollaborator mocks base method
 func (m *MockGiteaClient) AddCollaborator(repoName, username string, accessLevel entity.AccessLevel) error {
 	m.ctrl.T.Helper()

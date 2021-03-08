@@ -1,9 +1,6 @@
 package giteaservice
 
 import (
-	"errors"
-	"fmt"
-
 	"code.gitea.io/sdk/gitea"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 
@@ -11,17 +8,10 @@ import (
 )
 
 const (
-	// The KDL organization and the teams are created during the Gitea installation:
+	// The KDL organization is created during the Gitea installation:
 	// https://github.com/konstellation-io/science-toolkit/blob/master/helm/science-toolkit/templates/gitea/init-configmap.yaml
 	kdlOrganization = "kdl"
-	kdlTeamAdmin    = "admin-users"
-	kdlTeamManager  = "manager-users"
-	kdlTeamViewer   = "viewer-users"
 	kdlSSHKeyName   = "kdl-ssh-key"
-)
-
-var (
-	ErrTeamNotFound = errors.New("team not found in Gitea")
 )
 
 type giteaService struct {
@@ -88,51 +78,6 @@ func (g *giteaService) CreateRepo(name, ownerUsername string) error {
 	g.logger.Infof("Created repository \"%s\" in organization \"%s\" in Gitea with id \"%d\"", name, kdlOrganization, repo.ID)
 
 	return g.AddCollaborator(name, ownerUsername, entity.AccessLevelAdmin)
-}
-
-// AddTeamMember adds the specified user to a KDL team depending on his access level.
-func (g *giteaService) AddTeamMember(username string, accessLevel entity.AccessLevel) error {
-	// To add a team member we need to get the team ID
-	teams, _, err := g.client.ListOrgTeams(kdlOrganization, gitea.ListTeamsOptions{
-		ListOptions: gitea.ListOptions{Page: 0, PageSize: 10},
-	})
-	if err != nil {
-		return err
-	}
-
-	var targetTeamName string
-
-	switch accessLevel {
-	case entity.AccessLevelAdmin:
-		targetTeamName = kdlTeamAdmin
-	case entity.AccessLevelManager:
-		targetTeamName = kdlTeamManager
-	case entity.AccessLevelViewer:
-		targetTeamName = kdlTeamViewer
-	}
-
-	var targetTeamID int64 = -1
-
-	for _, t := range teams {
-		if t.Name == targetTeamName {
-			targetTeamID = t.ID
-			break
-		}
-	}
-
-	if targetTeamID == -1 {
-		return fmt.Errorf("%w: team \"%s\" not found in \"%s\" organization", ErrTeamNotFound, targetTeamName, kdlOrganization)
-	}
-
-	// Using the found team ID add the member
-	_, err = g.client.AddTeamMember(targetTeamID, username)
-	if err != nil {
-		return err
-	}
-
-	g.logger.Infof("Added user \"%s\" to team \"%s\" in Gitea", username, targetTeamName)
-
-	return nil
 }
 
 // AddCollaborator adds a new collaborator to the given repository.

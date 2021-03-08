@@ -2,9 +2,15 @@ package project
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+)
+
+var (
+	ErrRemoveNoMoreAdmins = errors.New("there are not more admin members so the user cannot be removed")
+	ErrUpdateNoMoreAdmins = errors.New("there are not more admin members so the user cannot be updated")
 )
 
 // AddMembers adds new users to the given project. These members will have the lowest access level.
@@ -77,6 +83,18 @@ func (i interactor) RemoveMember(ctx context.Context, projectID string, u, logge
 		return entity.Project{}, ErrOnlyAdminCanRemoveMember
 	}
 
+	// Check if after removing the user there is at least one administrator
+	numberOfAdmins := 0
+	for _, m := range p.Members {
+		if m.UserID != u.ID && m.AccessLevel == entity.AccessLevelAdmin {
+			numberOfAdmins++
+		}
+	}
+
+	if numberOfAdmins == 0 {
+		return entity.Project{}, ErrRemoveNoMoreAdmins
+	}
+
 	// Remove collaborator from the Gitea repository
 	if p.Repository.Type == entity.RepositoryTypeInternal {
 		err = i.giteaService.RemoveCollaborator(p.Repository.InternalRepoName, u.Username)
@@ -111,6 +129,22 @@ func (i interactor) UpdateMember(ctx context.Context, opt UpdateMemberOption) (e
 	// Check the member to update exists into the project
 	if ok, _ := i.getMember(opt.User.ID, p.Members); !ok {
 		return entity.Project{}, fmt.Errorf("%w: user ID=%s", ErrMemberNotExists, opt.User.ID)
+	}
+
+	// Check if after updating there is at least one administrator
+	if opt.AccessLevel != entity.AccessLevelAdmin {
+		atLeastOneAdmin := false
+
+		for _, m := range p.Members {
+			if m.UserID != opt.User.ID && m.AccessLevel == entity.AccessLevelAdmin {
+				atLeastOneAdmin = true
+				break
+			}
+		}
+
+		if !atLeastOneAdmin {
+			return entity.Project{}, ErrUpdateNoMoreAdmins
+		}
 	}
 
 	// If the repository is internal, update collaborator permissions in Gitea repository

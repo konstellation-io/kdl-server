@@ -234,11 +234,11 @@ func TestInteractor_RemoveMember(t *testing.T) {
 		UserID: loggedUser.ID, AccessLevel: entity.AccessLevelAdmin, AddedDate: time.Now().UTC(),
 	}
 
-	usersToRemove := entity.User{ID: "userA", Username: "user_a"}
+	userToRemove := entity.User{ID: "userA", Username: "user_a"}
 
 	p := entity.NewProject("project-x", "Project X")
 	p.ID = "project1"
-	p.Members = []entity.Member{adminMember, {UserID: usersToRemove.ID}}
+	p.Members = []entity.Member{adminMember, {UserID: userToRemove.ID}}
 	p.Repository = entity.Repository{
 		Type:             entity.RepositoryTypeInternal,
 		InternalRepoName: "repo-A",
@@ -250,16 +250,43 @@ func TestInteractor_RemoveMember(t *testing.T) {
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
 	s.mocks.giteaService.EXPECT().
-		RemoveCollaborator(p.Repository.InternalRepoName, usersToRemove.Username).
+		RemoveCollaborator(p.Repository.InternalRepoName, userToRemove.Username).
 		Return(nil)
 
-	s.mocks.repo.EXPECT().RemoveMember(ctx, p.ID, usersToRemove.ID).Return(nil)
+	s.mocks.repo.EXPECT().RemoveMember(ctx, p.ID, userToRemove.ID).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
 
-	p, err := s.interactor.RemoveMember(ctx, p.ID, usersToRemove, loggedUser)
+	p, err := s.interactor.RemoveMember(ctx, p.ID, userToRemove, loggedUser)
 
 	require.NoError(t, err)
 	require.Equal(t, p, expectedProject)
+}
+
+func TestInteractor_RemoveMember_ErrNoMoreAdmins(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	loggedUser := entity.User{
+		ID:       "logged.user.1234",
+		Username: "logged_user",
+	}
+
+	adminMember := entity.Member{
+		UserID: loggedUser.ID, AccessLevel: entity.AccessLevelAdmin, AddedDate: time.Now().UTC(),
+	}
+
+	p := entity.NewProject("project-x", "Project X")
+	p.ID = "project1"
+	p.Members = []entity.Member{adminMember}
+
+	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
+
+	p, err := s.interactor.RemoveMember(ctx, p.ID, loggedUser, loggedUser)
+
+	require.Equal(t, project.ErrRemoveNoMoreAdmins, err)
+	require.Equal(t, entity.Project{}, p)
 }
 
 func TestInteractor_UpdateMember(t *testing.T) {
@@ -279,11 +306,11 @@ func TestInteractor_UpdateMember(t *testing.T) {
 		UserID: loggedUser.ID, AccessLevel: entity.AccessLevelAdmin, AddedDate: time.Now().UTC(),
 	}
 
-	usersToUpd := entity.User{ID: "userA", Username: "user_a"}
+	userToUpd := entity.User{ID: "userA", Username: "user_a"}
 
 	p := entity.NewProject("project-x", "Project X")
 	p.ID = "project.1234"
-	p.Members = []entity.Member{adminMember, {UserID: usersToUpd.ID}}
+	p.Members = []entity.Member{adminMember, {UserID: userToUpd.ID}}
 	p.Repository = entity.Repository{
 		Type:             entity.RepositoryTypeInternal,
 		InternalRepoName: "repo-A",
@@ -295,19 +322,53 @@ func TestInteractor_UpdateMember(t *testing.T) {
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
 	s.mocks.giteaService.EXPECT().
-		UpdateCollaboratorPermissions(p.Repository.InternalRepoName, usersToUpd.Username, newAccessLevel).
+		UpdateCollaboratorPermissions(p.Repository.InternalRepoName, userToUpd.Username, newAccessLevel).
 		Return(nil)
 
-	s.mocks.repo.EXPECT().UpdateMemberAccessLevel(ctx, p.ID, usersToUpd.ID, newAccessLevel).Return(nil)
+	s.mocks.repo.EXPECT().UpdateMemberAccessLevel(ctx, p.ID, userToUpd.ID, newAccessLevel).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
 
 	p, err := s.interactor.UpdateMember(ctx, project.UpdateMemberOption{
 		ProjectID:   p.ID,
-		User:        usersToUpd,
+		User:        userToUpd,
 		AccessLevel: newAccessLevel,
 		LoggedUser:  loggedUser,
 	})
 
 	require.NoError(t, err)
 	require.Equal(t, p, expectedProject)
+}
+
+func TestInteractor_UpdateMember_ErrNoMoreAdmins(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	const newAccessLevel = entity.AccessLevelViewer
+
+	loggedUser := entity.User{
+		ID:       "logged.user.1234",
+		Username: "logged_user",
+	}
+
+	adminMember := entity.Member{
+		UserID: loggedUser.ID, AccessLevel: entity.AccessLevelAdmin, AddedDate: time.Now().UTC(),
+	}
+
+	p := entity.NewProject("project-x", "Project X")
+	p.ID = "project.1234"
+	p.Members = []entity.Member{adminMember}
+
+	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
+
+	p, err := s.interactor.UpdateMember(ctx, project.UpdateMemberOption{
+		ProjectID:   p.ID,
+		User:        loggedUser,
+		AccessLevel: newAccessLevel,
+		LoggedUser:  loggedUser,
+	})
+
+	require.Equal(t, project.ErrUpdateNoMoreAdmins, err)
+	require.Equal(t, p, entity.Project{})
 }

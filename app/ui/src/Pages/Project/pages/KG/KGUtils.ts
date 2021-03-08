@@ -22,17 +22,11 @@ export type Coord = {
   y: number;
 };
 
-interface DComplete extends D {
+export interface DComplete extends D {
   x: number;
   y: number;
-  id: number;
-}
-
-export interface GroupD {
-  x: number;
-  y: number;
-  elements: DComplete[];
-  id: number;
+  outsideMin: boolean;
+  outsideMax: boolean;
 }
 
 export const colorScale = scaleLinear({
@@ -58,45 +52,42 @@ export function getHash(text: string) {
   return hash;
 }
 
+function getOffset(outsideMin: boolean, outsideMax: boolean) {
+  if (outsideMin) return 17;
+  if (outsideMax) return -10;
+
+  return 0;
+}
+
 export function groupData(
   data: D[],
   coord: (
     { category, score, name }: CoordData,
     options: CoordOptions
   ) => CoordOut,
-  elementsCollide: (a: Coord, b: Coord) => boolean
-) {
-  const groupedData: GroupD[] = [];
+  minScore: number = 0,
+  maxScore: number = 1
+): DComplete[] {
+  return data.map((d) => {
+    const outsideMin = d.score < minScore;
+    const outsideMax = d.score > maxScore;
 
-  data.forEach((d) => {
-    const { x, y, hash } = coord(d, { jittered: true });
-    const newD: DComplete = { ...d, x, y, id: hash || 0 };
-    let collisionEl;
-    let collisionIdx = 0;
+    const { x, y } = coord(
+      {
+        ...d,
+        score: Math.max(minScore, Math.min(maxScore, d.score)),
+      },
+      { jittered: true, offset: getOffset(outsideMin, outsideMax) }
+    );
 
-    for (let idx = 0; idx < groupedData.length; idx++) {
-      const nd = groupedData[idx];
-      if (nd && elementsCollide({ x: nd.x, y: nd.y }, { x, y })) {
-        collisionEl = nd;
-        collisionIdx = idx;
-        break;
-      }
-    }
-
-    if (collisionEl) {
-      const newElements = [...groupedData[collisionIdx].elements, newD];
-      groupedData[collisionIdx] = {
-        elements: newElements,
-        x: (x + collisionEl.x) / 2,
-        y: (y + collisionEl.y) / 2,
-        id: newElements.reduce((a, b) => a + b.id, 0),
-      };
-    } else {
-      groupedData.push({ elements: [newD], x, y, id: newD.id });
-    }
+    return {
+      ...d,
+      x,
+      y,
+      outsideMin,
+      outsideMax,
+    };
   });
-
-  return groupedData;
 }
 
 export function getSectionsAndNames(newData: D[]) {

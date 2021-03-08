@@ -10,7 +10,7 @@ function entering() {
 
 function radialAxis(scale: any) {
   let tickValues: any = null;
-  let tickArguments: any = [2];
+  let tickArguments: any = [4];
   let tickFormat: any = null;
 
   function axis(context: any) {

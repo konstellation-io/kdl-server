@@ -1,20 +1,22 @@
 import React, { FC } from 'react';
 
-import IconOpen from '@material-ui/icons/ArrowForward';
-import { TextTooltipInfo } from 'Hooks/useTextTooltip';
 import cx from 'classnames';
 import styles from './KGVisualization.module.scss';
 
-const Tooltip: FC<TextTooltipInfo> = ({ top, left, text, open }) => (
+type Props = {
+  top: number;
+  left: number;
+  open: boolean;
+  onMouseLeave?: () => void;
+};
+
+const Tooltip: FC<Props> = ({ top, left, open, onMouseLeave, children }) => (
   <div
-    style={{ top: top - 2, left: left - 2 }}
+    style={{ top, left }}
     className={cx(styles.tooltip, { [styles.open]: open })}
+    onMouseLeave={onMouseLeave}
   >
-    <div className={styles.tooltipWrapper}>
-      <div className={styles.tooltipText}>{text}</div>
-      <IconOpen className={cx(styles.tooltipIcon, 'icon-regular')} />
-      <div className={styles.tooltipBg} />
-    </div>
+    <div className={styles.tooltipWrapper}>{children}</div>
   </div>
 );
 

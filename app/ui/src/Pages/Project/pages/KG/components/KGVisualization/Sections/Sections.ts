@@ -20,8 +20,8 @@ const SECTION_BOX_HEIGHT = 32;
 export default class Sections {
   container: Selection<SVGGElement, unknown, null, undefined>;
   data: string[] = [];
-  sectionStroke: number = 0;
-  sectionInterval: number = 0;
+  sectionStroke: number = SECTION_STROKE;
+  sectionInterval: number = SECTION_INTERVAL;
   sectionOrientation: Local<string>;
   coord: (
     { category, score, name }: CoordData,
@@ -34,13 +34,6 @@ export default class Sections {
 
     this.sectionOrientation = local<string>();
   }
-
-  updateSizes = (k: number) => {
-    const zoomScale = 1 / k;
-
-    this.sectionStroke = SECTION_STROKE * zoomScale;
-    this.sectionInterval = SECTION_INTERVAL * zoomScale;
-  };
 
   init = (
     container: Selection<SVGGElement, unknown, null, undefined>,

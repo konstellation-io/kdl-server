@@ -23,7 +23,6 @@ const selectedResource = 'Project Name 1';
 
 const MAX_RESOURCES = 0;
 const MAX_TOPICS = 10;
-console.log('D', data[0]);
 
 let resources = data.map((d: any) => ({
   category:

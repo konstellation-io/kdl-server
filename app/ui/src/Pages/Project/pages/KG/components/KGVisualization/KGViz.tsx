@@ -1,5 +1,7 @@
+import 'd3-transition';
+
 import { BaseType, Local, Selection, local, select } from 'd3-selection';
-import { Coord, GroupD, getHash, groupData } from '../../KGUtils';
+import { Coord, DComplete, getHash, groupData } from '../../KGUtils';
 import Resources, { RESOURCE_R } from './Resources/Resources';
 import { max, min } from 'd3-array';
 import { scaleBand, scaleLinear } from '@visx/scale';
@@ -7,8 +9,7 @@ import { scaleBand, scaleLinear } from '@visx/scale';
 import { D } from './KGVisualization';
 import MinimapViz from '../Minimap/MinimapViz';
 import Sections from './Sections/Sections';
-import { UpdateTooltip } from 'Hooks/useTextTooltip';
-import { ZoomValues } from './useZoom';
+import { UpdateTooltip } from 'Hooks/useTooltip';
 import { px } from 'Utils/d3';
 import radialAxis from './radialAxis';
 import styles from './KGVisualization.module.scss';
@@ -17,7 +18,7 @@ export const PADDING = 0.15;
 export const OUTER_R = 370;
 
 const TOOLTIP_WIDTH = 300;
-const INNER_R = 53.5;
+export const INNER_R = 53.5;
 const GUIDE_STROKE = 1;
 const AXIS_PADDING = 8;
 const AXIS_FONT_SIZE = 12;
@@ -25,6 +26,7 @@ const AXIS_FONT_SIZE = 12;
 export const N_GUIDES = 2;
 
 export let minimapViz: MinimapViz;
+export let resourcesViz: Resources;
 
 const section = (d: D) => d.category;
 const score = (d: D) => d.score;
@@ -51,17 +53,14 @@ type Props = {
   parent: SVGSVGElement;
   data: D[];
   height: number;
-  updateTooltip: (p: UpdateTooltip) => void;
+  updateTooltip: (p: UpdateTooltip<D>) => void;
   hideTooltip: () => void;
-  minimapRef: SVGSVGElement;
+  // minimapRef: SVGSVGElement;
   tooltipOpen: boolean;
-  x: number;
-  y: number;
-  k: number;
-  initialZoomValues: ZoomValues;
   onResourceSelection: (name: string) => void;
   centerText: string;
-  reallocateZoom: (dx: number, dy: number) => void;
+  onScroll: (dS: number) => void;
+  scores: [number, number];
 };
 
 class KGViz {
@@ -73,8 +72,8 @@ class KGViz {
   rDomain: [number, number] = [0, 0];
   sectionScale = scaleBand();
   sectionDomain: string[];
-  groupedData: GroupD[];
-  minimap: MinimapViz;
+  groupedData: DComplete[];
+  // minimap: MinimapViz;
   sectionOrientation: Local<string>;
   resources: Resources;
   sections: Sections;
@@ -89,13 +88,20 @@ class KGViz {
     axisPadding: number;
     axisFontSize: number;
   };
+  data: D[];
+  scores: [number, number];
+  minScore: number;
+  maxScore: number;
 
   constructor(wrapper: SVGGElement, props: Props) {
+    console.log('CONSTRUCTOR');
+
     this.wrapper = select(wrapper);
     this.mainG = select(wrapper);
     this.props = props;
     this.groupedData = [];
     this.sectionDomain = [];
+    this.data = props.data;
 
     const innerWidth = (1 - 2 * PADDING) * props.width;
     const innerHeight = (1 - 2 * PADDING) * props.height;
@@ -103,15 +109,16 @@ class KGViz {
     this.size = {
       innerWidth,
       innerHeight,
-      guideStroke: 0,
-      bubbleCollision: 0,
-      tooltipWidth: 0,
-      axisPadding: 0,
-      axisFontSize: 0,
+      guideStroke: GUIDE_STROKE,
+      bubbleCollision: RESOURCE_R + 2,
+      tooltipWidth: TOOLTIP_WIDTH,
+      axisPadding: AXIS_PADDING,
+      axisFontSize: AXIS_FONT_SIZE,
     };
 
     this.rScale = scaleLinear({
       range: [INNER_R + RESOURCE_R, OUTER_R - RESOURCE_R],
+      domain: props.scores,
     });
     this.sectionScale = scaleBand({
       range: [0, 360],
@@ -122,16 +129,16 @@ class KGViz {
       (t: string) => `${Math.round(+t * 100)}%`
     );
 
-    this.minimap = new MinimapViz(props.minimapRef, {
-      areaWidth: props.width,
-      areaHeight: props.height,
-      x: props.x,
-      y: props.y,
-      k: props.k,
-      initialZoomValues: props.initialZoomValues,
-      reallocateZoom: props.reallocateZoom,
-    });
-    minimapViz = this.minimap;
+    // this.minimap = new MinimapViz(props.minimapRef, {
+    //   areaWidth: props.width,
+    //   areaHeight: props.height,
+    //   x: props.x,
+    //   y: props.y,
+    //   k: props.k,
+    //   initialZoomValues: props.initialZoomValues,
+    //   reallocateZoom: props.reallocateZoom,
+    // });
+    // minimapViz = this.minimap;
 
     this.sectionOrientation = local<string>();
 
@@ -141,10 +148,14 @@ class KGViz {
       this.wrapper,
       this.props.onResourceSelection
     );
+    resourcesViz = this.resources;
 
     this.sections = new Sections(this.wrapper);
 
-    this.updateSizes();
+    this.scores = props.scores;
+    this.maxScore = this.scores[0];
+    this.minScore = this.scores[1];
+
     this.cleanup();
     this.initialize();
   }
@@ -162,14 +173,21 @@ class KGViz {
     this.rScale.domain(this.rDomain);
 
     this.axis.scale(this.rScale);
+    if (this.axisG) this.axisG.call(this.axis);
 
-    this.groupedData = groupData(data, this.coord, this.elementsCollide);
+    this.groupedData = groupData(
+      data,
+      this.coord,
+      this.minScore,
+      this.maxScore
+    );
   };
 
   initialize = () => {
     this.updateScalesAndData(this.props.data);
+    console.log('INIT');
 
-    this.minimap.initialize(this.groupedData);
+    // this.minimap.initialize(this.groupedData);
 
     const {
       sections,
@@ -217,7 +235,7 @@ class KGViz {
     mainG.append('circle').classed(styles.outerCircle, true).attr('r', OUTER_R);
 
     // Radius axis
-    this.axisG = mainG.append('g').attr('transform', `translate(${0},${0})`);
+    this.axisG = mainG.append('g');
     this.axisG.call(this.axis);
 
     const axis = mainG
@@ -225,11 +243,11 @@ class KGViz {
       .classed(styles.axis, true)
       .attr('transform', `translate(${INNER_R + 1}, 0)`);
 
-    axis.append('text').classed(styles.label1, true);
-    axis
-      .append('text')
-      .classed(styles.label4, true)
-      .attr('x', OUTER_R - INNER_R);
+    // axis.append('text').classed(styles.label1, true);
+    // axis
+    //   .append('text')
+    //   .classed(styles.label4, true)
+    //   .attr('x', OUTER_R - INNER_R);
     axis
       .selectAll('text')
       .attr('dx', axisPadding)
@@ -247,10 +265,10 @@ class KGViz {
 
     const [maxR, minR] = rDomain.map((v) => v * 100);
 
-    mainG.select(`.${styles.label1}`).text(`${Math.round(maxR)}%`);
-    mainG.select(`.${styles.label4}`).text(`${Math.round(minR)}%`);
+    // mainG.select(`.${styles.label1}`).text(`${Math.round(maxR)}%`);
+    // mainG.select(`.${styles.label4}`).text(`${Math.round(minR)}%`);
 
-    this.axisG.transition().duration(700).call(this.axis);
+    this.axisG.transition().duration(400).call(this.axis);
   };
 
   highlightResource = (resourceName: string | null) => {
@@ -263,29 +281,36 @@ class KGViz {
     mainG.select(`.${styles.innerCircleText}`).html(newCenterText);
   };
 
-  updateZoomArea = (
-    zoomValues: ZoomValues,
-    reallocateZoom: (dx: number, dy: number) => void
-  ) => {
-    const { sections, minimap, groupedData, resetTooltip } = this;
+  updateScores = (data: D[], scores: [number, number]) => {
+    this.scores = scores;
+    this.maxScore = scores[0];
+    this.minScore = scores[1];
+    const { resources } = this;
 
-    minimap.update(groupedData, zoomValues, reallocateZoom);
+    this.rScale.domain(scores);
+    this.axis.scale(this.rScale);
 
-    resetTooltip();
-    sections.positionSectionBoxes();
+    this.groupedData = groupData(
+      data,
+      this.coord,
+      this.minScore,
+      this.maxScore
+    );
+
+    resources.performUpdate(this.groupedData);
+    this.updateAxisLabels();
   };
 
-  update = (
-    zoomValues: ZoomValues,
-    data: D[],
-    reallocateZoom: (dx: number, dy: number) => void
-  ) => {
-    this.props.k = zoomValues.k;
-    this.updateSizes();
+  update = (data: D[], scores: [number, number]) => {
+    console.log('UPDATE');
+    this.data = data;
+    this.scores = scores;
+    this.maxScore = scores[0];
+    this.minScore = scores[1];
 
     this.updateScalesAndData(data);
 
-    this.minimap.update(this.groupedData, zoomValues, reallocateZoom);
+    // this.minimap.update(this.groupedData, zoomValues, reallocateZoom);
 
     const {
       sections,
@@ -297,6 +322,7 @@ class KGViz {
       coord,
       rDomain,
       updateAxisLabels,
+      minScore,
       size: { axisPadding, axisFontSize },
     } = this;
 
@@ -333,23 +359,6 @@ class KGViz {
       .selectAll(`.${styles.tooltipRect}`)
       .attr('width', 2 * resourceR + resourceStroke / 2)
       .attr('fill-opacity', 0);
-    // TODO: does the next line make performance wrost?
-    //   .interrupt().transition();
-  };
-
-  updateSizes = () => {
-    const zoomScale = 1 / this.props.k;
-    this.resources.updateSizes(this.props.k);
-    this.sections.updateSizes(this.props.k);
-
-    this.size = {
-      ...this.size,
-      guideStroke: GUIDE_STROKE * zoomScale,
-      bubbleCollision: (RESOURCE_R + 2) * zoomScale,
-      tooltipWidth: TOOLTIP_WIDTH * zoomScale,
-      axisPadding: AXIS_PADDING * zoomScale,
-      axisFontSize: AXIS_FONT_SIZE * zoomScale,
-    };
   };
 
   coord = (
@@ -378,44 +387,18 @@ class KGViz {
     return { x, y, angle, hash };
   };
 
-  elementsCollide = (a: Coord, b: Coord) =>
-    b.x + this.size.bubbleCollision > a.x - this.size.bubbleCollision &&
-    b.x - this.size.bubbleCollision < a.x + this.size.bubbleCollision &&
-    b.y + this.size.bubbleCollision > a.y - this.size.bubbleCollision &&
-    b.y - this.size.bubbleCollision < a.y + this.size.bubbleCollision;
+  onShowTooltip = (e: MouseEvent, d: DComplete, element: BaseType) => {
+    const { handleTooltip } = this;
 
-  onShowTooltip = (e: MouseEvent, d: GroupD, element: BaseType) => {
-    const {
-      handleTooltip,
-      size: { tooltipWidth },
-    } = this;
-
-    handleTooltip(e, d.elements[0]);
-
-    select(element)
-      .attr('fill-opacity', 1)
-      .transition()
-      .duration(400)
-      .attr('width', tooltipWidth);
+    handleTooltip(e, d);
   };
 
-  onHideTooltip = (element: BaseType) => {
+  onHideTooltip = () => {
     const {
-      resources: { resourceR, resourceStroke },
       props: { hideTooltip },
     } = this;
 
-    const rect = select(element);
-
     hideTooltip();
-
-    rect
-      .transition()
-      .duration(400)
-      .attr('width', 2 * resourceR + resourceStroke / 2)
-      .transition()
-      .duration(0)
-      .attr('fill-opacity', 0);
   };
 
   handleTooltip = (event: MouseEvent, d: D) => {
@@ -432,7 +415,7 @@ class KGViz {
       } = (event.target as HTMLElement).getBoundingClientRect();
 
       updateTooltip({
-        text: d.name,
+        data: d,
         left: circleLeft - dx,
         top: circleTop - dy,
         open: true,

@@ -1,15 +1,18 @@
+import { INNER_R, OUTER_R, resourcesViz } from './KGViz';
 import React, { useEffect, useRef, useState } from 'react';
 
 import FilterGlow from './FilterGlow/FilterGlow';
 import KGViz from './KGViz';
 import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
-import Minimap from '../Minimap/Minimap';
 import { ParentSize } from '@visx/responsive';
+import { RESOURCE_R } from './Resources/Resources';
+import Score from './Score';
 import SectionList from './SectionList/SectionList';
 import Tooltip from './Tooltip';
 import styles from './KGVisualization.module.scss';
-import useTextTooltip from 'Hooks/useTextTooltip';
-import useZoom from './useZoom';
+import useTooltip from 'Hooks/useTooltip';
+
+const SCORE_R = OUTER_R - RESOURCE_R - (INNER_R + RESOURCE_R);
 
 export type D = {
   category: string;
@@ -39,6 +42,8 @@ function KGVisualizationWrapper(props: WrapperProps) {
   );
 }
 
+const radarLimits = { out: OUTER_R - RESOURCE_R, in: INNER_R + RESOURCE_R };
+
 type Props = {
   width: number;
   height: number;
@@ -52,23 +57,109 @@ function KGVisualization({
   onResourceSelection,
 }: Props) {
   const [hoveredPaper, setHoveredPaper] = useState<string | null>(null);
-  const { tooltipInfo, updateTooltip, hideTooltip } = useTextTooltip();
+  const { tooltipInfo, updateTooltip, hideTooltip } = useTooltip<D>();
 
-  const minimapRef = useRef<SVGSVGElement>(null);
+  // const minimapRef = useRef<SVGSVGElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const gRef = useRef<SVGGElement>(null);
-  const {
-    zoomValues,
-    initialZoomValues,
-    zoomIn,
-    zoomOut,
-    reallocateZoom,
-  } = useZoom({
-    svgRef,
-    width,
-    height,
-  });
   const viz = useRef<KGViz | null>(null);
+
+  const [scores, setScores] = useState<[number, number]>([1, 0]);
+  const [borderScores, setBorderScores] = useState<[number, number]>([1, 0]);
+
+  useEffect(() => {
+    const allScores = data.map((d) => d.score);
+    const min = Math.min(...allScores);
+    const max = Math.max(...allScores);
+    setScores([max, min]);
+    setBorderScores([max + 0.01, 0]);
+  }, [data]);
+
+  const scoreUnitPerPx = (scores[0] - scores[1]) / SCORE_R;
+
+  function getMouseR(e: any) {
+    let mouseR = 0;
+    if (svgRef.current !== null) {
+      const parentRect = svgRef.current.getBoundingClientRect();
+
+      const center = { x: parentRect.width / 2, y: parentRect.height / 2 };
+      const mouse = { x: e.pageX - parentRect.x, y: e.pageY - parentRect.y };
+
+      const relativeToCenter = {
+        x: Math.abs(mouse.x - center.x),
+        y: Math.abs(mouse.y - center.y),
+      };
+
+      mouseR = Math.sqrt(relativeToCenter.x ** 2 + relativeToCenter.y ** 2);
+    }
+
+    return mouseR;
+  }
+
+  function onScroll(e: any) {
+    if (svgRef.current !== null) {
+      const mouseR = getMouseR(e);
+      const mouseWithinRadar =
+        mouseR >= radarLimits.in && mouseR <= radarLimits.out;
+
+      if (mouseWithinRadar) {
+        const [maxScore, minScore] = borderScores;
+
+        const mouseInScale = mouseR - (INNER_R + RESOURCE_R);
+        const mousePivot = mouseInScale / SCORE_R;
+
+        const [max, min] = scores;
+        const diff = max - min;
+        const rev = 1 / diff;
+
+        const scoreFactorMin = 1 - mousePivot;
+        const scoreFactorMax = mousePivot;
+
+        const dScore: number = -e.deltaY / (500 * rev); // 50 000
+        const newMin = Math.min(
+          max,
+          Math.max(minScore, min + dScore * scoreFactorMin)
+        );
+        const newMax = Math.max(
+          newMin + 0.0001,
+          Math.min(maxScore, max - dScore * scoreFactorMax)
+        );
+
+        setScores([newMax, newMin]);
+      }
+    }
+  }
+
+  const dragging = useRef(false);
+  const draggingOrig = useRef(0);
+  const draggingPivot = useRef([1, 0]);
+  function dragStart(e: any) {
+    dragging.current = true;
+    draggingOrig.current = getMouseR(e);
+    draggingPivot.current = [...scores];
+  }
+
+  function dragEnd(e: any) {
+    dragging.current = false;
+  }
+
+  function drag(e: any) {
+    if (dragging.current) {
+      const actMouseR = getMouseR(e);
+      const dR = actMouseR - draggingOrig.current;
+      const dScore = dR * scoreUnitPerPx;
+
+      const [max, min] = draggingPivot.current;
+      const newMax = max + dScore;
+      const newMin = min + dScore;
+
+      const [limitMax, limitMin] = borderScores;
+
+      if (!(newMin < limitMin || newMax > limitMax)) {
+        setScores([newMax, newMin]);
+      }
+    }
+  }
 
   // We want to restart the visualization when resizing
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -77,39 +168,31 @@ function KGVisualization({
   // We want to completelly update the visualization when there are changes
   // that affects the data
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(update, [zoomValues?.k, data]);
+  useEffect(update, [data]);
+
+  useEffect(updateScores, [scores]);
 
   useEffect(updateSelectedResource, [selectedResource]);
-
-  // We want to update only the minimap when draging the visualization
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(updateZoomArea, [zoomValues?.x, zoomValues?.y]);
 
   useEffect(() => {
     viz.current !== null && viz.current.highlightResource(hoveredPaper);
   }, [hoveredPaper]);
 
   function initialize() {
-    if (
-      svgRef.current !== null &&
-      gRef.current !== null &&
-      minimapRef.current !== null &&
-      zoomValues !== null
-    ) {
+    if (svgRef.current !== null && gRef.current !== null) {
       const vizProps = {
         parent: svgRef.current,
-        minimapRef: minimapRef.current,
+        // minimapRef: minimapRef.current,
         data,
         width,
         height,
         tooltipOpen: tooltipInfo.open,
         updateTooltip,
         hideTooltip,
-        initialZoomValues,
         onResourceSelection,
         centerText: selectedResource,
-        reallocateZoom,
-        ...zoomValues,
+        onScroll,
+        scores,
       };
       viz.current = new KGViz(gRef.current, vizProps);
     }
@@ -117,8 +200,18 @@ function KGVisualization({
 
   function update() {
     if (data) {
-      if (viz.current !== null && zoomValues !== null) {
-        viz.current.update(zoomValues, data, reallocateZoom);
+      if (viz.current !== null) {
+        viz.current.update(data, scores);
+      } else {
+        initialize();
+      }
+    }
+  }
+
+  function updateScores() {
+    if (data) {
+      if (viz.current !== null) {
+        viz.current.updateScores(data, scores);
       } else {
         initialize();
       }
@@ -131,23 +224,20 @@ function KGVisualization({
     }
   }
 
-  function updateZoomArea() {
-    if (viz.current !== null && zoomValues !== null) {
-      viz.current.updateZoomArea(zoomValues, reallocateZoom);
-    }
-  }
-
   return (
     <>
-      <svg ref={svgRef} width={width} height={height} className={styles.svg}>
-        <g
-          ref={gRef}
-          transform={`translate(${zoomValues?.x || 0}, ${
-            zoomValues?.y || 0
-          }) scale(${zoomValues?.k || 1})`}
-        />
-        <FilterGlow />
-      </svg>
+      <div>
+        <svg ref={svgRef} width={width} height={height} className={styles.svg}>
+          <g
+            ref={gRef}
+            onWheel={onScroll}
+            onMouseDown={dragStart}
+            onMouseUp={dragEnd}
+            onMouseMove={drag}
+          />
+          <FilterGlow />
+        </svg>
+      </div>
       <div className={styles.sectionTags}>
         {Object.keys(sections).map((section) => (
           <SectionList
@@ -159,14 +249,30 @@ function KGVisualization({
           />
         ))}
       </div>
-      <Tooltip {...tooltipInfo} />
-      <Minimap
+      <Tooltip
+        top={tooltipInfo.top}
+        left={tooltipInfo.left}
+        open={tooltipInfo.open}
+        onMouseLeave={() => {
+          hideTooltip();
+          resourcesViz.unhighlightAll();
+        }}
+      >
+        <div className={styles.tooltipContent}>
+          <div className={styles.title}>{tooltipInfo.data?.name}</div>
+          <div className={styles.catAndScore}>
+            <span>{tooltipInfo.data?.type}</span>
+            <Score value={tooltipInfo.data?.score || 0} />
+          </div>
+        </div>
+      </Tooltip>
+      {/* <Minimap
         minimapRef={minimapRef}
         zoomValues={zoomValues}
         initialZoomValues={initialZoomValues}
         zoomIn={zoomIn}
         zoomOut={zoomOut}
-      />
+      /> */}
     </>
   );
 }

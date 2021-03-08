@@ -1,6 +1,7 @@
 @import 'Styles/variables';
 @import 'Styles/mixins';
 @import 'Styles/colors';
+@import 'Styles/shadows';
 
 $tooltipWidth: 300px;
 
@@ -62,50 +63,106 @@ $tooltipWidth: 300px;
 
 .tooltip {
   position: absolute;
+  width: 50 * $grid-unit;
+  z-index: 999;
   pointer-events: none;
 
-  height: 4 * $grid-unit;
-  width: 0px;
-  overflow: hidden;
-  color: font-color(dark);
-
-  transition: width linear 0.4s;
+  opacity: 0;
+  transition: top ease 0.4s, left ease 0.4s, opacity ease 0.4s;
 
   &.open {
-    width: $tooltipWidth;
+    opacity: 1;
+    pointer-events: all;
   }
 }
 
-.tooltipText {
-  @include font-small;
+.tooltipContent {
+  width: 100%;
 
-  margin: 2px auto 0 6 * $grid-unit;
-  pointer-events: none;
-}
+  .title {
+    @include font-subheader;
+    color: font-color(light);
 
-.tooltipIcon {
-  margin-left: $grid-unit;
-}
+    margin-bottom: 2 * $grid-unit;
+  }
+  .catAndScore {
+    @include font-small;
+    color: font-color(lowlight);
 
-.tooltipBg {
-  position: absolute;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-  width: 4 * $grid-unit;
-  height: 4 * $grid-unit;
-  border-radius: 4 * $grid-unit;
-
-  flex-shrink: 0;
-}
-
-.tooltipGroup {
-  overflow: hidden;
-  width: $tooltipWidth;
+  &:before {
+    content: '';
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    bottom: -4 * $grid-unit;
+    left: 0;
+  }
 }
 
 .tooltipWrapper {
-  width: $tooltipWidth;
-  height: 100%;
+  @include shadow(3);
+
+  background-color: palette(base);
+  position: absolute;
+  padding: 2 * $grid-unit;
+  bottom: 2 * $grid-unit;
+  left: -50%;
+  width: 50 * $grid-unit;
   display: flex;
   align-items: center;
-  padding-right: 1 * $grid-unit;
+
+  &:after {
+    content: '';
+    width: 0;
+    height: 0;
+    border: solid palette(base) 10px;
+    border-left-color: transparent;
+    border-top-color: transparent;
+    position: absolute;
+    left: calc(50% - 6px);
+    bottom: -2 * $grid-unit + 6px;
+    transform: rotateZ(45deg);
+  }
+}
+
+$state-to-color: (
+  good: palette(success),
+  notSoBad: palette(feedback),
+  notGood: palette(alert),
+  bad: palette(error),
+);
+
+@each $class, $color in $state-to-color {
+  .scoreContainer.#{$class} {
+    .value {
+      @include font-small;
+      color: $color;
+      text-align: end;
+    }
+    .bars {
+      position: relative;
+      width: 6.5 * $grid-unit;
+      height: 2px;
+
+      .barBg {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        background-color: palette(base, 300);
+      }
+      .barValue {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        background-color: $color;
+        height: 100%;
+      }
+    }
+  }
 }

@@ -1089,6 +1089,8 @@ input RepositoryInput {
   type: RepositoryType!
   internalRepoName: String
   externalRepoUrl: String
+  externalRepoUsername: String
+  externalRepoPassword: String
 }
 
 type Repository {
@@ -5547,6 +5549,22 @@ func (ec *executionContext) unmarshalInputRepositoryInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalRepoUrl"))
 			it.ExternalRepoURL, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "externalRepoUsername":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalRepoUsername"))
+			it.ExternalRepoUsername, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "externalRepoPassword":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalRepoPassword"))
+			it.ExternalRepoPassword, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}

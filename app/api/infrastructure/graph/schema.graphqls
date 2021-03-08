@@ -184,6 +184,8 @@ input RepositoryInput {
   type: RepositoryType!
   internalRepoName: String
   externalRepoUrl: String
+  externalRepoUsername: String
+  externalRepoPassword: String
 }
 
 type Repository {

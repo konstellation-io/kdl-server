@@ -13,7 +13,6 @@ import (
 	"github.com/gosimple/slug"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/dataloader"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
@@ -56,12 +55,14 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 	}
 
 	createdProject, err := r.projects.Create(ctx, project.CreateProjectOption{
-		Name:             input.Name,
-		Description:      input.Description,
-		RepoType:         input.Repository.Type,
-		InternalRepoName: input.Repository.InternalRepoName,
-		ExternalRepoURL:  input.Repository.ExternalRepoURL,
-		Owner:            loggedUser,
+		Name:                 input.Name,
+		Description:          input.Description,
+		RepoType:             input.Repository.Type,
+		InternalRepoName:     input.Repository.InternalRepoName,
+		ExternalRepoURL:      input.Repository.ExternalRepoURL,
+		ExternalRepoUsername: input.Repository.ExternalRepoUsername,
+		ExternalRepoPassword: input.Repository.ExternalRepoPassword,
+		Owner:                loggedUser,
 	})
 
 	return &createdProject, err

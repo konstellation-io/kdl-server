@@ -47,9 +47,11 @@ type RemoveUsersInput struct {
 }
 
 type RepositoryInput struct {
-	Type             entity.RepositoryType `json:"type"`
-	InternalRepoName *string               `json:"internalRepoName"`
-	ExternalRepoURL  *string               `json:"externalRepoUrl"`
+	Type                 entity.RepositoryType `json:"type"`
+	InternalRepoName     *string               `json:"internalRepoName"`
+	ExternalRepoURL      *string               `json:"externalRepoUrl"`
+	ExternalRepoUsername *string               `json:"externalRepoUsername"`
+	ExternalRepoPassword *string               `json:"externalRepoPassword"`
 }
 
 type SetActiveUserToolsInput struct {

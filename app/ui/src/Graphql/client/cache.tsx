@@ -84,7 +84,6 @@ const cache = new InMemoryCache({
         userSettings: { read: () => userSettings() },
         primaryPanel: { read: () => primaryPanel() },
         secondaryPanel: { read: () => secondaryPanel() },
-        memberDetails: { read: () => memberDetails() },
         projects: { merge: false },
         apiTokens: { merge: false },
         users: { merge: false },

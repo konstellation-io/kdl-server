@@ -33,16 +33,15 @@ export interface GetProjects_projects_toolUrls {
 export interface GetProjects_projects_members_user {
   __typename: 'User';
   id: string;
-  accessLevel: AccessLevel;
   email: string;
   lastActivity: string | null;
 }
 
 export interface GetProjects_projects_members {
   __typename: 'Member';
+  user: GetProjects_projects_members_user;
   accessLevel: AccessLevel;
   addedDate: string;
-  user: GetProjects_projects_members_user;
 }
 
 export interface GetProjects_projects {

@@ -1,14 +1,10 @@
+#import '../fragments/memberFragment.graphql'
+
 mutation AddMembers($input: AddMembersInput!) {
   addMembers(input: $input) {
     id
     members {
-      user {
-        id
-        email
-        lastActivity
-      }
-      accessLevel
-      addedDate
+      ...MemberFields
     }
   }
 }

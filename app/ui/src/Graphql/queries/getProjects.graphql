@@ -1,3 +1,5 @@
+#import '../fragments/memberFragment.graphql'
+
 query GetProjects {
   projects {
     id
@@ -22,14 +24,7 @@ query GetProjects {
       vscode
     }
     members {
-      accessLevel
-      addedDate
-      user {
-        id
-        accessLevel
-        email
-        lastActivity
-      }
+      ...MemberFields
     }
   }
 }

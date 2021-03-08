@@ -2,6 +2,13 @@ const { MockList } = require('apollo-server');
 const casual = require('casual');
 
 const meId = casual.uuid;
+const me = {
+  id: meId,
+  email: 'admin@intelygenz.com',
+  username: 'admin',
+  areToolsActive: true,
+  apiTokens: () => new MockList([4, 8]),
+};
 
 const buildProject = () => ({
   id: casual.uuid,
@@ -35,7 +42,17 @@ const buildMember = () => ({
 });
 
 const buildRandomMembers = (memberCount) => {
-  const members = [];
+  const members = [
+    {
+      user: {
+        id: meId,
+        email: me.email,
+        lastActivity: new Date().toUTCString(),
+      },
+      accessLevel: 'ADMIN',
+      addedDate: new Date().toUTCString(),
+    },
+  ];
   for (let i = 0; i < memberCount; i++) {
     members.push(buildMember());
   }
@@ -46,13 +63,7 @@ const projects = Array(8).fill(0).map(buildProject);
 
 module.exports = {
   Query: () => ({
-    me: () => ({
-      id: meId,
-      email: 'admin@intelygenz.com',
-      username: 'admin',
-      areToolsActive: true,
-      apiTokens: () => new MockList([4, 8]),
-    }),
+    me: () => me,
     projects: () => projects,
     users: () => new MockList([20, 30]),
     project: (_, { id }) => projects.find((project) => project.id === id),

@@ -1,0 +1,9 @@
+fragment MemberFields on Member {
+  user {
+    id
+    email
+    lastActivity
+  }
+  accessLevel
+  addedDate
+}

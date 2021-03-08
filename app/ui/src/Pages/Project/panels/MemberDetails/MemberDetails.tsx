@@ -1,5 +1,5 @@
 import { Button, Select } from 'kwc';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import ActionsBar from 'Components/Layout/ActionsBar/ActionsBar';
@@ -12,7 +12,17 @@ import { formatDate } from 'Utils/format';
 import styles from './MemberDetails.module.scss';
 import { useForm } from 'react-hook-form';
 import useMember from 'Graphql/hooks/useMember';
-import { GetProjectMembers_project_members } from 'Graphql/queries/types/GetProjectMembers';
+import {
+  GetProjectMembers,
+  GetProjectMembers_project_members,
+  GetProjectMembersVariables,
+} from 'Graphql/queries/types/GetProjectMembers';
+import { useQuery } from '@apollo/client';
+import { GetMe } from 'Graphql/queries/types/GetMe';
+import { loader } from 'graphql.macro';
+
+const GetMeQuery = loader('Graphql/queries/getMe.graphql');
+const GetMembersQuery = loader('Graphql/queries/getProjectMembers.graphql');
 
 const gravatarStyle = {
   borderRadius: '50%',
@@ -28,6 +38,16 @@ type Props = {
   close: () => void;
 };
 function MemberDetail({ member, projectId, close }: Props) {
+  const { data: dataMe } = useQuery<GetMe>(GetMeQuery);
+  const { data: dataMembers } = useQuery<
+    GetProjectMembers,
+    GetProjectMembersVariables
+  >(GetMembersQuery, {
+    variables: {
+      id: projectId,
+    },
+  });
+
   const [done, setDone] = useState(false);
   const { removeMemberById, updateMemberAccessLevel } = useMember(projectId, {
     onCompleteUpdate: () => setDone(true),
@@ -48,6 +68,19 @@ function MemberDetail({ member, projectId, close }: Props) {
   useEffect(() => {
     setValue('accessLevel', member.accessLevel);
   }, [member, setValue]);
+
+  const canManageMember = useMemo(() => {
+    if (dataMe && dataMembers) {
+      const meAsMember = dataMembers.project.members.find(
+        ({ user }) => user.email === dataMe.me.email
+      );
+      const isNotMe = dataMe.me.email !== member.user.email;
+      const isAdmin = meAsMember?.accessLevel === AccessLevel.ADMIN;
+
+      return isNotMe && isAdmin;
+    }
+    return false;
+  }, [dataMe, dataMembers, member]);
 
   const accessLevelChanged = member.accessLevel !== watch('accessLevel');
 
@@ -100,35 +133,40 @@ function MemberDetail({ member, projectId, close }: Props) {
               setDone(false);
               setValue('accessLevel', value);
             }}
+            disabled={!canManageMember}
             hideError
           />
-          <div className={styles.removeButtonContainer}>
-            <ConfirmAction
-              title="DELETE MEMBER FROM PROJECT"
-              subtitle={`Are you sure you want to remove the member "${member.user.email}"`}
-              action={handleRemoveMember}
-              actionLabel="REMOVE"
-              warning
-            >
-              <Button
-                label="REMOVE FROM PROYECT"
-                Icon={IconRemove}
-                className={styles.removeButton}
-              />
-            </ConfirmAction>
-          </div>
+          {canManageMember && (
+            <div className={styles.removeButtonContainer}>
+              <ConfirmAction
+                title="DELETE MEMBER FROM PROJECT"
+                subtitle={`Are you sure you want to remove the member "${member.user.email}"`}
+                action={handleRemoveMember}
+                actionLabel="REMOVE"
+                warning
+              >
+                <Button
+                  label="REMOVE FROM PROJECT"
+                  Icon={IconRemove}
+                  className={styles.removeButton}
+                />
+              </ConfirmAction>
+            </div>
+          )}
         </div>
       </div>
-      <ActionsBar className={styles.actions}>
-        <Button
-          label="SAVE"
-          onClick={handleSubmit(handleUpdateMember)}
-          disabled={!done && !accessLevelChanged}
-          success={done}
-          primary
-        />
-        <Button label="CANCEL" onClick={close} />
-      </ActionsBar>
+      {canManageMember && (
+        <ActionsBar className={styles.actions}>
+          <Button
+            label="SAVE"
+            onClick={handleSubmit(handleUpdateMember)}
+            disabled={!done && !accessLevelChanged}
+            success={done}
+            primary
+          />
+          <Button label="CANCEL" onClick={close} />
+        </ActionsBar>
+      )}
     </div>
   );
 }

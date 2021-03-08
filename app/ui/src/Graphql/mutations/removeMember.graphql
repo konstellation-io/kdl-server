@@ -1,14 +1,10 @@
+#import '../fragments/memberFragment.graphql'
+
 mutation RemoveMember($input: RemoveMemberInput!) {
   removeMember(input: $input) {
     id
     members {
-      user {
-        id
-        email
-        lastActivity
-      }
-      accessLevel
-      addedDate
+      ...MemberFields
     }
   }
 }

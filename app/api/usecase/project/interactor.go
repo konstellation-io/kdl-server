@@ -19,17 +19,18 @@ const (
 
 var (
 	ErrCreateProjectValidation = errors.New("create project validation error")
-	ErrRepoTypeNotImplemented  = errors.New("the selected repository type is not implemented")
 )
 
 // CreateProjectOption options when creating project.
 type CreateProjectOption struct {
-	Name             string
-	Description      string
-	RepoType         entity.RepositoryType
-	InternalRepoName *string
-	ExternalRepoURL  *string
-	Owner            entity.User
+	Name                 string
+	Description          string
+	RepoType             entity.RepositoryType
+	InternalRepoName     *string
+	ExternalRepoURL      *string
+	ExternalRepoUsername *string
+	ExternalRepoPassword *string
+	Owner                entity.User
 }
 
 // Validate check that the CreateProjectOption properties are valid.
@@ -92,6 +93,7 @@ func NewInteractor(logger logging.Logger,
 // Create stores into the DB a new project.
 // Depending on the repository type:
 //  - For internal repositories creates a repository in Gitea.
+//  - For external repositories, mirrors the external repository in Gitea.
 //  - Create Minio bucket
 //  - Activate Drone.io repo
 func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
@@ -112,6 +114,7 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 			AddedDate:   now,
 		},
 	}
+	repoName := ""
 
 	// Create repository
 	switch opt.RepoType {
@@ -126,19 +129,32 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 			InternalRepoName: *opt.InternalRepoName,
 		}
 
-		// Create Minio bucket
-		err = i.minioService.CreateBucket(*opt.InternalRepoName)
+		repoName = *opt.InternalRepoName
+
+	case entity.RepositoryTypeExternal:
+		err := i.giteaService.MirrorRepo(*opt.ExternalRepoURL, opt.Name, *opt.ExternalRepoUsername, *opt.ExternalRepoPassword)
 		if err != nil {
 			return entity.Project{}, err
 		}
 
-		// Activate Drone.io repo
-		err = i.droneService.ActivateRepository(*opt.InternalRepoName)
-		if err != nil {
-			return entity.Project{}, err
+		project.Repository = entity.Repository{
+			Type:            entity.RepositoryTypeExternal,
+			ExternalRepoURL: *opt.ExternalRepoURL,
 		}
-	case entity.RepositoryTypeExternal:
-		return entity.Project{}, ErrRepoTypeNotImplemented
+
+		repoName = opt.Name
+	}
+
+	// Create Minio bucket
+	err = i.minioService.CreateBucket(repoName)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	// Activate Drone.io repo
+	err = i.droneService.ActivateRepository(repoName)
+	if err != nil {
+		return entity.Project{}, err
 	}
 
 	// Store the project into the database

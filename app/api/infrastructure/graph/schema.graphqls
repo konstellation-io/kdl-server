@@ -47,8 +47,9 @@ type KnowledgeGraphItem {
   isDiscarded: Boolean!
 
   # optional fields
+  repoUrls: [String]
   externalId: ID # for example: arxivId
-  framework: String
+  frameworks: [String]
 }
 
 type SSHKey {

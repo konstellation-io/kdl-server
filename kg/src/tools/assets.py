@@ -41,9 +41,9 @@ class AssetLoader:
         Loads the dataset from the filepath specified in object attributes.
         For current usage, this must be identical to the training set on which self.model was trained on.
         """
-        path = Path(self.path, "dataset.csv")
+        path = Path(self.path, "dataset.pkl.gz")
         self.log.debug(f"Loading dataset from: {path}")
-        df = pd.read_csv(path, dtype={"id": str})
+        df = pd.read_pickle(path, compression="gzip")
 
         return df
 

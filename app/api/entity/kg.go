@@ -33,7 +33,8 @@ type KnowledgeGraphItem struct {
 	Date        string
 	URL         string
 	ExternalID  *string
-	Framework   *string
+	RepoURLs    []string
+	Frameworks  []string
 	Score       float64
 	IsStarred   bool
 	IsDiscarded bool

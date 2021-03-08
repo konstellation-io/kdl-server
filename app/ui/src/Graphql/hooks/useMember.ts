@@ -2,11 +2,7 @@ import {
   AddMembers,
   AddMembersVariables,
 } from './../mutations/types/AddMembers';
-import { ApolloCache, FetchResult, useMutation } from '@apollo/client';
-import {
-  GetProjectMembers,
-  GetProjectMembers_project,
-} from 'Graphql/queries/types/GetProjectMembers';
+import { useMutation } from '@apollo/client';
 import {
   RemoveMember,
   RemoveMemberVariables,
@@ -20,7 +16,6 @@ import { AccessLevel } from 'Graphql/types/globalTypes';
 import { loader } from 'graphql.macro';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 
-const GetMembersQuery = loader('Graphql/queries/getProjectMembers.graphql');
 const UpdateMemberMutation = loader('Graphql/mutations/updateMember.graphql');
 const RemoveMemberMutation = loader('Graphql/mutations/removeMember.graphql');
 const AddMembersMutation = loader('Graphql/mutations/addMembers.graphql');

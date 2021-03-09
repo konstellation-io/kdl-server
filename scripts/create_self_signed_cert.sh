@@ -18,6 +18,17 @@ CA_CERTS_FOLDER=.certs/toolkit
 rm -rf ${CA_CERTS_FOLDER}/toolkit
 mkdir -p ${CA_CERTS_FOLDER}
 
+if [ "$OS" = "Darwin" ]; then
+  brew install mkcert
+  brew install nss
+  mkcert -install
+  TRUST_STORES=nss mkcert --install  *.$DOMAIN
+  mv _wildcard.* .certs/toolkit
+  echo "Creating K8S secrets with the CA private keys"
+  kubectl -n $NAMESPACE create secret tls $DOMAIN-tls-secret --key=$CA_CERTS_FOLDER/_wildcard.$DOMAIN-key.pem --cert=$CA_CERTS_FOLDER/_wildcard.$DOMAIN.pem --dry-run -o yaml | kubectl apply -f -
+  exit 0
+fi
+
 if [ -x .certs/mkcert ]; then
   echo "mkcert is installed"
 else

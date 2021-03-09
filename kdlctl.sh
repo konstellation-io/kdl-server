@@ -25,6 +25,7 @@ MINIKUBE_RESET=0
 MONORUNTIME_MODE=0
 MONGO_POD=""
 ENABLE_TLS=false
+OS=$(uname)
 
 # Admin MongoDB credentials
 MONGO_DB=kdl

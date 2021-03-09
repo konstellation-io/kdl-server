@@ -1,5 +1,5 @@
 import { Button, Select } from 'kwc';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import ActionsBar from 'Components/Layout/ActionsBar/ActionsBar';
@@ -8,11 +8,21 @@ import Gravatar from 'react-gravatar';
 import IconDate from '@material-ui/icons/Today';
 import IconRemove from '@material-ui/icons/Delete';
 import IconTime from '@material-ui/icons/Schedule';
-import { MemberDetails } from 'Graphql/client/models/MemberDetails';
 import { formatDate } from 'Utils/format';
 import styles from './MemberDetails.module.scss';
 import { useForm } from 'react-hook-form';
 import useMember from 'Graphql/hooks/useMember';
+import {
+  GetProjectMembers,
+  GetProjectMembers_project_members,
+  GetProjectMembersVariables,
+} from 'Graphql/queries/types/GetProjectMembers';
+import { useQuery } from '@apollo/client';
+import { GetMe } from 'Graphql/queries/types/GetMe';
+import { loader } from 'graphql.macro';
+
+const GetMeQuery = loader('Graphql/queries/getMe.graphql');
+const GetMembersQuery = loader('Graphql/queries/getProjectMembers.graphql');
 
 const gravatarStyle = {
   borderRadius: '50%',
@@ -23,11 +33,21 @@ type FormData = {
 };
 
 type Props = {
-  member: MemberDetails;
+  member: GetProjectMembers_project_members;
   projectId: string;
   close: () => void;
 };
 function MemberDetail({ member, projectId, close }: Props) {
+  const { data: dataMe } = useQuery<GetMe>(GetMeQuery);
+  const { data: dataMembers } = useQuery<
+    GetProjectMembers,
+    GetProjectMembersVariables
+  >(GetMembersQuery, {
+    variables: {
+      id: projectId,
+    },
+  });
+
   const [done, setDone] = useState(false);
   const { removeMemberById, updateMemberAccessLevel } = useMember(projectId, {
     onCompleteUpdate: () => setDone(true),
@@ -49,15 +69,28 @@ function MemberDetail({ member, projectId, close }: Props) {
     setValue('accessLevel', member.accessLevel);
   }, [member, setValue]);
 
+  const canManageMember = useMemo(() => {
+    if (dataMe && dataMembers) {
+      const meAsMember = dataMembers.project.members.find(
+        ({ user }) => user.email === dataMe.me.email
+      );
+      const isNotMe = dataMe.me.email !== member.user.email;
+      const isAdmin = meAsMember?.accessLevel === AccessLevel.ADMIN;
+
+      return isNotMe && isAdmin;
+    }
+    return false;
+  }, [dataMe, dataMembers, member]);
+
   const accessLevelChanged = member.accessLevel !== watch('accessLevel');
 
   function handleUpdateMember({ accessLevel }: FormData) {
     if (accessLevelChanged) {
-      updateMemberAccessLevel(member.id, accessLevel);
+      updateMemberAccessLevel(member.user.id, accessLevel);
     }
   }
   function handleRemoveMember() {
-    removeMemberById(member.id);
+    removeMemberById(member.user.id);
     close();
   }
 
@@ -65,9 +98,13 @@ function MemberDetail({ member, projectId, close }: Props) {
     <div className={styles.wrapper}>
       <div className={styles.container}>
         <div className={styles.info}>
-          <Gravatar email={member.email} size={160} style={gravatarStyle} />
+          <Gravatar
+            email={member.user.email}
+            size={160}
+            style={gravatarStyle}
+          />
           <p className={styles.accessLevel}>{member.accessLevel}</p>
-          <p className={styles.email}>{member.email}</p>
+          <p className={styles.email}>{member.user.email}</p>
           <div className={styles.added}>
             <IconDate className="icon-small" />
             <p className={styles.addedValue}>
@@ -77,11 +114,11 @@ function MemberDetail({ member, projectId, close }: Props) {
         </div>
         <div className={styles.form}>
           <p className={styles.lastActivityTitle}>LAST ACTIVITY</p>
-          {member.lastActivity ? (
+          {member.user.lastActivity ? (
             <div className={styles.lastActivity}>
               <IconTime className="icon-small" />
               <p className={styles.lastActivityValue}>
-                {`${formatDate(new Date(member.lastActivity), true)}`}
+                {`${formatDate(new Date(member.user.lastActivity), true)}`}
               </p>
             </div>
           ) : (
@@ -96,35 +133,40 @@ function MemberDetail({ member, projectId, close }: Props) {
               setDone(false);
               setValue('accessLevel', value);
             }}
+            disabled={!canManageMember}
             hideError
           />
-          <div className={styles.removeButtonContainer}>
-            <ConfirmAction
-              title="DELETE MEMBER FROM PROJECT"
-              subtitle={`Are you sure you want to remove the member "${member.email}"`}
-              action={handleRemoveMember}
-              actionLabel="REMOVE"
-              warning
-            >
-              <Button
-                label="REMOVE FROM PROYECT"
-                Icon={IconRemove}
-                className={styles.removeButton}
-              />
-            </ConfirmAction>
-          </div>
+          {canManageMember && (
+            <div className={styles.removeButtonContainer}>
+              <ConfirmAction
+                title="DELETE MEMBER FROM PROJECT"
+                subtitle={`Are you sure you want to remove the member "${member.user.email}"`}
+                action={handleRemoveMember}
+                actionLabel="REMOVE"
+                warning
+              >
+                <Button
+                  label="REMOVE FROM PROJECT"
+                  Icon={IconRemove}
+                  className={styles.removeButton}
+                />
+              </ConfirmAction>
+            </div>
+          )}
         </div>
       </div>
-      <ActionsBar className={styles.actions}>
-        <Button
-          label="SAVE"
-          onClick={handleSubmit(handleUpdateMember)}
-          disabled={!done && !accessLevelChanged}
-          success={done}
-          primary
-        />
-        <Button label="CANCEL" onClick={close} />
-      </ActionsBar>
+      {canManageMember && (
+        <ActionsBar className={styles.actions}>
+          <Button
+            label="SAVE"
+            onClick={handleSubmit(handleUpdateMember)}
+            disabled={!done && !accessLevelChanged}
+            success={done}
+            primary
+          />
+          <Button label="CANCEL" onClick={close} />
+        </ActionsBar>
+      )}
     </div>
   );
 }

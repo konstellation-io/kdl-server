@@ -1,6 +1,8 @@
 package entity
 
-import "time"
+import (
+	"time"
+)
 
 // ProjectState is an enum for project state.
 type ProjectState string

@@ -16,6 +16,7 @@ type Repository interface {
 	GetByEmail(ctx context.Context, email string) (entity.User, error)
 	Create(ctx context.Context, user entity.User) (string, error)
 	FindAll(ctx context.Context) ([]entity.User, error)
+	FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error)
 }
 
 // UseCase interface to manage all operations related with users.
@@ -26,4 +27,6 @@ type UseCase interface {
 	StartTools(ctx context.Context, username string) (entity.User, error)
 	StopTools(ctx context.Context, username string) (entity.User, error)
 	AreToolsRunning(username string) (bool, error)
+	FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error)
+	GetByID(ctx context.Context, userID string) (entity.User, error)
 }

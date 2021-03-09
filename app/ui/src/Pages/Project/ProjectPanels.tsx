@@ -1,9 +1,5 @@
 import { ErrorMessage, SpinnerCircular } from 'kwc';
 import {
-  GET_MEMBER_DETAILS,
-  GetMemberDetails,
-} from 'Graphql/client/queries/getMemberDetails.graphql';
-import {
   GET_PRIMARY_PANEL,
   GetPrimaryPanel,
 } from 'Graphql/client/queries/getPrimaryPanel.graphql';
@@ -24,7 +20,8 @@ import UpdateProjectDescription from './panels/UpdateProjectDescription/UpdatePr
 import UpdateRepository from './panels/UpdateRepository/UpdateRepository';
 import styles from './Project.module.scss';
 import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
-import { useQuery } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
+import { memberDetails } from 'Graphql/client/cache';
 
 export interface ProjectRoute {
   openedProject: GetProjects_projects;
@@ -41,11 +38,7 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
     error: panel2Error,
   } = useQuery<GetSecondaryPanel>(GET_SECONDARY_PANEL);
 
-  const {
-    data: memberDetailsData,
-    loading: memberDetailsLoading,
-    error: memberDetailsError,
-  } = useQuery<GetMemberDetails>(GET_MEMBER_DETAILS);
+  const memberDetailsData = useReactiveVar(memberDetails);
 
   const { closePanel: panel1Close } = usePanel(PanelType.PRIMARY);
   const { closePanel: panel2Close } = usePanel(PanelType.SECONDARY);
@@ -55,16 +48,10 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
   // this panel, last opened tab will remain opened.
   const [settingsOpenedTab, setSettingsOpenedTab] = useState(0);
 
-  if (
-    panel1Loading ||
-    panel2Loading ||
-    memberDetailsLoading ||
-    !memberDetailsData ||
-    !panel1Data ||
-    !panel2Data
-  )
+  if (panel1Loading || panel2Loading || !panel1Data || !panel2Data)
     return <SpinnerCircular />;
-  if (panel1Error || panel2Error || memberDetailsError) return <ErrorMessage />;
+
+  if (panel1Error || panel2Error) return <ErrorMessage />;
 
   function closeMemberInfoPanel() {
     panel2Close();
@@ -84,9 +71,9 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
     [PANEL_ID.PROJECT_DESCRIPTION]: (
       <UpdateProjectDescription project={openedProject} close={panel2Close} />
     ),
-    [PANEL_ID.MEMBER_INFO]: (
+    [PANEL_ID.MEMBER_INFO]: memberDetailsData && (
       <MemberDetails
-        member={memberDetailsData.memberDetails}
+        member={memberDetailsData}
         close={closeMemberInfoPanel}
         projectId={openedProject.id}
       />

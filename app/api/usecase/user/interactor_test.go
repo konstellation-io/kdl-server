@@ -118,7 +118,6 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
 	s.mocks.giteaService.EXPECT().CreateUser(email, username, password).Return(nil)
 	s.mocks.giteaService.EXPECT().AddSSHKey(username, sshKey.Public).Return(nil)
-	s.mocks.giteaService.EXPECT().AddTeamMember(username, accessLevel).Return(nil)
 	s.mocks.k8sClientMock.EXPECT().CreateSecret(secretName, secretValues)
 
 	createdUser, err := s.interactor.Create(ctx, email, username, password, accessLevel)
@@ -340,4 +339,38 @@ func TestInteractor_GetByEmail_Err(t *testing.T) {
 
 	require.Equal(t, someErr, err)
 	require.Equal(t, emptyUser, u)
+}
+
+func TestInteractor_FindByIDs(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+	expectedUsers := []entity.User{{Username: "john"}}
+
+	userIDs := []string{"userA", "userB"}
+
+	s.mocks.repo.EXPECT().FindByIDs(ctx, userIDs).Return(expectedUsers, nil)
+
+	users, err := s.interactor.FindByIDs(ctx, userIDs)
+
+	require.NoError(t, err)
+	require.Equal(t, expectedUsers, users)
+}
+
+func TestInteractor_GetByID(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+	expectedUser := entity.User{Username: "john"}
+
+	userID := "userA"
+
+	s.mocks.repo.EXPECT().Get(ctx, userID).Return(expectedUser, nil)
+
+	users, err := s.interactor.GetByID(ctx, userID)
+
+	require.NoError(t, err)
+	require.Equal(t, expectedUser, users)
 }

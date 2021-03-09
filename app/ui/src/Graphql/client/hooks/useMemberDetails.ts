@@ -1,8 +1,8 @@
-import { MemberDetails } from '../models/MemberDetails';
 import { memberDetails } from './../cache';
+import { GetProjectMembers_project_members } from '../../queries/types/GetProjectMembers';
 
 function useMemberDetails() {
-  function updateMemberDetails(details: MemberDetails) {
+  function updateMemberDetails(details: GetProjectMembers_project_members) {
     memberDetails(details);
   }
 

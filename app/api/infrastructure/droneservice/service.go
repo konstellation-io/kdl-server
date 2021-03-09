@@ -37,6 +37,8 @@ func NewDroneService(logger logging.Logger, url, token string) DroneService {
 }
 
 func (d *droneService) ActivateRepository(repoName string) error {
+	d.logger.Infof("Activating \"%s\" repository in Drone...", repoName)
+
 	repos, err := d.client.RepoListSync()
 	if err != nil {
 		return fmt.Errorf("fail to sync user repos: %w", err)

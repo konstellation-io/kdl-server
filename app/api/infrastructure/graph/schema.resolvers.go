@@ -12,10 +12,20 @@ import (
 	"github.com/gosimple/slug"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/dataloader"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
+
+func (r *memberResolver) User(ctx context.Context, obj *entity.Member) (*entity.User, error) {
+	u, err := dataloader.For(ctx).UserByID.Load(obj.UserID)
+	return &u, err
+}
+
+func (r *memberResolver) AddedDate(ctx context.Context, obj *entity.Member) (string, error) {
+	return obj.AddedDate.Format(time.RFC3339), nil
+}
 
 func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error) {
 	user, err := r.users.Create(ctx, input.Email, input.Username, input.Password, input.AccessLevel)
@@ -39,12 +49,18 @@ func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.SSHKey
 }
 
 func (r *mutationResolver) CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error) {
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	createdProject, err := r.projects.Create(ctx, project.CreateProjectOption{
 		Name:             input.Name,
 		Description:      input.Description,
 		RepoType:         input.Repository.Type,
 		InternalRepoName: input.Repository.InternalRepoName,
 		ExternalRepoURL:  input.Repository.ExternalRepoURL,
+		Owner:            loggedUser,
 	})
 
 	return &createdProject, err
@@ -54,16 +70,65 @@ func (r *mutationResolver) UpdateProject(ctx context.Context, input model.Update
 	return nil, entity.ErrNotImplemented
 }
 
-func (r *mutationResolver) AddMembers(ctx context.Context, input model.AddMembersInput) ([]entity.Member, error) {
-	return nil, entity.ErrNotImplemented
+func (r *mutationResolver) AddMembers(ctx context.Context, input model.AddMembersInput) (*entity.Project, error) {
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	users, err := r.users.FindByIDs(ctx, input.UserIds)
+	if err != nil {
+		return nil, err
+	}
+
+	p, err := r.projects.AddMembers(ctx, project.AddMembersOption{
+		ProjectID:  input.ProjectID,
+		Users:      users,
+		LoggedUser: loggedUser,
+	})
+
+	return &p, err
 }
 
-func (r *mutationResolver) RemoveMember(ctx context.Context, input model.RemoveMemberInput) (*entity.Member, error) {
-	return nil, entity.ErrNotImplemented
+func (r *mutationResolver) RemoveMember(ctx context.Context, input model.RemoveMemberInput) (*entity.Project, error) {
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := r.users.GetByID(ctx, input.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	p, err := r.projects.RemoveMember(ctx, project.RemoveMemberOption{
+		ProjectID:  input.ProjectID,
+		User:       user,
+		LoggedUser: loggedUser,
+	})
+
+	return &p, err
 }
 
-func (r *mutationResolver) UpdateMember(ctx context.Context, input model.UpdateMemberInput) (*entity.Member, error) {
-	return nil, entity.ErrNotImplemented
+func (r *mutationResolver) UpdateMember(ctx context.Context, input model.UpdateMemberInput) (*entity.Project, error) {
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := r.users.GetByID(ctx, input.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	p, err := r.projects.UpdateMember(ctx, project.UpdateMemberOption{
+		ProjectID:   input.ProjectID,
+		User:        user,
+		AccessLevel: input.AccessLevel,
+		LoggedUser:  loggedUser,
+	})
+
+	return &p, err
 }
 
 func (r *mutationResolver) AddAPIToken(ctx context.Context, input *model.APITokenInput) (*entity.APIToken, error) {
@@ -114,18 +179,21 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 }
 
 func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
-	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
-
-	u, err := r.users.GetByEmail(ctx, email)
+	loggedUser, err := r.getLoggedUser(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return &u, nil
+	return &loggedUser, nil
 }
 
 func (r *queryResolver) Projects(ctx context.Context) ([]entity.Project, error) {
-	return r.projects.FindAll(ctx)
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.projects.FindByUserID(ctx, loggedUser.ID)
 }
 
 func (r *queryResolver) Project(ctx context.Context, id string) (*entity.Project, error) {
@@ -197,6 +265,9 @@ func (r *userResolver) AreToolsActive(ctx context.Context, obj *entity.User) (bo
 	return r.users.AreToolsRunning(username)
 }
 
+// Member returns generated.MemberResolver implementation.
+func (r *Resolver) Member() generated.MemberResolver { return &memberResolver{r} }
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
@@ -215,6 +286,7 @@ func (r *Resolver) SSHKey() generated.SSHKeyResolver { return &sSHKeyResolver{r}
 // User returns generated.UserResolver implementation.
 func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
 
+type memberResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type projectResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

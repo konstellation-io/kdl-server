@@ -1,6 +1,10 @@
 package graph
 
 import (
+	"context"
+
+	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/kg"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
@@ -22,4 +26,10 @@ type Resolver struct {
 // NewResolver is a constructor function.
 func NewResolver(cfg config.Config, projectInteractor project.UseCase, userInteractor user.UseCase, kgInteractor kg.UseCase) *Resolver {
 	return &Resolver{cfg: cfg, projects: projectInteractor, users: userInteractor, kg: kgInteractor}
+}
+
+func (r *Resolver) getLoggedUser(ctx context.Context) (entity.User, error) {
+	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
+
+	return r.users.GetByEmail(ctx, email)
 }

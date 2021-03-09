@@ -13,6 +13,10 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
+const (
+	MemberAccessLevelOnCreation = entity.AccessLevelViewer
+)
+
 var (
 	ErrCreateProjectValidation = errors.New("create project validation error")
 	ErrRepoTypeNotImplemented  = errors.New("the selected repository type is not implemented")
@@ -25,6 +29,7 @@ type CreateProjectOption struct {
 	RepoType         entity.RepositoryType
 	InternalRepoName *string
 	ExternalRepoURL  *string
+	Owner            entity.User
 }
 
 // Validate check that the CreateProjectOption properties are valid.
@@ -56,8 +61,8 @@ func (c CreateProjectOption) Validate() error {
 	return nil
 }
 
-// Interactor implements the UseCase interface.
-type Interactor struct {
+// interactor implements the UseCase interface.
+type interactor struct {
 	logger       logging.Logger
 	repo         Repository
 	clock        clock.Clock
@@ -73,8 +78,8 @@ func NewInteractor(logger logging.Logger,
 	giteaService giteaservice.GiteaClient,
 	minioService minioservice.MinioService,
 	droneService droneservice.DroneService,
-) *Interactor {
-	return &Interactor{
+) UseCase {
+	return &interactor{
 		logger:       logger,
 		repo:         repo,
 		clock:        c,
@@ -89,20 +94,29 @@ func NewInteractor(logger logging.Logger,
 //  - For internal repositories creates a repository in Gitea.
 //  - Create Minio bucket
 //  - Activate Drone.io repo
-func (i *Interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
+func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
 	// Validate the creation input
 	err := opt.Validate()
 	if err != nil {
 		return entity.Project{}, err
 	}
 
+	now := i.clock.Now()
+
 	project := entity.NewProject(opt.Name, opt.Description)
-	project.CreationDate = i.clock.Now()
+	project.CreationDate = now
+	project.Members = []entity.Member{
+		{
+			UserID:      opt.Owner.ID,
+			AccessLevel: entity.AccessLevelAdmin,
+			AddedDate:   now,
+		},
+	}
 
 	// Create repository
 	switch opt.RepoType {
 	case entity.RepositoryTypeInternal:
-		err := i.giteaService.CreateRepo(*opt.InternalRepoName)
+		err := i.giteaService.CreateRepo(*opt.InternalRepoName, opt.Owner.Username)
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -130,6 +144,7 @@ func (i *Interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 	// Store the project into the database
 	insertedID, err := i.repo.Create(ctx, project)
 	if err != nil {
+		i.logger.Errorf("Unexpected error saving project into DB: %s", err)
 		return entity.Project{}, err
 	}
 
@@ -138,14 +153,14 @@ func (i *Interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 	return i.repo.Get(ctx, insertedID)
 }
 
-// Find all projects existing in the server.
-func (i Interactor) FindAll(ctx context.Context) ([]entity.Project, error) {
-	i.logger.Info("Finding all projects in the server")
-	return i.repo.FindAll(ctx)
+// FindByUserID returns the projects that the given user belongs to.
+func (i interactor) FindByUserID(ctx context.Context, userID string) ([]entity.Project, error) {
+	i.logger.Infof("Finding projects for the user \"%s\"", userID)
+	return i.repo.FindByUserID(ctx, userID)
 }
 
 // GetByID returns the project with the desired identifier.
-func (i Interactor) GetByID(ctx context.Context, id string) (entity.Project, error) {
+func (i interactor) GetByID(ctx context.Context, id string) (entity.Project, error) {
 	i.logger.Infof("Getting project with id \"%s\"", id)
 	return i.repo.Get(ctx, id)
 }

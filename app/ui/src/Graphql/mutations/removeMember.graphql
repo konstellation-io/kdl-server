@@ -1,5 +1,10 @@
+#import '../fragments/memberFragment.graphql'
+
 mutation RemoveMember($input: RemoveMemberInput!) {
   removeMember(input: $input) {
     id
+    members {
+      ...MemberFields
+    }
   }
 }

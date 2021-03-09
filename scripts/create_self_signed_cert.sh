@@ -7,6 +7,7 @@ fi
 
 NAMESPACE=$1
 DOMAIN=$2
+OS=$3
 
 if [ -z "$NAMESPACE" ] || [ -z "$DEPLOY_NAME" ]; then
   echo "Variables NAMESPACE and DOMAIN is required"

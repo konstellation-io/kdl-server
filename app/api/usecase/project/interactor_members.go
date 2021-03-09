@@ -85,6 +85,7 @@ func (i interactor) RemoveMember(ctx context.Context, projectID string, u, logge
 
 	// Check if after removing the user there is at least one administrator
 	numberOfAdmins := 0
+
 	for _, m := range p.Members {
 		if m.UserID != u.ID && m.AccessLevel == entity.AccessLevelAdmin {
 			numberOfAdmins++

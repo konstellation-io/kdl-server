@@ -17,6 +17,10 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
+const (
+	someProjectID = "project.1234"
+)
+
 type projectSuite struct {
 	ctrl       *gomock.Controller
 	interactor project.UseCase
@@ -69,7 +73,7 @@ func TestInteractor_Create(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const (
-		projectID     = "project.1234"
+		projectID     = someProjectID
 		projectName   = "The Project X"
 		projectDesc   = "The Project X Description"
 		ownerUserID   = "user.1234"
@@ -149,14 +153,12 @@ func TestInteractor_GetByID(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
-	const projectID = "project.1234"
-
 	ctx := context.Background()
 	expectedProject := entity.NewProject("project-x", "Project X")
 
-	s.mocks.repo.EXPECT().Get(ctx, projectID).Return(expectedProject, nil)
+	s.mocks.repo.EXPECT().Get(ctx, someProjectID).Return(expectedProject, nil)
 
-	p, err := s.interactor.GetByID(ctx, projectID)
+	p, err := s.interactor.GetByID(ctx, someProjectID)
 
 	require.NoError(t, err)
 	require.Equal(t, p, expectedProject)
@@ -179,7 +181,7 @@ func TestInteractor_AddMembers(t *testing.T) {
 	}
 
 	p := entity.NewProject("project-x", "Project X")
-	p.ID = "projectA"
+	p.ID = someProjectID
 	p.Members = []entity.Member{adminMember}
 	p.Repository = entity.Repository{
 		Type:             entity.RepositoryTypeInternal,
@@ -237,7 +239,7 @@ func TestInteractor_RemoveMember(t *testing.T) {
 	userToRemove := entity.User{ID: "userA", Username: "user_a"}
 
 	p := entity.NewProject("project-x", "Project X")
-	p.ID = "project1"
+	p.ID = someProjectID
 	p.Members = []entity.Member{adminMember, {UserID: userToRemove.ID}}
 	p.Repository = entity.Repository{
 		Type:             entity.RepositoryTypeInternal,
@@ -278,7 +280,7 @@ func TestInteractor_RemoveMember_ErrNoMoreAdmins(t *testing.T) {
 	}
 
 	p := entity.NewProject("project-x", "Project X")
-	p.ID = "project1"
+	p.ID = someProjectID
 	p.Members = []entity.Member{adminMember}
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
@@ -309,7 +311,7 @@ func TestInteractor_UpdateMember(t *testing.T) {
 	userToUpd := entity.User{ID: "userA", Username: "user_a"}
 
 	p := entity.NewProject("project-x", "Project X")
-	p.ID = "project.1234"
+	p.ID = someProjectID
 	p.Members = []entity.Member{adminMember, {UserID: userToUpd.ID}}
 	p.Repository = entity.Repository{
 		Type:             entity.RepositoryTypeInternal,
@@ -357,7 +359,7 @@ func TestInteractor_UpdateMember_ErrNoMoreAdmins(t *testing.T) {
 	}
 
 	p := entity.NewProject("project-x", "Project X")
-	p.ID = "project.1234"
+	p.ID = someProjectID
 	p.Members = []entity.Member{adminMember}
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)

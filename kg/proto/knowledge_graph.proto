@@ -17,12 +17,19 @@ message GraphItem {
   string date = 7;
   string url = 8;
   string external_id = 9;
-  repeated string repo_urls = 10;
-  repeated string frameworks = 11;
+  repeated Topic topics = 10;
+  repeated string repo_urls = 11;
+  repeated string frameworks = 12;
+}
+
+message Topic {
+    string name = 1;
+    float relevance = 2;
 }
 
 message GetGraphRes {
   repeated GraphItem items = 1;
+  repeated Topic topics = 2;
 }
 
 service KGService {

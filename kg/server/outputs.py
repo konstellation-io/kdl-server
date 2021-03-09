@@ -5,12 +5,41 @@ import proto.knowledge_graph_pb2 as kg_pb
 from exceptions import MissingFieldException
 
 
+@dataclass(order=False)
+class Topic:
+    """
+    Topics dataclass that has a name and a relevancy score
+    """
+    name: str
+    relevance: float
+
+    # Order methods
+    def __eq__(self, other):
+        return self.relevance == other.relevance
+
+    def __gt__(self, other):
+        return self.relevance > other.relevance
+
+    def __lt__(self, other):
+        return self.relevance < other.relevance
+
+    def __ge__(self, other):
+        return self.relevance >= other.relevance
+
+    def __le__(self, other):
+        return self.relevance <= other.relevance
+
+    def to_grpc(self):
+        item = kg_pb.Topic()
+        item.name = self.name
+        item.relevance = self.relevance
+
+
 @dataclass(init=False, order=False)
 class RecommendedItem:
     """
     Recommended Item class can be of the type paper or repository.
     """
-
     id: str
     category: str
     title: str
@@ -19,6 +48,7 @@ class RecommendedItem:
     score: str
     date: str
     url: str
+    topics: list[Topic]
 
     # Optional fields
     external_id: str = ""  # Keeping camelCase for consistency.
@@ -56,18 +86,19 @@ class RecommendedItem:
         Outputs RecommenderItem in a GraphItem type.
         """
         item = kg_pb.GraphItem()
-        for field in self.fields:
-            if field == "authors":
-                item.authors.extend(self.authors)
-                continue
-            elif field == "repo_urls":
-                item.repo_urls.extend(self.repo_urls)
-                continue
-            elif field == "frameworks":
-                item.frameworks.extend(self.frameworks)
-                continue
+        item.id = self.id
+        item.category = self.category
+        item.title = self.title
+        item.abstract = self.abstract
+        item.authors.extend(self.authors)
+        item.score = self.score
+        item.date = self.date
+        item.url = self.url
+        item.topics.extend([topic.to_grpc() for topic in self.topics].sort(reverse=True))
 
-            setattr(item, field, getattr(self, field))
+        item.external_id = self.external_id
+        item.frameworks.extend(self.frameworks)
+        item.repo_urls.extend(self.repo_urls)
 
         return item
 
@@ -95,6 +126,7 @@ class RecommendedList:
     """
 
     items: list[RecommendedItem]
+    topics: list[Topic]
 
     def __init__(self, entry: list[dict]):
         item_list = list()
@@ -109,6 +141,7 @@ class RecommendedList:
         Outputs a RecommendedList in GetGraphRes type.
         """
         res = kg_pb.GetGraphRes()
+        res.items.extend([item.to_grpc() for item in self.items])
         res.items.extend([item.to_grpc() for item in self.items])
 
         return res

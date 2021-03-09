@@ -29,8 +29,14 @@ type QualityProjectDesc {
   quality: Int!
 }
 
+type Topic {
+  name: String!
+  relevance: Float!
+}
+
 type KnowledgeGraph {
   items: [KnowledgeGraphItem!]!
+  topics: [Topic!]!
 }
 
 type KnowledgeGraphItem {
@@ -42,7 +48,7 @@ type KnowledgeGraphItem {
   score: Float!
   date: String!
   url: String!
-
+  topics: [Topic]!
   isStarred: Boolean!
   isDiscarded: Boolean!
 

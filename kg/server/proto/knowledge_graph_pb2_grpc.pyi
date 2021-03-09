@@ -3,12 +3,9 @@
 isort:skip_file
 """
 import abc
-
 import grpc
 
 from .knowledge_graph_pb2 import *
-
-
 class KGServiceStub:
     def __init__(self, channel: grpc.Channel) -> None: ...
     def GetGraph(self,

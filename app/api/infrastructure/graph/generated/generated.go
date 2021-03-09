@@ -58,7 +58,8 @@ type ComplexityRoot struct {
 	}
 
 	KnowledgeGraph struct {
-		Items func(childComplexity int) int
+		Items  func(childComplexity int) int
+		Topics func(childComplexity int) int
 	}
 
 	KnowledgeGraphItem struct {
@@ -74,6 +75,7 @@ type ComplexityRoot struct {
 		RepoURLs    func(childComplexity int) int
 		Score       func(childComplexity int) int
 		Title       func(childComplexity int) int
+		Topics      func(childComplexity int) int
 		URL         func(childComplexity int) int
 	}
 
@@ -148,6 +150,11 @@ type ComplexityRoot struct {
 		MLFlow  func(childComplexity int) int
 		Minio   func(childComplexity int) int
 		VSCode  func(childComplexity int) int
+	}
+
+	Topic struct {
+		Name      func(childComplexity int) int
+		Relevance func(childComplexity int) int
 	}
 
 	User struct {
@@ -269,6 +276,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.KnowledgeGraph.Items(childComplexity), true
 
+	case "KnowledgeGraph.topics":
+		if e.complexity.KnowledgeGraph.Topics == nil {
+			break
+		}
+
+		return e.complexity.KnowledgeGraph.Topics(childComplexity), true
+
 	case "KnowledgeGraphItem.abstract":
 		if e.complexity.KnowledgeGraphItem.Abstract == nil {
 			break
@@ -352,6 +366,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.KnowledgeGraphItem.Title(childComplexity), true
+
+	case "KnowledgeGraphItem.topics":
+		if e.complexity.KnowledgeGraphItem.Topics == nil {
+			break
+		}
+
+		return e.complexity.KnowledgeGraphItem.Topics(childComplexity), true
 
 	case "KnowledgeGraphItem.url":
 		if e.complexity.KnowledgeGraphItem.URL == nil {
@@ -783,6 +804,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ToolUrls.VSCode(childComplexity), true
 
+	case "Topic.name":
+		if e.complexity.Topic.Name == nil {
+			break
+		}
+
+		return e.complexity.Topic.Name(childComplexity), true
+
+	case "Topic.relevance":
+		if e.complexity.Topic.Relevance == nil {
+			break
+		}
+
+		return e.complexity.Topic.Relevance(childComplexity), true
+
 	case "User.apiTokens":
 		if e.complexity.User.APITokens == nil {
 			break
@@ -934,8 +969,14 @@ type QualityProjectDesc {
   quality: Int!
 }
 
+type Topic {
+  name: String!
+  relevance: Float!
+}
+
 type KnowledgeGraph {
   items: [KnowledgeGraphItem!]!
+  topics: [Topic!]!
 }
 
 type KnowledgeGraphItem {
@@ -947,7 +988,7 @@ type KnowledgeGraphItem {
   score: Float!
   date: String!
   url: String!
-
+  topics: [Topic]!
   isStarred: Boolean!
   isDiscarded: Boolean!
 
@@ -1633,6 +1674,41 @@ func (ec *executionContext) _KnowledgeGraph_items(ctx context.Context, field gra
 	return ec.marshalNKnowledgeGraphItem2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItemᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _KnowledgeGraph_topics(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraph) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "KnowledgeGraph",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Topics, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]entity.Topic)
+	fc.Result = res
+	return ec.marshalNTopic2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐTopicᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _KnowledgeGraphItem_id(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1911,6 +1987,41 @@ func (ec *executionContext) _KnowledgeGraphItem_url(ctx context.Context, field g
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _KnowledgeGraphItem_topics(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "KnowledgeGraphItem",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Topics, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]entity.Topic)
+	fc.Result = res
+	return ec.marshalNTopic2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐTopic(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _KnowledgeGraphItem_isStarred(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
@@ -3962,6 +4073,76 @@ func (ec *executionContext) _ToolUrls_mlflow(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Topic_name(ctx context.Context, field graphql.CollectedField, obj *entity.Topic) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Topic",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Topic_relevance(ctx context.Context, field graphql.CollectedField, obj *entity.Topic) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Topic",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Relevance, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *entity.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -5869,6 +6050,11 @@ func (ec *executionContext) _KnowledgeGraph(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "topics":
+			out.Values[i] = ec._KnowledgeGraph_topics(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5928,6 +6114,11 @@ func (ec *executionContext) _KnowledgeGraphItem(ctx context.Context, sel ast.Sel
 			}
 		case "url":
 			out.Values[i] = ec._KnowledgeGraphItem_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "topics":
+			out.Values[i] = ec._KnowledgeGraphItem_topics(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -6488,6 +6679,38 @@ func (ec *executionContext) _ToolUrls(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "mlflow":
 			out.Values[i] = ec._ToolUrls_mlflow(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var topicImplementors = []string{"Topic"}
+
+func (ec *executionContext) _Topic(ctx context.Context, sel ast.SelectionSet, obj *entity.Topic) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, topicImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Topic")
+		case "name":
+			out.Values[i] = ec._Topic_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "relevance":
+			out.Values[i] = ec._Topic_relevance(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -7322,6 +7545,84 @@ func (ec *executionContext) marshalNToolUrls2ᚖgithubᚗcomᚋkonstellationᚑi
 	return ec._ToolUrls(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNTopic2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐTopic(ctx context.Context, sel ast.SelectionSet, v entity.Topic) graphql.Marshaler {
+	return ec._Topic(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTopic2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐTopic(ctx context.Context, sel ast.SelectionSet, v []entity.Topic) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOTopic2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐTopic(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNTopic2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐTopicᚄ(ctx context.Context, sel ast.SelectionSet, v []entity.Topic) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTopic2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐTopic(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) unmarshalNUpdateAccessLevelInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUpdateAccessLevelInput(ctx context.Context, v interface{}) (model.UpdateAccessLevelInput, error) {
 	res, err := ec.unmarshalInputUpdateAccessLevelInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -7757,6 +8058,10 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return graphql.MarshalString(*v)
+}
+
+func (ec *executionContext) marshalOTopic2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐTopic(ctx context.Context, sel ast.SelectionSet, v entity.Topic) graphql.Marshaler {
+	return ec._Topic(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalOUpdateProjectRepositoryInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUpdateProjectRepositoryInput(ctx context.Context, v interface{}) (*model.UpdateProjectRepositoryInput, error) {

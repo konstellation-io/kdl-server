@@ -1,5 +1,5 @@
 import sys
 from pathlib import Path
 
-src = Path(Path.cwd(), 'src')
-sys.path.append(str(src))
+server = Path(Path.cwd(), 'server')
+sys.path.append(str(server))

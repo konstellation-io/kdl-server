@@ -1,7 +1,7 @@
 """
 You have to set up a server to run these tests:
 ```
-python src/app.py
+python server/app.py
 ```
 """
 

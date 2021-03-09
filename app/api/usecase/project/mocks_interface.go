@@ -190,33 +190,33 @@ func (mr *MockUseCaseMockRecorder) GetByID(ctx, id interface{}) *gomock.Call {
 }
 
 // AddMembers mocks base method
-func (m *MockUseCase) AddMembers(ctx context.Context, projectID string, users []entity.User, loggedUser entity.User) (entity.Project, error) {
+func (m *MockUseCase) AddMembers(ctx context.Context, opt AddMembersOption) (entity.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddMembers", ctx, projectID, users, loggedUser)
+	ret := m.ctrl.Call(m, "AddMembers", ctx, opt)
 	ret0, _ := ret[0].(entity.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // AddMembers indicates an expected call of AddMembers
-func (mr *MockUseCaseMockRecorder) AddMembers(ctx, projectID, users, loggedUser interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) AddMembers(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMembers", reflect.TypeOf((*MockUseCase)(nil).AddMembers), ctx, projectID, users, loggedUser)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMembers", reflect.TypeOf((*MockUseCase)(nil).AddMembers), ctx, opt)
 }
 
 // RemoveMember mocks base method
-func (m *MockUseCase) RemoveMember(ctx context.Context, projectID string, user, loggedUser entity.User) (entity.Project, error) {
+func (m *MockUseCase) RemoveMember(ctx context.Context, opt RemoveMemberOption) (entity.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RemoveMember", ctx, projectID, user, loggedUser)
+	ret := m.ctrl.Call(m, "RemoveMember", ctx, opt)
 	ret0, _ := ret[0].(entity.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // RemoveMember indicates an expected call of RemoveMember
-func (mr *MockUseCaseMockRecorder) RemoveMember(ctx, projectID, user, loggedUser interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) RemoveMember(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMember", reflect.TypeOf((*MockUseCase)(nil).RemoveMember), ctx, projectID, user, loggedUser)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMember", reflect.TypeOf((*MockUseCase)(nil).RemoveMember), ctx, opt)
 }
 
 // UpdateMember mocks base method

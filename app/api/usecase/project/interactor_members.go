@@ -8,27 +8,54 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 )
 
+// UpdateMemberOption options when updating a project member.
+type UpdateMemberOption struct {
+	ProjectID   string
+	User        entity.User
+	AccessLevel entity.AccessLevel
+	LoggedUser  entity.User
+}
+
+// RemoveMemberOption options when removing a project member.
+type RemoveMemberOption struct {
+	ProjectID  string
+	User       entity.User
+	LoggedUser entity.User
+}
+
+// AddMembersOption options when removing a project member.
+type AddMembersOption struct {
+	ProjectID  string
+	Users      []entity.User
+	LoggedUser entity.User
+}
+
 var (
-	ErrRemoveNoMoreAdmins = errors.New("there are not more admin members so the user cannot be removed")
-	ErrUpdateNoMoreAdmins = errors.New("there are not more admin members so the user cannot be updated")
+	ErrRemoveNoMoreAdmins       = errors.New("there are not more admin members so the user cannot be removed")
+	ErrUpdateNoMoreAdmins       = errors.New("there are not more admin members so the user cannot be updated")
+	ErrOnlyAdminCanAddMember    = errors.New("only admins can add members")
+	ErrOnlyAdminCanRemoveMember = errors.New("only admins can remove members")
+	ErrOnlyAdminCanUpdateMember = errors.New("only admins can update members")
+	ErrMemberAlreadyExists      = errors.New("member already exists")
+	ErrMemberNotExists          = errors.New("member not exists in the project")
 )
 
 // AddMembers adds new users to the given project. These members will have the lowest access level.
-func (i interactor) AddMembers(ctx context.Context, projectID string, users []entity.User, loggedUser entity.User) (entity.Project, error) {
-	p, err := i.repo.Get(ctx, projectID)
+func (i interactor) AddMembers(ctx context.Context, opt AddMembersOption) (entity.Project, error) {
+	p, err := i.repo.Get(ctx, opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err
 	}
 
 	// Check the logged user is admin in this project
-	memberAccessLevel := i.getMemberAccessLevel(loggedUser.ID, p.Members)
+	memberAccessLevel := i.getMemberAccessLevel(opt.LoggedUser.ID, p.Members)
 	if memberAccessLevel != entity.AccessLevelAdmin {
-		i.logger.Infof("The member \"%s\" has access level \"%s\" and cannot add new members", loggedUser.Username, memberAccessLevel)
+		i.logger.Infof("The member \"%s\" has access level \"%s\" and cannot add new members", opt.LoggedUser.Username, memberAccessLevel)
 		return entity.Project{}, ErrOnlyAdminCanAddMember
 	}
 
 	// Check that the users are new members
-	for _, u := range users {
+	for _, u := range opt.Users {
 		if ok, _ := i.getMember(u.ID, p.Members); ok {
 			return entity.Project{}, fmt.Errorf("%w: user ID=%s", ErrMemberAlreadyExists, u.ID)
 		}
@@ -36,7 +63,7 @@ func (i interactor) AddMembers(ctx context.Context, projectID string, users []en
 
 	// Add collaborators to the Gitea repository
 	if p.Repository.Type == entity.RepositoryTypeInternal {
-		for _, u := range users {
+		for _, u := range opt.Users {
 			err = i.giteaService.AddCollaborator(p.Repository.InternalRepoName, u.Username, MemberAccessLevelOnCreation)
 			if err != nil {
 				return entity.Project{}, err
@@ -46,9 +73,9 @@ func (i interactor) AddMembers(ctx context.Context, projectID string, users []en
 
 	// Store new members into the DataBase
 	now := i.clock.Now()
-	newMembers := make([]entity.Member, len(users))
+	newMembers := make([]entity.Member, len(opt.Users))
 
-	for idx, u := range users {
+	for idx, u := range opt.Users {
 		newMembers[idx] = entity.Member{
 			UserID:      u.ID,
 			AccessLevel: MemberAccessLevelOnCreation,
@@ -56,61 +83,53 @@ func (i interactor) AddMembers(ctx context.Context, projectID string, users []en
 		}
 	}
 
-	err = i.repo.AddMembers(ctx, projectID, newMembers)
+	err = i.repo.AddMembers(ctx, opt.ProjectID, newMembers)
 	if err != nil {
 		return entity.Project{}, err
 	}
 
-	return i.repo.Get(ctx, projectID)
+	return i.repo.Get(ctx, opt.ProjectID)
 }
 
 // RemoveMember removes a user from the given project.
-func (i interactor) RemoveMember(ctx context.Context, projectID string, u, loggedUser entity.User) (entity.Project, error) {
-	p, err := i.repo.Get(ctx, projectID)
+func (i interactor) RemoveMember(ctx context.Context, opt RemoveMemberOption) (entity.Project, error) {
+	p, err := i.repo.Get(ctx, opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err
 	}
 
 	// Check the member to remove exists into the project
-	if ok, _ := i.getMember(u.ID, p.Members); !ok {
-		return entity.Project{}, fmt.Errorf("%w: user ID=%s", ErrMemberNotExists, u.ID)
+	if ok, _ := i.getMember(opt.User.ID, p.Members); !ok {
+		return entity.Project{}, fmt.Errorf("%w: user ID=%s", ErrMemberNotExists, opt.User.ID)
 	}
 
 	// Check the logged user is admin in this project
-	memberAccessLevel := i.getMemberAccessLevel(loggedUser.ID, p.Members)
+	memberAccessLevel := i.getMemberAccessLevel(opt.LoggedUser.ID, p.Members)
 	if memberAccessLevel != entity.AccessLevelAdmin {
-		i.logger.Infof("The member \"%s\" has access level \"%s\" and cannot remove members", loggedUser.Username, memberAccessLevel)
+		i.logger.Infof("The member \"%s\" has access level \"%s\" and cannot remove members", opt.LoggedUser.Username, memberAccessLevel)
 		return entity.Project{}, ErrOnlyAdminCanRemoveMember
 	}
 
 	// Check if after removing the user there is at least one administrator
-	numberOfAdmins := 0
-
-	for _, m := range p.Members {
-		if m.UserID != u.ID && m.AccessLevel == entity.AccessLevelAdmin {
-			numberOfAdmins++
-		}
-	}
-
-	if numberOfAdmins == 0 {
+	if !i.checkAtLeastOneAdmin(opt.User.ID, p.Members) {
 		return entity.Project{}, ErrRemoveNoMoreAdmins
 	}
 
 	// Remove collaborator from the Gitea repository
 	if p.Repository.Type == entity.RepositoryTypeInternal {
-		err = i.giteaService.RemoveCollaborator(p.Repository.InternalRepoName, u.Username)
+		err = i.giteaService.RemoveCollaborator(p.Repository.InternalRepoName, opt.User.Username)
 		if err != nil {
 			return entity.Project{}, err
 		}
 	}
 
 	// Remove member from stored project in our DataBase
-	err = i.repo.RemoveMember(ctx, projectID, u.ID)
+	err = i.repo.RemoveMember(ctx, opt.ProjectID, opt.User.ID)
 	if err != nil {
 		return entity.Project{}, err
 	}
 
-	return i.repo.Get(ctx, projectID)
+	return i.repo.Get(ctx, opt.ProjectID)
 }
 
 // UpdateMember changes the access level for the given member.
@@ -134,16 +153,7 @@ func (i interactor) UpdateMember(ctx context.Context, opt UpdateMemberOption) (e
 
 	// Check if after updating there is at least one administrator
 	if opt.AccessLevel != entity.AccessLevelAdmin {
-		atLeastOneAdmin := false
-
-		for _, m := range p.Members {
-			if m.UserID != opt.User.ID && m.AccessLevel == entity.AccessLevelAdmin {
-				atLeastOneAdmin = true
-				break
-			}
-		}
-
-		if !atLeastOneAdmin {
+		if !i.checkAtLeastOneAdmin(opt.User.ID, p.Members) {
 			return entity.Project{}, ErrUpdateNoMoreAdmins
 		}
 	}
@@ -185,4 +195,15 @@ func (i interactor) getMember(userID string, members []entity.Member) (bool, ent
 	}
 
 	return false, entity.Member{}
+}
+
+// checkAtLeastOneAdmin indicates if there is at least one admin inside the members ignoring the given user.
+func (i interactor) checkAtLeastOneAdmin(skipUserID string, members []entity.Member) bool {
+	for _, m := range members {
+		if m.UserID != skipUserID && m.AccessLevel == entity.AccessLevelAdmin {
+			return true
+		}
+	}
+
+	return false
 }

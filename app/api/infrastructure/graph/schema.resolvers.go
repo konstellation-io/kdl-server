@@ -49,9 +49,7 @@ func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.SSHKey
 }
 
 func (r *mutationResolver) CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error) {
-	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
-
-	user, err := r.users.GetByEmail(ctx, email)
+	loggedUser, err := r.getLoggedUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +60,7 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 		RepoType:         input.Repository.Type,
 		InternalRepoName: input.Repository.InternalRepoName,
 		ExternalRepoURL:  input.Repository.ExternalRepoURL,
-		Owner:            user,
+		Owner:            loggedUser,
 	})
 
 	return &createdProject, err
@@ -73,9 +71,7 @@ func (r *mutationResolver) UpdateProject(ctx context.Context, input model.Update
 }
 
 func (r *mutationResolver) AddMembers(ctx context.Context, input model.AddMembersInput) (*entity.Project, error) {
-	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
-
-	loggedUser, err := r.users.GetByEmail(ctx, email)
+	loggedUser, err := r.getLoggedUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -85,15 +81,17 @@ func (r *mutationResolver) AddMembers(ctx context.Context, input model.AddMember
 		return nil, err
 	}
 
-	p, err := r.projects.AddMembers(ctx, input.ProjectID, users, loggedUser)
+	p, err := r.projects.AddMembers(ctx, project.AddMembersOption{
+		ProjectID:  input.ProjectID,
+		Users:      users,
+		LoggedUser: loggedUser,
+	})
 
 	return &p, err
 }
 
 func (r *mutationResolver) RemoveMember(ctx context.Context, input model.RemoveMemberInput) (*entity.Project, error) {
-	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
-
-	loggedUser, err := r.users.GetByEmail(ctx, email)
+	loggedUser, err := r.getLoggedUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -103,15 +101,17 @@ func (r *mutationResolver) RemoveMember(ctx context.Context, input model.RemoveM
 		return nil, err
 	}
 
-	p, err := r.projects.RemoveMember(ctx, input.ProjectID, user, loggedUser)
+	p, err := r.projects.RemoveMember(ctx, project.RemoveMemberOption{
+		ProjectID:  input.ProjectID,
+		User:       user,
+		LoggedUser: loggedUser,
+	})
 
 	return &p, err
 }
 
 func (r *mutationResolver) UpdateMember(ctx context.Context, input model.UpdateMemberInput) (*entity.Project, error) {
-	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
-
-	loggedUser, err := r.users.GetByEmail(ctx, email)
+	loggedUser, err := r.getLoggedUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -179,25 +179,21 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 }
 
 func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
-	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
-
-	u, err := r.users.GetByEmail(ctx, email)
+	loggedUser, err := r.getLoggedUser(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return &u, nil
+	return &loggedUser, nil
 }
 
 func (r *queryResolver) Projects(ctx context.Context) ([]entity.Project, error) {
-	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
-
-	u, err := r.users.GetByEmail(ctx, email)
+	loggedUser, err := r.getLoggedUser(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return r.projects.FindByUserID(ctx, u.ID)
+	return r.projects.FindByUserID(ctx, loggedUser.ID)
 }
 
 func (r *queryResolver) Project(ctx context.Context, id string) (*entity.Project, error) {

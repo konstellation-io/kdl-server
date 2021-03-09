@@ -215,7 +215,11 @@ func TestInteractor_AddMembers(t *testing.T) {
 	s.mocks.repo.EXPECT().AddMembers(ctx, p.ID, newMembers).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
 
-	p, err := s.interactor.AddMembers(ctx, p.ID, usersToAdd, loggedUser)
+	p, err := s.interactor.AddMembers(ctx, project.AddMembersOption{
+		ProjectID:  p.ID,
+		Users:      usersToAdd,
+		LoggedUser: loggedUser,
+	})
 
 	require.NoError(t, err)
 	require.Equal(t, p, expectedProject)
@@ -258,7 +262,11 @@ func TestInteractor_RemoveMember(t *testing.T) {
 	s.mocks.repo.EXPECT().RemoveMember(ctx, p.ID, userToRemove.ID).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
 
-	p, err := s.interactor.RemoveMember(ctx, p.ID, userToRemove, loggedUser)
+	p, err := s.interactor.RemoveMember(ctx, project.RemoveMemberOption{
+		ProjectID:  p.ID,
+		User:       userToRemove,
+		LoggedUser: loggedUser,
+	})
 
 	require.NoError(t, err)
 	require.Equal(t, p, expectedProject)
@@ -285,7 +293,11 @@ func TestInteractor_RemoveMember_ErrNoMoreAdmins(t *testing.T) {
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
 
-	p, err := s.interactor.RemoveMember(ctx, p.ID, loggedUser, loggedUser)
+	p, err := s.interactor.RemoveMember(ctx, project.RemoveMemberOption{
+		ProjectID:  p.ID,
+		User:       loggedUser,
+		LoggedUser: loggedUser,
+	})
 
 	require.Equal(t, project.ErrRemoveNoMoreAdmins, err)
 	require.Equal(t, entity.Project{}, p)

@@ -23,7 +23,7 @@ type UseCase interface {
 	Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error)
 	FindByUserID(ctx context.Context, userID string) ([]entity.Project, error)
 	GetByID(ctx context.Context, id string) (entity.Project, error)
-	AddMembers(ctx context.Context, projectID string, users []entity.User, loggedUser entity.User) (entity.Project, error)
-	RemoveMember(ctx context.Context, projectID string, user entity.User, loggedUser entity.User) (entity.Project, error)
+	AddMembers(ctx context.Context, opt AddMembersOption) (entity.Project, error)
+	RemoveMember(ctx context.Context, opt RemoveMemberOption) (entity.Project, error)
 	UpdateMember(ctx context.Context, opt UpdateMemberOption) (entity.Project, error)
 }

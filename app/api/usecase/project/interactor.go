@@ -18,13 +18,8 @@ const (
 )
 
 var (
-	ErrCreateProjectValidation  = errors.New("create project validation error")
-	ErrRepoTypeNotImplemented   = errors.New("the selected repository type is not implemented")
-	ErrOnlyAdminCanAddMember    = errors.New("only admins can add members")
-	ErrOnlyAdminCanRemoveMember = errors.New("only admins can remove members")
-	ErrOnlyAdminCanUpdateMember = errors.New("only admins can update members")
-	ErrMemberAlreadyExists      = errors.New("member already exists")
-	ErrMemberNotExists          = errors.New("member not exists in the project")
+	ErrCreateProjectValidation = errors.New("create project validation error")
+	ErrRepoTypeNotImplemented  = errors.New("the selected repository type is not implemented")
 )
 
 // CreateProjectOption options when creating project.
@@ -35,14 +30,6 @@ type CreateProjectOption struct {
 	InternalRepoName *string
 	ExternalRepoURL  *string
 	Owner            entity.User
-}
-
-// UpdateMemberOption options when updating a project member.
-type UpdateMemberOption struct {
-	ProjectID   string
-	User        entity.User
-	AccessLevel entity.AccessLevel
-	LoggedUser  entity.User
 }
 
 // Validate check that the CreateProjectOption properties are valid.

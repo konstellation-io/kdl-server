@@ -1,11 +1,15 @@
-import { BaseType, EnterElement, Selection, select } from 'd3-selection';
+import { BaseType, Selection } from 'd3-selection';
+import { Quadtree, quadtree } from 'd3-quadtree';
 
-import { DComplete } from '../../../KGUtils';
+import { DComplete } from './../../../KGUtils';
 import styles from './Resources.module.scss';
 
 export const RESOURCE_R = 4;
 const RESOURCE_STROKE = 1;
 const FONT_SIZE = 20;
+
+const x = (d: DComplete) => d.x;
+const y = (d: DComplete) => d.y;
 
 export default class Resources {
   container: Selection<SVGGElement, unknown, null, undefined>;
@@ -13,21 +17,65 @@ export default class Resources {
   resourceR: number = RESOURCE_R;
   resourceStroke: number = RESOURCE_STROKE;
   fontSize: number = FONT_SIZE;
-  onShowTooltip: (e: MouseEvent, d: DComplete, element: BaseType) => void;
+  context: CanvasRenderingContext2D | null;
+  canvas: Selection<HTMLCanvasElement, unknown, null, undefined>;
+  clearCanvas: () => void;
+  onShowTooltip: (e: MouseEvent, d: DComplete) => void;
   onHideTooltip: (element: BaseType) => void;
   onResourceSelection: (name: string) => void;
+  center: { x: number; y: number };
+  qt: Quadtree<DComplete>;
 
   constructor(
-    onShowTooltip: (e: MouseEvent, d: DComplete, element: BaseType) => void,
+    onShowTooltip: (e: MouseEvent, d: DComplete) => void,
     onHideTooltip: (element: BaseType) => void,
     container: Selection<SVGGElement, unknown, null, undefined>,
-    onResourceSelection: (name: string) => void
+    onResourceSelection: (name: string) => void,
+    context: CanvasRenderingContext2D | null,
+    clearCanvas: () => void,
+    center: { x: number; y: number },
+    canvas: Selection<HTMLCanvasElement, unknown, null, undefined>
   ) {
     this.onShowTooltip = onShowTooltip;
     this.onHideTooltip = onHideTooltip;
     this.onResourceSelection = onResourceSelection;
     this.container = container.select('g');
+    this.context = context;
+    this.canvas = canvas;
+    this.clearCanvas = clearCanvas;
+    this.center = center;
+    this.qt = quadtree<DComplete>().x(x).y(y);
   }
+
+  drawCircles = (hover?: string | undefined) => {
+    const {
+      clearCanvas,
+      context,
+      data,
+      center: { x, y },
+    } = this;
+
+    if (context === null) return;
+
+    context.fillStyle = 'rgba(43, 217, 217, 0.4)';
+    // context.globalCompositeOperation = 'lighter';
+    // context.fillStyle = 'rgba(12, 52, 72, 0.8)';
+    // context.globalCompositeOperation = 'lighter';
+
+    clearCanvas();
+    data.forEach((d) => {
+      if (hover) {
+        context.fillStyle =
+          d.name === hover ? 'white' : 'rgba(43, 217, 217, 0.2)';
+      }
+
+      const r = d.outsideMax ? RESOURCE_R * 0.7 : RESOURCE_R;
+      context.beginPath();
+      context.moveTo(x + d.x, y + d.y);
+      context.arc(x + d.x, y + d.y, r, 0, 2 * Math.PI);
+      context.fill();
+    });
+  };
 
   init = (
     container: Selection<SVGGElement, unknown, null, undefined>,
@@ -36,85 +84,41 @@ export default class Resources {
     this.data = data;
     this.container = container;
 
-    const { bindData, create } = this;
+    const { drawCircles } = this;
 
     container.append('g').classed(styles.resourcesWrapper, true);
 
-    const resourcesSelection = bindData(data);
+    this.qt.addAll(data);
+    drawCircles();
 
-    create(resourcesSelection.enter());
+    this.canvas.on('mousemove', this.onMouseMove);
+  };
+
+  onMouseMove = (e: any) => {
+    const hovered = this.qt.find(
+      e.offsetX - this.center.x,
+      e.offsetY - this.center.y,
+      50
+    );
+
+    if (hovered) {
+      this.onShowTooltip(e, hovered);
+    } else {
+      this.onHideTooltip(e);
+    }
+
+    this.drawCircles(hovered?.name);
   };
 
   performUpdate = (data: DComplete[]) => {
-    const { bindData, create, update, remove } = this;
+    this.qt.removeAll(this.data);
+    this.data = data;
+    this.qt.addAll(data);
 
-    const resourcesSelection = bindData(data);
-
-    create(resourcesSelection.enter());
-    update(resourcesSelection);
-    remove(resourcesSelection.exit());
-  };
-
-  bindData = (data: DComplete[]) => {
-    const { container } = this;
-
-    return container
-      .select(`.${styles.resourcesWrapper}`)
-      .selectAll(`.${styles.resource}`)
-      .data(data);
-  };
-
-  create = (
-    selection: Selection<EnterElement, DComplete, BaseType, unknown>
-  ) => {
-    const { onShowTooltip, container } = this;
-    selection
-      .append('circle')
-      .classed(styles.resource, true)
-      .attr('cx', (d) => d.x)
-      .attr('cy', (d) => d.y)
-      .attr('r', (d) => (d.outsideMax ? RESOURCE_R * 0.6 : RESOURCE_R))
-      .on('mouseenter', function (e, d) {
-        onShowTooltip(e, d, this);
-        container
-          .selectAll(`.${styles.resource}`)
-          .classed(styles.highlight, false);
-        select(this).classed(styles.highlight, true);
-      });
-  };
-
-  unhighlightAll = () => {
-    const { container } = this;
-
-    container.selectAll(`.${styles.resource}`).classed(styles.highlight, false);
-  };
-
-  update = (selection: Selection<BaseType, DComplete, BaseType, unknown>) => {
-    selection
-      .transition()
-      .duration(400)
-      .attr('cx', (d) => d.x)
-      .attr('cy', (d) => d.y)
-      .attr('r', (d) => (d.outsideMax ? RESOURCE_R * 0.6 : RESOURCE_R));
-  };
-
-  remove = (selection: Selection<BaseType, unknown, BaseType, unknown>) => {
-    selection.remove();
+    this.drawCircles();
   };
 
   highlightResource = (resourceName: string | null) => {
-    const { container } = this;
-
-    const allResources = container.selectAll<BaseType, DComplete>(
-      `.${styles.resource}`
-    );
-    allResources
-      .classed(styles.highlight, false)
-      .classed(styles.unhighlight, true);
-
-    allResources
-      .filter((d) => d.name === resourceName)
-      .classed(styles.highlight, true)
-      .classed(styles.unhighlight, false);
+    this.drawCircles(resourceName || '');
   };
 }

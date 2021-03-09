@@ -1,7 +1,7 @@
 import 'd3-transition';
 
-import { BaseType, Local, Selection, local, select } from 'd3-selection';
 import { Coord, DComplete, getHash, groupData } from '../../KGUtils';
+import { Local, Selection, local, select } from 'd3-selection';
 import Resources, { RESOURCE_R } from './Resources/Resources';
 import { max, min } from 'd3-array';
 import { scaleBand, scaleLinear } from '@visx/scale';
@@ -26,7 +26,6 @@ const AXIS_FONT_SIZE = 12;
 export const N_GUIDES = 2;
 
 export let minimapViz: MinimapViz;
-export let resourcesViz: Resources;
 
 const section = (d: D) => d.category;
 const score = (d: D) => d.score;
@@ -51,6 +50,7 @@ export type CoordOut = {
 type Props = {
   width: number;
   parent: SVGSVGElement;
+  canvas: HTMLCanvasElement;
   data: D[];
   height: number;
   updateTooltip: (p: UpdateTooltip<D>) => void;
@@ -66,6 +66,8 @@ type Props = {
 class KGViz {
   props: Props;
   wrapper: Selection<SVGGElement, unknown, null, undefined>;
+  canvas: Selection<HTMLCanvasElement, unknown, null, undefined>;
+  context: CanvasRenderingContext2D | null;
   mainG: Selection<SVGGElement, unknown, null, undefined>;
   center: Coord;
   rScale = scaleLinear<number>();
@@ -97,6 +99,8 @@ class KGViz {
     console.log('CONSTRUCTOR');
 
     this.wrapper = select(wrapper);
+    this.canvas = select(props.canvas);
+    this.context = props.canvas.getContext('2d');
     this.mainG = select(wrapper);
     this.props = props;
     this.groupedData = [];
@@ -146,9 +150,12 @@ class KGViz {
       this.onShowTooltip,
       this.onHideTooltip,
       this.wrapper,
-      this.props.onResourceSelection
+      this.props.onResourceSelection,
+      this.context,
+      this.clearCanvas,
+      this.center,
+      select(this.props.canvas)
     );
-    resourcesViz = this.resources;
 
     this.sections = new Sections(this.wrapper);
 
@@ -159,6 +166,10 @@ class KGViz {
     this.cleanup();
     this.initialize();
   }
+
+  clearCanvas = () => {
+    this.context?.clearRect(0, 0, this.props.width, this.props.height);
+  };
 
   cleanup = () => {
     this.wrapper.selectAll('*').remove();
@@ -261,13 +272,6 @@ class KGViz {
   };
 
   updateAxisLabels = () => {
-    const { rDomain, mainG } = this;
-
-    const [maxR, minR] = rDomain.map((v) => v * 100);
-
-    // mainG.select(`.${styles.label1}`).text(`${Math.round(maxR)}%`);
-    // mainG.select(`.${styles.label4}`).text(`${Math.round(minR)}%`);
-
     this.axisG.transition().duration(400).call(this.axis);
   };
 
@@ -322,7 +326,6 @@ class KGViz {
       coord,
       rDomain,
       updateAxisLabels,
-      minScore,
       size: { axisPadding, axisFontSize },
     } = this;
 
@@ -387,10 +390,10 @@ class KGViz {
     return { x, y, angle, hash };
   };
 
-  onShowTooltip = (e: MouseEvent, d: DComplete, element: BaseType) => {
+  onShowTooltip = (e: MouseEvent, d: DComplete) => {
     const { handleTooltip } = this;
 
-    handleTooltip(e, d);
+    handleTooltip(d);
   };
 
   onHideTooltip = () => {
@@ -401,26 +404,18 @@ class KGViz {
     hideTooltip();
   };
 
-  handleTooltip = (event: MouseEvent, d: D) => {
+  handleTooltip = (d: DComplete) => {
     const {
-      props: { updateTooltip, parent },
+      center,
+      props: { updateTooltip },
     } = this;
-    const wrapperNode = select(parent).node();
 
-    if (wrapperNode) {
-      const { x: dx, y: dy } = wrapperNode.getBoundingClientRect();
-      const {
-        x: circleLeft,
-        y: circleTop,
-      } = (event.target as HTMLElement).getBoundingClientRect();
-
-      updateTooltip({
-        data: d,
-        left: circleLeft - dx,
-        top: circleTop - dy,
-        open: true,
-      });
-    }
+    updateTooltip({
+      data: d,
+      left: d.x + center.x,
+      top: d.y + center.y,
+      open: true,
+    });
   };
 }
 

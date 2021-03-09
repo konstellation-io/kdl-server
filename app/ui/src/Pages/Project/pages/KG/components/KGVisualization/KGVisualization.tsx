@@ -1,4 +1,4 @@
-import { INNER_R, OUTER_R, resourcesViz } from './KGViz';
+import { INNER_R, OUTER_R } from './KGViz';
 import React, { useEffect, useRef, useState } from 'react';
 
 import FilterGlow from './FilterGlow/FilterGlow';
@@ -61,6 +61,7 @@ function KGVisualization({
 
   // const minimapRef = useRef<SVGSVGElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const gRef = useRef<SVGGElement>(null);
   const viz = useRef<KGViz | null>(null);
 
@@ -97,7 +98,7 @@ function KGVisualization({
   }
 
   function onScroll(e: any) {
-    if (svgRef.current !== null) {
+    if (canvasRef.current !== null) {
       const mouseR = getMouseR(e);
       const mouseWithinRadar =
         mouseR >= radarLimits.in && mouseR <= radarLimits.out;
@@ -179,9 +180,14 @@ function KGVisualization({
   }, [hoveredPaper]);
 
   function initialize() {
-    if (svgRef.current !== null && gRef.current !== null) {
+    if (
+      svgRef.current !== null &&
+      gRef.current !== null &&
+      canvasRef.current !== null
+    ) {
       const vizProps = {
         parent: svgRef.current,
+        canvas: canvasRef.current,
         // minimapRef: minimapRef.current,
         data,
         width,
@@ -227,16 +233,20 @@ function KGVisualization({
   return (
     <>
       <div>
-        <svg ref={svgRef} width={width} height={height} className={styles.svg}>
-          <g
-            ref={gRef}
-            onWheel={onScroll}
-            onMouseDown={dragStart}
-            onMouseUp={dragEnd}
-            onMouseMove={drag}
-          />
+        <svg className={styles.svg} ref={svgRef} width={width} height={height}>
+          <g ref={gRef} />
           <FilterGlow />
         </svg>
+        <canvas
+          className={styles.canvas}
+          ref={canvasRef}
+          width={width}
+          height={height}
+          onWheel={onScroll}
+          onMouseDown={dragStart}
+          onMouseUp={dragEnd}
+          onMouseMove={drag}
+        />
       </div>
       <div className={styles.sectionTags}>
         {Object.keys(sections).map((section) => (
@@ -252,11 +262,7 @@ function KGVisualization({
       <Tooltip
         top={tooltipInfo.top}
         left={tooltipInfo.left}
-        open={tooltipInfo.open}
-        onMouseLeave={() => {
-          hideTooltip();
-          resourcesViz.unhighlightAll();
-        }}
+        open={tooltipInfo.open && !dragging.current}
       >
         <div className={styles.tooltipContent}>
           <div className={styles.title}>{tooltipInfo.data?.name}</div>

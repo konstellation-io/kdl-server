@@ -12,8 +12,11 @@ $tooltipWidth: 300px;
   fill-opacity: 1;
 }
 
-.svg {
+.svg,
+.canvas {
   position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .sectionAndNamesG {
@@ -72,7 +75,7 @@ $tooltipWidth: 300px;
 
   &.open {
     opacity: 1;
-    pointer-events: all;
+    // pointer-events: all;
   }
 }
 
@@ -110,8 +113,8 @@ $tooltipWidth: 300px;
   background-color: palette(base);
   position: absolute;
   padding: 2 * $grid-unit;
-  bottom: 2 * $grid-unit;
-  left: -50%;
+  bottom: 2.5 * $grid-unit;
+  left: calc(-50% - 4px);
   width: 50 * $grid-unit;
   display: flex;
   align-items: center;

@@ -14,6 +14,15 @@ const y = (d: DComplete) => d.y;
 
 export let lastSection: string | undefined;
 
+const favoriteResources = [1, 5, 12, 13, 43, 76, 128, 654, 765, 734, 812];
+
+const COLORS = {
+  DEFAULT: 'rgba(12, 52, 72, 1)',
+  DEFAULT_HIGHLIGHT: '#33FFFF',
+  STARRED: '#CC7B55',
+  STARRED_HIGHLIGHT: '#fc915f',
+};
+
 export default class Resources {
   container: Selection<SVGGElement, unknown, null, undefined>;
   data: DComplete[] = [];
@@ -69,12 +78,16 @@ export default class Resources {
     let lastElement: DComplete | undefined;
 
     clearCanvas();
-    data.forEach((d) => {
+    data.forEach((d, i) => {
       let r = d.outsideMax ? RESOURCE_R * 0.7 : RESOURCE_R;
-      let fillStyle = 'rgba(12, 52, 72, 1)';
+      let fillStyle = COLORS.DEFAULT;
 
       if (hover && d.name === hover) {
         lastElement = d;
+      }
+
+      if (favoriteResources.includes(i)) {
+        fillStyle = COLORS.STARRED;
       }
 
       context.fillStyle = fillStyle;
@@ -87,9 +100,15 @@ export default class Resources {
     });
 
     if (lastElement) {
+      let fillStyle = COLORS.DEFAULT_HIGHLIGHT;
+
+      if (favoriteResources.includes(data.indexOf(lastElement))) {
+        fillStyle = COLORS.STARRED_HIGHLIGHT;
+      }
+
       context.globalCompositeOperation = 'source-over';
       context.shadowBlur = 10;
-      context.shadowColor = '#33FFFF';
+      context.shadowColor = fillStyle;
 
       context.beginPath();
       context.moveTo(x + lastElement.x, y + lastElement.y);
@@ -101,8 +120,8 @@ export default class Resources {
         2 * Math.PI
       );
       context.lineWidth = 0.5;
-      context.strokeStyle = '#33FFFF';
-      context.fillStyle = '#33FFFF';
+      context.strokeStyle = fillStyle;
+      context.fillStyle = fillStyle;
       context.stroke();
       context.closePath();
 

@@ -2,7 +2,6 @@ import { INNER_R, getInnerDimensions } from './KGViz';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import DetailsPanel from '../DetailsPanel/DetailsPanel';
-import FilterGlow from './FilterGlow/FilterGlow';
 import KGViz from './KGViz';
 import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 import ListPanel from '../ListPanel/ListPanel';
@@ -249,7 +248,6 @@ function KGVisualization({
       <div>
         <svg className={styles.svg} ref={svgRef} width={width} height={height}>
           <g ref={gRef} />
-          <FilterGlow />
         </svg>
         <canvas
           className={styles.canvas}

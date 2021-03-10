@@ -1,8 +1,4 @@
 import { BottomComponentProps, CrumbProps } from './components/Crumb/Crumb';
-import {
-  GET_OPENED_PROJECT,
-  GetOpenedProject,
-} from 'Graphql/client/queries/getOpenedProject.graphql';
 import { useLocation, useRouteMatch } from 'react-router-dom';
 import useProjectNavigation, {
   EnhancedRouteConfiguration,
@@ -20,7 +16,8 @@ import SectionSelector from '../SectionSelector/SectionSelector';
 import ServerIcon from 'Components/Icons/ServerIcon/ServerIcon';
 import ServerMetrics from '../ServerMetrics/ServerMetrics';
 import { loader } from 'graphql.macro';
-import { useQuery } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
+import { openedProject } from 'Graphql/client/cache';
 
 const GetProjectsQuery = loader('Graphql/queries/getProjects.graphql');
 
@@ -29,45 +26,37 @@ function useBreadcrumbs() {
   const routeMatch = useRouteMatch(ROUTE.PROJECT);
   const location = useLocation();
 
-  const {
-    data: projectsData,
-    loading: projectsLoading,
-    error: projectsError,
-  } = useQuery<GetProjects>(GetProjectsQuery);
-  const {
-    data: projectData,
-    loading: projectLoading,
-    error: projectError,
-  } = useQuery<GetOpenedProject>(GET_OPENED_PROJECT);
-
-  const projectSections: EnhancedRouteConfiguration[] = useProjectNavigation(
-    projectData?.openedProject?.id || ''
+  const { data: projectsData, loading, error } = useQuery<GetProjects>(
+    GetProjectsQuery
   );
 
-  const loading = projectLoading || projectsLoading;
-  const error = projectError || projectsError;
+  const project = useReactiveVar(openedProject);
+
+  const projectSections: EnhancedRouteConfiguration[] = useProjectNavigation(
+    project?.id || ''
+  );
 
   if (loading || !projectsData) return { loading, crumbs };
   if (error) throw Error('cannot retrieve data at useBreadcrumbs');
-
-  const openedProject = projectData?.openedProject;
 
   // Add server crumb
   crumbs.push({
     crumbText: CONFIG.SERVER_NAME,
     LeftIconComponent: <ServerIcon className="icon-regular" />,
+    RightIconComponent: ExpandMoreIcon,
     BottomComponent: (props: BottomComponentProps) => (
       <ServerMetrics serverUrl={CONFIG.SERVER_URL} {...props} />
     ),
   });
 
   // Check if we are in a project
-  if (routeMatch && openedProject) {
+  if (routeMatch && project) {
     // Add crumb for the project
-    const { name, state } = openedProject;
+    const { name, state } = project;
     crumbs.push({
       crumbText: name,
       LeftIconComponent: <ProjectIcon className="icon-regular" state={state} />,
+      RightIconComponent: ExpandMoreIcon,
       BottomComponent: (props: BottomComponentProps) => (
         <ProjectSelector options={projectsData.projects} {...props} />
       ),

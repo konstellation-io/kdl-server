@@ -15,7 +15,6 @@ import styles from '../KGVisualization.module.scss';
 const SECTION_STROKE = 1;
 const SECTION_INTERVAL = 4;
 const OFFSET_SECTION_GUIDES = 50;
-const SECTION_BOX_HEIGHT = 32;
 
 export default class Sections {
   container: Selection<SVGGElement, unknown, null, undefined>;
@@ -212,13 +211,16 @@ export default class Sections {
         // @ts-ignore
         const { left, top } = this.getBoundingClientRect();
         const orientation = sectionOrientation.get(this);
-        select(`#kg_${stringToId(sectionName)}`)
+        const sectionEl = select(`#kg_${stringToId(sectionName)}`);
+        // @ts-ignore
+        const sectionElHeight = sectionEl.node().getBoundingClientRect().height;
+        sectionEl
           .style('left', orientation === 'right' ? px(left) : 'auto')
           .style(
             'right',
             orientation === 'left' ? px(window.innerWidth - left) : 'auto'
           )
-          .style('top', px(top - SECTION_BOX_HEIGHT / 2));
+          .style('top', px(top - sectionElHeight / 2));
       });
   };
 }

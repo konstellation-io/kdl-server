@@ -87,16 +87,19 @@ function KG({ openedProject }: ProjectRoute) {
 
   return (
     <div className={styles.container}>
-      <div className={styles.kgTopBar}>
-        <NavigationMenu />
-        <Filters topics={topics} onFiltersChange={handleFiltersChange} />
+      <div className={styles.vizArea}>
+        <div className={styles.kgTopBar}>
+          <NavigationMenu />
+          <Filters topics={topics} onFiltersChange={handleFiltersChange} />
+        </div>
+        <KGVisualization
+          data={filteredResources}
+          sections={filteredSections}
+          selectedResource={selectedResource}
+          onResourceSelection={onResourceSelection}
+        />
       </div>
-      <KGVisualization
-        data={filteredResources}
-        sections={filteredSections}
-        selectedResource={selectedResource}
-        onResourceSelection={onResourceSelection}
-      />
+      <div className={styles.panelSafeArea} />
     </div>
   );
 }

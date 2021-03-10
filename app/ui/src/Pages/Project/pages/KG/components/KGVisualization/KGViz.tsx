@@ -14,8 +14,8 @@ import { px } from 'Utils/d3';
 import radialAxis from './radialAxis';
 import styles from './KGVisualization.module.scss';
 
-export const PADDING = 0.15;
-export const OUTER_R = 370;
+export const PADDING_H = 0.25;
+export const PADDING_V = 0.15;
 
 const TOOLTIP_WIDTH = 300;
 export const INNER_R = 53.5;
@@ -26,9 +26,18 @@ const AXIS_FONT_SIZE = 12;
 export const N_GUIDES = 2;
 
 export let minimapViz: MinimapViz;
+export let resourcesViz: Resources;
 
 const section = (d: D) => d.category;
 const score = (d: D) => d.score;
+
+export function getInnerDimensions(width: number, height: number) {
+  const innerWidth = (1 - 2 * PADDING_H) * width;
+  const innerHeight = (1 - 2 * PADDING_V) * height;
+  const outerR = Math.min(innerWidth / 2, innerHeight / 2);
+
+  return { innerWidth, innerHeight, outerR };
+}
 
 export type CoordData = {
   category: string;
@@ -94,6 +103,7 @@ class KGViz {
   scores: [number, number];
   minScore: number;
   maxScore: number;
+  outerR: number = 0;
 
   constructor(wrapper: SVGGElement, props: Props) {
     console.log('CONSTRUCTOR');
@@ -107,9 +117,12 @@ class KGViz {
     this.sectionDomain = [];
     this.data = props.data;
 
-    const innerWidth = (1 - 2 * PADDING) * props.width;
-    const innerHeight = (1 - 2 * PADDING) * props.height;
+    const { innerWidth, innerHeight, outerR } = getInnerDimensions(
+      props.width,
+      props.height
+    );
     this.center = { x: props.width / 2, y: props.height / 2 };
+    this.outerR = outerR;
     this.size = {
       innerWidth,
       innerHeight,
@@ -121,7 +134,7 @@ class KGViz {
     };
 
     this.rScale = scaleLinear({
-      range: [INNER_R + RESOURCE_R, OUTER_R - RESOURCE_R],
+      range: [INNER_R + RESOURCE_R, this.outerR - RESOURCE_R],
       domain: props.scores,
     });
     this.sectionScale = scaleBand({
@@ -130,7 +143,7 @@ class KGViz {
     });
 
     this.axis = radialAxis(this.rScale).tickFormat(
-      (t: string) => `${Math.round(+t * 100)}%`
+      (t: string) => `${Math.round(+t * 1000) / 10}%`
     );
 
     // this.minimap = new MinimapViz(props.minimapRef, {
@@ -156,6 +169,7 @@ class KGViz {
       this.center,
       select(this.props.canvas)
     );
+    resourcesViz = this.resources;
 
     this.sections = new Sections(this.wrapper);
 
@@ -207,6 +221,7 @@ class KGViz {
       groupedData,
       sectionDomain,
       coord,
+      outerR,
       rDomain,
       resources,
       updateAxisLabels,
@@ -243,7 +258,7 @@ class KGViz {
       .html(centerText);
 
     // OuterCircle
-    mainG.append('circle').classed(styles.outerCircle, true).attr('r', OUTER_R);
+    mainG.append('circle').classed(styles.outerCircle, true).attr('r', outerR);
 
     // Radius axis
     this.axisG = mainG.append('g');

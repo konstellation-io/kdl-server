@@ -169,3 +169,12 @@ $state-to-color: (
     }
   }
 }
+
+.listPanel {
+  position: fixed;
+  right: 0;
+  height: 100%;
+  width: 25vw;
+  min-width: 44 * $grid-unit;
+  max-width: 60 * $grid-unit;
+}

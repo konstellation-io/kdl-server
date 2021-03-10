@@ -58,7 +58,7 @@ export default class Resources {
     if (context === null) return;
 
     context.fillStyle = 'rgba(43, 217, 217, 0.4)';
-    // context.globalCompositeOperation = 'lighter';
+    context.globalCompositeOperation = 'screen';
     // context.fillStyle = 'rgba(12, 52, 72, 0.8)';
     // context.globalCompositeOperation = 'lighter';
 
@@ -66,7 +66,7 @@ export default class Resources {
     data.forEach((d) => {
       if (hover) {
         context.fillStyle =
-          d.name === hover ? 'white' : 'rgba(43, 217, 217, 0.2)';
+          d.name === hover ? 'white' : 'rgba(43, 217, 217, 0.4)';
       }
 
       const r = d.outsideMax ? RESOURCE_R * 0.7 : RESOURCE_R;
@@ -101,11 +101,11 @@ export default class Resources {
       50
     );
 
-    if (hovered) {
-      this.onShowTooltip(e, hovered);
-    } else {
-      this.onHideTooltip(e);
-    }
+    // if (hovered) {
+    //   this.onShowTooltip(e, hovered);
+    // } else {
+    //   this.onHideTooltip(e);
+    // }
 
     this.drawCircles(hovered?.name);
   };

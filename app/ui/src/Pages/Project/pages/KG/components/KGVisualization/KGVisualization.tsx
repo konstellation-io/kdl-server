@@ -1,9 +1,10 @@
-import { INNER_R, OUTER_R } from './KGViz';
-import React, { useEffect, useRef, useState } from 'react';
+import { INNER_R, getInnerDimensions } from './KGViz';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import FilterGlow from './FilterGlow/FilterGlow';
 import KGViz from './KGViz';
 import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
+import ListPanel from '../ListPanel/ListPanel';
 import { ParentSize } from '@visx/responsive';
 import { RESOURCE_R } from './Resources/Resources';
 import Score from './Score';
@@ -11,8 +12,6 @@ import SectionList from './SectionList/SectionList';
 import Tooltip from './Tooltip';
 import styles from './KGVisualization.module.scss';
 import useTooltip from 'Hooks/useTooltip';
-
-const SCORE_R = OUTER_R - RESOURCE_R - (INNER_R + RESOURCE_R);
 
 export type D = {
   category: string;
@@ -42,8 +41,6 @@ function KGVisualizationWrapper(props: WrapperProps) {
   );
 }
 
-const radarLimits = { out: OUTER_R - RESOURCE_R, in: INNER_R + RESOURCE_R };
-
 type Props = {
   width: number;
   height: number;
@@ -68,6 +65,11 @@ function KGVisualization({
   const [scores, setScores] = useState<[number, number]>([1, 0]);
   const [borderScores, setBorderScores] = useState<[number, number]>([1, 0]);
 
+  const showedData = useMemo(
+    () => data.filter((d) => d.score >= scores[1] && d.score <= scores[0]),
+    [data, scores]
+  );
+
   useEffect(() => {
     const allScores = data.map((d) => d.score);
     const min = Math.min(...allScores);
@@ -76,6 +78,10 @@ function KGVisualization({
     setBorderScores([max + 0.01, 0]);
   }, [data]);
 
+  const { outerR } = getInnerDimensions(width, height);
+  const radarLimits = { out: outerR - RESOURCE_R, in: INNER_R + RESOURCE_R };
+
+  const SCORE_R = outerR - RESOURCE_R - (INNER_R + RESOURCE_R);
   const scoreUnitPerPx = (scores[0] - scores[1]) / SCORE_R;
 
   function getMouseR(e: any) {
@@ -272,6 +278,9 @@ function KGVisualization({
           </div>
         </div>
       </Tooltip>
+      <div className={styles.listPanel}>
+        <ListPanel resources={showedData} scores={scores} />
+      </div>
       {/* <Minimap
         minimapRef={minimapRef}
         zoomValues={zoomValues}

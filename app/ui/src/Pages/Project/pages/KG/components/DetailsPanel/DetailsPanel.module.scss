@@ -1,0 +1,58 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.container {
+  background-color: palette(lowlight, 900);
+}
+.title {
+  @include font-body;
+  color: font-color(light);
+
+  .titleText {
+  }
+}
+.resourceTitleAndTopics {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .nameAndTopics {
+    .name {
+      @include font-title;
+      color: font-color(light);
+    }
+    .topics {
+      display: flex;
+    }
+  }
+  .score {
+  }
+}
+.content {
+  background-color: palette(base);
+
+  .sectionTitle {
+    @include font-caption;
+    color: font-color(regular);
+  }
+  .authors {
+    .authorsText {
+      @include font-subheader;
+      color: font-color(light);
+    }
+  }
+  .type {
+    color: font-color(light);
+  }
+  .url {
+    color: font-color(lowlight);
+  }
+  .topicsG {
+  }
+  .abstract {
+    @include font-small;
+    color: font-color(lowlight);
+  }
+}

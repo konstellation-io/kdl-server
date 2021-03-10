@@ -54,23 +54,7 @@ function SectionList({
         onClick={toggle}
       >
         <span>{`${section} (${names.length})`}</span>
-        <Icon className="icon-small" />
       </div>
-      <AnimateHeight height={opened ? 'auto' : 0} duration={300}>
-        <div className={styles.list} onMouseLeave={onListLeave}>
-          {names.map((name, idx) => (
-            <div
-              key={name}
-              className={styles.name}
-              onMouseEnter={() => onResourceHover(name)}
-              onClick={() => onResourceSelection(name)}
-            >
-              <div className={styles.nameIndex}>{idx + 1}</div>
-              <div className={styles.nameValue}>{name}</div>
-            </div>
-          ))}
-        </div>
-      </AnimateHeight>
     </div>
   );
 }

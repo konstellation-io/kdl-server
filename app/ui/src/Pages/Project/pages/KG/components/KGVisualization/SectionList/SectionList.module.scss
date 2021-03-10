@@ -6,7 +6,8 @@
   position: fixed;
   opacity: 1;
   z-index: 1;
-  width: 33 * $grid-unit;
+  width: 13 * $grid-unit;
+  height: auto;
 
   &.opened {
     z-index: 2;
@@ -26,9 +27,8 @@
   align-items: center;
   justify-content: space-between;
 
-  height: 4 * $grid-unit;
   border-radius: 0.75 * $grid-unit;
-  padding: 0 $grid-unit;
+  padding: $grid-unit $grid-unit;
 
   background-color: palette(lowlight, 900);
   cursor: pointer;

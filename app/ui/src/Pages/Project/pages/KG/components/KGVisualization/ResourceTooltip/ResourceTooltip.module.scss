@@ -1,0 +1,68 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.container {
+  width: 24vw;
+  max-width: 335px;
+  max-width: 460px;
+  background-color: palette(base, 900);
+  padding: 2 * $grid-unit;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  position: relative;
+  width: $grid-unit;
+  height: $grid-unit;
+  border-radius: 0.5 * $grid-unit;
+  background-color: palette(highlight);
+  flex-shrink: 0;
+  margin-right: $grid-unit;
+
+  box-shadow: 0 0 6px 1px palette(highlight);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1.9 * $grid-unit;
+    height: 1.9 * $grid-unit;
+    border: solid 1px palette(highlight);
+    border-radius: 50%;
+    background-color: transparent;
+  }
+}
+.name {
+  @include font-body;
+  color: font-color(light);
+
+  margin-left: $grid-unit;
+  word-wrap: break-all;
+}
+.score {
+  flex-shrink: 0;
+}
+
+.help {
+  @include font-body;
+  color: font-color(lowlight);
+
+  display: flex;
+  align-items: center;
+
+  span {
+    margin-left: 1.5 * $grid-unit;
+  }
+}

@@ -7,6 +7,7 @@ import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 import ListPanel from '../ListPanel/ListPanel';
 import { ParentSize } from '@visx/responsive';
 import { RESOURCE_R } from './Resources/Resources';
+import ResourceTooltip from './ResourceTooltip/ResourceTooltip';
 import Score from './Score';
 import SectionList from './SectionList/SectionList';
 import Tooltip from './Tooltip';
@@ -56,6 +57,7 @@ function KGVisualization({
   onResourceSelection,
 }: Props) {
   const [openedPaper, setOpenedPaper] = useState<D | null>(null);
+  const [hoveredPaper, setHoveredPaper] = useState<D | null>(null);
   const { tooltipInfo, updateTooltip, hideTooltip } = useTooltip<D>();
 
   // const minimapRef = useRef<SVGSVGElement>(null);
@@ -210,6 +212,7 @@ function KGVisualization({
         hideTooltip,
         onResourceSelection: openResourceDetails,
         centerText: selectedResource,
+        onHoverResource: setHoveredPaper,
         onScroll,
         scores,
       };
@@ -269,6 +272,9 @@ function KGVisualization({
             onResourceSelection={onResourceSelection}
           />
         ))}
+      </div>
+      <div className={styles.staticTooltip}>
+        <ResourceTooltip resource={hoveredPaper} />
       </div>
       <Tooltip
         top={tooltipInfo.top}

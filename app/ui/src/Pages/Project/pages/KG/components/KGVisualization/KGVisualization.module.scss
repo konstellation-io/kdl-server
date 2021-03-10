@@ -212,3 +212,9 @@ $state-to-color: (
     cursor: pointer;
   }
 }
+
+.staticTooltip {
+  position: absolute;
+  top: 3 * $grid-unit;
+  left: 3 * $grid-unit;
+}

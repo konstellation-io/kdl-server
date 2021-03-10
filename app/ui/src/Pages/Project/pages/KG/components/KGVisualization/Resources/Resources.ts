@@ -38,6 +38,7 @@ export default class Resources {
   center: { x: number; y: number };
   qt: Quadtree<DComplete>;
   moving: boolean;
+  onHoverResource: (d: DComplete | null) => void;
 
   constructor(
     onShowTooltip: (e: MouseEvent, d: DComplete) => void,
@@ -47,7 +48,8 @@ export default class Resources {
     context: CanvasRenderingContext2D | null,
     clearCanvas: () => void,
     center: { x: number; y: number },
-    canvas: Selection<HTMLCanvasElement, unknown, null, undefined>
+    canvas: Selection<HTMLCanvasElement, unknown, null, undefined>,
+    onHoverResource: (d: DComplete | null) => void
   ) {
     this.onShowTooltip = onShowTooltip;
     this.onHideTooltip = onHideTooltip;
@@ -59,6 +61,7 @@ export default class Resources {
     this.center = center;
     this.qt = quadtree<DComplete>().x(x).y(y);
     this.moving = false;
+    this.onHoverResource = onHoverResource;
   }
 
   drawCircles = (hover?: string | undefined) => {
@@ -172,11 +175,13 @@ export default class Resources {
 
     lastSection = hovered?.category;
 
-    // if (hovered) {
-    //   this.onShowTooltip(e, hovered);
-    // } else {
-    //   this.onHideTooltip(e);
-    // }
+    if (hovered) {
+      this.onHoverResource(hovered);
+      //   this.onShowTooltip(e, hovered);
+    } else {
+      this.onHoverResource(null);
+      //   this.onHideTooltip(e);
+    }
 
     this.drawCircles(hovered?.name);
   };

@@ -70,6 +70,7 @@ type Props = {
   centerText: string;
   onScroll: (dS: number) => void;
   scores: [number, number];
+  onHoverResource: (d: DComplete | null) => void;
 };
 
 class KGViz {
@@ -167,7 +168,8 @@ class KGViz {
       this.context,
       this.clearCanvas,
       this.center,
-      select(this.props.canvas)
+      select(this.props.canvas),
+      props.onHoverResource
     );
     resourcesViz = this.resources;
 

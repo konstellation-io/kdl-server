@@ -12,6 +12,8 @@ const FONT_SIZE = 20;
 const x = (d: DComplete) => d.x;
 const y = (d: DComplete) => d.y;
 
+export let lastSection: string | undefined;
+
 export default class Resources {
   container: Selection<SVGGElement, unknown, null, undefined>;
   data: DComplete[] = [];
@@ -60,32 +62,19 @@ export default class Resources {
 
     if (context === null) return;
 
-    context.fillStyle = 'rgba(43, 217, 217, 0.4)';
     context.globalCompositeOperation = 'screen';
     // context.fillStyle = 'rgba(12, 52, 72, 0.8)';
     // context.globalCompositeOperation = 'lighter';
 
+    let lastElement: DComplete | undefined;
+
     clearCanvas();
     data.forEach((d) => {
       let r = d.outsideMax ? RESOURCE_R * 0.7 : RESOURCE_R;
-      let fillStyle = 'rgba(43, 217, 217, 0.4)';
+      let fillStyle = 'rgba(12, 52, 72, 1)';
 
       if (hover && d.name === hover) {
-        fillStyle = '#33FFFF';
-        r = RESOURCE_R * 1.1;
-
-        context.shadowBlur = 10;
-        context.shadowColor = '#33FFFF';
-
-        context.beginPath();
-        context.moveTo(x + d.x, y + d.y);
-        context.arc(x + d.x, y + d.y, r * 1.6, 0, 2 * Math.PI);
-        context.lineWidth = 0.5;
-        context.strokeStyle = fillStyle;
-        context.stroke();
-        context.closePath();
-
-        context.shadowBlur = 0;
+        lastElement = d;
       }
 
       context.fillStyle = fillStyle;
@@ -96,6 +85,41 @@ export default class Resources {
       context.fill();
       context.closePath();
     });
+
+    if (lastElement) {
+      context.globalCompositeOperation = 'source-over';
+      context.shadowBlur = 10;
+      context.shadowColor = '#33FFFF';
+
+      context.beginPath();
+      context.moveTo(x + lastElement.x, y + lastElement.y);
+      context.arc(
+        x + lastElement.x,
+        y + lastElement.y,
+        RESOURCE_R * 1.7,
+        0,
+        2 * Math.PI
+      );
+      context.lineWidth = 0.5;
+      context.strokeStyle = '#33FFFF';
+      context.fillStyle = '#33FFFF';
+      context.stroke();
+      context.closePath();
+
+      context.beginPath();
+      context.moveTo(x + lastElement.x, y + lastElement.y);
+      context.arc(
+        x + lastElement.x,
+        y + lastElement.y,
+        RESOURCE_R,
+        0,
+        2 * Math.PI
+      );
+      context.fill();
+      context.closePath();
+
+      context.shadowBlur = 0;
+    }
   };
 
   init = (
@@ -126,6 +150,8 @@ export default class Resources {
     );
 
     this.moving = true;
+
+    lastSection = hovered?.category;
 
     // if (hovered) {
     //   this.onShowTooltip(e, hovered);

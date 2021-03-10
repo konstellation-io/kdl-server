@@ -12,15 +12,9 @@ import { useClickOutside } from 'kwc';
 type Props = {
   section: string;
   names: string[];
-  setHoveredPaper: (name: string | null) => void;
   onResourceSelection: (name: string) => void;
 };
-function SectionList({
-  section,
-  names,
-  setHoveredPaper,
-  onResourceSelection,
-}: Props) {
+function SectionList({ section, names, onResourceSelection }: Props) {
   const { value: opened, toggle, deactivate: close } = useBoolState(false);
 
   const componentRef = useRef<HTMLDivElement>(null);
@@ -28,13 +22,6 @@ function SectionList({
     componentRef,
     action: close,
   });
-
-  function onResourceHover(name: string) {
-    setHoveredPaper(name);
-  }
-  function onListLeave() {
-    setHoveredPaper(null);
-  }
 
   useEffect(() => {
     if (opened) addClickOutsideEvents();

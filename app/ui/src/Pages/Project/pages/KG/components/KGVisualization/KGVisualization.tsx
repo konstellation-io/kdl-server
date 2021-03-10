@@ -1,6 +1,7 @@
 import { INNER_R, getInnerDimensions } from './KGViz';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
+import DetailsPanel from '../DetailsPanel/DetailsPanel';
 import FilterGlow from './FilterGlow/FilterGlow';
 import KGViz from './KGViz';
 import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
@@ -10,10 +11,12 @@ import { RESOURCE_R } from './Resources/Resources';
 import Score from './Score';
 import SectionList from './SectionList/SectionList';
 import Tooltip from './Tooltip';
+import cx from 'classnames';
 import styles from './KGVisualization.module.scss';
 import useTooltip from 'Hooks/useTooltip';
 
 export type D = {
+  id: string;
   category: string;
   type: KnowledgeGraphItemCat;
   name: string;
@@ -53,7 +56,7 @@ function KGVisualization({
   selectedResource,
   onResourceSelection,
 }: Props) {
-  const [hoveredPaper, setHoveredPaper] = useState<string | null>(null);
+  const [openedPaper, setOpenedPaper] = useState<D | null>(null);
   const { tooltipInfo, updateTooltip, hideTooltip } = useTooltip<D>();
 
   // const minimapRef = useRef<SVGSVGElement>(null);
@@ -83,6 +86,13 @@ function KGVisualization({
 
   const SCORE_R = outerR - RESOURCE_R - (INNER_R + RESOURCE_R);
   const scoreUnitPerPx = (scores[0] - scores[1]) / SCORE_R;
+
+  function openResourceDetails(resource: D) {
+    setOpenedPaper(resource);
+  }
+  function closeResourceDetails() {
+    setOpenedPaper(null);
+  }
 
   function getMouseR(e: any) {
     let mouseR = 0;
@@ -157,14 +167,16 @@ function KGVisualization({
       const dScore = dR * scoreUnitPerPx;
 
       const [max, min] = draggingPivot.current;
-      const newMax = max + dScore;
-      const newMin = min + dScore;
+      const sep = max - min;
 
-      const [limitMax, limitMin] = borderScores;
+      let newMax = max + dScore;
 
-      if (!(newMin < limitMin || newMax > limitMax)) {
-        setScores([newMax, newMin]);
-      }
+      const [limitMax] = borderScores;
+
+      newMax = Math.min(limitMax, newMax);
+      const newMin = newMax - sep;
+
+      setScores([newMax, newMin]);
     }
   }
 
@@ -180,10 +192,6 @@ function KGVisualization({
   useEffect(updateScores, [scores]);
 
   useEffect(updateSelectedResource, [selectedResource]);
-
-  useEffect(() => {
-    viz.current !== null && viz.current.highlightResource(hoveredPaper);
-  }, [hoveredPaper]);
 
   function initialize() {
     if (
@@ -201,7 +209,7 @@ function KGVisualization({
         tooltipOpen: tooltipInfo.open,
         updateTooltip,
         hideTooltip,
-        onResourceSelection,
+        onResourceSelection: openResourceDetails,
         centerText: selectedResource,
         onScroll,
         scores,
@@ -260,7 +268,6 @@ function KGVisualization({
             section={section}
             key={section}
             names={sections[section]}
-            setHoveredPaper={setHoveredPaper}
             onResourceSelection={onResourceSelection}
           />
         ))}
@@ -278,8 +285,17 @@ function KGVisualization({
           </div>
         </div>
       </Tooltip>
+      <div
+        className={cx(styles.shield, { [styles.show]: openedPaper !== null })}
+        onClick={closeResourceDetails}
+      />
       <div className={styles.listPanel}>
-        <ListPanel resources={showedData} scores={scores} />
+        <ListPanel
+          resources={showedData}
+          scores={scores}
+          onResourceClick={openResourceDetails}
+        />
+        <DetailsPanel resource={openedPaper} onClose={closeResourceDetails} />
       </div>
       {/* <Minimap
         minimapRef={minimapRef}

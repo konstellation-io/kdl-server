@@ -66,7 +66,7 @@ type Props = {
   hideTooltip: () => void;
   // minimapRef: SVGSVGElement;
   tooltipOpen: boolean;
-  onResourceSelection: (name: string) => void;
+  onResourceSelection: (d: D) => void;
   centerText: string;
   onScroll: (dS: number) => void;
   scores: [number, number];
@@ -143,7 +143,7 @@ class KGViz {
     });
 
     this.axis = radialAxis(this.rScale).tickFormat(
-      (t: string) => `${Math.round(+t * 1000) / 10}%`
+      (t: string) => `${Math.round(+t * 10000) / 100}%`
     );
 
     // this.minimap = new MinimapViz(props.minimapRef, {

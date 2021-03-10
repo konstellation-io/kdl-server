@@ -56,6 +56,8 @@ function useBreadcrumbs() {
   crumbs.push({
     crumbText: CONFIG.SERVER_NAME,
     LeftIconComponent: <ServerIcon className="icon-regular" />,
+    RightIconComponent: ExpandMoreIcon,
+
     BottomComponent: (props: BottomComponentProps) => (
       <ServerMetrics serverUrl={CONFIG.SERVER_URL} {...props} />
     ),
@@ -68,6 +70,8 @@ function useBreadcrumbs() {
     crumbs.push({
       crumbText: name,
       LeftIconComponent: <ProjectIcon className="icon-regular" state={state} />,
+      RightIconComponent: ExpandMoreIcon,
+
       BottomComponent: (props: BottomComponentProps) => (
         <ProjectSelector options={projectsData.projects} {...props} />
       ),

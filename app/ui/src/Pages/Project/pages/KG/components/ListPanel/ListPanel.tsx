@@ -6,9 +6,10 @@ import styles from './ListPanel.module.scss';
 
 type Props = {
   resources: D[];
+  onResourceClick: (d: D) => void;
   scores: [number, number];
 };
-function ListPanel({ resources, scores }: Props) {
+function ListPanel({ resources, onResourceClick, scores }: Props) {
   const top25 = resources.slice(0, 25);
 
   function onEnter(name: string) {
@@ -38,6 +39,7 @@ function ListPanel({ resources, scores }: Props) {
             className={styles.resource}
             onMouseEnter={() => onEnter(r.name)}
             onMouseLeave={onLeave}
+            onClick={() => onResourceClick(r)}
           >
             <div className={styles.rTitle}>{r.name}</div>
             <div className={styles.typeAndScore}>

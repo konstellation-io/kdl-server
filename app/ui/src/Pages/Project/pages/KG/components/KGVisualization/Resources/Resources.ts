@@ -1,6 +1,7 @@
 import { BaseType, Selection } from 'd3-selection';
 import { Quadtree, quadtree } from 'd3-quadtree';
 
+import { D } from '../KGVisualization';
 import { DComplete } from './../../../KGUtils';
 import styles from './Resources.module.scss';
 
@@ -22,15 +23,16 @@ export default class Resources {
   clearCanvas: () => void;
   onShowTooltip: (e: MouseEvent, d: DComplete) => void;
   onHideTooltip: (element: BaseType) => void;
-  onResourceSelection: (name: string) => void;
+  onResourceSelection: (d: D) => void;
   center: { x: number; y: number };
   qt: Quadtree<DComplete>;
+  moving: boolean;
 
   constructor(
     onShowTooltip: (e: MouseEvent, d: DComplete) => void,
     onHideTooltip: (element: BaseType) => void,
     container: Selection<SVGGElement, unknown, null, undefined>,
-    onResourceSelection: (name: string) => void,
+    onResourceSelection: (d: D) => void,
     context: CanvasRenderingContext2D | null,
     clearCanvas: () => void,
     center: { x: number; y: number },
@@ -45,6 +47,7 @@ export default class Resources {
     this.clearCanvas = clearCanvas;
     this.center = center;
     this.qt = quadtree<DComplete>().x(x).y(y);
+    this.moving = false;
   }
 
   drawCircles = (hover?: string | undefined) => {
@@ -64,16 +67,34 @@ export default class Resources {
 
     clearCanvas();
     data.forEach((d) => {
-      if (hover) {
-        context.fillStyle =
-          d.name === hover ? 'white' : 'rgba(43, 217, 217, 0.4)';
+      let r = d.outsideMax ? RESOURCE_R * 0.7 : RESOURCE_R;
+      let fillStyle = 'rgba(43, 217, 217, 0.4)';
+
+      if (hover && d.name === hover) {
+        fillStyle = '#33FFFF';
+        r = RESOURCE_R * 1.1;
+
+        context.shadowBlur = 10;
+        context.shadowColor = '#33FFFF';
+
+        context.beginPath();
+        context.moveTo(x + d.x, y + d.y);
+        context.arc(x + d.x, y + d.y, r * 1.6, 0, 2 * Math.PI);
+        context.lineWidth = 0.5;
+        context.strokeStyle = fillStyle;
+        context.stroke();
+        context.closePath();
+
+        context.shadowBlur = 0;
       }
 
-      const r = d.outsideMax ? RESOURCE_R * 0.7 : RESOURCE_R;
+      context.fillStyle = fillStyle;
+
       context.beginPath();
       context.moveTo(x + d.x, y + d.y);
       context.arc(x + d.x, y + d.y, r, 0, 2 * Math.PI);
       context.fill();
+      context.closePath();
     });
   };
 
@@ -92,6 +113,9 @@ export default class Resources {
     drawCircles();
 
     this.canvas.on('mousemove', this.onMouseMove);
+    this.canvas.on('mousedown', this.onMouseDown);
+    this.canvas.on('mouseup', this.onMouseUp);
+    // this.canvas.on('click', this.onMouseClick);
   };
 
   onMouseMove = (e: any) => {
@@ -101,6 +125,8 @@ export default class Resources {
       50
     );
 
+    this.moving = true;
+
     // if (hovered) {
     //   this.onShowTooltip(e, hovered);
     // } else {
@@ -108,6 +134,38 @@ export default class Resources {
     // }
 
     this.drawCircles(hovered?.name);
+  };
+
+  onMouseClick = (e: any) => {
+    const resource = this.qt.find(
+      e.offsetX - this.center.x,
+      e.offsetY - this.center.y,
+      50
+    );
+
+    if (resource) {
+      this.onResourceSelection(resource);
+    }
+  };
+
+  onMouseDown = (e: any) => {
+    this.moving = false;
+  };
+
+  onMouseUp = (e: any) => {
+    console.log('moving', this.moving);
+
+    if (!this.moving) {
+      const resource = this.qt.find(
+        e.offsetX - this.center.x,
+        e.offsetY - this.center.y,
+        50
+      );
+
+      if (resource) {
+        this.onResourceSelection(resource);
+      }
+    }
   };
 
   performUpdate = (data: DComplete[]) => {

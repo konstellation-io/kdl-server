@@ -167,6 +167,26 @@ $state-to-color: (
         height: 100%;
       }
     }
+
+    &.inline {
+      display: flex;
+
+      align-items: center;
+
+      .value {
+        width: 5 * $grid-unit;
+
+        text-align: start;
+      }
+      .bars {
+        height: 0.5 * $grid-unit;
+        width: 8 * $grid-unit;
+
+        .barValue {
+          left: 0;
+        }
+      }
+    }
   }
 }
 
@@ -174,7 +194,21 @@ $state-to-color: (
   position: fixed;
   right: 0;
   height: 100%;
-  width: 25vw;
-  min-width: 44 * $grid-unit;
-  max-width: 60 * $grid-unit;
+  display: flex;
+  flex-direction: row;
+  z-index: 5;
+}
+
+.shield {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1 !important;
+
+  &.show {
+    @include shield;
+    pointer-events: all;
+    cursor: pointer;
+  }
 }

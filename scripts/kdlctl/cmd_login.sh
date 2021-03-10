@@ -13,7 +13,13 @@ show_login_help() {
 }
 
 local_login() {
-  # Open browser automatically
   LINK=https://kdlapp.kdl.$(minikube -p kdl-local ip).nip.io
+
+  if [ "$OS" = "Darwin" ]; then
+    open "$LINK"
+    exit 0
+  fi
+
+  # Open browser automatically
   nohup xdg-open "$LINK" >/dev/null 2>&1 &
 }

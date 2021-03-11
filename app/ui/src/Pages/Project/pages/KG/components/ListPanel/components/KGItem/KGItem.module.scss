@@ -1,0 +1,63 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.resource {
+  cursor: pointer;
+  background-color: palette(base, 400);
+  border-radius: $grid-unit / 2;
+  padding: 1.25 * $grid-unit 2 * $grid-unit;
+  margin-top: $grid-unit;
+  border-left: solid 3px transparent;
+  animation: border-left-color ease 0.4s;
+
+  &:hover {
+    border-left-color: palette(highlight);
+  }
+
+  &.starred:hover {
+    border-left-color: palette(alert);
+  }
+
+  .typeAndScore {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .rTypeWrapper {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .rType {
+    @include font-caption;
+    color: font-color(regular);
+  }
+
+  .rTitle {
+    @include font-body;
+    color: font-color(light);
+    margin-top: $grid-unit;
+  }
+
+  .rCategory {
+    @include font-small;
+    color: font-color(lowlight);
+    margin-top: $grid-unit;
+  }
+
+  .topics {
+    display: flex;
+    margin-left: $grid-unit;
+  }
+  .topic {
+    @include font-small;
+    color: font-color(lowlight);
+    background-color: palette(base, 500);
+    padding: 0.5 * $grid-unit 1 * $grid-unit;
+    border-radius: 0.5 * $grid-unit;
+    margin-right: $grid-unit;
+  }
+}

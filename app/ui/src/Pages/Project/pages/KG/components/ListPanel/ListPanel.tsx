@@ -1,15 +1,29 @@
 import { D } from '../KGVisualization/KGVisualization';
-import React from 'react';
-import Score from '../KGVisualization/Score';
+import React, { useMemo, useState } from 'react';
 import { resourcesViz } from '../KGVisualization/KGViz';
 import styles from './ListPanel.module.scss';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import TabAll from './components/TabAll/TabAll';
+import TabStarred from './components/TabStarred/TabStarred';
 
 type Props = {
   resources: D[];
   scores: [number, number];
 };
 function ListPanel({ resources, scores }: Props) {
-  const top25 = resources.slice(0, 25);
+  const [listFilterText, setListFilterText] = useState('');
+
+  const top25 = useMemo(() => resources.slice(0, 25), [resources]);
+
+  const filteredAllTopics = useMemo(() => {
+    return top25.filter((resource) =>
+      resource.name.toLowerCase().includes(listFilterText.toLowerCase())
+    );
+  }, [top25, listFilterText]);
+
+  function handleResourceClick(resource: D) {
+    console.log('resource clicked', resource);
+  }
 
   function onEnter(name: string) {
     resourcesViz?.highlightResource(name);
@@ -32,27 +46,35 @@ function ListPanel({ resources, scores }: Props) {
           maxScore
         )} and ${formatScore(minScore)} of score`}
       </div>
-      <div className={styles.list}>
-        {top25.map((r) => (
-          <div
-            className={styles.resource}
-            onMouseEnter={() => onEnter(r.name)}
-            onMouseLeave={onLeave}
-          >
-            <div className={styles.rTitle}>{r.name}</div>
-            <div className={styles.typeAndScore}>
-              <div className={styles.rType}>{r.type}</div>
-              <Score value={r.score} />
-            </div>
-            <div className={styles.topics}>
-              <div className={styles.topic}>{r.category}</div>
-              <div className={styles.topic}>
-                + {Math.round(Math.random() * 3)}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <Tabs
+        selectedTabClassName={styles.selectedTab}
+        className={styles.tabSection}
+      >
+        <TabList>
+          <Tab>LIST ({`${filteredAllTopics.length}`})</Tab>
+          <Tab>STARRED ({`25`})</Tab>
+        </TabList>
+        <div className={styles.tabContainer}>
+          <TabPanel>
+            <TabAll
+              resources={filteredAllTopics}
+              filterText={listFilterText}
+              onClick={handleResourceClick}
+              onEnter={onEnter}
+              onLeave={onLeave}
+              onChangeFilterText={setListFilterText}
+            />
+          </TabPanel>
+          <TabPanel>
+            <TabStarred
+              starredResources={top25}
+              onClick={handleResourceClick}
+              onEnter={onEnter}
+              onLeave={onLeave}
+            />
+          </TabPanel>
+        </div>
+      </Tabs>
     </div>
   );
 }

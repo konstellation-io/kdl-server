@@ -1,0 +1,12 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.list {
+  background-color: palette(lowlight, 900);
+
+  .listWrapper {
+    margin-top: 1.5 * $grid-unit;
+  }
+}

@@ -11,6 +11,7 @@ import { KnowledgeGraphItemCat } from './../../types/globalTypes';
 
 export interface GetKnowledgeGraph_knowledgeGraph_items {
   __typename: 'KnowledgeGraphItem';
+  id: string;
   category: KnowledgeGraphItemCat;
   score: number;
   title: string;

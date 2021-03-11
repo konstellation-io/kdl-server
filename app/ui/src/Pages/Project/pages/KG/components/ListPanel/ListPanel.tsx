@@ -8,9 +8,10 @@ import TabStarred from './components/TabStarred/TabStarred';
 
 type Props = {
   resources: D[];
+  onResourceClick: (d: D) => void;
   scores: [number, number];
 };
-function ListPanel({ resources, scores }: Props) {
+function ListPanel({ resources, onResourceClick, scores }: Props) {
   const [listFilterText, setListFilterText] = useState('');
 
   const top25 = useMemo(() => resources.slice(0, 25), [resources]);
@@ -20,10 +21,6 @@ function ListPanel({ resources, scores }: Props) {
       resource.name.toLowerCase().includes(listFilterText.toLowerCase())
     );
   }, [top25, listFilterText]);
-
-  function handleResourceClick(resource: D) {
-    console.log('resource clicked', resource);
-  }
 
   function onEnter(name: string) {
     resourcesViz?.highlightResource(name);
@@ -59,7 +56,7 @@ function ListPanel({ resources, scores }: Props) {
             <TabAll
               resources={filteredAllTopics}
               filterText={listFilterText}
-              onClick={handleResourceClick}
+              onClick={onResourceClick}
               onEnter={onEnter}
               onLeave={onLeave}
               onChangeFilterText={setListFilterText}
@@ -68,7 +65,7 @@ function ListPanel({ resources, scores }: Props) {
           <TabPanel>
             <TabStarred
               starredResources={top25}
-              onClick={handleResourceClick}
+              onClick={onResourceClick}
               onEnter={onEnter}
               onLeave={onLeave}
             />

@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useState } from 'react';
 import { D, TopicSections } from './KGVisualization/KGVisualization';
+import { useCallback, useMemo, useState } from 'react';
+
 import { Scores } from './Filters/components/ScoreFilter/ScoreFilter';
 
 export interface KGFilters {

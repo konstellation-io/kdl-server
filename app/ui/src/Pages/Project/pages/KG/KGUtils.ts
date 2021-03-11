@@ -107,8 +107,10 @@ export function buildKGItem({
   score,
   category,
   title,
+  id,
 }: GetKnowledgeGraph_knowledgeGraph_items): D {
   return {
+    id,
     category: 'Others',
     name: title,
     type: category,

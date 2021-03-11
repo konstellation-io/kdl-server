@@ -1,6 +1,7 @@
 import { BaseType, Selection } from 'd3-selection';
 import { Quadtree, quadtree } from 'd3-quadtree';
 
+import { D } from '../KGVisualization';
 import { DComplete } from './../../../KGUtils';
 import styles from './Resources.module.scss';
 
@@ -10,6 +11,17 @@ const FONT_SIZE = 20;
 
 const x = (d: DComplete) => d.x;
 const y = (d: DComplete) => d.y;
+
+export let lastSection: string | undefined;
+
+const favoriteResources = [1, 5, 12, 13, 43, 76, 128, 654, 765, 734, 812];
+
+const COLORS = {
+  DEFAULT: 'rgba(12, 52, 72, 1)',
+  DEFAULT_HIGHLIGHT: '#33FFFF',
+  STARRED: '#CC7B55',
+  STARRED_HIGHLIGHT: '#fc915f',
+};
 
 export default class Resources {
   container: Selection<SVGGElement, unknown, null, undefined>;
@@ -22,19 +34,22 @@ export default class Resources {
   clearCanvas: () => void;
   onShowTooltip: (e: MouseEvent, d: DComplete) => void;
   onHideTooltip: (element: BaseType) => void;
-  onResourceSelection: (name: string) => void;
+  onResourceSelection: (d: D) => void;
   center: { x: number; y: number };
   qt: Quadtree<DComplete>;
+  moving: boolean;
+  onHoverResource: (d: DComplete | null) => void;
 
   constructor(
     onShowTooltip: (e: MouseEvent, d: DComplete) => void,
     onHideTooltip: (element: BaseType) => void,
     container: Selection<SVGGElement, unknown, null, undefined>,
-    onResourceSelection: (name: string) => void,
+    onResourceSelection: (d: D) => void,
     context: CanvasRenderingContext2D | null,
     clearCanvas: () => void,
     center: { x: number; y: number },
-    canvas: Selection<HTMLCanvasElement, unknown, null, undefined>
+    canvas: Selection<HTMLCanvasElement, unknown, null, undefined>,
+    onHoverResource: (d: DComplete | null) => void
   ) {
     this.onShowTooltip = onShowTooltip;
     this.onHideTooltip = onHideTooltip;
@@ -45,6 +60,8 @@ export default class Resources {
     this.clearCanvas = clearCanvas;
     this.center = center;
     this.qt = quadtree<DComplete>().x(x).y(y);
+    this.moving = false;
+    this.onHoverResource = onHoverResource;
   }
 
   drawCircles = (hover?: string | undefined) => {
@@ -57,24 +74,74 @@ export default class Resources {
 
     if (context === null) return;
 
-    context.fillStyle = 'rgba(43, 217, 217, 0.4)';
     context.globalCompositeOperation = 'screen';
     // context.fillStyle = 'rgba(12, 52, 72, 0.8)';
     // context.globalCompositeOperation = 'lighter';
 
+    let lastElement: DComplete | undefined;
+
     clearCanvas();
-    data.forEach((d) => {
-      if (hover) {
-        context.fillStyle =
-          d.name === hover ? 'white' : 'rgba(43, 217, 217, 0.4)';
+    data.forEach((d, i) => {
+      let r = d.outsideMax ? RESOURCE_R * 0.7 : RESOURCE_R;
+      let fillStyle = COLORS.DEFAULT;
+
+      if (hover && d.name === hover) {
+        lastElement = d;
       }
 
-      const r = d.outsideMax ? RESOURCE_R * 0.7 : RESOURCE_R;
+      if (favoriteResources.includes(i)) {
+        fillStyle = COLORS.STARRED;
+      }
+
+      context.fillStyle = fillStyle;
+
       context.beginPath();
       context.moveTo(x + d.x, y + d.y);
       context.arc(x + d.x, y + d.y, r, 0, 2 * Math.PI);
       context.fill();
+      context.closePath();
     });
+
+    if (lastElement) {
+      let fillStyle = COLORS.DEFAULT_HIGHLIGHT;
+
+      if (favoriteResources.includes(data.indexOf(lastElement))) {
+        fillStyle = COLORS.STARRED_HIGHLIGHT;
+      }
+
+      context.globalCompositeOperation = 'source-over';
+      context.shadowBlur = 10;
+      context.shadowColor = fillStyle;
+
+      context.beginPath();
+      context.moveTo(x + lastElement.x, y + lastElement.y);
+      context.arc(
+        x + lastElement.x,
+        y + lastElement.y,
+        RESOURCE_R * 1.7,
+        0,
+        2 * Math.PI
+      );
+      context.lineWidth = 0.5;
+      context.strokeStyle = fillStyle;
+      context.fillStyle = fillStyle;
+      context.stroke();
+      context.closePath();
+
+      context.beginPath();
+      context.moveTo(x + lastElement.x, y + lastElement.y);
+      context.arc(
+        x + lastElement.x,
+        y + lastElement.y,
+        RESOURCE_R,
+        0,
+        2 * Math.PI
+      );
+      context.fill();
+      context.closePath();
+
+      context.shadowBlur = 0;
+    }
   };
 
   init = (
@@ -92,6 +159,9 @@ export default class Resources {
     drawCircles();
 
     this.canvas.on('mousemove', this.onMouseMove);
+    this.canvas.on('mousedown', this.onMouseDown);
+    this.canvas.on('mouseup', this.onMouseUp);
+    // this.canvas.on('click', this.onMouseClick);
   };
 
   onMouseMove = (e: any) => {
@@ -101,13 +171,51 @@ export default class Resources {
       50
     );
 
-    // if (hovered) {
-    //   this.onShowTooltip(e, hovered);
-    // } else {
-    //   this.onHideTooltip(e);
-    // }
+    this.moving = true;
+
+    lastSection = hovered?.category;
+
+    if (hovered) {
+      this.onHoverResource(hovered);
+      //   this.onShowTooltip(e, hovered);
+    } else {
+      this.onHoverResource(null);
+      //   this.onHideTooltip(e);
+    }
 
     this.drawCircles(hovered?.name);
+  };
+
+  onMouseClick = (e: any) => {
+    const resource = this.qt.find(
+      e.offsetX - this.center.x,
+      e.offsetY - this.center.y,
+      50
+    );
+
+    if (resource) {
+      this.onResourceSelection(resource);
+    }
+  };
+
+  onMouseDown = (e: any) => {
+    this.moving = false;
+  };
+
+  onMouseUp = (e: any) => {
+    console.log('moving', this.moving);
+
+    if (!this.moving) {
+      const resource = this.qt.find(
+        e.offsetX - this.center.x,
+        e.offsetY - this.center.y,
+        50
+      );
+
+      if (resource) {
+        this.onResourceSelection(resource);
+      }
+    }
   };
 
   performUpdate = (data: DComplete[]) => {

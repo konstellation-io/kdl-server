@@ -4,10 +4,12 @@
 @import 'Styles/shadows';
 
 .container {
-  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
+  width: 25vw;
+  min-width: 44 * $grid-unit;
+  max-width: 60 * $grid-unit;
 
   background-color: palette(base, 800);
 

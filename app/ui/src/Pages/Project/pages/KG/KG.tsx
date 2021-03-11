@@ -25,12 +25,26 @@ const MAX_RESOURCES = 0;
 const MAX_TOPICS = 10;
 
 let resources = data.map((d: any) => ({
+  id: d.id,
   category:
     Object.keys(JSON.parse(d.topics.replaceAll("'", '"')))[0] || 'Others',
+  categories: JSON.parse(d.topics.replaceAll("'", '"')),
   name: d.title,
   type: KnowledgeGraphItemCat.Paper,
   score: d.score,
 }));
+
+export const idToFullResource = Object.fromEntries(
+  data.map((r) => [
+    r.id,
+    {
+      title: r.title,
+      abstract: r.abstract,
+      topics: JSON.parse(r.topics.replaceAll("'", '"')),
+      score: r.score,
+    },
+  ])
+);
 
 if (MAX_TOPICS) {
   const allTopics = resources.map((d) => d.category);

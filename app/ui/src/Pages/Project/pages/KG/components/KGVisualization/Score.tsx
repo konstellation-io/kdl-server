@@ -25,13 +25,18 @@ function getColorClass(value: number) {
 
 type Props = {
   value: number;
+  inline?: boolean;
 };
 
-function Score({ value }: Props) {
+function Score({ value, inline = false }: Props) {
   const percValue = `${Math.round(value * 100)}%`;
 
   return (
-    <div className={cx(styles.scoreContainer, getColorClass(value))}>
+    <div
+      className={cx(styles.scoreContainer, getColorClass(value), {
+        [styles.inline]: inline,
+      })}
+    >
       <div className={styles.value}>{percValue}</div>
       <div className={styles.bars}>
         <div className={styles.barBg} />

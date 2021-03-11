@@ -7,15 +7,15 @@ import cx from 'classnames';
 type Props = {
   resource: D;
   onClick: (resource: D) => void;
-  onEnter?: (name: string) => void;
-  onLeave?: () => void;
+  onEnter: (name: string) => void;
+  onLeave: () => void;
   isStarred?: boolean;
 };
 const KGItem: FC<Props> = ({
   resource,
   onClick,
-  onLeave = () => {},
-  onEnter = () => {},
+  onLeave,
+  onEnter,
   isStarred = false,
 }: Props) => (
   <div

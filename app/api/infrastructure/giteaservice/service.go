@@ -68,7 +68,8 @@ func (g *giteaService) AddSSHKey(username, publicSSHKey string) error {
 // CreateRepo creates a repository in the KDL organization.
 func (g *giteaService) CreateRepo(name, ownerUsername string) error {
 	repo, _, err := g.client.AdminCreateRepo(kdlOrganization, gitea.CreateRepoOption{
-		Name: name,
+		Name:     name,
+		AutoInit: true,
 	})
 
 	if err != nil {

@@ -10,12 +10,14 @@ class TestDescriptionEvaluator(unittest.TestCase):
 
     def test_get_description_quality_returns_value_between_0_and_1(self):
 
-        query = "This is my test query"
+        queries = ["This is my test query",
+                   "A very long description " * 512]
 
-        result = self.evaluator.get_description_quality(query)
-
-        self.assertGreaterEqual(result, 0)
-        self.assertLessEqual(result, 1)
+        for query in queries:
+            result = self.evaluator.get_description_quality(query)
+            print(result)
+            self.assertGreaterEqual(result, 0)
+            self.assertLessEqual(result, 1)
 
     def test_get_description_quality_with_nonstring_input_raises_error(self):
 

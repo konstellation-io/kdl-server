@@ -194,9 +194,9 @@ $state-to-color: (
   position: fixed;
   right: 0;
   height: calc(100% - 40px);
-  width: 25vw;
-  min-width: 44 * $grid-unit;
-  max-width: 60 * $grid-unit;
+  display: flex;
+  flex-direction: row;
+  z-index: 5;
 }
 
 .shield {

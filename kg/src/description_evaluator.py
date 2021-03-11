@@ -16,5 +16,3 @@ class DescriptionEvaluator(object):
         if n_words > 512:
             return 1
         return n_words / 512
-
-

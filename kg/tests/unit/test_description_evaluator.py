@@ -1,6 +1,6 @@
 import unittest
 
-from src.description_evaluator import DescriptionEvaluator
+from description_evaluator import DescriptionEvaluator
 
 
 class TestDescriptionEvaluator(unittest.TestCase):

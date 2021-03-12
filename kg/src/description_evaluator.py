@@ -14,6 +14,9 @@ class DescriptionEvaluator(object):
     Example usage:
 
         # Set up recommender to inject into DescriptionEvaluator
+        import config
+        from tools.assets import AssetLoader
+
         assets = AssetLoader(config.ASSET_ROUTE)
         recommender = Recommender(
             model=assets.model,

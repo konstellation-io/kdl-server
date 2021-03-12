@@ -7,11 +7,11 @@ from tools.assets import AssetLoader
 
 class DescriptionEvaluator(object):
 
-    def __init__(self, recommender):
+    def __init__(self, recommender : Recommender) -> None:
         self.recommender = recommender
 
     @staticmethod
-    def convert_score_to_quality(score):
+    def convert_score_to_quality(score: float) -> float:
         a = 2.5    # estimated empirically, see notebook 18
         b = -1.25  # ibid
         quality = a * score + b
@@ -31,7 +31,7 @@ class DescriptionEvaluator(object):
 
         else:
             rec_list = self.recommender.get_top_items(description, n_hits=100)
-            last_item_score = rec_list.items[-1].score
+            last_item_score = float(rec_list.items[-1].score)
             quality = self.convert_score_to_quality(last_item_score)
             return quality
 
@@ -50,4 +50,4 @@ if __name__ == "__main__":
     de = DescriptionEvaluator(recommender=recommender)
     example_descr = "A test query for some machine learning project using image classification. "
     estimated_quality = de.get_description_quality(example_descr)
-
+    print("Description quality:", estimated_quality)

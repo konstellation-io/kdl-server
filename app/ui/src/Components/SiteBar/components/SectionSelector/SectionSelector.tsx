@@ -1,13 +1,10 @@
 import React, { FC } from 'react';
 import styles from './SectionSelector.module.scss';
-import projectNavigationStyles from 'Pages/Project/components/ProjectNavigation/ProjectNavigation.module.scss';
 import { NavLink } from 'react-router-dom';
 import { EnhancedRouteConfiguration } from 'Hooks/useProjectNavigation';
 import { BottomComponentProps } from '../Breadcrumbs/components/Crumb/Crumb';
-import NavigationButton, {
-  IconSize,
-} from 'Pages/Project/components/ProjectNavigation/NavigationButton';
 import cx from 'classnames';
+import NavListItem from './components/NavListItem/NavListItem';
 
 type Props = {
   options: EnhancedRouteConfiguration[];
@@ -20,21 +17,22 @@ const SectionSelector: FC<Props & BottomComponentProps> = ({
   <div className={styles.container}>
     <ul>
       {options.map(({ to, Icon, label, disabled }) => (
-        <NavLink
-          to={to}
+        <li
           key={label}
-          activeClassName={styles.selectedSection}
-          className={cx(styles.section, {
-            [projectNavigationStyles.disabled]: disabled,
+          className={cx({
+            [styles.disabled]: disabled,
           })}
-          onClick={closeComponent}
         >
-          <NavigationButton
-            label={label}
-            Icon={Icon}
-            iconSize={IconSize.SMALL}
-          />
-        </NavLink>
+          <NavLink
+            to={to}
+            activeClassName={styles.selectedSection}
+            className={styles.section}
+            onClick={closeComponent}
+            exact
+          >
+            <NavListItem label={label} Icon={Icon} disabled={disabled} />
+          </NavLink>
+        </li>
       ))}
     </ul>
   </div>

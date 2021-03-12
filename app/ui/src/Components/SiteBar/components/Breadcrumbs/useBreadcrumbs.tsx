@@ -7,6 +7,8 @@ import useProjectNavigation, {
 
 import { CONFIG } from 'index';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import PersonIcon from '@material-ui/icons/Person';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { GetProjects } from 'Graphql/queries/types/GetProjects';
 import ProjectIcon from 'Components/Icons/ProjectIcon/ProjectIcon';
 import ProjectSelector from '../ProjectSelector/ProjectSelector';
@@ -14,12 +16,25 @@ import ROUTE from 'Constants/routes';
 import React from 'react';
 import SectionSelector from '../SectionSelector/SectionSelector';
 import ServerIcon from 'Components/Icons/ServerIcon/ServerIcon';
-import ServerMetrics from '../ServerMetrics/ServerMetrics';
 import { loader } from 'graphql.macro';
 import { useQuery, useReactiveVar } from '@apollo/client';
 import { openedProject } from 'Graphql/client/cache';
 
 const GetProjectsQuery = loader('Graphql/queries/getProjects.graphql');
+const serverSections: EnhancedRouteConfiguration[] = [
+  {
+    id: 'users',
+    label: 'Users',
+    Icon: PersonIcon,
+    to: ROUTE.USERS,
+  },
+  {
+    id: 'projects',
+    label: 'Projects',
+    Icon: ArrowForwardIcon,
+    to: ROUTE.PROJECTS,
+  },
+];
 
 function useBreadcrumbs() {
   const crumbs: CrumbProps[] = [];
@@ -45,7 +60,7 @@ function useBreadcrumbs() {
     LeftIconComponent: <ServerIcon className="icon-regular" />,
     RightIconComponent: ExpandMoreIcon,
     BottomComponent: (props: BottomComponentProps) => (
-      <ServerMetrics serverUrl={CONFIG.SERVER_URL} {...props} />
+      <SectionSelector options={serverSections} {...props} />
     ),
   });
 

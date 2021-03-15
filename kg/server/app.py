@@ -23,6 +23,7 @@ class KnowledgeGraphService(kg_grpc_pb2.KGServiceServicer):
             tokenizer=assets.tokenizer,
             vectors=assets.vectors,
             dataset=assets.dataset,
+            topic_selector=self.topic_selector
         )
 
     def GetGraph(self, request: kg_pb2.GetGraphReq, context: grpc.ServicerContext) -> kg_pb2.GetGraphRes:
@@ -31,6 +32,7 @@ class KnowledgeGraphService(kg_grpc_pb2.KGServiceServicer):
             request.description, n_hits=config.N_HITS
         )
         self.log.debug(f"Output items:\n {recommended_items}")
+
         return recommended_items.to_grpc()
 
     def __repr__(self):

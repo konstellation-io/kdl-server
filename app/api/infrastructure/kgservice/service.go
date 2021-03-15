@@ -63,6 +63,7 @@ func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.K
 			Score:       float64(value.Score),
 			Date:        value.Date,
 			URL:         value.Url,
+			Topics:      convertTopics(value.Topics),
 			IsStarred:   false,
 			IsDiscarded: false,
 			RepoURLs:    value.RepoUrls,
@@ -71,7 +72,9 @@ func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.K
 		}
 	}
 
-	return entity.KnowledgeGraph{Items: items}, nil
+	topics := convertTopics(res.Topics)
+
+	return entity.KnowledgeGraph{Items: items, Topics: topics}, nil
 }
 
 func stringToPointer(s string) *string {
@@ -80,4 +83,17 @@ func stringToPointer(s string) *string {
 	}
 
 	return &s
+}
+
+func convertTopics(topics []*kgpb.Topic) []entity.Topic {
+	converted := make([]entity.Topic, len(topics))
+
+	for i, t := range topics {
+		converted[i] = entity.Topic{
+			Name:      t.Name,
+			Relevance: float64(t.Relevance),
+		}
+	}
+
+	return converted
 }

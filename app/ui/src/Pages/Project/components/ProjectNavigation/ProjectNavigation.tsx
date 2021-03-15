@@ -1,16 +1,16 @@
-import {NavLink, useParams} from 'react-router-dom';
-import React, {FC, useState} from 'react';
-import usePanel, {PanelType} from 'Graphql/client/hooks/usePanel';
-import useWorkspace, {CONFIG} from 'Hooks/useWorkspace';
+import { NavLink, useParams } from 'react-router-dom';
+import React, { FC, useState } from 'react';
+import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
+import useWorkspace, { CONFIG } from 'Hooks/useWorkspace';
 
 import IconCollapse from '@material-ui/icons/KeyboardBackspace';
 import IconSettings from '@material-ui/icons/Settings';
 import NavigationButton from './components/NavigationButton/NavigationButton';
-import {PANEL_ID} from 'Graphql/client/models/Panel';
-import {RouteProjectParams} from 'Constants/routes';
+import { PANEL_ID } from 'Graphql/client/models/Panel';
+import { RouteProjectParams } from 'Constants/routes';
 import cx from 'classnames';
 import styles from './ProjectNavigation.module.scss';
-import ProjectRoutes from './components/ProjectRoutes/ProjectRoutes';
+import NavElements from './components/NavElements/NavElements';
 
 export const NavButtonLink: FC<any> = ({ children, ...props }) => {
   return (
@@ -44,7 +44,7 @@ function ProjectNavigation() {
   return (
     <div className={cx(styles.container, { [styles.opened]: opened })}>
       <div className={styles.top}>
-        <ProjectRoutes isOpened={opened} />
+        <NavElements isOpened={opened} />
       </div>
       <div className={styles.bottom}>
         <div onClick={togglePanel}>

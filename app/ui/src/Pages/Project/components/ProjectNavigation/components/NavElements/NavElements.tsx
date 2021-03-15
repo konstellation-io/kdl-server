@@ -6,7 +6,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import NavigationButton from '../NavigationButton/NavigationButton';
 import { RouteProjectParams } from 'Constants/routes';
 import cx from 'classnames';
-import styles from './ProjectRoutes.module.scss';
+import styles from './NavElements.module.scss';
 import useProjectNavigation from 'Hooks/useProjectNavigation';
 import useTool from 'Graphql/hooks/useTool';
 import { GetMe } from 'Graphql/queries/types/GetMe';
@@ -21,13 +21,12 @@ type Props = {
   isOpened: boolean;
 };
 
-function ProjectRoutes({ isOpened }: Props) {
+function NavElements({ isOpened }: Props) {
   const { projectId } = useParams<RouteProjectParams>();
+  const { projectRoutes, userToolsRoutes } = useProjectNavigation(projectId);
   const { updateProjectActiveTools, projectActiveTools } = useTool();
   const { data } = useQuery<GetMe>(GetMeQuery);
   const areToolsActive = data?.me.areToolsActive;
-
-  const { projectRoutes, userToolsRoutes } = useProjectNavigation(projectId);
 
   function toggleTools() {
     updateProjectActiveTools(!areToolsActive);
@@ -79,4 +78,4 @@ function ProjectRoutes({ isOpened }: Props) {
   );
 }
 
-export default ProjectRoutes;
+export default NavElements;

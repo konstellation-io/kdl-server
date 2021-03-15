@@ -6,7 +6,6 @@
   background-color: palette(base);
   border-top: 2px solid palette(base, 400);
   margin-top: $grid-unit;
-  padding-top: 0.75 * $grid-unit;
   transition: border-right 0.3s ease;
   border-right: 2px solid transparent;
 
@@ -25,6 +24,7 @@
     white-space: nowrap;
     margin-left: 5 * $grid-unit;
     margin-bottom: $grid-unit;
+    padding-top: 0.75 * $grid-unit;
   }
 
   .toggleToolsWrapper {
@@ -35,6 +35,7 @@
       color: palette(highlight);
       margin: 0 1.4 * $grid-unit;
       transition: transform ease 0.3s;
+      flex-shrink: 0;
     }
 
     &.disabled {

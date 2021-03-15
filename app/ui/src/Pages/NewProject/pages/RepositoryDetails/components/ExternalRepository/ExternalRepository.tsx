@@ -14,7 +14,7 @@ import useNewProject from 'Graphql/client/hooks/useNewProject';
 import { useQuery } from '@apollo/client';
 
 function validateUrl(value: string): string {
-  const error = CHECK.getValidationError([CHECK.isDomainValid(value)]);
+  const error = CHECK.getValidationError([CHECK.isUrlValid(value)]);
   return error === true ? '' : (error as string);
 }
 

@@ -19,10 +19,10 @@
   }
 
   .label {
-    @include font-caption;
+    @include font-button;
     margin-left: 2px;
     white-space: nowrap;
-    text-transform: uppercase;
+    text-transform: capitalize;
   }
 
   &:hover {

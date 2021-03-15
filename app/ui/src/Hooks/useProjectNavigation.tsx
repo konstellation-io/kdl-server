@@ -37,6 +37,10 @@ export const projectRoutesConfiguration: {
     label: 'Knowledge Graph',
     Icon: IconKG,
   },
+};
+export const toolsRoutesConfiguration: {
+  [key: string]: RouteConfiguration;
+} = {
   [ROUTE.PROJECT_TOOL_GITEA]: {
     id: 'gitea',
     label: 'Gitea',
@@ -85,6 +89,7 @@ export interface EnhancedRouteConfiguration extends RouteConfiguration {
 export interface RoutesConfiguration {
   projectRoutes: EnhancedRouteConfiguration[];
   userToolsRoutes: EnhancedRouteConfiguration[];
+  projectToolsRoutes: EnhancedRouteConfiguration[];
 }
 
 function useProjectNavigation(projectId: string) {
@@ -110,7 +115,14 @@ function useProjectNavigation(projectId: string) {
     const userToolsRoutesEntries = Object.entries(userToolsRoutesConfiguration);
     const userToolsRoutes = userToolsRoutesEntries.map(mapRoute);
 
-    return { projectRoutes, userToolsRoutes };
+    const toolsRoutesEntries = Object.entries(toolsRoutesConfiguration);
+    const projectToolsRoutes = toolsRoutesEntries.map(mapRoute);
+
+    return {
+      projectRoutes,
+      userToolsRoutes,
+      projectToolsRoutes,
+    };
   }, [mapRoute]);
 
   return routesConfigurations;

@@ -4,6 +4,7 @@ import useProjectNavigation, {
   EnhancedRouteConfiguration,
   projectRoutesConfiguration,
   RoutesConfiguration,
+  toolsRoutesConfiguration,
   userToolsRoutesConfiguration,
 } from 'Hooks/useProjectNavigation';
 import { useQuery, useReactiveVar } from '@apollo/client';
@@ -52,6 +53,7 @@ function useBreadcrumbs() {
   const {
     projectRoutes,
     userToolsRoutes,
+    projectToolsRoutes,
   }: RoutesConfiguration = useProjectNavigation(project?.id || '');
 
   if (loading || !projectsData) return { loading, crumbs };
@@ -85,6 +87,7 @@ function useBreadcrumbs() {
     const projectRoute = Object.values({
       ...projectRoutesConfiguration,
       ...userToolsRoutesConfiguration,
+      ...toolsRoutesConfiguration,
     }).find(({ id }) => id === lastParam);
 
     if (projectRoute) {
@@ -95,7 +98,11 @@ function useBreadcrumbs() {
         RightIconComponent: ExpandMoreIcon,
         BottomComponent: (props: BottomComponentProps) => (
           <NavigationSelector
-            options={[...projectRoutes, ...userToolsRoutes]}
+            options={[
+              ...projectRoutes,
+              ...projectToolsRoutes,
+              ...userToolsRoutes,
+            ]}
             {...props}
           />
         ),

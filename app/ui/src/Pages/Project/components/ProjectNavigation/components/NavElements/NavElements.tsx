@@ -23,7 +23,11 @@ type Props = {
 
 function NavElements({ isOpened }: Props) {
   const { projectId } = useParams<RouteProjectParams>();
-  const { projectRoutes, userToolsRoutes } = useProjectNavigation(projectId);
+  const {
+    projectRoutes,
+    userToolsRoutes,
+    projectToolsRoutes,
+  } = useProjectNavigation(projectId);
   const { updateProjectActiveTools, projectActiveTools } = useTool();
   const { data } = useQuery<GetMe>(GetMeQuery);
   const areToolsActive = data?.me.areToolsActive;
@@ -47,31 +51,38 @@ function NavElements({ isOpened }: Props) {
           <NavigationButton label={label} Icon={Icon} />
         </NavButtonLink>
       ))}
-      <div
-        className={cx(styles.userTools, {
-          [styles.show]: isOpened,
-          [styles.started]: areToolsActive,
-          [styles.stopped]: !areToolsActive,
-        })}
-      >
-        <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
-          <div className={styles.userToolLabel}>USER TOOLS</div>
-        </AnimateHeight>
-        {userToolsRoutes.map(({ Icon, label, to, disabled }) => (
-          <NavButtonLink to={to} key={label} disabled={disabled}>
+      <div className={styles.projectTools}>
+        {projectToolsRoutes.map(({ Icon, label, to }) => (
+          <NavButtonLink to={to} key={label}>
             <NavigationButton label={label} Icon={Icon} />
           </NavButtonLink>
         ))}
         <div
-          className={cx(styles.toggleToolsWrapper, {
-            [styles.disabled]: projectActiveTools.loading,
+          className={cx(styles.userTools, {
+            [styles.show]: isOpened,
+            [styles.started]: areToolsActive,
+            [styles.stopped]: !areToolsActive,
           })}
-          onClick={toggleTools}
         >
-          <NavigationButton
-            label={areToolsActive ? 'Stop tools' : 'Run tools'}
-            Icon={renderToggleToolsIcon()}
-          />
+          <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
+            <div className={styles.userToolLabel}>USER TOOLS</div>
+          </AnimateHeight>
+          {userToolsRoutes.map(({ Icon, label, to, disabled }) => (
+            <NavButtonLink to={to} key={label} disabled={disabled}>
+              <NavigationButton label={label} Icon={Icon} />
+            </NavButtonLink>
+          ))}
+          <div
+            className={cx(styles.toggleToolsWrapper, {
+              [styles.disabled]: projectActiveTools.loading,
+            })}
+            onClick={toggleTools}
+          >
+            <NavigationButton
+              label={areToolsActive ? 'Stop tools' : 'Run tools'}
+              Icon={renderToggleToolsIcon()}
+            />
+          </div>
         </div>
       </div>
     </>

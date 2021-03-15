@@ -154,6 +154,13 @@ func TestInteractor_CreateExternal(t *testing.T) {
 
 	createProject := entity.NewProject(projectName, projectDesc)
 	createProject.CreationDate = now
+	createProject.Members = []entity.Member{
+		{
+			UserID:      ownerUserID,
+			AccessLevel: entity.AccessLevelAdmin,
+			AddedDate:   now,
+		},
+	}
 	createProject.Repository = entity.Repository{
 		Type:            entity.RepositoryTypeExternal,
 		ExternalRepoURL: externalRepoURL,

@@ -114,6 +114,7 @@ export function buildKGItem({
     category: 'Others',
     name: title,
     type: category,
+    starred: false,
     score,
   };
 }

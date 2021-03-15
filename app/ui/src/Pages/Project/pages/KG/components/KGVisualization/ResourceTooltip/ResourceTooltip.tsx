@@ -21,7 +21,11 @@ function ResourceTooltip({ resource }: Props) {
     return (
       <>
         <div className={styles.left}>
-          <div className={styles.icon} />
+          <div
+            className={cx(styles.icon, {
+              [styles.starred]: resource?.starred,
+            })}
+          />
           <div className={styles.name}>{resource.name}</div>
         </div>
         <div className={styles.score}>
@@ -34,6 +38,7 @@ function ResourceTooltip({ resource }: Props) {
     <div
       className={cx(styles.container, {
         [styles.opened]: resource !== null,
+        [styles.starred]: resource?.starred,
       })}
     >
       {getContent()}

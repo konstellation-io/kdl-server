@@ -25,9 +25,10 @@ const selectedResource = 'My project';
 const MAX_RESOURCES = 0;
 const MAX_TOPICS = 10;
 
+const starredItems = [0, 1, 4, 6, 12, 34, 35, 65, 120, 144, 365, 456, 754, 942];
 const allData = data;
 // const allData = [...data, ...data1];
-let resources = allData.map((d: any) => ({
+let resources = allData.map((d: any, idx: number) => ({
   id: d.id,
   category:
     Object.keys(JSON.parse(d.topics.replaceAll("'", '"')))[0] || 'Others',
@@ -35,6 +36,7 @@ let resources = allData.map((d: any) => ({
   name: d.title,
   type: KnowledgeGraphItemCat.Paper,
   score: d.score,
+  starred: starredItems.includes(idx),
 }));
 
 export const idToFullResource = Object.fromEntries(

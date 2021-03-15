@@ -33,7 +33,7 @@ function ListPanel({ resources, onResourceClick, scores }: Props) {
 
   function onSelectResource(resource: D) {
     if (resourcesViz) {
-      const target = resourcesViz.data.find((d) => (d.id = resource.id));
+      const target = resourcesViz.data.find((d) => d.id === resource.id);
       const left = (target?.x || 0) + resourcesViz.center.x;
 
       onResourceClick(resource, -left / 2);

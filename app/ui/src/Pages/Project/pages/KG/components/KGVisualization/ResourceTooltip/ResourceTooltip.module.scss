@@ -15,6 +15,10 @@
 
   &.opened {
     border: solid 1px palette(highlight, 900);
+
+    &.starred {
+      border-color: palette(alert, 800);
+    }
   }
 }
 
@@ -46,6 +50,14 @@
     border: solid 1px palette(highlight);
     border-radius: 50%;
     background-color: transparent;
+  }
+
+  &.starred {
+    background-color: palette(alert);
+    box-shadow: 0 0 6px 1px palette(alert);
+    &::before {
+      border: solid 1px palette(alert);
+    }
   }
 }
 .name {

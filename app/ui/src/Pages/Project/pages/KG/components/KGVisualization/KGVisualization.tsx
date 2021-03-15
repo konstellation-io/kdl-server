@@ -20,6 +20,7 @@ export type D = {
   type: KnowledgeGraphItemCat;
   name: string;
   score: number;
+  starred: boolean;
 };
 
 export interface TopicSections {

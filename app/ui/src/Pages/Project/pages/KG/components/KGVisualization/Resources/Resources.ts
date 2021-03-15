@@ -17,8 +17,6 @@ const y = (d: DComplete) => d.y;
 
 export let lastSection: string | undefined;
 
-const favoriteResources = [1, 5, 12, 13, 43, 76, 128, 654, 765, 734, 812];
-
 const COLORS = {
   DEFAULT: 'rgba(12, 52, 72, 1)',
   DEFAULT_HIGHLIGHT: '#33FFFF',
@@ -87,6 +85,7 @@ export default class Resources {
     // context.globalCompositeOperation = 'lighter';
 
     let hoveredElement: DComplete | null = null;
+    let selectedElement: DComplete | null = null;
     const highlightedElements: DComplete[] = [];
 
     clearCanvas();
@@ -99,10 +98,11 @@ export default class Resources {
         highlightedElements.push(d);
       }
       if (lockHighlight && d.name === lockHighlight) {
+        selectedElement = d;
         highlightedElements.push(d);
       }
 
-      if (favoriteResources.includes(i)) {
+      if (d.starred) {
         fillStyle = COLORS.STARRED;
       }
 
@@ -118,7 +118,7 @@ export default class Resources {
     highlightedElements.forEach((element) => {
       let fillStyle = COLORS.DEFAULT_HIGHLIGHT;
 
-      if (favoriteResources.includes(data.indexOf(element))) {
+      if (element.starred) {
         fillStyle = COLORS.STARRED_HIGHLIGHT;
       }
 
@@ -150,14 +150,16 @@ export default class Resources {
       context.shadowBlur = 0;
     });
 
-    if (hoveredElement !== null) {
+    if (hoveredElement !== null && !selectedElement) {
       context.beginPath();
       context.moveTo(
         x + (hoveredElement as DComplete).x,
         y + (hoveredElement as DComplete).y
       );
       context.lineTo(250, 50);
-      context.strokeStyle = 'rgba(43, 217, 217, 0.5)';
+      context.strokeStyle = (hoveredElement as DComplete).starred
+        ? COLORS.STARRED_HIGHLIGHT
+        : COLORS.DEFAULT_HIGHLIGHT;
 
       context.stroke();
       context.closePath();

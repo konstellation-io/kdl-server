@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import styles from './SectionSelector.module.scss';
+import styles from './NavigationSelector.module.scss';
 import { NavLink } from 'react-router-dom';
 import { EnhancedRouteConfiguration } from 'Hooks/useProjectNavigation';
 import { BottomComponentProps } from '../Breadcrumbs/components/Crumb/Crumb';
@@ -10,7 +10,7 @@ type Props = {
   options: EnhancedRouteConfiguration[];
 };
 
-const SectionSelector: FC<Props & BottomComponentProps> = ({
+const NavigationSelector: FC<Props & BottomComponentProps> = ({
   options,
   closeComponent,
 }) => (
@@ -37,4 +37,4 @@ const SectionSelector: FC<Props & BottomComponentProps> = ({
     </ul>
   </div>
 );
-export default SectionSelector;
+export default NavigationSelector;

@@ -14,7 +14,7 @@ import ProjectIcon from 'Components/Icons/ProjectIcon/ProjectIcon';
 import ProjectSelector from '../ProjectSelector/ProjectSelector';
 import ROUTE from 'Constants/routes';
 import React from 'react';
-import SectionSelector from '../SectionSelector/SectionSelector';
+import NavigationSelector from '../NavigationSelector/NavigationSelector';
 import ServerIcon from 'Components/Icons/ServerIcon/ServerIcon';
 import { loader } from 'graphql.macro';
 import { useQuery, useReactiveVar } from '@apollo/client';
@@ -60,7 +60,7 @@ function useBreadcrumbs() {
     LeftIconComponent: <ServerIcon className="icon-regular" />,
     RightIconComponent: ExpandMoreIcon,
     BottomComponent: (props: BottomComponentProps) => (
-      <SectionSelector options={serverSections} {...props} />
+      <NavigationSelector options={serverSections} {...props} />
     ),
   });
 
@@ -90,7 +90,7 @@ function useBreadcrumbs() {
         LeftIconComponent: <Icon className="icon-small" />,
         RightIconComponent: ExpandMoreIcon,
         BottomComponent: (props: BottomComponentProps) => (
-          <SectionSelector options={projectSections} {...props} />
+          <NavigationSelector options={projectSections} {...props} />
         ),
       });
     }

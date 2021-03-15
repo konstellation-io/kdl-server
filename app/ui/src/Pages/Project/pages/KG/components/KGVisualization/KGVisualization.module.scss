@@ -204,7 +204,7 @@ $state-to-color: (
 .listPanel {
   position: fixed;
   right: 0;
-  height: 100%;
+  height: calc(100% - 40px);
   display: flex;
   flex-direction: row;
   z-index: 5;

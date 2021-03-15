@@ -1,7 +1,7 @@
 import ROUTE, { buildRoute } from 'Constants/routes';
 import { OverridableComponent } from '@material-ui/core/OverridableComponent';
 import { SvgIconTypeMap } from '@material-ui/core';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import IconHome from '@material-ui/icons/Dashboard';
 import IconKG from '@material-ui/icons/EmojiObjects';
 import GiteaIcon from 'Components/Icons/GiteaIcon/GiteaIcon';
@@ -47,13 +47,6 @@ export const projectRoutesConfiguration: {
     label: 'Drone',
     Icon: DroneIcon,
   },
-  [ROUTE.PROJECT_TOOL_JUPYTER]: {
-    id: 'jupyter',
-    label: 'Jupyter',
-    Icon: JupyterIcon,
-    canBeDisabled: true,
-    disabled: true,
-  },
   [ROUTE.PROJECT_TOOL_MINIO]: {
     id: 'minio',
     label: 'Minio',
@@ -63,6 +56,18 @@ export const projectRoutesConfiguration: {
     id: 'mlflow',
     label: 'Mlflow',
     Icon: MlFlowIcon,
+  },
+};
+
+export const userToolsRoutesConfiguration: {
+  [key: string]: RouteConfiguration;
+} = {
+  [ROUTE.PROJECT_TOOL_JUPYTER]: {
+    id: 'jupyter',
+    label: 'Jupyter',
+    Icon: JupyterIcon,
+    canBeDisabled: true,
+    disabled: true,
   },
   [ROUTE.PROJECT_TOOL_VSCODE]: {
     id: 'vscode',
@@ -77,22 +82,37 @@ export interface EnhancedRouteConfiguration extends RouteConfiguration {
   to: string;
 }
 
+export interface RoutesConfiguration {
+  projectRoutes: EnhancedRouteConfiguration[];
+  userToolsRoutes: EnhancedRouteConfiguration[];
+}
+
 function useProjectNavigation(projectId: string) {
   const { data } = useQuery<GetMe>(GetMeQuery);
 
-  const routesConfigurations: EnhancedRouteConfiguration[] = useMemo(
-    () =>
-      Object.entries(projectRoutesConfiguration).map(
-        ([routeString, { id, label, Icon, canBeDisabled }]) => ({
-          to: buildRoute(routeString as ROUTE, projectId),
-          id,
-          label,
-          Icon,
-          disabled: canBeDisabled ? !data?.me.areToolsActive : false,
-        })
-      ),
+  const mapRoute: (
+    args: [string, RouteConfiguration]
+  ) => EnhancedRouteConfiguration = useCallback(
+    ([routeString, { id, label, Icon, canBeDisabled }]) => ({
+      to: buildRoute(routeString as ROUTE, projectId),
+      Icon,
+      id,
+      label,
+      disabled: canBeDisabled ? !data?.me.areToolsActive : false,
+    }),
     [projectId, data?.me.areToolsActive]
   );
+
+  const routesConfigurations: RoutesConfiguration = useMemo(() => {
+    const projectRoutesEntries = Object.entries(projectRoutesConfiguration);
+    const projectRoutes = projectRoutesEntries.map(mapRoute);
+
+    const userToolsRoutesEntries = Object.entries(userToolsRoutesConfiguration);
+    const userToolsRoutes = userToolsRoutesEntries.map(mapRoute);
+
+    return { projectRoutes, userToolsRoutes };
+  }, [mapRoute]);
+
   return routesConfigurations;
 }
 

@@ -3,6 +3,7 @@ import { useLocation, useRouteMatch } from 'react-router-dom';
 import useProjectNavigation, {
   EnhancedRouteConfiguration,
   projectRoutesConfiguration,
+  RoutesConfiguration,
 } from 'Hooks/useProjectNavigation';
 
 import { CONFIG } from 'index';
@@ -47,9 +48,10 @@ function useBreadcrumbs() {
 
   const project = useReactiveVar(openedProject);
 
-  const projectSections: EnhancedRouteConfiguration[] = useProjectNavigation(
-    project?.id || ''
-  );
+  const {
+    projectRoutes,
+    userToolsRoutes,
+  }: RoutesConfiguration = useProjectNavigation(project?.id || '');
 
   if (loading || !projectsData) return { loading, crumbs };
   if (error) throw Error('cannot retrieve data at useBreadcrumbs');
@@ -90,7 +92,10 @@ function useBreadcrumbs() {
         LeftIconComponent: <Icon className="icon-small" />,
         RightIconComponent: ExpandMoreIcon,
         BottomComponent: (props: BottomComponentProps) => (
-          <SectionSelector options={projectSections} {...props} />
+          <SectionSelector
+            options={[...projectRoutes, ...userToolsRoutes]}
+            {...props}
+          />
         ),
       });
     }

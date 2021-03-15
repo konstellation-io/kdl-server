@@ -18,6 +18,14 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
+func (r *memberResolver) User(ctx context.Context, obj *entity.Member) (*entity.User, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *memberResolver) AddedDate(ctx context.Context, obj *entity.Member) (string, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error) {
 	user, err := r.users.Create(ctx, input.Email, input.Username, input.Password, input.AccessLevel)
 	if err != nil {

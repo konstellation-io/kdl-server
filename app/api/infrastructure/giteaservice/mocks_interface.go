@@ -34,6 +34,20 @@ func (m *MockGiteaClient) EXPECT() *MockGiteaClientMockRecorder {
 	return m.recorder
 }
 
+// AddCollaborator mocks base method.
+func (m *MockGiteaClient) AddCollaborator(repoName, username string, accessLevel entity.AccessLevel) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddCollaborator", repoName, username, accessLevel)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddCollaborator indicates an expected call of AddCollaborator.
+func (mr *MockGiteaClientMockRecorder) AddCollaborator(repoName, username, accessLevel interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddCollaborator", reflect.TypeOf((*MockGiteaClient)(nil).AddCollaborator), repoName, username, accessLevel)
+}
+
 // AddSSHKey mocks base method.
 func (m *MockGiteaClient) AddSSHKey(username, publicSSHKey string) error {
 	m.ctrl.T.Helper()
@@ -48,35 +62,49 @@ func (mr *MockGiteaClientMockRecorder) AddSSHKey(username, publicSSHKey interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddSSHKey", reflect.TypeOf((*MockGiteaClient)(nil).AddSSHKey), username, publicSSHKey)
 }
 
-// CreateRepo mocks base method
+// CreateRepo mocks base method.
 func (m *MockGiteaClient) CreateRepo(name, ownerUsername string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateRepo", name)
+	ret := m.ctrl.Call(m, "CreateRepo", name, ownerUsername)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// CreateRepo indicates an expected call of CreateRepo
+// CreateRepo indicates an expected call of CreateRepo.
 func (mr *MockGiteaClientMockRecorder) CreateRepo(name, ownerUsername interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRepo", reflect.TypeOf((*MockGiteaClient)(nil).CreateRepo), name, ownerUsername)
 }
 
-// AddCollaborator mocks base method
-func (m *MockGiteaClient) AddCollaborator(repoName, username string, accessLevel entity.AccessLevel) error {
+// CreateUser mocks base method.
+func (m *MockGiteaClient) CreateUser(email, username, password string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddCollaborator", repoName, username, accessLevel)
+	ret := m.ctrl.Call(m, "CreateUser", email, username, password)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// AddCollaborator indicates an expected call of AddCollaborator
-func (mr *MockGiteaClientMockRecorder) AddCollaborator(repoName, username, accessLevel interface{}) *gomock.Call {
+// CreateUser indicates an expected call of CreateUser.
+func (mr *MockGiteaClientMockRecorder) CreateUser(email, username, password interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddCollaborator", reflect.TypeOf((*MockGiteaClient)(nil).AddCollaborator), repoName, username, accessLevel)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockGiteaClient)(nil).CreateUser), email, username, password)
 }
 
-// RemoveCollaborator mocks base method
+// MirrorRepo mocks base method.
+func (m *MockGiteaClient) MirrorRepo(url, repoName, userName, userToken string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MirrorRepo", url, repoName, userName, userToken)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// MirrorRepo indicates an expected call of MirrorRepo.
+func (mr *MockGiteaClientMockRecorder) MirrorRepo(url, repoName, userName, userToken interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MirrorRepo", reflect.TypeOf((*MockGiteaClient)(nil).MirrorRepo), url, repoName, userName, userToken)
+}
+
+// RemoveCollaborator mocks base method.
 func (m *MockGiteaClient) RemoveCollaborator(repoName, username string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemoveCollaborator", repoName, username)
@@ -84,13 +112,13 @@ func (m *MockGiteaClient) RemoveCollaborator(repoName, username string) error {
 	return ret0
 }
 
-// RemoveCollaborator indicates an expected call of RemoveCollaborator
+// RemoveCollaborator indicates an expected call of RemoveCollaborator.
 func (mr *MockGiteaClientMockRecorder) RemoveCollaborator(repoName, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveCollaborator", reflect.TypeOf((*MockGiteaClient)(nil).RemoveCollaborator), repoName, username)
 }
 
-// UpdateCollaboratorPermissions mocks base method
+// UpdateCollaboratorPermissions mocks base method.
 func (m *MockGiteaClient) UpdateCollaboratorPermissions(repoName, username string, accessLevel entity.AccessLevel) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateCollaboratorPermissions", repoName, username, accessLevel)
@@ -98,7 +126,7 @@ func (m *MockGiteaClient) UpdateCollaboratorPermissions(repoName, username strin
 	return ret0
 }
 
-// UpdateCollaboratorPermissions indicates an expected call of UpdateCollaboratorPermissions
+// UpdateCollaboratorPermissions indicates an expected call of UpdateCollaboratorPermissions.
 func (mr *MockGiteaClientMockRecorder) UpdateCollaboratorPermissions(repoName, username, accessLevel interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCollaboratorPermissions", reflect.TypeOf((*MockGiteaClient)(nil).UpdateCollaboratorPermissions), repoName, username, accessLevel)

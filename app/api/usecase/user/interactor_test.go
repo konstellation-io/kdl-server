@@ -72,11 +72,11 @@ func TestInteractor_Create(t *testing.T) {
 		id            = "user.1234"
 		email         = "user@email.com"
 		password      = "p4$sword"
-		username      = "john"
+		username      = "john.doe"
 		accessLevel   = entity.AccessLevelAdmin
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"
-		secretName    = "john-ssh-keys" //nolint:gosec // it is a unit test
+		secretName    = "john-doe-ssh-keys" //nolint:gosec // it is a unit test
 	)
 
 	secretValues := map[string]string{

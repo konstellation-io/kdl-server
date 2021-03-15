@@ -1,0 +1,36 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  height: 5 * $grid-unit;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+  background-color: transparent;
+  border-left: 3px solid transparent;
+
+  transition: background-color ease 0.3s, border-left-color ease 0.3s,
+    color ease 0.2s, opacity ease 0.3s;
+  color: font-color(lowlight);
+
+  &.disabled {
+    color: palette(lowlight, 300);
+    opacity: 0.5;
+  }
+
+  &:hover {
+    border-left-color: palette(highlight);
+    color: font-color(highlight);
+  }
+
+  .icon {
+    margin: 0 1.4 * $grid-unit;
+    transition: transform ease 0.3s;
+  }
+
+  .label {
+    @include font-small;
+  }
+}

@@ -23,7 +23,7 @@ var (
 	// This regexp extracts the repository name from a https URL like:
 	//  https://github.com/konstellation-io/kre.git
 	repoNameRegexp    = regexp.MustCompile(`([^/]+)\.git$`)
-	errInvalidRepoURL = errors.New("the repository URL is invalid")
+	ErrInvalidRepoURL = errors.New("the repository URL is invalid")
 )
 
 // CreateProjectOption options when creating project.
@@ -195,7 +195,7 @@ func getRepoNameFromURL(url string) (string, error) {
 
 	matches := repoNameRegexp.FindStringSubmatch(url)
 	if len(matches) != expectedMatches {
-		return "", errInvalidRepoURL
+		return "", ErrInvalidRepoURL
 	}
 
 	return matches[1], nil

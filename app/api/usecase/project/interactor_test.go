@@ -141,6 +141,7 @@ func TestInteractor_CreateExternal(t *testing.T) {
 		projectID   = "project.2345"
 		projectName = "The Project Y"
 		projectDesc = "The Project Y Description"
+		repoName    = "repo"
 	)
 
 	externalRepoURL := "https://github.com/org/repo.git"
@@ -159,7 +160,7 @@ func TestInteractor_CreateExternal(t *testing.T) {
 
 	expectedProject := entity.Project{
 		ID:           projectID,
-		Name:         projectName,
+		Name:         repoName,
 		Description:  projectDesc,
 		CreationDate: now,
 		Repository: entity.Repository{
@@ -169,8 +170,8 @@ func TestInteractor_CreateExternal(t *testing.T) {
 	}
 
 	s.mocks.giteaService.EXPECT().MirrorRepo(externalRepoURL, projectName, externalRepoUsername, externalRepoPassword).Return(nil)
-	s.mocks.minioService.EXPECT().CreateBucket(projectName).Return(nil)
-	s.mocks.droneService.EXPECT().ActivateRepository(projectName).Return(nil)
+	s.mocks.minioService.EXPECT().CreateBucket(repoName).Return(nil)
+	s.mocks.droneService.EXPECT().ActivateRepository(repoName).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(projectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, projectID).Return(expectedProject, nil)

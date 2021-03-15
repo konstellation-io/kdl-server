@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
@@ -19,6 +20,10 @@ const (
 
 var (
 	ErrCreateProjectValidation = errors.New("create project validation error")
+	// This regexp extracts the repository name from a https URL like:
+	//  https://github.com/konstellation-io/kre.git
+	repoNameRegexp    = regexp.MustCompile(`([^/]+)\.git$`)
+	errInvalidRepoURL = errors.New("the repository URL is invalid")
 )
 
 // CreateProjectOption options when creating project.
@@ -142,7 +147,10 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 			ExternalRepoURL: *opt.ExternalRepoURL,
 		}
 
-		repoName = opt.Name
+		repoName, err = getRepoNameFromURL(*opt.ExternalRepoURL)
+		if err != nil {
+			return entity.Project{}, err
+		}
 	}
 
 	// Create Minio bucket
@@ -179,6 +187,18 @@ func (i interactor) FindByUserID(ctx context.Context, userID string) ([]entity.P
 func (i interactor) GetByID(ctx context.Context, id string) (entity.Project, error) {
 	i.logger.Infof("Getting project with id \"%s\"", id)
 	return i.repo.Get(ctx, id)
+}
+
+// getRepoNameFromURL extracts the name of the repo from the external repo url.
+func getRepoNameFromURL(url string) (string, error) {
+	const expectedMatches = 2
+
+	matches := repoNameRegexp.FindStringSubmatch(url)
+	if len(matches) != expectedMatches {
+		return "", errInvalidRepoURL
+	}
+
+	return matches[1], nil
 }
 
 // Update changes the desired information about a project.

@@ -34,7 +34,7 @@ type CreateProjectOption struct {
 	InternalRepoName     *string
 	ExternalRepoURL      *string
 	ExternalRepoUsername *string
-	ExternalRepoPassword *string
+	ExternalRepoToken    *string
 	Owner                entity.User
 }
 
@@ -61,6 +61,14 @@ func (c CreateProjectOption) Validate() error {
 	if c.RepoType == entity.RepositoryTypeExternal {
 		if c.ExternalRepoURL == nil {
 			return fmt.Errorf("%w: external repository URL cannot be null", ErrCreateProjectValidation)
+		}
+
+		if c.ExternalRepoUsername == nil {
+			return fmt.Errorf("%w: external repository username cannot be null", ErrCreateProjectValidation)
+		}
+
+		if c.ExternalRepoToken == nil {
+			return fmt.Errorf("%w: external repository token cannot be null", ErrCreateProjectValidation)
 		}
 	}
 
@@ -137,7 +145,12 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		repoName = *opt.InternalRepoName
 
 	case entity.RepositoryTypeExternal:
-		err := i.giteaService.MirrorRepo(*opt.ExternalRepoURL, opt.Name, *opt.ExternalRepoUsername, *opt.ExternalRepoPassword)
+		repoName, err = getRepoNameFromURL(*opt.ExternalRepoURL)
+		if err != nil {
+			return entity.Project{}, err
+		}
+
+		err := i.giteaService.MirrorRepo(*opt.ExternalRepoURL, repoName, *opt.ExternalRepoUsername, *opt.ExternalRepoToken)
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -145,11 +158,6 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		project.Repository = entity.Repository{
 			Type:            entity.RepositoryTypeExternal,
 			ExternalRepoURL: *opt.ExternalRepoURL,
-		}
-
-		repoName, err = getRepoNameFromURL(*opt.ExternalRepoURL)
-		if err != nil {
-			return entity.Project{}, err
 		}
 	}
 
@@ -168,7 +176,6 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 	// Store the project into the database
 	insertedID, err := i.repo.Create(ctx, project)
 	if err != nil {
-		i.logger.Errorf("Unexpected error saving project into DB: %s", err)
 		return entity.Project{}, err
 	}
 

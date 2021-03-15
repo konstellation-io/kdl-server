@@ -18,15 +18,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
-func (r *memberResolver) User(ctx context.Context, obj *entity.Member) (*entity.User, error) {
-	u, err := dataloader.For(ctx).UserByID.Load(obj.UserID)
-	return &u, err
-}
-
-func (r *memberResolver) AddedDate(ctx context.Context, obj *entity.Member) (string, error) {
-	return obj.AddedDate.Format(time.RFC3339), nil
-}
-
 func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error) {
 	user, err := r.users.Create(ctx, input.Email, input.Username, input.Password, input.AccessLevel)
 	if err != nil {
@@ -54,14 +45,30 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 		return nil, err
 	}
 
+	internalRepoName := ""
+	externalRepoURL := ""
+	externalRepoUsername := ""
+	externalRepoToken := ""
+
+	switch input.Repository.Type {
+	case entity.RepositoryTypeInternal:
+		internalRepoName = input.Repository.Internal.Name
+	case entity.RepositoryTypeExternal:
+		externalRepoURL = input.Repository.External.URL
+		externalRepoUsername = input.Repository.External.Username
+		externalRepoToken = input.Repository.External.Token
+	default:
+		return &entity.Project{}, entity.ErrInvalidRepoType
+	}
+
 	createdProject, err := r.projects.Create(ctx, project.CreateProjectOption{
 		Name:                 input.Name,
 		Description:          input.Description,
 		RepoType:             input.Repository.Type,
-		InternalRepoName:     input.Repository.InternalRepoName,
-		ExternalRepoURL:      input.Repository.ExternalRepoURL,
-		ExternalRepoUsername: input.Repository.ExternalRepoUsername,
-		ExternalRepoPassword: input.Repository.ExternalRepoPassword,
+		InternalRepoName:     &internalRepoName,
+		ExternalRepoURL:      &externalRepoURL,
+		ExternalRepoUsername: &externalRepoUsername,
+		ExternalRepoToken:    &externalRepoToken,
 		Owner:                loggedUser,
 	})
 

@@ -12,6 +12,10 @@
 
   display: flex;
   justify-content: space-between;
+
+  &.opened {
+    border: solid 1px palette(highlight, 900);
+  }
 }
 
 .left {

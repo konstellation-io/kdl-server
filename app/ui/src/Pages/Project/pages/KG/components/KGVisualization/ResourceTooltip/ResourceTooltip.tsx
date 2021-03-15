@@ -2,6 +2,7 @@ import { D } from '../KGVisualization';
 import IconMouse from '@material-ui/icons/Mouse';
 import React from 'react';
 import Score from '../Score';
+import cx from 'classnames';
 import styles from './ResourceTooltip.module.scss';
 
 type Props = {
@@ -29,7 +30,15 @@ function ResourceTooltip({ resource }: Props) {
       </>
     );
   }
-  return <div className={styles.container}>{getContent()}</div>;
+  return (
+    <div
+      className={cx(styles.container, {
+        [styles.opened]: resource !== null,
+      })}
+    >
+      {getContent()}
+    </div>
+  );
 }
 
 export default ResourceTooltip;

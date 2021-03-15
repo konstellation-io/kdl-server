@@ -86,18 +86,20 @@ export default class Resources {
     // context.fillStyle = 'rgba(12, 52, 72, 0.8)';
     // context.globalCompositeOperation = 'lighter';
 
-    let lastElements: DComplete[] = [];
+    let hoveredElement: DComplete | null = null;
+    const highlightedElements: DComplete[] = [];
 
     clearCanvas();
     data.forEach((d, i) => {
       let r = d.outsideMax ? RESOURCE_R * 0.7 : RESOURCE_R;
       let fillStyle = COLORS.DEFAULT;
 
-      if (
-        (hover && d.name === hover) ||
-        (lockHighlight && d.name === lockHighlight)
-      ) {
-        lastElements.push(d);
+      if (hover && d.name === hover) {
+        hoveredElement = d;
+        highlightedElements.push(d);
+      }
+      if (lockHighlight && d.name === lockHighlight) {
+        highlightedElements.push(d);
       }
 
       if (favoriteResources.includes(i)) {
@@ -113,7 +115,7 @@ export default class Resources {
       context.closePath();
     });
 
-    lastElements.forEach((element) => {
+    highlightedElements.forEach((element) => {
       let fillStyle = COLORS.DEFAULT_HIGHLIGHT;
 
       if (favoriteResources.includes(data.indexOf(element))) {
@@ -147,6 +149,19 @@ export default class Resources {
 
       context.shadowBlur = 0;
     });
+
+    if (hoveredElement !== null) {
+      context.beginPath();
+      context.moveTo(
+        x + (hoveredElement as DComplete).x,
+        y + (hoveredElement as DComplete).y
+      );
+      context.lineTo(250, 50);
+      context.strokeStyle = 'rgba(43, 217, 217, 0.5)';
+
+      context.stroke();
+      context.closePath();
+    }
   };
 
   init = (
@@ -212,7 +227,6 @@ export default class Resources {
 
     axisToShow.style('opacity', 1);
     axisToShow.selectAll('text').style('text-anchor', () => {
-      if (bottom && secondHalf) return 'end';
       if (bottom && secondHalf) return 'end';
       if (bottom && !secondHalf) return 'start';
       if (!bottom && secondHalf) return 'start';

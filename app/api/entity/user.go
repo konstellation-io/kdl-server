@@ -1,6 +1,10 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"github.com/gosimple/slug"
+)
 
 // SSHKey entity definition.
 type SSHKey struct {
@@ -29,4 +33,8 @@ type User struct {
 	SSHKey       SSHKey
 	LastActivity *time.Time
 	APITokens    []APIToken
+}
+
+func (u User) UsernameSlug() string {
+	return slug.Make(u.Username)
 }

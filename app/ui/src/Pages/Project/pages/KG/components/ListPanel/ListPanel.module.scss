@@ -12,57 +12,26 @@
   max-width: 60 * $grid-unit;
 
   background-color: palette(base, 800);
+
+  .tabContainer {
+    height: 100%;
+    background-color: palette(lowlight, 900);
+    padding: $grid-unit;
+    overflow: auto;
+  }
+
+  .selectedTab {
+    background-color: palette(lowlight, 900);
+    color: font-color(light);
+    transition: background-color ease 0.2s;
+
+    &:hover {
+      background-color: palette(lowlight, 900);
+    }
+  }
 }
 .title {
   @include font-body;
   color: font-color(light);
-
   padding: 2 * $grid-unit 0 2 * $grid-unit 2.5 * $grid-unit;
-}
-.list {
-  background-color: palette(lowlight, 900);
-  flex-grow: 1;
-  padding: 2 * $grid-unit;
-  overflow: auto;
-}
-.resource {
-  background-color: palette(base, 500);
-  border-radius: 4px;
-  cursor: pointer;
-
-  padding: 2 * $grid-unit;
-  margin-bottom: $grid-unit;
-
-  border-left: solid 3px transparent;
-
-  animation: border-left-color ease 0.4s;
-
-  &:hover {
-    border-left-color: palette(highlight);
-  }
-
-  .typeAndScore {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 2 * $grid-unit;
-  }
-
-  .rType {
-    @include font-small;
-    color: font-color(lowlight);
-  }
-
-  .topics {
-    display: flex;
-    margin-top: $grid-unit;
-  }
-  .topic {
-    @include font-small;
-    font-size: 10px;
-    background-color: palette(base, 900);
-    padding: 0.25 * $grid-unit 1 * $grid-unit;
-    border-radius: 0.5 * $grid-unit;
-    margin-right: $grid-unit;
-  }
 }

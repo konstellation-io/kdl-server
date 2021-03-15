@@ -160,7 +160,7 @@ func TestInteractor_CreateExternal(t *testing.T) {
 
 	expectedProject := entity.Project{
 		ID:           projectID,
-		Name:         repoName,
+		Name:         projectName,
 		Description:  projectDesc,
 		CreationDate: now,
 		Repository: entity.Repository{

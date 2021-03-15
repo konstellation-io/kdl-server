@@ -1,7 +1,6 @@
 @import 'Styles/variables';
 @import 'Styles/mixins';
 @import 'Styles/colors';
-@import 'Styles/shadows';
 
 .resource {
   cursor: pointer;
@@ -56,7 +55,7 @@
     @include font-small;
     color: font-color(lowlight);
     background-color: palette(base, 500);
-    padding: 0.5 * $grid-unit 1 * $grid-unit;
+    padding: 0.5 * $grid-unit $grid-unit;
     border-radius: 0.5 * $grid-unit;
     margin-right: $grid-unit;
   }

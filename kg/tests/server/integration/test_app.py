@@ -32,10 +32,10 @@ class TestKnowledgeGraphService:
 
     @pytest.mark.int
     def test_GetGraph(self):
-        case = get_cases_from_load_dataset(1)
+        case = get_cases_from_load_dataset(4)
         client = self.set_client()
         res = client.request("kg.KGService", "GetGraph",
-                             {"description": case.abstract.iloc[0]},
+                             {"description": case.abstract.iloc[3]},
                              raw_output=True)
         assert isinstance(res.__class__, type(GetGraphRes))
-        assert res.items[0].external_id == case.external_id.iloc[0]
+        assert res.items[0].external_id == case.external_id.iloc[3]

@@ -44,5 +44,4 @@ type KnowledgeGraphItem struct {
 	Topics      []Topic
 	Score       float64
 	IsStarred   bool
-	IsDiscarded bool
 }

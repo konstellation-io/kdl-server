@@ -1,9 +1,11 @@
 import logging
+import pickle
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import transformers
+from scipy import sparse
 from transformers import PreTrainedModel, PreTrainedTokenizer
 
 from exceptions import AssetLoadingException
@@ -18,10 +20,16 @@ class AssetLoader:
     def __init__(self, path: str):
         self.log = logging.getLogger("AssetLoader")
         self.path = path
+
         self.dataset = self._load_dataset()
-        self.model = self._load_model()
         self.vectors = self._load_dataset_vectors()
+
+        self.topics = self._load_dataset_topics()
+        self.topics_dict = self._load_topics_dict()
+
+        self.model = self._load_model()
         self.tokenizer = self._load_tokenizer()
+
         self._asset_checks()
 
     def _asset_checks(self):
@@ -55,6 +63,25 @@ class AssetLoader:
         self.log.debug(f"Loading vectors from: {path}")
 
         return np.load(str(path))
+
+    def _load_dataset_topics(self) -> sparse.csr_matrix:
+        """
+        Loads topic sparse matrix from a file
+        """
+        path = Path(self.path, "vectors.npz")
+        self.log.debug(f"Loading topic matrix from: {path}")
+
+        return sparse.load_npz(path)
+
+    def _load_topics_dict(self) -> dict[int, str]:
+        """
+        Loads topic dict from a file
+        """
+        path = Path(self.path, "topics_dict.pkl")
+        with open(path, 'wb') as f:
+            topics_dict = pickle.load(f)
+
+        return topics_dict
 
     def _load_model(self) -> PreTrainedModel:
         """

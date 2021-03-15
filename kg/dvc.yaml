@@ -1,0 +1,32 @@
+stages:
+  check-inputs:
+    cmd: python pipe/check_inputs.py
+    deps:
+    - inputs/arxiv-metadata-oai-snapshot.json
+    - inputs/links-between-papers-and-code.json
+    - inputs/papers-with-abstracts.json
+    - pipe/check_inputs.py
+#  create-dataset:
+#    cmd: python pipe/create_dataset.py
+#    deps:
+#    - pipe/create_dataset.py
+#    - inputs/arxiv-metadata-oai-snapshot.json
+#    - inputs/links-between-papers-and-code.json
+#    - inputs/papers-with-abstracts.json
+#    outs:
+#    - assets/dataset.pkl.gz
+#  compute-vectors:
+#    cmd: python pipe/compute_vectors.py
+#    deps:
+#    - assets/dataset.pkl.gz
+#    - pipe/compute_vectors.py
+#    outs:
+#    - assets/vectors.npy
+#  compute-topics:
+#    cmd: python pipe/compute_topics.py
+#    deps:
+#    - assets/dataset.pkl.gz
+#    - pipe/compute_topics.py
+#    outs:
+#    - assets/topics.ngz
+#    - assets/topics_dict.pkl

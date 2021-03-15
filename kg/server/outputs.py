@@ -51,7 +51,7 @@ class RecommendedItem:
     topics: list[Topic]
 
     # Optional fields
-    external_id: str = ""  # Keeping camelCase for consistency.
+    external_id: str = ""
     frameworks: Optional[list[str]] = None
     repo_urls: Optional[list[str]] = None
 
@@ -136,12 +136,15 @@ class RecommendedList:
         self.items = item_list
         self.items.sort(reverse=True)
 
+    def add_topics(self, topics: list[Topic]):
+        self.topics = topics
+
     def to_grpc(self) -> kg_pb.GetGraphRes:
         """
         Outputs a RecommendedList in GetGraphRes type.
         """
         res = kg_pb.GetGraphRes()
         res.items.extend([item.to_grpc() for item in self.items])
-        res.items.extend([item.to_grpc() for item in self.items])
+        res.topics.extend([topic.to_grpc() for topic in self.topics])
 
         return res

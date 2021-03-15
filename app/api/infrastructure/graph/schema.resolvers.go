@@ -13,17 +13,19 @@ import (
 	"github.com/gosimple/slug"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/dataloader"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
 func (r *memberResolver) User(ctx context.Context, obj *entity.Member) (*entity.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	u, err := dataloader.For(ctx).UserByID.Load(obj.UserID)
+	return &u, err
 }
 
 func (r *memberResolver) AddedDate(ctx context.Context, obj *entity.Member) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	return obj.AddedDate.Format(time.RFC3339), nil
 }
 
 func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error) {

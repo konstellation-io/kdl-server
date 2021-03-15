@@ -1,37 +1,52 @@
+from collections import OrderedDict
+
+# FROM HERE DELETE
 import numpy as np
 import torch
+from faker import Faker
+from torchnlp.encoders.text import stack_and_pad_tensors
+from transformers import AutoModel, AutoTokenizer
 
 import compute_vectors
 
+# PATHS
+ASSET_PATH = "assets/"
+MODEL_PATH = ASSET_PATH + "model/"
+OUTPUT_PATH = ASSET_PATH + "vectors.npy"
+
+# CONSTANTS
+VECTOR_DIMS = 768
+BATCH_SIZE = 32
+
+# Inputs and outputs
+DATASET_PATH = ASSET_PATH + "dataset.pkl.gz"
+
 TEST_DATASET_PATH = "tests/pipe/files/test_ds.pkl.gz"
 
-INPUT_TEST = """Extremity direction existence as dashwoods do up. Securing marianne led welcomed offended but
-            offering six raptures. Conveying concluded newspaper rapturous oh at. Two indeed suffer saw beyond
-            far former mrs remain. Occasional continuing possession we insensible an sentiments as is.
-            Law but reasonably motionless principles she. Has six worse downs far blush rooms above stood.
-            Certainly elsewhere my do allowance at. The address farther six hearted hundred towards husband.
-            Are securing off occasion remember daughter replying. Held that feel his see own yet. Strangers
-            ye to he sometimes propriety in. She right plate seven has. Bed who perceive judgment did marianne.
-            Gave read use way make spot how nor. In daughter goodness an likewise oh consider at procured wandered.
-            Songs words wrong by me hills heard timed. Happy eat may doors songs.
-            Be ignorant so of suitable dissuade weddings together. Least whole timed we is.
-            An smallness deficient discourse do newspaper be an eagerness continued.
-            Mr my ready guest ye after short at.
-            Received overcame oh sensible so at an. Formed do change merely to county it.
-            Am separate contempt domestic to to oh.
-            On relation my so addition branched."""
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-INPUT_TEST_2 = """Put hearing cottage she norland letters equally prepare too.
-            Replied exposed savings he no viewing as up. Soon body add him hill.
-            No father living really people estate if. Mistake do produce beloved demesne if am pursuit.
-            Is post each that just leaf no. He connection interested so we an sympathize advantages.
-            To said is it shed want do. Occasional middletons everything so to. Have spot part for his quit may.
-            Enable it is square my an regard. Often merit stuff first oh up hills as he.
-            Servants contempt as although addition dashwood is procured.
-            Interest in yourself an do of numerous feelings cheerful confined.
-            Resources exquisite set arranging moonlight sex him household had. Months had too ham cousin remove far spirit.
-            She procuring the why performed continual improving. Civil songs so large shade in cause.
-            Lady an mr here must neat sold. """
+TOKENIZER = AutoTokenizer.from_pretrained(MODEL_PATH)
+TOKENIZER_ARGS = dict(truncation=True, max_length=512)
+
+TRANSFORMER = AutoModel.from_pretrained(MODEL_PATH).to(DEVICE)
+
+
+# TO HERE
+
+
+def gen_inputs(n_sentences: int = 10, n_paragraph: int = 5, n_inputs: int = 32) -> np.ndarray:
+    locales = OrderedDict([('en-US', 1)])
+    Faker.seed(0)
+    fake = Faker(locales)
+    outputs = list()
+    for _ in range(n_inputs):
+        description = ""
+        for _ in range(n_paragraph):
+            description += fake.paragraph(nb_sentences=n_sentences) + "\n"
+
+        outputs.append(description)
+
+    return np.array(outputs)
 
 
 def test_convert_to_batches():
@@ -44,27 +59,34 @@ def test_convert_to_batches():
 
 
 def test_tokenize_batch():
-    expected = torch.tensor(compute_vectors.TOKENIZER.encode(INPUT_TEST,
-                                                             **compute_vectors.TOKENIZER_ARGS))
-    batch = (INPUT_TEST, INPUT_TEST_2)
-    actual = compute_vectors.tokenize_batch(batch)
-    assert all(actual[0] == expected)
+    inputs = gen_inputs(n_inputs=64)
+    expected = stack_and_pad_tensors([torch.tensor(compute_vectors.TOKENIZER.encode(inputs[0],
+                                                                                    **TOKENIZER_ARGS))],
+                                     dim=512)
+    batches = compute_vectors.convert_to_batches(inputs, batch_size=32)
+    actual = compute_vectors.tokenize_batch(batches[0], tokenizer=TOKENIZER)
 
-
-def test_vectorize_batch():
-    pass
+    assert all(actual[0] == expected[0])
 
 
 def test_vectorize():
-    compute_vectors.vectorize([INPUT_TEST, INPUT_TEST_2], 1)
+    inputs = gen_inputs(n_sentences=10, n_paragraph=5, n_inputs=32 * 2)
+    vecs = compute_vectors.vectorize(inputs, batch_size=32, model=TRANSFORMER,
+                                     tokenizer=TOKENIZER)
+
+
+def test_vectorize_uneven_len():
+    inputs = gen_inputs(n_sentences=10, n_paragraph=5, n_inputs=33)
+    vecs = compute_vectors.vectorize(inputs, batch_size=32, model=TRANSFORMER,
+                                     tokenizer=TOKENIZER)
+
+    assert len(vecs) == 33
 
 
 def test_preprocess_output():
     title = "Test Title"
     abstract = "This **is** ñ a test \n a test is this"
-
     expected = "Test Title. This  is  ñ a test   a test is this"
-
     output = compute_vectors.create_inputs(title, abstract)
     assert expected == output
 
@@ -72,7 +94,6 @@ def test_preprocess_output():
 def test_get_inputs():
     expected_first_input = "test title 0. test abstract 0"
     expected_last_input = "test title 63. test abstract 63"
-
     inputs = compute_vectors.get_inputs(TEST_DATASET_PATH)
     assert expected_first_input == inputs[0]
     assert expected_last_input == inputs[-1]

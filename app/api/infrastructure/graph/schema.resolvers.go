@@ -67,7 +67,13 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 }
 
 func (r *mutationResolver) UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error) {
-	return nil, entity.ErrNotImplemented
+	p, err := r.projects.Update(ctx, project.UpdateProjectOption{
+		ProjectID:   input.ID,
+		Name:        input.Name,
+		Description: input.Description,
+	})
+
+	return &p, err
 }
 
 func (r *mutationResolver) AddMembers(ctx context.Context, input model.AddMembersInput) (*entity.Project, error) {

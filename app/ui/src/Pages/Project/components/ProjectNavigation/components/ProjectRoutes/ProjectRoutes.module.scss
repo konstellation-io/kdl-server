@@ -3,6 +3,7 @@
 @import 'Styles/colors';
 
 .userTools {
+  background-color: palette(base);
   border-top: 2px solid palette(base, 400);
   margin-top: $grid-unit;
   padding-top: 0.75 * $grid-unit;

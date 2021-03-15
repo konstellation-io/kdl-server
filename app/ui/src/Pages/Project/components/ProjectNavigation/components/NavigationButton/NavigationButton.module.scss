@@ -1,0 +1,32 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.navButton {
+  height: 5 * $grid-unit;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background-color: transparent;
+  border-left: 2px solid transparent;
+
+  transition: background-color ease 0.3s, border-left ease 0.3s, color ease 0.2s, opacity ease 0.3s;
+  color: font-color(lowlight);
+
+  .icon {
+    margin: 0 1.4 * $grid-unit;
+    transition: transform ease 0.3s;
+  }
+
+  .label {
+    @include font-caption;
+    margin-left: 2px;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  &:hover {
+    background-color: palette(base, 400);
+    color: font-color(light);
+  }
+}

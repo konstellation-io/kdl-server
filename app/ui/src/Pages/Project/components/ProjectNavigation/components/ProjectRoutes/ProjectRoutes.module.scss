@@ -1,0 +1,44 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.userTools {
+  border-top: 2px solid palette(base, 400);
+  margin-top: $grid-unit;
+  padding-top: 0.75 * $grid-unit;
+  transition: border-right 0.3s ease;
+  border-right: 2px solid transparent;
+
+  &.show.started {
+    border-right: 2px solid palette(success);
+  }
+
+  &.show.stopped {
+    border-right: 2px solid palette(alert);
+  }
+
+  .userToolLabel {
+    @include font-caption;
+    color: font-color(regular);
+    width: 100%;
+    white-space: nowrap;
+    margin-left: 5 * $grid-unit;
+    margin-bottom: $grid-unit;
+  }
+
+  .toggleToolsWrapper {
+    border-top: 2px dotted palette(base, 400);
+    transition: opacity 0.3s ease;
+
+    .loadingTools {
+      color: palette(highlight);
+      margin: 0 1.4 * $grid-unit;
+      transition: transform ease 0.3s;
+    }
+
+    &.disabled {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+  }
+}

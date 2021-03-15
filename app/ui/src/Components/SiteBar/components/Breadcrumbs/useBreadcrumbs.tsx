@@ -4,6 +4,7 @@ import useProjectNavigation, {
   EnhancedRouteConfiguration,
   projectRoutesConfiguration,
   RoutesConfiguration,
+  userToolsRoutesConfiguration,
 } from 'Hooks/useProjectNavigation';
 
 import { CONFIG } from 'index';
@@ -81,9 +82,10 @@ function useBreadcrumbs() {
 
     // Add crumb for the section
     const lastParam: string = location.pathname.split('/').pop() || '';
-    const projectRoute = Object.values(projectRoutesConfiguration).find(
-      ({ id }) => id === lastParam
-    );
+    const projectRoute = Object.values({
+      ...projectRoutesConfiguration,
+      ...userToolsRoutesConfiguration,
+    }).find(({ id }) => id === lastParam);
 
     if (projectRoute) {
       const { label: crumbText, Icon } = projectRoute;

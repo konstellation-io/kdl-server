@@ -1,29 +1,18 @@
-import { NavLink, useParams } from 'react-router-dom';
-import React, { FC, useState } from 'react';
-import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
-import useWorkspace, { CONFIG } from 'Hooks/useWorkspace';
+import {NavLink, useParams} from 'react-router-dom';
+import React, {FC, useState} from 'react';
+import usePanel, {PanelType} from 'Graphql/client/hooks/usePanel';
+import useWorkspace, {CONFIG} from 'Hooks/useWorkspace';
 
 import IconCollapse from '@material-ui/icons/KeyboardBackspace';
 import IconSettings from '@material-ui/icons/Settings';
-import PauseIcon from '@material-ui/icons/Pause';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
-import NavigationButton from './NavigationButton';
-import { PANEL_ID } from 'Graphql/client/models/Panel';
-import { RouteProjectParams } from 'Constants/routes';
+import NavigationButton from './components/NavigationButton/NavigationButton';
+import {PANEL_ID} from 'Graphql/client/models/Panel';
+import {RouteProjectParams} from 'Constants/routes';
 import cx from 'classnames';
 import styles from './ProjectNavigation.module.scss';
-import useProjectNavigation from 'Hooks/useProjectNavigation';
-import useTool from 'Graphql/hooks/useTool';
-import { GetMe } from 'Graphql/queries/types/GetMe';
-import { loader } from 'graphql.macro';
-import { useQuery } from '@apollo/client';
-import { Button, BUTTON_ALIGN } from 'kwc';
+import ProjectRoutes from './components/ProjectRoutes/ProjectRoutes';
 
-const GetMeQuery = loader('Graphql/queries/getMe.graphql');
-
-const NavButtonLink: FC<any> = ({ children, ...props }) => {
+export const NavButtonLink: FC<any> = ({ children, ...props }) => {
   return (
     <NavLink
       {...props}
@@ -39,10 +28,7 @@ const NavButtonLink: FC<any> = ({ children, ...props }) => {
 function ProjectNavigation() {
   const { projectId } = useParams<RouteProjectParams>();
   const [{ navigationOpened }, saveConfiguration] = useWorkspace(projectId);
-  const { updateProjectActiveTools, projectActiveTools } = useTool();
-  const { data } = useQuery<GetMe>(GetMeQuery);
   const [opened, setOpened] = useState(navigationOpened);
-  const areToolsActive = data?.me.areToolsActive;
 
   const { togglePanel } = usePanel(PanelType.PRIMARY, {
     id: PANEL_ID.SETTINGS,
@@ -55,53 +41,10 @@ function ProjectNavigation() {
     saveConfiguration(CONFIG.NAVIGATION_OPENED, !opened);
   }
 
-  const { projectRoutes, userToolsRoutes } = useProjectNavigation(projectId);
-
-  function toggleTools() {
-    updateProjectActiveTools(!areToolsActive);
-  }
-
-  function renderToggleToolsIcon() {
-    if (projectActiveTools.loading)
-      return () => (
-        <CircularProgress className={styles.loadingTools} size={16} />
-      );
-    return areToolsActive ? PauseIcon : PlayArrowIcon;
-  }
-
   return (
     <div className={cx(styles.container, { [styles.opened]: opened })}>
       <div className={styles.top}>
-        {projectRoutes.map(({ Icon, label, to }) => (
-          <NavButtonLink to={to} key={label}>
-            <NavigationButton label={label} Icon={Icon} />
-          </NavButtonLink>
-        ))}
-        <div
-          className={cx(styles.userTools, {
-            [styles.show]: opened,
-            [styles.started]: areToolsActive,
-            [styles.stopped]: !areToolsActive,
-          })}
-        >
-          <div className={styles.userToolLabel}>USER TOOLS</div>
-          <div className={styles.userToolsWrapper}>
-            {userToolsRoutes.map(({ Icon, label, to, disabled }) => (
-              <NavButtonLink to={to} key={label} disabled={disabled}>
-                <NavigationButton label={label} Icon={Icon} />
-              </NavButtonLink>
-            ))}
-          </div>
-          <div className={styles.toggleToolsWrapper}>
-            <Button
-              label={areToolsActive ? 'Stop tools' : 'Run tools'}
-              onClick={toggleTools}
-              className={styles.toggleToolsButton}
-              Icon={renderToggleToolsIcon()}
-              disabled={}
-            />
-          </div>
-        </div>
+        <ProjectRoutes isOpened={opened} />
       </div>
       <div className={styles.bottom}>
         <div onClick={togglePanel}>

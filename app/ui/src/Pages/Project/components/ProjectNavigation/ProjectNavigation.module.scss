@@ -32,84 +32,9 @@
     max-width: 25 * $grid-unit;
   }
 
-  .loadingTools {
-    margin: 0 1.4 * $grid-unit;
-    color: palette(highlight);
-    flex-shrink: 0;
-  }
-
-  .userTools {
-    border-top: 2px solid palette(base, 400);
-    margin-top: $grid-unit;
-    padding-top: 0.75 * $grid-unit;
-    transition: border-right 0.3s ease;
-    border-right: 2px solid transparent;
-
-    &.show.started {
-      border-right: 2px solid palette(success);
-    }
-
-    &.show.stopped {
-      border-right: 2px solid palette(alert);
-    }
-
-    .userToolLabel {
-      @include font-caption;
-      color: font-color(regular);
-      width: 100%;
-      white-space: nowrap;
-      margin-left: 5 * $grid-unit;
-    }
-
-    .userToolsWrapper {
-      margin-top: $grid-unit;
-    }
-
-    .toggleToolsWrapper {
-      border-top: 2px dotted palette(base, 400);
-
-      .toggleToolsButton {
-        margin-left: 5 * $grid-unit;
-        display: flex;
-        align-items: center;
-        flex-direction: row-reverse;
-      }
-    }
-  }
 }
 
-.navButton {
-  height: 5 * $grid-unit;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  background-color: transparent;
-  border-left: 2px solid transparent;
-
-  transition: background-color ease 0.3s, border-left ease 0.3s, color ease 0.2s,
-    opacity ease 0.3s;
-  color: font-color(lowlight);
-
-  .icon {
-    margin: 0 1.4 * $grid-unit;
-    transition: transform ease 0.3s;
-  }
-
-  .label {
-    @include font-caption;
-
-    margin-left: 2px;
-    white-space: nowrap;
-    text-transform: uppercase;
-  }
-
-  &:hover {
-    background-color: palette(base, 400);
-    color: font-color(light);
-  }
-}
-
-.active .navButton {
+.active > div {
   color: font-color(highlight);
   border-left: 2px solid palette(highlight);
 }
@@ -117,15 +42,9 @@
 .disabled {
   display: block;
   pointer-events: none;
-  .navButton {
+  & > div {
     color: palette(lowlight, 300);
     opacity: 0.5;
-  }
-}
-
-.iconOn {
-  > div {
-    color: palette(highlight);
   }
 }
 

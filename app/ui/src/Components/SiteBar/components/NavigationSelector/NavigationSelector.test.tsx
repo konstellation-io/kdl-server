@@ -1,7 +1,7 @@
-import SectionSelector from './SectionSelector';
+import NavigationSelector from './NavigationSelector';
 import React from 'react';
 import { shallow } from 'enzyme';
-import { EnhancedRouteConfiguration } from '../../../../../../../../Hooks/useProjectNavigation';
+import { EnhancedRouteConfiguration } from 'Hooks/useProjectNavigation';
 import IconHome from '@material-ui/icons/Dashboard';
 import { runAtThisOrScheduleAtNextAnimationFrame } from 'custom-electron-titlebar/lib/common/dom';
 import { NavLink } from 'react-router-dom';
@@ -19,7 +19,7 @@ const props = {
 
 let component;
 beforeEach(() => {
-  component = shallow(<SectionSelector {...props} />);
+  component = shallow(<NavigationSelector {...props} />);
 });
 
 describe('SectionSelector component', () => {

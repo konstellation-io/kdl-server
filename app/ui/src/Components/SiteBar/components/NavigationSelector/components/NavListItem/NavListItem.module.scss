@@ -9,10 +9,10 @@
   cursor: pointer;
   width: 100%;
   background-color: transparent;
-  border-left: 2px solid transparent;
+  border-left: 3px solid transparent;
 
-  transition: background-color ease 0.3s, border-left ease 0.3s, color ease 0.2s,
-  opacity ease 0.3s;
+  transition: background-color ease 0.3s, border-left-color ease 0.3s,
+    color ease 0.2s, opacity ease 0.3s;
   color: font-color(lowlight);
 
   &.disabled {
@@ -21,7 +21,7 @@
   }
 
   &:hover {
-    border-left: 2px solid palette(highlight);
+    border-left-color: palette(highlight);
     color: font-color(highlight);
   }
 

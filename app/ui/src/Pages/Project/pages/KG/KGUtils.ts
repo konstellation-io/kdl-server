@@ -54,7 +54,7 @@ export function getHash(text: string) {
 
 function getOffset(outsideMin: boolean, outsideMax: boolean) {
   if (outsideMin) return 17;
-  if (outsideMax) return -10;
+  if (outsideMax) return -6;
 
   return 0;
 }

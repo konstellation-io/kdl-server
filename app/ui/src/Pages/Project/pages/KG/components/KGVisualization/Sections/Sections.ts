@@ -27,9 +27,14 @@ export default class Sections {
     options: CoordOptions
   ) => CoordOut = () => ({ x: 0, y: 0, angle: 0 });
   scoreDomain: [number, number] = [0, 0];
+  parent: HTMLDivElement;
 
-  constructor(container: Selection<SVGGElement, unknown, null, undefined>) {
+  constructor(
+    container: Selection<SVGGElement, unknown, null, undefined>,
+    parent: HTMLDivElement
+  ) {
     this.container = container.select('g');
+    this.parent = parent;
 
     this.sectionOrientation = local<string>();
   }
@@ -202,7 +207,12 @@ export default class Sections {
   };
 
   positionSectionBoxes = () => {
-    const { container, sectionOrientation } = this;
+    const { container, sectionOrientation, parent } = this;
+
+    const parentRect = parent.getBoundingClientRect();
+    const dxLeft = parentRect.left;
+    const dxRight = parentRect.left;
+    const dy = parentRect.top;
 
     container
       .selectAll<SVGGElement, string>(`.${styles.sectionAndNamesGuide}`)
@@ -215,12 +225,14 @@ export default class Sections {
         // @ts-ignore
         const sectionElHeight = sectionEl.node().getBoundingClientRect().height;
         sectionEl
-          .style('left', orientation === 'right' ? px(left) : 'auto')
+          .style('left', orientation === 'right' ? px(left - dxLeft) : 'auto')
           .style(
             'right',
-            orientation === 'left' ? px(window.innerWidth - left) : 'auto'
+            orientation === 'left'
+              ? px(parentRect.width - left + dxRight)
+              : 'auto'
           )
-          .style('top', px(top - sectionElHeight / 2));
+          .style('top', px(top - sectionElHeight / 2 - dy));
       });
   };
 }

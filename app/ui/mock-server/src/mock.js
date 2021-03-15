@@ -36,7 +36,7 @@ module.exports = {
     updateProject: (_, { input: { id, name, description } }) => ({
       id,
       name,
-      description
+      description,
     }),
     updateMember: (_, { input: { memberId, accessLevel } }) => ({
       id: memberId,

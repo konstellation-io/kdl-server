@@ -13,7 +13,7 @@ function ResourceTooltip({ resource }: Props) {
       return (
         <div className={styles.help}>
           <IconMouse className="icon-regular" />
-          <span>Explore the Knowledge Galaxy to see more information.</span>
+          <span>Click on a resource to see its details.</span>
         </div>
       );
 

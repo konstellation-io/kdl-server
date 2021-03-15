@@ -12,12 +12,10 @@
 
   display: flex;
   justify-content: space-between;
-  align-items: center;
 }
 
 .left {
   display: flex;
-  align-items: center;
 }
 
 .icon {
@@ -28,6 +26,8 @@
   background-color: palette(highlight);
   flex-shrink: 0;
   margin-right: $grid-unit;
+  margin-top: 0.75 * $grid-unit;
+  margin-left: 0.25 * $grid-unit;
 
   box-shadow: 0 0 6px 1px palette(highlight);
 
@@ -49,6 +49,7 @@
   color: font-color(light);
 
   margin-left: $grid-unit;
+  padding-right: 2 * $grid-unit;
   word-wrap: break-all;
 }
 .score {

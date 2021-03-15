@@ -5,6 +5,16 @@
 
 $tooltipWidth: 300px;
 
+.container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  transition: top ease 0.5s, left ease 0.5s;
+}
+
 .label1,
 .tick,
 .axisG,
@@ -48,7 +58,8 @@ $tooltipWidth: 300px;
 
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .sectionsWrapper {

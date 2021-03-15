@@ -3,7 +3,6 @@ import 'd3-transition';
 import { Coord, DComplete, getHash, groupData } from '../../KGUtils';
 import { Local, Selection, local, select } from 'd3-selection';
 import Resources, { RESOURCE_R } from './Resources/Resources';
-import { max, min } from 'd3-array';
 import { scaleBand, scaleLinear } from '@visx/scale';
 
 import { D } from './KGVisualization';
@@ -29,7 +28,6 @@ export let minimapViz: MinimapViz;
 export let resourcesViz: Resources;
 
 const section = (d: D) => d.category;
-const score = (d: D) => d.score;
 
 export function getInnerDimensions(width: number, height: number) {
   const innerWidth = (1 - 2 * PADDING_H) * width;
@@ -58,6 +56,7 @@ export type CoordOut = {
 
 type Props = {
   width: number;
+  container: HTMLDivElement;
   parent: SVGSVGElement;
   canvas: HTMLCanvasElement;
   data: D[];
@@ -66,7 +65,7 @@ type Props = {
   hideTooltip: () => void;
   // minimapRef: SVGSVGElement;
   tooltipOpen: boolean;
-  onResourceSelection: (d: D) => void;
+  onResourceSelection: (d: D, left: number) => void;
   centerText: string;
   onScroll: (dS: number) => void;
   scores: [number, number];
@@ -81,8 +80,7 @@ class KGViz {
   mainG: Selection<SVGGElement, unknown, null, undefined>;
   center: Coord;
   rScale = scaleLinear<number>();
-  rDomain: [number, number] = [0, 0];
-  sectionScale = scaleBand();
+  sectionScale = scaleBand<string>();
   sectionDomain: string[];
   groupedData: DComplete[];
   // minimap: MinimapViz;
@@ -91,6 +89,7 @@ class KGViz {
   sections: Sections;
   axisG: any = null;
   axis: any;
+  scores: [number, number];
   size: {
     innerWidth: number;
     innerHeight: number;
@@ -101,7 +100,6 @@ class KGViz {
     axisFontSize: number;
   };
   data: D[];
-  scores: [number, number];
   minScore: number;
   maxScore: number;
   outerR: number = 0;
@@ -133,13 +131,14 @@ class KGViz {
       axisPadding: AXIS_PADDING,
       axisFontSize: AXIS_FONT_SIZE,
     };
+    this.scores = props.scores;
 
     this.rScale = scaleLinear({
-      range: [INNER_R + RESOURCE_R, this.outerR - RESOURCE_R],
+      range: [INNER_R, this.outerR - RESOURCE_R],
       domain: props.scores,
     });
     this.sectionScale = scaleBand({
-      range: [0, 360],
+      range: [-90, 270],
       padding: 0,
     });
 
@@ -169,11 +168,12 @@ class KGViz {
       this.clearCanvas,
       this.center,
       select(this.props.canvas),
-      props.onHoverResource
+      props.onHoverResource,
+      this.sectionScale
     );
     resourcesViz = this.resources;
 
-    this.sections = new Sections(this.wrapper);
+    this.sections = new Sections(this.wrapper, props.container);
 
     this.scores = props.scores;
     this.maxScore = this.scores[0];
@@ -191,15 +191,15 @@ class KGViz {
     this.wrapper.selectAll('*').remove();
   };
 
-  updateScalesAndData = (data: D[]) => {
+  updateScalesAndData = (data: D[], scores: [number, number]) => {
     this.sectionDomain = Array.from(new Set(data.map(section)));
-
-    this.rDomain = [max(data, score) ?? 1, min(data, score) ?? 0];
+    this.scores = scores;
 
     this.sectionScale.domain(this.sectionDomain);
-    this.rScale.domain(this.rDomain);
+    this.rScale.domain(scores);
 
     this.axis.scale(this.rScale);
+    this.axis.sections(this.sectionDomain);
     if (this.axisG) this.axisG.call(this.axis);
 
     this.groupedData = groupData(
@@ -211,7 +211,7 @@ class KGViz {
   };
 
   initialize = () => {
-    this.updateScalesAndData(this.props.data);
+    this.updateScalesAndData(this.props.data, this.props.scores);
     console.log('INIT');
 
     // this.minimap.initialize(this.groupedData);
@@ -224,7 +224,7 @@ class KGViz {
       sectionDomain,
       coord,
       outerR,
-      rDomain,
+      scores,
       resources,
       updateAxisLabels,
       size: { axisPadding, axisFontSize },
@@ -240,7 +240,7 @@ class KGViz {
     const { mainG } = this;
 
     // Sections
-    sections.init(mainG, sectionDomain, coord, rDomain);
+    sections.init(mainG, sectionDomain, coord, scores);
 
     // InnerCircle
     const innerCircle = mainG.append('g');
@@ -318,7 +318,7 @@ class KGViz {
       this.maxScore
     );
 
-    resources.performUpdate(this.groupedData);
+    resources.performUpdate(this.groupedData, this.sectionScale);
     this.updateAxisLabels();
   };
 
@@ -329,7 +329,7 @@ class KGViz {
     this.maxScore = scores[0];
     this.minScore = scores[1];
 
-    this.updateScalesAndData(data);
+    this.updateScalesAndData(data, scores);
 
     // this.minimap.update(this.groupedData, zoomValues, reallocateZoom);
 
@@ -341,7 +341,6 @@ class KGViz {
       sectionDomain,
       resources,
       coord,
-      rDomain,
       updateAxisLabels,
       size: { axisPadding, axisFontSize },
     } = this;
@@ -349,7 +348,7 @@ class KGViz {
     resetTooltip();
 
     // Sections
-    sections.performUpdate(sectionDomain, coord, rDomain);
+    sections.performUpdate(sectionDomain, coord, scores);
 
     updateAxisLabels();
 
@@ -362,7 +361,7 @@ class KGViz {
       .style('font-size', px(axisFontSize));
 
     // Data
-    resources.performUpdate(groupedData);
+    resources.performUpdate(groupedData, this.sectionScale);
   };
 
   resetTooltip = () => {

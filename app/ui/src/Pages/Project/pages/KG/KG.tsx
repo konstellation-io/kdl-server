@@ -13,18 +13,21 @@ import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 import NavigationMenu from './components/NavigationMenu/NavigationMenu';
 import { ProjectRoute } from '../../ProjectPanels';
 import data from './components/KGVisualization/data/data0.json';
+// import data1 from './components/KGVisualization/data/data1.json';
 import { loader } from 'graphql.macro';
 import { orderBy } from 'lodash';
 import styles from './KG.module.scss';
 import useKGFilters from './components/useKGFilters';
 import { useQuery } from '@apollo/client';
 
-const selectedResource = 'Project Name 1';
+const selectedResource = 'My project';
 
 const MAX_RESOURCES = 0;
 const MAX_TOPICS = 10;
 
-let resources = data.map((d: any) => ({
+const allData = data;
+// const allData = [...data, ...data1];
+let resources = allData.map((d: any) => ({
   id: d.id,
   category:
     Object.keys(JSON.parse(d.topics.replaceAll("'", '"')))[0] || 'Others',
@@ -35,7 +38,7 @@ let resources = data.map((d: any) => ({
 }));
 
 export const idToFullResource = Object.fromEntries(
-  data.map((r) => [
+  allData.map((r) => [
     r.id,
     {
       title: r.title,

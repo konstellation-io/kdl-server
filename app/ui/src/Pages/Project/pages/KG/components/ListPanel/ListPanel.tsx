@@ -6,7 +6,7 @@ import styles from './ListPanel.module.scss';
 
 type Props = {
   resources: D[];
-  onResourceClick: (d: D) => void;
+  onResourceClick: (d: D, left: number) => void;
   scores: [number, number];
 };
 function ListPanel({ resources, onResourceClick, scores }: Props) {
@@ -18,6 +18,15 @@ function ListPanel({ resources, onResourceClick, scores }: Props) {
 
   function onLeave() {
     resourcesViz?.highlightResource(null);
+  }
+
+  function onSelectResource(resource: D) {
+    if (resourcesViz) {
+      const target = resourcesViz.data.find((d) => (d.id = resource.id));
+      const left = (target?.x || 0) + resourcesViz.center.x;
+
+      onResourceClick(resource, -left / 2);
+    }
   }
 
   function formatScore(score: number) {
@@ -34,20 +43,20 @@ function ListPanel({ resources, onResourceClick, scores }: Props) {
         )} and ${formatScore(minScore)} of score`}
       </div>
       <div className={styles.list}>
-        {top25.map((r) => (
+        {top25.map((resource) => (
           <div
             className={styles.resource}
-            onMouseEnter={() => onEnter(r.name)}
+            onMouseEnter={() => onEnter(resource.name)}
             onMouseLeave={onLeave}
-            onClick={() => onResourceClick(r)}
+            onClick={() => onSelectResource(resource)}
           >
-            <div className={styles.rTitle}>{r.name}</div>
+            <div className={styles.rTitle}>{resource.name}</div>
             <div className={styles.typeAndScore}>
-              <div className={styles.rType}>{r.type}</div>
-              <Score value={r.score} />
+              <div className={styles.rType}>{resource.type}</div>
+              <Score value={resource.score} />
             </div>
             <div className={styles.topics}>
-              <div className={styles.topic}>{r.category}</div>
+              <div className={styles.topic}>{resource.category}</div>
               <div className={styles.topic}>
                 + {Math.round(Math.random() * 3)}
               </div>

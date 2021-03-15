@@ -10,3 +10,13 @@ h3 {
 #chartjs-tooltip {
   z-index: 3;
 }
+
+.tickSection {
+  opacity: 0;
+  transition: opacity ease 0.4s;
+}
+
+.edgeAxisLabel {
+  fill: palette(highlight);
+  font-weight: 600 !important;
+}

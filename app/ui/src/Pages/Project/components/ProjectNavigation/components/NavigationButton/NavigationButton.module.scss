@@ -30,3 +30,21 @@
     color: font-color(light);
   }
 }
+
+.active .navButton {
+  color: font-color(highlight);
+  border-left: 2px solid palette(highlight);
+}
+
+.disabled {
+  display: block;
+  pointer-events: none;
+  & .navButton {
+    color: palette(lowlight, 300);
+    opacity: 0.5;
+  }
+}
+
+.collapsed .icon {
+  transform: scaleX(-1);
+}

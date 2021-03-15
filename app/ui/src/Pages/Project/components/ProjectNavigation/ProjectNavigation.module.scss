@@ -33,21 +33,3 @@
   }
 
 }
-
-.active > div {
-  color: font-color(highlight);
-  border-left: 2px solid palette(highlight);
-}
-
-.disabled {
-  display: block;
-  pointer-events: none;
-  & > div {
-    color: palette(lowlight, 300);
-    opacity: 0.5;
-  }
-}
-
-.collapsed svg {
-  transform: scaleX(-1);
-}

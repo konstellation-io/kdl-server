@@ -10,14 +10,15 @@ import { PANEL_ID } from 'Graphql/client/models/Panel';
 import { RouteProjectParams } from 'Constants/routes';
 import cx from 'classnames';
 import styles from './ProjectNavigation.module.scss';
+import navButtonStyles from './components/NavigationButton/NavigationButton.module.scss';
 import NavElements from './components/NavElements/NavElements';
 
 export const NavButtonLink: FC<any> = ({ children, ...props }) => {
   return (
     <NavLink
       {...props}
-      activeClassName={styles.active}
-      className={cx({ [styles.disabled]: props.disabled })}
+      activeClassName={navButtonStyles.active}
+      className={cx({ [navButtonStyles.disabled]: props.disabled })}
       exact
     >
       {children}
@@ -52,7 +53,7 @@ function ProjectNavigation() {
         </div>
         <div
           className={cx({
-            [styles.collapsed]: !opened,
+            [navButtonStyles.collapsed]: !opened,
           })}
           onClick={onToggleOpened}
         >

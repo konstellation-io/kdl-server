@@ -92,7 +92,7 @@ export interface RoutesConfiguration {
   projectToolsRoutes: EnhancedRouteConfiguration[];
 }
 
-function useProjectNavigation(projectId: string) {
+function useProjectNavigation(projectId: string): RoutesConfiguration {
   const { data } = useQuery<GetMe>(GetMeQuery);
 
   const buildRoutes = useCallback(
@@ -103,7 +103,7 @@ function useProjectNavigation(projectId: string) {
     [projectId]
   );
 
-  const routesConfigurations: RoutesConfiguration = useMemo(() => {
+  return useMemo(() => {
     const disabled = !data?.me.areToolsActive;
     const userToolsRoutesDisabled = userToolsRoutesConfig.map((route) => ({
       ...route,
@@ -121,8 +121,6 @@ function useProjectNavigation(projectId: string) {
       userToolsRoutes,
     };
   }, [buildRoutes, data?.me.areToolsActive]);
-
-  return routesConfigurations;
 }
 
 export default useProjectNavigation;

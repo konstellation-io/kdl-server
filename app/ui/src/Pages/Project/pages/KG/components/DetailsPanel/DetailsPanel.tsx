@@ -1,6 +1,8 @@
 import { Button } from 'kwc';
 import { D } from '../KGVisualization/KGVisualization';
 import IconClose from '@material-ui/icons/Close';
+import IconStar from '@material-ui/icons/Star';
+import IconUnstar from '@material-ui/icons/StarBorder';
 import React from 'react';
 import Score from '../KGVisualization/Score';
 import cx from 'classnames';
@@ -13,6 +15,7 @@ type Props = {
 };
 function DetailsPanel({ resource: tempResource, onClose }: Props) {
   const resource = idToFullResource[tempResource?.id || ''] || null;
+  const starred = tempResource?.starred;
 
   return (
     <div
@@ -20,7 +23,15 @@ function DetailsPanel({ resource: tempResource, onClose }: Props) {
     >
       <div className={styles.title}>
         <div className={styles.titleText}>Detail</div>
-        <Button Icon={IconClose} label="" onClick={onClose} />
+        <div className={styles.actions}>
+          <div className={styles.starredText}>{starred ? 'Starred' : ''}</div>
+          <Button
+            Icon={starred ? IconStar : IconUnstar}
+            label=""
+            className={cx({ [styles.starred]: starred })}
+          />
+          <Button Icon={IconClose} label="" onClick={onClose} />
+        </div>
       </div>
       {resource !== null && (
         <>
@@ -41,7 +52,9 @@ function DetailsPanel({ resource: tempResource, onClose }: Props) {
             </div>
             <div className={styles.type}>{'Paper'}</div>
             <div className={styles.url}>
-              http://www.arxiv-sanity.com/1611.03130
+              <a href="http://www.arxiv-sanity.com/1611.03130" target="_blank">
+                http://www.arxiv-sanity.com/1611.03130
+              </a>
             </div>
             <div className={styles.topicsG}>
               <div className={styles.sectionTitle}>TOPICS</div>

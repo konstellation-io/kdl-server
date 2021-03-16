@@ -29,6 +29,22 @@
   justify-content: space-between;
   align-items: center;
 
+  .actions {
+    display: flex;
+    align-items: center;
+
+    .starred {
+      color: palette(alert);
+    }
+
+    .starredText {
+      @include font-body;
+      color: palette(alert);
+
+      margin-right: 2 * $grid-unit;
+    }
+  }
+
   .titleText {
     border-left: solid 2px palette(lowlight);
     margin-left: 2.5 * $grid-unit;
@@ -72,6 +88,12 @@
   .url {
     color: font-color(lowlight);
     margin-top: 2 * $grid-unit;
+
+    transition: color ease 0.3s;
+
+    &:hover {
+      color: palette(highlight);
+    }
   }
   .topicsG {
     margin-top: 2 * $grid-unit;

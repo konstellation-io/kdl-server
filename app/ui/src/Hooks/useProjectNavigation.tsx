@@ -20,74 +20,73 @@ export interface RouteConfiguration {
   id: string;
   label: string;
   Icon: OverridableComponent<SvgIconTypeMap<{}, 'svg'>>;
-  canBeDisabled?: boolean;
   disabled?: boolean;
+  route: ROUTE;
 }
 
-export const projectRoutesConfiguration: {
-  [key: string]: RouteConfiguration;
-} = {
-  [ROUTE.PROJECT_OVERVIEW]: {
+export const mainRoutesConfig: RouteConfiguration[] = [
+  {
     id: 'overview',
     label: 'Overview',
     Icon: IconHome,
+    route: ROUTE.PROJECT_OVERVIEW,
   },
-  [ROUTE.PROJECT_KG]: {
+  {
     id: 'knowledge-graph',
-    label: 'Knowledge Graph',
+    label: 'Knowledge Galaxy',
     Icon: IconKG,
+    route: ROUTE.PROJECT_KG,
   },
-};
-export const toolsRoutesConfiguration: {
-  [key: string]: RouteConfiguration;
-} = {
-  [ROUTE.PROJECT_TOOL_GITEA]: {
+];
+export const projectToolsRoutesConfig: RouteConfiguration[] = [
+  {
     id: 'gitea',
     label: 'Gitea',
     Icon: GiteaIcon,
+    route: ROUTE.PROJECT_TOOL_GITEA,
   },
-  [ROUTE.PROJECT_TOOL_DRONE]: {
+  {
     id: 'drone',
+    route: ROUTE.PROJECT_TOOL_DRONE,
     label: 'Drone',
     Icon: DroneIcon,
   },
-  [ROUTE.PROJECT_TOOL_MINIO]: {
+  {
     id: 'minio',
+    route: ROUTE.PROJECT_TOOL_MINIO,
     label: 'Minio',
     Icon: MinioIcon,
   },
-  [ROUTE.PROJECT_TOOL_MLFLOW]: {
+  {
     id: 'mlflow',
+    route: ROUTE.PROJECT_TOOL_MLFLOW,
     label: 'Mlflow',
     Icon: MlFlowIcon,
   },
-};
+];
 
-export const userToolsRoutesConfiguration: {
-  [key: string]: RouteConfiguration;
-} = {
-  [ROUTE.PROJECT_TOOL_JUPYTER]: {
+export const userToolsRoutesConfig: RouteConfiguration[] = [
+  {
     id: 'jupyter',
+    route: ROUTE.PROJECT_TOOL_JUPYTER,
     label: 'Jupyter',
     Icon: JupyterIcon,
-    canBeDisabled: true,
-    disabled: true,
   },
-  [ROUTE.PROJECT_TOOL_VSCODE]: {
+  {
     id: 'vscode',
+    route: ROUTE.PROJECT_TOOL_VSCODE,
     label: 'Vscode',
     Icon: VSIcon,
-    canBeDisabled: true,
-    disabled: true,
   },
-};
+];
 
 export interface EnhancedRouteConfiguration extends RouteConfiguration {
   to: string;
 }
 
 export interface RoutesConfiguration {
-  projectRoutes: EnhancedRouteConfiguration[];
+  allRoutes: EnhancedRouteConfiguration[];
+  mainRoutes: EnhancedRouteConfiguration[];
   userToolsRoutes: EnhancedRouteConfiguration[];
   projectToolsRoutes: EnhancedRouteConfiguration[];
 }
@@ -95,35 +94,32 @@ export interface RoutesConfiguration {
 function useProjectNavigation(projectId: string) {
   const { data } = useQuery<GetMe>(GetMeQuery);
 
-  const mapRoute: (
-    args: [string, RouteConfiguration]
-  ) => EnhancedRouteConfiguration = useCallback(
-    ([routeString, { id, label, Icon, canBeDisabled }]) => ({
-      to: buildRoute(routeString as ROUTE, projectId),
-      Icon,
-      id,
-      label,
-      disabled: canBeDisabled ? !data?.me.areToolsActive : false,
+  const buildRoutes = useCallback(
+    (route: RouteConfiguration) => ({
+      ...route,
+      to: buildRoute(route.route, projectId),
     }),
-    [projectId, data?.me.areToolsActive]
+    [projectId]
   );
 
   const routesConfigurations: RoutesConfiguration = useMemo(() => {
-    const projectRoutesEntries = Object.entries(projectRoutesConfiguration);
-    const projectRoutes = projectRoutesEntries.map(mapRoute);
+    const disabled = data?.me.areToolsActive || true;
+    const userToolsRoutesDisabled = userToolsRoutesConfig.map((route) => ({
+      ...route,
+      disabled,
+    }));
 
-    const userToolsRoutesEntries = Object.entries(userToolsRoutesConfiguration);
-    const userToolsRoutes = userToolsRoutesEntries.map(mapRoute);
-
-    const toolsRoutesEntries = Object.entries(toolsRoutesConfiguration);
-    const projectToolsRoutes = toolsRoutesEntries.map(mapRoute);
+    const userToolsRoutes = userToolsRoutesDisabled.map(buildRoutes);
+    const projectToolsRoutes = projectToolsRoutesConfig.map(buildRoutes);
+    const mainRoutes = mainRoutesConfig.map(buildRoutes);
 
     return {
-      projectRoutes,
-      userToolsRoutes,
+      allRoutes: [...mainRoutes, ...projectToolsRoutes, ...userToolsRoutes],
+      mainRoutes,
       projectToolsRoutes,
+      userToolsRoutes,
     };
-  }, [mapRoute]);
+  }, [buildRoutes, data?.me.areToolsActive]);
 
   return routesConfigurations;
 }

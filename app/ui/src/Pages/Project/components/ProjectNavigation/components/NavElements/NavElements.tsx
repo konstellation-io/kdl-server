@@ -24,7 +24,7 @@ type Props = {
 function NavElements({ isOpened }: Props) {
   const { projectId } = useParams<RouteProjectParams>();
   const {
-    projectRoutes,
+    mainRoutes,
     userToolsRoutes,
     projectToolsRoutes,
   } = useProjectNavigation(projectId);
@@ -46,7 +46,7 @@ function NavElements({ isOpened }: Props) {
 
   return (
     <>
-      {projectRoutes.map(({ Icon, label, to }) => (
+      {mainRoutes.map(({ Icon, label, to }) => (
         <NavButtonLink to={to} key={label}>
           <NavigationButton label={label} Icon={Icon} />
         </NavButtonLink>

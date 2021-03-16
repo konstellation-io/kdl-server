@@ -2,8 +2,6 @@ import { BaseType, Selection, select } from 'd3-selection';
 import { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { zoom, zoomIdentity } from 'd3-zoom';
 
-import { OUTER_R } from './KGViz';
-
 export const PADDING = 0.15;
 
 const MIN_ZOOM = 0.1; // x0.1
@@ -43,7 +41,7 @@ const useZoom: (p: Params) => UseZoom = ({
     width * TARGET_OUTER_R_PERC,
     height * TARGET_OUTER_R_PERC
   );
-  const scaleToTarget = targetOuterR / OUTER_R;
+  const scaleToTarget = targetOuterR / 1;
 
   const [zoomValues, setTx] = useState<ZoomValues | null>(null);
   const initialZoomValues = useRef<ZoomValues>({ x: 0, y: 0, k: 0 });

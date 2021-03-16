@@ -1,5 +1,6 @@
-import { Topic } from '../../Filters';
 import { useEffect, useMemo, useState } from 'react';
+
+import { Topic } from '../../Filters';
 
 function useTopicFilter(
   topics: Topic[],
@@ -44,11 +45,18 @@ function useTopicFilter(
     filterTopics('');
   }
 
+  function clearAll() {
+    setSelectedTopics([]);
+    onUpdate([]);
+    filterTopics('');
+  }
+
   return {
     filteredTopics,
     handleSelectTopic,
     filterTopics,
     resetTopics,
+    clearAll,
     selectedTopics,
   };
 }

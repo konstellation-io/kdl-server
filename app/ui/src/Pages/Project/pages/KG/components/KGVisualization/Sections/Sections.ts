@@ -15,32 +15,29 @@ import styles from '../KGVisualization.module.scss';
 const SECTION_STROKE = 1;
 const SECTION_INTERVAL = 4;
 const OFFSET_SECTION_GUIDES = 50;
-const SECTION_BOX_HEIGHT = 32;
 
 export default class Sections {
   container: Selection<SVGGElement, unknown, null, undefined>;
   data: string[] = [];
-  sectionStroke: number = 0;
-  sectionInterval: number = 0;
+  sectionStroke: number = SECTION_STROKE;
+  sectionInterval: number = SECTION_INTERVAL;
   sectionOrientation: Local<string>;
   coord: (
     { category, score, name }: CoordData,
     options: CoordOptions
   ) => CoordOut = () => ({ x: 0, y: 0, angle: 0 });
   scoreDomain: [number, number] = [0, 0];
+  parent: HTMLDivElement;
 
-  constructor(container: Selection<SVGGElement, unknown, null, undefined>) {
+  constructor(
+    container: Selection<SVGGElement, unknown, null, undefined>,
+    parent: HTMLDivElement
+  ) {
     this.container = container.select('g');
+    this.parent = parent;
 
     this.sectionOrientation = local<string>();
   }
-
-  updateSizes = (k: number) => {
-    const zoomScale = 1 / k;
-
-    this.sectionStroke = SECTION_STROKE * zoomScale;
-    this.sectionInterval = SECTION_INTERVAL * zoomScale;
-  };
 
   init = (
     container: Selection<SVGGElement, unknown, null, undefined>,
@@ -210,7 +207,12 @@ export default class Sections {
   };
 
   positionSectionBoxes = () => {
-    const { container, sectionOrientation } = this;
+    const { container, sectionOrientation, parent } = this;
+
+    const parentRect = parent.getBoundingClientRect();
+    const dxLeft = parentRect.left;
+    const dxRight = parentRect.left;
+    const dy = parentRect.top;
 
     container
       .selectAll<SVGGElement, string>(`.${styles.sectionAndNamesGuide}`)
@@ -219,13 +221,18 @@ export default class Sections {
         // @ts-ignore
         const { left, top } = this.getBoundingClientRect();
         const orientation = sectionOrientation.get(this);
-        select(`#kg_${stringToId(sectionName)}`)
-          .style('left', orientation === 'right' ? px(left) : 'auto')
+        const sectionEl = select(`#kg_${stringToId(sectionName)}`);
+        // @ts-ignore
+        const sectionElHeight = sectionEl.node().getBoundingClientRect().height;
+        sectionEl
+          .style('left', orientation === 'right' ? px(left - dxLeft) : 'auto')
           .style(
             'right',
-            orientation === 'left' ? px(window.innerWidth - left) : 'auto'
+            orientation === 'left'
+              ? px(parentRect.width - left + dxRight)
+              : 'auto'
           )
-          .style('top', px(top - SECTION_BOX_HEIGHT / 2));
+          .style('top', px(top - sectionElHeight / 2 - dy));
       });
   };
 }

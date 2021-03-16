@@ -10,8 +10,11 @@ import { RESOURCE_R } from './Resources/Resources';
 import ResourceTooltip from './ResourceTooltip/ResourceTooltip';
 import SectionList from './SectionList/SectionList';
 import cx from 'classnames';
+import { kgScore } from 'Graphql/client/cache';
 import { select } from 'd3-selection';
 import styles from './KGVisualization.module.scss';
+import useKGFilters from 'Graphql/client/hooks/useKGFilters';
+import { useReactiveVar } from '@apollo/client';
 import useTooltip from 'Hooks/useTooltip';
 
 export type D = {
@@ -56,6 +59,9 @@ function KGVisualization({
   selectedResource,
   onResourceSelection,
 }: Props) {
+  const scores = useReactiveVar(kgScore);
+  const { updateScore } = useKGFilters();
+
   const [containerLeft, setContainerLeft] = useState(0);
   const [openedPaper, setOpenedPaper] = useState<D | null>(null);
   const [hoveredPaper, setHoveredPaper] = useState<D | null>(null);
@@ -76,7 +82,6 @@ function KGVisualization({
   const viz = useRef<KGViz | null>(null);
 
   const [animating, setAnimating] = useState(true);
-  const [scores, setScores] = useState<[number, number]>([1, 0]);
   const [borderScores, setBorderScores] = useState<[number, number]>([1, 0]);
 
   const showedData = useMemo(
@@ -99,7 +104,7 @@ function KGVisualization({
         .duration(1000)
         .delay(500)
         .attrTween('fill', () => (t) => {
-          setScores(() => [1 - difMax * t, difMin * t]);
+          updateScore([1 - difMax * t, difMin * t]);
           return t;
         })
         .on('end', () => setAnimating(false));
@@ -110,7 +115,9 @@ function KGVisualization({
     const allScores = data.map((d) => d.score);
     const min = Math.min(...allScores);
     const max = Math.max(...allScores);
-    if (!animating) setScores([max, min]);
+    if (!animating) {
+      updateScore([max, min]);
+    }
     setBorderScores([max + 0.01, 0]);
   }, [data, animating]);
 
@@ -175,7 +182,7 @@ function KGVisualization({
         Math.min(maxScore, max - dScore * scoreFactorMax)
       );
 
-      setScores([newMax, newMin]);
+      updateScore([newMax, newMin]);
     }
   }
 
@@ -208,7 +215,7 @@ function KGVisualization({
       newMax = Math.min(limitMax, newMax);
       const newMin = newMax - sep;
 
-      setScores([newMax, newMin]);
+      updateScore([newMax, newMin]);
     }
   }
 

@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
-import ScoreFilter, { Scores } from './components/ScoreFilter/ScoreFilter';
 
 import { KGFilters } from '../useKGFilters';
+import ScoreFilter from './components/ScoreFilter/ScoreFilter';
 import ShowOthersFilter from './components/ShowOthersFilter/ShowOthersFilter';
 import TopicFilter from './components/TopicFilter/TopicFilter';
 import styles from './Filters.module.scss';
@@ -15,14 +15,10 @@ const MAX_SCORE = 100;
 
 type Props = {
   topics: Topic[];
-  showOthers: boolean;
+  filters: KGFilters;
   onFiltersChange: (kgFilters: KGFilters) => void;
 };
-function Filters({ topics, showOthers, onFiltersChange }: Props) {
-  const handleScoreUpdate = useCallback(
-    (score: Scores) => onFiltersChange({ score }),
-    [onFiltersChange]
-  );
+function Filters({ topics, filters, onFiltersChange }: Props) {
   const handleTopicsUpdate = useCallback(
     (value: string[]) => onFiltersChange({ topics: value }),
     [onFiltersChange]
@@ -39,10 +35,10 @@ function Filters({ topics, showOthers, onFiltersChange }: Props) {
 
   return (
     <div className={styles.container}>
-      <ScoreFilter onUpdate={handleScoreUpdate} max={MAX_SCORE} />
+      <ScoreFilter max={MAX_SCORE} />
       <TopicFilter topics={filterableTopics} onUpdate={handleTopicsUpdate} />
       <ShowOthersFilter
-        showOthers={showOthers}
+        showOthers={filters?.showOthers ?? false}
         onUpdate={handleShowOthersUpdate}
       />
     </div>

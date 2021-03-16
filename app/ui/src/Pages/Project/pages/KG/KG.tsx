@@ -6,12 +6,13 @@ import {
 import KGVisualization, {
   TopicSections,
 } from './components/KGVisualization/KGVisualization';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { buildKGItem, getSectionsAndNames } from './KGUtils';
 
 import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 import NavigationMenu from './components/NavigationMenu/NavigationMenu';
 import { ProjectRoute } from '../../ProjectPanels';
+import { Scores } from './components/Filters/components/ScoreFilter/ScoreFilter';
 import data from './components/KGVisualization/data/data0.json';
 // import data1 from './components/KGVisualization/data/data1.json';
 import { loader } from 'graphql.macro';
@@ -98,7 +99,7 @@ function KG({ openedProject }: ProjectRoute) {
     handleFiltersChange,
     filteredResources,
     filteredSections,
-    filters: { showOthers },
+    filters,
   } = useKGFilters(sections, resources);
 
   function onResourceSelection(name: string) {
@@ -112,7 +113,7 @@ function KG({ openedProject }: ProjectRoute) {
           <NavigationMenu />
           <Filters
             topics={topics}
-            showOthers={showOthers ?? false}
+            filters={filters}
             onFiltersChange={handleFiltersChange}
           />
         </div>

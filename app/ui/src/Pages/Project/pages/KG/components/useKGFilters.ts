@@ -1,17 +1,13 @@
 import { D, TopicSections } from './KGVisualization/KGVisualization';
 import { useCallback, useMemo, useState } from 'react';
 
-import { Scores } from './Filters/components/ScoreFilter/ScoreFilter';
-
 export interface KGFilters {
-  score?: Scores;
   topics?: string[];
   showOthers?: boolean;
 }
 
 function useKGFilters(sections: TopicSections, resources: D[]) {
   const [filters, setFilters] = useState<KGFilters>({
-    score: [0, 1],
     topics: Object.keys(sections),
     showOthers: true,
   });
@@ -31,11 +27,9 @@ function useKGFilters(sections: TopicSections, resources: D[]) {
   }, [filters.topics, filters.showOthers]);
 
   const filteredResources = useMemo<D[]>(() => {
-    const [bottomScore, topScore] = filters.score;
-    return resources.filter(({ score, category }) => {
-      const isInScoreRange = score <= topScore && score >= bottomScore;
+    return resources.filter(({ category }) => {
       const isInCategory = filteredSections.includes(category);
-      return isInScoreRange && isInCategory;
+      return isInCategory;
     });
   }, [filters, resources]);
 

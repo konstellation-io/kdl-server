@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SectionSelector component should render without crashing 1`] = `
+<div
+  className="container"
+>
+  <ul>
+    <li
+      className=""
+      key="foo"
+    >
+      <NavLink
+        activeClassName="selectedSection"
+        className="section"
+        exact={true}
+        onClick={[MockFunction]}
+        to="bar"
+      >
+        <NavListItem
+          Icon={
+            Object {
+              "$$typeof": Symbol(react.memo),
+              "compare": null,
+              "type": Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "render": [Function],
+              },
+            }
+          }
+          label="foo"
+        />
+      </NavLink>
+    </li>
+  </ul>
+</div>
+`;

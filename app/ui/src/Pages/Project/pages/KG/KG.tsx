@@ -98,6 +98,7 @@ function KG({ openedProject }: ProjectRoute) {
     handleFiltersChange,
     filteredResources,
     filteredSections,
+    filters: { showOthers },
   } = useKGFilters(sections, resources);
 
   function onResourceSelection(name: string) {
@@ -109,7 +110,11 @@ function KG({ openedProject }: ProjectRoute) {
       <div className={styles.vizArea}>
         <div className={styles.kgTopBar}>
           <NavigationMenu />
-          <Filters topics={topics} onFiltersChange={handleFiltersChange} />
+          <Filters
+            topics={topics}
+            showOthers={showOthers ?? false}
+            onFiltersChange={handleFiltersChange}
+          />
         </div>
         <KGVisualization
           data={filteredResources}

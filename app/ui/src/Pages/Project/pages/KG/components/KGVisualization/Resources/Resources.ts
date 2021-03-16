@@ -16,6 +16,7 @@ const x = (d: DComplete) => d.x;
 const y = (d: DComplete) => d.y;
 
 export let lastSection: string | undefined;
+export let textAnchor: string = '';
 
 const COLORS = {
   DEFAULT: 'rgba(12, 52, 72, 1)',
@@ -228,12 +229,13 @@ export default class Resources {
     if (bottom && !secondHalf && realAngle - eachSlice / 2 < 90) bottom = false;
 
     axisToShow.style('opacity', 1);
-    axisToShow.selectAll('text').style('text-anchor', () => {
-      if (bottom && secondHalf) return 'end';
-      if (bottom && !secondHalf) return 'start';
-      if (!bottom && secondHalf) return 'start';
-      if (!bottom && !secondHalf) return 'end';
-    });
+
+    if (bottom && secondHalf) textAnchor = 'end';
+    if (bottom && !secondHalf) textAnchor = 'start';
+    if (!bottom && secondHalf) textAnchor = 'start';
+    if (!bottom && !secondHalf) textAnchor = 'end';
+
+    axisToShow.selectAll('text').style('text-anchor', textAnchor);
 
     this.moving = true;
 

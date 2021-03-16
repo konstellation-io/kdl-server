@@ -1,5 +1,6 @@
 import { select } from 'd3-selection';
 import { stringToId } from 'Utils/d3';
+import { textAnchor } from './Resources/Resources';
 
 export let radialAxes: any;
 
@@ -179,6 +180,7 @@ function radialAxis(scale: any) {
 
         return getY(angle, r);
       })
+      .style('text-anchor', textAnchor)
       .text(format);
 
     selection

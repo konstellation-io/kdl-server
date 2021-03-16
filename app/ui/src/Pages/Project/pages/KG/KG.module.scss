@@ -19,6 +19,7 @@
   .kgTopBar {
     position: absolute;
     width: 100%;
+    height: 5 * $grid-unit;
     top: $grid-unit * 3;
     z-index: 3;
     display: flex;

@@ -29,7 +29,7 @@ export interface TopicSections {
 
 type WrapperProps = {
   data: D[];
-  sections: TopicSections;
+  sections: string[];
   selectedResource: string;
   onResourceSelection: (name: string) => void;
 };
@@ -305,11 +305,10 @@ function KGVisualization({
         />
       </div>
       <div className={styles.sectionTags}>
-        {Object.keys(sections).map((section) => (
+        {sections.map((section) => (
           <SectionList
             section={section}
             key={section}
-            names={sections[section]}
             onResourceSelection={onResourceSelection}
           />
         ))}

@@ -1,18 +1,19 @@
 import ROUTE, { buildRoute } from 'Constants/routes';
-import { OverridableComponent } from '@material-ui/core/OverridableComponent';
-import { SvgIconTypeMap } from '@material-ui/core';
 import { useCallback, useMemo } from 'react';
+
+import DroneIcon from 'Components/Icons/DroneIcon/DroneIcon';
+import { GetMe } from 'Graphql/queries/types/GetMe';
+import GiteaIcon from 'Components/Icons/GiteaIcon/GiteaIcon';
 import IconHome from '@material-ui/icons/Dashboard';
 import IconKG from '@material-ui/icons/EmojiObjects';
-import GiteaIcon from 'Components/Icons/GiteaIcon/GiteaIcon';
-import MinioIcon from 'Components/Icons/MinioIcon/MinioIcon';
-import DroneIcon from 'Components/Icons/DroneIcon/DroneIcon';
-import VSIcon from 'Components/Icons/VSIcon/VSIcon';
 import JupyterIcon from 'Components/Icons/JupyterIcon/JupyterIcon';
+import MinioIcon from 'Components/Icons/MinioIcon/MinioIcon';
 import MlFlowIcon from 'Components/Icons/MlFlowIcon/MlFlowIcon';
-import { useQuery } from '@apollo/client';
-import { GetMe } from 'Graphql/queries/types/GetMe';
+import { OverridableComponent } from '@material-ui/core/OverridableComponent';
+import { SvgIconTypeMap } from '@material-ui/core';
+import VSIcon from 'Components/Icons/VSIcon/VSIcon';
 import { loader } from 'graphql.macro';
+import { useQuery } from '@apollo/client';
 
 const GetMeQuery = loader('Graphql/queries/getMe.graphql');
 
@@ -103,7 +104,7 @@ function useProjectNavigation(projectId: string) {
   );
 
   const routesConfigurations: RoutesConfiguration = useMemo(() => {
-    const disabled = data?.me.areToolsActive || true;
+    const disabled = !data?.me.areToolsActive;
     const userToolsRoutesDisabled = userToolsRoutesConfig.map((route) => ({
       ...route,
       disabled,

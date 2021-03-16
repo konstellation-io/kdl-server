@@ -5,13 +5,13 @@ import useWorkspace, { CONFIG } from 'Hooks/useWorkspace';
 
 import IconCollapse from '@material-ui/icons/KeyboardBackspace';
 import IconSettings from '@material-ui/icons/Settings';
+import NavElements from './components/NavElements/NavElements';
 import NavigationButton from './components/NavigationButton/NavigationButton';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
 import { RouteProjectParams } from 'Constants/routes';
 import cx from 'classnames';
-import styles from './ProjectNavigation.module.scss';
 import navButtonStyles from './components/NavigationButton/NavigationButton.module.scss';
-import NavElements from './components/NavElements/NavElements';
+import styles from './ProjectNavigation.module.scss';
 
 export const NavButtonLink: FC<any> = ({ children, ...props }) => {
   return (

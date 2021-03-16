@@ -76,7 +76,9 @@ function radialAxis(scale: any) {
       .enter()
       .append('g')
       .attr('class', (d: any) => `tickSection ${stringToId(d[0])}`);
-    sec = sec.merge(secEnter);
+    sec = sec
+      .attr('class', (d: any) => `tickSection ${stringToId(d[0])}`)
+      .merge(secEnter);
 
     radialAxes = selection;
 

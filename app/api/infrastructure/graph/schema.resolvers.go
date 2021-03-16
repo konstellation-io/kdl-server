@@ -62,11 +62,15 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 
 	switch input.Repository.Type {
 	case entity.RepositoryTypeInternal:
-		internalRepoName = input.Repository.Internal.Name
+		if input.Repository.Internal != nil {
+			internalRepoName = input.Repository.Internal.Name
+		}
 	case entity.RepositoryTypeExternal:
-		externalRepoURL = input.Repository.External.URL
-		externalRepoUsername = input.Repository.External.Username
-		externalRepoToken = input.Repository.External.Token
+		if input.Repository.External != nil {
+			externalRepoURL = input.Repository.External.URL
+			externalRepoUsername = input.Repository.External.Username
+			externalRepoToken = input.Repository.External.Token
+		}
 	default:
 		return &entity.Project{}, entity.ErrInvalidRepoType
 	}

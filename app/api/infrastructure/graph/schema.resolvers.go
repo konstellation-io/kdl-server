@@ -55,13 +55,35 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 		return nil, err
 	}
 
+	internalRepoName := ""
+	externalRepoURL := ""
+	externalRepoUsername := ""
+	externalRepoToken := ""
+
+	switch input.Repository.Type {
+	case entity.RepositoryTypeInternal:
+		if input.Repository.Internal != nil {
+			internalRepoName = input.Repository.Internal.Name
+		}
+	case entity.RepositoryTypeExternal:
+		if input.Repository.External != nil {
+			externalRepoURL = input.Repository.External.URL
+			externalRepoUsername = input.Repository.External.Username
+			externalRepoToken = input.Repository.External.Token
+		}
+	default:
+		return &entity.Project{}, entity.ErrInvalidRepoType
+	}
+
 	createdProject, err := r.projects.Create(ctx, project.CreateProjectOption{
-		Name:             input.Name,
-		Description:      input.Description,
-		RepoType:         input.Repository.Type,
-		InternalRepoName: input.Repository.InternalRepoName,
-		ExternalRepoURL:  input.Repository.ExternalRepoURL,
-		Owner:            loggedUser,
+		Name:                 input.Name,
+		Description:          input.Description,
+		RepoType:             input.Repository.Type,
+		InternalRepoName:     &internalRepoName,
+		ExternalRepoURL:      &externalRepoURL,
+		ExternalRepoUsername: &externalRepoUsername,
+		ExternalRepoToken:    &externalRepoToken,
+		Owner:                loggedUser,
 	})
 
 	return &createdProject, err

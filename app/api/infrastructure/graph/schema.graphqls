@@ -182,8 +182,18 @@ type Project {
 
 input RepositoryInput {
   type: RepositoryType!
-  internalRepoName: String
-  externalRepoUrl: String
+  external: ExternalRepository
+  internal: InternalRepository
+}
+
+input ExternalRepository {
+  url: String!
+  username: String!
+  token: String!
+}
+
+input InternalRepository {
+  name: String!
 }
 
 type Repository {

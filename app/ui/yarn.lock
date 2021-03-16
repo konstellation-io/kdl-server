@@ -8235,10 +8235,10 @@ kleur@^3.0.3:
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
 
-kwc@1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/kwc/-/kwc-1.8.0.tgz#dfe07bd00f940193078eaf966116ac25f5b218c1"
-  integrity sha512-7qlq9caBRrB/vvw6h5pWSZ/ZS3O5EpE0NAzfC4RMCyQthjSxUgwZBNuRth8xRVQY9hAIj3pQXbIXMB2AHf01kQ==
+kwc@1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/kwc/-/kwc-1.8.2.tgz#b522d4512dbf26ca986bb346f8954b46895b0f6d"
+  integrity sha512-utZxGCewqdRBUl5WTkINz8/0EcmUsTjw7a+3su/DJCRVnPHaAdxNp8/Tybj5o8FyUf0LUt/6crcEr0Des0RrFg==
   dependencies:
     "@material-ui/core" "^4.11.0"
     "@material-ui/icons" "^4.9.1"

@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
@@ -19,17 +21,22 @@ const (
 
 var (
 	ErrCreateProjectValidation = errors.New("create project validation error")
-	ErrRepoTypeNotImplemented  = errors.New("the selected repository type is not implemented")
+	// This regexp extracts the repository name from a https URL like:
+	//  https://github.com/konstellation-io/kre.git
+	repoNameRegexp    = regexp.MustCompile(`([^/]+)\.git$`)
+	ErrInvalidRepoURL = errors.New("the repository URL is invalid")
 )
 
 // CreateProjectOption options when creating project.
 type CreateProjectOption struct {
-	Name             string
-	Description      string
-	RepoType         entity.RepositoryType
-	InternalRepoName *string
-	ExternalRepoURL  *string
-	Owner            entity.User
+	Name                 string
+	Description          string
+	RepoType             entity.RepositoryType
+	InternalRepoName     *string
+	ExternalRepoURL      *string
+	ExternalRepoUsername *string
+	ExternalRepoToken    *string
+	Owner                entity.User
 }
 
 // Validate check that the CreateProjectOption properties are valid.
@@ -47,14 +54,22 @@ func (c CreateProjectOption) Validate() error {
 	}
 
 	if c.RepoType == entity.RepositoryTypeInternal {
-		if c.InternalRepoName == nil {
+		if kdlutil.IsNilOrEmpty(c.InternalRepoName) {
 			return fmt.Errorf("%w: internal repository name cannot be null", ErrCreateProjectValidation)
 		}
 	}
 
 	if c.RepoType == entity.RepositoryTypeExternal {
-		if c.ExternalRepoURL == nil {
+		if kdlutil.IsNilOrEmpty(c.ExternalRepoURL) {
 			return fmt.Errorf("%w: external repository URL cannot be null", ErrCreateProjectValidation)
+		}
+
+		if kdlutil.IsNilOrEmpty(c.ExternalRepoUsername) {
+			return fmt.Errorf("%w: external repository username cannot be null", ErrCreateProjectValidation)
+		}
+
+		if kdlutil.IsNilOrEmpty(c.ExternalRepoToken) {
+			return fmt.Errorf("%w: external repository token cannot be null", ErrCreateProjectValidation)
 		}
 	}
 
@@ -92,9 +107,10 @@ func NewInteractor(logger logging.Logger,
 // Create stores into the DB a new project.
 // Depending on the repository type:
 //  - For internal repositories creates a repository in Gitea.
+//  - For external repositories, mirrors the external repository in Gitea.
 //  - Create Minio bucket
 //  - Activate Drone.io repo
-func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
+func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
 	// Validate the creation input
 	err := opt.Validate()
 	if err != nil {
@@ -112,6 +128,7 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 			AddedDate:   now,
 		},
 	}
+	repoName := ""
 
 	// Create repository
 	switch opt.RepoType {
@@ -126,25 +143,40 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 			InternalRepoName: *opt.InternalRepoName,
 		}
 
-		// Create Minio bucket
-		err = i.minioService.CreateBucket(*opt.InternalRepoName)
+		repoName = *opt.InternalRepoName
+
+	case entity.RepositoryTypeExternal:
+		repoName, err = i.getRepoNameFromURL(*opt.ExternalRepoURL)
 		if err != nil {
 			return entity.Project{}, err
 		}
 
-		// Activate Drone.io repo
-		err = i.droneService.ActivateRepository(*opt.InternalRepoName)
+		err := i.giteaService.MirrorRepo(*opt.ExternalRepoURL, repoName, *opt.ExternalRepoUsername, *opt.ExternalRepoToken)
 		if err != nil {
 			return entity.Project{}, err
 		}
-	case entity.RepositoryTypeExternal:
-		return entity.Project{}, ErrRepoTypeNotImplemented
+
+		project.Repository = entity.Repository{
+			Type:            entity.RepositoryTypeExternal,
+			ExternalRepoURL: *opt.ExternalRepoURL,
+		}
+	}
+
+	// Create Minio bucket
+	err = i.minioService.CreateBucket(repoName)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	// Activate Drone.io repo
+	err = i.droneService.ActivateRepository(repoName)
+	if err != nil {
+		return entity.Project{}, err
 	}
 
 	// Store the project into the database
 	insertedID, err := i.repo.Create(ctx, project)
 	if err != nil {
-		i.logger.Errorf("Unexpected error saving project into DB: %s", err)
 		return entity.Project{}, err
 	}
 
@@ -167,14 +199,14 @@ func (i interactor) GetByID(ctx context.Context, id string) (entity.Project, err
 
 // Update changes the desired information about a project.
 func (i interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
-	if opt.Name != nil && *opt.Name != "" {
+	if !kdlutil.IsNilOrEmpty(opt.Name) {
 		err := i.repo.UpdateName(ctx, opt.ProjectID, *opt.Name)
 		if err != nil {
 			return entity.Project{}, err
 		}
 	}
 
-	if opt.Description != nil && *opt.Description != "" {
+	if !kdlutil.IsNilOrEmpty(opt.Description) {
 		err := i.repo.UpdateDescription(ctx, opt.ProjectID, *opt.Description)
 		if err != nil {
 			return entity.Project{}, err
@@ -182,4 +214,16 @@ func (i interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity
 	}
 
 	return i.repo.Get(ctx, opt.ProjectID)
+}
+
+// getRepoNameFromURL extracts the name of the repo from the external repo url.
+func (i interactor) getRepoNameFromURL(url string) (string, error) {
+	const expectedMatches = 2
+
+	matches := repoNameRegexp.FindStringSubmatch(url)
+	if len(matches) != expectedMatches {
+		return "", ErrInvalidRepoURL
+	}
+
+	return matches[1], nil
 }

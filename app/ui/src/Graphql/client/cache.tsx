@@ -36,13 +36,13 @@ export const initialNewProject: NewProject = {
   externalRepository: {
     values: {
       url: '',
-      isConnectionTested: false,
-      hasConnectionError: '',
-      warning: false,
+      username: '',
+      token: '',
     },
     errors: {
-      url: '',
-      warning: 'not accepted',
+      url: 'This field is mandatory',
+      token: 'This field is mandatory',
+      username: 'This field is mandatory',
     },
   },
   internalRepository: {

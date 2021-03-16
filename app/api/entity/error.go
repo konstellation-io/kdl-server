@@ -17,4 +17,7 @@ var (
 
 	// ErrNotImplemented error definition.
 	ErrNotImplemented = fmt.Errorf("not implemented")
+
+	// ErrInvalidRepoType error definition.
+	ErrInvalidRepoType = fmt.Errorf("invalid repo type")
 )

@@ -68,7 +68,7 @@ func newProjectSuite(t *testing.T) *projectSuite {
 	}
 }
 
-func TestInteractor_Create(t *testing.T) {
+func TestInteractor_CreateInternal(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
@@ -118,12 +118,81 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.repo.EXPECT().Get(ctx, projectID).Return(expectedProject, nil)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
-		Name:             projectName,
-		Description:      projectDesc,
-		RepoType:         entity.RepositoryTypeInternal,
-		InternalRepoName: &internalRepoName,
-		ExternalRepoURL:  nil,
-		Owner:            entity.User{ID: ownerUserID, Username: ownerUsername},
+		Name:                 projectName,
+		Description:          projectDesc,
+		RepoType:             entity.RepositoryTypeInternal,
+		InternalRepoName:     &internalRepoName,
+		ExternalRepoURL:      nil,
+		ExternalRepoUsername: nil,
+		ExternalRepoToken:    nil,
+		Owner:                entity.User{ID: ownerUserID, Username: ownerUsername},
+	})
+
+	require.NoError(t, err)
+	require.Equal(t, expectedProject, createdProject)
+}
+
+func TestInteractor_CreateExternal(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		projectID     = "project.2345"
+		projectName   = "The Project Y"
+		projectDesc   = "The Project Y Description"
+		repoName      = "repo"
+		ownerUserID   = "user.1234"
+		ownerUsername = "john"
+	)
+
+	externalRepoURL := "https://github.com/org/repo.git"
+	externalRepoUsername := "username"
+	externalRepoToken := "token"
+
+	ctx := context.Background()
+	now := time.Now().UTC()
+
+	createProject := entity.NewProject(projectName, projectDesc)
+	createProject.CreationDate = now
+	createProject.Members = []entity.Member{
+		{
+			UserID:      ownerUserID,
+			AccessLevel: entity.AccessLevelAdmin,
+			AddedDate:   now,
+		},
+	}
+	createProject.Repository = entity.Repository{
+		Type:            entity.RepositoryTypeExternal,
+		ExternalRepoURL: externalRepoURL,
+	}
+
+	expectedProject := entity.Project{
+		ID:           projectID,
+		Name:         projectName,
+		Description:  projectDesc,
+		CreationDate: now,
+		Repository: entity.Repository{
+			Type:            entity.RepositoryTypeExternal,
+			ExternalRepoURL: externalRepoURL,
+		},
+	}
+
+	s.mocks.giteaService.EXPECT().MirrorRepo(externalRepoURL, repoName, externalRepoUsername, externalRepoToken).Return(nil)
+	s.mocks.minioService.EXPECT().CreateBucket(repoName).Return(nil)
+	s.mocks.droneService.EXPECT().ActivateRepository(repoName).Return(nil)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(projectID, nil)
+	s.mocks.repo.EXPECT().Get(ctx, projectID).Return(expectedProject, nil)
+
+	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
+		Name:                 projectName,
+		Description:          projectDesc,
+		RepoType:             entity.RepositoryTypeExternal,
+		InternalRepoName:     nil,
+		ExternalRepoURL:      &externalRepoURL,
+		ExternalRepoUsername: &externalRepoUsername,
+		ExternalRepoToken:    &externalRepoToken,
+		Owner:                entity.User{ID: ownerUserID, Username: ownerUsername},
 	})
 
 	require.NoError(t, err)

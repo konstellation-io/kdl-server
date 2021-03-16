@@ -4,6 +4,7 @@ import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { D } from '../KGVisualization/KGVisualization';
 import TabAll from './components/TabAll/TabAll';
 import TabStarred from './components/TabStarred/TabStarred';
+import { orderBy } from 'lodash';
 import { resourcesViz } from '../KGVisualization/KGViz';
 import styles from './ListPanel.module.scss';
 
@@ -15,7 +16,10 @@ type Props = {
 function ListPanel({ resources, onResourceClick, scores }: Props) {
   const [listFilterText, setListFilterText] = useState('');
 
-  const top25 = useMemo(() => resources.slice(0, 25), [resources]);
+  const top25 = useMemo(
+    () => orderBy(resources, ['score'], ['desc']).slice(0, 25),
+    [resources]
+  );
 
   const filteredAllTopics = useMemo(() => {
     return top25.filter((resource) =>

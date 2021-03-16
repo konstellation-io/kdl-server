@@ -34,7 +34,6 @@ type WrapperProps = {
   data: D[];
   sections: string[];
   selectedResource: string;
-  onResourceSelection: (name: string) => void;
 };
 function KGVisualizationWrapper(props: WrapperProps) {
   return (
@@ -57,7 +56,6 @@ function KGVisualization({
   data,
   sections,
   selectedResource,
-  onResourceSelection,
 }: Props) {
   const scores = useReactiveVar(kgScore);
   const { updateScore } = useKGFilters();
@@ -313,11 +311,7 @@ function KGVisualization({
       </div>
       <div className={styles.sectionTags}>
         {sections.map((section) => (
-          <SectionList
-            section={section}
-            key={section}
-            onResourceSelection={onResourceSelection}
-          />
+          <SectionList section={section} key={section} />
         ))}
       </div>
       <div className={styles.staticTooltip}>

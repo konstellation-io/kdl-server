@@ -31,7 +31,7 @@
   padding: $grid-unit $grid-unit;
 
   background-color: palette(lowlight, 900);
-  cursor: pointer;
+  pointer-events: none;
 
   transition: border-radius ease 0.3s;
 

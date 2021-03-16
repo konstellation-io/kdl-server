@@ -4,9 +4,8 @@ import styles from './SectionList.module.scss';
 
 type Props = {
   section: string;
-  onResourceSelection: (name: string) => void;
 };
-function SectionList({ section, onResourceSelection }: Props) {
+function SectionList({ section }: Props) {
   return (
     <div id={`kg_${stringToId(section)}`} className={styles.container}>
       <div className={styles.section}>{section}</div>

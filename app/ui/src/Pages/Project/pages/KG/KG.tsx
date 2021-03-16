@@ -4,6 +4,7 @@ import {
   GetKnowledgeGraphVariables,
 } from 'Graphql/queries/types/GetKnowledgeGraph';
 import KGVisualization, {
+  D,
   TopicSections,
 } from './components/KGVisualization/KGVisualization';
 import React, { useCallback, useMemo } from 'react';
@@ -52,15 +53,15 @@ export const idToFullResource = Object.fromEntries(
   ])
 );
 
-if (MAX_TOPICS) {
-  const allTopics = resources.map((d) => d.category);
-  const topTopics = allTopics.slice(0, MAX_TOPICS);
+const allTopics = resources
+  .filter((d) => d.category !== 'Others')
+  .map((d) => d.category);
+const topTopics = [...allTopics.slice(0, MAX_TOPICS), 'Others'];
 
-  resources = resources.map((d: any) => ({
-    ...d,
-    category: topTopics.includes(d.category) ? d.category : 'Others',
-  }));
-}
+resources = resources.map((d: any) => ({
+  ...d,
+  category: topTopics.includes(d.category) ? d.category : 'Others',
+}));
 
 if (MAX_RESOURCES) {
   resources = orderBy(resources, ['score']).reverse().slice(0, MAX_RESOURCES);
@@ -102,9 +103,14 @@ function KG({ openedProject }: ProjectRoute) {
     filters,
   } = useKGFilters(sections, resources);
 
-  function onResourceSelection(name: string) {
-    alert(`Resource selected: ${name}`);
-  }
+  const filtersOrder = topTopics;
+  const filtersOrderDict = Object.fromEntries(
+    filtersOrder.map((f, idx) => [f, idx])
+  );
+  const sortFilters = (a: D, b: D) =>
+    filtersOrderDict[a.category] - filtersOrderDict[b.category] ||
+    a.category.localeCompare(b.category);
+  filteredResources.sort(sortFilters);
 
   return (
     <div className={styles.container}>
@@ -121,7 +127,6 @@ function KG({ openedProject }: ProjectRoute) {
           data={filteredResources}
           sections={filteredSections}
           selectedResource={selectedResource}
-          onResourceSelection={onResourceSelection}
         />
       </div>
       <div className={styles.panelSafeArea} />

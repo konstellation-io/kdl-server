@@ -101,7 +101,6 @@ func (g *giteaService) MirrorRepo(url, repoName, userName, userToken string) err
 	return nil
 }
 
-
 // AddCollaborator adds a new collaborator to the given repository.
 func (g *giteaService) AddCollaborator(repoName, username string, accessLevel entity.AccessLevel) error {
 	var accessMode gitea.AccessMode

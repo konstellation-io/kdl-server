@@ -53,21 +53,21 @@ func (c CreateProjectOption) Validate() error {
 	}
 
 	if c.RepoType == entity.RepositoryTypeInternal {
-		if c.InternalRepoName == nil {
+		if c.InternalRepoName == nil || *c.InternalRepoName == "" {
 			return fmt.Errorf("%w: internal repository name cannot be null", ErrCreateProjectValidation)
 		}
 	}
 
 	if c.RepoType == entity.RepositoryTypeExternal {
-		if c.ExternalRepoURL == nil {
+		if c.ExternalRepoURL == nil || *c.ExternalRepoURL == "" {
 			return fmt.Errorf("%w: external repository URL cannot be null", ErrCreateProjectValidation)
 		}
 
-		if c.ExternalRepoUsername == nil {
+		if c.ExternalRepoUsername == nil || *c.ExternalRepoUsername == "" {
 			return fmt.Errorf("%w: external repository username cannot be null", ErrCreateProjectValidation)
 		}
 
-		if c.ExternalRepoToken == nil {
+		if c.ExternalRepoToken == nil || *c.ExternalRepoToken == "" {
 			return fmt.Errorf("%w: external repository token cannot be null", ErrCreateProjectValidation)
 		}
 	}

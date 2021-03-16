@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"regexp"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
@@ -53,21 +54,21 @@ func (c CreateProjectOption) Validate() error {
 	}
 
 	if c.RepoType == entity.RepositoryTypeInternal {
-		if c.InternalRepoName == nil || *c.InternalRepoName == "" {
+		if kdlutil.IsNilOrEmpty(c.InternalRepoName) {
 			return fmt.Errorf("%w: internal repository name cannot be null", ErrCreateProjectValidation)
 		}
 	}
 
 	if c.RepoType == entity.RepositoryTypeExternal {
-		if c.ExternalRepoURL == nil || *c.ExternalRepoURL == "" {
+		if kdlutil.IsNilOrEmpty(c.ExternalRepoURL) {
 			return fmt.Errorf("%w: external repository URL cannot be null", ErrCreateProjectValidation)
 		}
 
-		if c.ExternalRepoUsername == nil || *c.ExternalRepoUsername == "" {
+		if kdlutil.IsNilOrEmpty(c.ExternalRepoUsername) {
 			return fmt.Errorf("%w: external repository username cannot be null", ErrCreateProjectValidation)
 		}
 
-		if c.ExternalRepoToken == nil || *c.ExternalRepoToken == "" {
+		if kdlutil.IsNilOrEmpty(c.ExternalRepoToken) {
 			return fmt.Errorf("%w: external repository token cannot be null", ErrCreateProjectValidation)
 		}
 	}
@@ -109,7 +110,7 @@ func NewInteractor(logger logging.Logger,
 //  - For external repositories, mirrors the external repository in Gitea.
 //  - Create Minio bucket
 //  - Activate Drone.io repo
-func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
+func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
 	// Validate the creation input
 	err := opt.Validate()
 	if err != nil {
@@ -145,7 +146,7 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		repoName = *opt.InternalRepoName
 
 	case entity.RepositoryTypeExternal:
-		repoName, err = getRepoNameFromURL(*opt.ExternalRepoURL)
+		repoName, err = i.getRepoNameFromURL(*opt.ExternalRepoURL)
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -196,8 +197,27 @@ func (i interactor) GetByID(ctx context.Context, id string) (entity.Project, err
 	return i.repo.Get(ctx, id)
 }
 
+// Update changes the desired information about a project.
+func (i interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
+	if kdlutil.IsNilOrEmpty(opt.Name) {
+		err := i.repo.UpdateName(ctx, opt.ProjectID, *opt.Name)
+		if err != nil {
+			return entity.Project{}, err
+		}
+	}
+
+	if kdlutil.IsNilOrEmpty(opt.Description) {
+		err := i.repo.UpdateDescription(ctx, opt.ProjectID, *opt.Description)
+		if err != nil {
+			return entity.Project{}, err
+		}
+	}
+
+	return i.repo.Get(ctx, opt.ProjectID)
+}
+
 // getRepoNameFromURL extracts the name of the repo from the external repo url.
-func getRepoNameFromURL(url string) (string, error) {
+func (i interactor) getRepoNameFromURL(url string) (string, error) {
 	const expectedMatches = 2
 
 	matches := repoNameRegexp.FindStringSubmatch(url)
@@ -206,23 +226,4 @@ func getRepoNameFromURL(url string) (string, error) {
 	}
 
 	return matches[1], nil
-}
-
-// Update changes the desired information about a project.
-func (i interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
-	if opt.Name != nil && *opt.Name != "" {
-		err := i.repo.UpdateName(ctx, opt.ProjectID, *opt.Name)
-		if err != nil {
-			return entity.Project{}, err
-		}
-	}
-
-	if opt.Description != nil && *opt.Description != "" {
-		err := i.repo.UpdateDescription(ctx, opt.ProjectID, *opt.Description)
-		if err != nil {
-			return entity.Project{}, err
-		}
-	}
-
-	return i.repo.Get(ctx, opt.ProjectID)
 }

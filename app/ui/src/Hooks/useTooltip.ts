@@ -1,32 +1,32 @@
 import { useState } from 'react';
 
-export type TextTooltipInfo = {
+export type TooltipInfo<T> = {
   top: number;
   left: number;
-  text: string;
   open: boolean;
+  data?: T;
 };
 
-export type UpdateTooltip = {
+export type UpdateTooltip<T> = {
   top?: number;
   left?: number;
-  text?: string;
   open?: boolean;
+  data?: T;
 };
 
-const defaultValues: TextTooltipInfo = {
+const defaultValues = {
   top: 0,
   left: 0,
-  text: '',
   open: false,
+  data: undefined,
 };
 
-export function useTextTooltip() {
-  const [tooltipInfo, setTooltipInfo] = useState<TextTooltipInfo>(
+export function useTooltip<TooltipData>() {
+  const [tooltipInfo, setTooltipInfo] = useState<TooltipInfo<TooltipData>>(
     defaultValues
   );
 
-  function updateTooltip(newValues: UpdateTooltip) {
+  function updateTooltip(newValues: UpdateTooltip<TooltipData>) {
     setTooltipInfo((prevValues) => ({
       ...prevValues,
       ...newValues,
@@ -43,4 +43,4 @@ export function useTextTooltip() {
     hideTooltip,
   };
 }
-export default useTextTooltip;
+export default useTooltip;

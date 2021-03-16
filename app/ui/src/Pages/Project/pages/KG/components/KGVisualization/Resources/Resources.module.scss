@@ -2,55 +2,31 @@
 @import 'Styles/mixins';
 @import 'Styles/colors';
 
-.resourcesWrapper,
-.resourceWrapper {
+.resourcesWrapper {
   pointer-events: none;
-}
-
-.resourceG {
-  pointer-events: all;
 }
 
 .resource {
-  pointer-events: none;
-
-  &.resourceGroup {
-    pointer-events: none;
-  }
-
-  &.resourceNode {
-    fill: palette(base);
-    stroke: palette(feedback, 900);
-  }
+  pointer-events: all;
+  fill: palette(highlight);
+  fill-opacity: 0.3;
+  stroke-opacity: 0;
+  stroke-width: 2 * $grid-unit;
 
   &.unhighlight {
     transition: stroke ease 0.4s;
   }
 
   &.highlight {
-    stroke: palette(highlight);
-    filter: url(#resourceGlow);
+    fill: white;
+    fill-opacity: 1;
+    // stroke: palette(highlight);
+    // filter: url(#resourceGlow);
   }
-}
 
-.resourceLabel {
-  pointer-events: none;
-  font-weight: 600;
-  dominant-baseline: central;
-}
-
-.resourceImage {
-  pointer-events: none;
-
-  fill: font-color(light);
-}
-
-.tooltipRect {
-  fill: palette(highlight);
-  cursor: pointer;
-
-  &.resourceGroup {
-    pointer-events: none;
-    fill-opacity: 0;
+  &:hover {
+    fill: white;
+    fill-opacity: 1;
+    // filter: url(#resourceGlow);
   }
 }

@@ -20,14 +20,14 @@ export interface RepositoryErrors {
 
 export interface ExternalRepositoryValues {
   url: string;
-  isConnectionTested: boolean;
-  hasConnectionError: string;
-  warning: boolean;
+  username: string;
+  token: string;
 }
 
 export interface ExternalRepositoryErrors {
   url: string;
-  warning: string;
+  username: string;
+  token: string;
 }
 
 export interface InternalRepositoryValues {

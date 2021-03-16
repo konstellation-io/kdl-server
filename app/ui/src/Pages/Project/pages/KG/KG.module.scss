@@ -3,6 +3,14 @@
 @import 'Styles/colors';
 
 .container {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  position: relative;
+}
+
+.vizArea {
   position: relative;
   width: 100%;
   height: 100%;
@@ -11,6 +19,7 @@
   .kgTopBar {
     position: absolute;
     width: 100%;
+    height: 5 * $grid-unit;
     top: $grid-unit * 3;
     z-index: 3;
     display: flex;
@@ -23,4 +32,11 @@
       pointer-events: all;
     }
   }
+}
+
+.panelSafeArea {
+  width: 25vw;
+  min-width: 44 * $grid-unit;
+  max-width: 60 * $grid-unit;
+  flex-shrink: 0;
 }

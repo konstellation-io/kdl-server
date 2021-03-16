@@ -1,0 +1,20 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: palette(base, 900);
+  border-left: solid 2px palette(base);
+  padding: 0 3 * $grid-unit;
+  height: 100%;
+
+  .text {
+    @include font-caption;
+    color: font-color(lowlight);
+
+    margin-left: 2 * $grid-unit;
+  }
+}

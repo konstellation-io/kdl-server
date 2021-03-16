@@ -101,12 +101,6 @@ function NewProject() {
     data: stepperSteps,
   });
 
-  useEffect(() => {
-    updateState(false, true, Steps.REPOSITORY_DETAILS);
-    // We only want to update state also when type changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type]);
-
   function getActions() {
     const onNextClick = () => {
       if (validateStep()) nextStep();
@@ -139,27 +133,10 @@ function NewProject() {
             key="next"
             label="NEXT"
             primary
-            disabled={isNextDisabled()}
             onClick={onNextClick}
           />,
         ];
     }
-  }
-
-  function isNextDisabled() {
-    if (
-      data &&
-      data.newProject.externalRepository &&
-      actStep === Steps.REPOSITORY_DETAILS &&
-      type === RepositoryType.EXTERNAL
-    ) {
-      const {
-        errors: { warning },
-      } = data.newProject.externalRepository;
-
-      return warning !== '';
-    }
-    return false;
   }
 
   if (!data) return <SpinnerCircular />;

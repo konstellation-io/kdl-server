@@ -1,121 +1,82 @@
-import { Button, CHECK, Check, SpinnerCircular, TextInput } from 'kwc';
-import CircledInfoMessage, {
-  CircledInfoMessageTypes,
-} from 'Components/CircledInfoMessage/CircledInfoMessage';
-import {
-  GET_NEW_PROJECT,
-  GetNewProject,
-} from 'Graphql/client/queries/getNewProject.graphql';
-import React, { useState } from 'react';
-
+import { SpinnerCircular, TextInput } from 'kwc';
+import React from 'react';
 import IconLink from '@material-ui/icons/Link';
 import styles from './ExternalRepository.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
-import { useQuery } from '@apollo/client';
-
-function validateUrl(value: string): string {
-  const error = CHECK.getValidationError([CHECK.isDomainValid(value)]);
-  return error === true ? '' : (error as string);
-}
+import { useReactiveVar } from '@apollo/client';
+import { newProject } from 'Graphql/client/cache';
+import { validateMandatoryField, validateUrl } from './ExternalRepositoryUtils';
+import { getErrorMsg } from 'Utils/string';
 
 type Props = {
   showErrors: boolean;
 };
 
 function ExternalRepository({ showErrors }: Props) {
-  const [loading, setLoading] = useState(false);
-  const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
+  const project = useReactiveVar(newProject);
   const { updateValue, updateError, clearError } = useNewProject(
     'externalRepository'
   );
 
-  if (!data) return <SpinnerCircular />;
+  if (!project) return <SpinnerCircular />;
 
   const {
-    values: { url, isConnectionTested, warning, hasConnectionError },
-    errors: { url: urlError },
-  } = data.newProject.externalRepository;
-
-  const isValidUrl = validateUrl(url);
-
-  function validateConnection() {
-    setLoading(true);
-
-    // TODO: verify the url inserted
-    setTimeout(() => {
-      const success = false;
-      setLoading(false);
-      updateError('warning', success ? '' : 'not accepted');
-      updateValue('warning', success);
-      updateValue('hasConnectionError', success ? '' : 'error');
-      updateValue('isConnectionTested', true);
-    }, 500);
-  }
+    values: { url, token, username },
+    errors: { url: urlError, token: tokenError, username: usernameError },
+  } = project.externalRepository;
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.title}>Test your URL</h3>
-      <p className={styles.subtitle}>
-        Make sure you have your public Konstellation SSH key in the external
-        repository.
-      </p>
-      <div className={styles.formUrlRow}>
+      <h3 className={styles.title}>Your external repository</h3>
+      <div className={styles.formContainer}>
         <TextInput
           label="url"
           onChange={(value: string) => {
             updateValue('url', value);
-            updateValue('isConnectionTested', false);
             clearError('url');
           }}
           onBlur={() => {
-            updateError('url', isValidUrl);
-            updateError('warning', 'not accepted');
+            const isValidUrl = validateUrl(url);
+            updateError('url', getErrorMsg(isValidUrl));
           }}
-          error={url && urlError}
-          customClassname={styles.formUrl}
+          error={showErrors ? urlError : ''}
+          customClassname={styles.form}
           formValue={url}
           Icon={IconLink}
           showClearButton
+          helpText="The HTTP(S) or GIT 'clone' URL of an existing repository."
         />
-        <Button
-          label="TEST"
-          primary
-          className={styles.testButton}
-          onClick={validateConnection}
-          disabled={isValidUrl !== ''}
-          loading={loading}
+        <TextInput
+          label="username"
+          onChange={(value: string) => {
+            updateValue('username', value);
+            clearError('username');
+          }}
+          onBlur={() => {
+            const isValidUsername = validateMandatoryField(username);
+            updateError('username', getErrorMsg(isValidUsername));
+          }}
+          error={showErrors ? usernameError : ''}
+          customClassname={styles.form}
+          formValue={username}
+          showClearButton
+        />
+        <TextInput
+          label="token"
+          onChange={(value: string) => {
+            updateValue('token', value);
+            clearError('token');
+          }}
+          onBlur={() => {
+            const isValidToken = validateMandatoryField(token);
+            updateError('token', getErrorMsg(isValidToken));
+          }}
+          error={showErrors ? tokenError : ''}
+          customClassname={styles.form}
+          formValue={token}
+          showClearButton
         />
       </div>
-      {isConnectionTested && !!hasConnectionError && (
-        <CircledInfoMessage
-          type={CircledInfoMessageTypes.ERROR}
-          text="connection error"
-        >
-          <div className={styles.arrow} />
-          <div className={styles.warningBox}>
-            <h6 className={styles.title}>Repository connection failed.</h6>
-            <p className={styles.message}>
-              Make sure your SSH key is included in the repository. If not,
-              access SSH Key section inside the Server Project list and follow
-              the instructions. You may skip this process by checking the
-              confirmation bellow.
-            </p>
-            <div className={styles.checkContainer}>
-              <Check
-                className={styles.testCheck}
-                checked={warning}
-                onChange={(checked) => {
-                  updateError('warning', checked ? '' : 'not accepted');
-                  updateValue('warning', checked);
-                }}
-              />
-              <span className={styles.checkLabel}>
-                Save my project without testing the url
-              </span>
-            </div>
-          </div>
-        </CircledInfoMessage>
-      )}
     </div>
   );
 }

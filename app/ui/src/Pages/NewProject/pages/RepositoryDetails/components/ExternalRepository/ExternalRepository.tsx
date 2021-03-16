@@ -74,7 +74,7 @@ function ExternalRepository({ showErrors }: Props) {
           error={showErrors ? tokenError : ''}
           customClassname={styles.form}
           formValue={token}
-          showClearButton
+          hidden
         />
       </div>
     </div>

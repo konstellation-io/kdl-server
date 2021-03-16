@@ -21,6 +21,7 @@ import { orderBy } from 'lodash';
 import styles from './KG.module.scss';
 import useKGFilters from './components/useKGFilters';
 import { useQuery } from '@apollo/client';
+import { replaceAll } from 'Utils/string';
 
 const selectedResource = 'My project';
 
@@ -33,8 +34,8 @@ const allData = data;
 let resources = allData.map((d: any, idx: number) => ({
   id: d.id,
   category:
-    Object.keys(JSON.parse(d.topics.replaceAll("'", '"')))[0] || 'Others',
-  categories: JSON.parse(d.topics.replaceAll("'", '"')),
+    Object.keys(JSON.parse(replaceAll(d.topics, /'/, '"')))[0] || 'Others',
+  categories: JSON.parse(replaceAll(d.topics, /'/, '"')),
   name: d.title,
   type: KnowledgeGraphItemCat.Paper,
   score: d.score,
@@ -47,7 +48,7 @@ export const idToFullResource = Object.fromEntries(
     {
       title: r.title,
       abstract: r.abstract,
-      topics: JSON.parse(r.topics.replaceAll("'", '"')),
+      topics: JSON.parse(replaceAll(r.topics, /'/, '"')),
       score: r.score,
     },
   ])

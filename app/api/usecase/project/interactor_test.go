@@ -386,3 +386,32 @@ func TestInteractor_UpdateMember_ErrNoMoreAdmins(t *testing.T) {
 	require.Equal(t, project.ErrUpdateNoMoreAdmins, err)
 	require.Equal(t, p, entity.Project{})
 }
+
+func TestInteractor_Update(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	newName := "The new project name"
+	newDesc := "the new description"
+
+	expectedProject := entity.Project{
+		ID:          someProjectID,
+		Name:        newName,
+		Description: newDesc,
+	}
+
+	ctx := context.Background()
+
+	s.mocks.repo.EXPECT().UpdateName(ctx, someProjectID, newName).Return(nil)
+	s.mocks.repo.EXPECT().UpdateDescription(ctx, someProjectID, newDesc).Return(nil)
+	s.mocks.repo.EXPECT().Get(ctx, someProjectID).Return(expectedProject, nil)
+
+	result, err := s.interactor.Update(ctx, project.UpdateProjectOption{
+		ProjectID:   someProjectID,
+		Name:        &newName,
+		Description: &newDesc,
+	})
+
+	require.NoError(t, err)
+	require.Equal(t, expectedProject, result)
+}

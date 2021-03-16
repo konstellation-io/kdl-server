@@ -164,3 +164,22 @@ func (i interactor) GetByID(ctx context.Context, id string) (entity.Project, err
 	i.logger.Infof("Getting project with id \"%s\"", id)
 	return i.repo.Get(ctx, id)
 }
+
+// Update changes the desired information about a project.
+func (i interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
+	if opt.Name != nil && *opt.Name != "" {
+		err := i.repo.UpdateName(ctx, opt.ProjectID, *opt.Name)
+		if err != nil {
+			return entity.Project{}, err
+		}
+	}
+
+	if opt.Description != nil && *opt.Description != "" {
+		err := i.repo.UpdateDescription(ctx, opt.ProjectID, *opt.Description)
+		if err != nil {
+			return entity.Project{}, err
+		}
+	}
+
+	return i.repo.Get(ctx, opt.ProjectID)
+}

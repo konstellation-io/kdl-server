@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"strings"
 	"time"
 
@@ -67,7 +68,13 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 }
 
 func (r *mutationResolver) UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error) {
-	return nil, entity.ErrNotImplemented
+	p, err := r.projects.Update(ctx, project.UpdateProjectOption{
+		ProjectID:   input.ID,
+		Name:        input.Name,
+		Description: input.Description,
+	})
+
+	return &p, err
 }
 
 func (r *mutationResolver) AddMembers(ctx context.Context, input model.AddMembersInput) (*entity.Project, error) {
@@ -214,7 +221,15 @@ func (r *queryResolver) SSHKey(ctx context.Context) (*entity.SSHKey, error) {
 }
 
 func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
-	return nil, entity.ErrNotImplemented
+	// We are sending a random number until the feature is developed
+	min := 0
+	max := 100
+	// nolint:gosec // this is a temp workaround
+	randomInt := rand.Intn(max-min) + min
+
+	return &model.QualityProjectDesc{
+		Quality: randomInt,
+	}, nil
 }
 
 func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) (*entity.KnowledgeGraph, error) {

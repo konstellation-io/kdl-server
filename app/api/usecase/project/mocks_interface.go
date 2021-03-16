@@ -121,6 +121,34 @@ func (mr *MockRepositoryMockRecorder) UpdateMemberAccessLevel(ctx, projectID, us
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMemberAccessLevel", reflect.TypeOf((*MockRepository)(nil).UpdateMemberAccessLevel), ctx, projectID, userID, accessLevel)
 }
 
+// UpdateName mocks base method
+func (m *MockRepository) UpdateName(ctx context.Context, projectID, name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateName", ctx, projectID, name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateName indicates an expected call of UpdateName
+func (mr *MockRepositoryMockRecorder) UpdateName(ctx, projectID, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateName", reflect.TypeOf((*MockRepository)(nil).UpdateName), ctx, projectID, name)
+}
+
+// UpdateDescription mocks base method
+func (m *MockRepository) UpdateDescription(ctx context.Context, projectID, description string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateDescription", ctx, projectID, description)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateDescription indicates an expected call of UpdateDescription
+func (mr *MockRepositoryMockRecorder) UpdateDescription(ctx, projectID, description interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDescription", reflect.TypeOf((*MockRepository)(nil).UpdateDescription), ctx, projectID, description)
+}
+
 // MockUseCase is a mock of UseCase interface
 type MockUseCase struct {
 	ctrl     *gomock.Controller
@@ -232,4 +260,19 @@ func (m *MockUseCase) UpdateMember(ctx context.Context, opt UpdateMemberOption) 
 func (mr *MockUseCaseMockRecorder) UpdateMember(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMember", reflect.TypeOf((*MockUseCase)(nil).UpdateMember), ctx, opt)
+}
+
+// Update mocks base method
+func (m *MockUseCase) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", ctx, opt)
+	ret0, _ := ret[0].(entity.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Update indicates an expected call of Update
+func (mr *MockUseCaseMockRecorder) Update(ctx, opt interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUseCase)(nil).Update), ctx, opt)
 }

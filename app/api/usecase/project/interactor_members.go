@@ -8,6 +8,13 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 )
 
+// UpdateProjectOption options when updating a project member.
+type UpdateProjectOption struct {
+	ProjectID   string
+	Name        *string
+	Description *string
+}
+
 // UpdateMemberOption options when updating a project member.
 type UpdateMemberOption struct {
 	ProjectID   string

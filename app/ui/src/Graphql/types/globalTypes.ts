@@ -31,7 +31,7 @@ export enum RepositoryType {
 
 export interface AddMembersInput {
   projectId: string;
-  memberIds: string[];
+  userIds: string[];
 }
 
 export interface AddUserInput {
@@ -58,7 +58,7 @@ export interface RemoveApiTokenInput {
 
 export interface RemoveMemberInput {
   projectId: string;
-  memberId: string;
+  userId: string;
 }
 
 export interface RemoveUsersInput {
@@ -82,7 +82,7 @@ export interface UpdateAccessLevelInput {
 
 export interface UpdateMemberInput {
   projectId: string;
-  memberId: string;
+  userId: string;
   accessLevel: AccessLevel;
 }
 

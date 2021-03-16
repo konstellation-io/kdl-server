@@ -17,4 +17,4 @@ __pycache__/
 .env
 
 # Assest directory
-assets/
+/assets

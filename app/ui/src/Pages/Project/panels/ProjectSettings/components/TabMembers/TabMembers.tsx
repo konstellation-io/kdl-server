@@ -6,27 +6,27 @@ import {
   SpinnerCircular,
 } from 'kwc';
 import {
-  GET_MEMBER_DETAILS,
-  GetMemberDetails,
-} from 'Graphql/client/queries/getMemberDetails.graphql';
-import {
   GetProjectMembers,
+  GetProjectMembers_project_members,
   GetProjectMembersVariables,
 } from 'Graphql/queries/types/GetProjectMembers';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 
 import { GetUsers } from 'Graphql/queries/types/GetUsers';
 import Member from './components/Member/Member';
-import { MemberDetails } from 'Graphql/client/models/MemberDetails';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
 import { PANEL_THEME } from 'Components/Layout/Panel/Panel';
 import { loader } from 'graphql.macro';
 import styles from './TabMembers.module.scss';
 import useMember from 'Graphql/hooks/useMember';
 import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
-import { useQuery } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
+import { memberDetails } from 'Graphql/client/cache';
+import { GetMe } from 'Graphql/queries/types/GetMe';
+import { AccessLevel } from 'Graphql/types/globalTypes';
 
+const GetMeQuery = loader('Graphql/queries/getMe.graphql');
 const GetUsersQuery = loader('Graphql/queries/getUsers.graphql');
 const GetMembersQuery = loader('Graphql/queries/getProjectMembers.graphql');
 
@@ -34,6 +34,7 @@ type Props = {
   projectId: string;
 };
 function TabMembers({ projectId }: Props) {
+  const { data: dataMe } = useQuery<GetMe>(GetMeQuery);
   const [memberSelection, setMemberSelection] = useState<string[]>([]);
   const [error, setError] = useState<string>('');
 
@@ -63,23 +64,31 @@ function TabMembers({ projectId }: Props) {
       id: projectId,
     },
   });
-  const { data: memberDetailsData } = useQuery<GetMemberDetails>(
-    GET_MEMBER_DETAILS
-  );
+
+  const memberDetailsData = useReactiveVar(memberDetails);
 
   const openDetails = useCallback(
-    (details: MemberDetails) => {
+    (details: GetProjectMembers_project_members) => {
       updateMemberDetails(details);
       openPanel();
     },
     [updateMemberDetails, openPanel]
   );
 
+  const canAddMembers = useMemo(() => {
+    if (dataMe && dataMembers) {
+      const meAsMember = dataMembers.project.members.find(
+        ({ user }) => user.email === dataMe.me.email
+      );
+      return meAsMember?.accessLevel === AccessLevel.ADMIN;
+    }
+  }, [dataMe?.me, dataMembers?.project]);
+
   // Update opened member details as data is updated
   useEffect(() => {
     if (dataMembers && memberDetailsData) {
       const selectedMember = dataMembers.project.members.find(
-        (m) => m.id === memberDetailsData.memberDetails?.id
+        (m) => m.user.id === memberDetailsData.user.id
       );
 
       if (selectedMember) updateMemberDetails(selectedMember);
@@ -93,12 +102,14 @@ function TabMembers({ projectId }: Props) {
     return <ErrorMessage />;
 
   const users = dataUsers.users.map((user) => user.email);
-  const members = dataMembers.project.members.map((member) => member.email);
+  const members = dataMembers.project.members.map(
+    (member) => member.user.email
+  );
   const allMembers = [...members, ...memberSelection];
 
   const options = users.filter((email) => !allMembers.includes(email));
 
-  function performAddmembers() {
+  function performAddMembers() {
     if (dataUsers) {
       const emailToId = Object.fromEntries(
         dataUsers.users.map((user) => [user.email, user.id])
@@ -110,41 +121,44 @@ function TabMembers({ projectId }: Props) {
   return (
     <div>
       <div className={styles.formSearch}>
-        <SearchSelect
-          options={options}
-          theme={SearchSelectTheme.LIGHT}
-          chipSelection={memberSelection}
-          onRemoveChip={(email) =>
-            setMemberSelection(memberSelection.filter((m) => m !== email))
-          }
-          onChange={(value: string) => {
-            setError('');
-
-            if (value) {
-              if (users.includes(value)) {
-                setMemberSelection([...memberSelection, value]);
-              } else {
-                setError('Add a user from the Server users');
+        {canAddMembers && (
+          <>
+            <SearchSelect
+              options={options}
+              theme={SearchSelectTheme.LIGHT}
+              chipSelection={memberSelection}
+              onRemoveChip={(email) =>
+                setMemberSelection(memberSelection.filter((m) => m !== email))
               }
-            }
-          }}
-          className={styles.formInput}
-          placeholder="Find a new member..."
-          error={error}
-          showSearchIcon
-          hideLabel
-          showClear
-        />
-        <Button
-          label="ADD"
-          height={44}
-          onClick={performAddmembers}
-          disabled={!memberSelection.length}
-        />
+              onChange={(value: string) => {
+                setError('');
+                if (value) {
+                  if (users.includes(value)) {
+                    setMemberSelection([...memberSelection, value]);
+                  } else {
+                    setError('Add a user from the Server users');
+                  }
+                }
+              }}
+              className={styles.formInput}
+              placeholder="Find a new member..."
+              error={error}
+              showSearchIcon
+              hideLabel
+              showClear
+            />
+            <Button
+              label="ADD"
+              height={44}
+              onClick={performAddMembers}
+              disabled={!memberSelection.length}
+            />
+          </>
+        )}
       </div>
       <div className={styles.members}>
         {dataMembers.project.members.map((member) => (
-          <Member key={member.id} member={member} onOpen={openDetails} />
+          <Member key={member.user.id} member={member} onOpen={openDetails} />
         ))}
       </div>
     </div>

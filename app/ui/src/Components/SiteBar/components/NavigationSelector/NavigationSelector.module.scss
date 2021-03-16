@@ -1,16 +1,22 @@
 @import 'Styles/variables';
 @import 'Styles/mixins';
 @import 'Styles/colors';
+@import 'Styles/shadows';
 
 .container {
-  background-color: palette(base, 700);
+  background-color: palette(lowlight, 900);
   border-bottom-left-radius: $grid-unit / 2;
   border-bottom-right-radius: $grid-unit / 2;
+  @include glow(2, palette(base, 900));
 
   ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
+
+    .disabled {
+      pointer-events: none;
+    }
 
     .section {
       display: flex;
@@ -31,7 +37,7 @@
       }
       &.selectedSection > div {
         color: font-color(highlight);
-        border-left: 2px solid palette(highlight);
+        border-left: 3px solid palette(highlight);
       }
     }
   }

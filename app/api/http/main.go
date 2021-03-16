@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/dataloader"
+
 	"github.com/konstellation-io/kdl-server/app/api/usecase/kg"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/kgservice"
@@ -106,10 +108,10 @@ func main() {
 		kg.NewInteractor(logger, kgService),
 	)
 
-	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, resolvers)
+	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, resolvers, userRepo)
 }
 
-func startHTTPServer(logger logging.Logger, port, staticFilesPath string, resolvers generated.ResolverRoot) {
+func startHTTPServer(logger logging.Logger, port, staticFilesPath string, resolvers generated.ResolverRoot, userRepo user.Repository) {
 	const apiQueryPath = "/api/query"
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers}))
@@ -118,7 +120,7 @@ func startHTTPServer(logger logging.Logger, port, staticFilesPath string, resolv
 
 	http.Handle("/", fs)
 	http.Handle("/api/playground", middleware.AuthMiddleware(pg))
-	http.Handle(apiQueryPath, middleware.AuthMiddleware(srv))
+	http.Handle(apiQueryPath, middleware.AuthMiddleware(dataloader.Middleware(userRepo, srv)))
 
 	logger.Infof("Server running at port %s", port)
 

@@ -123,6 +123,21 @@ func (mr *MockRepositoryMockRecorder) FindAll(ctx interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockRepository)(nil).FindAll), ctx)
 }
 
+// FindByIDs mocks base method
+func (m *MockRepository) FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindByIDs", ctx, userIDs)
+	ret0, _ := ret[0].([]entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByIDs indicates an expected call of FindByIDs
+func (mr *MockRepositoryMockRecorder) FindByIDs(ctx, userIDs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByIDs", reflect.TypeOf((*MockRepository)(nil).FindByIDs), ctx, userIDs)
+}
+
 // MockUseCase is a mock of UseCase interface
 type MockUseCase struct {
 	ctrl     *gomock.Controller
@@ -234,4 +249,34 @@ func (m *MockUseCase) AreToolsRunning(username string) (bool, error) {
 func (mr *MockUseCaseMockRecorder) AreToolsRunning(username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AreToolsRunning", reflect.TypeOf((*MockUseCase)(nil).AreToolsRunning), username)
+}
+
+// FindByIDs mocks base method
+func (m *MockUseCase) FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindByIDs", ctx, userIDs)
+	ret0, _ := ret[0].([]entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByIDs indicates an expected call of FindByIDs
+func (mr *MockUseCaseMockRecorder) FindByIDs(ctx, userIDs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByIDs", reflect.TypeOf((*MockUseCase)(nil).FindByIDs), ctx, userIDs)
+}
+
+// GetByID mocks base method
+func (m *MockUseCase) GetByID(ctx context.Context, userID string) (entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByID", ctx, userID)
+	ret0, _ := ret[0].(entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByID indicates an expected call of GetByID
+func (mr *MockUseCaseMockRecorder) GetByID(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockUseCase)(nil).GetByID), ctx, userID)
 }

@@ -63,7 +63,7 @@ func TestInteractor_Get(t *testing.T) {
 		Date:        "date",
 		URL:         "url",
 		ExternalID:  &aux,
-		Framework:   &aux,
+		Frameworks:  []string{"tf"},
 		Score:       0,
 		IsStarred:   false,
 		IsDiscarded: false,

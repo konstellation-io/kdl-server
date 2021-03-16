@@ -1,4 +1,5 @@
 from dataclasses import MISSING, dataclass, fields
+from typing import Optional
 
 import proto.knowledge_graph_pb2 as kg_pb
 from exceptions import MissingFieldException
@@ -21,7 +22,8 @@ class RecommendedItem:
 
     # Optional fields
     external_id: str = ""  # Keeping camelCase for consistency.
-    framework: str = ""
+    frameworks: Optional[list[str]] = None
+    repo_urls: Optional[list[str]] = None
 
     def __init__(self, field_dict):
         self.fields = self._get_fields()
@@ -55,6 +57,16 @@ class RecommendedItem:
         """
         item = kg_pb.GraphItem()
         for field in self.fields:
+            if field == "authors":
+                item.authors.extend(self.authors)
+                continue
+            elif field == "repo_urls":
+                item.repo_urls.extend(self.repo_urls)
+                continue
+            elif field == "frameworks":
+                item.frameworks.extend(self.frameworks)
+                continue
+
             setattr(item, field, getattr(self, field))
 
         return item

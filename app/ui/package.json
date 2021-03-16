@@ -41,6 +41,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:cov": "react-scripts test --coverage --watchAll=false",
     "test:cov:sonar": "react-scripts test --silent --env=jsdom --coverage --watchAll=false --testResultsProcessor jest-sonar-reporter",
     "eject": "react-scripts eject",
     "prettier": "prettier --write --single-quote \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
@@ -89,12 +90,33 @@
     "@types/react-tabs": "2.3.2",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "^1.15.6",
+    "enzyme-to-json": "^3.6.1",
     "husky": "5.0.9",
     "jest-canvas-mock": "2.3.1",
     "jest-sonar-reporter": "^2.0.0",
     "lint-staged": "10.5.4",
     "mutationobserver-shim": "^0.3.7",
     "prettier": "2.1.2"
+  },
+  "jest": {
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.tsx",
+      "src/**/*.ts",
+      "!src/index.tsx",
+      "!Graphql/client/queries/*.ts",
+      "!Graphql/mutations/**/*.ts",
+      "!Graphql/queries/**/*.ts",
+      "!Graphql/types/**/*.ts",
+      "!types/**/*.ts",
+      "!browserHistory.ts",
+      "!react-app-env.d.ts"
+    ],
+    "coverageReporters": [
+      "text"
+    ]
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [

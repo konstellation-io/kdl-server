@@ -1,11 +1,10 @@
+#import '../fragments/memberFragment.graphql'
+
 query GetProjectMembers($id: ID!) {
   project(id: $id) {
+    id
     members {
-      id
-      email
-      accessLevel
-      addedDate
-      lastActivity
+      ...MemberFields
     }
   }
 }

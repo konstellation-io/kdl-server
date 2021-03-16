@@ -1,6 +1,10 @@
+#import '../fragments/memberFragment.graphql'
+
 mutation UpdateMember($input: UpdateMemberInput!) {
   updateMember(input: $input) {
     id
-    accessLevel
+    members {
+      ...MemberFields
+    }
   }
 }

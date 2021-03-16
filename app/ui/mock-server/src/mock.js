@@ -1,30 +1,72 @@
 const { MockList } = require('apollo-server');
 const casual = require('casual');
 
-const projectsIds = Array(8)
-  .fill(0)
-  .map(() => casual.uuid);
-
 const meId = casual.uuid;
+const me = {
+  id: meId,
+  email: 'admin@intelygenz.com',
+  username: 'admin',
+  areToolsActive: true,
+  apiTokens: () => new MockList([4, 8]),
+};
+
+const buildProject = () => ({
+  id: casual.uuid,
+  name: casual.name,
+  description: casual.description,
+  favorite: casual.boolean,
+  repository: this.Repository,
+  creationDate: () => new Date().toISOString(),
+  lastActivationDate: () => new Date().toISOString(),
+  error: casual.random_element([null, casual.error]),
+  state: casual.random_element(['STARTED', 'STOPPED', 'ARCHIVED']),
+  members: buildRandomMembers(casual.integer(1, 5)),
+  toolUrls: () => ({
+    gitea: 'https://gitea.io/en-us/',
+    minio: 'https://min.io/',
+    jupyter: 'https://jupyter.org/',
+    vscode: 'https://code.visualstudio.com/',
+    drone: 'https://www.drone.io/',
+    mlflow: 'https://mlflow.org/',
+  }),
+});
+
+const buildMember = () => ({
+  user: {
+    id: casual.uuid,
+    email: casual.email,
+    lastActivity: new Date().toUTCString(),
+  },
+  accessLevel: casual.random_element(['ADMIN', 'VIEWER', 'MANAGER']),
+  addedDate: new Date().toUTCString(),
+});
+
+const buildRandomMembers = (memberCount) => {
+  const members = [
+    {
+      user: {
+        id: meId,
+        email: me.email,
+        lastActivity: new Date().toUTCString(),
+      },
+      accessLevel: 'ADMIN',
+      addedDate: new Date().toUTCString(),
+    },
+  ];
+  for (let i = 0; i < memberCount; i++) {
+    members.push(buildMember());
+  }
+  return members;
+};
+
+const projects = Array(8).fill(0).map(buildProject);
 
 module.exports = {
   Query: () => ({
-    me: () => ({
-      id: meId,
-      email: 'admin@intelygenz.com',
-      username: 'admin',
-      areToolsActive: true,
-      apiTokens: () => new MockList([4, 8]),
-    }),
-    projects: () =>
-      projectsIds.map((id) => ({
-        id,
-      })),
+    me: () => me,
+    projects: () => projects,
     users: () => new MockList([20, 30]),
-    project: ({ project }, { id }) => ({
-      ...project,
-      id,
-    }),
+    project: (_, { id }) => projects.find((project) => project.id === id),
     qualityProjectDesc: () => ({
       quality: Math.round((Math.random() * 1000) % 100),
     }),
@@ -33,22 +75,38 @@ module.exports = {
     }),
   }),
   Mutation: () => ({
-    updateProject: (_, { input: { id, name, description } }) => ({
-      id,
-      name,
-      description,
-    }),
-    updateMember: (_, { input: { memberId, accessLevel } }) => ({
-      id: memberId,
-      accessLevel,
-    }),
-    removeMember: (_, { input: { memberId } }) => ({
-      id: memberId,
-    }),
+    updateProject: (_, { input: { id, name, description } }) => {
+      const project = projects.find((project) => project.id === id);
+      if (name) project.name = name;
+      if (description) project.description = description;
+
+      return project;
+    },
+    addMembers: (_, { input: { projectId, userIds } }) => {
+      const project = projects.find(({ id }) => id === projectId);
+      const newMembers = userIds.map((id) => ({ ...buildMember(), id }));
+      project.members = [...project.members, ...newMembers];
+
+      return project;
+    },
+    removeMember: (_, { input: { projectId, userId } }) => {
+      const project = projects.find(({ id }) => id === projectId);
+      project.members = project.members.filter(
+        ({ user }) => user.id !== userId
+      );
+
+      return project;
+    },
+    updateMember: (_, { input: { userId, accessLevel, projectId } }) => {
+      const project = projects.find(({ id }) => id === projectId);
+      const member = project.members.find(({ user }) => user.id === userId);
+      member.accessLevel = accessLevel;
+
+      return project;
+    },
     removeApiToken: (_, { input: { apiTokenId } }) => ({
       id: apiTokenId,
     }),
-    addMembers: () => new MockList([2, 4]),
     addApiToken: this.ApiToken,
     updateAccessLevel: (_, { input: { userIds, accessLevel } }) =>
       userIds.map((userId) => ({
@@ -59,21 +117,20 @@ module.exports = {
       userIds.map((userId) => ({
         id: userId,
       })),
-    createProject: (_, { input }) => ({
-      ...input,
-      repository: {
-        ...input.repository,
-        connected: false,
-      },
-      id: 'some-new-id',
-      favorite: false,
-      state: 'STOPPED',
-      creationDate: new Date().toUTCString(),
-      lastActivationDate: new Date().toUTCString(),
-      members: [],
-      tools: [],
-      areToolsActive: false,
-    }),
+    createProject: (_, { input }) => {
+      const generatedProject = buildProject();
+      const newProject = {
+        ...generatedProject,
+        ...input,
+        repository: {
+          ...input.repository,
+          connected: false,
+        },
+        members: [],
+      };
+      projects.push(newProject);
+      return newProject;
+    },
     setActiveUserTools: (_, { input }) => ({
       id: meId,
       areToolsActive: input.active,
@@ -94,33 +151,8 @@ module.exports = {
     accessLevel: casual.random_element(['ADMIN', 'VIEWER', 'MANAGER']),
     lastActivity: new Date().toUTCString(),
   }),
-  Member: () => ({
-    id: casual.uuid,
-    email: casual.email,
-    accessLevel: casual.random_element(['ADMIN', 'VIEWER', 'MANAGER']),
-    addedDate: new Date().toUTCString(),
-    lastActivity: new Date().toUTCString(),
-  }),
-  Project: () => ({
-    id: casual.uuid,
-    name: casual.name,
-    description: casual.description,
-    favorite: casual.boolean,
-    repository: this.Repository,
-    creationDate: () => new Date().toISOString(),
-    lastActivationDate: () => new Date().toISOString(),
-    error: casual.random_element([null, casual.error]),
-    state: casual.random_element(['STARTED', 'STOPPED', 'ARCHIVED']),
-    members: () => new MockList([4, 6]),
-    toolUrls: () => ({
-      gitea: 'https://gitea.io/en-us/',
-      minio: 'https://min.io/',
-      jupyter: 'https://jupyter.org/',
-      vscode: 'https://code.visualstudio.com/',
-      drone: 'https://www.drone.io/',
-      mlflow: 'https://mlflow.org/',
-    }),
-  }),
+  Member: buildMember,
+  Project: buildProject,
   Repository: () => ({
     id: casual.uuid,
     type: casual.random_element(['INTERNAL', 'EXTERNAL']),

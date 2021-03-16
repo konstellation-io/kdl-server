@@ -19,3 +19,7 @@ export function replaceAll(
 ): string {
   return text.replace(new RegExp(regex, 'g'), replaceWith);
 }
+
+export function getErrorMsg(validation: string | boolean): string {
+  return validation === true ? '' : (validation as string);
+}

@@ -13,7 +13,7 @@ RUN adduser \
     "${USER}"
 
 RUN apt-get update \
-    && apt-get install -y build-essential wget
+    && apt-get install -y build-essential wget git
 
 WORKDIR /kg
 
@@ -23,9 +23,7 @@ RUN python3 -m pip install pipenv && \
 
 COPY src src
 
-RUN wget https://kdl-kg-assets.s3.eu-central-1.amazonaws.com/assets.tar.gz \
-    && tar zxvf assets.tar.gz \
-    && rm -rf assets.tar.gz
+RUN dvc get https://github.com/konstellation-io/kdl-server --rev b8ce1287463951d290158dc7c7e23b580e807d88 kg/assets
 
 RUN chown -R kdl:0 /kg \
     && chmod -R g+w /kg \

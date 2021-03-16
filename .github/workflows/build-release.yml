@@ -110,6 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - docker-kdl-server
+      - docker-drone-authorizer
       - docker-kdl-kg
     steps:
       - name: Checkout

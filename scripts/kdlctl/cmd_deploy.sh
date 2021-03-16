@@ -34,7 +34,7 @@ deploy() {
   create_namespace
 
   if [ "$ENABLE_TLS" != "false" ]; then
-    ./scripts/create_self_signed_cert.sh $NAMESPACE $DOMAIN
+    ./scripts/create_self_signed_cert.sh $NAMESPACE $DOMAIN $OS
   fi
 
   deploy_helm_chart

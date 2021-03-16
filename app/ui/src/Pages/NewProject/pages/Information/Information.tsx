@@ -10,11 +10,15 @@ import React, { useEffect, useState } from 'react';
 import { SpinnerCircular, TextInput } from 'kwc';
 import { useLazyQuery, useQuery } from '@apollo/client';
 
-import DescriptionScore from '../../../../Components/DescriptionScore/DescriptionScore';
-import { generateSlug } from 'Utils/string';
+import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
+import { generateSlug, getErrorMsg } from 'Utils/string';
 import { loader } from 'graphql.macro';
 import styles from './Information.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
+import {
+  validateProjectDescription,
+  validateProjectName,
+} from './InformationUtils';
 
 const GetQualityProjectDescQuery = loader(
   'Graphql/queries/getQualityProjectDesc.graphql'
@@ -63,10 +67,8 @@ function Information({ showErrors }: Props) {
         }}
         onBlur={() => {
           updateInternalRepositoryValue('slug', generateSlug(name));
-          updateError(
-            'name',
-            name.length === 0 ? 'This field is mandatory, please fill it.' : ''
-          );
+          const isValidName = validateProjectName(name);
+          updateError('name', getErrorMsg(isValidName));
         }}
         formValue={name}
         autoFocus
@@ -81,12 +83,8 @@ function Information({ showErrors }: Props) {
           clearError('description');
         }}
         onBlur={() => {
-          updateError(
-            'description',
-            description.length === 0
-              ? 'Please, write a description is important for the project'
-              : ''
-          );
+          const isValidDescription = validateProjectDescription(description);
+          updateError('description', getErrorMsg(isValidDescription));
           getQualityProjectDesc({ variables: { description } });
         }}
         limits={limits}

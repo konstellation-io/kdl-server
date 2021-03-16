@@ -51,7 +51,6 @@ func NewInteractor(
 // - Generates a new SSH public/private keys.
 // - Creates the user into Gitea.
 // - Adds the public SSH key to the user in Gitea.
-// - Add the user to the KDL team.
 // - Stores the user and ssh keys into the DB.
 // - Creates a new secret in Kubernetes with the generated SSH keys.
 func (i *interactor) Create(ctx context.Context, email, username, password string, accessLevel entity.AccessLevel) (entity.User, error) {
@@ -94,12 +93,6 @@ func (i *interactor) Create(ctx context.Context, email, username, password strin
 		return entity.User{}, err
 	}
 
-	// Add the user to the KDL team.
-	err = i.giteaService.AddTeamMember(username, accessLevel)
-	if err != nil {
-		return entity.User{}, err
-	}
-
 	// Stores the user and ssh keys into the DB.
 	user := entity.User{
 		Username:     username,
@@ -116,7 +109,7 @@ func (i *interactor) Create(ctx context.Context, email, username, password strin
 
 	i.logger.Infof("The user \"%s\" (%s) was created with ID \"%s\"", user.Username, user.Email, insertedID)
 
-	secretName := fmt.Sprintf("%s-ssh-keys", user.Username)
+	secretName := fmt.Sprintf("%s-ssh-keys", user.UsernameSlug())
 	err = i.k8sClient.CreateSecret(secretName, map[string]string{
 		"KDL_USER_PUBLIC_SSH_KEY":  keys.Public,
 		"KDL_USER_PRIVATE_SSH_KEY": keys.Private,
@@ -198,4 +191,14 @@ func (i *interactor) StopTools(ctx context.Context, username string) (entity.Use
 // AreToolsRunning checks if the user tools are running for the given username.
 func (i *interactor) AreToolsRunning(username string) (bool, error) {
 	return i.k8sClient.IsUserToolPODRunning(username)
+}
+
+// FindByIDs retrieves the users for the given identifiers.
+func (i *interactor) FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error) {
+	return i.repo.FindByIDs(ctx, userIDs)
+}
+
+// GetByID retrieve the user for the given identifier.
+func (i *interactor) GetByID(ctx context.Context, userID string) (entity.User, error) {
+	return i.repo.Get(ctx, userID)
 }

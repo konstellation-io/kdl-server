@@ -169,6 +169,33 @@ func (m *projectMongoDBRepo) UpdateMemberAccessLevel(ctx context.Context, projec
 	return err
 }
 
+// UpdateName changes the name for the given project.
+func (m *projectMongoDBRepo) UpdateName(ctx context.Context, projectID, name string) error {
+	return m.updateProjectFields(ctx, projectID, bson.M{"name": name})
+}
+
+// UpdateDescription changes the description for the given project.
+func (m *projectMongoDBRepo) UpdateDescription(ctx context.Context, projectID, description string) error {
+	return m.updateProjectFields(ctx, projectID, bson.M{"description": description})
+}
+
+func (m *projectMongoDBRepo) updateProjectFields(ctx context.Context, projectID string, fields bson.M) error {
+	m.logger.Debugf("Updating the project \"%s\" with \"%s\"...", projectID, fields)
+
+	pObjID, err := primitive.ObjectIDFromHex(projectID)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": pObjID}
+
+	_, err = m.collection.UpdateOne(ctx, filter, bson.M{
+		"$set": fields,
+	})
+
+	return err
+}
+
 func (m *projectMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.Project, error) {
 	m.logger.Debugf("Finding one project by \"%s\" from database...", filters)
 

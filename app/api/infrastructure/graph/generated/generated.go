@@ -931,7 +931,7 @@ type Mutation {
 }
 
 type QualityProjectDesc {
-  quality: Float
+  quality: Int!
 }
 
 type KnowledgeGraph {
@@ -1087,8 +1087,18 @@ type Project {
 
 input RepositoryInput {
   type: RepositoryType!
-  internalRepoName: String
-  externalRepoUrl: String
+  external: ExternalRepository
+  internal: InternalRepository
+}
+
+input ExternalRepository {
+  url: String!
+  username: String!
+  token: String!
+}
+
+input InternalRepository {
+  name: String!
 }
 
 type Repository {
@@ -3156,11 +3166,14 @@ func (ec *executionContext) _QualityProjectDesc_quality(ctx context.Context, fie
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*float64)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_me(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -5449,6 +5462,62 @@ func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputExternalRepository(ctx context.Context, obj interface{}) (model.ExternalRepository, error) {
+	var it model.ExternalRepository
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "url":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
+			it.URL, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "username":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			it.Username, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "token":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+			it.Token, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputInternalRepository(ctx context.Context, obj interface{}) (model.InternalRepository, error) {
+	var it model.InternalRepository
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputRemoveApiTokenInput(ctx context.Context, obj interface{}) (model.RemoveAPITokenInput, error) {
 	var it model.RemoveAPITokenInput
 	var asMap = obj.(map[string]interface{})
@@ -5531,19 +5600,19 @@ func (ec *executionContext) unmarshalInputRepositoryInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "internalRepoName":
+		case "external":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("internalRepoName"))
-			it.InternalRepoName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("external"))
+			it.External, err = ec.unmarshalOExternalRepository2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐExternalRepository(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "externalRepoUrl":
+		case "internal":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalRepoUrl"))
-			it.ExternalRepoURL, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("internal"))
+			it.Internal, err = ec.unmarshalOInternalRepository2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐInternalRepository(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6139,6 +6208,9 @@ func (ec *executionContext) _QualityProjectDesc(ctx context.Context, sel ast.Sel
 			out.Values[i] = graphql.MarshalString("QualityProjectDesc")
 		case "quality":
 			out.Values[i] = ec._QualityProjectDesc_quality(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6918,6 +6990,21 @@ func (ec *executionContext) marshalNID2ᚕstringᚄ(ctx context.Context, sel ast
 	return ret
 }
 
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNKnowledgeGraph2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraph(ctx context.Context, sel ast.SelectionSet, v entity.KnowledgeGraph) graphql.Marshaler {
 	return ec._KnowledgeGraph(ctx, sel, &v)
 }
@@ -7569,19 +7656,12 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
-func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
+func (ec *executionContext) unmarshalOExternalRepository2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐExternalRepository(ctx context.Context, v interface{}) (*model.ExternalRepository, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := graphql.UnmarshalFloat(v)
+	res, err := ec.unmarshalInputExternalRepository(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalFloat(*v)
 }
 
 func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
@@ -7597,6 +7677,14 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 		return graphql.Null
 	}
 	return graphql.MarshalID(*v)
+}
+
+func (ec *executionContext) unmarshalOInternalRepository2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐInternalRepository(ctx context.Context, v interface{}) (*model.InternalRepository, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputInternalRepository(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalORemoveApiTokenInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRemoveAPITokenInput(ctx context.Context, v interface{}) (*model.RemoveAPITokenInput, error) {

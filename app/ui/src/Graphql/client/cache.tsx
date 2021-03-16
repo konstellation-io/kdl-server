@@ -6,11 +6,11 @@ import {
 } from './models/ProjectFilters';
 import { UserSelection, UserSettings } from './models/UserSettings';
 
+import { GetProjectMembers_project_members } from '../queries/types/GetProjectMembers';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTools';
 import { NewProject } from './models/NewProject';
 import { PanelInfo } from './models/Panel';
-import { GetProjectMembers_project_members } from '../queries/types/GetProjectMembers';
 
 export const initialProjectFilters: ProjectFilters = {
   name: '',
@@ -36,13 +36,13 @@ export const initialNewProject: NewProject = {
   externalRepository: {
     values: {
       url: '',
-      isConnectionTested: false,
-      hasConnectionError: '',
-      warning: false,
+      username: '',
+      token: '',
     },
     errors: {
-      url: '',
-      warning: 'not accepted',
+      url: 'This field is mandatory',
+      token: 'This field is mandatory',
+      username: 'This field is mandatory',
     },
   },
   internalRepository: {
@@ -73,6 +73,8 @@ export const primaryPanel = makeVar<PanelInfo | null>(null);
 export const secondaryPanel = makeVar<PanelInfo | null>(null);
 export const currentTool = makeVar<ToolName | null>(null);
 export const openedTools = makeVar<ToolName[]>([]);
+
+export const kgScore = makeVar<[number, number]>([1, 0]);
 
 const cache = new InMemoryCache({
   typePolicies: {

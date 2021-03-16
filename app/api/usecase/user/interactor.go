@@ -109,7 +109,7 @@ func (i *interactor) Create(ctx context.Context, email, username, password strin
 
 	i.logger.Infof("The user \"%s\" (%s) was created with ID \"%s\"", user.Username, user.Email, insertedID)
 
-	secretName := fmt.Sprintf("%s-ssh-keys", user.Username)
+	secretName := fmt.Sprintf("%s-ssh-keys", user.UsernameSlug())
 	err = i.k8sClient.CreateSecret(secretName, map[string]string{
 		"KDL_USER_PUBLIC_SSH_KEY":  keys.Public,
 		"KDL_USER_PRIVATE_SSH_KEY": keys.Private,

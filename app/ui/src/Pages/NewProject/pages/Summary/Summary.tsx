@@ -1,14 +1,10 @@
-import CircledInfoMessage, {
-  CircledInfoMessageTypes,
-} from 'Components/CircledInfoMessage/CircledInfoMessage';
 import {
   GET_NEW_PROJECT,
   GetNewProject,
-  GetNewProject_newProject_externalRepository,
 } from 'Graphql/client/queries/getNewProject.graphql';
 import React, { FC } from 'react';
 
-import { CONFIG } from '../../../../index';
+import { CONFIG } from 'index';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
 import IconLink from '@material-ui/icons/Link';
 import { RepositoryType } from 'Graphql/types/globalTypes';
@@ -57,21 +53,6 @@ function Summary() {
     return isExternalRepo ? url : `${CONFIG.INTERNAL_REPO_BASE_URL}/${url}`;
   }
 
-  function getRepositoryCheckMessage() {
-    const hasConnectionError =
-      (repoTypeDetails as GetNewProject_newProject_externalRepository).values
-        .hasConnectionError !== '';
-
-    const messageText = hasConnectionError
-      ? 'connection error'
-      : 'connection ok';
-    const messageType = hasConnectionError
-      ? CircledInfoMessageTypes.ERROR
-      : CircledInfoMessageTypes.SUCCESS;
-
-    return <CircledInfoMessage type={messageType} text={messageText} />;
-  }
-
   return (
     <div className={styles.container}>
       <Section title="Information">
@@ -85,7 +66,6 @@ function Summary() {
               <p className={styles.url}>{getRepositoryUrl()}</p>
               <CopyToClipboard>{getRepositoryUrl()}</CopyToClipboard>
             </div>
-            {isExternalRepo && getRepositoryCheckMessage()}
           </div>
         </Field>
         <Field title="PROJECT DESCRIPTION">

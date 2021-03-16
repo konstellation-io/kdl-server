@@ -5,8 +5,6 @@
 .container {
   display: flex;
   align-items: center;
-
-  .topic {
-    margin-left: $grid-unit / 4;
-  }
+  background-color: palette(base, 900);
+  height: 100%;
 }

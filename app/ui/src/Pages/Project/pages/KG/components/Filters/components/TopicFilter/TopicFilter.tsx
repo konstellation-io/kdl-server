@@ -1,13 +1,14 @@
+import { BUTTON_ALIGN, Button, TextInput, useClickOutside } from 'kwc';
 import React, { useEffect, useRef, useState } from 'react';
-import styles from './TopicFilter.module.scss';
-import { Button, BUTTON_ALIGN, TextInput, useClickOutside } from 'kwc';
-import cx from 'classnames';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 import AnimateHeight from 'react-animate-height';
-import TopicList from './components/TopicList/TopicList';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SearchIcon from '@material-ui/icons/Search';
-import useTopicFilter from './useTopicFilter';
 import { Topic } from '../../Filters';
+import TopicList from './components/TopicList/TopicList';
+import cx from 'classnames';
+import styles from './TopicFilter.module.scss';
+import useTopicFilter from './useTopicFilter';
 
 interface Props {
   topics: Topic[];
@@ -28,6 +29,7 @@ function TopicFilter({ topics, onUpdate }: Props) {
     handleSelectTopic,
     filteredTopics,
     filterTopics,
+    clearAll,
     selectedTopics,
   } = useTopicFilter(topics, onUpdate);
 
@@ -43,7 +45,9 @@ function TopicFilter({ topics, onUpdate }: Props) {
   }
 
   function getButtonLabel() {
-    const selectedTopicsCount = selectedTopics.length;
+    const selectedTopicsCount = topics.filter((t) =>
+      selectedTopics.includes(t.name)
+    ).length;
     return `${selectedTopicsCount} ${
       selectedTopicsCount === 1 ? 'TOPIC' : 'TOPICS'
     }`;
@@ -84,6 +88,11 @@ function TopicFilter({ topics, onUpdate }: Props) {
             label="RESET TO DEFAULT"
             align={BUTTON_ALIGN.LEFT}
             onClick={resetTopics}
+          />
+          <Button
+            label="CLEAR ALL"
+            align={BUTTON_ALIGN.LEFT}
+            onClick={clearAll}
           />
         </div>
       </AnimateHeight>

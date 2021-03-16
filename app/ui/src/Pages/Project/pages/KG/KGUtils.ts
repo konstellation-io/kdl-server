@@ -1,10 +1,14 @@
-import { CoordData, CoordOptions } from './components/KGVisualization/KGViz';
+import {
+  CoordData,
+  CoordOptions,
+  CoordOut,
+} from './components/KGVisualization/KGViz';
 import { D, TopicSections } from './components/KGVisualization/KGVisualization';
 import { RGBColor, color } from 'd3-color';
 
+import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
 import { orderBy } from 'lodash';
 import { scaleLinear } from '@visx/scale';
-import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
 
 const TEXT_COLOR_THRESHOLD = 120;
 const TEXT_COLOR = {
@@ -18,15 +22,11 @@ export type Coord = {
   y: number;
 };
 
-interface DComplete extends D {
+export interface DComplete extends D {
   x: number;
   y: number;
-}
-
-export interface GroupD {
-  x: number;
-  y: number;
-  elements: DComplete[];
+  outsideMin: boolean;
+  outsideMax: boolean;
 }
 
 export const colorScale = scaleLinear({
@@ -52,40 +52,42 @@ export function getHash(text: string) {
   return hash;
 }
 
+function getOffset(outsideMin: boolean, outsideMax: boolean) {
+  if (outsideMin) return 17;
+  if (outsideMax) return -6;
+
+  return 0;
+}
+
 export function groupData(
   data: D[],
-  coord: ({ category, score, name }: CoordData, options: CoordOptions) => Coord,
-  elementsCollide: (a: Coord, b: Coord) => boolean
-) {
-  const groupedData: GroupD[] = [];
+  coord: (
+    { category, score, name }: CoordData,
+    options: CoordOptions
+  ) => CoordOut,
+  minScore: number = 0,
+  maxScore: number = 1
+): DComplete[] {
+  return data.map((d) => {
+    const outsideMin = d.score < minScore;
+    const outsideMax = d.score > maxScore;
 
-  data.forEach((d) => {
-    const { x, y } = coord(d, { jittered: true });
-    const newD: DComplete = { ...d, x, y };
-    let collisionEl;
-    let collisionIdx = 0;
+    const { x, y } = coord(
+      {
+        ...d,
+        score: Math.max(minScore, Math.min(maxScore, d.score)),
+      },
+      { jittered: true, offset: getOffset(outsideMin, outsideMax) }
+    );
 
-    for (let idx = 0; idx < groupedData.length; idx++) {
-      const nd = groupedData[idx];
-      if (nd && elementsCollide({ x: nd.x, y: nd.y }, { x, y })) {
-        collisionEl = nd;
-        collisionIdx = idx;
-        break;
-      }
-    }
-
-    if (collisionEl) {
-      groupedData[collisionIdx] = {
-        elements: [...groupedData[collisionIdx].elements, newD],
-        x: (x + collisionEl.x) / 2,
-        y: (y + collisionEl.y) / 2,
-      };
-    } else {
-      groupedData.push({ elements: [newD], x, y });
-    }
+    return {
+      ...d,
+      x,
+      y,
+      outsideMin,
+      outsideMax,
+    };
   });
-
-  return groupedData;
 }
 
 export function getSectionsAndNames(newData: D[]) {
@@ -105,11 +107,14 @@ export function buildKGItem({
   score,
   category,
   title,
+  id,
 }: GetKnowledgeGraph_knowledgeGraph_items): D {
   return {
+    id,
     category: 'Others',
     name: title,
     type: category,
+    starred: false,
     score,
   };
 }

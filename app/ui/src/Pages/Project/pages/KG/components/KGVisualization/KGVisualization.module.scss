@@ -1,11 +1,32 @@
 @import 'Styles/variables';
 @import 'Styles/mixins';
 @import 'Styles/colors';
+@import 'Styles/shadows';
 
 $tooltipWidth: 300px;
 
-.svg {
+.container {
   position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  transition: top ease 0.5s, left ease 0.5s;
+}
+
+.label1,
+.tick,
+.axisG,
+.label4 {
+  fill-opacity: 1;
+}
+
+.svg,
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .sectionAndNamesG {
@@ -37,16 +58,12 @@ $tooltipWidth: 300px;
 
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .sectionsWrapper {
   opacity: 1;
-}
-
-.guide {
-  fill-opacity: 0;
-  stroke: palette(lowlight, 900);
 }
 
 .axis {
@@ -60,50 +77,155 @@ $tooltipWidth: 300px;
 
 .tooltip {
   position: absolute;
+  width: 50 * $grid-unit;
+  z-index: 999;
   pointer-events: none;
 
-  height: 4 * $grid-unit;
-  width: 0px;
-  overflow: hidden;
-  color: font-color(dark);
-
-  transition: width linear 0.4s;
+  opacity: 0;
+  transition: top ease 0.4s, left ease 0.4s, opacity ease 0.4s;
 
   &.open {
-    width: $tooltipWidth;
+    opacity: 1;
+    // pointer-events: all;
   }
 }
 
-.tooltipText {
-  @include font-small;
+.tooltipContent {
+  width: 100%;
 
-  margin: 2px auto 0 6 * $grid-unit;
-  pointer-events: none;
-}
+  .title {
+    @include font-subheader;
+    color: font-color(light);
 
-.tooltipIcon {
-  margin-left: $grid-unit;
-}
+    margin-bottom: 2 * $grid-unit;
+  }
+  .catAndScore {
+    @include font-small;
+    color: font-color(lowlight);
 
-.tooltipBg {
-  position: absolute;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-  width: 4 * $grid-unit;
-  height: 4 * $grid-unit;
-  border-radius: 4 * $grid-unit;
-
-  flex-shrink: 0;
-}
-
-.tooltipGroup {
-  overflow: hidden;
-  width: $tooltipWidth;
+  &:before {
+    content: '';
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    bottom: -4 * $grid-unit;
+    left: 0;
+  }
 }
 
 .tooltipWrapper {
-  width: $tooltipWidth;
-  height: 100%;
+  @include shadow(3);
+
+  background-color: palette(base);
+  position: absolute;
+  padding: 2 * $grid-unit;
+  bottom: 2.5 * $grid-unit;
+  left: calc(-50% - 4px);
+  width: 50 * $grid-unit;
   display: flex;
   align-items: center;
-  padding-right: 1 * $grid-unit;
+
+  &:after {
+    content: '';
+    width: 0;
+    height: 0;
+    border: solid palette(base) 10px;
+    border-left-color: transparent;
+    border-top-color: transparent;
+    position: absolute;
+    left: calc(50% - 6px);
+    bottom: -2 * $grid-unit + 6px;
+    transform: rotateZ(45deg);
+  }
+}
+
+$state-to-color: (
+  good: palette(success),
+  notSoBad: palette(feedback),
+  notGood: palette(alert),
+  bad: palette(error),
+);
+
+@each $class, $color in $state-to-color {
+  .scoreContainer.#{$class} {
+    .value {
+      @include font-small;
+      color: $color;
+      text-align: end;
+    }
+    .bars {
+      position: relative;
+      width: 6.5 * $grid-unit;
+      height: 2px;
+
+      .barBg {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        background-color: palette(base, 300);
+      }
+      .barValue {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        background-color: $color;
+        height: 100%;
+      }
+    }
+
+    &.inline {
+      display: flex;
+
+      align-items: center;
+
+      .value {
+        width: 5 * $grid-unit;
+
+        text-align: start;
+      }
+      .bars {
+        height: 0.5 * $grid-unit;
+        width: 8 * $grid-unit;
+
+        .barValue {
+          left: 0;
+        }
+      }
+    }
+  }
+}
+
+.listPanel {
+  position: fixed;
+  right: 0;
+  height: calc(100% - 40px);
+  display: flex;
+  flex-direction: row;
+  z-index: 5;
+}
+
+.shield {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1 !important;
+
+  &.show {
+    @include shield;
+    pointer-events: all;
+    cursor: pointer;
+  }
+}
+
+.staticTooltip {
+  position: absolute;
+  top: 3 * $grid-unit;
+  left: 3 * $grid-unit;
 }

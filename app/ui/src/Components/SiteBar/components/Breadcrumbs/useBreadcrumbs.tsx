@@ -2,7 +2,7 @@ import { BottomComponentProps, CrumbProps } from './components/Crumb/Crumb';
 import { useLocation, useRouteMatch } from 'react-router-dom';
 import useProjectNavigation, {
   EnhancedRouteConfiguration,
-  projectRoutesConfiguration,
+  RoutesConfiguration,
 } from 'Hooks/useProjectNavigation';
 import { useQuery, useReactiveVar } from '@apollo/client';
 
@@ -26,12 +26,14 @@ const serverSections: EnhancedRouteConfiguration[] = [
     id: 'projects',
     label: 'Projects',
     Icon: ArrowForwardIcon,
+    route: ROUTE.PROJECTS,
     to: ROUTE.PROJECTS,
   },
   {
     id: 'users',
     label: 'Users',
     Icon: PersonIcon,
+    route: ROUTE.USERS,
     to: ROUTE.USERS,
   },
 ];
@@ -47,7 +49,7 @@ function useBreadcrumbs() {
 
   const project = useReactiveVar(openedProject);
 
-  const projectSections: EnhancedRouteConfiguration[] = useProjectNavigation(
+  const { allRoutes }: RoutesConfiguration = useProjectNavigation(
     project?.id || ''
   );
 
@@ -79,9 +81,7 @@ function useBreadcrumbs() {
 
     // Add crumb for the section
     const lastParam: string = location.pathname.split('/').pop() || '';
-    const projectRoute = Object.values(projectRoutesConfiguration).find(
-      ({ id }) => id === lastParam
-    );
+    const projectRoute = allRoutes.find(({ id }) => id === lastParam);
 
     if (projectRoute) {
       const { label: crumbText, Icon } = projectRoute;
@@ -90,7 +90,7 @@ function useBreadcrumbs() {
         LeftIconComponent: <Icon className="icon-small" />,
         RightIconComponent: ExpandMoreIcon,
         BottomComponent: (props: BottomComponentProps) => (
-          <NavigationSelector options={projectSections} {...props} />
+          <NavigationSelector options={allRoutes} {...props} />
         ),
       });
     }

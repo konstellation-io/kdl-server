@@ -1,18 +1,19 @@
 import ROUTE, { buildRoute } from 'Constants/routes';
-import { OverridableComponent } from '@material-ui/core/OverridableComponent';
-import { SvgIconTypeMap } from '@material-ui/core';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
+
+import DroneIcon from 'Components/Icons/DroneIcon/DroneIcon';
+import { GetMe } from 'Graphql/queries/types/GetMe';
+import GiteaIcon from 'Components/Icons/GiteaIcon/GiteaIcon';
 import IconHome from '@material-ui/icons/Dashboard';
 import IconKG from '@material-ui/icons/EmojiObjects';
-import GiteaIcon from 'Components/Icons/GiteaIcon/GiteaIcon';
-import MinioIcon from 'Components/Icons/MinioIcon/MinioIcon';
-import DroneIcon from 'Components/Icons/DroneIcon/DroneIcon';
-import VSIcon from 'Components/Icons/VSIcon/VSIcon';
 import JupyterIcon from 'Components/Icons/JupyterIcon/JupyterIcon';
+import MinioIcon from 'Components/Icons/MinioIcon/MinioIcon';
 import MlFlowIcon from 'Components/Icons/MlFlowIcon/MlFlowIcon';
-import { useQuery } from '@apollo/client';
-import { GetMe } from 'Graphql/queries/types/GetMe';
+import { OverridableComponent } from '@material-ui/core/OverridableComponent';
+import { SvgIconTypeMap } from '@material-ui/core';
+import VSIcon from 'Components/Icons/VSIcon/VSIcon';
 import { loader } from 'graphql.macro';
+import { useQuery } from '@apollo/client';
 
 const GetMeQuery = loader('Graphql/queries/getMe.graphql');
 
@@ -20,80 +21,106 @@ export interface RouteConfiguration {
   id: string;
   label: string;
   Icon: OverridableComponent<SvgIconTypeMap<{}, 'svg'>>;
-  canBeDisabled?: boolean;
   disabled?: boolean;
+  route: ROUTE;
 }
 
-export const projectRoutesConfiguration: {
-  [key: string]: RouteConfiguration;
-} = {
-  [ROUTE.PROJECT_OVERVIEW]: {
+export const mainRoutesConfig: RouteConfiguration[] = [
+  {
     id: 'overview',
     label: 'Overview',
     Icon: IconHome,
+    route: ROUTE.PROJECT_OVERVIEW,
   },
-  [ROUTE.PROJECT_KG]: {
+  {
     id: 'knowledge-graph',
-    label: 'Knowledge Graph',
+    label: 'Knowledge Galaxy',
     Icon: IconKG,
+    route: ROUTE.PROJECT_KG,
   },
-  [ROUTE.PROJECT_TOOL_GITEA]: {
+];
+export const projectToolsRoutesConfig: RouteConfiguration[] = [
+  {
     id: 'gitea',
     label: 'Gitea',
     Icon: GiteaIcon,
+    route: ROUTE.PROJECT_TOOL_GITEA,
   },
-  [ROUTE.PROJECT_TOOL_DRONE]: {
+  {
     id: 'drone',
+    route: ROUTE.PROJECT_TOOL_DRONE,
     label: 'Drone',
     Icon: DroneIcon,
   },
-  [ROUTE.PROJECT_TOOL_JUPYTER]: {
-    id: 'jupyter',
-    label: 'Jupyter',
-    Icon: JupyterIcon,
-    canBeDisabled: true,
-    disabled: true,
-  },
-  [ROUTE.PROJECT_TOOL_MINIO]: {
+  {
     id: 'minio',
+    route: ROUTE.PROJECT_TOOL_MINIO,
     label: 'Minio',
     Icon: MinioIcon,
   },
-  [ROUTE.PROJECT_TOOL_MLFLOW]: {
+  {
     id: 'mlflow',
+    route: ROUTE.PROJECT_TOOL_MLFLOW,
     label: 'Mlflow',
     Icon: MlFlowIcon,
   },
-  [ROUTE.PROJECT_TOOL_VSCODE]: {
+];
+
+export const userToolsRoutesConfig: RouteConfiguration[] = [
+  {
+    id: 'jupyter',
+    route: ROUTE.PROJECT_TOOL_JUPYTER,
+    label: 'Jupyter',
+    Icon: JupyterIcon,
+  },
+  {
     id: 'vscode',
+    route: ROUTE.PROJECT_TOOL_VSCODE,
     label: 'Vscode',
     Icon: VSIcon,
-    canBeDisabled: true,
-    disabled: true,
   },
-};
+];
 
 export interface EnhancedRouteConfiguration extends RouteConfiguration {
   to: string;
 }
 
-function useProjectNavigation(projectId: string) {
+export interface RoutesConfiguration {
+  allRoutes: EnhancedRouteConfiguration[];
+  mainRoutes: EnhancedRouteConfiguration[];
+  userToolsRoutes: EnhancedRouteConfiguration[];
+  projectToolsRoutes: EnhancedRouteConfiguration[];
+}
+
+function useProjectNavigation(projectId: string): RoutesConfiguration {
   const { data } = useQuery<GetMe>(GetMeQuery);
 
-  const routesConfigurations: EnhancedRouteConfiguration[] = useMemo(
-    () =>
-      Object.entries(projectRoutesConfiguration).map(
-        ([routeString, { id, label, Icon, canBeDisabled }]) => ({
-          to: buildRoute(routeString as ROUTE, projectId),
-          id,
-          label,
-          Icon,
-          disabled: canBeDisabled ? !data?.me.areToolsActive : false,
-        })
-      ),
-    [projectId, data?.me.areToolsActive]
+  const buildRoutes = useCallback(
+    (route: RouteConfiguration) => ({
+      ...route,
+      to: buildRoute(route.route, projectId),
+    }),
+    [projectId]
   );
-  return routesConfigurations;
+
+  return useMemo(() => {
+    const disabled = !data?.me.areToolsActive;
+    const userToolsRoutesDisabled = userToolsRoutesConfig.map((route) => ({
+      ...route,
+      disabled,
+    }));
+
+    const userToolsRoutes = userToolsRoutesDisabled.map(buildRoutes);
+    const projectToolsRoutes = projectToolsRoutesConfig.map(buildRoutes);
+    const mainRoutes = mainRoutesConfig.map(buildRoutes);
+
+    return {
+      allRoutes: [...mainRoutes, ...projectToolsRoutes, ...userToolsRoutes],
+      mainRoutes,
+      projectToolsRoutes,
+      userToolsRoutes,
+    };
+  }, [buildRoutes, data?.me.areToolsActive]);
 }
 
 export default useProjectNavigation;

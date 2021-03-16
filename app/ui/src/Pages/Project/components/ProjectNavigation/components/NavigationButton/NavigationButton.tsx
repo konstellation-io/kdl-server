@@ -1,6 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
-import styles from './ProjectNavigation.module.scss';
+import styles from './NavigationButton.module.scss';
 
 export enum IconSize {
   SMALL = 'icon-small',

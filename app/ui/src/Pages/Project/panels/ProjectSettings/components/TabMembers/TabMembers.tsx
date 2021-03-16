@@ -76,13 +76,13 @@ function TabMembers({ projectId }: Props) {
   );
 
   const canAddMembers = useMemo(() => {
-    if (dataMe && dataMembers) {
+    if (dataMe?.me && dataMembers?.project) {
       const meAsMember = dataMembers.project.members.find(
         ({ user }) => user.email === dataMe.me.email
       );
       return meAsMember?.accessLevel === AccessLevel.ADMIN;
     }
-  }, [dataMe?.me, dataMembers?.project]);
+  }, [dataMe, dataMembers]);
 
   // Update opened member details as data is updated
   useEffect(() => {

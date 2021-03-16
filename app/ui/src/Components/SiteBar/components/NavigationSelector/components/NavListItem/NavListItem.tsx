@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import styles from './NavListItem.module.scss';
-import { IconSize } from 'Pages/Project/components/ProjectNavigation/NavigationButton';
+import { IconSize } from 'Pages/Project/components/ProjectNavigation/components/NavigationButton/NavigationButton';
 import cx from 'classnames';
 
 type Props = {

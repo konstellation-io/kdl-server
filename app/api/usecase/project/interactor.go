@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"regexp"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
@@ -12,6 +11,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
@@ -199,14 +199,14 @@ func (i interactor) GetByID(ctx context.Context, id string) (entity.Project, err
 
 // Update changes the desired information about a project.
 func (i interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
-	if kdlutil.IsNilOrEmpty(opt.Name) {
+	if !kdlutil.IsNilOrEmpty(opt.Name) {
 		err := i.repo.UpdateName(ctx, opt.ProjectID, *opt.Name)
 		if err != nil {
 			return entity.Project{}, err
 		}
 	}
 
-	if kdlutil.IsNilOrEmpty(opt.Description) {
+	if !kdlutil.IsNilOrEmpty(opt.Description) {
 		err := i.repo.UpdateDescription(ctx, opt.ProjectID, *opt.Description)
 		if err != nil {
 			return entity.Project{}, err

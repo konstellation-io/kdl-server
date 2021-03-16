@@ -69,9 +69,9 @@ spec:
                   key: accesskey
                   name: {{ .Release.Name }}-minio
             - name: JUPYTER_URL
-              value: {{ include "protocol" . }}://USERNAME-jupyter.{{ .Values.domain }}
+              value: {{ include "protocol" . }}://USERNAME-jupyter.{{ .Values.domain }}/lab/workspaces/REPO_FOLDER/tree/repos/REPO_FOLDER
             - name: VSCODE_URL
-              value: {{ include "protocol" . }}://USERNAME-code.{{ .Values.domain }}
+              value: {{ include "protocol" . }}://USERNAME-code.{{ .Values.domain }}/?folder=/home/coder/repos/REPO_FOLDER
             - name: DRONE_URL
               value: {{ include "protocol" . }}://drone.{{ .Values.domain }}
             - name: MLFLOW_URL

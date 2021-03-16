@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"regexp"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
@@ -21,10 +20,6 @@ const (
 
 var (
 	ErrCreateProjectValidation = errors.New("create project validation error")
-	// This regexp extracts the repository name from a https URL like:
-	//  https://github.com/konstellation-io/kre.git
-	repoNameRegexp    = regexp.MustCompile(`([^/]+)\.git$`)
-	ErrInvalidRepoURL = errors.New("the repository URL is invalid")
 )
 
 // CreateProjectOption options when creating project.
@@ -146,7 +141,7 @@ func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity
 		repoName = *opt.InternalRepoName
 
 	case entity.RepositoryTypeExternal:
-		repoName, err = i.getRepoNameFromURL(*opt.ExternalRepoURL)
+		repoName, err = kdlutil.GetRepoNameFromURL(*opt.ExternalRepoURL)
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -214,16 +209,4 @@ func (i interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity
 	}
 
 	return i.repo.Get(ctx, opt.ProjectID)
-}
-
-// getRepoNameFromURL extracts the name of the repo from the external repo url.
-func (i interactor) getRepoNameFromURL(url string) (string, error) {
-	const expectedMatches = 2
-
-	matches := repoNameRegexp.FindStringSubmatch(url)
-	if len(matches) != expectedMatches {
-		return "", ErrInvalidRepoURL
-	}
-
-	return matches[1], nil
 }

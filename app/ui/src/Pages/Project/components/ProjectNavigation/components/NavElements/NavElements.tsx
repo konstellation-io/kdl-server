@@ -1,22 +1,20 @@
 import { useParams } from 'react-router-dom';
-import React, { useState } from 'react';
-import PauseIcon from '@material-ui/icons/Pause';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import React from 'react';
 import NavigationButton from '../NavigationButton/NavigationButton';
 import { RouteProjectParams } from 'Constants/routes';
 import cx from 'classnames';
 import styles from './NavElements.module.scss';
 import useProjectNavigation from 'Hooks/useProjectNavigation';
-import useTool from 'Graphql/hooks/useTool';
 import { GetMe } from 'Graphql/queries/types/GetMe';
 import { loader } from 'graphql.macro';
 import { useQuery } from '@apollo/client';
 import { NavButtonLink } from '../../ProjectNavigation';
 import AnimateHeight from 'react-animate-height';
-import { Button } from 'kwc';
-import IconRemove from '@material-ui/icons/Delete';
-import ConfirmAction from '../../../../../../Components/Layout/ConfirmAction/ConfirmAction';
+import useTool from 'Graphql/hooks/useTool';
+import PauseIcon from '@material-ui/icons/Pause';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import ConfirmAction from 'Components/Layout/ConfirmAction/ConfirmAction';
 
 const GetMeQuery = loader('Graphql/queries/getMe.graphql');
 
@@ -79,27 +77,20 @@ function NavElements({ isOpened }: Props) {
             className={cx(styles.toggleToolsWrapper, {
               [styles.disabled]: projectActiveTools.loading,
             })}
-            onClick={toggleTools}
           >
-            {areToolsActive && (
-              <ConfirmAction
-                title="STOP YOUR TOOLS"
-                action={toggleTools}
-                actionLabel="STOP"
-                warning
-              >
-                <NavigationButton
-                  label="Stop tools"
-                  Icon={renderToggleToolsIcon()}
-                />
-              </ConfirmAction>
-            )}
-            {!areToolsActive && (
+            <ConfirmAction
+              title="STOP YOUR TOOLS"
+              subtitle="You are going to stop your user tools, please confirm your choice."
+              action={toggleTools}
+              actionLabel="STOP"
+              skipConfirmation={!areToolsActive}
+              warning
+            >
               <NavigationButton
-                label="Run tools"
+                label={areToolsActive ? 'Stop tools' : 'Run tools'}
                 Icon={renderToggleToolsIcon()}
               />
-            )}
+            </ConfirmAction>
           </div>
         </div>
       </div>

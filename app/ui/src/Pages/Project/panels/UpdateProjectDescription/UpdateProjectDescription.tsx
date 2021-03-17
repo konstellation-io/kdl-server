@@ -46,13 +46,12 @@ function UpdateProjectDescription({ project, close }: Props) {
 
   const descriptionValue = watch('description');
 
-  const {
-    descriptionScore,
-    isDescAcceptable,
-    fetchDescriptionScore,
-  } = useQualityDescription(descriptionValue, {
-    skipFirstRun: false,
-  });
+  const { descriptionScore, fetchDescriptionScore } = useQualityDescription(
+    descriptionValue,
+    {
+      skipFirstRun: false,
+    }
+  );
 
   function submit({ description }: FormData) {
     updateProjectDescription(project.id, description);

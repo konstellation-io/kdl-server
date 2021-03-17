@@ -16,7 +16,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/dataloader"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
@@ -198,23 +197,7 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 	userName := ctx.Value(middleware.LoggedUserNameKey).(string)
 	slugUserName := slug.Make(userName)
 
-	var (
-		err        error
-		folderName string
-	)
-
-	switch obj.Repository.Type {
-	case entity.RepositoryTypeExternal:
-		folderName, err = kdlutil.GetRepoNameFromURL(obj.Repository.ExternalRepoURL)
-		if err != nil {
-			return &entity.ToolUrls{}, entity.ErrInvalidRepoURL
-		}
-	case entity.RepositoryTypeInternal:
-		folderName = obj.Repository.InternalRepoName
-	default:
-		return &entity.ToolUrls{}, entity.ErrInvalidRepoType
-	}
-
+	folderName := obj.Repository.RepoName
 	jupyterWithUsername := strings.Replace(r.cfg.Jupyter.URL, "USERNAME", slugUserName, 1)
 	jupyterWithUsernameAndFolder := strings.Replace(jupyterWithUsername, "REPO_FOLDER", folderName, 2)
 	vscodeWithUsername := strings.Replace(r.cfg.VSCode.URL, "USERNAME", slugUserName, 1)

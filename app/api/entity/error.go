@@ -15,9 +15,6 @@ var (
 	// ErrDuplicatedUser error definition.
 	ErrDuplicatedUser = errors.New("user is duplicated")
 
-	// ErrInvalidRepoURL error definition.
-	ErrInvalidRepoURL = errors.New("the repository URL is invalid")
-
 	// ErrNotImplemented error definition.
 	ErrNotImplemented = fmt.Errorf("not implemented")
 

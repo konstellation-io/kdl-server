@@ -46,12 +46,13 @@ function UpdateProjectDescription({ project, close }: Props) {
 
   const descriptionValue = watch('description');
 
-  const { descriptionScore, getQualityProjectDesc } = useQualityDescription(
-    descriptionValue,
-    {
-      skipFirstRun: false,
-    }
-  );
+  const {
+    descriptionScore,
+    isDescAcceptable,
+    retrieveDescriptionScore,
+  } = useQualityDescription(descriptionValue, {
+    skipFirstRun: false,
+  });
 
   function submit({ description }: FormData) {
     updateProjectDescription(project.id, description);
@@ -75,10 +76,8 @@ function UpdateProjectDescription({ project, close }: Props) {
             clearErrors();
           }}
           onBlur={() => {
-            if (descriptionValue) {
-              getQualityProjectDesc({
-                variables: { description: descriptionValue },
-              });
+            if (descriptionValue && isDescAcceptable) {
+              retrieveDescriptionScore();
             }
           }}
           error={errors.description?.message}

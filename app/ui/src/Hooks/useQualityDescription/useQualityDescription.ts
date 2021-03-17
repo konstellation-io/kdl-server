@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import {
   GetQualityProjectDesc,
@@ -35,16 +35,19 @@ function useQualityDescription(
     },
   });
 
-  const isDescriptionLengthValid = useMemo(() => {
-    const isValid = description.split(' ').length >= minWordsNumber;
-    if (!isValid) setDescriptionScore(0);
+  const isDescAcceptable = useMemo(() => {
+    const isLengthAcceptable = description.split(' ').length >= minWordsNumber;
+    if (!isLengthAcceptable) setDescriptionScore(0);
 
-    return isValid;
+    return isLengthAcceptable;
   }, [description, minWordsNumber]);
 
+  const retrieveDescriptionScore = useCallback(() => {
+    if (isDescAcceptable) getQualityProjectDesc({ variables: { description } });
+  }, [isDescAcceptable, getQualityProjectDesc, description]);
+
   useEffect(() => {
-    if (!skipFirstRun && isDescriptionLengthValid)
-      getQualityProjectDesc({ variables: { description } });
+    if (!skipFirstRun && isDescAcceptable) retrieveDescriptionScore();
     // We want to run this only on first hook instantiation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -55,18 +58,16 @@ function useQualityDescription(
       firstRun.current = false;
       return;
     }
-    if (!isDescriptionLengthValid) return;
 
-    const scoreTimeoutId = setTimeout(() => {
-      getQualityProjectDesc({ variables: { description } });
-    }, debounceTime);
+    const scoreTimeoutId = setTimeout(retrieveDescriptionScore, debounceTime);
 
     return () => clearTimeout(scoreTimeoutId);
-  }, [description, isDescriptionLengthValid, getQualityProjectDesc]);
+  }, [retrieveDescriptionScore]);
 
   return {
     descriptionScore,
-    getQualityProjectDesc,
+    retrieveDescriptionScore,
+    isDescAcceptable,
   };
 }
 

@@ -17,6 +17,14 @@ import useKGFilters from 'Graphql/client/hooks/useKGFilters';
 import { useReactiveVar } from '@apollo/client';
 import useTooltip from 'Hooks/useTooltip';
 
+let mouseDown = false;
+document.body.onmousedown = function () {
+  mouseDown = true;
+};
+document.body.onmouseup = function () {
+  mouseDown = false;
+};
+
 export type D = {
   id: string;
   category: string;
@@ -87,6 +95,8 @@ function KGVisualization({
     [data, scores]
   );
 
+  const starredResources = useMemo(() => data.filter((d) => d.starred), [data]);
+
   useEffect(() => {
     if (animating && data) {
       const allScores = data.map((d) => d.score);
@@ -128,6 +138,7 @@ function KGVisualization({
     setOpenedPaper(resource);
     centerContainer(left);
     resourcesViz.lockHighlight = resource.name;
+    setHoveredPaper(null);
   }
   function closeResourceDetails() {
     setOpenedPaper(null);
@@ -170,7 +181,15 @@ function KGVisualization({
       const scoreFactorMin = 1 - mousePivot;
       const scoreFactorMax = mousePivot;
 
+      // console.log('e.deltaY', e.deltaY);
+      // const deltaYNormalized = -(e.deltaY / height) / 10;
+      // console.log('deltaYNormalized', deltaYNormalized);
+      // console.log('scoreFactorMin', scoreFactorMin);
+      // console.log('rev', rev);
+
       const dScore: number = -e.deltaY / (500 * rev); // 50 000
+      // const dScore: number = deltaYNormalized; // 50 000
+
       const newMin = Math.min(
         max,
         Math.max(minScore, min + dScore * scoreFactorMin)
@@ -181,24 +200,19 @@ function KGVisualization({
       );
 
       updateScore([newMax, newMin]);
+      setHoveredPaper(null);
     }
   }
 
-  const dragging = useRef(false);
   const draggingOrig = useRef(0);
   const draggingPivot = useRef([1, 0]);
   function dragStart(e: any) {
-    dragging.current = true;
     draggingOrig.current = getMouseR(e);
     draggingPivot.current = [...scores];
   }
 
-  function dragEnd(e: any) {
-    dragging.current = false;
-  }
-
   function drag(e: any) {
-    if (dragging.current) {
+    if (mouseDown) {
       const actMouseR = getMouseR(e);
       const dR = actMouseR - draggingOrig.current;
       const dScore = dR * scoreUnitPerPx;
@@ -305,7 +319,6 @@ function KGVisualization({
           height={height}
           onWheel={onScroll}
           onMouseDown={dragStart}
-          onMouseUp={dragEnd}
           onMouseMove={drag}
         />
       </div>
@@ -324,6 +337,7 @@ function KGVisualization({
       <div className={styles.listPanel}>
         <ListPanel
           resources={showedData}
+          starredResources={starredResources}
           scores={scores}
           onResourceClick={openResourceDetails}
         />

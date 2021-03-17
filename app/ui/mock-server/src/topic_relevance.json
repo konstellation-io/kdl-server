@@ -1,0 +1,94 @@
+[
+  {
+    "name": "Semantic Segmentation",
+    "relevance": 24.04555320739746
+  },
+  {
+    "name": "Transfer Learning",
+    "relevance": 13.31100845336914
+  },
+  {
+    "name": "Image Classification",
+    "relevance": 8.25033950805664
+  },
+  {
+    "name": "Medical Image Segmentation",
+    "relevance": 8.17716121673584
+  },
+  {
+    "name": "Data Augmentation",
+    "relevance": 6.566402435302734
+  },
+  {
+    "name": "Object Detection",
+    "relevance": 6.40046501159668
+  },
+  {
+    "name": "COVID-19 Diagnosis",
+    "relevance": 5.340160846710205
+  },
+  {
+    "name": "Computed Tomography (CT)",
+    "relevance": 5.253567218780518
+  },
+  {
+    "name": "Tumor Segmentation",
+    "relevance": 5.156097888946533
+  },
+  {
+    "name": "Image Generation",
+    "relevance": 4.359178066253662
+  },
+  {
+    "name": "Face Recognition",
+    "relevance": 4.256319046020508
+  },
+  {
+    "name": "Image-to-Image Translation",
+    "relevance": 4.204217910766602
+  },
+  {
+    "name": "Brain Tumor Segmentation",
+    "relevance": 4.2035722732543945
+  },
+  {
+    "name": "Super-Resolution",
+    "relevance": 4.1897735595703125
+  },
+  {
+    "name": "Domain Adaptation",
+    "relevance": 4.084090232849121
+  },
+  {
+    "name": "Multi-Task Learning",
+    "relevance": 3.276594400405884
+  },
+  {
+    "name": "Lesion Segmentation",
+    "relevance": 3.179610252380371
+  },
+  {
+    "name": "Few-Shot Learning",
+    "relevance": 3.146632432937622
+  },
+  {
+    "name": "Video Recognition",
+    "relevance": 2.2036449909210205
+  },
+  {
+    "name": "Instance Segmentation",
+    "relevance": 2.1919827461242676
+  },
+  {
+    "name": "Scene Understanding",
+    "relevance": 2.1919050216674805
+  },
+  {
+    "name": "Activity Recognition",
+    "relevance": 2.1784000396728516
+  },
+  {
+    "name": "Image Quality Assessment",
+    "relevance": 2.169410228729248
+  }
+]

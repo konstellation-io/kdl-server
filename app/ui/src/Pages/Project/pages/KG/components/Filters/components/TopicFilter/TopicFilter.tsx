@@ -48,7 +48,7 @@ function TopicFilter({ topics, onUpdate }: Props) {
     const selectedTopicsCount = topics.filter((t) =>
       selectedTopics.includes(t.name)
     ).length;
-    return `${selectedTopicsCount} ${
+    return `TOP ${selectedTopicsCount} ${
       selectedTopicsCount === 1 ? 'TOPIC' : 'TOPICS'
     }`;
   }

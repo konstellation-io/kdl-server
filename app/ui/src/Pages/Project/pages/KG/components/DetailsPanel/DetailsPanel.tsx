@@ -14,7 +14,7 @@ type Props = {
   onClose: () => void;
 };
 function DetailsPanel({ resource: tempResource, onClose }: Props) {
-  const resource = idToFullResource[tempResource?.id || ''] || null;
+  const resource: any = idToFullResource[tempResource?.id || ''] || null;
   const starred = tempResource?.starred;
 
   return (
@@ -57,11 +57,13 @@ function DetailsPanel({ resource: tempResource, onClose }: Props) {
               </a>
             </div>
             <div className={styles.topicsG}>
-              <div className={styles.sectionTitle}>TOPICS</div>
-              {Object.entries(resource.topics).map(([topic, value]: any) => (
+              {resource.topics.length > 0 && (
+                <div className={styles.sectionTitle}>TOPICS</div>
+              )}
+              {resource.topics.map(({ name, relevance }: any) => (
                 <div className={styles.topicScore}>
-                  <Score value={value} inline />
-                  <span>{topic}</span>
+                  <Score value={relevance} inline />
+                  <span>{name}</span>
                 </div>
               ))}
             </div>

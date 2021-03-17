@@ -1,5 +1,24 @@
 const { MockList } = require('apollo-server');
+const data = require('./data0.json');
+const relevances = require('./topic_relevance.json');
 const casual = require('casual');
+
+const kgData = data.map((d) => ({
+  id: d.id,
+  category: casual.random_element(['Code', 'Paper']),
+  topics: Object.entries(JSON.parse(d.topics.replace(/[']+/g, '"'))).map(
+    ([name, relevance]) => ({
+      name,
+      relevance,
+    })
+  ),
+  title: d.title,
+  abstract: d.abstract,
+  authors: ['Xingyi Zhou', 'Vladlen Koltun', 'Philipp Krähenbühl'],
+  score: d.score,
+  date: new Date().toISOString(),
+  url: 'https://paperswithcode.com/paper/probabilistic-two-stage-detection',
+}));
 
 const meId = casual.uuid;
 const me = {
@@ -71,7 +90,8 @@ module.exports = {
       quality: Math.round((Math.random() * 1000) % 100),
     }),
     knowledgeGraph: () => ({
-      items: () => new MockList([1, 80]),
+      items: () => kgData,
+      topics: () => relevances,
     }),
   }),
   Mutation: () => ({

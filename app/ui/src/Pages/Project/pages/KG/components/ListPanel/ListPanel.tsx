@@ -2,18 +2,23 @@ import React, { useMemo, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 import { D } from '../KGVisualization/KGVisualization';
-import TabAll from './components/TabAll/TabAll';
-import TabStarred from './components/TabStarred/TabStarred';
+import ResourcesList from './components/ResourcesList/ResourcesList';
 import { orderBy } from 'lodash';
 import { resourcesViz } from '../KGVisualization/KGViz';
 import styles from './ListPanel.module.scss';
 
 type Props = {
+  starredResources: D[];
   resources: D[];
   onResourceClick: (d: D, left: number) => void;
   scores: [number, number];
 };
-function ListPanel({ resources, onResourceClick, scores }: Props) {
+function ListPanel({
+  starredResources,
+  resources,
+  onResourceClick,
+  scores,
+}: Props) {
   const [listFilterText, setListFilterText] = useState('');
 
   const top25 = useMemo(
@@ -50,24 +55,28 @@ function ListPanel({ resources, onResourceClick, scores }: Props) {
 
   const [maxScore, minScore] = scores;
 
+  const listHeader = (
+    <div className={styles.title}>
+      {`Top 25 of resources between ${formatScore(maxScore)} and ${formatScore(
+        minScore
+      )} of score`}
+    </div>
+  );
+
   return (
     <div className={styles.container}>
-      <div className={styles.title}>
-        {`Top 25 of resources between ${formatScore(
-          maxScore
-        )} and ${formatScore(minScore)} of score`}
-      </div>
       <Tabs
         selectedTabClassName={styles.selectedTab}
         className={styles.tabSection}
       >
         <TabList>
-          <Tab>LIST ({`${filteredAllTopics.length}`})</Tab>
-          <Tab>STARRED ({`25`})</Tab>
+          <Tab>{`LIST (${filteredAllTopics.length})`}</Tab>
+          <Tab>{`STARRED (${starredResources.length})`}</Tab>
         </TabList>
         <div className={styles.tabContainer}>
           <TabPanel>
-            <TabAll
+            <ResourcesList
+              header={listHeader}
               resources={filteredAllTopics}
               filterText={listFilterText}
               onClick={onSelectResource}
@@ -77,11 +86,13 @@ function ListPanel({ resources, onResourceClick, scores }: Props) {
             />
           </TabPanel>
           <TabPanel>
-            <TabStarred
-              starredResources={top25}
+            <ResourcesList
+              resources={starredResources}
+              filterText={listFilterText}
               onClick={onSelectResource}
               onEnter={onEnter}
               onLeave={onLeave}
+              onChangeFilterText={setListFilterText}
             />
           </TabPanel>
         </div>

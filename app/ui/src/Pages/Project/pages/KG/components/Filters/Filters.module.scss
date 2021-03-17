@@ -5,6 +5,11 @@
 .container {
   display: flex;
   align-items: center;
-  background-color: palette(base, 900);
+  flex-wrap: wrap;
+  flex-direction: row-reverse;
   height: 100%;
+
+  > div {
+    background-color: palette(base, 900);
+  }
 }

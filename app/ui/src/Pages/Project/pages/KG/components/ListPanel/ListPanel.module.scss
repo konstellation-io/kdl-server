@@ -33,5 +33,5 @@
 .title {
   @include font-body;
   color: font-color(light);
-  padding: 2 * $grid-unit 0 2 * $grid-unit 2.5 * $grid-unit;
+  padding: $grid-unit 0 2 * $grid-unit 2.5 * $grid-unit;
 }

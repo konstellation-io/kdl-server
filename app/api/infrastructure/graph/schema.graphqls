@@ -6,6 +6,7 @@ type Query {
   sshKey: SSHKey!
   qualityProjectDesc(description: String!): QualityProjectDesc!
   knowledgeGraph(description: String!): KnowledgeGraph!
+  knowledgeGraphItem(id: ID!): KnowledgeGraphItem!
 }
 
 type Mutation {
@@ -31,6 +32,12 @@ type QualityProjectDesc {
 
 type KnowledgeGraph {
   items: [KnowledgeGraphItem!]!
+  topics: [Topic!]!
+}
+
+type Topic {
+  name: String!
+  relevance: Float!
 }
 
 type KnowledgeGraphItem {
@@ -42,9 +49,7 @@ type KnowledgeGraphItem {
   score: Float!
   date: String!
   url: String!
-
-  isStarred: Boolean!
-  isDiscarded: Boolean!
+  topics: [Topic]!
 
   # optional fields
   repoUrls: [String]

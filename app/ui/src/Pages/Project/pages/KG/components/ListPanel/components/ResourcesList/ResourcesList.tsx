@@ -1,9 +1,9 @@
-import React from 'react';
 import { D } from '../../../KGVisualization/KGVisualization';
-import styles from './TabAll.module.scss';
-import KGItem from '../KGItem/KGItem';
 import IconSearch from '@material-ui/icons/Search';
+import KGItem from '../KGItem/KGItem';
+import React from 'react';
 import { TextInput } from 'kwc';
+import styles from './ResourcesList.module.scss';
 
 type Props = {
   onClick: (resource: D) => void;
@@ -12,8 +12,10 @@ type Props = {
   onChangeFilterText: (filter: string) => void;
   filterText: string;
   resources: D[];
+  header?: JSX.Element | null;
 };
-function TabAll({
+function ResourcesList({
+  header = null,
   resources,
   onClick,
   onEnter,
@@ -23,6 +25,7 @@ function TabAll({
 }: Props) {
   return (
     <div className={styles.list}>
+      {header}
       <TextInput
         formValue={filterText}
         onChange={(value: string) => onChangeFilterText(value)}
@@ -46,4 +49,4 @@ function TabAll({
   );
 }
 
-export default TabAll;
+export default ResourcesList;

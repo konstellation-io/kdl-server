@@ -12,10 +12,8 @@ const GetQualityProjectDescQuery = loader(
 
 function useQualityDescription(
   description: string,
-  { skipFirstRun = true, debounceTime = 2000, minWordsNumber = 2000 } = {}
+  { skipFirstRun = true, debounceTime = 2000, minWordsNumber = 50 } = {}
 ) {
-  console.log(skipFirstRun);
-  const firstRun = useRef(true);
   const [descriptionScore, setDescriptionScore] = useState(0);
 
   const [getQualityProjectDesc, { data: score }] = useLazyQuery<
@@ -29,15 +27,22 @@ function useQualityDescription(
   }, [score]);
 
   useEffect(() => {
-    if (skipFirstRun && firstRun.current) {
+    if (!skipFirstRun) getQualityProjectDesc({ variables: { description } });
+    // We want to run this only on first.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const firstRun = useRef(true);
+  useEffect(() => {
+    if (firstRun.current) {
       firstRun.current = false;
       return;
     }
 
-    const scoreTimeoutId = setTimeout(() => {
-      console.log('sending to back');
-      getQualityProjectDesc({ variables: { description } });
-    }, debounceTime);
+    const scoreTimeoutId = setTimeout(
+      () => getQualityProjectDesc({ variables: { description } }),
+      debounceTime
+    );
 
     return () => clearTimeout(scoreTimeoutId);
   }, [description]);

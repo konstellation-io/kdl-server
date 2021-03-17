@@ -8,7 +8,7 @@ from typing import Union
 import numpy as np
 import pandas as pd
 
-from data_checks import dataset_checks
+from data_checks import dataset
 
 BASE_DIR = "inputs/"
 
@@ -214,20 +214,20 @@ if __name__ == "__main__":
                                    INPUT_PWC, INPUT_EXTRA_PWC)
 
     # Check format
-    dataset_checks.check_df_columns(df_final)
-    dataset_checks.check_categories(df_final)
+    dataset.check_df_columns(df_final)
+    dataset.check_categories(df_final)
 
     # Check no na
-    dataset_checks.check_no_nan(df_final.repo_urls)
-    dataset_checks.check_no_nan(df_final.frameworks)
-    dataset_checks.check_no_nan(df_final.external_id)
+    dataset.check_no_nan(df_final.repo_urls)
+    dataset.check_no_nan(df_final.frameworks)
+    dataset.check_no_nan(df_final.external_id)
 
     # Check types
-    dataset_checks.check_type(df_final.repo_urls, list)
-    dataset_checks.check_type(df_final.frameworks, list)
-    dataset_checks.check_type(df_final.category, str)
-    dataset_checks.check_type(df_final.date, str)
-    dataset_checks.check_type(df_final.external_id, str)
+    dataset.check_type(df_final.repo_urls, list)
+    dataset.check_type(df_final.frameworks, list)
+    dataset.check_type(df_final.category, str)
+    dataset.check_type(df_final.date, str)
+    dataset.check_type(df_final.external_id, str)
 
     df_final.to_pickle(OUTPUT_FILEPATH + 'dataset.pkl.gz',
                        compression="gzip",

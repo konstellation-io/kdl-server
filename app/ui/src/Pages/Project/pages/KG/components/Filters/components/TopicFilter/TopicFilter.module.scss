@@ -6,7 +6,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  background-color: palette(base, 900);
+  border-left: solid 2px palette(base);
 
   .button {
     display: flex;

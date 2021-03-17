@@ -27,14 +27,14 @@ export interface GetNewProject_newProject_information_values {
 
 export interface GetNewProject_newProject_externalRepository_values {
   url: string;
-  isConnectionTested: boolean;
-  hasConnectionError: string;
-  warning: boolean;
+  username: string;
+  token: string;
 }
 
 export interface GetNewProject_newProject_externalRepository_errors {
   url: string;
-  warning: string;
+  username: string;
+  token: string;
 }
 
 export interface GetNewProject_newProject_internalRepository_values {
@@ -96,13 +96,13 @@ export const GET_NEW_PROJECT = gql`
       externalRepository {
         values {
           url
-          isConnectionTested
-          hasConnectionError
-          warning
+          username
+          token
         }
         errors {
           url
-          warning
+          username
+          token
         }
       }
       internalRepository {

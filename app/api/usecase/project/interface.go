@@ -16,6 +16,8 @@ type Repository interface {
 	AddMembers(ctx context.Context, projectID string, members []entity.Member) error
 	RemoveMember(ctx context.Context, projectID, userID string) error
 	UpdateMemberAccessLevel(ctx context.Context, projectID, userID string, accessLevel entity.AccessLevel) error
+	UpdateName(ctx context.Context, projectID, name string) error
+	UpdateDescription(ctx context.Context, projectID, description string) error
 }
 
 // UseCase interface to manage all operations related with projects.
@@ -26,4 +28,5 @@ type UseCase interface {
 	AddMembers(ctx context.Context, opt AddMembersOption) (entity.Project, error)
 	RemoveMember(ctx context.Context, opt RemoveMemberOption) (entity.Project, error)
 	UpdateMember(ctx context.Context, opt UpdateMemberOption) (entity.Project, error)
+	Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error)
 }

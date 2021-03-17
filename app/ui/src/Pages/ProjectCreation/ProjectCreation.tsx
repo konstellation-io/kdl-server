@@ -44,10 +44,12 @@ function ProjectCreation() {
 
       if (type === RepositoryType.INTERNAL) {
         const { internalRepository } = data.newProject;
-        inputRepository.internalRepoName = internalRepository.values.slug;
+        inputRepository.internal = {
+          name: internalRepository.values.slug,
+        };
       } else {
         const { externalRepository } = data.newProject;
-        inputRepository.externalRepoUrl = externalRepository.values.url;
+        inputRepository.external = externalRepository.values
       }
 
       addNewProject({

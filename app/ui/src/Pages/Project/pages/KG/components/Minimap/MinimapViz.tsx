@@ -1,6 +1,7 @@
 import { BaseType, EnterElement, Selection, select } from 'd3-selection';
-import { Coord, GroupD } from '../../KGUtils';
+import { Coord, DComplete } from '../../KGUtils';
 import { DragBehavior, drag } from 'd3-drag';
+import { zoom, zoomIdentity } from 'd3-zoom';
 
 import { N_GUIDES } from '../KGVisualization/KGViz';
 import { ZoomValues } from '../KGVisualization/useZoom';
@@ -37,7 +38,7 @@ class MinimapViz {
   center: Coord;
   container: any;
   zoom: ZoomValues;
-  data: GroupD[] = [];
+  data: DComplete[] = [];
   dragEvent: DragBehavior<Element, unknown, unknown> = drag();
   minimapScale: number = 0;
 
@@ -99,7 +100,7 @@ class MinimapViz {
     this.update(this.data, this.zoom, this.reallocateZoom);
   };
 
-  initialize = (data: GroupD[]) => {
+  initialize = (data: DComplete[]) => {
     this.data = data;
 
     const {
@@ -159,7 +160,7 @@ class MinimapViz {
   };
 
   update = (
-    data: GroupD[],
+    data: DComplete[],
     zoom: ZoomValues,
     reallocateZoom: (dx: number, dy: number) => void
   ) => {
@@ -183,7 +184,7 @@ class MinimapViz {
     const allResources = container
       .select(`.${styles.resourcesWrapper}`)
       .selectAll(`.${styles.resourceG}`)
-      .data(data, (d: GroupD) => `${d.x}${d.y}`);
+      .data(data, (d: DComplete) => `${d.x}${d.y}`);
     const newResources = allResources.enter();
     const oldResources = allResources.exit();
 
@@ -215,7 +216,9 @@ class MinimapViz {
   };
 
   resources = {
-    create: (container: Selection<EnterElement, GroupD, BaseType, unknown>) => {
+    create: (
+      container: Selection<EnterElement, DComplete, BaseType, unknown>
+    ) => {
       const resourcesG = container
         .append('g')
         .classed(styles.resourceG, true)
@@ -224,12 +227,9 @@ class MinimapViz {
       resourcesG
         .append('circle')
         .classed(styles.resource, true)
-        .classed(styles.resourceGroup, (d: GroupD) => d.elements.length > 1)
-        .classed(styles.resourceNode, (d: GroupD) => d.elements.length === 1)
-        .attr('fill', (d: GroupD) => colorScale(d.elements.length))
         .attr('r', RESOURCE_R);
     },
-    update: (container: Selection<BaseType, GroupD, BaseType, unknown>) => {
+    update: (container: Selection<BaseType, DComplete, BaseType, unknown>) => {
       container.attr('transform', (d) => `translate(${d.x}, ${d.y})`);
     },
     remove: (container: Selection<BaseType, unknown, BaseType, unknown>) => {

@@ -219,13 +219,15 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 	jupyterWithUsernameAndFolder := strings.Replace(jupyterWithUsername, "REPO_FOLDER", folderName, 2)
 	vscodeWithUsername := strings.Replace(r.cfg.VSCode.URL, "USERNAME", slugUserName, 1)
 	vscodeWithUsernameAndFolder := strings.Replace(vscodeWithUsername, "REPO_FOLDER", folderName, 1)
+	giteaWithFolder := r.cfg.Gitea.URL + "/kdl/" + folderName
+	droneWithFolder := r.cfg.Drone.URL + "/kdl/" + folderName
 
 	return &entity.ToolUrls{
-		Gitea:   r.cfg.Gitea.URL,
+		Gitea:   giteaWithFolder,
 		Minio:   r.cfg.Minio.URL,
 		Jupyter: jupyterWithUsernameAndFolder,
 		VSCode:  vscodeWithUsernameAndFolder,
-		Drone:   r.cfg.Drone.URL,
+		Drone:   droneWithFolder,
 		MLFlow:  r.cfg.MLFlow.URL,
 	}, nil
 }

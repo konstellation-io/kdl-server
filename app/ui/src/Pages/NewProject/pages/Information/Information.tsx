@@ -1,14 +1,6 @@
-import {
-  GET_NEW_PROJECT,
-  GetNewProject,
-} from 'Graphql/client/queries/getNewProject.graphql';
-import {
-  GetQualityProjectDesc,
-  GetQualityProjectDescVariables,
-} from 'Graphql/queries/types/GetQualityProjectDesc';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { SpinnerCircular, TextInput } from 'kwc';
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
 
 import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
 import { generateSlug, getErrorMsg } from 'Utils/string';
@@ -19,10 +11,8 @@ import {
   validateProjectDescription,
   validateProjectName,
 } from './InformationUtils';
-
-const GetQualityProjectDescQuery = loader(
-  'Graphql/queries/getQualityProjectDesc.graphql'
-);
+import { newProject } from 'Graphql/client/cache';
+import useQualityDescription from '../../../../Hooks/useQualityDescription/useQualityDescription';
 
 const limits = {
   maxHeight: 500,
@@ -33,29 +23,21 @@ type Props = {
   showErrors: boolean;
 };
 function Information({ showErrors }: Props) {
-  const [getQualityProjectDesc, { data: descriptionScore }] = useLazyQuery<
-    GetQualityProjectDesc,
-    GetQualityProjectDescVariables
-  >(GetQualityProjectDescQuery);
-
+  const project = useReactiveVar(newProject);
   const { updateValue, updateError, clearError } = useNewProject('information');
   const { updateValue: updateInternalRepositoryValue } = useNewProject(
     'internalRepository'
   );
-  const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
-  const [score, setScore] = useState(0);
 
-  useEffect(() => {
-    if (descriptionScore !== undefined)
-      setScore(descriptionScore.qualityProjectDesc.quality || 0);
-  }, [descriptionScore]);
+  const { values, errors } = project.information || {};
+  const { name, description } = values;
+  const { name: errorName, description: errorDescription } = errors;
 
-  if (!data) return <SpinnerCircular />;
+  const { descriptionScore, getQualityProjectDesc } = useQualityDescription(
+    description
+  );
 
-  const {
-    values: { name, description },
-    errors: { name: errorName, description: errorDescription },
-  } = data.newProject.information;
+  if (!project) return <SpinnerCircular />;
 
   return (
     <div className={styles.container}>
@@ -93,7 +75,7 @@ function Information({ showErrors }: Props) {
         lockHorizontalGrowth
         error={showErrors ? errorDescription : ''}
       />
-      <DescriptionScore score={score} />
+      <DescriptionScore score={descriptionScore} />
     </div>
   );
 }

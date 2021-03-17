@@ -26,10 +26,14 @@ function useQualityDescription(
 ) {
   const [descriptionScore, setDescriptionScore] = useState(0);
 
-  const [getQualityProjectDesc, { data: score }] = useLazyQuery<
+  const [getQualityProjectDesc] = useLazyQuery<
     GetQualityProjectDesc,
     GetQualityProjectDescVariables
-  >(GetQualityProjectDescQuery);
+  >(GetQualityProjectDescQuery, {
+    onCompleted: (data) => {
+      setDescriptionScore(data.qualityProjectDesc.quality || 0);
+    },
+  });
 
   const isDescriptionLengthValid = useMemo(() => {
     const isValid = description.split(' ').length >= minWordsNumber;
@@ -37,11 +41,6 @@ function useQualityDescription(
 
     return isValid;
   }, [description, minWordsNumber]);
-
-  useEffect(() => {
-    if (score !== undefined)
-      setDescriptionScore(score.qualityProjectDesc.quality || 0);
-  }, [score]);
 
   useEffect(() => {
     if (!skipFirstRun && isDescriptionLengthValid)
@@ -58,10 +57,9 @@ function useQualityDescription(
     }
     if (!isDescriptionLengthValid) return;
 
-    const scoreTimeoutId = setTimeout(
-      () => getQualityProjectDesc({ variables: { description } }),
-      debounceTime
-    );
+    const scoreTimeoutId = setTimeout(() => {
+      getQualityProjectDesc({ variables: { description } });
+    }, debounceTime);
 
     return () => clearTimeout(scoreTimeoutId);
   }, [description, isDescriptionLengthValid, getQualityProjectDesc]);

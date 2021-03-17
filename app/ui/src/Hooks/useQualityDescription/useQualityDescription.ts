@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import {
   GetQualityProjectDesc,
@@ -10,9 +10,19 @@ const GetQualityProjectDescQuery = loader(
   'Graphql/queries/getQualityProjectDesc.graphql'
 );
 
+type Options = {
+  skipFirstRun?: boolean;
+  debounceTime?: number;
+  minWordsNumber?: number;
+};
+
 function useQualityDescription(
   description: string,
-  { skipFirstRun = true, debounceTime = 2000, minWordsNumber = 50 } = {}
+  {
+    skipFirstRun = true,
+    debounceTime = 2000,
+    minWordsNumber = 50,
+  }: Options = {}
 ) {
   const [descriptionScore, setDescriptionScore] = useState(0);
 
@@ -21,14 +31,22 @@ function useQualityDescription(
     GetQualityProjectDescVariables
   >(GetQualityProjectDescQuery);
 
+  const isDescriptionLengthValid = useMemo(() => {
+    const isValid = description.split(' ').length >= minWordsNumber;
+    if (!isValid) setDescriptionScore(0);
+
+    return isValid;
+  }, [description, minWordsNumber]);
+
   useEffect(() => {
     if (score !== undefined)
       setDescriptionScore(score.qualityProjectDesc.quality || 0);
   }, [score]);
 
   useEffect(() => {
-    if (!skipFirstRun) getQualityProjectDesc({ variables: { description } });
-    // We want to run this only on first.
+    if (!skipFirstRun && isDescriptionLengthValid)
+      getQualityProjectDesc({ variables: { description } });
+    // We want to run this only on first hook instantiation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -38,6 +56,7 @@ function useQualityDescription(
       firstRun.current = false;
       return;
     }
+    if (!isDescriptionLengthValid) return;
 
     const scoreTimeoutId = setTimeout(
       () => getQualityProjectDesc({ variables: { description } }),
@@ -45,7 +64,7 @@ function useQualityDescription(
     );
 
     return () => clearTimeout(scoreTimeoutId);
-  }, [description]);
+  }, [description, isDescriptionLengthValid, getQualityProjectDesc]);
 
   return {
     descriptionScore,

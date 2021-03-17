@@ -1,23 +1,13 @@
 import { Button, TextInput } from 'kwc';
-import {
-  GetQualityProjectDesc,
-  GetQualityProjectDescVariables,
-} from 'Graphql/queries/types/GetQualityProjectDesc';
 import React, { useEffect, useState } from 'react';
 
 import ActionsBar from 'Components/Layout/ActionsBar/ActionsBar';
 import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
-import { loader } from 'graphql.macro';
 import styles from './UpdateProjectDescription.module.scss';
 import { useForm } from 'react-hook-form';
 import useProject from 'Graphql/hooks/useProject';
-import { useQuery } from '@apollo/client';
-import useQualityDescription from '../../../../Hooks/useQualityDescription/useQualityDescription';
-
-const GetQualityProjectDescQuery = loader(
-  'Graphql/queries/getQualityProjectDesc.graphql'
-);
+import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
 
 type FormData = {
   description: string;

@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { SpinnerCircular, TextInput } from 'kwc';
 import { useReactiveVar } from '@apollo/client';
 
 import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
 import { generateSlug, getErrorMsg } from 'Utils/string';
-import { loader } from 'graphql.macro';
 import styles from './Information.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 import {
@@ -12,7 +11,7 @@ import {
   validateProjectName,
 } from './InformationUtils';
 import { newProject } from 'Graphql/client/cache';
-import useQualityDescription from '../../../../Hooks/useQualityDescription/useQualityDescription';
+import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
 
 const limits = {
   maxHeight: 500,

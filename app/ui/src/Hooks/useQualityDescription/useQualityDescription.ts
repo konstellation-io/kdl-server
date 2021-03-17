@@ -35,19 +35,15 @@ function useQualityDescription(
     },
   });
 
-  const isDescAcceptable = useMemo(() => {
+  const fetchDescriptionScore = useCallback(() => {
     const isLengthAcceptable = description.split(' ').length >= minWordsNumber;
+
     if (!isLengthAcceptable) setDescriptionScore(0);
-
-    return isLengthAcceptable;
-  }, [description, minWordsNumber]);
-
-  const retrieveDescriptionScore = useCallback(() => {
-    if (isDescAcceptable) getQualityProjectDesc({ variables: { description } });
-  }, [isDescAcceptable, getQualityProjectDesc, description]);
+    else getQualityProjectDesc({ variables: { description } });
+  }, [description, minWordsNumber, getQualityProjectDesc]);
 
   useEffect(() => {
-    if (!skipFirstRun && isDescAcceptable) retrieveDescriptionScore();
+    if (!skipFirstRun) fetchDescriptionScore();
     // We want to run this only on first hook instantiation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -59,15 +55,14 @@ function useQualityDescription(
       return;
     }
 
-    const scoreTimeoutId = setTimeout(retrieveDescriptionScore, debounceTime);
+    const scoreTimeoutId = setTimeout(fetchDescriptionScore, debounceTime);
 
     return () => clearTimeout(scoreTimeoutId);
-  }, [retrieveDescriptionScore]);
+  }, [description, fetchDescriptionScore]);
 
   return {
     descriptionScore,
-    retrieveDescriptionScore,
-    isDescAcceptable,
+    fetchDescriptionScore,
   };
 }
 

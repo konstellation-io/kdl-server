@@ -49,7 +49,7 @@ function UpdateProjectDescription({ project, close }: Props) {
   const {
     descriptionScore,
     isDescAcceptable,
-    retrieveDescriptionScore,
+    fetchDescriptionScore,
   } = useQualityDescription(descriptionValue, {
     skipFirstRun: false,
   });
@@ -76,9 +76,7 @@ function UpdateProjectDescription({ project, close }: Props) {
             clearErrors();
           }}
           onBlur={() => {
-            if (descriptionValue && isDescAcceptable) {
-              retrieveDescriptionScore();
-            }
+            if (descriptionValue) fetchDescriptionScore();
           }}
           error={errors.description?.message}
           whiteColor

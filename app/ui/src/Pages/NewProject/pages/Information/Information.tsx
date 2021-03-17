@@ -32,11 +32,9 @@ function Information({ showErrors }: Props) {
   const { name, description } = values;
   const { name: errorName, description: errorDescription } = errors;
 
-  const {
-    descriptionScore,
-    retrieveDescriptionScore,
-    isDescAcceptable,
-  } = useQualityDescription(description);
+  const { descriptionScore, fetchDescriptionScore } = useQualityDescription(
+    description
+  );
 
   if (!project) return <SpinnerCircular />;
 
@@ -68,7 +66,7 @@ function Information({ showErrors }: Props) {
         onBlur={() => {
           const isValidDescription = validateProjectDescription(description);
           updateError('description', getErrorMsg(isValidDescription));
-          if (isDescAcceptable) retrieveDescriptionScore();
+          fetchDescriptionScore();
         }}
         limits={limits}
         showClearButton

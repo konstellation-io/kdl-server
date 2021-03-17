@@ -13,7 +13,7 @@ const me = {
 const buildProject = () => ({
   id: casual.uuid,
   name: casual.name,
-  description: casual.description,
+  description: casual.words(200),
   favorite: casual.boolean,
   repository: this.Repository,
   creationDate: () => new Date().toISOString(),

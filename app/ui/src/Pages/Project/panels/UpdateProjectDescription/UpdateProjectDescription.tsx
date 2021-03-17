@@ -74,9 +74,7 @@ function UpdateProjectDescription({ project, close }: Props) {
             setCompleted(false);
             clearErrors();
           }}
-          onBlur={() => {
-            if (descriptionValue) fetchDescriptionScore();
-          }}
+          onBlur={fetchDescriptionScore}
           error={errors.description?.message}
           whiteColor
           textArea

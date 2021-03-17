@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import {
   GetQualityProjectDesc,
@@ -35,12 +35,12 @@ function useQualityDescription(
     },
   });
 
-  const fetchDescriptionScore = useCallback(() => {
+  function fetchDescriptionScore() {
     const isLengthAcceptable = description.split(' ').length >= minWordsNumber;
 
     if (!isLengthAcceptable) setDescriptionScore(0);
     else getQualityProjectDesc({ variables: { description } });
-  }, [description, minWordsNumber, getQualityProjectDesc]);
+  }
 
   useEffect(() => {
     if (!skipFirstRun) fetchDescriptionScore();
@@ -58,7 +58,9 @@ function useQualityDescription(
     const scoreTimeoutId = setTimeout(fetchDescriptionScore, debounceTime);
 
     return () => clearTimeout(scoreTimeoutId);
-  }, [description, debounceTime, fetchDescriptionScore]);
+    // We can omit fetchDescriptionScore as it is not change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [description, debounceTime]);
 
   return {
     descriptionScore,

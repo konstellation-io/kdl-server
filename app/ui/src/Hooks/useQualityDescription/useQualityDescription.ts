@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import {
   GetQualityProjectDesc,
@@ -44,7 +44,7 @@ function useQualityDescription(
 
   useEffect(() => {
     if (!skipFirstRun) fetchDescriptionScore();
-    // We want to run this only on first hook instantiation.
+    // We want to run this only on hook instantiation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -58,7 +58,7 @@ function useQualityDescription(
     const scoreTimeoutId = setTimeout(fetchDescriptionScore, debounceTime);
 
     return () => clearTimeout(scoreTimeoutId);
-  }, [description, fetchDescriptionScore]);
+  }, [description, debounceTime, fetchDescriptionScore]);
 
   return {
     descriptionScore,

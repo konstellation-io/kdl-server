@@ -3,10 +3,11 @@
 isort:skip_file
 """
 import builtins
+import typing
+
 import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.message
-import typing
 import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor = ...
@@ -22,6 +23,18 @@ class GetGraphReq(google.protobuf.message.Message):
         ) -> None: ...
     def ClearField(self, field_name: typing_extensions.Literal[u"description",b"description"]) -> None: ...
 global___GetGraphReq = GetGraphReq
+
+class GetItemReq(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    ID_FIELD_NUMBER: builtins.int
+    id: typing.Text = ...
+
+    def __init__(self,
+        *,
+        id : typing.Text = ...,
+        ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"id",b"id"]) -> None: ...
+global___GetItemReq = GetItemReq
 
 class GraphItem(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
@@ -103,3 +116,18 @@ class GetGraphRes(google.protobuf.message.Message):
         ) -> None: ...
     def ClearField(self, field_name: typing_extensions.Literal[u"items",b"items",u"topics",b"topics"]) -> None: ...
 global___GetGraphRes = GetGraphRes
+
+class GetItemRes(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    ITEM_FIELD_NUMBER: builtins.int
+
+    @property
+    def item(self) -> global___GraphItem: ...
+
+    def __init__(self,
+        *,
+        item : typing.Optional[global___GraphItem] = ...,
+        ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"item",b"item"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"item",b"item"]) -> None: ...
+global___GetItemRes = GetItemRes

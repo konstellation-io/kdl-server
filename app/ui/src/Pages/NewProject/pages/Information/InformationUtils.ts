@@ -9,6 +9,6 @@ export function validateProjectName(name: string) {
 export function validateProjectDescription(description: string) {
   return CHECK.getValidationError([
     CHECK.isFieldNotEmpty(description),
-    CHECK.isLengthAllowed(description, 2000),
+    CHECK.isLengthAllowed(description, 100000),
   ]);
 }

@@ -26,7 +26,7 @@ function useQualityDescription(
 ) {
   const [descriptionScore, setDescriptionScore] = useState(0);
 
-  const [getQualityProjectDesc] = useLazyQuery<
+  const [getQualityProjectDesc, { loading, error }] = useLazyQuery<
     GetQualityProjectDesc,
     GetQualityProjectDescVariables
   >(GetQualityProjectDescQuery, {
@@ -63,6 +63,8 @@ function useQualityDescription(
   }, [description, debounceTime]);
 
   return {
+    loading,
+    error,
     descriptionScore,
     fetchDescriptionScore,
   };

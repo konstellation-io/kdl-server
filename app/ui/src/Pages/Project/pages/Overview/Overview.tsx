@@ -12,28 +12,20 @@ import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import React from 'react';
 import { RepositoryType } from 'Graphql/types/globalTypes';
-import { loader } from 'graphql.macro';
 import styles from './Overview.module.scss';
-import { useQuery } from '@apollo/client';
-
-const GetQualityProjectDescQuery = loader(
-  'Graphql/queries/getQualityProjectDesc.graphql'
-);
+import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
 
 type Props = {
   openedProject: GetProjects_projects;
 };
 function Overview({ openedProject }: Props) {
-  const { data, loading, error } = useQuery<
-    GetQualityProjectDesc,
-    GetQualityProjectDescVariables
-  >(GetQualityProjectDescQuery, {
-    variables: {
-      description: openedProject.description,
-    },
-  });
+  const {
+    descriptionScore,
+    loading,
+    error,
+  } = useQualityDescription(openedProject.description, { skipFirstRun: false });
 
-  if (loading || !data) return <SpinnerCircular />;
+  if (loading) return <SpinnerCircular />;
   if (error) return <ErrorMessage />;
 
   return (
@@ -49,7 +41,7 @@ function Overview({ openedProject }: Props) {
           <div className={styles.description}>{openedProject.description}</div>
         </div>
         <div className={styles.section}>
-          <DescriptionScore score={data.qualityProjectDesc.quality || 0} />
+          <DescriptionScore score={descriptionScore} />
         </div>
         <div className={styles.section}>
           <div className={styles.repoType}>

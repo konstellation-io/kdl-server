@@ -8,4 +8,47 @@
   h1 {
     text-align: left;
   }
+
+  .projectData {
+    margin-top: 4 * $grid-unit;
+  }
+  .section {
+    margin-bottom: 3 * $grid-unit;
+  }
+  .sectionTitle {
+    @include font-caption;
+    color: font-color(regular);
+  }
+  .name {
+    @include font-subheader;
+    color: font-color(light);
+
+    margin-top: 1.5 * $grid-unit;
+  }
+  .description {
+    @include font-small;
+    color: font-color(lowlight);
+
+    background-color: palette(base, 400);
+    margin-top: 2 * $grid-unit;
+    padding: 2 * $grid-unit;
+    border-radius: 0.5 * $grid-unit;
+    max-width: 125 * $grid-unit;
+  }
+
+  .repoType {
+    @include font-caption;
+    color: font-color(regular);
+
+    display: flex;
+    margin-top: 5 * $grid-unit;
+
+    .repoTypeName {
+      margin: 0 0 0 1.5 * $grid-unit;
+    }
+  }
+
+  .nMembers {
+    margin: 2 * $grid-unit 0 0 3.5 * $grid-unit;
+  }
 }

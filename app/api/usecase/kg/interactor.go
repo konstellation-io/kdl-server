@@ -24,3 +24,9 @@ func (i *interactor) Get(ctx context.Context, description string) (entity.Knowle
 	i.logger.Infof("Getting KG with description \"%s\"", description)
 	return i.kgService.GetGraph(ctx, description)
 }
+
+// GetItem gets an item for a given id.
+func (i *interactor) GetItem(ctx context.Context, id string) (entity.KnowledgeGraphItem, error) {
+	i.logger.Infof("Getting KG item with id \"%s\"", id)
+	return i.kgService.GetItem(ctx, id)
+}

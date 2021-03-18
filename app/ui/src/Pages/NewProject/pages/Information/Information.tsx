@@ -25,8 +25,8 @@ const GetQualityProjectDescQuery = loader(
 );
 
 const limits = {
-  maxHeight: 500,
-  minHeight: 400,
+  maxHeight: 400,
+  minHeight: 375,
 };
 
 type Props = {
@@ -88,10 +88,10 @@ function Information({ showErrors }: Props) {
           getQualityProjectDesc({ variables: { description } });
         }}
         limits={limits}
+        error={showErrors ? errorDescription : ''}
         showClearButton
         textArea
         lockHorizontalGrowth
-        error={showErrors ? errorDescription : ''}
       />
       <DescriptionScore score={score} />
     </div>

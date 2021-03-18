@@ -1,21 +1,13 @@
 """
 You have to set up a server to run these tests:
 ```
-python src/app.py
+python server/app.py
 ```
 """
-
-import pandas as pd
 import pytest
 from grpc_requests import StubClient
 
-import config
-from proto.knowledge_graph_pb2 import DESCRIPTOR, GetGraphRes
-from tools.assets import AssetLoader
-
-
-def get_cases_from_load_dataset(n: int = 1) -> pd.DataFrame:
-    return AssetLoader(config.ASSET_ROUTE).dataset.head(n)
+from proto.knowledge_graph_pb2 import DESCRIPTOR, GetGraphRes, GetItemRes
 
 
 class TestKnowledgeGraphService:
@@ -31,11 +23,17 @@ class TestKnowledgeGraphService:
         assert client.service_names == ["kg.KGService"]
 
     @pytest.mark.int
-    def test_GetGraph(self):
-        case = get_cases_from_load_dataset(1)
+    def test_GetGraph_grpc(self):
         client = self.set_client()
         res = client.request("kg.KGService", "GetGraph",
-                             {"description": case.abstract.iloc[0]},
+                             {"description": "test"},
                              raw_output=True)
         assert isinstance(res.__class__, type(GetGraphRes))
-        assert res.items[0].external_id == case.external_id.iloc[0]
+
+    @pytest.mark.int
+    def test_GetItem_grpc(self):
+        client = self.set_client()
+        res = client.request("kg.KGService", "GetItem",
+                             {"id": "4e10c22261836cd0c415d2731465d43e"},
+                             raw_output=True)
+        assert isinstance(res.__class__, type(GetItemRes))

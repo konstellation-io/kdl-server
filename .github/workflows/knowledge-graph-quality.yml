@@ -29,7 +29,7 @@ jobs:
     - name: Run test
       working-directory: kg
       run: |
-        pytest --cov=src --cov-report xml tests/unit
+        pytest --cov=server --cov-report xml tests/server/unit
     - name: Archive code coverage results
       uses: actions/upload-artifact@v2
       with:

@@ -8,7 +8,8 @@ import torch
 import transformers
 from scipy import spatial
 
-import outputs
+from outputs import RecommendedList
+from topics import get_relevant_topics
 
 
 class Recommender:
@@ -101,7 +102,7 @@ class Recommender:
         """
         return 1 / (1 + math.exp(scale * (distance - 1 + shift)))
 
-    def get_top_items(self, raw_query_text: str, n_hits: int = 1000) -> outputs.RecommendedList:
+    def get_top_items(self, raw_query_text: str, n_hits: int = 1000) -> RecommendedList:
         """
         Gets top paper/repo matches for a given query text.
         """
@@ -111,9 +112,12 @@ class Recommender:
         distances = self._compute_cosine_distances(query_vec, self.vectors)
         df_subset = copy.copy(self.dataset)
         df_subset["distance"] = distances[0]
-        df_subset = df_subset.sort_values(by=["distance"], ascending=True).head(n_hits)
+        df_subset = df_subset.sort_values(by=["distance"], ascending=True, ignore_index=True).head(n_hits)
+
         df_subset["score"] = df_subset.distance.apply(self._compute_scores)
 
-        recommended_list = outputs.RecommendedList(list(df_subset.T.to_dict().values()))
+        recommended_list = RecommendedList(list(df_subset.T.to_dict().values()))
+        relevant_topics = get_relevant_topics(df_subset.topics)
+        recommended_list.add_topics(relevant_topics)
 
         return recommended_list

@@ -7,6 +7,7 @@ import transformers
 from transformers import PreTrainedModel, PreTrainedTokenizer
 
 from exceptions import AssetLoadingException
+from topics import convert_type_topics
 
 
 class AssetLoader:
@@ -18,10 +19,13 @@ class AssetLoader:
     def __init__(self, path: str):
         self.log = logging.getLogger("AssetLoader")
         self.path = path
-        self.dataset = self._load_dataset()
-        self.model = self._load_model()
+
+        self.dataset = self._merge_dataset_topics()
         self.vectors = self._load_dataset_vectors()
+
+        self.model = self._load_model()
         self.tokenizer = self._load_tokenizer()
+
         self._asset_checks()
 
     def _asset_checks(self):
@@ -55,6 +59,26 @@ class AssetLoader:
         self.log.debug(f"Loading vectors from: {path}")
 
         return np.load(str(path))
+
+    def _load_topics(self) -> pd.DataFrame:
+        """
+        Loads topic dataset from a file
+        """
+        path = Path(self.path, "topics.pkl.gz")
+        self.log.debug(f"Loading topics ds from: {path}")
+
+        return pd.read_pickle(path, compression="gzip")
+
+    def _merge_dataset_topics(self) -> pd.DataFrame:
+        """
+        Loads topic dataset from a file
+        """
+        topics = self._load_topics()
+        topics['topics'] = topics['topics'].apply(convert_type_topics)
+        dataset = self._load_dataset()
+
+        self.log.debug("Merging topics into the dataset")
+        return pd.merge(left=dataset, right=topics, left_on="id", right_on="id", how="left")
 
     def _load_model(self) -> PreTrainedModel:
         """

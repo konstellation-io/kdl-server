@@ -55,13 +55,17 @@ func TestInteractor_Get(t *testing.T) {
 	aux := "afsd"
 	authors := []string{"a", "b"}
 	kgItems := []entity.KnowledgeGraphItem{{
-		ID:          "1234",
-		Category:    entity.KnowledgeGraphItemCatPaper,
-		Title:       "title",
-		Abstract:    "abstract",
-		Authors:     authors,
-		Date:        "date",
-		URL:         "url",
+		ID:       "1234",
+		Category: entity.KnowledgeGraphItemCatPaper,
+		Title:    "title",
+		Abstract: "abstract",
+		Authors:  authors,
+		Date:     "date",
+		URL:      "url",
+		Topics: []entity.Topic{{
+			Name:      "test",
+			Relevance: 0.1,
+		}},
 		ExternalID:  &aux,
 		Frameworks:  []string{"tf"},
 		Score:       0,

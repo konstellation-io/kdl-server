@@ -6,7 +6,7 @@ import abc
 
 import grpc
 
-from .knowledge_graph_pb2 import *
+from proto.knowledge_graph_pb2 import *
 
 
 class KGServiceStub:
@@ -15,6 +15,10 @@ class KGServiceStub:
         request: global___GetGraphReq,
     ) -> global___GetGraphRes: ...
 
+    def GetItem(self,
+        request: global___GetItemReq,
+    ) -> global___GetItemRes: ...
+
 
 class KGServiceServicer(metaclass=abc.ABCMeta):
     @abc.abstractmethod
@@ -22,6 +26,12 @@ class KGServiceServicer(metaclass=abc.ABCMeta):
         request: global___GetGraphReq,
         context: grpc.ServicerContext,
     ) -> global___GetGraphRes: ...
+
+    @abc.abstractmethod
+    def GetItem(self,
+        request: global___GetItemReq,
+        context: grpc.ServicerContext,
+    ) -> global___GetItemRes: ...
 
 
 def add_KGServiceServicer_to_server(servicer: KGServiceServicer, server: grpc.Server) -> None: ...

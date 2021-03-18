@@ -1,0 +1,63 @@
+schema: '2.0'
+stages:
+  create-dataset:
+    cmd: python pipe/create_dataset.py
+    deps:
+    - path: inputs/arxiv-metadata-oai-snapshot.json
+      md5: 00b1b2d81516db5b87c4af81bc2d9f06
+      size: 2862793190
+    - path: inputs/links-between-papers-and-code.json
+      md5: 32c5d45c85a4d8aebb5269598c1208f4
+      size: 33866055
+    - path: inputs/papers-with-abstracts.json
+      md5: 553834169476a4ef4452f61f00bfbe81
+      size: 436693842
+    - path: pipe/create_dataset.py
+      md5: e307aeddc1f4fb95c642744bbfc7931a
+      size: 7953
+    outs:
+    - path: assets/dataset.pkl.gz
+      md5: fff7b0ccdb3a126b7507e86961934476
+      size: 228998543
+  compute-vectors:
+    cmd: python pipe/compute_vectors.py
+    deps:
+    - path: assets/dataset.pkl.gz
+      md5: fff7b0ccdb3a126b7507e86961934476
+      size: 228998543
+    - path: pipe/compute_vectors.py
+      md5: b5df23787fe55a26370aed1f6c8ff239
+      size: 5541
+    outs:
+    - path: assets/vectors.npy
+      md5: ddfccedb23ba5d02a9bcc006ffdeff9e
+      size: 3128088704
+  check-inputs:
+    cmd: python pipe/check_inputs.py
+    deps:
+    - path: inputs/arxiv-metadata-oai-snapshot.json
+      md5: 00b1b2d81516db5b87c4af81bc2d9f06
+      size: 2862793190
+    - path: inputs/links-between-papers-and-code.json
+      md5: 32c5d45c85a4d8aebb5269598c1208f4
+      size: 33866055
+    - path: inputs/papers-with-abstracts.json
+      md5: 553834169476a4ef4452f61f00bfbe81
+      size: 436693842
+    - path: pipe/check_inputs.py
+      md5: a636c77345c15d355f79c44671eca49d
+      size: 3094
+  compute-topics:
+    cmd: python pipe/compute_topics.py
+    deps:
+    - path: assets/dataset.pkl.gz
+      md5: fff7b0ccdb3a126b7507e86961934476
+      size: 228998543
+    - path: inputs/topics_model
+      md5: 6fdd56fa496047913eee00bef84393c1.dir
+    - path: pipe/compute_topics.py
+      md5: a0ef2fab224ef4c2123ff3f9a03202a9
+    outs:
+    - path: assets/topics.pkl.gz
+      md5: 332b77cceb5af824dbe517a70d6dab2a
+      size: 11214530

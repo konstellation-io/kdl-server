@@ -1,0 +1,4 @@
+outs:
+- md5: 00b1b2d81516db5b87c4af81bc2d9f06
+  size: 2862793190
+  path: arxiv-metadata-oai-snapshot.json

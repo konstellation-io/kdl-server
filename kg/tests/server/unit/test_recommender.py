@@ -54,6 +54,7 @@ class TestRecommender:
                    "authors",
                    "distance",
                    "date",
+                   "topics",
                    "url",
                    "externalId",
                    "framework"]
@@ -65,6 +66,7 @@ class TestRecommender:
                  "test author",
                  0.5,
                  "2020-01-05",
+                 [outputs.Topic("name", 0.1)],
                  "http://test",
                  "",
                  ""]]

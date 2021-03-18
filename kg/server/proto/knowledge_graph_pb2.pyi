@@ -24,6 +24,18 @@ class GetGraphReq(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal[u"description",b"description"]) -> None: ...
 global___GetGraphReq = GetGraphReq
 
+class GetItemReq(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    ID_FIELD_NUMBER: builtins.int
+    id: typing.Text = ...
+
+    def __init__(self,
+        *,
+        id : typing.Text = ...,
+        ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"id",b"id"]) -> None: ...
+global___GetItemReq = GetItemReq
+
 class GraphItem(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
     ID_FIELD_NUMBER: builtins.int
@@ -35,6 +47,7 @@ class GraphItem(google.protobuf.message.Message):
     DATE_FIELD_NUMBER: builtins.int
     URL_FIELD_NUMBER: builtins.int
     EXTERNAL_ID_FIELD_NUMBER: builtins.int
+    TOPICS_FIELD_NUMBER: builtins.int
     REPO_URLS_FIELD_NUMBER: builtins.int
     FRAMEWORKS_FIELD_NUMBER: builtins.int
     id: typing.Text = ...
@@ -49,6 +62,9 @@ class GraphItem(google.protobuf.message.Message):
     repo_urls: google.protobuf.internal.containers.RepeatedScalarFieldContainer[typing.Text] = ...
     frameworks: google.protobuf.internal.containers.RepeatedScalarFieldContainer[typing.Text] = ...
 
+    @property
+    def topics(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___Topic]: ...
+
     def __init__(self,
         *,
         id : typing.Text = ...,
@@ -60,22 +76,58 @@ class GraphItem(google.protobuf.message.Message):
         date : typing.Text = ...,
         url : typing.Text = ...,
         external_id : typing.Text = ...,
+        topics : typing.Optional[typing.Iterable[global___Topic]] = ...,
         repo_urls : typing.Optional[typing.Iterable[typing.Text]] = ...,
         frameworks : typing.Optional[typing.Iterable[typing.Text]] = ...,
         ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"abstract",b"abstract",u"authors",b"authors",u"category",b"category",u"date",b"date",u"external_id",b"external_id",u"frameworks",b"frameworks",u"id",b"id",u"repo_urls",b"repo_urls",u"score",b"score",u"title",b"title",u"url",b"url"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"abstract",b"abstract",u"authors",b"authors",u"category",b"category",u"date",b"date",u"external_id",b"external_id",u"frameworks",b"frameworks",u"id",b"id",u"repo_urls",b"repo_urls",u"score",b"score",u"title",b"title",u"topics",b"topics",u"url",b"url"]) -> None: ...
 global___GraphItem = GraphItem
+
+class Topic(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    NAME_FIELD_NUMBER: builtins.int
+    RELEVANCE_FIELD_NUMBER: builtins.int
+    name: typing.Text = ...
+    relevance: builtins.float = ...
+
+    def __init__(self,
+        *,
+        name : typing.Text = ...,
+        relevance : builtins.float = ...,
+        ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"name",b"name",u"relevance",b"relevance"]) -> None: ...
+global___Topic = Topic
 
 class GetGraphRes(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
     ITEMS_FIELD_NUMBER: builtins.int
+    TOPICS_FIELD_NUMBER: builtins.int
 
     @property
     def items(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___GraphItem]: ...
 
+    @property
+    def topics(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___Topic]: ...
+
     def __init__(self,
         *,
         items : typing.Optional[typing.Iterable[global___GraphItem]] = ...,
+        topics : typing.Optional[typing.Iterable[global___Topic]] = ...,
         ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"items",b"items"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"items",b"items",u"topics",b"topics"]) -> None: ...
 global___GetGraphRes = GetGraphRes
+
+class GetItemRes(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    ITEM_FIELD_NUMBER: builtins.int
+
+    @property
+    def item(self) -> global___GraphItem: ...
+
+    def __init__(self,
+        *,
+        item : typing.Optional[global___GraphItem] = ...,
+        ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"item",b"item"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"item",b"item"]) -> None: ...
+global___GetItemRes = GetItemRes

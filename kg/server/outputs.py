@@ -5,23 +5,55 @@ import proto.knowledge_graph_pb2 as kg_pb
 from exceptions import MissingFieldException
 
 
+@dataclass(order=False)
+class Topic:
+    """
+    Topics dataclass that has a name and a relevancy score
+    """
+    name: str
+    relevance: float
+
+    # Order methods
+    def __eq__(self, other):
+        return self.relevance == other.relevance
+
+    def __gt__(self, other):
+        return self.relevance > other.relevance
+
+    def __lt__(self, other):
+        return self.relevance < other.relevance
+
+    def __ge__(self, other):
+        return self.relevance >= other.relevance
+
+    def __le__(self, other):
+        return self.relevance <= other.relevance
+
+    def to_grpc(self):
+        item = kg_pb.Topic()
+        item.name = self.name
+        item.relevance = self.relevance
+
+        return item
+
+
 @dataclass(init=False, order=False)
 class RecommendedItem:
     """
     Recommended Item class can be of the type paper or repository.
     """
-
     id: str
     category: str
     title: str
     abstract: str
     authors: str
-    score: str
+    score: float
     date: str
     url: str
+    topics: list[Topic]
 
     # Optional fields
-    external_id: str = ""  # Keeping camelCase for consistency.
+    external_id: str = ""
     frameworks: Optional[list[str]] = None
     repo_urls: Optional[list[str]] = None
 
@@ -31,7 +63,7 @@ class RecommendedItem:
 
         # Checks that all required fields are present
         if not set(self.mandatory_fields).issubset(field_dict.keys()):
-            missing_fields = set(field_dict).difference(self.mandatory_fields)
+            missing_fields = set(self.mandatory_fields).difference(set(field_dict.keys()))
             raise MissingFieldException(f"Missing mandatory fields: {missing_fields}")
 
         for key, value in field_dict.items():
@@ -56,18 +88,20 @@ class RecommendedItem:
         Outputs RecommenderItem in a GraphItem type.
         """
         item = kg_pb.GraphItem()
-        for field in self.fields:
-            if field == "authors":
-                item.authors.extend(self.authors)
-                continue
-            elif field == "repo_urls":
-                item.repo_urls.extend(self.repo_urls)
-                continue
-            elif field == "frameworks":
-                item.frameworks.extend(self.frameworks)
-                continue
+        item.id = self.id
+        item.category = self.category
+        item.title = self.title
+        item.abstract = self.abstract
+        item.authors.extend(self.authors)
+        item.score = self.score
+        item.date = self.date
+        item.url = self.url
+        topics = [topic.to_grpc() for topic in self.topics]
+        item.topics.extend(topics)
 
-            setattr(item, field, getattr(self, field))
+        item.external_id = self.external_id
+        item.frameworks.extend(self.frameworks)
+        item.repo_urls.extend(self.repo_urls)
 
         return item
 
@@ -95,6 +129,7 @@ class RecommendedList:
     """
 
     items: list[RecommendedItem]
+    topics: list[Topic]
 
     def __init__(self, entry: list[dict]):
         item_list = list()
@@ -104,11 +139,15 @@ class RecommendedList:
         self.items = item_list
         self.items.sort(reverse=True)
 
+    def add_topics(self, topics: list[Topic]):
+        self.topics = topics
+
     def to_grpc(self) -> kg_pb.GetGraphRes:
         """
         Outputs a RecommendedList in GetGraphRes type.
         """
         res = kg_pb.GetGraphRes()
         res.items.extend([item.to_grpc() for item in self.items])
+        res.topics.extend([topic.to_grpc() for topic in self.topics])
 
         return res

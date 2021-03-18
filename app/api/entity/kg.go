@@ -20,8 +20,14 @@ func (e KnowledgeGraphItemCat) String() string {
 	return string(e)
 }
 
+type Topic struct {
+	Name      string
+	Relevance float64
+}
+
 type KnowledgeGraph struct {
-	Items []KnowledgeGraphItem `json:"items"`
+	Items  []KnowledgeGraphItem `json:"items"`
+	Topics []Topic
 }
 
 type KnowledgeGraphItem struct {
@@ -35,7 +41,7 @@ type KnowledgeGraphItem struct {
 	ExternalID  *string
 	RepoURLs    []string
 	Frameworks  []string
+	Topics      []Topic
 	Score       float64
 	IsStarred   bool
-	IsDiscarded bool
 }

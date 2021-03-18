@@ -24,7 +24,7 @@ function ResourceDetails({
   return (
     <div className={styles.container}>
       <div className={styles.title}>
-        <div className={styles.titleText}>Detail</div>
+        <div className={styles.titleText}>Resource Details</div>
         <div className={styles.actions}>
           <div className={styles.starredText}>{starred ? 'Starred' : ''}</div>
           <Button
@@ -37,7 +37,11 @@ function ResourceDetails({
       </div>
       {resource !== null && (
         <>
-          <div className={styles.resourceTitleAndTopics}>
+          <div
+            className={cx(styles.resourceTitleAndTopics, {
+              [styles.starred]: starred,
+            })}
+          >
             <div className={styles.nameAndTopics}>
               <div className={styles.name}>{resource.title}</div>
             </div>

@@ -97,6 +97,7 @@ func TestInteractor_CreateInternal(t *testing.T) {
 	createProject.Repository = entity.Repository{
 		Type:             entity.RepositoryTypeInternal,
 		InternalRepoName: internalRepoName,
+		RepoName:         internalRepoName,
 	}
 
 	expectedProject := entity.Project{
@@ -164,6 +165,7 @@ func TestInteractor_CreateExternal(t *testing.T) {
 	createProject.Repository = entity.Repository{
 		Type:            entity.RepositoryTypeExternal,
 		ExternalRepoURL: externalRepoURL,
+		RepoName:        repoName,
 	}
 
 	expectedProject := entity.Project{
@@ -174,6 +176,7 @@ func TestInteractor_CreateExternal(t *testing.T) {
 		Repository: entity.Repository{
 			Type:            entity.RepositoryTypeExternal,
 			ExternalRepoURL: externalRepoURL,
+			RepoName:        repoName,
 		},
 	}
 

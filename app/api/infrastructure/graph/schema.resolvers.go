@@ -16,6 +16,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/dataloader"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
@@ -197,12 +198,29 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 	userName := ctx.Value(middleware.LoggedUserNameKey).(string)
 	slugUserName := slug.Make(userName)
 
+	folderName := obj.Repository.RepoName
+
+	giteaWithFolder, err := kdlutil.JoinToURL(r.cfg.Gitea.URL, "kdl", folderName)
+	if err != nil {
+		return &entity.ToolUrls{}, err
+	}
+
+	droneWithFolder, err := kdlutil.JoinToURL(r.cfg.Drone.URL, "kdl", folderName)
+	if err != nil {
+		return &entity.ToolUrls{}, err
+	}
+
+	jupyterWithUsername := strings.Replace(r.cfg.Jupyter.URL, "USERNAME", slugUserName, 1)
+	jupyterWithUsernameAndFolder := strings.Replace(jupyterWithUsername, "REPO_FOLDER", folderName, 2)
+	vscodeWithUsername := strings.Replace(r.cfg.VSCode.URL, "USERNAME", slugUserName, 1)
+	vscodeWithUsernameAndFolder := strings.Replace(vscodeWithUsername, "REPO_FOLDER", folderName, 1)
+
 	return &entity.ToolUrls{
-		Gitea:   r.cfg.Gitea.URL,
+		Gitea:   giteaWithFolder,
 		Minio:   r.cfg.Minio.URL,
-		Jupyter: strings.Replace(r.cfg.Jupyter.URL, "USERNAME", slugUserName, 1),
-		VSCode:  strings.Replace(r.cfg.VSCode.URL, "USERNAME", slugUserName, 1),
-		Drone:   r.cfg.Drone.URL,
+		Jupyter: jupyterWithUsernameAndFolder,
+		VSCode:  vscodeWithUsernameAndFolder,
+		Drone:   droneWithFolder,
 		MLFlow:  r.cfg.MLFlow.URL,
 	}, nil
 }

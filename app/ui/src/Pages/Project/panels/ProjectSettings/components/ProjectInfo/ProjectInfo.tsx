@@ -18,13 +18,15 @@ function ProjectInfo({ project }: Props) {
         <IconCloud className="icon-big" />
       </div>
       <div>
-        <div className={styles.time}>
-          <IconTime className="icon-small" />
-          <p>{`ACTIVE FROM: ${formatDate(
-            new Date(project.lastActivationDate),
-            true
-          )}`}</p>
-        </div>
+        {project.lastActivationDate && (
+          <div className={styles.time}>
+            <IconTime className="icon-small" />
+            <p>{`ACTIVE FROM: ${formatDate(
+              new Date(project.lastActivationDate),
+              true
+            )}`}</p>
+          </div>
+        )}
         <div
           className={cx(styles.connection, {
             [styles.connected]: !repoError,

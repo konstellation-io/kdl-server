@@ -21,8 +21,8 @@ export let textAnchor: string = '';
 const COLORS = {
   DEFAULT: 'rgba(12, 52, 72, 1)',
   DEFAULT_HIGHLIGHT: '#33FFFF',
-  STARRED: '#8c672d',
-  STARRED_HIGHLIGHT: '#ffbb52',
+  STARRED: '#be8d41',
+  STARRED_HIGHLIGHT: '#FFBB52',
 };
 
 export default class Resources {

@@ -4,7 +4,7 @@ import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import useWorkspace, { CONFIG } from 'Hooks/useWorkspace';
 
 import IconCollapse from '@material-ui/icons/KeyboardBackspace';
-import IconKGViewer from '@material-ui/icons/OpenInBrowser';
+import IconKGViewer from 'Components/Icons/AutoStories';
 import IconSettings from '@material-ui/icons/Settings';
 import NavElements from './components/NavElements/NavElements';
 import NavigationButton from './components/NavigationButton/NavigationButton';

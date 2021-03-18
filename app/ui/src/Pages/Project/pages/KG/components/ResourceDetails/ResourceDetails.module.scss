@@ -19,17 +19,19 @@
   justify-content: space-between;
   align-items: center;
 
+  border-bottom: solid 1px palette(base, 200);
+
   .actions {
     display: flex;
     align-items: center;
 
     .starred {
-      color: palette(alert);
+      color: palette(starred);
     }
 
     .starredText {
       @include font-body;
-      color: palette(alert);
+      color: palette(starred);
 
       margin-right: 2 * $grid-unit;
     }
@@ -46,12 +48,17 @@
   justify-content: space-between;
   align-items: center;
   padding: 2 * $grid-unit;
+  border-left: solid $grid-unit transparent;
 
   .nameAndTopics {
     .name {
       @include font-title;
       color: font-color(light);
     }
+  }
+
+  &.starred {
+    border-left: solid $grid-unit palette(starred);
   }
 }
 .content {

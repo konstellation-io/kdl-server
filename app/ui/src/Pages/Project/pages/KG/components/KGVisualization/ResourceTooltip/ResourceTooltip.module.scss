@@ -14,10 +14,10 @@
   justify-content: space-between;
 
   &.opened {
-    border: solid 1px palette(highlight, 900);
+    border-bottom: solid 2px palette(highlight, 900);
 
     &.starred {
-      border-color: palette(starred, 800);
+      border-bottom-color: palette(starred, 800);
     }
   }
 }

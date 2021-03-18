@@ -51,11 +51,13 @@ const Panel: FC<Props> = ({
       <>
         {show && (
           <div className={cx(styles.container, styles[size], styles[theme])}>
-            <header>
-              <div className={styles.separator} />
-              <p className={styles.title}>{title}</p>
-              <Button label="" Icon={IconClose} onClick={close} />
-            </header>
+            {title !== '' && (
+              <header>
+                <div className={styles.separator} />
+                <p className={styles.title}>{title}</p>
+                <Button label="" Icon={IconClose} onClick={close} />
+              </header>
+            )}
             <div className={styles.content}>{children}</div>
           </div>
         )}

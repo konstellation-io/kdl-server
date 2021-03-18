@@ -34,7 +34,7 @@ function KGResults() {
 
   const { openPanel } = usePanel(PanelType.SECONDARY, {
     id: PANEL_ID.KG_RESULT_DETAILS,
-    title: 'Resource details',
+    title: '',
     size: PANEL_SIZE.BIG,
     theme: PANEL_THEME.DARK,
   });
@@ -47,7 +47,12 @@ function KGResults() {
     [updateResourceDetails, openPanel]
   );
 
-  if (loading || !data) return <SpinnerCircular />;
+  if (loading || !data)
+    return (
+      <div className={styles.container}>
+        <SpinnerCircular />
+      </div>
+    );
   if (error) return <ErrorMessage />;
 
   const resources = data.knowledgeGraph.items.map((d, idx: number) => ({

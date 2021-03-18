@@ -1,8 +1,10 @@
 import React, { FC } from 'react';
 
 import { D } from '../../../KGVisualization/KGVisualization';
+import IconTime from '@material-ui/icons/AccessTime';
 import Score from '../../../KGVisualization/Score';
 import cx from 'classnames';
+import { formatDate } from 'Utils/format';
 import styles from './KGItem.module.scss';
 
 type Props = {
@@ -19,7 +21,7 @@ const KGItem: FC<Props> = ({
   onEnter,
   idToFullResource,
 }: Props) => {
-  const topics = idToFullResource[resource.id].topics;
+  const fullResource = idToFullResource[resource.id];
 
   return (
     <div
@@ -31,12 +33,19 @@ const KGItem: FC<Props> = ({
     >
       <div className={styles.typeAndScore}>
         <div className={styles.rTypeWrapper}>
-          <span className={styles.rType}>{resource.type}</span>
-          {topics.length !== 0 && (
+          <div className={styles.timeField}>
+            <IconTime className="icon-regular" />
+            <span className={styles.rType}>
+              {formatDate(fullResource.date)}
+            </span>
+          </div>
+          {fullResource.topics.length !== 0 && (
             <div className={styles.topics}>
               <span className={styles.topic}>{resource.category}</span>
-              {topics.length > 1 && (
-                <span className={styles.topic}>+ {topics.length - 1}</span>
+              {fullResource.topics.length > 1 && (
+                <span className={styles.topic}>
+                  + {fullResource.topics.length - 1}
+                </span>
               )}
             </div>
           )}
@@ -44,7 +53,7 @@ const KGItem: FC<Props> = ({
         <Score value={resource.score} />
       </div>
       <div className={styles.rTitle}>{resource.name}</div>
-      <div className={styles.rCategory}>Category: {resource.category}</div>
+      <div className={styles.rCategory}>{resource.type}</div>
     </div>
   );
 };

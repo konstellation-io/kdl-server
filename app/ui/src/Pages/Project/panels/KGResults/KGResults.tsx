@@ -72,6 +72,9 @@ function KGResults() {
         abstract: d.abstract,
         topics: d.topics,
         score: d.score,
+        date: d.date,
+        authors: d.authors,
+        url: d.url,
       },
     ])
   );

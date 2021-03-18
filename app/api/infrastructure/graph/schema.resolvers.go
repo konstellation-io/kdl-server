@@ -239,7 +239,17 @@ func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
 }
 
 func (r *queryResolver) SSHKey(ctx context.Context) (*entity.SSHKey, error) {
-	return nil, entity.ErrNotImplemented
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entity.SSHKey{
+		Public:       loggedUser.SSHKey.Public,
+		Private:      loggedUser.SSHKey.Private,
+		CreationDate: loggedUser.SSHKey.CreationDate,
+		LastActivity: loggedUser.SSHKey.LastActivity,
+	}, nil
 }
 
 func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
@@ -284,11 +294,17 @@ func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (s
 }
 
 func (r *sSHKeyResolver) CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error) {
-	return "", entity.ErrNotImplemented
+	return obj.CreationDate.Format(time.RFC3339), nil
 }
 
 func (r *sSHKeyResolver) LastActivity(ctx context.Context, obj *entity.SSHKey) (*string, error) {
-	return nil, entity.ErrNotImplemented
+	if obj.LastActivity == nil {
+		return nil, nil
+	}
+
+	lastActivity := obj.LastActivity.Format(time.RFC3339)
+
+	return &lastActivity, nil
 }
 
 func (r *userResolver) CreationDate(ctx context.Context, obj *entity.User) (string, error) {

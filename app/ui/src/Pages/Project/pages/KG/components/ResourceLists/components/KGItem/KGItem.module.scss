@@ -27,12 +27,20 @@
     .rTypeWrapper {
       display: flex;
       align-items: center;
-    }
-  }
 
-  .rType {
-    @include font-caption;
-    color: font-color(regular);
+      .timeField {
+        display: flex;
+        align-items: center;
+        color: font-color(lowlight);
+
+        .rType {
+          @include font-caption;
+          color: font-color(regular);
+
+          margin: 0 $grid-unit;
+        }
+      }
+    }
   }
 
   .rTitle {

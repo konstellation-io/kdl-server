@@ -78,7 +78,10 @@ function KG({ openedProject }: ProjectRoute) {
             title: r.title,
             abstract: r.abstract,
             topics: r.topics,
+            date: r.date,
+            authors: r.authors,
             score: r.score,
+            url: r.url,
           },
         ])
       );

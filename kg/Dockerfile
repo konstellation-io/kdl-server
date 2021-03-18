@@ -3,6 +3,9 @@ FROM python:3.9-slim
 # Create kdl user.
 ENV USER=kdl
 ENV UID=10001
+ENV ASSET_COMMIT="558ea7724d7ac7c4787856535372503e7c4bbf73"
+ENV REPO_URL="https://github.com/konstellation-io/kdl-server"
+
 RUN adduser \
     --disabled-password \
     --gecos "" \
@@ -23,7 +26,10 @@ RUN python3 -m pip install pipenv && \
 
 COPY server server
 
-RUN dvc get https://github.com/konstellation-io/kdl-server --rev b8ce1287463951d290158dc7c7e23b580e807d88 kg/assets
+RUN dvc get $REPO_URL --rev $ASSET_COMMIT kg/assets/vectors.npy && \
+    dvc get $REPO_URL --rev $ASSET_COMMIT kg/assets/model && \
+    dvc get $REPO_URL --rev $ASSET_COMMIT kg/assets/topics.pkl.gz && \
+    dvc get $REPO_URL --rev $ASSET_COMMIT kg/assets/dataset.pkl.gz
 
 RUN chown -R kdl:0 /kg \
     && chmod -R g+w /kg \

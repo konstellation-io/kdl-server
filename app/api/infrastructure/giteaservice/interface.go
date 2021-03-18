@@ -8,6 +8,8 @@ import "github.com/konstellation-io/kdl-server/app/api/entity"
 type GiteaClient interface {
 	CreateUser(email, username, password string) error
 	AddSSHKey(username, publicSSHKey string) error
+	UpdateSSHKey(username string, publicSSHKey string) error
+	UserSSHKeyExists(username string) (bool, error)
 	CreateRepo(name string, ownerUsername string) error
 	AddCollaborator(repoName, username string, accessLevel entity.AccessLevel) error
 	RemoveCollaborator(repoName, username string) error

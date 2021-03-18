@@ -202,3 +202,80 @@ func (i *interactor) FindByIDs(ctx context.Context, userIDs []string) ([]entity.
 func (i *interactor) GetByID(ctx context.Context, userID string) (entity.User, error) {
 	return i.repo.Get(ctx, userID)
 }
+
+// RegenerateSSHKeys generate new SSH key pair for the given user.
+// - Check if user exists, or return ErrUserNotFound error
+// - Generate a new ssh key pair
+// - Check if k8s secret exists. If yes, update it. Else, create it.
+// - Check if one ssh key exist for user in gitea. If more than one, returns error.
+//   If one, delete it and  create a new one. If not exist, create a new one.
+// - Update ssh keys for user in database.
+func (i *interactor) RegenerateSSHKeys(ctx context.Context, username string) (entity.User, error) {
+	i.logger.Infof("Regenerating user SSH keys for user \"%s\" ", username)
+
+	// Check if the user exists
+	user, err := i.repo.GetByUsername(ctx, username)
+	if err != nil {
+		return entity.User{}, entity.ErrUserNotFound
+	}
+
+	// Create new SSH public and private keys
+	keys, err := i.sshGenerator.NewKeys()
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	// Check if k8s secret exists. If exists, update it. Otherwise, create it.
+	secretName := fmt.Sprintf("%s-ssh-keys", user.UsernameSlug())
+
+	exists, err := i.k8sClient.IsSecretPresent(secretName)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	k8sKeys := map[string]string{
+		"KDL_USER_PUBLIC_SSH_KEY":  keys.Public,
+		"KDL_USER_PRIVATE_SSH_KEY": keys.Private,
+	}
+
+	if exists {
+		err = i.k8sClient.UpdateSecret(secretName, k8sKeys)
+	} else {
+		err = i.k8sClient.CreateSecret(secretName, k8sKeys)
+	}
+
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	// Check if user ssh key exists in gitea. If exists, update it. Otherwise, create it
+	exists, err = i.giteaService.UserSSHKeyExists(username)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	if exists {
+		err = i.giteaService.UpdateSSHKey(username, keys.Public)
+	} else {
+		err = i.giteaService.AddSSHKey(username, keys.Public)
+	}
+
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	// Update the user ssh keys in the DB.
+	user = entity.User{
+		Username: username,
+		SSHKey:   keys,
+	}
+
+	err = i.repo.UpdateSSHKey(ctx, username, keys)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	i.logger.Infof("The SSH keys for user \"%s\" has been successfully regenerated", user.Username)
+
+	return i.repo.GetByUsername(ctx, username)
+}

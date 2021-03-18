@@ -1,6 +1,8 @@
 package giteaservice
 
 import (
+	"errors"
+
 	"code.gitea.io/sdk/gitea"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 
@@ -12,6 +14,10 @@ const (
 	// https://github.com/konstellation-io/science-toolkit/blob/master/helm/science-toolkit/templates/gitea/init-configmap.yaml
 	kdlOrganization = "kdl"
 	kdlSSHKeyName   = "kdl-ssh-key"
+)
+
+var (
+	errMultipleSSHKeys = errors.New("user has more than one ssh key")
 )
 
 type giteaService struct {
@@ -63,6 +69,40 @@ func (g *giteaService) AddSSHKey(username, publicSSHKey string) error {
 	g.logger.Infof("Created public SSH key for user \"%s\" in Gitea with id \"%d\"", username, key.ID)
 
 	return nil
+}
+
+func (g *giteaService) UpdateSSHKey(username, publicSSHKey string) error {
+	keyID, err := g.getUserSSHKeyID(username)
+	if err != nil {
+		return err
+	}
+
+	_, err = g.client.AdminDeleteUserPublicKey(username, keyID)
+
+	if err != nil {
+		return err
+	}
+
+	g.logger.Infof("Deleted public SSH key for user \"%s\" in Gitea with id \"%v\"", username, keyID)
+
+	return g.AddSSHKey(username, publicSSHKey)
+}
+
+func (g *giteaService) UserSSHKeyExists(username string) (bool, error) {
+	keys, _, err := g.client.ListPublicKeys(username, gitea.ListPublicKeysOptions{})
+	if err != nil {
+		return false, err
+	}
+
+	if len(keys) > 1 {
+		return false, errMultipleSSHKeys
+	}
+
+	if len(keys) == 0 {
+		return false, nil
+	}
+
+	return true, nil
 }
 
 // CreateRepo creates a repository in the KDL organization.
@@ -147,4 +187,13 @@ func (g *giteaService) UpdateCollaboratorPermissions(repoName, username string, 
 	}
 
 	return g.AddCollaborator(repoName, username, newAccessLevel)
+}
+
+func (g *giteaService) getUserSSHKeyID(username string) (int, error) {
+	keys, _, err := g.client.ListPublicKeys(username, gitea.ListPublicKeysOptions{})
+	if err != nil {
+		return 0, err
+	}
+
+	return int(keys[0].ID), nil
 }

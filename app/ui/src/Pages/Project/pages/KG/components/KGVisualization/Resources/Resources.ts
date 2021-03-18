@@ -70,7 +70,7 @@ export default class Resources {
     this.sectionScale = sectionScale;
   }
 
-  drawCircles = (hover?: string | undefined) => {
+  drawCircles = (hover?: string | undefined, skipLink?: boolean) => {
     const {
       clearCanvas,
       context,
@@ -151,7 +151,7 @@ export default class Resources {
       context.shadowBlur = 0;
     });
 
-    if (hoveredElement !== null && !selectedElement) {
+    if (hoveredElement !== null && !selectedElement && !skipLink) {
       context.beginPath();
       context.moveTo(
         x + (hoveredElement as DComplete).x,
@@ -280,7 +280,7 @@ export default class Resources {
     this.drawCircles();
   };
 
-  highlightResource = (resourceName: string | null) => {
-    this.drawCircles(resourceName || '');
+  highlightResource = (resourceName: string | null, skipLink?: boolean) => {
+    this.drawCircles(resourceName || '', skipLink);
   };
 }

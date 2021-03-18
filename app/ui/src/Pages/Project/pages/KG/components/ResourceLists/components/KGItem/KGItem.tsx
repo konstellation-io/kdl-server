@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import { D } from '../../../KGVisualization/KGVisualization';
+import IconStar from '@material-ui/icons/Star';
 import IconTime from '@material-ui/icons/AccessTime';
 import Score from '../../../KGVisualization/Score';
 import cx from 'classnames';
@@ -52,7 +53,14 @@ const KGItem: FC<Props> = ({
         </div>
         <Score value={resource.score} />
       </div>
-      <div className={styles.rTitle}>{resource.name}</div>
+      <div className={styles.rTitle}>
+        {resource.starred && (
+          <div className={styles.starIcon}>
+            <IconStar className="icon-small" />
+          </div>
+        )}
+        {resource.name}
+      </div>
       <div className={styles.rCategory}>{resource.type}</div>
     </div>
   );

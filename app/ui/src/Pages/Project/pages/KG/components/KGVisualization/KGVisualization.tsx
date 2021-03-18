@@ -140,6 +140,7 @@ function KGVisualization({
     setOpenedPaper(resource);
     centerContainer(left);
     resourcesViz.lockHighlight = resource.name;
+    resourcesViz.highlightResource(resource.name, true);
     setHoveredPaper(null);
   }
   function closeResourceDetails() {

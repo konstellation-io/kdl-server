@@ -11,11 +11,14 @@
   border-left: solid 4px transparent;
   animation: border-left-color ease 0.4s;
 
+  transition: background-color ease 0.3s;
+
   &:hover {
     border-left-color: palette(highlight);
+    background-color: palette(base, 900);
   }
 
-  &.starred:hover {
+  &.starred {
     border-left-color: palette(starred);
   }
 
@@ -46,7 +49,14 @@
   .rTitle {
     @include font-body;
     color: font-color(light);
+
+    display: flex;
     margin-top: $grid-unit;
+
+    .starIcon {
+      margin-right: $grid-unit;
+      color: palette(starred);
+    }
   }
 
   .rCategory {

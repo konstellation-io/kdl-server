@@ -57,10 +57,11 @@ function ResourceDetails({
               </div>
             </div>
             <div className={styles.type}>{'Paper'}</div>
-            <div className={styles.url}>
-              <a href={resource.url} target="_blank">
-                {resource.url}
-              </a>
+            <div
+              className={styles.url}
+              onClick={() => window.open(resource.url)}
+            >
+              {resource.url}
             </div>
             <div className={styles.topicsG}>
               {resource.topics.length > 0 && (

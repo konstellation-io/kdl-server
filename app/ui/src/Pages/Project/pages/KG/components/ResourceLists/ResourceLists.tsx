@@ -35,7 +35,7 @@ function ResourceLists({
   }, [top25, listFilterText]);
 
   function onEnter(name: string) {
-    resourcesViz?.highlightResource(name);
+    resourcesViz?.highlightResource(name, true);
   }
 
   function onLeave() {

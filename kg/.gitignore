@@ -16,5 +16,4 @@ __pycache__/
 # Enviroment file
 .env
 
-# Assest directory
-/assets
+

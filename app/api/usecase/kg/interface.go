@@ -11,4 +11,5 @@ import (
 // Knowledge Graph interface to retrieve items.
 type UseCase interface {
 	Get(ctx context.Context, description string) (entity.KnowledgeGraph, error)
+	GetItem(ctx context.Context, id string) (entity.KnowledgeGraphItem, error)
 }

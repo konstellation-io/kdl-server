@@ -33,7 +33,7 @@ export const mainRoutesConfig: RouteConfiguration[] = [
     route: ROUTE.PROJECT_OVERVIEW,
   },
   {
-    id: 'knowledge-graph',
+    id: 'knowledge-galaxy',
     label: 'Knowledge Galaxy',
     Icon: IconKG,
     route: ROUTE.PROJECT_KG,

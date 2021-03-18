@@ -17,7 +17,7 @@
     border: solid 1px palette(highlight, 900);
 
     &.starred {
-      border-color: palette(alert, 800);
+      border-color: palette(starred, 800);
     }
   }
 }
@@ -53,10 +53,10 @@
   }
 
   &.starred {
-    background-color: palette(alert);
-    box-shadow: 0 0 6px 1px palette(alert);
+    background-color: palette(starred);
+    box-shadow: 0 0 6px 1px palette(starred);
     &::before {
-      border: solid 1px palette(alert);
+      border: solid 1px palette(starred);
     }
   }
 }

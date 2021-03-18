@@ -72,8 +72,8 @@ function UpdateProjectDescription({ project, close }: Props) {
       <div className={styles.container}>
         <div className={styles.descriptionLabel}>
           Write a detailed description for your project. This description is
-          used by the Knowledge Graph to generate the recommendations. The more
-          detailed the description is, the better the descriptions are.
+          used by the Knowledge Galaxy to generate the recommendations. The more
+          detailed the description is, the better the recommendations are.
         </div>
       </div>
       <div className={styles.formInput}>

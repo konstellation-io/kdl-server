@@ -30,7 +30,7 @@ type SectionProps = {
 };
 const Section: FC<SectionProps> = ({ title, children }) => (
   <div className={styles.section}>
-    <p className={styles.title}>{title}</p>
+    <h3 className={styles.title}>{title}</h3>
     {children}
   </div>
 );

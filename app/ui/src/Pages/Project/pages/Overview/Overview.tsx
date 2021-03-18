@@ -1,10 +1,76 @@
-import React from 'react';
-import styles from './Overview.module.scss';
+import { ErrorMessage, SpinnerCircular } from 'kwc';
+import {
+  GetQualityProjectDesc,
+  GetQualityProjectDescVariables,
+} from 'Graphql/queries/types/GetQualityProjectDesc';
+import RepositoryTypeComponent, {
+  LOCATION,
+  SIZE,
+} from 'Pages/NewProject/pages/Repository/components/RepositoryTypeComponent/RepositoryTypeComponent';
 
-function Overview() {
+import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
+import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
+import React from 'react';
+import { RepositoryType } from 'Graphql/types/globalTypes';
+import { loader } from 'graphql.macro';
+import styles from './Overview.module.scss';
+import { useQuery } from '@apollo/client';
+
+const GetQualityProjectDescQuery = loader(
+  'Graphql/queries/getQualityProjectDesc.graphql'
+);
+
+type Props = {
+  openedProject: GetProjects_projects;
+};
+function Overview({ openedProject }: Props) {
+  const { data, loading, error } = useQuery<
+    GetQualityProjectDesc,
+    GetQualityProjectDescVariables
+  >(GetQualityProjectDescQuery, {
+    variables: {
+      description: openedProject.description,
+    },
+  });
+
+  if (loading || !data) return <SpinnerCircular />;
+  if (error) return <ErrorMessage />;
+
   return (
     <div className={styles.container}>
       <h1>Overview</h1>
+      <div className={styles.projectData}>
+        <div className={styles.section}>
+          <div className={styles.sectionTitle}>PROJECT NAME</div>
+          <div className={styles.name}>{openedProject.name}</div>
+        </div>
+        <div className={styles.section}>
+          <div className={styles.sectionTitle}>ABSTRACT</div>
+          <div className={styles.description}>{openedProject.description}</div>
+        </div>
+        <div className={styles.section}>
+          <DescriptionScore score={data.qualityProjectDesc.quality || 0} />
+        </div>
+        <div className={styles.section}>
+          <div className={styles.repoType}>
+            <RepositoryTypeComponent
+              squareLocation={
+                openedProject.repository?.type === RepositoryType.EXTERNAL
+                  ? LOCATION.OUT
+                  : LOCATION.IN
+              }
+              size={SIZE.TINY}
+              shouldAnimate={false}
+            />
+            <p
+              className={styles.repoTypeName}
+            >{`${openedProject.repository?.type} REPOSITORY`}</p>
+          </div>
+          <div
+            className={styles.nMembers}
+          >{`${openedProject.members.length} members`}</div>
+        </div>
+      </div>
     </div>
   );
 }

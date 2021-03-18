@@ -49,7 +49,7 @@ function ProjectCreation() {
         };
       } else {
         const { externalRepository } = data.newProject;
-        inputRepository.external = externalRepository.values
+        inputRepository.external = externalRepository.values;
       }
 
       addNewProject({

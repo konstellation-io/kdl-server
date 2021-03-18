@@ -3,8 +3,20 @@ query GetKnowledgeGraph($description: String!) {
     items {
       id
       category
-      score
       title
+      abstract
+      authors
+      score
+      date
+      url
+      topics {
+        name
+        relevance
+      }
+    }
+    topics {
+      name
+      relevance
     }
   }
 }

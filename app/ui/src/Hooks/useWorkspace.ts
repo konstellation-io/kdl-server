@@ -11,7 +11,7 @@ function useWorkspace(
 ): [Workspace, (type: CONFIG, value: boolean) => void] {
   function getBool(field: CONFIG, defaultValue: boolean) {
     const value = localStorage.getItem(`${projectId}-${field}`);
-    return value === undefined ? defaultValue : value === 'true';
+    return !value ? defaultValue : value === 'true';
   }
 
   const navigationOpened = getBool(CONFIG.NAVIGATION_OPENED, true);

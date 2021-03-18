@@ -25,8 +25,15 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 $grid-unit * 3.5 0 $grid-unit * 4.5;
+    padding: 0 $grid-unit * 3.5 0 3 * $grid-unit;
     pointer-events: none;
+
+    .safeArea {
+      height: $grid-unit;
+      width: 24vw;
+      max-width: 335px;
+      max-width: 460px;
+    }
 
     > div {
       pointer-events: all;

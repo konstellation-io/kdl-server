@@ -26,7 +26,7 @@ export function getScoreLevel(score: number) {
 }
 
 export const scoreText = new Map([
-  [ScoreLevels.LOW, 'Description is incomplete for Knowledge Graph.'],
+  [ScoreLevels.LOW, 'Description is incomplete for Knowledge Galaxy.'],
   [ScoreLevels.MEDIUM, 'Please, write some more text in description.'],
   [ScoreLevels.HIGH, 'Your description is good enough to be indexed.'],
   [ScoreLevels.VERY_HIGH, 'Nice, your description is fully indexable.'],

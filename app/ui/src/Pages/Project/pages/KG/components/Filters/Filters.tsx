@@ -35,12 +35,12 @@ function Filters({ topics, filters, onFiltersChange }: Props) {
 
   return (
     <div className={styles.container}>
-      <ScoreFilter max={MAX_SCORE} />
-      <TopicFilter topics={filterableTopics} onUpdate={handleTopicsUpdate} />
       <ShowOthersFilter
         showOthers={filters?.showOthers ?? false}
         onUpdate={handleShowOthersUpdate}
       />
+      <TopicFilter topics={filterableTopics} onUpdate={handleTopicsUpdate} />
+      <ScoreFilter max={MAX_SCORE} />
     </div>
   );
 }

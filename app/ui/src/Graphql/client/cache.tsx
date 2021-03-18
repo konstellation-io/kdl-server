@@ -6,6 +6,7 @@ import {
 } from './models/ProjectFilters';
 import { UserSelection, UserSettings } from './models/UserSettings';
 
+import { D } from 'Pages/Project/pages/KG/components/KGVisualization/KGVisualization';
 import { GetProjectMembers_project_members } from '../queries/types/GetProjectMembers';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTools';
@@ -69,6 +70,7 @@ export const userSettings = makeVar<UserSettings>(initialStateUserSettings);
 export const memberDetails = makeVar<GetProjectMembers_project_members | null>(
   null
 );
+export const resourceDetails = makeVar<D | null>(null);
 export const primaryPanel = makeVar<PanelInfo | null>(null);
 export const secondaryPanel = makeVar<PanelInfo | null>(null);
 export const currentTool = makeVar<ToolName | null>(null);

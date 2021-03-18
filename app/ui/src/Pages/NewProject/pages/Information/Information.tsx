@@ -14,8 +14,8 @@ import { newProject } from 'Graphql/client/cache';
 import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
 
 const limits = {
-  maxHeight: 500,
-  minHeight: 400,
+  maxHeight: 400,
+  minHeight: 375,
 };
 
 type Props = {
@@ -69,10 +69,10 @@ function Information({ showErrors }: Props) {
           fetchDescriptionScore();
         }}
         limits={limits}
+        error={showErrors ? errorDescription : ''}
         showClearButton
         textArea
         lockHorizontalGrowth
-        error={showErrors ? errorDescription : ''}
       />
       <DescriptionScore score={descriptionScore} />
     </div>

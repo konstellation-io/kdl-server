@@ -8,7 +8,6 @@ import { D } from 'Pages/Project/pages/KG/components/KGVisualization/KGVisualiza
 import React from 'react';
 import ResourceDetails from 'Pages/Project/pages/KG/components/ResourceDetails/ResourceDetails';
 import { loader } from 'graphql.macro';
-import styles from './MemberDetails.module.scss';
 import { useQuery } from '@apollo/client';
 
 const GetKGItemQuery = loader('Graphql/queries/getKnowledgeGraphItem.graphql');

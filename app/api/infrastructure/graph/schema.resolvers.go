@@ -7,8 +7,6 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
-	"net/url"
-	"path"
 	"strings"
 	"time"
 
@@ -18,6 +16,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/dataloader"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
@@ -201,21 +200,15 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 
 	folderName := obj.Repository.RepoName
 
-	giteaURL, err := url.Parse(r.cfg.Gitea.URL)
+	giteaWithFolder, err := kdlutil.JoinToURL(r.cfg.Gitea.URL, "kdl", folderName)
 	if err != nil {
 		return &entity.ToolUrls{}, err
 	}
 
-	giteaURL.Path = path.Join(giteaURL.Path, "kdl", folderName)
-	giteaWithFolder := giteaURL.String()
-
-	droneURL, err := url.Parse(r.cfg.Drone.URL)
+	droneWithFolder, err := kdlutil.JoinToURL(r.cfg.Drone.URL, "kdl", folderName)
 	if err != nil {
 		return &entity.ToolUrls{}, err
 	}
-
-	droneURL.Path = path.Join(droneURL.Path, "kdl", folderName)
-	droneWithFolder := droneURL.String()
 
 	jupyterWithUsername := strings.Replace(r.cfg.Jupyter.URL, "USERNAME", slugUserName, 1)
 	jupyterWithUsernameAndFolder := strings.Replace(jupyterWithUsername, "REPO_FOLDER", folderName, 2)

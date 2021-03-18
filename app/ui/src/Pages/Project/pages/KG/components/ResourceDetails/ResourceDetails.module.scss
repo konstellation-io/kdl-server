@@ -85,6 +85,7 @@
   .url {
     color: font-color(lowlight);
     margin-top: 2 * $grid-unit;
+    cursor: pointer;
 
     transition: color ease 0.3s;
 

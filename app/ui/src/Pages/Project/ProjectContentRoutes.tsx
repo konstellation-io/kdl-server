@@ -1,24 +1,21 @@
+import ROUTE, { buildRoute } from 'Constants/routes';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
+import { GetMe } from 'Graphql/queries/types/GetMe';
 import KG from './pages/KG/KG';
 import Overview from './pages/Overview/Overview';
-import ROUTE, { buildRoute } from 'Constants/routes';
-import React, { useMemo } from 'react';
 import { ProjectRoute } from './ProjectPanels';
 import ProjectToolsRoutes from './components/ProjectToolsRoutes/ProjectToolsRoutes';
-import { useQuery } from '@apollo/client';
-import { GetMe } from 'Graphql/queries/types/GetMe';
+import React from 'react';
 import { loader } from 'graphql.macro';
+import { useQuery } from '@apollo/client';
 
 const GetMeQuery = loader('Graphql/queries/getMe.graphql');
 
 function ProjectContentRoutes({ openedProject }: ProjectRoute) {
   const { data } = useQuery<GetMe>(GetMeQuery);
   const areToolsActive = data?.me.areToolsActive;
-  const overviewRoute = useMemo(
-    () => buildRoute(ROUTE.PROJECT_OVERVIEW, openedProject.id),
-    [openedProject]
-  );
+  const overviewRoute = buildRoute(ROUTE.PROJECT_OVERVIEW, openedProject.id);
 
   return (
     <Switch>

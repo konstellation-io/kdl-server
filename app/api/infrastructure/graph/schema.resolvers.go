@@ -7,6 +7,8 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"net/url"
+	"path"
 	"strings"
 	"time"
 
@@ -198,12 +200,27 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 	slugUserName := slug.Make(userName)
 
 	folderName := obj.Repository.RepoName
+
+	giteaURL, err := url.Parse(r.cfg.Gitea.URL)
+	if err != nil {
+		return &entity.ToolUrls{}, err
+	}
+
+	giteaURL.Path = path.Join(giteaURL.Path, "kdl", folderName)
+	giteaWithFolder := giteaURL.String()
+
+	droneURL, err := url.Parse(r.cfg.Drone.URL)
+	if err != nil {
+		return &entity.ToolUrls{}, err
+	}
+
+	droneURL.Path = path.Join(droneURL.Path, "kdl", folderName)
+	droneWithFolder := droneURL.String()
+
 	jupyterWithUsername := strings.Replace(r.cfg.Jupyter.URL, "USERNAME", slugUserName, 1)
 	jupyterWithUsernameAndFolder := strings.Replace(jupyterWithUsername, "REPO_FOLDER", folderName, 2)
 	vscodeWithUsername := strings.Replace(r.cfg.VSCode.URL, "USERNAME", slugUserName, 1)
 	vscodeWithUsernameAndFolder := strings.Replace(vscodeWithUsername, "REPO_FOLDER", folderName, 1)
-	giteaWithFolder := r.cfg.Gitea.URL + "/kdl/" + folderName
-	droneWithFolder := r.cfg.Drone.URL + "/kdl/" + folderName
 
 	return &entity.ToolUrls{
 		Gitea:   giteaWithFolder,

@@ -6,19 +6,9 @@
 .container {
   background-color: palette(lowlight, 900);
   height: 100%;
-  width: 37.5vw;
-  max-width: 0;
-  min-width: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-
-  transition: max-width ease 0.4s, min-width ease 0.4s;
-
-  &.opened {
-    min-width: 44 * $grid-unit;
-    max-width: 90 * $grid-unit;
-  }
 }
 .title {
   @include font-body;

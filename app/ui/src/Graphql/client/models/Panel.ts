@@ -14,4 +14,5 @@ export enum PANEL_ID {
   PROJECT_DESCRIPTION = 'projectDescription',
   MEMBER_INFO = 'memberInfo',
   KG_RESULTS = 'kgResults',
+  KG_RESULT_DETAILS = 'kgResultDetails',
 }

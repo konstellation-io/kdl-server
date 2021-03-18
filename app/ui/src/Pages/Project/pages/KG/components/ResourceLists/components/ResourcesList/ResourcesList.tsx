@@ -13,6 +13,7 @@ type Props = {
   filterText: string;
   resources: D[];
   header?: JSX.Element | null;
+  idToFullResource: { [key: string]: any };
 };
 function ResourcesList({
   header = null,
@@ -22,26 +23,31 @@ function ResourcesList({
   onLeave,
   onChangeFilterText,
   filterText,
+  idToFullResource,
 }: Props) {
   return (
     <div className={styles.list}>
-      {header}
-      <TextInput
-        formValue={filterText}
-        onChange={(value: string) => onChangeFilterText(value)}
-        Icon={IconSearch}
-        placeholder={'Find a paper...'}
-        showClearButton
-        hideLabel
-        hideBottomText
-      />
+      <div className={styles.top}>
+        {header}
+        <TextInput
+          formValue={filterText}
+          onChange={(value: string) => onChangeFilterText(value)}
+          Icon={IconSearch}
+          placeholder={'Find a paper...'}
+          showClearButton
+          hideLabel
+          hideBottomText
+        />
+      </div>
       <div className={styles.listWrapper}>
         {resources.map((r) => (
           <KGItem
+            key={r.id}
             onEnter={onEnter}
             onLeave={onLeave}
             onClick={onClick}
             resource={r}
+            idToFullResource={idToFullResource}
           />
         ))}
       </div>

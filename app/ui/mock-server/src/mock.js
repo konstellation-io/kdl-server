@@ -186,8 +186,23 @@ module.exports = {
     lastActivity: new Date().toUTCString(),
   }),
   KnowledgeGraphItem: () => ({
-    title: casual.short_description,
-    type: casual.random_element(['Code', 'Paper']),
+    id: casual.id,
+    category: casual.random_element(['Code', 'Paper']),
+    topics: [
+      {
+        name: 'Topic 1',
+        relevance: 0.8,
+      },
+      {
+        name: 'Topic 2',
+        relevance: 0.2,
+      },
+    ],
+    title: casual.name,
+    abstract: casual.words(200),
+    authors: ['Xingyi Zhou', 'Vladlen Koltun', 'Philipp Krähenbühl'],
     score: casual.random,
+    date: new Date().toISOString(),
+    url: 'https://paperswithcode.com/paper/probabilistic-two-stage-detection',
   }),
 };

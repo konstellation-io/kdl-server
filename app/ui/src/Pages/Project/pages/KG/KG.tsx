@@ -7,7 +7,7 @@ import KGVisualization, {
   D,
   TopicSections,
 } from './components/KGVisualization/KGVisualization';
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 import { ProjectRoute } from '../../ProjectPanels';
 import { getSectionsAndNames } from './KGUtils';
@@ -18,9 +18,22 @@ import { useQuery } from '@apollo/client';
 
 const selectedResource = 'My project';
 
-const starredItems = [0, 1, 4, 6, 12, 34, 35, 65, 120, 144, 365, 456, 754, 942];
-
-export let idToFullResource: { [key: string]: any } = {};
+export const starredItems = [
+  0,
+  1,
+  4,
+  6,
+  12,
+  34,
+  35,
+  65,
+  120,
+  144,
+  365,
+  456,
+  754,
+  942,
+];
 
 const GetKnowledgeGraphQuery = loader(
   'Graphql/queries/getKnowledgeGraph.graphql'
@@ -56,9 +69,9 @@ function KG({ openedProject }: ProjectRoute) {
     return [];
   }, [data]);
 
-  useEffect(() => {
+  const idToFullResource: { [key: string]: any } = useMemo(() => {
     if (data?.knowledgeGraph.items) {
-      idToFullResource = Object.fromEntries(
+      return Object.fromEntries(
         data.knowledgeGraph.items.map((r) => [
           r.id,
           {
@@ -70,6 +83,7 @@ function KG({ openedProject }: ProjectRoute) {
         ])
       );
     }
+    return {};
   }, [data?.knowledgeGraph.items]);
 
   const [sections, topics]: [TopicSections, Topic[]] = useMemo(() => {
@@ -114,6 +128,7 @@ function KG({ openedProject }: ProjectRoute) {
           data={filteredResources}
           sections={filteredSections}
           selectedResource={selectedResource}
+          idToFullResource={idToFullResource}
         />
       </div>
       <div className={styles.panelSafeArea} />

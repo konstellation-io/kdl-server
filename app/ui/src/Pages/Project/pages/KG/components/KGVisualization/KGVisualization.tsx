@@ -1,12 +1,12 @@
 import { INNER_R, getInnerDimensions, resourcesViz } from './KGViz';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import DetailsPanel from '../DetailsPanel/DetailsPanel';
 import KGViz from './KGViz';
 import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
-import ListPanel from '../ListPanel/ListPanel';
 import { ParentSize } from '@visx/responsive';
 import { RESOURCE_R } from './Resources/Resources';
+import ResourceDetails from '../ResourceDetails/ResourceDetails';
+import ResourceLists from '../ResourceLists/ResourceLists';
 import ResourceTooltip from './ResourceTooltip/ResourceTooltip';
 import SectionList from './SectionList/SectionList';
 import cx from 'classnames';
@@ -42,6 +42,7 @@ type WrapperProps = {
   data: D[];
   sections: string[];
   selectedResource: string;
+  idToFullResource: { [key: string]: any };
 };
 function KGVisualizationWrapper(props: WrapperProps) {
   return (
@@ -64,6 +65,7 @@ function KGVisualization({
   data,
   sections,
   selectedResource,
+  idToFullResource,
 }: Props) {
   const scores = useReactiveVar(kgScore);
   const { updateScore } = useKGFilters();
@@ -334,14 +336,27 @@ function KGVisualization({
         className={cx(styles.shield, { [styles.show]: openedPaper !== null })}
         onClick={closeResourceDetails}
       />
-      <div className={styles.listPanel}>
-        <ListPanel
-          resources={showedData}
-          starredResources={starredResources}
-          scores={scores}
-          onResourceClick={openResourceDetails}
-        />
-        <DetailsPanel resource={openedPaper} onClose={closeResourceDetails} />
+      <div className={styles.panels}>
+        <div className={styles.listPanel}>
+          <ResourceLists
+            resources={showedData}
+            starredResources={starredResources}
+            scores={scores}
+            onResourceClick={openResourceDetails}
+            idToFullResource={idToFullResource}
+          />
+        </div>
+        <div
+          className={cx(styles.detailsPanel, {
+            [styles.opened]: openedPaper !== null,
+          })}
+        >
+          <ResourceDetails
+            resource={openedPaper}
+            onClose={closeResourceDetails}
+            idToFullResource={idToFullResource}
+          />
+        </div>
       </div>
       {/* <Minimap
         minimapRef={minimapRef}

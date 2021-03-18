@@ -3,7 +3,6 @@ import React, { FC } from 'react';
 import { D } from '../../../KGVisualization/KGVisualization';
 import Score from '../../../KGVisualization/Score';
 import cx from 'classnames';
-import { idToFullResource } from '../../../../KG';
 import styles from './KGItem.module.scss';
 
 type Props = {
@@ -11,8 +10,15 @@ type Props = {
   onClick: (resource: D) => void;
   onEnter: (name: string) => void;
   onLeave: () => void;
+  idToFullResource: { [key: string]: any };
 };
-const KGItem: FC<Props> = ({ resource, onClick, onLeave, onEnter }: Props) => {
+const KGItem: FC<Props> = ({
+  resource,
+  onClick,
+  onLeave,
+  onEnter,
+  idToFullResource,
+}: Props) => {
   const topics = idToFullResource[resource.id].topics;
 
   return (

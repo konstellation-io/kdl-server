@@ -5,19 +5,21 @@ import { D } from '../KGVisualization/KGVisualization';
 import ResourcesList from './components/ResourcesList/ResourcesList';
 import { orderBy } from 'lodash';
 import { resourcesViz } from '../KGVisualization/KGViz';
-import styles from './ListPanel.module.scss';
+import styles from './ResourceLists.module.scss';
 
 type Props = {
   starredResources: D[];
   resources: D[];
   onResourceClick: (d: D, left: number) => void;
   scores: [number, number];
+  idToFullResource: { [key: string]: any };
 };
-function ListPanel({
+function ResourceLists({
   starredResources,
   resources,
   onResourceClick,
   scores,
+  idToFullResource,
 }: Props) {
   const [listFilterText, setListFilterText] = useState('');
 
@@ -41,12 +43,14 @@ function ListPanel({
   }
 
   function onSelectResource(resource: D) {
+    let left = 0;
+
     if (resourcesViz) {
       const target = resourcesViz.data.find((d) => d.id === resource.id);
-      const left = (target?.x || 0) + resourcesViz.center.x;
-
-      onResourceClick(resource, -left / 2);
+      left = (target?.x || 0) + resourcesViz.center.x;
     }
+
+    onResourceClick(resource, -left / 2);
   }
 
   function formatScore(score: number) {
@@ -83,6 +87,7 @@ function ListPanel({
               onEnter={onEnter}
               onLeave={onLeave}
               onChangeFilterText={setListFilterText}
+              idToFullResource={idToFullResource}
             />
           </TabPanel>
           <TabPanel>
@@ -93,6 +98,7 @@ function ListPanel({
               onEnter={onEnter}
               onLeave={onLeave}
               onChangeFilterText={setListFilterText}
+              idToFullResource={idToFullResource}
             />
           </TabPanel>
         </div>
@@ -101,4 +107,4 @@ function ListPanel({
   );
 }
 
-export default ListPanel;
+export default ResourceLists;

@@ -30,8 +30,6 @@ function MemberDetail({ resource, close }: Props) {
   if (loading || !data) return <SpinnerCircular />;
   if (error) return <ErrorMessage />;
 
-  console.log('resource', resource);
-
   return (
     <ResourceDetails
       resource={resource}

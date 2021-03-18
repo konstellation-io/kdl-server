@@ -12,16 +12,24 @@ type Props = {
   Icon: any;
   title?: string;
   iconSize?: IconSize;
+  onClick?: () => void;
+  className?: string;
 };
 
 function NavigationButton({
   label,
   title,
   Icon,
+  onClick,
+  className = '',
   iconSize = IconSize.REGULAR,
 }: Props) {
   return (
-    <div className={styles.navButton} title={title || label}>
+    <div
+      className={cx(styles.navButton, className)}
+      title={title || label}
+      onClick={onClick}
+    >
       <Icon className={cx(iconSize, styles.icon)} />
       <span className={styles.label}>{label}</span>
     </div>

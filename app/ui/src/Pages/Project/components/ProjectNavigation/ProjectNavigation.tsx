@@ -88,24 +88,25 @@ function ProjectNavigation() {
         <NavElements isOpened={opened} />
       </div>
       <div className={styles.bottom}>
-        <div onClick={toggleKGPanel}>
-          <NavigationButton label="Knowledge Viewer" Icon={IconKGViewer} />
-        </div>
-        <div onClick={toggleSettingsPanel}>
-          <NavigationButton label="Settings" Icon={IconSettings} />
-        </div>
-        <div
+        <NavigationButton
+          onClick={toggleKGPanel}
+          label="Knowledge Viewer"
+          Icon={IconKGViewer}
+        />
+        <NavigationButton
+          onClick={toggleSettingsPanel}
+          label="Settings"
+          Icon={IconSettings}
+        />
+        <NavigationButton
+          label="Collapse"
+          title={opened ? 'COLLAPSE' : 'EXPAND'}
+          Icon={IconCollapse}
+          onClick={onToggleOpened}
           className={cx({
             [navButtonStyles.collapsed]: !opened,
           })}
-          onClick={onToggleOpened}
-        >
-          <NavigationButton
-            label="Collapse"
-            title={opened ? 'COLLAPSE' : 'EXPAND'}
-            Icon={IconCollapse}
-          />
-        </div>
+        />
       </div>
     </div>
   );

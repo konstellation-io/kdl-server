@@ -6,10 +6,10 @@ import numpy as np
 import pandas as pd
 import torch
 import transformers
-from scipy import sparse, spatial
+from scipy import spatial
 
 from outputs import RecommendedList
-from topics import TopicSelector
+from topics import get_relevant_topics
 
 
 class Recommender:
@@ -30,8 +30,6 @@ class Recommender:
         tokenizer: transformers.PreTrainedTokenizer,
         vectors: np.ndarray,
         dataset: pd.DataFrame,
-        topics_matrix: sparse.csr_matrix,
-        topics_dict: dict[int, str],
     ):
         self.log = logging.getLogger("Recommender")
         self.log.info("Initializing Recommender")
@@ -41,9 +39,6 @@ class Recommender:
 
         self.dataset = dataset
         self.vectors = vectors
-
-        self.topic_selector = TopicSelector(topics_matrix=topics_matrix,
-                                            topics_dict=topics_dict)
 
         self.log.info("Recommender successfully loaded.")
 
@@ -119,11 +114,10 @@ class Recommender:
         df_subset["distance"] = distances[0]
         df_subset = df_subset.sort_values(by=["distance"], ascending=True, ignore_index=True).head(n_hits)
 
-        df_subset["topics"] = df_subset.apply(self.topic_selector.get_topics)
         df_subset["score"] = df_subset.distance.apply(self._compute_scores)
 
         recommended_list = RecommendedList(list(df_subset.T.to_dict().values()))
-        relevant_topics = self.topic_selector.get_relevant_topics(df_subset.index)
+        relevant_topics = get_relevant_topics(df_subset.topics)
         recommended_list.add_topics(relevant_topics)
 
         return recommended_list

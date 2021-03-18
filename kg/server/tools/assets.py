@@ -1,14 +1,13 @@
 import logging
-import pickle
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import transformers
-from scipy import sparse
 from transformers import PreTrainedModel, PreTrainedTokenizer
 
 from exceptions import AssetLoadingException
+from topics import convert_type_topics
 
 
 class AssetLoader:
@@ -21,11 +20,8 @@ class AssetLoader:
         self.log = logging.getLogger("AssetLoader")
         self.path = path
 
-        self.dataset = self._load_dataset()
+        self.dataset = self._merge_dataset_topics()
         self.vectors = self._load_dataset_vectors()
-
-        self.topics = self._load_dataset_topics()
-        self.topics_dict = self._load_topics_dict()
 
         self.model = self._load_model()
         self.tokenizer = self._load_tokenizer()
@@ -64,24 +60,25 @@ class AssetLoader:
 
         return np.load(str(path))
 
-    def _load_dataset_topics(self) -> sparse.csr_matrix:
+    def _load_topics(self) -> pd.DataFrame:
         """
-        Loads topic sparse matrix from a file
+        Loads topic dataset from a file
         """
-        path = Path(self.path, "vectors.npz")
-        self.log.debug(f"Loading topic matrix from: {path}")
+        path = Path(self.path, "topics.pkl.gz")
+        self.log.debug(f"Loading topics ds from: {path}")
 
-        return sparse.load_npz(path)
+        return pd.read_pickle(path, compression="gzip")
 
-    def _load_topics_dict(self) -> dict[int, str]:
+    def _merge_dataset_topics(self) -> pd.DataFrame:
         """
-        Loads topic dict from a file
+        Loads topic dataset from a file
         """
-        path = Path(self.path, "topics_dict.pkl")
-        with open(path, 'wb') as f:
-            topics_dict = pickle.load(f)
+        topics = self._load_topics()
+        topics['topics'] = topics['topics'].apply(convert_type_topics)
+        dataset = self._load_dataset()
 
-        return topics_dict
+        self.log.debug("Merging topics into the dataset")
+        return pd.merge(left=dataset, right=topics, left_on="id", right_on="id", how="left")
 
     def _load_model(self) -> PreTrainedModel:
         """

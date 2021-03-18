@@ -34,6 +34,8 @@ class Topic:
         item.name = self.name
         item.relevance = self.relevance
 
+        return item
+
 
 @dataclass(init=False, order=False)
 class RecommendedItem:
@@ -45,7 +47,7 @@ class RecommendedItem:
     title: str
     abstract: str
     authors: str
-    score: str
+    score: float
     date: str
     url: str
     topics: list[Topic]
@@ -61,7 +63,7 @@ class RecommendedItem:
 
         # Checks that all required fields are present
         if not set(self.mandatory_fields).issubset(field_dict.keys()):
-            missing_fields = set(field_dict).difference(self.mandatory_fields)
+            missing_fields = set(self.mandatory_fields).difference(set(field_dict.keys()))
             raise MissingFieldException(f"Missing mandatory fields: {missing_fields}")
 
         for key, value in field_dict.items():
@@ -94,7 +96,8 @@ class RecommendedItem:
         item.score = self.score
         item.date = self.date
         item.url = self.url
-        item.topics.extend([topic.to_grpc() for topic in self.topics].sort(reverse=True))
+        topics = [topic.to_grpc() for topic in self.topics]
+        item.topics.extend(topics)
 
         item.external_id = self.external_id
         item.frameworks.extend(self.frameworks)

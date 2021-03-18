@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z\nproto;kgpb',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x15knowledge_graph.proto\x12\x02kg\"\"\n\x0bGetGraphReq\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\"\xdc\x01\n\tGraphItem\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08\x63\x61tegory\x18\x02 \x01(\t\x12\r\n\x05title\x18\x03 \x01(\t\x12\x10\n\x08\x61\x62stract\x18\x04 \x01(\t\x12\x0f\n\x07\x61uthors\x18\x05 \x03(\t\x12\r\n\x05score\x18\x06 \x01(\x02\x12\x0c\n\x04\x64\x61te\x18\x07 \x01(\t\x12\x0b\n\x03url\x18\x08 \x01(\t\x12\x13\n\x0b\x65xternal_id\x18\t \x01(\t\x12\x19\n\x06topics\x18\n \x03(\x0b\x32\t.kg.Topic\x12\x11\n\trepo_urls\x18\x0b \x03(\t\x12\x12\n\nframeworks\x18\x0c \x03(\t\"(\n\x05Topic\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x11\n\trelevance\x18\x02 \x01(\x02\"F\n\x0bGetGraphRes\x12\x1c\n\x05items\x18\x01 \x03(\x0b\x32\r.kg.GraphItem\x12\x19\n\x06topics\x18\x02 \x03(\x0b\x32\t.kg.Topic2;\n\tKGService\x12.\n\x08GetGraph\x12\x0f.kg.GetGraphReq\x1a\x0f.kg.GetGraphRes\"\x00\x42\x0cZ\nproto;kgpbb\x06proto3'
+  serialized_pb=b'\n\x15knowledge_graph.proto\x12\x02kg\"\"\n\x0bGetGraphReq\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\"\x18\n\nGetItemReq\x12\n\n\x02id\x18\x01 \x01(\t\"\xdc\x01\n\tGraphItem\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08\x63\x61tegory\x18\x02 \x01(\t\x12\r\n\x05title\x18\x03 \x01(\t\x12\x10\n\x08\x61\x62stract\x18\x04 \x01(\t\x12\x0f\n\x07\x61uthors\x18\x05 \x03(\t\x12\r\n\x05score\x18\x06 \x01(\x02\x12\x0c\n\x04\x64\x61te\x18\x07 \x01(\t\x12\x0b\n\x03url\x18\x08 \x01(\t\x12\x13\n\x0b\x65xternal_id\x18\t \x01(\t\x12\x19\n\x06topics\x18\n \x03(\x0b\x32\t.kg.Topic\x12\x11\n\trepo_urls\x18\x0b \x03(\t\x12\x12\n\nframeworks\x18\x0c \x03(\t\"(\n\x05Topic\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x11\n\trelevance\x18\x02 \x01(\x02\"F\n\x0bGetGraphRes\x12\x1c\n\x05items\x18\x01 \x03(\x0b\x32\r.kg.GraphItem\x12\x19\n\x06topics\x18\x02 \x03(\x0b\x32\t.kg.Topic\")\n\nGetItemRes\x12\x1b\n\x04item\x18\x01 \x01(\x0b\x32\r.kg.GraphItem2h\n\tKGService\x12.\n\x08GetGraph\x12\x0f.kg.GetGraphReq\x1a\x0f.kg.GetGraphRes\"\x00\x12+\n\x07GetItem\x12\x0e.kg.GetItemReq\x1a\x0e.kg.GetItemRes\"\x00\x42\x0cZ\nproto;kgpbb\x06proto3'
 )
 
 
@@ -54,6 +54,38 @@ _GETGRAPHREQ = _descriptor.Descriptor(
   ],
   serialized_start=29,
   serialized_end=63,
+)
+
+
+_GETITEMREQ = _descriptor.Descriptor(
+  name='GetItemReq',
+  full_name='kg.GetItemReq',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='kg.GetItemReq.id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=65,
+  serialized_end=89,
 )
 
 
@@ -161,8 +193,8 @@ _GRAPHITEM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=66,
-  serialized_end=286,
+  serialized_start=92,
+  serialized_end=312,
 )
 
 
@@ -200,8 +232,8 @@ _TOPIC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=288,
-  serialized_end=328,
+  serialized_start=314,
+  serialized_end=354,
 )
 
 
@@ -239,17 +271,52 @@ _GETGRAPHRES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=330,
-  serialized_end=400,
+  serialized_start=356,
+  serialized_end=426,
+)
+
+
+_GETITEMRES = _descriptor.Descriptor(
+  name='GetItemRes',
+  full_name='kg.GetItemRes',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='item', full_name='kg.GetItemRes.item', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=428,
+  serialized_end=469,
 )
 
 _GRAPHITEM.fields_by_name['topics'].message_type = _TOPIC
 _GETGRAPHRES.fields_by_name['items'].message_type = _GRAPHITEM
 _GETGRAPHRES.fields_by_name['topics'].message_type = _TOPIC
+_GETITEMRES.fields_by_name['item'].message_type = _GRAPHITEM
 DESCRIPTOR.message_types_by_name['GetGraphReq'] = _GETGRAPHREQ
+DESCRIPTOR.message_types_by_name['GetItemReq'] = _GETITEMREQ
 DESCRIPTOR.message_types_by_name['GraphItem'] = _GRAPHITEM
 DESCRIPTOR.message_types_by_name['Topic'] = _TOPIC
 DESCRIPTOR.message_types_by_name['GetGraphRes'] = _GETGRAPHRES
+DESCRIPTOR.message_types_by_name['GetItemRes'] = _GETITEMRES
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 GetGraphReq = _reflection.GeneratedProtocolMessageType('GetGraphReq', (_message.Message,), {
@@ -258,6 +325,13 @@ GetGraphReq = _reflection.GeneratedProtocolMessageType('GetGraphReq', (_message.
   # @@protoc_insertion_point(class_scope:kg.GetGraphReq)
   })
 _sym_db.RegisterMessage(GetGraphReq)
+
+GetItemReq = _reflection.GeneratedProtocolMessageType('GetItemReq', (_message.Message,), {
+  'DESCRIPTOR' : _GETITEMREQ,
+  '__module__' : 'knowledge_graph_pb2'
+  # @@protoc_insertion_point(class_scope:kg.GetItemReq)
+  })
+_sym_db.RegisterMessage(GetItemReq)
 
 GraphItem = _reflection.GeneratedProtocolMessageType('GraphItem', (_message.Message,), {
   'DESCRIPTOR' : _GRAPHITEM,
@@ -280,6 +354,13 @@ GetGraphRes = _reflection.GeneratedProtocolMessageType('GetGraphRes', (_message.
   })
 _sym_db.RegisterMessage(GetGraphRes)
 
+GetItemRes = _reflection.GeneratedProtocolMessageType('GetItemRes', (_message.Message,), {
+  'DESCRIPTOR' : _GETITEMRES,
+  '__module__' : 'knowledge_graph_pb2'
+  # @@protoc_insertion_point(class_scope:kg.GetItemRes)
+  })
+_sym_db.RegisterMessage(GetItemRes)
+
 
 DESCRIPTOR._options = None
 
@@ -290,8 +371,8 @@ _KGSERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=402,
-  serialized_end=461,
+  serialized_start=471,
+  serialized_end=575,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetGraph',
@@ -300,6 +381,16 @@ _KGSERVICE = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_GETGRAPHREQ,
     output_type=_GETGRAPHRES,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='GetItem',
+    full_name='kg.KGService.GetItem',
+    index=1,
+    containing_service=None,
+    input_type=_GETITEMREQ,
+    output_type=_GETITEMRES,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

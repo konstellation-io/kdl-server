@@ -119,7 +119,7 @@ function TabMembers({ projectId }: Props) {
   }
 
   return (
-    <div>
+    <div className={styles.container}>
       <div className={styles.formSearch}>
         {canAddMembers && (
           <>
@@ -146,6 +146,7 @@ function TabMembers({ projectId }: Props) {
               showSearchIcon
               hideLabel
               showClear
+              hideError
             />
             <Button
               label="ADD"

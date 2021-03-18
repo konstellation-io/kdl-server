@@ -10,6 +10,12 @@
     color: font-color(lowlight);
   }
 
+  .title {
+    @include font-title;
+    color: font-color(lowlight);
+    margin-top: 0;
+  }
+
   .field {
     margin-top: 5 * $grid-unit;
   }

@@ -8,7 +8,9 @@ import {
   GetSecondaryPanel,
 } from 'Graphql/client/queries/getSecondaryPanel.graphql';
 import React, { useState } from 'react';
+import { memberDetails, resourceDetails } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
+import { useQuery, useReactiveVar } from '@apollo/client';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import KGResults from './panels/KGResults/KGResults';
@@ -16,12 +18,12 @@ import MemberDetails from './panels/MemberDetails/MemberDetails';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
 import Panel from 'Components/Layout/Panel/Panel';
 import ProjectSettings from './panels/ProjectSettings/ProjectSettings';
+import ResourceDetailsPanel from './panels/ResourceDetailsPanel/ResourceDetailsPanel';
 import UpdateProjectDescription from './panels/UpdateProjectDescription/UpdateProjectDescription';
 import UpdateRepository from './panels/UpdateRepository/UpdateRepository';
 import styles from './Project.module.scss';
 import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
-import { useQuery, useReactiveVar } from '@apollo/client';
-import { memberDetails } from 'Graphql/client/cache';
+import useResourceDetails from 'Graphql/client/hooks/useResourceDetails';
 
 export interface ProjectRoute {
   openedProject: GetProjects_projects;
@@ -39,10 +41,12 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
   } = useQuery<GetSecondaryPanel>(GET_SECONDARY_PANEL);
 
   const memberDetailsData = useReactiveVar(memberDetails);
+  const resourceDetailsData = useReactiveVar(resourceDetails);
 
   const { closePanel: panel1Close } = usePanel(PanelType.PRIMARY);
   const { closePanel: panel2Close } = usePanel(PanelType.SECONDARY);
   const { unselectMemberDetails } = useMemberDetails();
+  const { unselectResourceDetails } = useResourceDetails();
 
   // Stores last opened tab inside project settings panel. When you reopen
   // this panel, last opened tab will remain opened.
@@ -56,6 +60,11 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
   function closeMemberInfoPanel() {
     panel2Close();
     unselectMemberDetails();
+  }
+
+  function closeResourceInfoPanel() {
+    panel2Close();
+    unselectResourceDetails();
   }
 
   const panels: { [key in PANEL_ID]: JSX.Element | null } = {
@@ -79,6 +88,12 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
       />
     ),
     [PANEL_ID.KG_RESULTS]: <KGResults />,
+    [PANEL_ID.KG_RESULT_DETAILS]: resourceDetailsData && (
+      <ResourceDetailsPanel
+        resource={resourceDetailsData}
+        close={closeResourceInfoPanel}
+      />
+    ),
   };
 
   return (

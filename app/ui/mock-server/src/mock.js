@@ -1,5 +1,24 @@
 const { MockList } = require('apollo-server');
+const data = require('./data0.json');
+const relevances = require('./topic_relevance.json');
 const casual = require('casual');
+
+const kgData = data.map((d) => ({
+  id: d.id,
+  category: casual.random_element(['Code', 'Paper']),
+  topics: Object.entries(JSON.parse(d.topics.replace(/[']+/g, '"'))).map(
+    ([name, relevance]) => ({
+      name,
+      relevance,
+    })
+  ),
+  title: d.title,
+  abstract: d.abstract,
+  authors: ['Xingyi Zhou', 'Vladlen Koltun', 'Philipp Krähenbühl'],
+  score: d.score,
+  date: new Date().toISOString(),
+  url: 'https://paperswithcode.com/paper/probabilistic-two-stage-detection',
+}));
 
 const meId = casual.uuid;
 const me = {
@@ -71,7 +90,8 @@ module.exports = {
       quality: Math.round((Math.random() * 1000) % 100),
     }),
     knowledgeGraph: () => ({
-      items: () => new MockList([1, 80]),
+      items: () => kgData,
+      topics: () => relevances,
     }),
   }),
   Mutation: () => ({
@@ -166,8 +186,23 @@ module.exports = {
     lastActivity: new Date().toUTCString(),
   }),
   KnowledgeGraphItem: () => ({
-    title: casual.short_description,
-    type: casual.random_element(['Code', 'Paper']),
+    id: casual.id,
+    category: casual.random_element(['Code', 'Paper']),
+    topics: [
+      {
+        name: 'Topic 1',
+        relevance: 0.8,
+      },
+      {
+        name: 'Topic 2',
+        relevance: 0.2,
+      },
+    ],
+    title: casual.name,
+    abstract: casual.words(200),
+    authors: ['Xingyi Zhou', 'Vladlen Koltun', 'Philipp Krähenbühl'],
     score: casual.random,
+    date: new Date().toISOString(),
+    url: 'https://paperswithcode.com/paper/probabilistic-two-stage-detection',
   }),
 };

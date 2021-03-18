@@ -7,86 +7,84 @@ import KGVisualization, {
   D,
   TopicSections,
 } from './components/KGVisualization/KGVisualization';
-import React, { useCallback, useMemo } from 'react';
-import { buildKGItem, getSectionsAndNames } from './KGUtils';
+import React, { useMemo } from 'react';
 
-import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
-import NavigationMenu from './components/NavigationMenu/NavigationMenu';
 import { ProjectRoute } from '../../ProjectPanels';
-import { Scores } from './components/Filters/components/ScoreFilter/ScoreFilter';
-import data from './components/KGVisualization/data/data0.json';
-// import data1 from './components/KGVisualization/data/data1.json';
+import { getSectionsAndNames } from './KGUtils';
 import { loader } from 'graphql.macro';
-import { orderBy } from 'lodash';
 import styles from './KG.module.scss';
 import useKGFilters from './components/useKGFilters';
 import { useQuery } from '@apollo/client';
-import { replaceAll } from 'Utils/string';
 
 const selectedResource = 'My project';
 
-const MAX_RESOURCES = 0;
-const MAX_TOPICS = 10;
-
-const starredItems = [0, 1, 4, 6, 12, 34, 35, 65, 120, 144, 365, 456, 754, 942];
-const allData = data;
-// const allData = [...data, ...data1];
-let resources = allData.map((d: any, idx: number) => ({
-  id: d.id,
-  category:
-    Object.keys(JSON.parse(replaceAll(d.topics, /'/, '"')))[0] || 'Others',
-  categories: JSON.parse(replaceAll(d.topics, /'/, '"')),
-  name: d.title,
-  type: KnowledgeGraphItemCat.Paper,
-  score: d.score,
-  starred: starredItems.includes(idx),
-}));
-
-export const idToFullResource = Object.fromEntries(
-  allData.map((r) => [
-    r.id,
-    {
-      title: r.title,
-      abstract: r.abstract,
-      topics: JSON.parse(replaceAll(r.topics, /'/, '"')),
-      score: r.score,
-    },
-  ])
-);
-
-const allTopics = resources
-  .filter((d) => d.category !== 'Others')
-  .map((d) => d.category);
-const topTopics = [...allTopics.slice(0, MAX_TOPICS), 'Others'];
-
-resources = resources.map((d: any) => ({
-  ...d,
-  category: topTopics.includes(d.category) ? d.category : 'Others',
-}));
-
-if (MAX_RESOURCES) {
-  resources = orderBy(resources, ['score']).reverse().slice(0, MAX_RESOURCES);
-}
+export const starredItems = [
+  0,
+  1,
+  4,
+  6,
+  12,
+  34,
+  35,
+  65,
+  120,
+  144,
+  365,
+  456,
+  754,
+  942,
+];
 
 const GetKnowledgeGraphQuery = loader(
   'Graphql/queries/getKnowledgeGraph.graphql'
 );
 
 function KG({ openedProject }: ProjectRoute) {
-  // const { data } = useQuery<GetKnowledgeGraph, GetKnowledgeGraphVariables>(
-  //   GetKnowledgeGraphQuery,
-  //   {
-  //     variables: { description: openedProject.description },
-  //   }
-  // );
+  const { data } = useQuery<GetKnowledgeGraph, GetKnowledgeGraphVariables>(
+    GetKnowledgeGraphQuery,
+    {
+      variables: { description: openedProject.description },
+    }
+  );
+
+  const topTopics = useMemo(
+    () => data?.knowledgeGraph.topics.map((t) => t.name).slice(0, 9) || [],
+    [data]
+  );
 
   // TODO: Check this var when we have integration with the server
-  // const resources = useMemo(() => {
-  //   if (data?.knowledgeGraph) {
-  //     return data.knowledgeGraph.items.map(buildKGItem);
-  //   }
-  //   return [];
-  // }, [data]);
+  const resources: D[] = useMemo(() => {
+    if (data?.knowledgeGraph) {
+      return data.knowledgeGraph.items.map((item, idx: number) => ({
+        id: item.id,
+        category: topTopics.includes(item.topics[0]?.name || '')
+          ? item.topics[0]?.name || ''
+          : 'Others',
+        type: item.category,
+        name: item.title,
+        score: item.score,
+        starred: starredItems.includes(idx),
+      }));
+    }
+    return [];
+  }, [data]);
+
+  const idToFullResource: { [key: string]: any } = useMemo(() => {
+    if (data?.knowledgeGraph.items) {
+      return Object.fromEntries(
+        data.knowledgeGraph.items.map((r) => [
+          r.id,
+          {
+            title: r.title,
+            abstract: r.abstract,
+            topics: r.topics,
+            score: r.score,
+          },
+        ])
+      );
+    }
+    return {};
+  }, [data?.knowledgeGraph.items]);
 
   const [sections, topics]: [TopicSections, Topic[]] = useMemo(() => {
     const sections = getSectionsAndNames(resources);
@@ -104,7 +102,9 @@ function KG({ openedProject }: ProjectRoute) {
     filters,
   } = useKGFilters(sections, resources);
 
-  const filtersOrder = topTopics;
+  if (data === undefined) return null;
+
+  const filtersOrder = [...topTopics, 'Others'];
   const filtersOrderDict = Object.fromEntries(
     filtersOrder.map((f, idx) => [f, idx])
   );
@@ -117,7 +117,7 @@ function KG({ openedProject }: ProjectRoute) {
     <div className={styles.container}>
       <div className={styles.vizArea}>
         <div className={styles.kgTopBar}>
-          <NavigationMenu />
+          <div className={styles.safeArea} />
           <Filters
             topics={topics}
             filters={filters}
@@ -128,6 +128,7 @@ function KG({ openedProject }: ProjectRoute) {
           data={filteredResources}
           sections={filteredSections}
           selectedResource={selectedResource}
+          idToFullResource={idToFullResource}
         />
       </div>
       <div className={styles.panelSafeArea} />

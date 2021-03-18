@@ -6,21 +6,23 @@ import IconUnstar from '@material-ui/icons/StarBorder';
 import React from 'react';
 import Score from '../KGVisualization/Score';
 import cx from 'classnames';
-import { idToFullResource } from '../../KG';
-import styles from './DetailsPanel.module.scss';
+import styles from './ResourceDetails.module.scss';
 
 type Props = {
   resource: D | null;
   onClose: () => void;
+  idToFullResource: { [key: string]: any };
 };
-function DetailsPanel({ resource: tempResource, onClose }: Props) {
-  const resource = idToFullResource[tempResource?.id || ''] || null;
+function ResourceDetails({
+  resource: tempResource,
+  onClose,
+  idToFullResource,
+}: Props) {
+  const resource: any = idToFullResource[tempResource?.id || ''] || null;
   const starred = tempResource?.starred;
 
   return (
-    <div
-      className={cx(styles.container, { [styles.opened]: resource !== null })}
-    >
+    <div className={styles.container}>
       <div className={styles.title}>
         <div className={styles.titleText}>Detail</div>
         <div className={styles.actions}>
@@ -57,11 +59,13 @@ function DetailsPanel({ resource: tempResource, onClose }: Props) {
               </a>
             </div>
             <div className={styles.topicsG}>
-              <div className={styles.sectionTitle}>TOPICS</div>
-              {Object.entries(resource.topics).map(([topic, value]: any) => (
+              {resource.topics.length > 0 && (
+                <div className={styles.sectionTitle}>TOPICS</div>
+              )}
+              {resource.topics.map(({ name, relevance }: any) => (
                 <div className={styles.topicScore}>
-                  <Score value={value} inline />
-                  <span>{topic}</span>
+                  <Score value={relevance} inline />
+                  <span>{name}</span>
                 </div>
               ))}
             </div>
@@ -73,4 +77,4 @@ function DetailsPanel({ resource: tempResource, onClose }: Props) {
   );
 }
 
-export default DetailsPanel;
+export default ResourceDetails;

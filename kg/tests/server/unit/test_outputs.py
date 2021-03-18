@@ -1,13 +1,14 @@
 import pytest
 
 from exceptions import MissingFieldException
-from outputs import RecommendedItem, RecommendedList
+from outputs import RecommendedItem, RecommendedList, Topic
 from proto.knowledge_graph_pb2 import GetGraphRes, GraphItem
 
 VALUES_1 = {"id": "12345",
             "category": "paper",
             "title": "title test 1",
             "abstract": "test abstract",
+            "topics": [Topic(name="", relevance=0.1)],
             "authors": ["test author", "test author 2"],
             "score": 0.9,
             "date": "2020-01-01",
@@ -17,6 +18,7 @@ VALUES_2 = {"id": "6789",
             "category": "paper",
             "title": "title test 2",
             "abstract": "test abstract 2",
+            "topics": [Topic(name="", relevance=0.1)],
             "authors": ["test author 2", "test author 1"],
             "score": 0.2,
             "date": "2020-01-01",
@@ -26,6 +28,7 @@ VALUES_EXTRA = {"id": "6789",
                 "category": "paper",
                 "title": "title test 2",
                 "abstract": "test abstract 2",
+                "topics": [Topic(name="", relevance=0.1)],
                 "authors": ["test author 2", "test author"],
                 "score": 0.2,
                 "date": "2020-01-01",
@@ -35,6 +38,7 @@ VALUES_EXTRA = {"id": "6789",
 VALUES_OPTIONAL = {"id": "6789",
                    "category": "paper",
                    "title": "title test 2",
+                   "topics": [Topic(name="", relevance=0.1)],
                    "abstract": "test abstract 2",
                    "authors": "test author 2",
                    "score": 0.2,
@@ -80,9 +84,11 @@ class TestRecommendedItem:
                            'score',
                            'date',
                            'url',
+                           'topics',
                            'external_id',
                            'frameworks',
-                           'repo_urls']
+                           'repo_urls',
+                           ]
         fields = RecommendedItem(VALUES_1)._get_fields()
         assert isinstance(fields, list)
         assert fields == expected_fields
@@ -95,7 +101,8 @@ class TestRecommendedItem:
                            'authors',
                            'score',
                            'date',
-                           'url']
+                           'url',
+                           'topics']
         fields = RecommendedItem(VALUES_1)._get_mandatory_fields()
         assert isinstance(fields, list)
         assert fields == expected_fields
@@ -125,6 +132,8 @@ class TestRecommendedList:
         assert rec_list.items[0].title == "title test 1"
 
     def test_to_grpc(self):
-        rec_list = RecommendedList([VALUES_2, VALUES_1]).to_grpc()
+        rec_list = RecommendedList([VALUES_2, VALUES_1])
+        rec_list.add_topics([Topic(name="", relevance=0.1)])
+        rec_list = rec_list.to_grpc()
         assert isinstance(rec_list, GetGraphRes)
         assert isinstance(rec_list.items[0], GraphItem)

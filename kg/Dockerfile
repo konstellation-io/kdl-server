@@ -26,10 +26,14 @@ RUN python3 -m pip install pipenv && \
 
 COPY server server
 
+WORKDIR /kg/assets
+
 RUN dvc get $REPO_URL --rev $ASSET_COMMIT kg/assets/vectors.npy && \
     dvc get $REPO_URL --rev $ASSET_COMMIT kg/assets/model && \
     dvc get $REPO_URL --rev $ASSET_COMMIT kg/assets/topics.pkl.gz && \
     dvc get $REPO_URL --rev $ASSET_COMMIT kg/assets/dataset.pkl.gz
+
+WORKDIR /kg
 
 RUN chown -R kdl:0 /kg \
     && chmod -R g+w /kg \

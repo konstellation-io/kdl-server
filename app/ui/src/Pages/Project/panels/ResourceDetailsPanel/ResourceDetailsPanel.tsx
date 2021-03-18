@@ -16,7 +16,7 @@ type Props = {
   resource: D;
   close: () => void;
 };
-function MemberDetail({ resource, close }: Props) {
+function ResourceDetailsPanel({ resource, close }: Props) {
   const { data, loading, error } = useQuery<
     GetKnowledgeGraphItem,
     GetKnowledgeGraphItemVariables
@@ -40,4 +40,4 @@ function MemberDetail({ resource, close }: Props) {
   );
 }
 
-export default MemberDetail;
+export default ResourceDetailsPanel;

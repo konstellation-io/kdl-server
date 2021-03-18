@@ -23,13 +23,14 @@ const (
 )
 
 type userDTO struct {
-	ID            primitive.ObjectID `bson:"_id"`
-	Username      string             `bson:"username"`
-	Email         string             `bson:"email"`
-	CreationDate  time.Time          `bson:"creation_date"`
-	AccessLevel   string             `bson:"access_level"`
-	PublicSSHKey  string             `bson:"public_ssh_key"`
-	PrivateSSHKey string             `bson:"private_ssh_key"`
+	ID                 primitive.ObjectID `bson:"_id"`
+	Username           string             `bson:"username"`
+	Email              string             `bson:"email"`
+	CreationDate       time.Time          `bson:"creation_date"`
+	AccessLevel        string             `bson:"access_level"`
+	PublicSSHKey       string             `bson:"public_ssh_key"`
+	PrivateSSHKey      string             `bson:"private_ssh_key"`
+	SSHKeyCreationDate time.Time          `bson:"ssh_key_creation_date"`
 }
 
 type userMongoDBRepo struct {
@@ -163,12 +164,13 @@ func (m *userMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity.Us
 
 func (m *userMongoDBRepo) entityToDTO(u entity.User) (userDTO, error) {
 	dto := userDTO{
-		Username:      u.Username,
-		Email:         u.Email,
-		AccessLevel:   string(u.AccessLevel),
-		PrivateSSHKey: u.SSHKey.Private,
-		PublicSSHKey:  u.SSHKey.Public,
-		CreationDate:  u.CreationDate,
+		Username:           u.Username,
+		Email:              u.Email,
+		AccessLevel:        string(u.AccessLevel),
+		PrivateSSHKey:      u.SSHKey.Private,
+		PublicSSHKey:       u.SSHKey.Public,
+		SSHKeyCreationDate: u.SSHKey.CreationDate,
+		CreationDate:       u.CreationDate,
 	}
 
 	if u.ID != "" {
@@ -191,8 +193,9 @@ func (m *userMongoDBRepo) dtoToEntity(dto userDTO) entity.User {
 		AccessLevel:  entity.AccessLevel(dto.AccessLevel),
 		CreationDate: dto.CreationDate,
 		SSHKey: entity.SSHKey{
-			Public:  dto.PublicSSHKey,
-			Private: dto.PrivateSSHKey,
+			Public:       dto.PublicSSHKey,
+			Private:      dto.PrivateSSHKey,
+			CreationDate: dto.SSHKeyCreationDate,
 		},
 	}
 }

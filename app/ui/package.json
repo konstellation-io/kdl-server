@@ -17,7 +17,7 @@
     "d3-zoom": "2.0.0",
     "graphql": "15.5.0",
     "graphql.macro": "github:mgs95/graphql.macro#build",
-    "kwc": "1.8.2",
+    "kwc": "1.9.0",
     "lodash.capitalize": "4.2.1",
     "moment-timezone": "0.5.32",
     "node-sass": "4.14.1",

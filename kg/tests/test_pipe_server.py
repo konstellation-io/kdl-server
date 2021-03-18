@@ -31,7 +31,7 @@ def test_vectorize_diferent_batch_size(gen_inputs):
                                          batch_size=4,
                                          model=TRANSFORMER,
                                          tokenizer=TOKENIZER,
-                                         tokinzer_args=TOKENIZER_ARGS,
+                                         tokenizer_args=TOKENIZER_ARGS,
                                          device=DEVICE)
 
     assert np.allclose(vecs_all[0], vec_1)

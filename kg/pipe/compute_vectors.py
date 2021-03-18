@@ -17,7 +17,7 @@ DATASET_PATH = ASSET_PATH + "dataset.pkl.gz"
 
 # Constants
 VECTOR_DIMS = 768
-BATCH_SIZE = 1
+BATCH_SIZE = 1  # This batch size is a workaround for a padding problem.
 
 
 def create_inputs(title: str, abstract: str) -> str:
@@ -42,8 +42,7 @@ def get_inputs(input_path: str) -> np.ndarray:
     Return:
         returns a numpy array with shape (number_of_inputs, 1)
     """
-    # TODO take out index
-    df = pd.read_pickle(input_path, compression="gzip")[['title', 'abstract']][:63]
+    df = pd.read_pickle(input_path, compression="gzip")[['title', 'abstract']]
     return np.vectorize(create_inputs)(df['title'], df['abstract'])
 
 

@@ -48,9 +48,8 @@ func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.K
 	items := make([]entity.KnowledgeGraphItem, len(res.Items))
 
 	for i, value := range res.Items {
-		cat := entity.KnowledgeGraphItemCat(strings.Title(value.Category))
-		if !cat.IsValid() {
-			err = fmt.Errorf("%w: category \"%s\"", ErrInvalidCategory, value.Category)
+		cat, err := parseValidateCategory(value)
+		if err != nil {
 			return entity.KnowledgeGraph{}, err
 		}
 
@@ -65,7 +64,6 @@ func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.K
 			URL:         value.Url,
 			Topics:      convertTopics(value.Topics),
 			IsStarred:   false,
-			IsDiscarded: false,
 			RepoURLs:    value.RepoUrls,
 			ExternalID:  stringToPointer(value.ExternalId),
 			Frameworks:  value.Frameworks,
@@ -75,6 +73,38 @@ func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.K
 	topics := convertTopics(res.Topics)
 
 	return entity.KnowledgeGraph{Items: items, Topics: topics}, nil
+}
+
+func (kg *kgService) GetItem(ctx context.Context, ID string) (entity.KnowledgeGraphItem, error) {
+	req := kgpb.GetItemReq{Id: ID}
+
+	res, err := kg.client.GetItem(ctx, &req)
+	if err != nil {
+		return entity.KnowledgeGraphItem{}, err
+	}
+
+	cat, err := parseValidateCategory(res.Item)
+	if err != nil {
+		return entity.KnowledgeGraphItem{}, err
+	}
+
+	item := entity.KnowledgeGraphItem{
+		ID:          res.Item.Id,
+		Category:    cat,
+		Title:       res.Item.Title,
+		Abstract:    res.Item.Abstract,
+		Authors:     res.Item.Authors,
+		Score:       float64(res.Item.Score),
+		Date:        res.Item.Date,
+		URL:         res.Item.Url,
+		Topics:      convertTopics(res.Item.Topics),
+		IsStarred:   false,
+		RepoURLs:    res.Item.RepoUrls,
+		ExternalID:  stringToPointer(res.Item.ExternalId),
+		Frameworks:  res.Item.Frameworks,
+	}
+
+	return item, nil
 }
 
 func stringToPointer(s string) *string {
@@ -96,4 +126,17 @@ func convertTopics(topics []*kgpb.Topic) []entity.Topic {
 	}
 
 	return converted
+}
+
+func parseValidateCategory(item *kgpb.GraphItem) (entity.KnowledgeGraphItemCat, error) {
+	cat := entity.KnowledgeGraphItemCat(strings.Title(item.Category))
+
+	var err error
+	err = nil
+
+	if !cat.IsValid() {
+		err = fmt.Errorf("%w: category \"%s\"", ErrInvalidCategory, item.Category)
+	}
+
+	return cat, err
 }

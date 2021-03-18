@@ -1,9 +1,6 @@
 import numpy as np
 
 import compute_vectors
-import numpy as np
-
-import compute_vectors
 
 TEST_DATASET_PATH = "tests/files/test_ds.pkl.gz"
 

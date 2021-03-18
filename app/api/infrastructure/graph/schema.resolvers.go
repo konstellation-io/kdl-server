@@ -263,6 +263,15 @@ func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) 
 	return &kg, nil
 }
 
+func (r *queryResolver) KnowledgeGraphItem(ctx context.Context, id string) (*entity.KnowledgeGraphItem, error) {
+	kg, err := r.kg.GetItem(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &kg, nil
+}
+
 func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (string, error) {
 	switch obj.Type {
 	case entity.RepositoryTypeInternal:

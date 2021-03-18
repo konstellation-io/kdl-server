@@ -134,6 +134,7 @@ dvc repro
 
 The pipeline consists of the following steps:
 ```
+check-inputs
 create-dataset
 compute-vectors
 compute-topics

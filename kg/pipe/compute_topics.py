@@ -1,20 +1,21 @@
-from pathlib import Path
 import pickle
+from pathlib import Path
 from typing import Union
 
 import numpy as np
 import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
 import torch
+from sklearn.feature_extraction.text import TfidfVectorizer
 from torch import nn
-
 
 # Paths
 ASSET_PATH = "assets/"
-TOPICS_MODEL_PATH = ASSET_PATH + "topics_model"
+INPUT_PATH = "inputs/"
+
+TOPICS_MODEL_PATH = INPUT_PATH + "topics_model"
 DATASET_PATH = ASSET_PATH + "dataset.pkl.gz"
 
-OUTPUT_TOPICS_PATH = ASSET_PATH + "topics.csv"
+OUTPUT_TOPICS_PATH = ASSET_PATH + "topics.pkl.gz"
 
 # Constants
 BATCH_SIZE = 32
@@ -64,13 +65,16 @@ def convert_to_batches(input_items: Union[np.ndarray, range],
 
 def get_topics_from_probs(topic_probs, topic_names, threshold=0.5):
     """Given a 2D array of topic probabilities per document (and corresponding topic names),
-    returns a human-readable output of topics for each input document (above provided threshold probability, 50% by default).
+    returns a human-readable output of topics for each input document (above provided threshold
+    probability, 50% by default).
     (Replaces obsolete summarize_topic_mixture.)
 
     Args:
-        topic_probs: (numpy array) of shape (n_docs, n_topics) containing all topic probabilities for that document.
+        topic_probs: (numpy array) of shape (n_docs, n_topics) containing all topic
+         probabilities for that document.
         topic_names: (list) names of topics corresponding to columns in topic_probs
-        threshold: (float) probability required for a topic to be included in the output list of assigned/predicted topics
+        threshold: (float) probability required for a topic to be included in the
+        output list of assigned/predicted topics
 
     Returns:
         (list of dict) in the form of {'topic_name': topic_prob}, e.g.:
@@ -84,8 +88,9 @@ def get_topics_from_probs(topic_probs, topic_names, threshold=0.5):
         top_idx = np.where(w_row > threshold)[0]
         top_topic_names = [topic_names[idx] for idx in top_idx]
         top_topic_weights = [w_row[idx] for idx in top_idx]
-        topics_summary_dict = [(name, weight) for weight, name in sorted(zip(top_topic_weights, top_topic_names))[
-                                                                ::-1]]
+        topics_summary_dict = [(name, weight) for weight, name
+                               in sorted(zip(top_topic_weights,
+                                             top_topic_names))[::-1]]
 
         output_list.append(topics_summary_dict)
 
@@ -114,9 +119,10 @@ class DNNModel(nn.Module):
         return x
 
 
-class DNNTopicPredictor(object):
-    """TODO: Methods for model training and saving but not needed for inference are removed; need a better solution
+class DNNTopicPredictor:
     """
+    """
+
     def __init__(self, config=None, load_for_inference=False, filepath_saved_model=None):
 
         self.config = config
@@ -155,7 +161,7 @@ class DNNTopicPredictor(object):
         self.model = DNNModel(n_vocab=self.vocab_size, n_labels=len(self.topic_names))
 
         # Load state_dict
-        saved_state = torch.load(Path(filepath) / "model_state.pt")
+        saved_state = torch.load(Path(filepath) / "model_state.pt", map_location=self.device)
         self.model.load_state_dict(saved_state)
         self.model.to(self.device)
         self.model.eval()
@@ -219,8 +225,7 @@ class DNNTopicPredictor(object):
         return output_topic_list, Y_probs
 
 
-def main():
-
+def compute_topics():
     print("Starting topic computation stage ...")
 
     # Load the topic prediction model
@@ -232,7 +237,7 @@ def main():
     doc_hashes = pd.read_pickle(DATASET_PATH)['id']
 
     # Convert to batches for higher efficiency of inference computation
-    texts_in_batches = convert_to_batches(texts, BATCH_SIZE)
+    texts_in_batches = convert_to_batches(texts, batch_size=BATCH_SIZE)
     hashes_in_batches = convert_to_batches(doc_hashes, batch_size=BATCH_SIZE)
 
     # Allocate a data frame to store outputs
@@ -244,16 +249,10 @@ def main():
         df_output.loc[hashes, 'topics'] = batch_topics
 
     # Save
-    df_output.to_csv(OUTPUT_TOPICS_PATH)
+    df_output.reset_index()
+    df_output.to_pickle(OUTPUT_TOPICS_PATH, compression="gzip", protocol=5)
     print(f"Completed topic computation and saved at {OUTPUT_TOPICS_PATH}")
 
 
 if __name__ == "__main__":
-
-    main()
-
-
-
-
-
-
+    compute_topics()

@@ -71,8 +71,7 @@ def test_tokenize_batch(gen_inputs):
     inputs = gen_inputs
     tensor = torch.tensor(TOKENIZER.encode(inputs[0], **TOKENIZER_ARGS))
     expected = compute_vectors.stack_and_pad_tensors([tensor],
-                                                     TOKENIZER.pad_token_id,
-                                                     max_len=TOKENIZER_ARGS['max_length'])
+                                                     TOKENIZER.pad_token_id)
     batches = compute_vectors.convert_to_batches(inputs, batch_size=32)
     actual = compute_vectors.tokenize_batch(batches[0], tokenizer=TOKENIZER,
                                             tokenizer_args=TOKENIZER_ARGS, device=DEVICE)

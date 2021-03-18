@@ -49,13 +49,13 @@ function ResourceDetails({
             <div className={styles.authors}>
               <div className={styles.sectionTitle}>AUTHORS</div>
               <div className={styles.authorsText}>
-                Cavigelli, Lukas; Bernath, Dominic; Magno, Michele; Benini, Luca
+                {resource.authors.join(', ')}
               </div>
             </div>
             <div className={styles.type}>{'Paper'}</div>
             <div className={styles.url}>
-              <a href="http://www.arxiv-sanity.com/1611.03130" target="_blank">
-                http://www.arxiv-sanity.com/1611.03130
+              <a href={resource.url} target="_blank">
+                {resource.url}
               </a>
             </div>
             <div className={styles.topicsG}>

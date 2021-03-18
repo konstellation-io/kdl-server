@@ -9,7 +9,7 @@
 
 .steps {
   position: relative;
-  height: 17 * $grid-unit;
+  height: 9vh;
   background-color: palette(base, 700);
   flex-shrink: 0;
 }
@@ -31,18 +31,19 @@
   position: relative;
   height: 100%;
   width: 100%;
+  padding: 6 * $grid-unit 8 * $grid-unit;
 }
 
 .pages {
   height: 100%;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   background-color: palette(base, 900);
 
   > div {
     position: absolute;
     width: 100%;
-    padding: 6 * $grid-unit 8 * $grid-unit;
   }
 }
 

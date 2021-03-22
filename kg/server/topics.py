@@ -14,17 +14,16 @@ def convert_type_topics(topic_list: list[tuple[str, float]]) -> list[Topic]:
     return result_list
 
 
-def get_relevant_topics(topics_summaries: pd.Series,
-                        cutoff: int = 100) -> list[Topic]:
+def get_relevant_topics(topics_summaries: pd.Series, cutoff: int = 100) -> list[Topic]:
     """
     Gets a list of most relevant topics for a papers recommendation
     """
     topics = defaultdict(float)
-    for _, topic_list in topics_summaries.iteritems():
+    for _, topic_list in topics_summaries.head(cutoff).iteritems():
         for topic in topic_list:
             topics[topic.name] += topic.relevance
 
     topics = [Topic(*topic) for topic in topics.items()]
-    topics.sort()
+    topics.sort(reverse=True)
 
-    return topics[:cutoff]
+    return topics

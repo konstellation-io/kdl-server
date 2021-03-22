@@ -326,8 +326,8 @@ function KGVisualization({
         />
       </div>
       <div className={styles.sectionTags}>
-        {sections.map((section) => (
-          <SectionList section={section} key={section} />
+        {sections.map((section, idx) => (
+          <SectionList section={section} idx={idx} key={section} />
         ))}
       </div>
       <div className={styles.staticTooltip}>

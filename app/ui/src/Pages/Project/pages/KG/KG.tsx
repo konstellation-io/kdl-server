@@ -98,12 +98,10 @@ function KG({ openedProject }: ProjectRoute) {
     return [sections, topics];
   }, [resources]);
 
-  const {
-    handleFiltersChange,
-    filteredResources,
-    filteredSections,
-    filters,
-  } = useKGFilters(sections, resources);
+  const { handleFiltersChange, filteredResources, filters } = useKGFilters(
+    sections,
+    resources
+  );
 
   if (data === undefined) return null;
 
@@ -115,6 +113,9 @@ function KG({ openedProject }: ProjectRoute) {
     filtersOrderDict[a.category] - filtersOrderDict[b.category] ||
     a.category.localeCompare(b.category);
   filteredResources.sort(sortFilters);
+  const sectionsSorted = Array.from(
+    new Set(filteredResources.map((r) => r.category))
+  );
 
   return (
     <div className={styles.container}>
@@ -129,7 +130,7 @@ function KG({ openedProject }: ProjectRoute) {
         </div>
         <KGVisualization
           data={filteredResources}
-          sections={filteredSections}
+          sections={sectionsSorted}
           selectedResource={selectedResource}
           idToFullResource={idToFullResource}
         />

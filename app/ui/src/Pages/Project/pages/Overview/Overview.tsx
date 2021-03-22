@@ -1,8 +1,4 @@
 import { ErrorMessage, SpinnerCircular } from 'kwc';
-import {
-  GetQualityProjectDesc,
-  GetQualityProjectDescVariables,
-} from 'Graphql/queries/types/GetQualityProjectDesc';
 import RepositoryTypeComponent, {
   LOCATION,
   SIZE,

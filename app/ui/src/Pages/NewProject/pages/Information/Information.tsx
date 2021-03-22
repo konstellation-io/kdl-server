@@ -32,11 +32,7 @@ function Information({ showErrors }: Props) {
   const { name, description } = values;
   const { name: errorName, description: errorDescription } = errors;
 
-  const {
-    descriptionScore,
-    fetchDescriptionScore,
-    loading,
-  } = useQualityDescription(description);
+  const { descriptionScore, loading } = useQualityDescription(description);
 
   if (!project) return <SpinnerCircular />;
 
@@ -68,7 +64,6 @@ function Information({ showErrors }: Props) {
         onBlur={() => {
           const isValidDescription = validateProjectDescription(description);
           updateError('description', getErrorMsg(isValidDescription));
-          fetchDescriptionScore();
         }}
         limits={limits}
         error={showErrors ? errorDescription : ''}

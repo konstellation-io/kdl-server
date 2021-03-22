@@ -1,4 +1,3 @@
-import { Button } from 'kwc';
 import { GetProjectMembers_project_members } from 'Graphql/queries/types/GetProjectMembers';
 import Gravatar from 'react-gravatar';
 import IconOpen from '@material-ui/icons/ArrowForward';

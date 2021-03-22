@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import { useLazyQuery } from '@apollo/client';
 import {
   GetQualityProjectDesc,
   GetQualityProjectDescVariables,
 } from 'Graphql/queries/types/GetQualityProjectDesc';
+import { useEffect, useRef, useState } from 'react';
+
 import { loader } from 'graphql.macro';
+import { useLazyQuery } from '@apollo/client';
 
 const GetQualityProjectDescQuery = loader(
   'Graphql/queries/getQualityProjectDesc.graphql'
@@ -20,26 +21,27 @@ function useQualityDescription(
   description: string,
   {
     skipFirstRun = true,
-    debounceTime = 2000,
+    debounceTime = 1000,
     minWordsNumber = 50,
   }: Options = {}
 ) {
   const [descriptionScore, setDescriptionScore] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  const [getQualityProjectDesc, { loading, error }] = useLazyQuery<
+  const [getQualityProjectDesc, { error }] = useLazyQuery<
     GetQualityProjectDesc,
     GetQualityProjectDescVariables
   >(GetQualityProjectDescQuery, {
     onCompleted: (data) => {
       setDescriptionScore(data.qualityProjectDesc.quality || 0);
+      setLoading(false);
     },
   });
 
-  function fetchDescriptionScore() {
-    const isLengthAcceptable = description.split(' ').length >= minWordsNumber;
+  const isLengthAcceptable = description.split(' ').length >= minWordsNumber;
 
-    if (!isLengthAcceptable) setDescriptionScore(0);
-    else getQualityProjectDesc({ variables: { description } });
+  function fetchDescriptionScore() {
+    getQualityProjectDesc({ variables: { description } });
   }
 
   useEffect(() => {
@@ -50,12 +52,19 @@ function useQualityDescription(
 
   const firstRun = useRef(true);
   useEffect(() => {
+    let scoreTimeoutId: number = 0;
+
     if (firstRun.current) {
       firstRun.current = false;
       return;
     }
 
-    const scoreTimeoutId = setTimeout(fetchDescriptionScore, debounceTime);
+    if (isLengthAcceptable) {
+      setLoading(true);
+      scoreTimeoutId = window.setTimeout(fetchDescriptionScore, debounceTime);
+    } else {
+      setDescriptionScore(0);
+    }
 
     return () => clearTimeout(scoreTimeoutId);
     // We can omit fetchDescriptionScore as it is not change

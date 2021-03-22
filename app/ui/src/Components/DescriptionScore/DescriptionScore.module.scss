@@ -12,6 +12,8 @@
     transition: color ease 0.4s;
     text-align: right;
 
+    position: relative;
+
     &.LOW {
       color: palette(error);
     }

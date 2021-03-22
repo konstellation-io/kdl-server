@@ -1,17 +1,17 @@
-import React from 'react';
 import { SpinnerCircular, TextInput } from 'kwc';
-import { useReactiveVar } from '@apollo/client';
-
-import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
 import { generateSlug, getErrorMsg } from 'Utils/string';
-import styles from './Information.module.scss';
-import useNewProject from 'Graphql/client/hooks/useNewProject';
 import {
   validateProjectDescription,
   validateProjectName,
 } from './InformationUtils';
+
+import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
+import React from 'react';
 import { newProject } from 'Graphql/client/cache';
+import styles from './Information.module.scss';
+import useNewProject from 'Graphql/client/hooks/useNewProject';
 import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
+import { useReactiveVar } from '@apollo/client';
 
 const limits = {
   maxHeight: 400,
@@ -32,9 +32,11 @@ function Information({ showErrors }: Props) {
   const { name, description } = values;
   const { name: errorName, description: errorDescription } = errors;
 
-  const { descriptionScore, fetchDescriptionScore } = useQualityDescription(
-    description
-  );
+  const {
+    descriptionScore,
+    fetchDescriptionScore,
+    loading,
+  } = useQualityDescription(description);
 
   if (!project) return <SpinnerCircular />;
 
@@ -70,11 +72,14 @@ function Information({ showErrors }: Props) {
         }}
         limits={limits}
         error={showErrors ? errorDescription : ''}
+        helpText={`A minimum of 50 words is required to get a valid score. Words: ${
+          description.split(' ').length
+        }`}
         showClearButton
         textArea
         lockHorizontalGrowth
       />
-      <DescriptionScore score={descriptionScore} />
+      <DescriptionScore score={descriptionScore} loading={loading} />
     </div>
   );
 }

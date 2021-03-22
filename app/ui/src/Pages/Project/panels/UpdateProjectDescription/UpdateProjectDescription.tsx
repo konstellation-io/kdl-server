@@ -46,12 +46,13 @@ function UpdateProjectDescription({ project, close }: Props) {
 
   const descriptionValue = watch('description');
 
-  const { descriptionScore, fetchDescriptionScore } = useQualityDescription(
-    descriptionValue,
-    {
-      skipFirstRun: false,
-    }
-  );
+  const {
+    descriptionScore,
+    fetchDescriptionScore,
+    loading,
+  } = useQualityDescription(descriptionValue, {
+    skipFirstRun: false,
+  });
 
   function submit({ description }: FormData) {
     updateProjectDescription(project.id, description);
@@ -82,7 +83,7 @@ function UpdateProjectDescription({ project, close }: Props) {
         />
       </div>
       <div className={styles.score}>
-        <DescriptionScore score={descriptionScore} />
+        <DescriptionScore score={descriptionScore} loading={loading} />
       </div>
       <ActionsBar className={styles.actions}>
         <Button

@@ -16,7 +16,8 @@ import (
 
 // DeleteUserToolsCR removes the Custom Resource from Kubernetes.
 func (k *k8sClient) DeleteUserToolsCR(ctx context.Context, username string) error {
-	resName := k.getUserToolsResName(username)
+	slugUsername := k.getSlugUsername(username)
+	resName := k.getUserToolsResName(slugUsername)
 
 	var zero int64 = 0
 

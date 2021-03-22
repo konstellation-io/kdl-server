@@ -10,6 +10,7 @@ import KGVisualization, {
 import React, { useMemo } from 'react';
 
 import { ProjectRoute } from '../../ProjectPanels';
+import { SpinnerCircular } from 'kwc';
 import { getSectionsAndNames } from './KGUtils';
 import { loader } from 'graphql.macro';
 import styles from './KG.module.scss';
@@ -40,12 +41,12 @@ const GetKnowledgeGraphQuery = loader(
 );
 
 function KG({ openedProject }: ProjectRoute) {
-  const { data } = useQuery<GetKnowledgeGraph, GetKnowledgeGraphVariables>(
-    GetKnowledgeGraphQuery,
-    {
-      variables: { description: openedProject.description },
-    }
-  );
+  const { data, loading } = useQuery<
+    GetKnowledgeGraph,
+    GetKnowledgeGraphVariables
+  >(GetKnowledgeGraphQuery, {
+    variables: { description: openedProject.description },
+  });
 
   const topTopics = useMemo(
     () => data?.knowledgeGraph.topics.map((t) => t.name).slice(0, 9) || [],
@@ -106,6 +107,7 @@ function KG({ openedProject }: ProjectRoute) {
   } = useKGFilters(sections, resources);
 
   if (data === undefined) return null;
+  if (loading) return <SpinnerCircular />;
 
   const filtersOrder = [...topTopics, 'Others'];
   const filtersOrderDict = Object.fromEntries(

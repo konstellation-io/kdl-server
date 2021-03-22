@@ -31,17 +31,17 @@ type KnowledgeGraph struct {
 }
 
 type KnowledgeGraphItem struct {
-	ID          string
-	Category    KnowledgeGraphItemCat
-	Title       string
-	Abstract    string
-	Authors     []string
-	Date        string
-	URL         string
-	ExternalID  *string
-	RepoURLs    []string
-	Frameworks  []string
-	Topics      []Topic
-	Score       float64
-	IsStarred   bool
+	ID         string
+	Category   KnowledgeGraphItemCat
+	Title      string
+	Abstract   string
+	Authors    []string
+	Date       string
+	URL        string
+	ExternalID *string
+	RepoURLs   []string
+	Frameworks []string
+	Topics     []Topic
+	Score      float64
+	IsStarred  bool
 }

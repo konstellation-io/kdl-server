@@ -54,19 +54,19 @@ func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.K
 		}
 
 		items[i] = entity.KnowledgeGraphItem{
-			ID:          value.Id,
-			Category:    cat,
-			Title:       value.Title,
-			Abstract:    value.Abstract,
-			Authors:     value.Authors,
-			Score:       float64(value.Score),
-			Date:        value.Date,
-			URL:         value.Url,
-			Topics:      convertTopics(value.Topics),
-			IsStarred:   false,
-			RepoURLs:    value.RepoUrls,
-			ExternalID:  stringToPointer(value.ExternalId),
-			Frameworks:  value.Frameworks,
+			ID:         value.Id,
+			Category:   cat,
+			Title:      value.Title,
+			Abstract:   value.Abstract,
+			Authors:    value.Authors,
+			Score:      float64(value.Score),
+			Date:       value.Date,
+			URL:        value.Url,
+			Topics:     convertTopics(value.Topics),
+			IsStarred:  false,
+			RepoURLs:   value.RepoUrls,
+			ExternalID: stringToPointer(value.ExternalId),
+			Frameworks: value.Frameworks,
 		}
 	}
 
@@ -75,8 +75,8 @@ func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.K
 	return entity.KnowledgeGraph{Items: items, Topics: topics}, nil
 }
 
-func (kg *kgService) GetItem(ctx context.Context, ID string) (entity.KnowledgeGraphItem, error) {
-	req := kgpb.GetItemReq{Id: ID}
+func (kg *kgService) GetItem(ctx context.Context, id string) (entity.KnowledgeGraphItem, error) {
+	req := kgpb.GetItemReq{Id: id}
 
 	res, err := kg.client.GetItem(ctx, &req)
 	if err != nil {
@@ -89,19 +89,19 @@ func (kg *kgService) GetItem(ctx context.Context, ID string) (entity.KnowledgeGr
 	}
 
 	item := entity.KnowledgeGraphItem{
-		ID:          res.Item.Id,
-		Category:    cat,
-		Title:       res.Item.Title,
-		Abstract:    res.Item.Abstract,
-		Authors:     res.Item.Authors,
-		Score:       float64(res.Item.Score),
-		Date:        res.Item.Date,
-		URL:         res.Item.Url,
-		Topics:      convertTopics(res.Item.Topics),
-		IsStarred:   false,
-		RepoURLs:    res.Item.RepoUrls,
-		ExternalID:  stringToPointer(res.Item.ExternalId),
-		Frameworks:  res.Item.Frameworks,
+		ID:         res.Item.Id,
+		Category:   cat,
+		Title:      res.Item.Title,
+		Abstract:   res.Item.Abstract,
+		Authors:    res.Item.Authors,
+		Score:      float64(res.Item.Score),
+		Date:       res.Item.Date,
+		URL:        res.Item.Url,
+		Topics:     convertTopics(res.Item.Topics),
+		IsStarred:  false,
+		RepoURLs:   res.Item.RepoUrls,
+		ExternalID: stringToPointer(res.Item.ExternalId),
+		Frameworks: res.Item.Frameworks,
 	}
 
 	return item, nil

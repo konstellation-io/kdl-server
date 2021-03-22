@@ -66,11 +66,10 @@ func TestInteractor_Get(t *testing.T) {
 			Name:      "test",
 			Relevance: 0.1,
 		}},
-		ExternalID:  &aux,
-		Frameworks:  []string{"tf"},
-		Score:       0,
-		IsStarred:   false,
-		IsDiscarded: false,
+		ExternalID: &aux,
+		Frameworks: []string{"tf"},
+		Score:      0,
+		IsStarred:  false,
 	}}
 
 	expectedKG := entity.KnowledgeGraph{

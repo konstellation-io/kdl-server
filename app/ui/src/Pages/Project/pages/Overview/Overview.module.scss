@@ -28,6 +28,7 @@
   .description {
     @include font-small;
     color: font-color(lowlight);
+    white-space: pre-line;
 
     background-color: palette(base, 400);
     margin-top: 2 * $grid-unit;

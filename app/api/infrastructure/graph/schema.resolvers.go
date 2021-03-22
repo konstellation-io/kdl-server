@@ -279,7 +279,7 @@ func (r *queryResolver) QualityProjectDesc(ctx context.Context, description stri
 	if descriptionWords > enoughWords {
 		quality = 100
 	} else if descriptionWords > minWords {
-		quality = ((descriptionWords - minWords) / (enoughWords - minWords)) * 100
+		quality = (descriptionWords - minWords) * 100 / (enoughWords - minWords)
 	}
 
 	return &model.QualityProjectDesc{

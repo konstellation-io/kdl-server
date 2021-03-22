@@ -26,7 +26,7 @@ const KGItem: FC<Props> = ({
 
   return (
     <div
-      key={resource.name}
+      key={resource.id}
       className={cx(styles.resource, { [styles.starred]: resource.starred })}
       onMouseEnter={() => onEnter(resource.name)}
       onMouseLeave={onLeave}

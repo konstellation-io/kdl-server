@@ -6,7 +6,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"strings"
 	"time"
 
@@ -271,14 +270,20 @@ func (r *queryResolver) SSHKey(ctx context.Context) (*entity.SSHKey, error) {
 }
 
 func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
-	// We are sending a random number until the feature is developed
-	min := 0
-	max := 100
-	// nolint:gosec // this is a temp workaround
-	randomInt := rand.Intn(max-min) + min
+	minWords := 50
+	enoughWords := 200
+
+	descriptionWords := len(strings.Fields(description))
+	quality := 0
+
+	if descriptionWords > enoughWords {
+		quality = 100
+	} else if descriptionWords > minWords {
+		quality = ((descriptionWords - minWords) / (enoughWords - minWords)) * 100
+	}
 
 	return &model.QualityProjectDesc{
-		Quality: randomInt,
+		Quality: quality,
 	}, nil
 }
 

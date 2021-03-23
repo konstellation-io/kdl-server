@@ -10,7 +10,7 @@ type Props = {
   name: string;
   creationDate: string;
   lastUsedDate: string;
-  removeToken: (apiTokenId: string) => void;
+  removeToken: () => void;
 };
 
 const Token: FC<Props> = ({

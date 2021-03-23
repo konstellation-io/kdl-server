@@ -7,6 +7,7 @@ import grpc
 import config
 import proto.knowledge_graph_pb2 as kg_pb2
 import proto.knowledge_graph_pb2_grpc as kg_grpc_pb2
+from description_evaluator import DescriptionEvaluator
 from outputs import RecommendedItem
 from recommender import Recommender
 from tools.assets import AssetLoader
@@ -26,6 +27,7 @@ class KnowledgeGraphService(kg_grpc_pb2.KGServiceServicer):
             vectors=self.assets.vectors,
             dataset=self.assets.dataset,
         )
+        self.evaluator = DescriptionEvaluator(self.recommender)
 
     def GetGraph(self, request: kg_pb2.GetGraphReq, context: grpc.ServicerContext) -> kg_pb2.GetGraphRes:
         self.log.debug(f"Input description:\n {request.description}")
@@ -48,6 +50,13 @@ class KnowledgeGraphService(kg_grpc_pb2.KGServiceServicer):
             item = RecommendedItem(res_item.iloc[0].to_dict()).to_grpc()
 
         res = kg_pb2.GetItemRes(item=item)
+
+        return res
+
+    def GetDescriptionQuality(self, request: kg_pb2.DescriptionQualityReq, context: grpc.ServicerContext):
+        description_score = self.evaluator.get_description_quality(request.description)
+        res = kg_pb2.DescriptionQualityRes(quality_score=description_score)
+
         return res
 
     def __repr__(self):

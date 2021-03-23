@@ -30,14 +30,14 @@ class DescriptionEvaluator(object):
         estimated_quality = de.get_description_quality(example_descr)
         print("Description quality:", estimated_quality)
     """
-    def __init__(self, recommender: Recommender) -> None:
+    def __init__(self, recommender: Recommender):
         self._recommender = recommender
 
     @staticmethod
     def _convert_score_to_quality(score: float) -> float:
         """Computes the estimated quality based on score of a paper """
-        a = 2.5    # estimated empirically, see notebook 18
-        b = -1.25  # ibid
+        a = 2.5
+        b = -1.25
         quality = a * score + b
         quality = np.clip(quality, a_min=0, a_max=1)
 
@@ -53,16 +53,8 @@ class DescriptionEvaluator(object):
         Returns:
             (float) estimated description quality
         """
-        if not isinstance(description, str):
-            raise ValueError("`get_description_quality` expected a string input.")
+        top_items = self._recommender.get_top_items(description, n_hits=100)
+        last_item_score = float(top_items.items[-1].score)
+        quality = self._convert_score_to_quality(last_item_score)
 
-        n_words = len(description.split())
-
-        if n_words < 10:
-            return 0
-
-        else:
-            top_items = self._recommender.get_top_items(description, n_hits=100)
-            last_item_score = float(top_items.items[-1].score)
-            quality = self._convert_score_to_quality(last_item_score)
-            return quality
+        return quality

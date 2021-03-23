@@ -11,6 +11,14 @@ message GetItemReq {
     string id = 1;
 }
 
+message DescriptionQualityReq {
+    string description = 1;
+}
+
+message DescriptionQualityRes {
+    float quality_score = 1;
+}
+
 message GraphItem {
     string id = 1;
     string category = 2;
@@ -43,4 +51,5 @@ message GetItemRes {
 service KGService {
     rpc GetGraph (GetGraphReq) returns (GetGraphRes) {};
     rpc GetItem  (GetItemReq) returns (GetItemRes) {};
+    rpc GetDescriptionQuality (DescriptionQualityReq) returns (DescriptionQualityRes) {};
 };

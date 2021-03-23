@@ -60,7 +60,6 @@ function NavElements({ isOpened }: Props) {
         ))}
         <div
           className={cx(styles.userTools, {
-            [styles.show]: isOpened,
             [styles.started]: areToolsActive,
             [styles.stopped]: !areToolsActive,
           })}

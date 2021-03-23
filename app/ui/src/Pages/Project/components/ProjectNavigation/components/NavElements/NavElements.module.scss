@@ -11,11 +11,11 @@
     transition: border-right 0.3s ease;
     border-right: 2px solid transparent;
 
-    &.show.started {
+    &.started {
       border-right: 2px solid palette(success);
     }
 
-    &.show.stopped {
+    &.stopped {
       border-right: 2px solid palette(alert);
     }
 

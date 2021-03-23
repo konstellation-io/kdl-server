@@ -8,7 +8,6 @@ import "context"
 type K8sClient interface {
 	CreateSecret(name string, values map[string]string) error
 	UpdateSecret(name string, values map[string]string) error
-	IsSecretPresent(name string) (bool, error)
 	CreateUserToolsCR(ctx context.Context, username string) error
 	DeleteUserToolsCR(ctx context.Context, username string) error
 	IsUserToolPODRunning(username string) (bool, error)

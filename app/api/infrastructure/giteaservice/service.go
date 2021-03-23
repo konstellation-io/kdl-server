@@ -17,7 +17,7 @@ const (
 )
 
 var (
-	errMultipleSSHKeys = errors.New("user has more than one ssh key")
+	errNoKdlSSHKeyFound = errors.New("no kdl SSH key found")
 )
 
 type giteaService struct {
@@ -83,7 +83,7 @@ func (g *giteaService) UpdateSSHKey(username, publicSSHKey string) error {
 		return err
 	}
 
-	g.logger.Infof("Deleted public SSH key for user \"%s\" in Gitea with id \"%v\"", username, keyID)
+	g.logger.Infof("Deleted public SSH key for user \"%s\" in Gitea with id \"%d\"", username, keyID)
 
 	return g.AddSSHKey(username, publicSSHKey)
 }
@@ -94,15 +94,13 @@ func (g *giteaService) UserSSHKeyExists(username string) (bool, error) {
 		return false, err
 	}
 
-	if len(keys) > 1 {
-		return false, errMultipleSSHKeys
+	for _, key := range keys {
+		if key.Title == kdlSSHKeyName {
+			return true, nil
+		}
 	}
 
-	if len(keys) == 0 {
-		return false, nil
-	}
-
-	return true, nil
+	return false, nil
 }
 
 // CreateRepo creates a repository in the KDL organization.
@@ -195,5 +193,11 @@ func (g *giteaService) getUserSSHKeyID(username string) (int, error) {
 		return 0, err
 	}
 
-	return int(keys[0].ID), nil
+	for _, key := range keys {
+		if key.Title == kdlSSHKeyName {
+			return int(key.ID), nil
+		}
+	}
+
+	return 0, errNoKdlSSHKeyFound
 }

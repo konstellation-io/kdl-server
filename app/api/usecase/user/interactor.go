@@ -228,28 +228,19 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, username string) (en
 	// Check if k8s secret exists. If exists, update it. Otherwise, create it.
 	secretName := fmt.Sprintf("%s-ssh-keys", user.UsernameSlug())
 
-	exists, err := i.k8sClient.IsSecretPresent(secretName)
-	if err != nil {
-		return entity.User{}, err
-	}
-
 	k8sKeys := map[string]string{
 		"KDL_USER_PUBLIC_SSH_KEY":  keys.Public,
 		"KDL_USER_PRIVATE_SSH_KEY": keys.Private,
 	}
 
-	if exists {
-		err = i.k8sClient.UpdateSecret(secretName, k8sKeys)
-	} else {
-		err = i.k8sClient.CreateSecret(secretName, k8sKeys)
-	}
+	err = i.k8sClient.UpdateSecret(secretName, k8sKeys)
 
 	if err != nil {
 		return entity.User{}, err
 	}
 
 	// Check if user ssh key exists in gitea. If exists, update it. Otherwise, create it
-	exists, err = i.giteaService.UserSSHKeyExists(username)
+	exists, err := i.giteaService.UserSSHKeyExists(username)
 	if err != nil {
 		return entity.User{}, err
 	}

@@ -29,7 +29,6 @@ func (k *k8sClient) UpdateSecret(name string, values map[string]string) error {
 	secret := k.formSecret(name, values)
 
 	_, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Update(secret)
-
 	if err != nil {
 		return err
 	}
@@ -39,8 +38,8 @@ func (k *k8sClient) UpdateSecret(name string, values map[string]string) error {
 	return nil
 }
 
-// IsSecretPresent checks if there is a secret with the given name.
-func (k *k8sClient) IsSecretPresent(name string) (bool, error) {
+// isSecretPresent checks if there is a secret with the given name.
+func (k *k8sClient) isSecretPresent(name string) (bool, error) {
 	_, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Get(name, metaV1.GetOptions{})
 	if err != nil && !k8sErrors.IsNotFound(err) {
 		return false, err

@@ -76,21 +76,6 @@ func (mr *MockK8sClientMockRecorder) DeleteUserToolsCR(ctx, username interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserToolsCR", reflect.TypeOf((*MockK8sClient)(nil).DeleteUserToolsCR), ctx, username)
 }
 
-// IsSecretPresent mocks base method.
-func (m *MockK8sClient) IsSecretPresent(name string) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsSecretPresent", name)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// IsSecretPresent indicates an expected call of IsSecretPresent.
-func (mr *MockK8sClientMockRecorder) IsSecretPresent(name interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsSecretPresent", reflect.TypeOf((*MockK8sClient)(nil).IsSecretPresent), name)
-}
-
 // IsUserToolPODRunning mocks base method.
 func (m *MockK8sClient) IsUserToolPODRunning(username string) (bool, error) {
 	m.ctrl.T.Helper()

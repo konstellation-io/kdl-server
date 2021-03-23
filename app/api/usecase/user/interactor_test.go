@@ -414,7 +414,6 @@ func TestInteractor_RegenerateSSHKeys(t *testing.T) {
 
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil).AnyTimes()
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
-	s.mocks.k8sClientMock.EXPECT().IsSecretPresent(secretName).Return(true, nil)
 	s.mocks.k8sClientMock.EXPECT().UpdateSecret(secretName, secretValues).Return(nil)
 	s.mocks.giteaService.EXPECT().UserSSHKeyExists(username).Return(true, nil)
 	s.mocks.giteaService.EXPECT().UpdateSSHKey(username, sshKey.Public).Return(nil)

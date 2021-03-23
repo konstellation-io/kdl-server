@@ -1,8 +1,6 @@
 package giteaservice
 
 import (
-	"errors"
-
 	"code.gitea.io/sdk/gitea"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 
@@ -14,10 +12,6 @@ const (
 	// https://github.com/konstellation-io/science-toolkit/blob/master/helm/science-toolkit/templates/gitea/init-configmap.yaml
 	kdlOrganization = "kdl"
 	kdlSSHKeyName   = "kdl-ssh-key"
-)
-
-var (
-	errNoKdlSSHKeyFound = errors.New("no kdl SSH key found")
 )
 
 type giteaService struct {
@@ -71,13 +65,10 @@ func (g *giteaService) AddSSHKey(username, publicSSHKey string) error {
 	return nil
 }
 
-func (g *giteaService) UpdateSSHKey(username, publicSSHKey string) error {
-	keyID, err := g.getUserSSHKeyID(username)
-	if err != nil {
-		return err
-	}
+func (g *giteaService) UpdateSSHKey(username string, publicSSHKey *gitea.PublicKey, newPublicSSHKey string) error {
+	keyID := int(publicSSHKey.ID)
 
-	_, err = g.client.AdminDeleteUserPublicKey(username, keyID)
+	_, err := g.client.AdminDeleteUserPublicKey(username, keyID)
 
 	if err != nil {
 		return err
@@ -85,22 +76,22 @@ func (g *giteaService) UpdateSSHKey(username, publicSSHKey string) error {
 
 	g.logger.Infof("Deleted public SSH key for user \"%s\" in Gitea with id \"%d\"", username, keyID)
 
-	return g.AddSSHKey(username, publicSSHKey)
+	return g.AddSSHKey(username, newPublicSSHKey)
 }
 
-func (g *giteaService) UserSSHKeyExists(username string) (bool, error) {
+func (g *giteaService) GetUserSSHKey(username string) (*gitea.PublicKey, error) {
 	keys, _, err := g.client.ListPublicKeys(username, gitea.ListPublicKeysOptions{})
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	for _, key := range keys {
 		if key.Title == kdlSSHKeyName {
-			return true, nil
+			return key, nil
 		}
 	}
 
-	return false, nil
+	return nil, entity.ErrNoKdlSSHKeyFound
 }
 
 // CreateRepo creates a repository in the KDL organization.
@@ -185,19 +176,4 @@ func (g *giteaService) UpdateCollaboratorPermissions(repoName, username string, 
 	}
 
 	return g.AddCollaborator(repoName, username, newAccessLevel)
-}
-
-func (g *giteaService) getUserSSHKeyID(username string) (int, error) {
-	keys, _, err := g.client.ListPublicKeys(username, gitea.ListPublicKeysOptions{})
-	if err != nil {
-		return 0, err
-	}
-
-	for _, key := range keys {
-		if key.Title == kdlSSHKeyName {
-			return int(key.ID), nil
-		}
-	}
-
-	return 0, errNoKdlSSHKeyFound
 }

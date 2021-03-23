@@ -10,7 +10,7 @@ import (
 func (k *k8sClient) CreateSecret(name string, values map[string]string) error {
 	k.logger.Infof("Creating secret \"%s\" in k8s...", name)
 
-	secret := k.formSecret(name, values)
+	secret := k.newSecret(name, values)
 
 	createdSecret, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Create(secret)
 	if err != nil {
@@ -26,7 +26,7 @@ func (k *k8sClient) CreateSecret(name string, values map[string]string) error {
 func (k *k8sClient) UpdateSecret(name string, values map[string]string) error {
 	k.logger.Infof("Updating secret \"%s\" in k8s...", name)
 
-	secret := k.formSecret(name, values)
+	secret := k.newSecret(name, values)
 
 	_, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Update(secret)
 	if err != nil {
@@ -48,8 +48,8 @@ func (k *k8sClient) isSecretPresent(name string) (bool, error) {
 	return !k8sErrors.IsNotFound(err), nil
 }
 
-// formSecret conform a new k8s secret from values map.
-func (k *k8sClient) formSecret(name string, values map[string]string) *coreV1.Secret {
+// newSecret conform a new k8s secret from values map.
+func (k *k8sClient) newSecret(name string, values map[string]string) *coreV1.Secret {
 	secretData := map[string][]byte{}
 	for key, val := range values {
 		secretData[key] = []byte(val)

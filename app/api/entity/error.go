@@ -20,4 +20,7 @@ var (
 
 	// ErrInvalidRepoType error definition.
 	ErrInvalidRepoType = fmt.Errorf("invalid repo type")
+
+	// ErrNoKdlSSHKeyFound error definition.
+	ErrNoKdlSSHKeyFound = errors.New("no kdl SSH key found")
 )

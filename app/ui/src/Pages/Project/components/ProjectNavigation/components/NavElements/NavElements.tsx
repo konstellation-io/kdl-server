@@ -14,6 +14,7 @@ import { useParams } from 'react-router-dom';
 import useProjectNavigation from 'Hooks/useProjectNavigation';
 import { useQuery } from '@apollo/client';
 import useTool from 'Graphql/hooks/useTool';
+import ConfirmAction from 'Components/Layout/ConfirmAction/ConfirmAction';
 
 const GetMeQuery = loader('Graphql/queries/getMe.graphql');
 

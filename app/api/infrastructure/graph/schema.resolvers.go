@@ -45,7 +45,7 @@ func (r *mutationResolver) UpdateAccessLevel(ctx context.Context, input model.Up
 	return nil, entity.ErrNotImplemented
 }
 
-func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.SSHKey, error) {
+func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.User, error) {
 	loggedUser, err := r.getLoggedUser(ctx)
 	if err != nil {
 		return nil, err
@@ -56,12 +56,7 @@ func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.SSHKey
 		return nil, err
 	}
 
-	return &entity.SSHKey{
-		Public:       loggedUser.SSHKey.Public,
-		Private:      loggedUser.SSHKey.Private,
-		CreationDate: loggedUser.SSHKey.CreationDate,
-		LastActivity: loggedUser.SSHKey.LastActivity,
-	}, nil
+	return &loggedUser, nil
 }
 
 func (r *mutationResolver) CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error) {
@@ -270,20 +265,6 @@ func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
 	return r.users.FindAll(ctx)
 }
 
-func (r *queryResolver) SSHKey(ctx context.Context) (*entity.SSHKey, error) {
-	loggedUser, err := r.getLoggedUser(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return &entity.SSHKey{
-		Public:       loggedUser.SSHKey.Public,
-		Private:      loggedUser.SSHKey.Private,
-		CreationDate: loggedUser.SSHKey.CreationDate,
-		LastActivity: loggedUser.SSHKey.LastActivity,
-	}, nil
-}
-
 func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
 	minWords := 50
 	enoughWords := 200
@@ -393,3 +374,23 @@ type queryResolver struct{ *Resolver }
 type repositoryResolver struct{ *Resolver }
 type sSHKeyResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) SSHKey(ctx context.Context) (*entity.SSHKey, error) {
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entity.SSHKey{
+		Public:       loggedUser.SSHKey.Public,
+		Private:      loggedUser.SSHKey.Private,
+		CreationDate: loggedUser.SSHKey.CreationDate,
+		LastActivity: loggedUser.SSHKey.LastActivity,
+	}, nil
+}

@@ -125,7 +125,6 @@ type ComplexityRoot struct {
 		Project            func(childComplexity int, id string) int
 		Projects           func(childComplexity int) int
 		QualityProjectDesc func(childComplexity int, description string) int
-		SSHKey             func(childComplexity int) int
 		Users              func(childComplexity int) int
 	}
 
@@ -164,6 +163,7 @@ type ComplexityRoot struct {
 		Email          func(childComplexity int) int
 		ID             func(childComplexity int) int
 		LastActivity   func(childComplexity int) int
+		SSHKey         func(childComplexity int) int
 		Username       func(childComplexity int) int
 	}
 }
@@ -177,7 +177,7 @@ type MutationResolver interface {
 	AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error)
 	RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error)
 	UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]entity.User, error)
-	RegenerateSSHKey(ctx context.Context) (*entity.SSHKey, error)
+	RegenerateSSHKey(ctx context.Context) (*entity.User, error)
 	CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error)
 	UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error)
 	AddMembers(ctx context.Context, input model.AddMembersInput) (*entity.Project, error)
@@ -199,7 +199,6 @@ type QueryResolver interface {
 	Projects(ctx context.Context) ([]entity.Project, error)
 	Project(ctx context.Context, id string) (*entity.Project, error)
 	Users(ctx context.Context) ([]entity.User, error)
-	SSHKey(ctx context.Context) (*entity.SSHKey, error)
 	QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error)
 	KnowledgeGraph(ctx context.Context, description string) (*entity.KnowledgeGraph, error)
 	KnowledgeGraphItem(ctx context.Context, id string) (*entity.KnowledgeGraphItem, error)
@@ -697,13 +696,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.QualityProjectDesc(childComplexity, args["description"].(string)), true
 
-	case "Query.sshKey":
-		if e.complexity.Query.SSHKey == nil {
-			break
-		}
-
-		return e.complexity.Query.SSHKey(childComplexity), true
-
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
 			break
@@ -865,6 +857,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.LastActivity(childComplexity), true
 
+	case "User.sshKey":
+		if e.complexity.User.SSHKey == nil {
+			break
+		}
+
+		return e.complexity.User.SSHKey(childComplexity), true
+
 	case "User.username":
 		if e.complexity.User.Username == nil {
 			break
@@ -941,7 +940,6 @@ var sources = []*ast.Source{
   projects: [Project!]!
   project(id: ID!): Project!
   users: [User!]!
-  sshKey: SSHKey!
   qualityProjectDesc(description: String!): QualityProjectDesc!
   knowledgeGraph(description: String!): KnowledgeGraph!
   knowledgeGraphItem(id: ID!): KnowledgeGraphItem!
@@ -951,7 +949,7 @@ type Mutation {
   addUser(input: AddUserInput!): User!
   removeUsers(input: RemoveUsersInput!): [User!]!
   updateAccessLevel(input: UpdateAccessLevelInput!): [User!]!
-  regenerateSSHKey: SSHKey!
+  regenerateSSHKey: User!
   createProject(input: CreateProjectInput!): Project!
   updateProject(input: UpdateProjectInput!): Project!
   addMembers(input: AddMembersInput!): Project!
@@ -1011,6 +1009,7 @@ type User {
   lastActivity: String
   apiTokens: [ApiToken!]!
   areToolsActive: Boolean!
+  sshKey: SSHKey!
 }
 
 type ApiToken {
@@ -2393,9 +2392,9 @@ func (ec *executionContext) _Mutation_regenerateSSHKey(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*entity.SSHKey)
+	res := resTmp.(*entity.User)
 	fc.Result = res
-	return ec.marshalNSSHKey2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐSSHKey(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createProject(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3374,41 +3373,6 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	res := resTmp.([]entity.User)
 	fc.Result = res
 	return ec.marshalNUser2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUserᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_sshKey(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().SSHKey(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*entity.SSHKey)
-	fc.Result = res
-	return ec.marshalNSSHKey2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐSSHKey(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_qualityProjectDesc(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4402,6 +4366,41 @@ func (ec *executionContext) _User_areToolsActive(ctx context.Context, field grap
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_sshKey(ctx context.Context, field graphql.CollectedField, obj *entity.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SSHKey, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entity.SSHKey)
+	fc.Result = res
+	return ec.marshalNSSHKey2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐSSHKey(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -6458,20 +6457,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "sshKey":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_sshKey(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
 		case "qualityProjectDesc":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -6788,6 +6773,11 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 				}
 				return res
 			})
+		case "sshKey":
+			out.Values[i] = ec._User_sshKey(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7452,16 +7442,6 @@ func (ec *executionContext) marshalNRepositoryType2githubᚗcomᚋkonstellation�
 
 func (ec *executionContext) marshalNSSHKey2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐSSHKey(ctx context.Context, sel ast.SelectionSet, v entity.SSHKey) graphql.Marshaler {
 	return ec._SSHKey(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNSSHKey2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐSSHKey(ctx context.Context, sel ast.SelectionSet, v *entity.SSHKey) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._SSHKey(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNSetActiveUserToolsInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSetActiveUserToolsInput(ctx context.Context, v interface{}) (model.SetActiveUserToolsInput, error) {

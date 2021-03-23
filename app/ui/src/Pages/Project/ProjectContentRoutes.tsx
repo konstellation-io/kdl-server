@@ -20,13 +20,10 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
   return (
     <Switch>
       <Redirect exact from={ROUTE.PROJECT} to={overviewRoute} />
-      {!areToolsActive && (
-        <>
-          {[ROUTE.PROJECT_TOOL_JUPYTER, ROUTE.PROJECT_TOOL_VSCODE].map((r) => (
-            <Redirect key={r} from={r} to={overviewRoute} />
-          ))}
-        </>
-      )}
+      {!areToolsActive &&
+        [ROUTE.PROJECT_TOOL_JUPYTER, ROUTE.PROJECT_TOOL_VSCODE].map((r) => (
+          <Redirect key={r} from={r} to={overviewRoute} />
+        ))}
 
       <Route
         exact

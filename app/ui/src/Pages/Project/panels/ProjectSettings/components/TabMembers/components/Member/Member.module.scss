@@ -7,7 +7,8 @@
   display: flex;
   align-items: center;
   color: font-color(light);
-  padding-left: 2 * $grid-unit;
+  padding: 0 2 * $grid-unit;
+  cursor: pointer;
   background-color: palette(base, 600);
 
   transition: background-color ease 0.4s;

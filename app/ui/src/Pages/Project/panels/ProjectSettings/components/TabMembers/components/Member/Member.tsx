@@ -1,4 +1,3 @@
-import { Button } from 'kwc';
 import { GetProjectMembers_project_members } from 'Graphql/queries/types/GetProjectMembers';
 import Gravatar from 'react-gravatar';
 import IconOpen from '@material-ui/icons/ArrowForward';
@@ -17,12 +16,15 @@ type Props = {
 };
 function Member({ member, onOpen, active = false }: Props) {
   return (
-    <div className={cx(styles.container, { [styles.active]: active })}>
+    <div
+      className={cx(styles.container, { [styles.active]: active })}
+      onClick={() => onOpen(member)}
+    >
       <Gravatar email={member.user.email} size={24} style={gravatarStyle} />
       <p className={styles.email}>{member.user.email}</p>
       <p className={styles.level}>{member.accessLevel}</p>
       <div className={styles.button}>
-        <Button Icon={IconOpen} label="" onClick={() => onOpen(member)} />
+        <IconOpen className="icon-small" />
       </div>
     </div>
   );

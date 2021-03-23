@@ -128,6 +128,7 @@ export default class Resources {
       context.shadowColor = fillStyle;
 
       context.beginPath();
+      context.setLineDash([]);
       context.moveTo(x + element.x, y + element.y);
       context.arc(
         x + element.x,
@@ -153,6 +154,7 @@ export default class Resources {
 
     if (hoveredElement !== null && !selectedElement && !skipLink) {
       context.beginPath();
+      context.setLineDash([4, 4]);
       context.moveTo(
         x + (hoveredElement as DComplete).x,
         y + (hoveredElement as DComplete).y

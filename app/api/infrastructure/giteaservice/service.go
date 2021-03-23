@@ -65,33 +65,25 @@ func (g *giteaService) AddSSHKey(username, publicSSHKey string) error {
 	return nil
 }
 
-func (g *giteaService) UpdateSSHKey(username string, publicSSHKey *gitea.PublicKey, newPublicSSHKey string) error {
-	keyID := int(publicSSHKey.ID)
-
-	_, err := g.client.AdminDeleteUserPublicKey(username, keyID)
-
+// UpdateSSHKey updates public SSH key on Gitea for a user.
+func (g *giteaService) UpdateSSHKey(username, publicSSHKey string) error {
+	userKey, err := g.getUserSSHKey(username)
 	if err != nil {
 		return err
 	}
 
-	g.logger.Infof("Deleted public SSH key for user \"%s\" in Gitea with id \"%d\"", username, keyID)
+	if userKey != nil {
+		keyID := int(userKey.ID)
 
-	return g.AddSSHKey(username, newPublicSSHKey)
-}
-
-func (g *giteaService) GetUserSSHKey(username string) (*gitea.PublicKey, error) {
-	keys, _, err := g.client.ListPublicKeys(username, gitea.ListPublicKeysOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	for _, key := range keys {
-		if key.Title == kdlSSHKeyName {
-			return key, nil
+		_, err = g.client.AdminDeleteUserPublicKey(username, keyID)
+		if err != nil {
+			return err
 		}
+
+		g.logger.Infof("Deleted public SSH key for user \"%s\" in Gitea with id \"%d\"", username, keyID)
 	}
 
-	return nil, entity.ErrNoKdlSSHKeyFound
+	return g.AddSSHKey(username, publicSSHKey)
 }
 
 // CreateRepo creates a repository in the KDL organization.
@@ -176,4 +168,19 @@ func (g *giteaService) UpdateCollaboratorPermissions(repoName, username string, 
 	}
 
 	return g.AddCollaborator(repoName, username, newAccessLevel)
+}
+
+func (g *giteaService) getUserSSHKey(username string) (*gitea.PublicKey, error) {
+	keys, _, err := g.client.ListPublicKeys(username, gitea.ListPublicKeysOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, key := range keys {
+		if key.Title == kdlSSHKeyName {
+			return key, nil
+		}
+	}
+
+	return nil, nil
 }

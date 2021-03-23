@@ -1,7 +1,6 @@
 package giteaservice
 
 import (
-	"code.gitea.io/sdk/gitea"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 )
 
@@ -11,8 +10,7 @@ import (
 type GiteaClient interface {
 	CreateUser(email, username, password string) error
 	AddSSHKey(username, publicSSHKey string) error
-	UpdateSSHKey(username string, publicSSHKey *gitea.PublicKey, newPublicSSHKey string) error
-	GetUserSSHKey(username string) (*gitea.PublicKey, error)
+	UpdateSSHKey(username string, newPublicSSHKey string) error
 	CreateRepo(name string, ownerUsername string) error
 	AddCollaborator(repoName, username string, accessLevel entity.AccessLevel) error
 	RemoveCollaborator(repoName, username string) error

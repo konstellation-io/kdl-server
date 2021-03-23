@@ -6,8 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"code.gitea.io/sdk/gitea"
-
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 
@@ -405,17 +403,6 @@ func TestInteractor_RegenerateSSHKeys(t *testing.T) {
 		CreationDate: now,
 	}
 
-	giteaPublicKey := gitea.PublicKey{
-		ID:          0,
-		Key:         "key",
-		Title:       "title",
-		Fingerprint: "asdf",
-		Created:     time.Time{},
-		Owner:       nil,
-		ReadOnly:    false,
-		KeyType:     "public",
-	}
-
 	expectedUser := entity.User{
 		ID:           id,
 		Username:     username,
@@ -428,8 +415,7 @@ func TestInteractor_RegenerateSSHKeys(t *testing.T) {
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil).AnyTimes()
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	s.mocks.k8sClientMock.EXPECT().UpdateSecret(secretName, secretValues).Return(nil)
-	s.mocks.giteaService.EXPECT().GetUserSSHKey(username).Return(&giteaPublicKey, nil)
-	s.mocks.giteaService.EXPECT().UpdateSSHKey(username, &giteaPublicKey, sshKey.Public).Return(nil)
+	s.mocks.giteaService.EXPECT().UpdateSSHKey(username, sshKey.Public).Return(nil)
 	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, sshKey).Return(nil)
 
 	userData, err := s.interactor.RegenerateSSHKeys(ctx, username)

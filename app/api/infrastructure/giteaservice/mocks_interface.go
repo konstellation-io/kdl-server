@@ -7,7 +7,6 @@ package giteaservice
 import (
 	reflect "reflect"
 
-	gitea "code.gitea.io/sdk/gitea"
 	gomock "github.com/golang/mock/gomock"
 	entity "github.com/konstellation-io/kdl-server/app/api/entity"
 )
@@ -91,21 +90,6 @@ func (mr *MockGiteaClientMockRecorder) CreateUser(email, username, password inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockGiteaClient)(nil).CreateUser), email, username, password)
 }
 
-// GetUserSSHKey mocks base method.
-func (m *MockGiteaClient) GetUserSSHKey(username string) (*gitea.PublicKey, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserSSHKey", username)
-	ret0, _ := ret[0].(*gitea.PublicKey)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetUserSSHKey indicates an expected call of GetUserSSHKey.
-func (mr *MockGiteaClientMockRecorder) GetUserSSHKey(username interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserSSHKey", reflect.TypeOf((*MockGiteaClient)(nil).GetUserSSHKey), username)
-}
-
 // MirrorRepo mocks base method.
 func (m *MockGiteaClient) MirrorRepo(url, repoName, userName, userToken string) error {
 	m.ctrl.T.Helper()
@@ -149,15 +133,15 @@ func (mr *MockGiteaClientMockRecorder) UpdateCollaboratorPermissions(repoName, u
 }
 
 // UpdateSSHKey mocks base method.
-func (m *MockGiteaClient) UpdateSSHKey(username string, publicSSHKey *gitea.PublicKey, newPublicSSHKey string) error {
+func (m *MockGiteaClient) UpdateSSHKey(username, newPublicSSHKey string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateSSHKey", username, publicSSHKey, newPublicSSHKey)
+	ret := m.ctrl.Call(m, "UpdateSSHKey", username, newPublicSSHKey)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateSSHKey indicates an expected call of UpdateSSHKey.
-func (mr *MockGiteaClientMockRecorder) UpdateSSHKey(username, publicSSHKey, newPublicSSHKey interface{}) *gomock.Call {
+func (mr *MockGiteaClientMockRecorder) UpdateSSHKey(username, newPublicSSHKey interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSSHKey", reflect.TypeOf((*MockGiteaClient)(nil).UpdateSSHKey), username, publicSSHKey, newPublicSSHKey)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSSHKey", reflect.TypeOf((*MockGiteaClient)(nil).UpdateSSHKey), username, newPublicSSHKey)
 }

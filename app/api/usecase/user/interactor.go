@@ -239,19 +239,7 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, username string) (en
 		return entity.User{}, err
 	}
 
-	// Check if user ssh key exists in gitea. If exists, update it. Otherwise, create it
-	giteaPublicKey, err := i.giteaService.GetUserSSHKey(username)
-
-	if err != nil {
-		if !errors.Is(err, entity.ErrNoKdlSSHKeyFound) {
-			return entity.User{}, err
-		}
-
-		err = i.giteaService.AddSSHKey(username, keys.Public)
-	} else {
-		err = i.giteaService.UpdateSSHKey(username, giteaPublicKey, keys.Public)
-	}
-
+	err = i.giteaService.UpdateSSHKey(username, keys.Public)
 	if err != nil {
 		return entity.User{}, err
 	}

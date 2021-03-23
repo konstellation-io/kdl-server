@@ -20,7 +20,9 @@ function UserSshKey() {
     if (loading) return <SpinnerCircular />;
     if (error || !data) return <ErrorMessage />;
 
-    const { sshKey } = data;
+    const {
+      me: { sshKey },
+    } = data;
 
     return (
       <>

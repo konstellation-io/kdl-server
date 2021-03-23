@@ -1,8 +1,11 @@
 query GetSSHKey {
-  sshKey {
-    public
-    private
-    creationDate
-    lastActivity
+  me {
+    id
+    sshKey {
+      public
+      private
+      creationDate
+      lastActivity
+    }
   }
 }

@@ -127,6 +127,10 @@ module.exports = {
     removeApiToken: (_, { input: { apiTokenId } }) => ({
       id: apiTokenId,
     }),
+    regenerateSSHKey: () => ({
+      id: meId,
+      sshKey: this.SSHKey,
+    }),
     addApiToken: this.ApiToken,
     updateAccessLevel: (_, { input: { userIds, accessLevel } }) =>
       userIds.map((userId) => ({

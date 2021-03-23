@@ -32,6 +32,7 @@ type projectDTO struct {
 	RepositoryType   entity.RepositoryType `bson:"repo_type"`
 	InternalRepoName string                `bson:"internal_repo_name"`
 	ExternalRepoURL  string                `bson:"external_repo_url"`
+	RepoName         string                `bson:"repo_name"`
 	Members          []memberDTO           `bson:"members"`
 }
 
@@ -230,6 +231,7 @@ func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 		RepositoryType:   p.Repository.Type,
 		InternalRepoName: p.Repository.InternalRepoName,
 		ExternalRepoURL:  p.Repository.ExternalRepoURL,
+		RepoName:         p.Repository.RepoName,
 	}
 
 	if p.ID != "" {
@@ -280,6 +282,7 @@ func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 			Type:             dto.RepositoryType,
 			ExternalRepoURL:  dto.ExternalRepoURL,
 			InternalRepoName: dto.InternalRepoName,
+			RepoName:         dto.RepoName,
 		},
 	}
 

@@ -127,7 +127,7 @@ jobs:
         id: get_version
         run: |
           # format version X.X.X 
-          RELEASE_VERSION=`echo "${GITHUB_REF#refs/tags/}" | sed -e 's/helm-v//g' | sed -e 's/-alpha.*/.0/g'`
+          RELEASE_VERSION=`echo "${GITHUB_REF#refs/tags/}" | sed -e 's/v//g' | sed -e 's/-alpha.*/.0/g'`
           echo ::set-output name=RELEASE_VERSION::${RELEASE_VERSION}
           echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
 
@@ -153,4 +153,4 @@ jobs:
 
       - name: Update Helm Chart
         run:  |
-          curl --request POST --header "${{ secrets.NOTIFY_TOKEN }}" "${{ secrets.NOTIFY_URL }}${{ steps.get_version.outputs.RELEASE_VERSION }}"
+          curl --request POST --header "${{ secrets.NOTIFY_TOKEN }}" ${{ secrets.NOTIFY_URL }}${{ steps.get_version.outputs.RELEASE_VERSION }} >/dev/null 2>&1

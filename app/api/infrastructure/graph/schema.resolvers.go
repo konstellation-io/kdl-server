@@ -6,7 +6,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"strings"
 	"time"
 
@@ -16,6 +15,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/dataloader"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
@@ -197,12 +197,29 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 	userName := ctx.Value(middleware.LoggedUserNameKey).(string)
 	slugUserName := slug.Make(userName)
 
+	folderName := obj.Repository.RepoName
+
+	giteaWithFolder, err := kdlutil.JoinToURL(r.cfg.Gitea.URL, "kdl", folderName)
+	if err != nil {
+		return &entity.ToolUrls{}, err
+	}
+
+	droneWithFolder, err := kdlutil.JoinToURL(r.cfg.Drone.URL, "kdl", folderName)
+	if err != nil {
+		return &entity.ToolUrls{}, err
+	}
+
+	jupyterWithUsername := strings.Replace(r.cfg.Jupyter.URL, "USERNAME", slugUserName, 1)
+	jupyterWithUsernameAndFolder := strings.Replace(jupyterWithUsername, "REPO_FOLDER", folderName, 2)
+	vscodeWithUsername := strings.Replace(r.cfg.VSCode.URL, "USERNAME", slugUserName, 1)
+	vscodeWithUsernameAndFolder := strings.Replace(vscodeWithUsername, "REPO_FOLDER", folderName, 1)
+
 	return &entity.ToolUrls{
-		Gitea:   r.cfg.Gitea.URL,
+		Gitea:   giteaWithFolder,
 		Minio:   r.cfg.Minio.URL,
-		Jupyter: strings.Replace(r.cfg.Jupyter.URL, "USERNAME", slugUserName, 1),
-		VSCode:  strings.Replace(r.cfg.VSCode.URL, "USERNAME", slugUserName, 1),
-		Drone:   r.cfg.Drone.URL,
+		Jupyter: jupyterWithUsernameAndFolder,
+		VSCode:  vscodeWithUsernameAndFolder,
+		Drone:   droneWithFolder,
 		MLFlow:  r.cfg.MLFlow.URL,
 	}, nil
 }
@@ -239,23 +256,48 @@ func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
 }
 
 func (r *queryResolver) SSHKey(ctx context.Context) (*entity.SSHKey, error) {
-	return nil, entity.ErrNotImplemented
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entity.SSHKey{
+		Public:       loggedUser.SSHKey.Public,
+		Private:      loggedUser.SSHKey.Private,
+		CreationDate: loggedUser.SSHKey.CreationDate,
+		LastActivity: loggedUser.SSHKey.LastActivity,
+	}, nil
 }
 
 func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
-	// We are sending a random number until the feature is developed
-	min := 0
-	max := 100
-	// nolint:gosec // this is a temp workaround
-	randomInt := rand.Intn(max-min) + min
+	minWords := 50
+	enoughWords := 200
+
+	descriptionWords := len(strings.Fields(description))
+	quality := 0
+
+	if descriptionWords > enoughWords {
+		quality = 100
+	} else if descriptionWords > minWords {
+		quality = (descriptionWords - minWords) * 100 / (enoughWords - minWords)
+	}
 
 	return &model.QualityProjectDesc{
-		Quality: randomInt,
+		Quality: quality,
 	}, nil
 }
 
 func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) (*entity.KnowledgeGraph, error) {
 	kg, err := r.kg.Get(ctx, description)
+	if err != nil {
+		return nil, err
+	}
+
+	return &kg, nil
+}
+
+func (r *queryResolver) KnowledgeGraphItem(ctx context.Context, id string) (*entity.KnowledgeGraphItem, error) {
+	kg, err := r.kg.GetItem(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -275,11 +317,17 @@ func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (s
 }
 
 func (r *sSHKeyResolver) CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error) {
-	return "", entity.ErrNotImplemented
+	return obj.CreationDate.Format(time.RFC3339), nil
 }
 
 func (r *sSHKeyResolver) LastActivity(ctx context.Context, obj *entity.SSHKey) (*string, error) {
-	return nil, entity.ErrNotImplemented
+	if obj.LastActivity == nil {
+		return nil, nil
+	}
+
+	lastActivity := obj.LastActivity.Format(time.RFC3339)
+
+	return &lastActivity, nil
 }
 
 func (r *userResolver) CreationDate(ctx context.Context, obj *entity.User) (string, error) {

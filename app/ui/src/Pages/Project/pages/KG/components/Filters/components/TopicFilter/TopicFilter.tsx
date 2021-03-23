@@ -48,7 +48,7 @@ function TopicFilter({ topics, onUpdate }: Props) {
     const selectedTopicsCount = topics.filter((t) =>
       selectedTopics.includes(t.name)
     ).length;
-    return `${selectedTopicsCount} ${
+    return `TOP ${selectedTopicsCount} ${
       selectedTopicsCount === 1 ? 'TOPIC' : 'TOPICS'
     }`;
   }
@@ -84,16 +84,8 @@ function TopicFilter({ topics, onUpdate }: Props) {
               onSelectOption={handleSelectTopic}
             />
           </div>
-          <Button
-            label="RESET TO DEFAULT"
-            align={BUTTON_ALIGN.LEFT}
-            onClick={resetTopics}
-          />
-          <Button
-            label="CLEAR ALL"
-            align={BUTTON_ALIGN.LEFT}
-            onClick={clearAll}
-          />
+          <Button label="SELECT ALL" onClick={resetTopics} />
+          <Button label="CLEAR ALL" onClick={clearAll} />
         </div>
       </AnimateHeight>
     </div>

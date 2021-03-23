@@ -1,4 +1,4 @@
-const ID_MAX_LENGTH = 15;
+const ID_MAX_LENGTH = 100;
 const MIN_LENGTH = 3;
 const INVALID_ID_CHARS_REGEXP = /[^a-z0-9-]/g;
 const SPACES_REGEXP = / +/g;

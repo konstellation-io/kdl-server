@@ -1,0 +1,35 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  background-color: palette(base, 800);
+
+  .tabContainer {
+    height: 100%;
+    background-color: palette(lowlight, 900);
+    padding: $grid-unit 0 $grid-unit $grid-unit;
+    overflow: hidden;
+  }
+
+  .selectedTab {
+    background-color: palette(lowlight, 900);
+    color: font-color(light);
+    transition: background-color ease 0.2s;
+
+    &:hover {
+      background-color: palette(lowlight, 900);
+    }
+  }
+}
+.title {
+  @include font-body;
+  color: font-color(light);
+  padding: $grid-unit $grid-unit 2 * $grid-unit 2.5 * $grid-unit;
+}

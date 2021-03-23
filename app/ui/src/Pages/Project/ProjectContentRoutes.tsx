@@ -28,7 +28,11 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
         </>
       )}
 
-      <Route exact path={ROUTE.PROJECT_OVERVIEW} component={Overview} />
+      <Route
+        exact
+        path={ROUTE.PROJECT_OVERVIEW}
+        component={() => <Overview openedProject={openedProject} />}
+      />
       <Route path={ROUTE.PROJECT_TOOL} component={ProjectToolsRoutes} />
       <Route
         exact

@@ -9,7 +9,7 @@
 
 export interface GetQualityProjectDesc_qualityProjectDesc {
   __typename: 'QualityProjectDesc';
-  quality: number | null;
+  quality: number;
 }
 
 export interface GetQualityProjectDesc {

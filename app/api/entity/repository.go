@@ -33,5 +33,6 @@ type Repository struct {
 	ExternalRepoURL      string
 	ExternalRepoUsername string
 	ExternalRepoPassword string
+	RepoName             string
 	Error                *string
 }

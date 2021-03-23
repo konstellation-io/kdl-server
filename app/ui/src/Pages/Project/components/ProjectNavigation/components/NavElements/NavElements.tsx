@@ -1,20 +1,19 @@
-import { useParams } from 'react-router-dom';
-import React from 'react';
-import NavigationButton from '../NavigationButton/NavigationButton';
-import { RouteProjectParams } from 'Constants/routes';
-import cx from 'classnames';
-import styles from './NavElements.module.scss';
-import useProjectNavigation from 'Hooks/useProjectNavigation';
-import { GetMe } from 'Graphql/queries/types/GetMe';
-import { loader } from 'graphql.macro';
-import { useQuery } from '@apollo/client';
-import { NavButtonLink } from '../../ProjectNavigation';
 import AnimateHeight from 'react-animate-height';
-import useTool from 'Graphql/hooks/useTool';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { GetMe } from 'Graphql/queries/types/GetMe';
+import { NavButtonLink } from '../../ProjectNavigation';
+import NavigationButton from '../NavigationButton/NavigationButton';
 import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import ConfirmAction from 'Components/Layout/ConfirmAction/ConfirmAction';
+import React from 'react';
+import { RouteProjectParams } from 'Constants/routes';
+import cx from 'classnames';
+import { loader } from 'graphql.macro';
+import styles from './NavElements.module.scss';
+import { useParams } from 'react-router-dom';
+import useProjectNavigation from 'Hooks/useProjectNavigation';
+import { useQuery } from '@apollo/client';
+import useTool from 'Graphql/hooks/useTool';
 
 const GetMeQuery = loader('Graphql/queries/getMe.graphql');
 

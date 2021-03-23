@@ -4,27 +4,43 @@ package kg;
 option go_package = "proto;kgpb";
 
 message GetGraphReq {
-  string description = 1;
+    string description = 1;
+}
+
+message GetItemReq {
+    string id = 1;
 }
 
 message GraphItem {
-  string id = 1;
-  string category = 2;
-  string title = 3;
-  string abstract = 4;
-  repeated string authors = 5;
-  float score = 6;
-  string date = 7;
-  string url = 8;
-  string external_id = 9;
-  repeated string repo_urls = 10;
-  repeated string frameworks = 11;
+    string id = 1;
+    string category = 2;
+    string title = 3;
+    string abstract = 4;
+    repeated string authors = 5;
+    float score = 6;
+    string date = 7;
+    string url = 8;
+    string external_id = 9;
+    repeated Topic topics = 10;
+    repeated string repo_urls = 11;
+    repeated string frameworks = 12;
+}
+
+message Topic {
+    string name = 1;
+    float relevance = 2;
 }
 
 message GetGraphRes {
-  repeated GraphItem items = 1;
+    repeated GraphItem items = 1;
+    repeated Topic topics = 2;
+}
+
+message GetItemRes {
+    GraphItem item = 1;
 }
 
 service KGService {
-  rpc GetGraph (GetGraphReq) returns (GetGraphRes) {};
+    rpc GetGraph (GetGraphReq) returns (GetGraphRes) {};
+    rpc GetItem  (GetItemReq) returns (GetItemRes) {};
 };

@@ -138,12 +138,13 @@ func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity
 			return entity.Project{}, err
 		}
 
+		repoName = *opt.InternalRepoName
+
 		project.Repository = entity.Repository{
 			Type:             entity.RepositoryTypeInternal,
 			InternalRepoName: *opt.InternalRepoName,
+			RepoName:         repoName,
 		}
-
-		repoName = *opt.InternalRepoName
 
 	case entity.RepositoryTypeExternal:
 		repoName, err = i.getRepoNameFromURL(*opt.ExternalRepoURL)
@@ -159,6 +160,7 @@ func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity
 		project.Repository = entity.Repository{
 			Type:            entity.RepositoryTypeExternal,
 			ExternalRepoURL: *opt.ExternalRepoURL,
+			RepoName:        repoName,
 		}
 	}
 

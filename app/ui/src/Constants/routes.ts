@@ -16,7 +16,7 @@ enum ROUTE {
   PROJECT_TOOL_MINIO = '/projects/:projectId/tool/minio',
   PROJECT_TOOL_MLFLOW = '/projects/:projectId/tool/mlflow',
   PROJECT_TOOL_VSCODE = '/projects/:projectId/tool/vscode',
-  PROJECT_KG = '/projects/:projectId/knowledge-graph',
+  PROJECT_KG = '/projects/:projectId/knowledge-galaxy',
   NEW_PROJECT = '/new-project',
   PROJECT_CREATION = '/new-project/create',
 }

@@ -1,12 +1,12 @@
 import { INNER_R, getInnerDimensions, resourcesViz } from './KGViz';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import DetailsPanel from '../DetailsPanel/DetailsPanel';
 import KGViz from './KGViz';
 import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
-import ListPanel from '../ListPanel/ListPanel';
 import { ParentSize } from '@visx/responsive';
 import { RESOURCE_R } from './Resources/Resources';
+import ResourceDetails from '../ResourceDetails/ResourceDetails';
+import ResourceLists from '../ResourceLists/ResourceLists';
 import ResourceTooltip from './ResourceTooltip/ResourceTooltip';
 import SectionList from './SectionList/SectionList';
 import cx from 'classnames';
@@ -16,6 +16,14 @@ import styles from './KGVisualization.module.scss';
 import useKGFilters from 'Graphql/client/hooks/useKGFilters';
 import { useReactiveVar } from '@apollo/client';
 import useTooltip from 'Hooks/useTooltip';
+
+let mouseDown = false;
+document.body.onmousedown = function () {
+  mouseDown = true;
+};
+document.body.onmouseup = function () {
+  mouseDown = false;
+};
 
 export type D = {
   id: string;
@@ -34,6 +42,7 @@ type WrapperProps = {
   data: D[];
   sections: string[];
   selectedResource: string;
+  idToFullResource: { [key: string]: any };
 };
 function KGVisualizationWrapper(props: WrapperProps) {
   return (
@@ -56,6 +65,7 @@ function KGVisualization({
   data,
   sections,
   selectedResource,
+  idToFullResource,
 }: Props) {
   const scores = useReactiveVar(kgScore);
   const { updateScore } = useKGFilters();
@@ -86,6 +96,8 @@ function KGVisualization({
     () => data.filter((d) => d.score >= scores[1] && d.score <= scores[0]),
     [data, scores]
   );
+
+  const starredResources = useMemo(() => data.filter((d) => d.starred), [data]);
 
   useEffect(() => {
     if (animating && data) {
@@ -128,6 +140,8 @@ function KGVisualization({
     setOpenedPaper(resource);
     centerContainer(left);
     resourcesViz.lockHighlight = resource.name;
+    resourcesViz.highlightResource(resource.name, true);
+    setHoveredPaper(null);
   }
   function closeResourceDetails() {
     setOpenedPaper(null);
@@ -170,7 +184,15 @@ function KGVisualization({
       const scoreFactorMin = 1 - mousePivot;
       const scoreFactorMax = mousePivot;
 
+      // console.log('e.deltaY', e.deltaY);
+      // const deltaYNormalized = -(e.deltaY / height) / 10;
+      // console.log('deltaYNormalized', deltaYNormalized);
+      // console.log('scoreFactorMin', scoreFactorMin);
+      // console.log('rev', rev);
+
       const dScore: number = -e.deltaY / (500 * rev); // 50 000
+      // const dScore: number = deltaYNormalized; // 50 000
+
       const newMin = Math.min(
         max,
         Math.max(minScore, min + dScore * scoreFactorMin)
@@ -181,24 +203,19 @@ function KGVisualization({
       );
 
       updateScore([newMax, newMin]);
+      setHoveredPaper(null);
     }
   }
 
-  const dragging = useRef(false);
   const draggingOrig = useRef(0);
   const draggingPivot = useRef([1, 0]);
   function dragStart(e: any) {
-    dragging.current = true;
     draggingOrig.current = getMouseR(e);
     draggingPivot.current = [...scores];
   }
 
-  function dragEnd(e: any) {
-    dragging.current = false;
-  }
-
   function drag(e: any) {
-    if (dragging.current) {
+    if (mouseDown) {
       const actMouseR = getMouseR(e);
       const dR = actMouseR - draggingOrig.current;
       const dScore = dR * scoreUnitPerPx;
@@ -305,7 +322,6 @@ function KGVisualization({
           height={height}
           onWheel={onScroll}
           onMouseDown={dragStart}
-          onMouseUp={dragEnd}
           onMouseMove={drag}
         />
       </div>
@@ -321,13 +337,27 @@ function KGVisualization({
         className={cx(styles.shield, { [styles.show]: openedPaper !== null })}
         onClick={closeResourceDetails}
       />
-      <div className={styles.listPanel}>
-        <ListPanel
-          resources={showedData}
-          scores={scores}
-          onResourceClick={openResourceDetails}
-        />
-        <DetailsPanel resource={openedPaper} onClose={closeResourceDetails} />
+      <div className={styles.panels}>
+        <div className={styles.listPanel}>
+          <ResourceLists
+            resources={showedData}
+            starredResources={starredResources}
+            scores={scores}
+            onResourceClick={openResourceDetails}
+            idToFullResource={idToFullResource}
+          />
+        </div>
+        <div
+          className={cx(styles.detailsPanel, {
+            [styles.opened]: openedPaper !== null,
+          })}
+        >
+          <ResourceDetails
+            resource={openedPaper}
+            onClose={closeResourceDetails}
+            idToFullResource={idToFullResource}
+          />
+        </div>
       </div>
       {/* <Minimap
         minimapRef={minimapRef}

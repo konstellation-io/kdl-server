@@ -1,61 +1,40 @@
-import {
-  GET_NEW_PROJECT,
-  GetNewProject,
-} from 'Graphql/client/queries/getNewProject.graphql';
-import {
-  GetQualityProjectDesc,
-  GetQualityProjectDescVariables,
-} from 'Graphql/queries/types/GetQualityProjectDesc';
-import React, { useEffect, useState } from 'react';
 import { SpinnerCircular, TextInput } from 'kwc';
-import { useLazyQuery, useQuery } from '@apollo/client';
-
-import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
 import { generateSlug, getErrorMsg } from 'Utils/string';
-import { loader } from 'graphql.macro';
-import styles from './Information.module.scss';
-import useNewProject from 'Graphql/client/hooks/useNewProject';
 import {
   validateProjectDescription,
   validateProjectName,
 } from './InformationUtils';
 
-const GetQualityProjectDescQuery = loader(
-  'Graphql/queries/getQualityProjectDesc.graphql'
-);
+import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
+import React from 'react';
+import { newProject } from 'Graphql/client/cache';
+import styles from './Information.module.scss';
+import useNewProject from 'Graphql/client/hooks/useNewProject';
+import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
+import { useReactiveVar } from '@apollo/client';
 
 const limits = {
-  maxHeight: 500,
-  minHeight: 400,
+  maxHeight: 400,
+  minHeight: 375,
 };
 
 type Props = {
   showErrors: boolean;
 };
 function Information({ showErrors }: Props) {
-  const [getQualityProjectDesc, { data: descriptionScore }] = useLazyQuery<
-    GetQualityProjectDesc,
-    GetQualityProjectDescVariables
-  >(GetQualityProjectDescQuery);
-
+  const project = useReactiveVar(newProject);
   const { updateValue, updateError, clearError } = useNewProject('information');
   const { updateValue: updateInternalRepositoryValue } = useNewProject(
     'internalRepository'
   );
-  const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
-  const [score, setScore] = useState(0);
 
-  useEffect(() => {
-    if (descriptionScore !== undefined)
-      setScore(descriptionScore.qualityProjectDesc.quality || 0);
-  }, [descriptionScore]);
+  const { values, errors } = project.information || {};
+  const { name, description } = values;
+  const { name: errorName, description: errorDescription } = errors;
 
-  if (!data) return <SpinnerCircular />;
+  const { descriptionScore, loading } = useQualityDescription(description);
 
-  const {
-    values: { name, description },
-    errors: { name: errorName, description: errorDescription },
-  } = data.newProject.information;
+  if (!project) return <SpinnerCircular />;
 
   return (
     <div className={styles.container}>
@@ -85,15 +64,17 @@ function Information({ showErrors }: Props) {
         onBlur={() => {
           const isValidDescription = validateProjectDescription(description);
           updateError('description', getErrorMsg(isValidDescription));
-          getQualityProjectDesc({ variables: { description } });
         }}
         limits={limits}
+        error={showErrors ? errorDescription : ''}
+        helpText={`A minimum of 50 words is required to get a valid score. Words: ${
+          description.split(' ').length
+        }`}
         showClearButton
         textArea
         lockHorizontalGrowth
-        error={showErrors ? errorDescription : ''}
       />
-      <DescriptionScore score={score} />
+      <DescriptionScore score={descriptionScore} loading={loading} />
     </div>
   );
 }

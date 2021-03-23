@@ -374,3 +374,72 @@ func TestInteractor_GetByID(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, users)
 }
+
+func TestInteractor_RegenerateSSHKeys(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		id            = "user.1234"
+		email         = "user@email.com"
+		username      = "john.doe"
+		accessLevel   = entity.AccessLevelAdmin
+		publicSSHKey  = "test-ssh-key-public"
+		privateSSHKey = "test-ssh-key-private"
+		secretName    = "john-doe-ssh-keys" //nolint:gosec // it is a unit test
+	)
+
+	secretValues := map[string]string{
+		"KDL_USER_PUBLIC_SSH_KEY":  publicSSHKey,
+		"KDL_USER_PRIVATE_SSH_KEY": privateSSHKey,
+	}
+
+	ctx := context.Background()
+	now := time.Now().UTC()
+
+	sshKey := entity.SSHKey{
+		Public:       publicSSHKey,
+		Private:      privateSSHKey,
+		CreationDate: now,
+	}
+
+	expectedUser := entity.User{
+		ID:           id,
+		Username:     username,
+		Email:        email,
+		AccessLevel:  accessLevel,
+		SSHKey:       sshKey,
+		CreationDate: now,
+	}
+
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil).AnyTimes()
+	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
+	s.mocks.k8sClientMock.EXPECT().IsSecretPresent(secretName).Return(true, nil)
+	s.mocks.k8sClientMock.EXPECT().UpdateSecret(secretName, secretValues).Return(nil)
+	s.mocks.giteaService.EXPECT().UserSSHKeyExists(username).Return(true, nil)
+	s.mocks.giteaService.EXPECT().UpdateSSHKey(username, sshKey.Public).Return(nil)
+	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, sshKey).Return(nil)
+
+	userData, err := s.interactor.RegenerateSSHKeys(ctx, username)
+
+	require.NoError(t, err)
+	require.Equal(t, expectedUser, userData)
+}
+
+func TestInteractor_RegenerateSSHKeys_UserNotFound(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		username = "john"
+	)
+
+	ctx := context.Background()
+
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
+
+	userData, err := s.interactor.RegenerateSSHKeys(ctx, username)
+
+	require.Equal(t, userData, entity.User{})
+	require.Equal(t, err, entity.ErrUserNotFound)
+}

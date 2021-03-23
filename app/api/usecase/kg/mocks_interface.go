@@ -63,3 +63,18 @@ func (mr *MockUseCaseMockRecorder) GetItem(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetItem", reflect.TypeOf((*MockUseCase)(nil).GetItem), ctx, id)
 }
+
+// DescriptionQuality mocks base method
+func (m *MockUseCase) DescriptionQuality(ctx context.Context, description string) (float64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DescriptionQuality", ctx, description)
+	ret0, _ := ret[0].(float64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DescriptionQuality indicates an expected call of DescriptionQuality
+func (mr *MockUseCaseMockRecorder) DescriptionQuality(ctx, description interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescriptionQuality", reflect.TypeOf((*MockUseCase)(nil).DescriptionQuality), ctx, description)
+}

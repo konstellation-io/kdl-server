@@ -27,7 +27,7 @@ type Mutation {
 }
 
 type QualityProjectDesc {
-  quality: Int!
+  quality: Float!
 }
 
 type Topic {

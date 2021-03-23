@@ -30,3 +30,9 @@ func (i *interactor) GetItem(ctx context.Context, id string) (entity.KnowledgeGr
 	i.logger.Infof("Getting KG item with id \"%s\"", id)
 	return i.kgService.GetItem(ctx, id)
 }
+
+// DescriptionQuality gets description quality.
+func (i *interactor) DescriptionQuality(ctx context.Context, description string) (float64, error) {
+	i.logger.Infof("Getting quality of description  \"%s\"", description)
+	return i.kgService.DescriptionQuality(ctx, description)
+}

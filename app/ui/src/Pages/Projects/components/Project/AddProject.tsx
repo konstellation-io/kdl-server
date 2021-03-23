@@ -7,7 +7,7 @@ import styles from './Project.module.scss';
 
 const AddProject = () => (
   <div className={styles.addProjectContainer}>
-    <Link to={ROUTE.NEW_PROJECT}>
+    <Link to={ROUTE.NEW_PROJECT} data-test-id="addProject">
       <div className={styles.addProjectBg}>
         <div className={styles.addProjectBgUpper} />
         <div className={styles.addProjectBgLower} />

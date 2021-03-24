@@ -6,20 +6,23 @@ import ResourcesList from './components/ResourcesList/ResourcesList';
 import { orderBy } from 'lodash';
 import { resourcesViz } from '../KGVisualization/KGViz';
 import styles from './ResourceLists.module.scss';
+import NoItems from './components/NoItems/NoItems';
 
 type Props = {
   starredResources: D[];
-  resources: D[];
+  resources?: D[];
   onResourceClick: (d: D, left: number) => void;
-  scores: [number, number];
+  scores?: [number, number];
   idToFullResource: { [key: string]: any };
+  showTopResources?: boolean;
 };
 function ResourceLists({
   starredResources,
-  resources,
+  resources = [],
   onResourceClick,
-  scores,
+  scores = [1, 0],
   idToFullResource,
+  showTopResources = true,
 }: Props) {
   const [listFilterText, setListFilterText] = useState('');
 
@@ -74,22 +77,32 @@ function ResourceLists({
         className={styles.tabSection}
       >
         <TabList>
-          <Tab>{`LIST (${filteredAllTopics.length})`}</Tab>
+          {showTopResources && (
+            <Tab>{`LIST (${filteredAllTopics.length})`}</Tab>
+          )}
           <Tab>{`STARRED (${starredResources.length})`}</Tab>
         </TabList>
         <div className={styles.tabContainer}>
-          <TabPanel>
-            <ResourcesList
-              header={listHeader}
-              resources={filteredAllTopics}
-              filterText={listFilterText}
-              onClick={onSelectResource}
-              onEnter={onEnter}
-              onLeave={onLeave}
-              onChangeFilterText={setListFilterText}
-              idToFullResource={idToFullResource}
-            />
-          </TabPanel>
+          {showTopResources && (
+            <TabPanel>
+              <ResourcesList
+                header={listHeader}
+                resources={filteredAllTopics}
+                filterText={listFilterText}
+                onClick={onSelectResource}
+                onEnter={onEnter}
+                onLeave={onLeave}
+                onChangeFilterText={setListFilterText}
+                idToFullResource={idToFullResource}
+                noItems={
+                  <NoItems
+                    title="No items in the KG!"
+                    subTitle="Please, provide us a better description of your project."
+                  />
+                }
+              />
+            </TabPanel>
+          )}
           <TabPanel>
             <ResourcesList
               resources={starredResources}
@@ -99,6 +112,12 @@ function ResourceLists({
               onLeave={onLeave}
               onChangeFilterText={setListFilterText}
               idToFullResource={idToFullResource}
+              noItems={
+                <NoItems
+                  title="No starred items yet!"
+                  subTitle="Once you favourite an item you'll see them here."
+                />
+              }
             />
           </TabPanel>
         </div>

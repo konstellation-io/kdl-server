@@ -1,0 +1,17 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.resource {
+  background-color: palette(base, 400);
+  border-radius: $grid-unit / 2;
+  padding: 1.25 * $grid-unit 2 * $grid-unit;
+  margin-top: $grid-unit;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  .title {
+    @include font-body
+  }
+}

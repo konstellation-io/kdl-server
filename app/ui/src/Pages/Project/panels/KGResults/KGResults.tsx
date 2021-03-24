@@ -82,11 +82,10 @@ function KGResults() {
   return (
     <div className={styles.container}>
       <ResourceLists
-        resources={resources}
         starredResources={resources.filter((r) => r.starred)}
         onResourceClick={openDetails}
-        scores={[1, 0]}
         idToFullResource={idToFullResource}
+        showTopResources={false}
       />
     </div>
   );

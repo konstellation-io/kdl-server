@@ -13,6 +13,7 @@ type Props = {
   filterText: string;
   resources: D[];
   header?: JSX.Element | null;
+  noItems?: JSX.Element | null;
   idToFullResource: { [key: string]: any };
 };
 function ResourcesList({
@@ -23,33 +24,39 @@ function ResourcesList({
   onLeave,
   onChangeFilterText,
   filterText,
+  noItems,
   idToFullResource,
 }: Props) {
+  const hasResources = resources.length > 0;
   return (
     <div className={styles.list}>
       <div className={styles.top}>
         {header}
-        <TextInput
-          formValue={filterText}
-          onChange={(value: string) => onChangeFilterText(value)}
-          Icon={IconSearch}
-          placeholder={'Find a paper...'}
-          showClearButton
-          hideLabel
-          hideBottomText
-        />
+        {hasResources && (
+          <TextInput
+            formValue={filterText}
+            onChange={(value: string) => onChangeFilterText(value)}
+            Icon={IconSearch}
+            placeholder={'Find a paper...'}
+            showClearButton
+            hideLabel
+            hideBottomText
+          />
+        )}
       </div>
       <div className={styles.listWrapper}>
-        {resources.map((r) => (
-          <KGItem
-            key={r.id}
-            onEnter={onEnter}
-            onLeave={onLeave}
-            onClick={onClick}
-            resource={r}
-            idToFullResource={idToFullResource}
-          />
-        ))}
+        {hasResources
+          ? resources.map((r) => (
+              <KGItem
+                key={r.id}
+                onEnter={onEnter}
+                onLeave={onLeave}
+                onClick={onClick}
+                resource={r}
+                idToFullResource={idToFullResource}
+              />
+            ))
+          : noItems}
       </div>
     </div>
   );

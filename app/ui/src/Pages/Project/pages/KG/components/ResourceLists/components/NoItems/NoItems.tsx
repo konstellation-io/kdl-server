@@ -8,7 +8,7 @@ type Props = {
 const NoItems: FC<Props> = ({ title, subTitle }) => (
   <div className={styles.resource}>
     <span className={styles.title}>{title}</span>
-    <p>{subTitle}</p>
+    {subTitle && <p>{subTitle}</p>}
   </div>
 );
 

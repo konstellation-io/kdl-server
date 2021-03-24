@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z\nproto;kgpb',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x15knowledge_graph.proto\x12\x02kg\"\"\n\x0bGetGraphReq\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\"\x18\n\nGetItemReq\x12\n\n\x02id\x18\x01 \x01(\t\",\n\x15\x44\x65scriptionQualityReq\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\".\n\x15\x44\x65scriptionQualityRes\x12\x15\n\rquality_score\x18\x01 \x01(\x02\"\xdc\x01\n\tGraphItem\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08\x63\x61tegory\x18\x02 \x01(\t\x12\r\n\x05title\x18\x03 \x01(\t\x12\x10\n\x08\x61\x62stract\x18\x04 \x01(\t\x12\x0f\n\x07\x61uthors\x18\x05 \x03(\t\x12\r\n\x05score\x18\x06 \x01(\x02\x12\x0c\n\x04\x64\x61te\x18\x07 \x01(\t\x12\x0b\n\x03url\x18\x08 \x01(\t\x12\x13\n\x0b\x65xternal_id\x18\t \x01(\t\x12\x19\n\x06topics\x18\n \x03(\x0b\x32\t.kg.Topic\x12\x11\n\trepo_urls\x18\x0b \x03(\t\x12\x12\n\nframeworks\x18\x0c \x03(\t\"(\n\x05Topic\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x11\n\trelevance\x18\x02 \x01(\x02\"F\n\x0bGetGraphRes\x12\x1c\n\x05items\x18\x01 \x03(\x0b\x32\r.kg.GraphItem\x12\x19\n\x06topics\x18\x02 \x03(\x0b\x32\t.kg.Topic\")\n\nGetItemRes\x12\x1b\n\x04item\x18\x01 \x01(\x0b\x32\r.kg.GraphItem2\xb9\x01\n\tKGService\x12.\n\x08GetGraph\x12\x0f.kg.GetGraphReq\x1a\x0f.kg.GetGraphRes\"\x00\x12+\n\x07GetItem\x12\x0e.kg.GetItemReq\x1a\x0e.kg.GetItemRes\"\x00\x12O\n\x15GetDescriptionQuality\x12\x19.kg.DescriptionQualityReq\x1a\x19.kg.DescriptionQualityRes\"\x00\x42\x0cZ\nproto;kgpbb\x06proto3'
+  serialized_pb=b'\n\x15knowledge_graph.proto\x12\x02kg\"\"\n\x0bGetGraphReq\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\"\x18\n\nGetItemReq\x12\n\n\x02id\x18\x01 \x01(\t\",\n\x15\x44\x65scriptionQualityReq\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\".\n\x15\x44\x65scriptionQualityRes\x12\x15\n\rquality_score\x18\x01 \x01(\x05\"\xdc\x01\n\tGraphItem\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08\x63\x61tegory\x18\x02 \x01(\t\x12\r\n\x05title\x18\x03 \x01(\t\x12\x10\n\x08\x61\x62stract\x18\x04 \x01(\t\x12\x0f\n\x07\x61uthors\x18\x05 \x03(\t\x12\r\n\x05score\x18\x06 \x01(\x02\x12\x0c\n\x04\x64\x61te\x18\x07 \x01(\t\x12\x0b\n\x03url\x18\x08 \x01(\t\x12\x13\n\x0b\x65xternal_id\x18\t \x01(\t\x12\x19\n\x06topics\x18\n \x03(\x0b\x32\t.kg.Topic\x12\x11\n\trepo_urls\x18\x0b \x03(\t\x12\x12\n\nframeworks\x18\x0c \x03(\t\"(\n\x05Topic\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x11\n\trelevance\x18\x02 \x01(\x02\"F\n\x0bGetGraphRes\x12\x1c\n\x05items\x18\x01 \x03(\x0b\x32\r.kg.GraphItem\x12\x19\n\x06topics\x18\x02 \x03(\x0b\x32\t.kg.Topic\")\n\nGetItemRes\x12\x1b\n\x04item\x18\x01 \x01(\x0b\x32\r.kg.GraphItem2\xb9\x01\n\tKGService\x12.\n\x08GetGraph\x12\x0f.kg.GetGraphReq\x1a\x0f.kg.GetGraphRes\"\x00\x12+\n\x07GetItem\x12\x0e.kg.GetItemReq\x1a\x0e.kg.GetItemRes\"\x00\x12O\n\x15GetDescriptionQuality\x12\x19.kg.DescriptionQualityReq\x1a\x19.kg.DescriptionQualityRes\"\x00\x42\x0cZ\nproto;kgpbb\x06proto3'
 )
 
 
@@ -131,8 +131,8 @@ _DESCRIPTIONQUALITYRES = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='quality_score', full_name='kg.DescriptionQualityRes.quality_score', index=0,
-      number=1, type=2, cpp_type=6, label=1,
-      has_default_value=False, default_value=float(0),
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),

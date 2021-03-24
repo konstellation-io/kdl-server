@@ -16,7 +16,7 @@ message DescriptionQualityReq {
 }
 
 message DescriptionQualityRes {
-    float quality_score = 1;
+    int32 quality_score = 1;
 }
 
 message GraphItem {

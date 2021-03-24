@@ -7,7 +7,7 @@ python server/app.py
 import pytest
 from grpc_requests import StubClient
 
-from proto.knowledge_graph_pb2 import DESCRIPTOR, GetGraphRes, GetItemRes
+from proto.knowledge_graph_pb2 import DESCRIPTOR, DescriptionQualityRes, GetGraphRes, GetItemRes
 
 
 class TestKnowledgeGraphService:
@@ -37,3 +37,11 @@ class TestKnowledgeGraphService:
                              {"id": "4e10c22261836cd0c415d2731465d43e"},
                              raw_output=True)
         assert isinstance(res.__class__, type(GetItemRes))
+
+    @pytest.mark.int
+    def test_GetDescriptionQuality_grpc(self):
+        client = self.set_client()
+        res = client.request("kg.KGService", "GetDescriptionQuality",
+                             {"description": "test"},
+                             raw_output=True)
+        assert isinstance(res.__class__, type(DescriptionQualityRes))

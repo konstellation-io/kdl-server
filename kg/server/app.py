@@ -54,7 +54,7 @@ class KnowledgeGraphService(kg_grpc_pb2.KGServiceServicer):
         return res
 
     def GetDescriptionQuality(self, request: kg_pb2.DescriptionQualityReq, context: grpc.ServicerContext):
-        description_score = self.evaluator.get_description_quality(request.description)
+        description_score = self.evaluator.get_description_quality(request.description, config.MIN_WORDS)
         res = kg_pb2.DescriptionQualityRes(quality_score=description_score)
 
         return res

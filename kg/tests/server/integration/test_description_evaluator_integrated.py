@@ -3,30 +3,32 @@ DescriptionEvaluator relies on a functioning Recommender, which is too heavy and
 Therefore, this file contains tests for a functional integration between the DescriptionEvaluator and the
 Recommender.
 """
-
-import unittest
 import pytest
 
 import config
-from tools.assets import AssetLoader
-from recommender import Recommender
 from description_evaluator import DescriptionEvaluator
+from recommender import Recommender
+from tools.assets import AssetLoader
 
 
-class TestDescriptionEvaluatorWithTrueRecommender(unittest.TestCase):
+@pytest.fixture
+def integrated_evaluator():
+    assets = AssetLoader(config.ASSET_ROUTE)
+    recommender = Recommender(
+        model=assets.model,
+        tokenizer=assets.tokenizer,
+        vectors=assets.vectors,
+        dataset=assets.dataset)
 
-    def setUp(self) -> None:
-        assets = AssetLoader(config.ASSET_ROUTE)
-        recommender = Recommender(
-            model=assets.model,
-            tokenizer=assets.tokenizer,
-            vectors=assets.vectors,
-            dataset=assets.dataset)
+    evaluator = DescriptionEvaluator(recommender=recommender)
 
-        self.evaluator = DescriptionEvaluator(recommender=recommender)
+    return evaluator
+
+
+class TestDescriptionEvaluatorWithRealRecommender:
 
     @pytest.mark.int
-    def test_get_description_quality_with_high_quality_description_returns_quality_above_50_percent(self):
+    def test_get_description_quality_returns_quality_above_50_percent(self, integrated_evaluator):
 
         query = """The purpose of this project is to generate an algorithm for automated image quality enhancement.
             We have an extensive dataset of paired images of the same scene, in which one of the pair of images was
@@ -35,6 +37,6 @@ class TestDescriptionEvaluatorWithTrueRecommender(unittest.TestCase):
             enhancing the quality of any mobile phone photograph, irrespective of the optical properties of the
             source camera. We want the solution to achieve various aims, including denoising, color and contrast
             improvement and removal of Moire patterns."""
-        result = self.evaluator.get_description_quality(description=query)
+        result = integrated_evaluator.get_description_quality(description=query, min_words=10)
 
-        self.assertGreaterEqual(result, 0.5)
+        assert result >= 0.5

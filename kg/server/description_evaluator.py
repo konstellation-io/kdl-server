@@ -34,27 +34,31 @@ class DescriptionEvaluator(object):
         self._recommender = recommender
 
     @staticmethod
-    def _convert_score_to_quality(score: float) -> float:
+    def _convert_score_to_quality(score: float) -> int:
         """Computes the estimated quality based on score of a paper """
         a = 2.5
         b = -1.25
         quality = a * score + b
-        quality = np.clip(quality, a_min=0, a_max=1)
+        quality = round(np.clip(quality, a_min=0, a_max=1) * 100)
 
         return quality
 
-    def get_description_quality(self, description: str) -> float:
+    def get_description_quality(self, description: str, min_words: int) -> int:
         """Given a project description string, returns estimated description quality based on the
         scores of the highly-ranked papers returned by the recommender (including top-100 papers).
 
         Args:
           description: (str) input project description
+          min_words: (int) minimum number of words to start counting.
 
         Returns:
-            (float) estimated description quality
+            (int) estimated description quality percentage
         """
+        if len(description.split()) < min_words:
+            return 0
+
         top_items = self._recommender.get_top_items(description, n_hits=100)
-        last_item_score = float(top_items.items[-1].score)
+        last_item_score = top_items.items[-1].score
         quality = self._convert_score_to_quality(last_item_score)
 
         return quality

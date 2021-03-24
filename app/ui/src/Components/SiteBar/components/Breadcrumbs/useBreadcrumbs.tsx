@@ -62,7 +62,11 @@ function useBreadcrumbs() {
     LeftIconComponent: <ServerIcon className="icon-regular" />,
     RightIconComponent: ExpandMoreIcon,
     BottomComponent: (props: BottomComponentProps) => (
-      <NavigationSelector options={serverSections} {...props} />
+      <NavigationSelector
+        options={serverSections}
+        shouldShowConfirmation={!!routeMatch}
+        {...props}
+      />
     ),
   });
 

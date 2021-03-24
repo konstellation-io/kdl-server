@@ -15,14 +15,17 @@ const GetMeQuery = loader('Graphql/queries/getMe.graphql');
 function ProjectContentRoutes({ openedProject }: ProjectRoute) {
   const { data } = useQuery<GetMe>(GetMeQuery);
   const areToolsActive = data?.me.areToolsActive;
-  const overviewRoute = buildRoute(ROUTE.PROJECT_OVERVIEW, openedProject.id);
 
   return (
     <Switch>
-      <Redirect exact from={ROUTE.PROJECT} to={overviewRoute} />
+      <Redirect exact from={ROUTE.PROJECT} to={ROUTE.PROJECT_OVERVIEW} />
       {!areToolsActive &&
         [ROUTE.PROJECT_TOOL_JUPYTER, ROUTE.PROJECT_TOOL_VSCODE].map((r) => (
-          <Redirect key={r} from={r} to={overviewRoute} />
+          <Redirect
+            key={r}
+            from={r}
+            to={buildRoute(ROUTE.PROJECT_OVERVIEW, openedProject.id)}
+          />
         ))}
 
       <Route

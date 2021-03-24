@@ -26,6 +26,7 @@ type Props = {
   title: string;
   desciption: string;
   action?: Action;
+  customAction?: JSX.Element;
   theme?: BOX_THEME;
   loading?: boolean;
 };
@@ -34,6 +35,7 @@ function FAQBox({
   title,
   desciption,
   action,
+  customAction,
   theme = BOX_THEME.DEFAULT,
   loading = false,
 }: Props) {
@@ -58,6 +60,7 @@ function FAQBox({
         title={title}
         desciption={desciption}
         action={action}
+        customAction={customAction}
         theme={theme}
         loading={loading}
       />

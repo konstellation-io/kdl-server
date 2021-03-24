@@ -32,11 +32,13 @@ type Props = {
   action?: Action;
   theme?: BOX_THEME;
   loading?: boolean;
+  customAction?: JSX.Element;
 };
 function MessageActionBox({
   title,
   desciption,
   action,
+  customAction,
   theme = BOX_THEME.DEFAULT,
   loading = false,
 }: Props) {
@@ -48,14 +50,11 @@ function MessageActionBox({
     }
   }, [loading]);
 
-  return (
-    <div
-      className={cx(styles.container, styles[theme])}
-      onClick={(e) => e.stopPropagation()}
-    >
-      <p className={styles.title}>{title}</p>
-      <p className={styles.description}>{desciption}</p>
-      {action && (
+  function getAction() {
+    if (customAction) return customAction;
+
+    if (action) {
+      return (
         <div className={styles.action}>
           {action.needConfirmation && (
             <div className={styles.confirmation}>
@@ -76,7 +75,18 @@ function MessageActionBox({
             />
           </div>
         </div>
-      )}
+      );
+    }
+  }
+
+  return (
+    <div
+      className={cx(styles.container, styles[theme])}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <p className={styles.title}>{title}</p>
+      <p className={styles.description}>{desciption}</p>
+      {getAction()}
     </div>
   );
 }

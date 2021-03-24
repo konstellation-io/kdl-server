@@ -1,11 +1,11 @@
-from typing import Union
+from typing import Union, List, Dict
 
 import numpy as np
 import pandas as pd
 import torch
 import transformers
-from torchnlp.encoders.text import stack_and_pad_tensors
 from transformers import AutoModel, AutoTokenizer
+from transformers.tokenization_utils_base import BatchEncoding
 
 from data_checks.vectors import check_vector_size
 
@@ -77,32 +77,25 @@ def convert_to_batches(input_items: Union[np.ndarray, range],
     return output
 
 
-def tokenize_batch(samples: list[str],
+def tokenize_batch(samples: List[str],
                    tokenizer: transformers.PreTrainedTokenizer,
-                   tokenizer_args: dict[str],
-                   device: torch.device) -> torch.Tensor:
+                   tokenizer_args: Dict,
+                   device: torch.device) -> BatchEncoding:
     """
-    Convert a list of texts to a list of tokens as input for
-    downstream use by the transformer (in the vectorize_batch function).
+    Convert a list of texts to a BatchEconding as input for downstream use by the transformer (in the
+    vectorize_batch function).
 
     Args:
         samples: (iterable of str) each string is a document (eg. paper abstract)
         tokenizer: (huggingface tokenizer object)
-        tokenizer_args: dict with tokenizer config
-        device: device to save the tensors to
+        tokenizer_args: dict with tokenizer config, excluding padding and return_tensors which are mandatory.
+        device: device to pass the outputs to
 
     Returns:
-        (torch.Tensor)
+        (transformers.tokenization_utils_base.BatchEncoding)
     """
-    batch = []
-    for sequence in samples:
-        doc_tokens = torch.tensor(tokenizer.encode(sequence, **tokenizer_args)).to(device)
-        batch.append(doc_tokens)
-
-    stack_tensors = stack_and_pad_tensors(batch, tokenizer.pad_token_id)[0]
-    assert stack_tensors[-1].shape == doc_tokens.shape
-
-    return stack_tensors
+    batch_tokens = tokenizer(samples, padding=True, return_tensors='pt', **tokenizer_args).to(device)
+    return batch_tokens
 
 
 def vectorize_batch(batch, model):

@@ -7,6 +7,7 @@ import SSHKey from './components/SSHKey/SSHKey';
 import { copyAndToast } from 'Utils/clipboard';
 import { loader } from 'graphql.macro';
 import styles from './UserSshKey.module.scss';
+import { toast } from 'react-toastify';
 import { useQuery } from '@apollo/client';
 import useSSHKey from 'Graphql/hooks/useSSHKey';
 
@@ -14,7 +15,12 @@ const GetSSHKeys = loader('Graphql/queries/getSSHKey.graphql');
 
 function UserSshKey() {
   const { data, loading, error } = useQuery<GetSSHKey>(GetSSHKeys);
-  const { regenerateSSHKey } = useSSHKey();
+  const { regenerateSSHKey } = useSSHKey({
+    onRegenerateSSHKeyComplete: () => {
+      toast.info('SSH Key has been regenerated');
+      toast.clearWaitingQueue();
+    },
+  });
 
   function getContent() {
     if (loading) return <SpinnerCircular />;

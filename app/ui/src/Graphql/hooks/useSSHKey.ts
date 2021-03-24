@@ -6,9 +6,16 @@ const RegenerateSSHKeyMutation = loader(
   'Graphql/mutations/regenerateSSHKey.graphql'
 );
 
-export default function useSSHKey() {
+type Options = {
+  onRegenerateSSHKeyComplete?: () => void;
+};
+
+export default function useSSHKey(options?: Options) {
   const [mutationRegenerateSSHKey] = useMutation<RegenerateSSHKey>(
-    RegenerateSSHKeyMutation
+    RegenerateSSHKeyMutation,
+    {
+      onCompleted: options?.onRegenerateSSHKeyComplete,
+    }
   );
 
   return {

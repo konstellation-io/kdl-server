@@ -5,8 +5,7 @@ from transformers import AutoModel, AutoTokenizer
 
 import compute_vectors
 
-# DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-DEVICE = torch.device("cpu")
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 TRANSFORMER = AutoModel.from_pretrained(compute_vectors.MODEL_PATH).to(DEVICE)
 TOKENIZER = AutoTokenizer.from_pretrained(compute_vectors.MODEL_PATH)
 TOKENIZER_ARGS = dict(truncation=True, max_length=512)
@@ -14,15 +13,34 @@ TOKENIZER_ARGS = dict(truncation=True, max_length=512)
 
 @pytest.mark.int
 def test_tokenize_batch_produces_batch_with_attention_masks_and_input_ids(gen_inputs):
+    """
+    Tests that the outputs of tokenize_batch match the expectations for downstream usage by the transformer model.
+    """
     inputs = gen_inputs
     n_inputs = len(inputs)
 
     batch_of_tokens = compute_vectors.tokenize_batch(
         inputs, tokenizer=TOKENIZER, tokenizer_args=TOKENIZER_ARGS, device=DEVICE)
 
-    assert batch_of_tokens['input_ids'].size()[0] == n_inputs  # If fails at .size(), call tokenizer with return_tensors='pt'
-    assert batch_of_tokens['attention_mask'].size()[0] == n_inputs
+    # Check that tokens batch object contains 'input_ids' and 'attention_mask'
+    message_batch_components = "'{}' not found in tokenize_batch outputs. Check the tokenizer is called with " \
+        "tokenizer(inputs) rather than tokenizer.encode(inputs)"
 
+    assert 'input_ids' in batch_of_tokens.keys(), message_batch_components.format("input_ids")
+    assert 'attention_mask' in batch_of_tokens.keys(), message_batch_components.format("attention_mask")
+
+    # Check that tokens batch components are tensors, or at least implement the size attribute
+    message_size_attr = ".size attribute is required for passing tokens to the transformer. " \
+        "Check that tokenizer is called with return_tensors='pt'."
+
+    assert hasattr(batch_of_tokens['input_ids'], 'size'), message_size_attr
+    assert hasattr(batch_of_tokens['attention_mask'], 'size'), message_size_attr
+
+    # Check that the batch dimensions are as expected
+    message_expected_dims = "Outputs of tokenize_batch do not match expected format."
+
+    assert batch_of_tokens['input_ids'].size()[0] == n_inputs, message_expected_dims
+    assert batch_of_tokens['attention_mask'].size()[0] == n_inputs, message_expected_dims
 
 #
 # @pytest.mark.int

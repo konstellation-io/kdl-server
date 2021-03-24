@@ -1,5 +1,5 @@
 import { BUTTON_THEMES, Button, Check } from 'kwc';
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 
 import { OverrideProps } from '@material-ui/core/OverridableComponent';
 import { SvgIconTypeMap } from '@material-ui/core';
@@ -31,14 +31,22 @@ type Props = {
   desciption: string;
   action?: Action;
   theme?: BOX_THEME;
+  loading?: boolean;
 };
 function MessageActionBox({
   title,
   desciption,
   action,
   theme = BOX_THEME.DEFAULT,
+  loading = false,
 }: Props) {
   const [confirmed, setConfirmed] = useState(false);
+
+  useEffect(() => {
+    if (loading) {
+      setConfirmed(false);
+    }
+  }, [loading]);
 
   return (
     <div
@@ -55,15 +63,18 @@ function MessageActionBox({
               <p className={styles.confirmationText}>{action.message}</p>
             </div>
           )}
-          <Button
-            label={action.label}
-            theme={toButtonTheme.get(theme)}
-            onClick={action.onClick}
-            disabled={action.needConfirmation && !confirmed}
-            height={30}
-            Icon={action.Icon}
-            primary
-          />
+          <div className={styles.button}>
+            <Button
+              label={action.label}
+              theme={toButtonTheme.get(theme)}
+              onClick={action.onClick}
+              disabled={action.needConfirmation && !confirmed}
+              loading={loading}
+              height={30}
+              Icon={action.Icon}
+              primary
+            />
+          </div>
         </div>
       )}
     </div>

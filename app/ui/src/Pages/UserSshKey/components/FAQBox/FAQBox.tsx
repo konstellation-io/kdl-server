@@ -27,6 +27,7 @@ type Props = {
   desciption: string;
   action?: Action;
   theme?: BOX_THEME;
+  loading?: boolean;
 };
 function FAQBox({
   label,
@@ -34,6 +35,7 @@ function FAQBox({
   desciption,
   action,
   theme = BOX_THEME.DEFAULT,
+  loading = false,
 }: Props) {
   const [opened, setOpened] = useState(false);
 
@@ -57,6 +59,7 @@ function FAQBox({
         desciption={desciption}
         action={action}
         theme={theme}
+        loading={loading}
       />
     </AnimateHeight>
   );

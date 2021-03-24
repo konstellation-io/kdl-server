@@ -11,14 +11,17 @@ type Options = {
 };
 
 export default function useSSHKey(options?: Options) {
-  const [mutationRegenerateSSHKey] = useMutation<RegenerateSSHKey>(
-    RegenerateSSHKeyMutation,
-    {
-      onCompleted: options?.onRegenerateSSHKeyComplete,
-    }
-  );
+  const [
+    mutationRegenerateSSHKey,
+    { loading: regenerateSSHKeyLoading },
+  ] = useMutation<RegenerateSSHKey>(RegenerateSSHKeyMutation, {
+    onCompleted: options?.onRegenerateSSHKeyComplete,
+  });
 
   return {
-    regenerateSSHKey: mutationRegenerateSSHKey,
+    regenerateSSHKey: {
+      performMutation: mutationRegenerateSSHKey,
+      loading: regenerateSSHKeyLoading,
+    },
   };
 }

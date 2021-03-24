@@ -15,7 +15,12 @@ const GetSSHKeys = loader('Graphql/queries/getSSHKey.graphql');
 
 function UserSshKey() {
   const { data, loading, error } = useQuery<GetSSHKey>(GetSSHKeys);
-  const { regenerateSSHKey } = useSSHKey({
+  const {
+    regenerateSSHKey: {
+      performMutation: regenerateSSHKey,
+      loading: regenerateSSHKeyLoading,
+    },
+  } = useSSHKey({
     onRegenerateSSHKeyComplete: () => {
       toast.info('SSH Key has been regenerated');
       toast.clearWaitingQueue();
@@ -74,6 +79,7 @@ function UserSshKey() {
                 label: 'REGENERATE',
                 onClick: regenerateSSHKey,
               }}
+              loading={regenerateSSHKeyLoading}
             />
           </div>
           <FAQBox

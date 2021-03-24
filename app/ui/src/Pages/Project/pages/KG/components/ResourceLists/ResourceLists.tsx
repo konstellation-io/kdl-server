@@ -74,22 +74,9 @@ function ResourceLists({
         className={styles.tabSection}
       >
         <TabList>
-          <Tab>{`LIST (${filteredAllTopics.length})`}</Tab>
           <Tab>{`STARRED (${starredResources.length})`}</Tab>
         </TabList>
         <div className={styles.tabContainer}>
-          <TabPanel>
-            <ResourcesList
-              header={listHeader}
-              resources={filteredAllTopics}
-              filterText={listFilterText}
-              onClick={onSelectResource}
-              onEnter={onEnter}
-              onLeave={onLeave}
-              onChangeFilterText={setListFilterText}
-              idToFullResource={idToFullResource}
-            />
-          </TabPanel>
           <TabPanel>
             <ResourcesList
               resources={starredResources}

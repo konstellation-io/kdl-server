@@ -40,7 +40,7 @@ type InternalRepository struct {
 }
 
 type QualityProjectDesc struct {
-	Quality float64 `json:"quality"`
+	Quality int `json:"quality"`
 }
 
 type RemoveAPITokenInput struct {

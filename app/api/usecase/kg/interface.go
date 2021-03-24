@@ -12,5 +12,5 @@ import (
 type UseCase interface {
 	Get(ctx context.Context, description string) (entity.KnowledgeGraph, error)
 	GetItem(ctx context.Context, id string) (entity.KnowledgeGraphItem, error)
-	DescriptionQuality(ctx context.Context, description string) (float64, error)
+	DescriptionQuality(ctx context.Context, description string) (int, error)
 }

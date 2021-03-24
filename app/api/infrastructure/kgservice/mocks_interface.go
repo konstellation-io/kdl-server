@@ -65,10 +65,10 @@ func (mr *MockKGServiceMockRecorder) GetItem(ctx, id interface{}) *gomock.Call {
 }
 
 // DescriptionQuality mocks base method
-func (m *MockKGService) DescriptionQuality(ctx context.Context, description string) (float64, error) {
+func (m *MockKGService) DescriptionQuality(ctx context.Context, description string) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DescriptionQuality", ctx, description)
-	ret0, _ := ret[0].(float64)
+	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

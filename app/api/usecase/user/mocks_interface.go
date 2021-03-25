@@ -267,18 +267,18 @@ func (mr *MockUseCaseMockRecorder) GetByID(ctx, userID interface{}) *gomock.Call
 }
 
 // RegenerateSSHKeys mocks base method.
-func (m *MockUseCase) RegenerateSSHKeys(ctx context.Context, username string) (entity.User, error) {
+func (m *MockUseCase) RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RegenerateSSHKeys", ctx, username)
+	ret := m.ctrl.Call(m, "RegenerateSSHKeys", ctx, user)
 	ret0, _ := ret[0].(entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // RegenerateSSHKeys indicates an expected call of RegenerateSSHKeys.
-func (mr *MockUseCaseMockRecorder) RegenerateSSHKeys(ctx, username interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) RegenerateSSHKeys(ctx, user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegenerateSSHKeys", reflect.TypeOf((*MockUseCase)(nil).RegenerateSSHKeys), ctx, username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegenerateSSHKeys", reflect.TypeOf((*MockUseCase)(nil).RegenerateSSHKeys), ctx, user)
 }
 
 // StartTools mocks base method.

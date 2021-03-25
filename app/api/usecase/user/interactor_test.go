@@ -403,7 +403,7 @@ func TestInteractor_RegenerateSSHKeys(t *testing.T) {
 		CreationDate: now,
 	}
 
-	expectedUser := entity.User{
+	targetUser := entity.User{
 		ID:           id,
 		Username:     username,
 		Email:        email,
@@ -412,33 +412,54 @@ func TestInteractor_RegenerateSSHKeys(t *testing.T) {
 		CreationDate: now,
 	}
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil).AnyTimes()
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(username).Return(false, nil)
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	s.mocks.k8sClientMock.EXPECT().UpdateSecret(secretName, secretValues).Return(nil)
 	s.mocks.giteaService.EXPECT().UpdateSSHKey(username, sshKey.Public).Return(nil)
 	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, sshKey).Return(nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(targetUser, nil).AnyTimes()
 
-	userData, err := s.interactor.RegenerateSSHKeys(ctx, username)
+	userData, err := s.interactor.RegenerateSSHKeys(ctx, targetUser)
 
 	require.NoError(t, err)
-	require.Equal(t, expectedUser, userData)
+	require.Equal(t, targetUser, userData)
 }
 
-func TestInteractor_RegenerateSSHKeys_UserNotFound(t *testing.T) {
+func TestInteractor_RegenerateSSHKeys_UserToolsRunning(t *testing.T) {
 	s := newUserSuite(t)
 	defer s.ctrl.Finish()
 
 	const (
-		username = "john"
+		id            = "user.1234"
+		email         = "user@email.com"
+		username      = "john.doe"
+		accessLevel   = entity.AccessLevelAdmin
+		publicSSHKey  = "test-ssh-key-public"
+		privateSSHKey = "test-ssh-key-private"
+		secretName    = "john-doe-ssh-keys" //nolint:gosec // it is a unit test
 	)
 
 	ctx := context.Background()
+	now := time.Now().UTC()
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
+	sshKey := entity.SSHKey{
+		Public:       publicSSHKey,
+		Private:      privateSSHKey,
+		CreationDate: now,
+	}
 
-	userData, err := s.interactor.RegenerateSSHKeys(ctx, username)
+	targetUser := entity.User{
+		ID:           id,
+		Username:     username,
+		Email:        email,
+		AccessLevel:  accessLevel,
+		SSHKey:       sshKey,
+		CreationDate: now,
+	}
+
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(username).Return(true, nil)
+	userData, err := s.interactor.RegenerateSSHKeys(ctx, targetUser)
 
 	require.Equal(t, userData, entity.User{})
-	require.Equal(t, err, entity.ErrUserNotFound)
+	require.Equal(t, err, user.ErrUserToolsActive)
 }

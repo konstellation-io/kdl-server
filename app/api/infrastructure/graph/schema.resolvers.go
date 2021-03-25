@@ -51,7 +51,7 @@ func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.User, 
 		return nil, err
 	}
 
-	loggedUser, err = r.users.RegenerateSSHKeys(ctx, loggedUser.Username)
+	loggedUser, err = r.users.RegenerateSSHKeys(ctx, loggedUser)
 	if err != nil {
 		return nil, err
 	}

@@ -15,11 +15,6 @@ import { PanelInfo } from './models/Panel';
 
 type ToolName = keyof GetUserTools_project_toolUrls;
 
-export type PromptProps = {
-  isEnabled: boolean;
-  message: string;
-};
-
 export const initialProjectFilters: ProjectFilters = {
   name: '',
   selection: ProjectSelection.ACTIVE,
@@ -68,11 +63,6 @@ const initialStateUserSettings: UserSettings = {
   },
 };
 
-const initialPrompt: PromptProps = {
-  isEnabled: false,
-  message: 'Do you really want to leave this page',
-};
-
 export const projectFilters = makeVar(initialProjectFilters);
 export const newProject = makeVar(initialNewProject);
 export const openedProject = makeVar<GetProjects_projects | null>(null);
@@ -85,7 +75,6 @@ export const primaryPanel = makeVar<PanelInfo | null>(null);
 export const secondaryPanel = makeVar<PanelInfo | null>(null);
 export const currentTool = makeVar<ToolName | null>(null);
 export const openedTools = makeVar<ToolName[]>([]);
-export const promptEnabled = makeVar<PromptProps>(initialPrompt);
 
 export const kgScore = makeVar<[number, number]>([1, 0]);
 

@@ -3,10 +3,9 @@ import {
   ApolloLink,
   ApolloProvider,
   HttpLink,
-  useReactiveVar,
 } from '@apollo/client';
-import { Redirect, Route, Router, Switch, Prompt } from 'react-router-dom';
-import { Slide, ToastContainer, toast } from 'react-toastify';
+import { Prompt, Redirect, Route, Router, Switch } from 'react-router-dom';
+import { Slide, toast, ToastContainer } from 'react-toastify';
 
 import { CONFIG } from 'index';
 import GenerateApiToken from 'Pages/GenerateApiToken/GenerateApiToken';
@@ -25,7 +24,6 @@ import cache from 'Graphql/client/cache';
 import history from 'browserHistory';
 import { onError } from '@apollo/client/link/error';
 import styles from './App.module.scss';
-import { promptEnabled } from 'Graphql/client/cache';
 
 const routesWithTopBar = [
   ROUTE.USERS,
@@ -36,11 +34,8 @@ const routesWithTopBar = [
 ];
 
 function Routes() {
-  const { isEnabled, message } = useReactiveVar(promptEnabled);
-
   return (
     <Router history={history}>
-      <Prompt when={isEnabled} message={message} />
       <Route path={routesWithTopBar} component={SiteBar} />
       <Switch>
         <Redirect exact from={ROUTE.HOME} to={ROUTE.PROJECTS} />

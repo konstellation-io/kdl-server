@@ -94,6 +94,7 @@ func (r *mutationResolver) UpdateProject(ctx context.Context, input model.Update
 		ProjectID:   input.ID,
 		Name:        input.Name,
 		Description: input.Description,
+		Archived:    input.Archived,
 	})
 
 	return &p, err

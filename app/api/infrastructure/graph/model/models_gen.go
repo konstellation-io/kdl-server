@@ -87,6 +87,7 @@ type UpdateProjectInput struct {
 	Name        *string                       `json:"name"`
 	Description *string                       `json:"description"`
 	Repository  *UpdateProjectRepositoryInput `json:"repository"`
+	Archived    *bool                         `json:"archived"`
 }
 
 type UpdateProjectRepositoryInput struct {

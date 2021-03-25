@@ -1,4 +1,4 @@
-import { ExpandableTextInput, Left, Right } from 'kwc';
+import { Left, Right } from 'kwc';
 import React, { useEffect } from 'react';
 
 import ArrowsNavigator from './components/ArrowsNavigator/ArrowsNavigator';

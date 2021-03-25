@@ -43,7 +43,7 @@ def test_vectorize_batch_refuses_unbatched_samples():
     attention_mask = [1, 1, 1, 1, 1]
     batch_not_ok = {'input_ids': torch.Tensor(input_ids),
                     'attention_mask': torch.Tensor(attention_mask)}
-    ## Example of correct input shape for single-element batch:
+    # Example of correct input shape for single-element batch:
     # batch_ok = {'input_ids': torch.Tensor([input_ids]),
     #             'attention_mask': torch.Tensor([attention_mask])}
     model = MagicMock()

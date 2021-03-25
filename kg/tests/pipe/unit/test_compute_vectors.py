@@ -41,10 +41,11 @@ def test_vectorize_batch_refuses_unbatched_samples():
 
     input_ids = [101, 4905, 2855, 4018, 102]
     attention_mask = [1, 1, 1, 1, 1]
-    batch_ok = {'input_ids': torch.Tensor([input_ids]),   # Example of correct input shape for single-element batch
-                'attention_mask': torch.Tensor([attention_mask])}
     batch_not_ok = {'input_ids': torch.Tensor(input_ids),
                     'attention_mask': torch.Tensor(attention_mask)}
+    ## Example of correct input shape for single-element batch:
+    # batch_ok = {'input_ids': torch.Tensor([input_ids]),
+    #             'attention_mask': torch.Tensor([attention_mask])}
     model = MagicMock()
     with pytest.raises(AssertionError):
         compute_vectors.vectorize_batch(batch_not_ok, model=model)

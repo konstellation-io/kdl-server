@@ -1,5 +1,5 @@
-query GetKnowledgeGraph($description: String!) {
-  knowledgeGraph(description: $description) {
+query GetKnowledgeGraph($projectId: ID!) {
+  knowledgeGraph(projectId: $projectId) {
     items {
       id
       category

@@ -33,7 +33,7 @@ function KG({ openedProject }: ProjectRoute) {
     GetKnowledgeGraph,
     GetKnowledgeGraphVariables
   >(GetKnowledgeGraphQuery, {
-    variables: { description: openedProject.description },
+    variables: { projectId: openedProject.id },
   });
 
   const topTopics = useMemo(

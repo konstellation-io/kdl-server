@@ -46,5 +46,5 @@ export interface GetKnowledgeGraph {
 }
 
 export interface GetKnowledgeGraphVariables {
-  description: string;
+  projectId: string;
 }

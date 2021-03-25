@@ -28,7 +28,7 @@ function KGResults() {
     GetKnowledgeGraph,
     GetKnowledgeGraphVariables
   >(GetKnowledgeGraphQuery, {
-    variables: { description: openedProjectData?.description || '' },
+    variables: { projectId: openedProjectData?.id || '' },
   });
 
   const { openPanel } = usePanel(PanelType.SECONDARY, {

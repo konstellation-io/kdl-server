@@ -100,19 +100,29 @@ def tokenize_batch(samples: List[str],
 
 def vectorize_batch(batch, model):
     """
-    Passes a list of tokens to the transformer model for inference,
-    returning a vector embedding for each input. Operates in batches.
+    Passes batched tokens for multiple documents to the transformer model for inference,
+    aggregates all token vectors in a document into a document vector for that document,
+    and returns a vector for each input document in the batch.
 
     Args:
-        batch: (iterable) a list with one element
-         per document, each element containing document tokens,
-            e.g.  [['tokens', 'for', 'first', 'paper', 'in', 'batch'],
-            ['tokens', 'for', 'second', 'paper'], ...]
-        model: (huggingface transformer model)
-    """
+        batch: (BatchEnconding), containing:
+            'input_ids': a tensor with one row per document, each row containing tokens for that document,
+                e.g. [[101, 4905, 2855, ... , 102,  0],   # Tokens for first doc in batch (padded by one),
+                      [101, 823, 3338, ..., 1012, 102],   # Tokens for next doc (unpadded; longest in batch)
+                      [101, 2219,  2800,  ..., 0,   0]    # Tokens for final doc (padded at the end)
+            'attention_mask': a tensor with one row per document, each row containing attention mask for that doc
+                e.g. [[1, 1, 1, ..., 1, 0],  # Attention mask for first paper, etc.
+                      [1, 1, 1, ..., 1, 1],
+                      [1, 1, 1, ..., 0, 0]]
 
+        model: (huggingface transformer model)
+
+    Returns:
+        (torch Tensor) of shape (batch_size, vector_dims)
+    """
+    assert len(batch['input_ids'].shape) == 2  # dimension 1: docs in batch, dimension 2: tokens in doc
     with torch.no_grad():
-        vecs_by_token = model(batch)[0].detach()
+        vecs_by_token = model(input_ids=batch['input_ids'], attention_mask=batch['attention_mask'])[0].detach()
         vecs_by_doc = torch.mean(vecs_by_token, dim=1)  # Doc vector is a simple mean of token vectors
 
     return vecs_by_doc.to("cpu")
@@ -137,6 +147,7 @@ def vectorize(inputs: np.ndarray, batch_size: int,
     Return:
         Returns an array of shape (number of inputs, vector_size)
     """
+    # TODO: refactor to remove ambiguity in naming between batches of text and batches of tokens
     # Convert inputs to batches
     batches = convert_to_batches(inputs, batch_size=batch_size)
     batch_idx = convert_to_batches(range(len(inputs)), batch_size=batch_size)

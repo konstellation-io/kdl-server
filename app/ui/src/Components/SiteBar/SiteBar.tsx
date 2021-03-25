@@ -39,10 +39,6 @@ function SiteBar() {
         <Breadcrumbs />
       </Left>
       <Right className={styles.right}>
-        <ExpandableTextInput
-          onChange={(value: string) => setValue('projectName', value)}
-          className={styles.formSearch}
-        />
         <SettingsMenu />
       </Right>
     </div>

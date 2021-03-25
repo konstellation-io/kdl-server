@@ -136,6 +136,28 @@ func (m *userMongoDBRepo) FindByIDs(ctx context.Context, userIDs []string) ([]en
 	return m.find(ctx, bson.M{"_id": bson.M{"$in": objIDs}})
 }
 
+func (m *userMongoDBRepo) UpdateSSHKey(ctx context.Context, username string, sshKey entity.SSHKey) error {
+	fields := bson.M{
+		"public_ssh_key":        sshKey.Public,
+		"private_ssh_key":       sshKey.Private,
+		"ssh_key_creation_date": sshKey.CreationDate,
+	}
+
+	return m.updateUserFields(ctx, username, fields)
+}
+
+func (m *userMongoDBRepo) updateUserFields(ctx context.Context, username string, fields bson.M) error {
+	m.logger.Debugf("Updating user \"%s\" with \"%s\"...", username, fields)
+
+	filter := bson.M{"username": username}
+
+	_, err := m.collection.UpdateOne(ctx, filter, bson.M{
+		"$set": fields,
+	})
+
+	return err
+}
+
 func (m *userMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.User, error) {
 	m.logger.Debugf("Finding one user by \"%s\" from database...", filters)
 

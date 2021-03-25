@@ -34,7 +34,7 @@ def test_vectorize_diferent_batch_size(gen_inputs):
                                          tokenizer_args=TOKENIZER_ARGS,
                                          device=DEVICE)
 
-    assert np.allclose(vecs_all[0], vec_1)
-    assert np.allclose(vecs_all[1], vec_2)
-    assert np.allclose(vecs_all[2], vec_3)
-    assert np.allclose(vecs_all[3], vec_4)
+    assert np.allclose(vecs_all[0], vec_1, atol=10e-7)
+    assert np.allclose(vecs_all[1], vec_2, atol=10e-7)
+    assert np.allclose(vecs_all[2], vec_3, atol=10e-7)
+    assert np.allclose(vecs_all[3], vec_4, atol=10e-7)

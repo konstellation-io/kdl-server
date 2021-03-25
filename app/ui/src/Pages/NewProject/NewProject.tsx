@@ -24,6 +24,7 @@ import cx from 'classnames';
 import styles from './NewProject.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 import { useQuery } from '@apollo/client';
+import usePrompt from 'Hooks/usePrompt/usePrompt';
 
 enum Steps {
   INFORMATION,
@@ -68,6 +69,9 @@ export const repoTypeToStepName: {
 };
 
 function NewProject() {
+  const { enablePrompt, disablePrompt } = usePrompt(
+    "You are going to leave this page. You'll lose your changes, please confirm."
+  );
   const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
 
   const { clearAll } = useNewProject('information');
@@ -87,6 +91,13 @@ function NewProject() {
   // We want to execute this on on component unmount
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => () => clearAll(), []);
+
+  useEffect(() => {
+    enablePrompt();
+    return () => disablePrompt();
+    // We want to execute this on on component mount and unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const {
     direction,

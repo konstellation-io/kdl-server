@@ -6,8 +6,7 @@ from transformers import AutoModel, AutoTokenizer
 
 import compute_vectors
 
-# DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-DEVICE = torch.device("cpu")
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 TRANSFORMER = AutoModel.from_pretrained(compute_vectors.MODEL_PATH).to(DEVICE)
 TOKENIZER = AutoTokenizer.from_pretrained(compute_vectors.MODEL_PATH)
 TOKENIZER_ARGS = dict(truncation=True, max_length=512)
@@ -45,7 +44,7 @@ def test_tokenize_batch_produces_batch_with_attention_masks_and_input_ids(gen_in
     assert batch_of_tokens['attention_mask'].size()[0] == n_inputs, message_expected_dims
 
 
-# @pytest.mark.int
+@pytest.mark.int
 def test_vectorize_batch_outputs_are_not_affected_by_padding_tokens():
     """
     Padding tokens have a surprising effect on the document vector, even when accompanied by an attention mask.

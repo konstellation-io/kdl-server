@@ -156,23 +156,18 @@ def vectorize(inputs: List[str], batch_size: int,
     Return:
         Returns an array of shape (number of inputs, vector_size)
     """
-    # TODO: refactor to remove ambiguity in naming between batches of text and batches of tokens
     # Convert inputs to batches
-    batches = convert_to_batches(inputs, batch_size=batch_size)
+    batches_of_docs = convert_to_batches(inputs, batch_size=batch_size)
     batch_idx = convert_to_batches(range(len(inputs)), batch_size=batch_size)
 
-    # Tokenize per batch
-    tokens_arxiv = list()
-    for batch in batches:
-        tokens_arxiv.append(tokenize_batch(batch,
-                                           tokenizer=tokenizer,
-                                           tokenizer_args=tokenizer_args,
-                                           device=device))
+    tokens_batch_generator = (
+        tokenize_batch(batch, tokenizer=tokenizer, tokenizer_args=tokenizer_args, device=device)
+        for batch in batches_of_docs)
 
-    # Allocate arrays for output vectors
+    # Allocate array for output vectors
     vecs = np.zeros(shape=(len(inputs), model.config.dim))
 
-    for idx, batch_tokens in zip(batch_idx, tokens_arxiv):
+    for idx, batch_tokens in zip(batch_idx, tokens_batch_generator):
         if verbose:
             print("Vectorizing batch idx", idx)
         vecs[idx, :] = vectorize_batch(batch_tokens, model=model)

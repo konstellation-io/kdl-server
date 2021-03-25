@@ -242,11 +242,6 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 	}
 
 	// Update the user ssh keys in the DB.
-	user = entity.User{
-		Username: user.Username,
-		SSHKey:   keys,
-	}
-
 	err = i.repo.UpdateSSHKey(ctx, user.Username, keys)
 	if err != nil {
 		return entity.User{}, err

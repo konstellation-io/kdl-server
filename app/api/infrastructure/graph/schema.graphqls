@@ -51,9 +51,9 @@ type KnowledgeGraphItem {
   starred: Boolean!
 
   # optional fields
-  repoUrls: [String]
+  repoUrls: [String!]
   externalId: ID # for example: arxivId
-  frameworks: [String]
+  frameworks: [String!]
 }
 
 type SSHKey {

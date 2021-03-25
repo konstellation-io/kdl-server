@@ -17,6 +17,8 @@ const kgData = data.map((d, idx) => ({
   title: d.title,
   abstract: d.abstract,
   authors: ['Xingyi Zhou', 'Vladlen Koltun', 'Philipp Krähenbühl'],
+  frameworks: null,
+  repoUrls: null,
   score: d.score,
   date: new Date().toISOString(),
   starred: starredItems.includes(idx),

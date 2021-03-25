@@ -35,27 +35,3 @@
   align-items: center;
   margin-top: $grid-unit;
 }
-
-.log {
-  background-color: palette(base, 800);
-  flex-grow: 1;
-  padding: 2 * $grid-unit;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  margin-top: 3 * $grid-unit;
-
-  .title {
-    @include font-caption;
-    color: font-color(regular);
-
-    margin-bottom: 2 * $grid-unit;
-  }
-  .content {
-    @include font-code;
-    color: font-color(light);
-
-    white-space: pre-line;
-    overflow: auto;
-  }
-}

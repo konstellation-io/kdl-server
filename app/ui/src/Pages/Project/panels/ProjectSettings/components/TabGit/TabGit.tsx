@@ -43,18 +43,6 @@ function TabGit({ repository }: Props) {
         <p>{repository.url}</p>
         <CopyToClipboard>{repository.url}</CopyToClipboard>
       </div>
-      <div className={styles.log}>
-        <p className={styles.title}>REPOSITORY LOG</p>
-        <div className={styles.content}>
-          {
-            'Commit		65465468798790870654650640\n\
-            Autohor: 	Some Konstellation User <some.konstellation-user@konstellation.io>\n\
-            Date: 		Thu May 21 14:10:05 2020 +0200\n\
-            \n\
-            Add model parameters input reader'
-          }
-        </div>
-      </div>
     </div>
   );
 }

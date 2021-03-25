@@ -27,7 +27,6 @@ $small-square-base: 30px;
       color: font-color(regular);
     }
 
-    .favorite,
     .warning {
       display: none;
     }
@@ -116,7 +115,7 @@ $small-square-base: 30px;
   @include font-subheader;
   color: font-color(light);
 
-  margin: 0 2 * $grid-unit 0 0;
+  margin: 0 2 * $grid-unit 0 3 * $grid-unit;
 
   transition: color ease 0.4s;
 }
@@ -135,49 +134,6 @@ $small-square-base: 30px;
 
   margin: 0;
   transition: color ease 0.4s;
-}
-
-.favorite {
-  position: relative;
-  width: 5 * $grid-unit;
-  height: 5 * $grid-unit;
-  text-align: center;
-  line-height: 5.5 * $grid-unit;
-  color: font-color(lowlight);
-  pointer-events: all;
-  cursor: pointer;
-
-  transition: color ease 0.4s;
-
-  .fav {
-    @include center;
-
-    opacity: 1;
-    transition: opacity ease 0.4s;
-
-    &.isFav {
-      color: palette(highlight);
-    }
-  }
-  .favBg {
-    @include center;
-
-    opacity: 0;
-    transition: opacity ease 0.2s;
-  }
-
-  &:hover {
-    .fav {
-      opacity: 0;
-      display: none;
-    }
-    .favBg {
-      opacity: 1;
-      path {
-        color: font-color(light) !important;
-      }
-    }
-  }
 }
 
 .band {
@@ -199,18 +155,6 @@ $small-square-base: 30px;
   clip-path: polygon(0 100%, 0 0, 100% 0, calc(100% - #{$side}) 50%, 100% 100%);
 }
 
-.internalTag {
-  @include font-small;
-  color: font-color(lowlight) !important;
-  line-height: 3 * $grid-unit;
-
-  background-color: palette(base);
-  height: 3 * $grid-unit;
-  border-radius: $grid-unit / 2;
-  padding: 0 $grid-unit;
-  margin-left: 2 * $grid-unit;
-}
-
 .warning {
   @include font-button;
   color: palette(alert);
@@ -223,6 +167,7 @@ $small-square-base: 30px;
   text-align: center;
   line-height: $label-height;
 
+  background-color: palette(feedback, 700);
   height: $label-height;
   min-width: 150px;
   padding: 0 5 * $grid-unit;
@@ -231,20 +176,7 @@ $small-square-base: 30px;
   border-bottom-right-radius: 3 * $grid-unit;
   border-top-right-radius: 3 * $grid-unit;
 
-  transition: background-color ease 0.4s;
   z-index: 1;
-
-  &.STARTED {
-    background-color: palette(success);
-  }
-
-  &.STOPPED {
-    background-color: palette(feedback);
-  }
-
-  &.ARCHIVED {
-    background-color: palette(base, 300);
-  }
 }
 
 .square {
@@ -258,27 +190,13 @@ $small-square-base: 30px;
   background-color: palette(base);
   transform: rotate(45deg);
 
-  .state {
-    @include center;
+  .repoType {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
 
-    width: $small-square-base;
-    height: $small-square-base;
-
-    transition: border ease 0.4s, background-color ease 0.4s;
-
-    &.STARTED {
-      background-color: palette(success);
-    }
-
-    &.STOPPED {
-      background-color: transparent;
-      border: solid 1px palette(feedback);
-    }
-
-    &.ARCHIVED {
-      background-color: transparent;
-      border: solid 1px palette(base, 300);
-    }
+    opacity: 0.7;
   }
 }
 

@@ -5,7 +5,7 @@ type Query {
   users: [User!]!
   sshKey: SSHKey!
   qualityProjectDesc(description: String!): QualityProjectDesc!
-  knowledgeGraph(description: String!): KnowledgeGraph!
+  knowledgeGraph(projectId: ID!): KnowledgeGraph!
 }
 
 type Mutation {

@@ -11,6 +11,7 @@ server = Path(Path.cwd(), 'server')
 sys.path.append(str(pipe))
 sys.path.append(str(server))
 
+
 @pytest.fixture
 def gen_inputs(n_sentences: int = 5, n_paragraph: int = 2, n_inputs: int = 4) -> List[str]:
     """Creates garbled texts that can be used as inputs for testing tokenization and vectorization tasks"""

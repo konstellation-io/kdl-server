@@ -38,8 +38,8 @@ const buildProject = () => ({
   creationDate: () => new Date().toISOString(),
   lastActivationDate: () => new Date().toISOString(),
   error: casual.random_element([null, casual.error]),
-  state: casual.random_element(['STARTED', 'STOPPED', 'ARCHIVED']),
   members: buildRandomMembers(casual.integer(1, 5)),
+  isArchived: casual.boolean,
   toolUrls: () => ({
     gitea: 'https://gitea.io/en-us/',
     minio: 'https://min.io/',

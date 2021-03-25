@@ -15,6 +15,7 @@ type Repository interface {
 	GetByUsername(ctx context.Context, username string) (entity.User, error)
 	GetByEmail(ctx context.Context, email string) (entity.User, error)
 	Create(ctx context.Context, user entity.User) (string, error)
+	UpdateSSHKey(ctx context.Context, username string, SSHKey entity.SSHKey) error
 	FindAll(ctx context.Context) ([]entity.User, error)
 	FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error)
 }
@@ -29,4 +30,5 @@ type UseCase interface {
 	AreToolsRunning(username string) (bool, error)
 	FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error)
 	GetByID(ctx context.Context, userID string) (entity.User, error)
+	RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error)
 }

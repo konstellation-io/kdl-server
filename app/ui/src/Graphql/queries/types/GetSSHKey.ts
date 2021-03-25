@@ -7,7 +7,7 @@
 // GraphQL query operation: GetSSHKey
 // ====================================================
 
-export interface GetSSHKey_sshKey {
+export interface GetSSHKey_me_sshKey {
   __typename: 'SSHKey';
   public: string;
   private: string;
@@ -15,6 +15,12 @@ export interface GetSSHKey_sshKey {
   lastActivity: string | null;
 }
 
+export interface GetSSHKey_me {
+  __typename: 'User';
+  id: string;
+  sshKey: GetSSHKey_me_sshKey;
+}
+
 export interface GetSSHKey {
-  sshKey: GetSSHKey_sshKey;
+  me: GetSSHKey_me;
 }

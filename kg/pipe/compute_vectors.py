@@ -16,7 +16,6 @@ OUTPUT_PATH = ASSET_PATH + "vectors.npy"
 DATASET_PATH = ASSET_PATH + "dataset.pkl.gz"
 
 # Constants
-VECTOR_DIMS = 768  # TODO Access with model.config.dim
 BATCH_SIZE = 1    # This batch size is a workaround for a padding problem.
 
 
@@ -46,15 +45,14 @@ def get_inputs(input_path: str) -> np.ndarray:
     return np.vectorize(create_inputs)(df['title'], df['abstract'])
 
 
-def convert_to_batches(input_items: Union[np.ndarray, range],
+def convert_to_batches(input_items: Union[np.ndarray, list, range],
                        batch_size: int) -> list[list[np.str_]]:
     """
     Converts an iterable of items into a list of list
     of items of the same size.
 
     Args:
-        input_items: list of input items can be list of inputs
-        or range of indexes.
+        input_items: list of input items can be list of inputs range of indexes.
         batch_size: batch size
 
     Returns:
@@ -82,7 +80,7 @@ def tokenize_batch(samples: List[str],
                    tokenizer_args: Dict,
                    device: torch.device) -> BatchEncoding:
     """
-    Convert a list of texts to a BatchEconding as input for downstream use by the transformer (in the
+    Convert a list of texts to a BatchEncoding as input for downstream use by the transformer (in the
     vectorize_batch function).
 
     Args:
@@ -122,7 +120,7 @@ def vectorize_batch(batch, model):
     """
     assert len(batch['input_ids'].shape) == 2  # dimension 1: docs in batch, dimension 2: tokens in doc
     batch_size = batch['input_ids'].shape[0]
-    vecs_by_doc = torch.zeros(batch_size, VECTOR_DIMS)
+    vecs_by_doc = torch.zeros(batch_size, model.config.dim)
 
     with torch.no_grad():
 
@@ -138,7 +136,7 @@ def vectorize_batch(batch, model):
 
 def vectorize(inputs: List[str], batch_size: int,
               tokenizer: transformers.PreTrainedTokenizer,
-              tokenizer_args: dict[str],
+              tokenizer_args: dict,
               model: transformers.PreTrainedModel,
               device: torch.device,
               verbose: bool = True) -> np.ndarray:
@@ -150,6 +148,8 @@ def vectorize(inputs: List[str], batch_size: int,
         inputs: An iterable of strings, typically documents to be vectorized (shape: (n_documents)).
         batch_size: Size of the computation batches.
         tokenizer: A pretrained tokenizer from the transformer library.
+        tokenizer_args: arguments for calling the tokenizer.
+            Recommended values {'truncation': True, 'max_length': model.config.max_position_embeddings}
         model: A pretrained model from the transformer library loaded.
         device: The device where the computation will be performed, either cpu or gpu
         verbose: if True, print progress for every processed batch
@@ -170,7 +170,7 @@ def vectorize(inputs: List[str], batch_size: int,
                                            device=device))
 
     # Allocate arrays for output vectors
-    vecs = np.zeros(shape=(len(inputs), VECTOR_DIMS))
+    vecs = np.zeros(shape=(len(inputs), model.config.dim))
 
     for idx, batch_tokens in zip(batch_idx, tokens_arxiv):
         if verbose:

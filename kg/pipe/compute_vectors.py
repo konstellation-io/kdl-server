@@ -16,8 +16,8 @@ OUTPUT_PATH = ASSET_PATH + "vectors.npy"
 DATASET_PATH = ASSET_PATH + "dataset.pkl.gz"
 
 # Constants
-VECTOR_DIMS = 768
-BATCH_SIZE = 1  # This batch size is a workaround for a padding problem.
+VECTOR_DIMS = 768  # TODO Access with model.config.dim
+BATCH_SIZE = 1    # This batch size is a workaround for a padding problem.
 
 
 def create_inputs(title: str, abstract: str) -> str:
@@ -121,29 +121,38 @@ def vectorize_batch(batch, model):
         (torch Tensor) of shape (batch_size, vector_dims)
     """
     assert len(batch['input_ids'].shape) == 2  # dimension 1: docs in batch, dimension 2: tokens in doc
+    batch_size = batch['input_ids'].shape[0]
+    vecs_by_doc = torch.zeros(batch_size, VECTOR_DIMS)
+
     with torch.no_grad():
+
         vecs_by_token = model(input_ids=batch['input_ids'], attention_mask=batch['attention_mask'])[0].detach()
-        vecs_by_doc = torch.mean(vecs_by_token, dim=1)  # Doc vector is a simple mean of token vectors
+
+        # Attention masks are not sufficient to completely ignore the padding tokens when computing the doc vector
+        for i, (ids, mask) in enumerate(zip(batch['input_ids'], batch['attention_mask'])):
+            n_unmasked_tokens = mask.sum().item()
+            vecs_by_doc[i, :] = torch.mean(vecs_by_token[i, :n_unmasked_tokens, :], dim=0)
 
     return vecs_by_doc.to("cpu")
 
 
-def vectorize(inputs: np.ndarray, batch_size: int,
+def vectorize(inputs: List[str], batch_size: int,
               tokenizer: transformers.PreTrainedTokenizer,
               tokenizer_args: dict[str],
               model: transformers.PreTrainedModel,
-              device: torch.device) -> np.ndarray:
+              device: torch.device,
+              verbose: bool = True) -> np.ndarray:
     """
     Main function of compute vectors gets an numpy array of strings
     and computes the vectors for it in batches for a given model and tokenizer
     a device can be specified (cpu/gpu).
     Args:
-        inputs: An array of strings of shape (dataset rows).
+        inputs: An iterable of strings, typically documents to be vectorized (shape: (n_documents)).
         batch_size: Size of the computation batches.
         tokenizer: A pretrained tokenizer from the transformer library.
         model: A pretrained model from the transformer library loaded.
-        device: The device where the computation will be performed
-        either cpu or gpu
+        device: The device where the computation will be performed, either cpu or gpu
+        verbose: if True, print progress for every processed batch
     Return:
         Returns an array of shape (number of inputs, vector_size)
     """
@@ -164,7 +173,8 @@ def vectorize(inputs: np.ndarray, batch_size: int,
     vecs = np.zeros(shape=(len(inputs), VECTOR_DIMS))
 
     for idx, batch_tokens in zip(batch_idx, tokens_arxiv):
-        print("Vectorizing batch idx", idx)
+        if verbose:
+            print("Vectorizing batch idx", idx)
         vecs[idx, :] = vectorize_batch(batch_tokens, model=model)
 
     return vecs

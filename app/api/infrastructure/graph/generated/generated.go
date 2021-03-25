@@ -109,6 +109,7 @@ type ComplexityRoot struct {
 		LastActivationDate func(childComplexity int) int
 		Members            func(childComplexity int) int
 		Name               func(childComplexity int) int
+		NeedAccess         func(childComplexity int) int
 		Repository         func(childComplexity int) int
 		State              func(childComplexity int) int
 		ToolUrls           func(childComplexity int) int
@@ -193,6 +194,7 @@ type ProjectResolver interface {
 	CreationDate(ctx context.Context, obj *entity.Project) (string, error)
 
 	ToolUrls(ctx context.Context, obj *entity.Project) (*entity.ToolUrls, error)
+	NeedAccess(ctx context.Context, obj *entity.Project) (bool, error)
 }
 type QueryResolver interface {
 	Me(ctx context.Context) (*entity.User, error)
@@ -605,6 +607,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Project.Name(childComplexity), true
+
+	case "Project.needAccess":
+		if e.complexity.Project.NeedAccess == nil {
+			break
+		}
+
+		return e.complexity.Project.NeedAccess(childComplexity), true
 
 	case "Project.repository":
 		if e.complexity.Project.Repository == nil {
@@ -1120,6 +1129,7 @@ type Project {
   error: String
   members: [Member!]!
   toolUrls: ToolUrls!
+  needAccess: Boolean!
 }
 
 input RepositoryInput {
@@ -3191,6 +3201,41 @@ func (ec *executionContext) _Project_toolUrls(ctx context.Context, field graphql
 	res := resTmp.(*entity.ToolUrls)
 	fc.Result = res
 	return ec.marshalNToolUrls2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolUrls(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_needAccess(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Project().NeedAccess(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _QualityProjectDesc_quality(ctx context.Context, field graphql.CollectedField, obj *model.QualityProjectDesc) (ret graphql.Marshaler) {
@@ -6343,6 +6388,20 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 					}
 				}()
 				res = ec._Project_toolUrls(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "needAccess":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Project_needAccess(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

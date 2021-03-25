@@ -183,6 +183,7 @@ type Project {
   error: String
   members: [Member!]!
   toolUrls: ToolUrls!
+  needAccess: Boolean!
 }
 
 input RepositoryInput {

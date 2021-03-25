@@ -64,21 +64,6 @@ func (mr *MockRepositoryMockRecorder) Create(ctx, project interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockRepository)(nil).Create), ctx, project)
 }
 
-// FindByUserID mocks base method.
-func (m *MockRepository) FindByUserID(ctx context.Context, userID string) ([]entity.Project, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindByUserID", ctx, userID)
-	ret0, _ := ret[0].([]entity.Project)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// FindByUserID indicates an expected call of FindByUserID.
-func (mr *MockRepositoryMockRecorder) FindByUserID(ctx, userID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByUserID", reflect.TypeOf((*MockRepository)(nil).FindByUserID), ctx, userID)
-}
-
 // Get mocks base method.
 func (m *MockRepository) Get(ctx context.Context, id string) (entity.Project, error) {
 	m.ctrl.T.Helper()
@@ -92,6 +77,21 @@ func (m *MockRepository) Get(ctx context.Context, id string) (entity.Project, er
 func (mr *MockRepositoryMockRecorder) Get(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockRepository)(nil).Get), ctx, id)
+}
+
+// GetAll mocks base method.
+func (m *MockRepository) GetAll(ctx context.Context) ([]entity.Project, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAll", ctx)
+	ret0, _ := ret[0].([]entity.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAll indicates an expected call of GetAll.
+func (mr *MockRepositoryMockRecorder) GetAll(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockRepository)(nil).GetAll), ctx)
 }
 
 // RemoveMember mocks base method.
@@ -203,19 +203,19 @@ func (mr *MockUseCaseMockRecorder) Create(ctx, opt interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUseCase)(nil).Create), ctx, opt)
 }
 
-// FindByUserID mocks base method.
-func (m *MockUseCase) FindByUserID(ctx context.Context, userID string) ([]entity.Project, error) {
+// GetAll mocks base method.
+func (m *MockUseCase) GetAll(ctx context.Context) ([]entity.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindByUserID", ctx, userID)
+	ret := m.ctrl.Call(m, "GetAll", ctx)
 	ret0, _ := ret[0].([]entity.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FindByUserID indicates an expected call of FindByUserID.
-func (mr *MockUseCaseMockRecorder) FindByUserID(ctx, userID interface{}) *gomock.Call {
+// GetAll indicates an expected call of GetAll.
+func (mr *MockUseCaseMockRecorder) GetAll(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByUserID", reflect.TypeOf((*MockUseCase)(nil).FindByUserID), ctx, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockUseCase)(nil).GetAll), ctx)
 }
 
 // GetByID mocks base method.

@@ -187,10 +187,10 @@ func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity
 	return i.repo.Get(ctx, insertedID)
 }
 
-// FindByUserID returns the projects that the given user belongs to.
-func (i interactor) FindByUserID(ctx context.Context, userID string) ([]entity.Project, error) {
-	i.logger.Infof("Finding projects for the user \"%s\"", userID)
-	return i.repo.FindByUserID(ctx, userID)
+// GetAll returns all the projects.
+func (i interactor) GetAll(ctx context.Context) ([]entity.Project, error) {
+	i.logger.Info("Finding all projects")
+	return i.repo.GetAll(ctx)
 }
 
 // GetByID returns the project with the desired identifier.

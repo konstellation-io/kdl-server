@@ -110,7 +110,7 @@ func (i *interactor) Create(ctx context.Context, email, username, password strin
 
 	i.logger.Infof("The user \"%s\" (%s) was created with ID \"%s\"", user.Username, user.Email, insertedID)
 
-	secretName, k8sKeys := i.newK8sNameAndSSHKeysSecret(user, keys.Public, keys.Private)
+	secretName, k8sKeys := i.newUserSSHKeySecret(user, keys.Public, keys.Private)
 	err = i.k8sClient.CreateSecret(secretName, k8sKeys)
 
 	if err != nil {
@@ -228,7 +228,7 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 	}
 
 	// Check if k8s secret exists. If exists, update it. Otherwise, create it.
-	secretName, k8sKeys := i.newK8sNameAndSSHKeysSecret(user, keys.Public, keys.Private)
+	secretName, k8sKeys := i.newUserSSHKeySecret(user, keys.Public, keys.Private)
 
 	err = i.k8sClient.UpdateSecret(secretName, k8sKeys)
 	if err != nil {
@@ -257,8 +257,8 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 	return i.repo.GetByUsername(ctx, user.Username)
 }
 
-// newK8sNameAndSSHKeysSecret returns the name and the k8s secret for public and private SSH keys.
-func (i *interactor) newK8sNameAndSSHKeysSecret(user entity.User, public, private string) (secretName string, k8sKeys map[string]string) {
+// newUserSSHKeySecret returns the name and the k8s secret for public and private SSH keys.
+func (i *interactor) newUserSSHKeySecret(user entity.User, public, private string) (secretName string, k8sKeys map[string]string) {
 	secretName = fmt.Sprintf("%s-ssh-keys", user.UsernameSlug())
 	k8sKeys = map[string]string{
 		"KDL_USER_PUBLIC_SSH_KEY":  public,

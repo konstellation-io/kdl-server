@@ -1,4 +1,4 @@
-import { ExpandableTextInput, Left, Right } from 'kwc';
+import { Left, Right } from 'kwc';
 import React, { useEffect } from 'react';
 
 import ArrowsNavigator from './components/ArrowsNavigator/ArrowsNavigator';
@@ -39,10 +39,6 @@ function SiteBar() {
         <Breadcrumbs />
       </Left>
       <Right className={styles.right}>
-        <ExpandableTextInput
-          onChange={(value: string) => setValue('projectName', value)}
-          className={styles.formSearch}
-        />
         <SettingsMenu />
       </Right>
     </div>

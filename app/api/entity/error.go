@@ -20,7 +20,4 @@ var (
 
 	// ErrInvalidRepoType error definition.
 	ErrInvalidRepoType = fmt.Errorf("invalid repo type")
-
-	// ErrUserToolsActive error definition.
-	ErrUserToolsActive = fmt.Errorf("it is not possible to regenerate SSH keys with the usertools active")
 )

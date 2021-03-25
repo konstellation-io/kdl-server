@@ -1,0 +1,6 @@
+mutation SetStarredKGItem($input: SetStarredKGItemInput!) {
+  setStarredKGItem(input: $input) {
+    id
+    starred
+  }
+}

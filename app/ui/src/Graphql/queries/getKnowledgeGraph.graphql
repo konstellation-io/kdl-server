@@ -9,6 +9,7 @@ query GetKnowledgeGraph($description: String!) {
       score
       date
       url
+      starred
       topics {
         name
         relevance

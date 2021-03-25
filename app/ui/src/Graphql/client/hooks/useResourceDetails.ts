@@ -1,8 +1,8 @@
-import { D } from 'Pages/Project/pages/KG/components/KGVisualization/KGVisualization';
+import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
 import { resourceDetails } from './../cache';
 
 function useResourceDetails() {
-  function updateResourceDetails(d: D) {
+  function updateResourceDetails(d: GetKnowledgeGraph_knowledgeGraph_items) {
     resourceDetails(d);
   }
 

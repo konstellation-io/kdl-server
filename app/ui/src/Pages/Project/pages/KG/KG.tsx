@@ -2,9 +2,10 @@ import Filters, { Topic } from './components/Filters/Filters';
 import {
   GetKnowledgeGraph,
   GetKnowledgeGraphVariables,
+  GetKnowledgeGraph_knowledgeGraph_items,
+  GetKnowledgeGraph_knowledgeGraph_items_topics,
 } from 'Graphql/queries/types/GetKnowledgeGraph';
 import KGVisualization, {
-  D,
   TopicSections,
 } from './components/KGVisualization/KGVisualization';
 import React, { useMemo } from 'react';
@@ -19,26 +20,13 @@ import { useQuery } from '@apollo/client';
 
 const selectedResource = 'My project';
 
-export const starredItems = [
-  0,
-  1,
-  4,
-  6,
-  12,
-  34,
-  35,
-  65,
-  120,
-  144,
-  365,
-  456,
-  754,
-  942,
-];
-
 const GetKnowledgeGraphQuery = loader(
   'Graphql/queries/getKnowledgeGraph.graphql'
 );
+
+export interface KGItem extends GetKnowledgeGraph_knowledgeGraph_items {
+  topic?: GetKnowledgeGraph_knowledgeGraph_items_topics;
+}
 
 function KG({ openedProject }: ProjectRoute) {
   const { data, loading } = useQuery<
@@ -53,58 +41,36 @@ function KG({ openedProject }: ProjectRoute) {
     [data]
   );
 
-  // TODO: Check this var when we have integration with the server
-  const resources: D[] = useMemo(() => {
-    if (data?.knowledgeGraph) {
-      return data.knowledgeGraph.items.map((item, idx: number) => ({
-        id: item.id,
-        category: topTopics.includes(item.topics[0]?.name || '')
-          ? item.topics[0]?.name || ''
-          : 'Others',
-        type: item.category,
-        name: item.title,
-        score: item.score,
-        starred: starredItems.includes(idx),
-      }));
-    }
-    return [];
-  }, [data]);
-
-  const idToFullResource: { [key: string]: any } = useMemo(() => {
-    if (data?.knowledgeGraph.items) {
-      return Object.fromEntries(
-        data.knowledgeGraph.items.map((r) => [
-          r.id,
-          {
-            title: r.title,
-            abstract: r.abstract,
-            topics: r.topics,
-            date: r.date,
-            authors: r.authors,
-            score: r.score,
-            url: r.url,
-          },
-        ])
-      );
-    }
-    return {};
-  }, [data?.knowledgeGraph.items]);
+  const kgItems: KGItem[] = useMemo(
+    () =>
+      data?.knowledgeGraph.items.map((r) => {
+        const mainTopic = r.topics[0];
+        const isInTop = topTopics.includes(mainTopic?.name);
+        return {
+          ...r,
+          topic: isInTop
+            ? mainTopic
+            : { name: 'Others', relevance: 0, __typename: 'Topic' },
+        };
+      }) || [],
+    [data, topTopics]
+  );
 
   const [sections, topics]: [TopicSections, Topic[]] = useMemo(() => {
-    const sections = getSectionsAndNames(resources);
-    const topics = Object.keys(sections).map((sectionName) => ({
-      name: sectionName,
-      nResources: sections[sectionName].length,
+    const _sections = getSectionsAndNames(kgItems);
+    const _topics: Topic[] = topTopics.map((topic) => ({
+      name: topic,
+      nResources: _sections[topic].length,
     }));
-    return [sections, topics];
-  }, [resources]);
+    return [_sections, _topics];
+  }, [kgItems, topTopics]);
 
   const {
     handleFiltersChange,
     filteredResources,
     filteredSections,
     filters,
-  } = useKGFilters(sections, resources);
+  } = useKGFilters(sections, kgItems);
 
   if (data === undefined) return null;
   if (loading) return <SpinnerCircular />;
@@ -113,9 +79,10 @@ function KG({ openedProject }: ProjectRoute) {
   const filtersOrderDict = Object.fromEntries(
     filtersOrder.map((f, idx) => [f, idx])
   );
-  const sortFilters = (a: D, b: D) =>
-    filtersOrderDict[a.category] - filtersOrderDict[b.category] ||
-    a.category.localeCompare(b.category);
+  const sortFilters = (a: KGItem, b: KGItem) =>
+    filtersOrderDict[a.topic?.name || ''] -
+      filtersOrderDict[b.topic?.name || ''] ||
+    (a.topic?.name || '').localeCompare(b.topic?.name || '');
   filteredResources.sort(sortFilters);
 
   return (
@@ -131,9 +98,9 @@ function KG({ openedProject }: ProjectRoute) {
         </div>
         <KGVisualization
           data={filteredResources}
+          kgItems={kgItems}
           sections={filteredSections}
           selectedResource={selectedResource}
-          idToFullResource={idToFullResource}
         />
       </div>
       <div className={styles.panelSafeArea} />

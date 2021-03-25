@@ -18,6 +18,7 @@ type Repository interface {
 	UpdateMemberAccessLevel(ctx context.Context, projectID, userID string, accessLevel entity.AccessLevel) error
 	UpdateName(ctx context.Context, projectID, name string) error
 	UpdateDescription(ctx context.Context, projectID, description string) error
+	UpdateArchived(ctx context.Context, projectID string, archived bool) error
 }
 
 // UseCase interface to manage all operations related with projects.

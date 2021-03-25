@@ -26,6 +26,7 @@ type memberDTO struct {
 
 type projectDTO struct {
 	ID               primitive.ObjectID    `bson:"_id"`
+	Archived         bool                  `bson:"archived"`
 	Name             string                `bson:"name"`
 	Description      string                `bson:"description"`
 	CreationDate     time.Time             `bson:"creation_date"`
@@ -180,6 +181,11 @@ func (m *projectMongoDBRepo) UpdateDescription(ctx context.Context, projectID, d
 	return m.updateProjectFields(ctx, projectID, bson.M{"description": description})
 }
 
+// UpdateDescription changes the description for the given project.
+func (m *projectMongoDBRepo) UpdateArchived(ctx context.Context, projectID string, archived bool) error {
+	return m.updateProjectFields(ctx, projectID, bson.M{"archived": archived})
+}
+
 func (m *projectMongoDBRepo) updateProjectFields(ctx context.Context, projectID string, fields bson.M) error {
 	m.logger.Debugf("Updating the project \"%s\" with \"%s\"...", projectID, fields)
 
@@ -232,6 +238,7 @@ func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 		InternalRepoName: p.Repository.InternalRepoName,
 		ExternalRepoURL:  p.Repository.ExternalRepoURL,
 		RepoName:         p.Repository.RepoName,
+		Archived:         p.Archived,
 	}
 
 	if p.ID != "" {
@@ -284,6 +291,7 @@ func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 			InternalRepoName: dto.InternalRepoName,
 			RepoName:         dto.RepoName,
 		},
+		Archived: dto.Archived,
 	}
 
 	p.Members = make([]entity.Member, len(dto.Members))

@@ -215,6 +215,13 @@ func (i interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity
 		}
 	}
 
+	if opt.Archived != nil {
+		err := i.repo.UpdateArchived(ctx, opt.ProjectID, *opt.Archived)
+		if err != nil {
+			return entity.Project{}, err
+		}
+	}
+
 	return i.repo.Get(ctx, opt.ProjectID)
 }
 

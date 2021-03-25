@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 from scipy.spatial.distance import cdist
 import torch
@@ -47,7 +48,7 @@ def test_tokenize_batch_produces_batch_with_attention_masks_and_input_ids(gen_in
 # @pytest.mark.int
 def test_vectorize_batch_outputs_are_not_affected_by_padding_tokens():
     """
-    Padding tokens, even when accompanied by an attention mask, have a surprising effect on the document vector.
+    Padding tokens have a surprising effect on the document vector, even when accompanied by an attention mask.
     They do not affect the vectors of non-pad tokens, but the pad tokens do get their own vectors calculated too
     and by default they would get included in the computation of the document vector, thereby corrupting it.
     This is prevented by a loop in vectorize_batch which applies the masks separately for each document.
@@ -73,58 +74,34 @@ def test_vectorize_batch_outputs_are_not_affected_by_padding_tokens():
     assert cdist(vec_simple, vec_padded, metric='cosine') < 10e-9
 
 
-# @pytest.mark.int
-# def test_vectorize_outputs_do_not_depend_on_batch_size(gen_inputs):
-#
-#
-#     VECTORIZE_ARGS = dict(model=TRANSFORMER,
-#                           tokenizer=TOKENIZER,
-#                           tokenizer_args=TOKENIZER_ARGS,
-#                           device=DEVICE)
-#     inputs = gen_inputs
-#
-#     vecs_all = compute_vectors.vectorize(inputs, batch_size=4, **VECTORIZE_ARGS)
-#
-#     vec_1 = compute_vectors.vectorize([inputs[0]], batch_size=1, **VECTORIZE_ARGS)
-#     vec_2 = compute_vectors.vectorize([inputs[1]], batch_size=1, **VECTORIZE_ARGS)
-#     vec_3 = compute_vectors.vectorize([inputs[2]], batch_size=1, **VECTORIZE_ARGS)
-#     vec_4 = compute_vectors.vectorize([inputs[3]], batch_size=1, **VECTORIZE_ARGS)
-#
-#     assert np.allclose(vecs_all[0], vec_1)
-#     assert np.allclose(vecs_all[1], vec_2)
-#     assert np.allclose(vecs_all[2], vec_3)
-#     assert np.allclose(vecs_all[3], vec_4)
+@pytest.mark.int
+def test_vectorize_outputs_are_not_affected_by_batch_size(gen_inputs):
+    """
+    This may appear an obvious condition, but a non-obvious behaviour of padding tokens made it necessary to
+    check this explicitly (see test_vectorize_batch_outputs_are_not_affected_by_padding_tokens).
+    """
+    VECTORIZE_ARGS = dict(model=TRANSFORMER,
+                          tokenizer=TOKENIZER,
+                          tokenizer_args=TOKENIZER_ARGS,
+                          device=DEVICE,
+                          verbose=False)
+    inputs = gen_inputs
 
+    vecs_batch_1 = compute_vectors.vectorize(inputs, batch_size=1, **VECTORIZE_ARGS)
+    vecs_batch_2 = compute_vectors.vectorize(inputs, batch_size=2, **VECTORIZE_ARGS)
+    vecs_batch_4 = compute_vectors.vectorize(inputs, batch_size=4, **VECTORIZE_ARGS)
+    vecs_batch_32 = compute_vectors.vectorize(inputs, batch_size=32, **VECTORIZE_ARGS)
 
-#
-# @pytest.mark.int
-# def test_tokenize_batch(gen_inputs):
-#     inputs = gen_inputs
-#     tensor = torch.tensor(TOKENIZER.encode(inputs[0], **TOKENIZER_ARGS))
-#     expected = compute_vectors.stack_and_pad_tensors([tensor], TOKENIZER.pad_token_id)
-#     batches = compute_vectors.convert_to_batches(inputs, batch_size=32)
-#     actual = compute_vectors.tokenize_batch(batches[0], tokenizer=TOKENIZER,
-#                                             tokenizer_args=TOKENIZER_ARGS, device=DEVICE)
-#     assert torch.allclose(actual[0], expected[0])
-#     assert torch.allclose(actual[1], expected[1])
-#
-#
+    assert np.allclose(vecs_batch_1, vecs_batch_2, atol=10e-6)
+    assert np.allclose(vecs_batch_1, vecs_batch_4, atol=10e-6)
+    assert np.allclose(vecs_batch_1, vecs_batch_32, atol=10e-6)
 
-# @pytest.mark.int
-# def test_vectorize_batch_size(gen_inputs):
-#     inputs = gen_inputs
-#     vecs = compute_vectors.vectorize(inputs, batch_size=4, model=TRANSFORMER,
-#                                      tokenizer=TOKENIZER,
-#                                      tokenizer_args=TOKENIZER_ARGS,
-#                                      device=DEVICE)
-#     first_vec = compute_vectors.vectorize(np.array([inputs[0]]), batch_size=1, model=TRANSFORMER,
-#                                           tokenizer=TOKENIZER,
-#                                           tokenizer_args=TOKENIZER_ARGS,
-#                                           device=DEVICE)
-#     assert np.allclose(vecs[0], first_vec[0])
-#
-#
+    vec_0 = compute_vectors.vectorize([inputs[0]], batch_size=1, **VECTORIZE_ARGS)
+    vec_1 = compute_vectors.vectorize([inputs[1]], batch_size=1, **VECTORIZE_ARGS)
+    vec_2 = compute_vectors.vectorize([inputs[2]], batch_size=1, **VECTORIZE_ARGS)
+    vec_3 = compute_vectors.vectorize([inputs[3]], batch_size=1, **VECTORIZE_ARGS)
 
-
-
-
+    assert np.allclose(vecs_batch_4[0], vec_0, atol=10e-6)
+    assert np.allclose(vecs_batch_4[1], vec_1, atol=10e-6)
+    assert np.allclose(vecs_batch_4[2], vec_2, atol=10e-6)
+    assert np.allclose(vecs_batch_4[3], vec_3, atol=10e-6)

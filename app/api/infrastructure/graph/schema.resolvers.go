@@ -266,21 +266,12 @@ func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
 }
 
 func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
-	minWords := 50
-	enoughWords := 200
-
-	descriptionWords := len(strings.Fields(description))
-	quality := 0
-
-	if descriptionWords > enoughWords {
-		quality = 100
-	} else if descriptionWords > minWords {
-		quality = (descriptionWords - minWords) * 100 / (enoughWords - minWords)
+	q, err := r.kg.DescriptionQuality(ctx, description)
+	if err != nil {
+		return nil, err
 	}
 
-	return &model.QualityProjectDesc{
-		Quality: quality,
-	}, nil
+	return &model.QualityProjectDesc{Quality: q}, nil
 }
 
 func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) (*entity.KnowledgeGraph, error) {

@@ -14,6 +14,9 @@ PORT = int(get_environ("KG_PORT", default="5555"))
 # Recommender Settings
 N_HITS = int(get_environ("N_HITS", default="1000"))
 
+# Description Quality Settings
+MIN_WORDS = int(get_environ("MIN_WORDS", default="10"))
+
 # Logger Settings
 LOG_FILE = Path(get_environ("KG_LOG_FILE", default="/var/log/kg.log"))
 LOG_LEVEL = get_environ("KG_LOG_LEVEL", default="INFO")

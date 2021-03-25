@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 type KGServiceClient interface {
 	GetGraph(ctx context.Context, in *GetGraphReq, opts ...grpc.CallOption) (*GetGraphRes, error)
 	GetItem(ctx context.Context, in *GetItemReq, opts ...grpc.CallOption) (*GetItemRes, error)
+	GetDescriptionQuality(ctx context.Context, in *DescriptionQualityReq, opts ...grpc.CallOption) (*DescriptionQualityRes, error)
 }
 
 type kGServiceClient struct {
@@ -48,12 +49,22 @@ func (c *kGServiceClient) GetItem(ctx context.Context, in *GetItemReq, opts ...g
 	return out, nil
 }
 
+func (c *kGServiceClient) GetDescriptionQuality(ctx context.Context, in *DescriptionQualityReq, opts ...grpc.CallOption) (*DescriptionQualityRes, error) {
+	out := new(DescriptionQualityRes)
+	err := c.cc.Invoke(ctx, "/kg.KGService/GetDescriptionQuality", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // KGServiceServer is the server API for KGService service.
 // All implementations must embed UnimplementedKGServiceServer
 // for forward compatibility
 type KGServiceServer interface {
 	GetGraph(context.Context, *GetGraphReq) (*GetGraphRes, error)
 	GetItem(context.Context, *GetItemReq) (*GetItemRes, error)
+	GetDescriptionQuality(context.Context, *DescriptionQualityReq) (*DescriptionQualityRes, error)
 	mustEmbedUnimplementedKGServiceServer()
 }
 
@@ -66,6 +77,9 @@ func (UnimplementedKGServiceServer) GetGraph(context.Context, *GetGraphReq) (*Ge
 }
 func (UnimplementedKGServiceServer) GetItem(context.Context, *GetItemReq) (*GetItemRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetItem not implemented")
+}
+func (UnimplementedKGServiceServer) GetDescriptionQuality(context.Context, *DescriptionQualityReq) (*DescriptionQualityRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDescriptionQuality not implemented")
 }
 func (UnimplementedKGServiceServer) mustEmbedUnimplementedKGServiceServer() {}
 
@@ -116,6 +130,24 @@ func _KGService_GetItem_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _KGService_GetDescriptionQuality_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DescriptionQualityReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KGServiceServer).GetDescriptionQuality(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kg.KGService/GetDescriptionQuality",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KGServiceServer).GetDescriptionQuality(ctx, req.(*DescriptionQualityReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // KGService_ServiceDesc is the grpc.ServiceDesc for KGService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -130,6 +162,10 @@ var KGService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetItem",
 			Handler:    _KGService_GetItem_Handler,
+		},
+		{
+			MethodName: "GetDescriptionQuality",
+			Handler:    _KGService_GetDescriptionQuality_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

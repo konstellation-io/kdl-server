@@ -95,10 +95,11 @@ module.exports = {
     }),
   }),
   Mutation: () => ({
-    updateProject: (_, { input: { id, name, description } }) => {
+    updateProject: (_, { input: { id, name, description, archived } }) => {
       const project = projects.find((project) => project.id === id);
       if (name) project.name = name;
       if (description) project.description = description;
+      project.archive = Boolean(archived);
 
       return project;
     },

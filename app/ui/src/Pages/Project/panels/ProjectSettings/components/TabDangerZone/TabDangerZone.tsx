@@ -5,8 +5,16 @@ import MessageActionBox, {
 import IconArchive from '@material-ui/icons/Archive';
 import React from 'react';
 import styles from './TabDangerZone.module.scss';
+import useProject from 'Graphql/hooks/useProject';
 
-function TabDangerZone() {
+type Props = {
+  projectId: string;
+  isArchived: boolean;
+};
+
+function TabDangerZone({ projectId, isArchived }: Props) {
+  const { updateProjectArchived } = useProject();
+
   return (
     <div className={styles.container}>
       <p className={styles.title}>
@@ -20,7 +28,7 @@ function TabDangerZone() {
           default, archived projects are hidden)."
         action={{
           label: 'ARCHIVE',
-          onClick: () => {},
+          onClick: () => updateProjectArchived(projectId, !isArchived),
           Icon: IconArchive,
         }}
         theme={BOX_THEME.DEFAULT}

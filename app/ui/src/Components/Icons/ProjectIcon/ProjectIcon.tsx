@@ -9,7 +9,6 @@ interface AdditionalProps {
 
 const ProjectIcon = (props: AdditionalProps & SvgIconProps) => (
   <SvgIcon
-    {...props}
     className={cx(props.className, {
       [styles.STARTED]: !props.isArchived,
       [styles.ARCHIVED]: props.isArchived,

@@ -86,11 +86,16 @@ export default function useProject(options?: UseProjectParams) {
     mutationUpdateProject(mutationPayloadHelper({ id, repository: { url } }));
   }
 
+  function updateProjectArchived(id: string, archived: boolean) {
+    mutationUpdateProject(mutationPayloadHelper({ id, archived }));
+  }
+
   return {
     addNewProject,
     updateProjectName,
     updateProjectDescription,
     updateProjectRepositoryUrl,
+    updateProjectArchived,
     create: { data },
   };
 }

@@ -3,5 +3,6 @@ mutation UpdateProject($input: UpdateProjectInput!) {
     id
     name
     description
+    archived
   }
 }

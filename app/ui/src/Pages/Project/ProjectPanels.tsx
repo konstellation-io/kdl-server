@@ -70,6 +70,7 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
   const panels: { [key in PANEL_ID]: JSX.Element | null } = {
     [PANEL_ID.SETTINGS]: (
       <ProjectSettings
+        project={openedProject}
         settingsOpenedTab={settingsOpenedTab}
         setSettingsOpenedTab={setSettingsOpenedTab}
       />

@@ -124,14 +124,15 @@ def vectorize_batch(batch, model):
 
     with torch.no_grad():
 
-        vecs_by_token = model(input_ids=batch['input_ids'], attention_mask=batch['attention_mask'])[0].detach()
+        vecs_by_token = model(input_ids=batch['input_ids'].to(model.device),
+                              attention_mask=batch['attention_mask'].to(model.device))[0].detach()
 
         # Attention masks are not sufficient to completely ignore the padding tokens when computing the doc vector
         for i, (ids, mask) in enumerate(zip(batch['input_ids'], batch['attention_mask'])):
             n_unmasked_tokens = mask.sum().item()
             vecs_by_doc[i, :] = torch.mean(vecs_by_token[i, :n_unmasked_tokens, :], dim=0)
 
-    return vecs_by_doc.to("cpu")
+    return vecs_by_doc.cpu()
 
 
 def vectorize(inputs: List[str], batch_size: int,

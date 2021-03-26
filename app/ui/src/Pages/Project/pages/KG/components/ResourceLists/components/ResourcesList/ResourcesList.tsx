@@ -29,6 +29,22 @@ function ResourcesList({
   idToFullResource,
 }: Props) {
   const hasResources = resources.length > 0;
+
+  function renderListContent() {
+    if (hasResources) {
+      return resources.map((r) => (
+        <KGItem
+          key={r.id}
+          onEnter={onEnter}
+          onLeave={onLeave}
+          onClick={onClick}
+          resource={r}
+          idToFullResource={idToFullResource}
+        />
+      ));
+    }
+    return <NoItems {...noItems} />;
+  }
   return (
     <div className={styles.list}>
       <div className={styles.top}>
@@ -45,22 +61,7 @@ function ResourcesList({
           />
         )}
       </div>
-      <div className={styles.listWrapper}>
-        {hasResources ? (
-          resources.map((r) => (
-            <KGItem
-              key={r.id}
-              onEnter={onEnter}
-              onLeave={onLeave}
-              onClick={onClick}
-              resource={r}
-              idToFullResource={idToFullResource}
-            />
-          ))
-        ) : (
-          <NoItems {...noItems} />
-        )}
-      </div>
+      <div className={styles.listWrapper}>{renderListContent()}</div>
     </div>
   );
 }

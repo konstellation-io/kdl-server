@@ -37,7 +37,7 @@ function ProjectsOrder() {
         hideError
         options={options}
         theme={SelectTheme.DARK}
-        defaultOption={ProjectOrder.VISITED}
+        defaultOption={ProjectOrder.CREATION}
         formSelectedOption={filters?.order}
         valuesMapper={optionsMapper}
       />

@@ -1,9 +1,5 @@
 import { InMemoryCache, makeVar } from '@apollo/client';
-import {
-  ProjectFilters,
-  ProjectOrder,
-  ProjectSelection,
-} from './models/ProjectFilters';
+import { ProjectFilters, ProjectOrder, ProjectSelection, } from './models/ProjectFilters';
 import { UserSelection, UserSettings } from './models/UserSettings';
 
 import { D } from 'Pages/Project/pages/KG/components/KGVisualization/KGVisualization';
@@ -16,7 +12,7 @@ import { PanelInfo } from './models/Panel';
 export const initialProjectFilters: ProjectFilters = {
   name: '',
   selection: ProjectSelection.ACTIVE,
-  order: ProjectOrder.AZ,
+  order: ProjectOrder.CREATION,
   nFiltered: 0,
 };
 

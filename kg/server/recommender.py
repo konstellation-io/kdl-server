@@ -54,10 +54,10 @@ class Recommender:
         Tokenizes input text
         """
         tokens = self.tokenizer(text, truncation=True, max_length=512, return_tensors="pt")
-
+        self.log.info(f"tokens shape: {tokens['input_ids'].shape}")
         return tokens
 
-    def _compute_query_vector(self, raw_query_text: str) -> torch.Tensor:
+    def _compute_query_vector(self, raw_query_text: str) -> np.ndarray:
         """
         Computes a vector for a given query input.
         """
@@ -69,7 +69,7 @@ class Recommender:
 
         query_token_vecs = self.model(input_ids=tokens['input_ids'].to(device),
                                       attention_mask=tokens['attention_mask'].to(device))[0].detach().squeeze()
-        query_vector = torch.mean(query_token_vecs, dim=0).cpu()
+        query_vector = torch.mean(query_token_vecs, dim=0).cpu().numpy()
 
         return query_vector
 

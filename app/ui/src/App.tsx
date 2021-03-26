@@ -5,10 +5,9 @@ import {
   HttpLink,
 } from '@apollo/client';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
-import { Slide, ToastContainer, toast } from 'react-toastify';
+import { Slide, toast, ToastContainer } from 'react-toastify';
 
 import { CONFIG } from 'index';
-import GenerateApiToken from 'Pages/GenerateApiToken/GenerateApiToken';
 import NewProject from 'Pages/NewProject/NewProject';
 import NewUser from 'Pages/NewUser/NewUser';
 import Project from 'Pages/Project/Project';
@@ -17,7 +16,6 @@ import Projects from 'Pages/Projects/Projects';
 import ROUTE from 'Constants/routes';
 import React from 'react';
 import SiteBar from 'Components/SiteBar/SiteBar';
-import UserApiTokens from 'Pages/UserApiToken/UserApiTokens';
 import UserSshKey from 'Pages/UserSshKey/UserSshKey';
 import Users from 'Pages/Users/Users';
 import cache from 'Graphql/client/cache';

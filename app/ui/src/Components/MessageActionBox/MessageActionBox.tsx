@@ -24,6 +24,8 @@ type Action = {
   label: string;
   onClick: () => void;
   Icon?: FunctionComponent<OverrideProps<SvgIconTypeMap<{}, 'svg'>, 'svg'>>;
+  loading?: boolean;
+  disabled?: boolean;
 };
 
 type Props = {
@@ -59,9 +61,12 @@ function MessageActionBox({
             label={action.label}
             theme={toButtonTheme.get(theme)}
             onClick={action.onClick}
-            disabled={action.needConfirmation && !confirmed}
+            disabled={
+              (action.needConfirmation && !confirmed) || action.disabled
+            }
             height={30}
             Icon={action.Icon}
+            loading={action.loading}
             primary
           />
         </div>

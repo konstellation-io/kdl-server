@@ -6,6 +6,7 @@ import IconArchive from '@material-ui/icons/Archive';
 import React from 'react';
 import styles from './TabDangerZone.module.scss';
 import useProject from 'Graphql/hooks/useProject';
+import { toast } from 'react-toastify';
 
 type Props = {
   projectId: string;
@@ -13,7 +14,13 @@ type Props = {
 };
 
 function TabDangerZone({ projectId, isArchived }: Props) {
-  const { updateProjectArchived } = useProject();
+  const {
+    archiveProjectAction: { updateProjectArchived, loading },
+  } = useProject({ onUpdateCompleted: handleUpdateCompleted });
+
+  function handleUpdateCompleted() {
+    toast.info('The project has been archived successfully!');
+  }
 
   return (
     <div className={styles.container}>
@@ -30,6 +37,8 @@ function TabDangerZone({ projectId, isArchived }: Props) {
           label: 'ARCHIVE',
           onClick: () => updateProjectArchived(projectId, !isArchived),
           Icon: IconArchive,
+          disabled: loading,
+          loading,
         }}
         theme={BOX_THEME.DEFAULT}
       />

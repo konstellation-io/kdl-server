@@ -39,7 +39,7 @@ const buildProject = () => ({
   lastActivationDate: () => new Date().toISOString(),
   error: casual.random_element([null, casual.error]),
   members: buildRandomMembers(casual.integer(1, 5)),
-  isArchived: casual.boolean,
+  archived: casual.boolean,
   toolUrls: () => ({
     gitea: 'https://gitea.io/en-us/',
     minio: 'https://min.io/',
@@ -99,7 +99,7 @@ module.exports = {
       const project = projects.find((project) => project.id === id);
       if (name) project.name = name;
       if (description) project.description = description;
-      project.archive = Boolean(archived);
+      if (archived !== undefined) project.archived = archived;
 
       return project;
     },

@@ -33,7 +33,7 @@ export default function useProject(options?: UseProjectParams) {
     update: updateCacheAdd,
   });
 
-  const [mutationUpdateProject] = useMutation<
+  const [mutationUpdateProject, { loading }] = useMutation<
     UpdateProject,
     UpdateProjectVariables
   >(UpdateProjectMutation, {
@@ -95,7 +95,10 @@ export default function useProject(options?: UseProjectParams) {
     updateProjectName,
     updateProjectDescription,
     updateProjectRepositoryUrl,
-    updateProjectArchived,
+    archiveProjectAction: {
+      updateProjectArchived,
+      loading,
+    },
     create: { data },
   };
 }

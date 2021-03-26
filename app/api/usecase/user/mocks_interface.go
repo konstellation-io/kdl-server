@@ -139,6 +139,21 @@ func (mr *MockRepositoryMockRecorder) GetByUsername(ctx, username interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByUsername", reflect.TypeOf((*MockRepository)(nil).GetByUsername), ctx, username)
 }
 
+// UpdateAccessLevel mocks base method.
+func (m *MockRepository) UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateAccessLevel", ctx, userIds, level)
+	ret0, _ := ret[0].([]entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateAccessLevel indicates an expected call of UpdateAccessLevel.
+func (mr *MockRepositoryMockRecorder) UpdateAccessLevel(ctx, userIds, level interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccessLevel", reflect.TypeOf((*MockRepository)(nil).UpdateAccessLevel), ctx, userIds, level)
+}
+
 // UpdateSSHKey mocks base method.
 func (m *MockRepository) UpdateSSHKey(ctx context.Context, username string, SSHKey entity.SSHKey) error {
 	m.ctrl.T.Helper()
@@ -309,4 +324,19 @@ func (m *MockUseCase) StopTools(ctx context.Context, username string) (entity.Us
 func (mr *MockUseCaseMockRecorder) StopTools(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopTools", reflect.TypeOf((*MockUseCase)(nil).StopTools), ctx, username)
+}
+
+// UpdateAccessLevel mocks base method.
+func (m *MockUseCase) UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateAccessLevel", ctx, userIds, level)
+	ret0, _ := ret[0].([]entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateAccessLevel indicates an expected call of UpdateAccessLevel.
+func (mr *MockUseCaseMockRecorder) UpdateAccessLevel(ctx, userIds, level interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccessLevel", reflect.TypeOf((*MockUseCase)(nil).UpdateAccessLevel), ctx, userIds, level)
 }

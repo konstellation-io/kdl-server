@@ -136,6 +136,28 @@ func (m *userMongoDBRepo) FindByIDs(ctx context.Context, userIDs []string) ([]en
 	return m.find(ctx, bson.M{"_id": bson.M{"$in": objIDs}})
 }
 
+// UpdateAccessLevel update the user access level for the given user identifiers.
+func (m *userMongoDBRepo) UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error) {
+	users, err := m.FindByIDs(ctx, userIds)
+	if err != nil {
+		return []entity.User{}, err
+	}
+
+	for _, user := range users {
+		err = m.updateUserFields(ctx, user.Username, bson.M{"access_level": level})
+		if err != nil {
+			return []entity.User{}, err
+		}
+	}
+
+	users, err = m.FindByIDs(ctx, userIds)
+	if err != nil {
+		return []entity.User{}, err
+	}
+
+	return users, nil
+}
+
 func (m *userMongoDBRepo) UpdateSSHKey(ctx context.Context, username string, sshKey entity.SSHKey) error {
 	fields := bson.M{
 		"public_ssh_key":        sshKey.Public,

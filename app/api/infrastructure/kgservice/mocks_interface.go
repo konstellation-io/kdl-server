@@ -35,6 +35,21 @@ func (m *MockKGService) EXPECT() *MockKGServiceMockRecorder {
 	return m.recorder
 }
 
+// DescriptionQuality mocks base method.
+func (m *MockKGService) DescriptionQuality(ctx context.Context, description string) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DescriptionQuality", ctx, description)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DescriptionQuality indicates an expected call of DescriptionQuality.
+func (mr *MockKGServiceMockRecorder) DescriptionQuality(ctx, description interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescriptionQuality", reflect.TypeOf((*MockKGService)(nil).DescriptionQuality), ctx, description)
+}
+
 // GetGraph mocks base method.
 func (m *MockKGService) GetGraph(ctx context.Context, description string) (entity.KnowledgeGraph, error) {
 	m.ctrl.T.Helper()
@@ -63,19 +78,4 @@ func (m *MockKGService) GetItem(ctx context.Context, id string) (entity.Knowledg
 func (mr *MockKGServiceMockRecorder) GetItem(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetItem", reflect.TypeOf((*MockKGService)(nil).GetItem), ctx, id)
-}
-
-// DescriptionQuality mocks base method
-func (m *MockKGService) DescriptionQuality(ctx context.Context, description string) (int, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DescriptionQuality", ctx, description)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DescriptionQuality indicates an expected call of DescriptionQuality
-func (mr *MockKGServiceMockRecorder) DescriptionQuality(ctx, description interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescriptionQuality", reflect.TypeOf((*MockKGService)(nil).DescriptionQuality), ctx, description)
 }

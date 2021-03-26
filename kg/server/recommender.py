@@ -62,12 +62,14 @@ class Recommender:
         Computes a vector for a given query input.
         """
         self.log.debug(f"Computing vector for query text ('{raw_query_text[:120]}...'")
+        device = self.model.device
 
         processed_query = self._preprocess(raw_query_text)
         tokens = self._tokenize(processed_query)
 
-        query_token_vecs = self.model(**tokens)[0].detach().squeeze()
-        query_vector = torch.mean(query_token_vecs, dim=0)
+        query_token_vecs = self.model(input_ids=tokens['input_ids'].to(device),
+                                      attention_mask=tokens['attention_mask'].to(device))[0].detach().squeeze()
+        query_vector = torch.mean(query_token_vecs, dim=0).cpu()
 
         return query_vector
 

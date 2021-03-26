@@ -26,27 +26,27 @@ def create_inputs(title: str, abstract: str) -> str:
         title: paper title
         abstract: paper abstract
     Return:
-        Clean and concatenated paper + abstract with format:
+        Clean and concatenated title + abstract with format:
         "title. abstract"
     """
     title_abstract_str = f"{title}. {abstract}"
     return title_abstract_str.replace("\n", " ").replace("**", " ")
 
 
-def get_inputs(input_path: str) -> np.ndarray:
+def get_inputs(input_path: str) -> List[str]:
     """
     Gets combination of title and abstracts for all the papers of the dataset.
     Args:
         input_path: dataset route
     Return:
-        returns a numpy array with shape (number_of_inputs, 1)
+        returns a list of strings with length (number_of_inputs)
     """
     df = pd.read_pickle(input_path, compression="gzip")[['title', 'abstract']]
-    return np.vectorize(create_inputs)(df['title'], df['abstract'])
+    return np.vectorize(create_inputs)(df['title'], df['abstract']).tolist()
 
 
 def convert_to_batches(input_items: Union[np.ndarray, list, range],
-                       batch_size: int) -> list[list[np.str_]]:
+                       batch_size: int) -> List[List[str]]:
     """
     Converts an iterable of items into a list of list
     of items of the same size.
@@ -96,14 +96,15 @@ def tokenize_batch(samples: List[str],
     return batch_tokens
 
 
-def vectorize_batch(batch, model):
+def vectorize_batch(batch: Union[BatchEncoding, Dict],
+                    model: transformers.PreTrainedModel) -> np.ndarray:
     """
     Passes batched tokens for multiple documents to the transformer model for inference,
     aggregates all token vectors in a document into a document vector for that document,
     and returns a vector for each input document in the batch.
 
     Args:
-        batch: (BatchEnconding), containing:
+        batch: (transformers BatchEncoding or dict), containing:
             'input_ids': a tensor with one row per document, each row containing tokens for that document,
                 e.g. [[101, 4905, 2855, ... , 102,  0],   # Tokens for first doc in batch (padded by one),
                       [101, 823, 3338, ..., 1012, 102],   # Tokens for next doc (unpadded; longest in batch)
@@ -113,7 +114,7 @@ def vectorize_batch(batch, model):
                       [1, 1, 1, ..., 1, 1],
                       [1, 1, 1, ..., 0, 0]]
 
-        model: (huggingface transformer model)
+        model: (transformers.PreTrainedModel)
 
     Returns:
         (torch Tensor) of shape (batch_size, vector_dims)

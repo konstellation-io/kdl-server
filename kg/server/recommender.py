@@ -62,7 +62,7 @@ class Recommender:
         Computes a vector for a given query input.
         """
         self.log.debug(f"Computing vector for query text ('{raw_query_text[:120]}...'")
-        device = self.model.device
+        device = self.model.device  # To make computation device-agnostic; wherever the model is, tensors will go
 
         processed_query = self._preprocess(raw_query_text)
         tokens = self._tokenize(processed_query)

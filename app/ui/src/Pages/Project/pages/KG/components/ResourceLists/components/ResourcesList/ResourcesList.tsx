@@ -4,6 +4,7 @@ import KGItem from '../KGItem/KGItem';
 import React from 'react';
 import { TextInput } from 'kwc';
 import styles from './ResourcesList.module.scss';
+import NoItems, { NoItemsProps } from '../NoItems/NoItems';
 
 type Props = {
   onClick: (resource: D) => void;
@@ -13,7 +14,7 @@ type Props = {
   filterText: string;
   resources: D[];
   header?: JSX.Element | null;
-  noItems?: JSX.Element | null;
+  noItems: NoItemsProps;
   idToFullResource: { [key: string]: any };
 };
 function ResourcesList({
@@ -45,18 +46,20 @@ function ResourcesList({
         )}
       </div>
       <div className={styles.listWrapper}>
-        {hasResources
-          ? resources.map((r) => (
-              <KGItem
-                key={r.id}
-                onEnter={onEnter}
-                onLeave={onLeave}
-                onClick={onClick}
-                resource={r}
-                idToFullResource={idToFullResource}
-              />
-            ))
-          : noItems}
+        {hasResources ? (
+          resources.map((r) => (
+            <KGItem
+              key={r.id}
+              onEnter={onEnter}
+              onLeave={onLeave}
+              onClick={onClick}
+              resource={r}
+              idToFullResource={idToFullResource}
+            />
+          ))
+        ) : (
+          <NoItems {...noItems} />
+        )}
       </div>
     </div>
   );

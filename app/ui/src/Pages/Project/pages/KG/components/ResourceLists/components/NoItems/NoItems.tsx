@@ -1,11 +1,11 @@
 import React, { FC } from 'react';
 import styles from './NoItems.module.scss';
 
-type Props = {
+export type NoItemsProps = {
   title: string;
   subTitle?: string;
 };
-const NoItems: FC<Props> = ({ title, subTitle }) => (
+const NoItems: FC<NoItemsProps> = ({ title, subTitle }) => (
   <div className={styles.resource}>
     <span className={styles.title}>{title}</span>
     {subTitle && <p>{subTitle}</p>}

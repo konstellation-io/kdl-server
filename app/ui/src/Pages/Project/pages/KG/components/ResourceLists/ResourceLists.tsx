@@ -94,12 +94,11 @@ function ResourceLists({
                 onLeave={onLeave}
                 onChangeFilterText={setListFilterText}
                 idToFullResource={idToFullResource}
-                noItems={
-                  <NoItems
-                    title="No items in the KG!"
-                    subTitle="Please, provide us a better description of your project."
-                  />
-                }
+                noItems={{
+                  title: 'No items in the KG!',
+                  subTitle:
+                    'Please, provide us a better description of your project.',
+                }}
               />
             </TabPanel>
           )}
@@ -112,12 +111,10 @@ function ResourceLists({
               onLeave={onLeave}
               onChangeFilterText={setListFilterText}
               idToFullResource={idToFullResource}
-              noItems={
-                <NoItems
-                  title="No starred items yet!"
-                  subTitle="Once you favourite an item you'll see them here."
-                />
-              }
+              noItems={{
+                title: 'No starred items yet!',
+                subTitle: "Once you favourite an item you'll see them here.",
+              }}
             />
           </TabPanel>
         </div>

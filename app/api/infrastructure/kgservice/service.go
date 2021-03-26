@@ -36,7 +36,7 @@ func NewKGService(logger logging.Logger, url string) (KGService, error) {
 	}, nil
 }
 
-// GetGraph gets a Knowledge Graph from the server.
+// GetGraph gets a entity.KnowledgeGraph from the server for a given description.
 func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.KnowledgeGraph, error) {
 	req := kgpb.GetGraphReq{Description: description}
 	res, err := kg.client.GetGraph(ctx, &req)
@@ -75,6 +75,7 @@ func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.K
 	return entity.KnowledgeGraph{Items: items, Topics: topics}, nil
 }
 
+// GetItem gets a entity.KnowledgeGraphItem for a given id.
 func (kg *kgService) GetItem(ctx context.Context, id string) (entity.KnowledgeGraphItem, error) {
 	req := kgpb.GetItemReq{Id: id}
 
@@ -105,6 +106,18 @@ func (kg *kgService) GetItem(ctx context.Context, id string) (entity.KnowledgeGr
 	}
 
 	return item, nil
+}
+
+// DescriptionQuality gets the quality score of a given description.
+func (kg *kgService) DescriptionQuality(ctx context.Context, description string) (int, error) {
+	req := kgpb.DescriptionQualityReq{Description: description}
+
+	res, err := kg.client.GetDescriptionQuality(ctx, &req)
+	if err != nil {
+		return 0, err
+	}
+
+	return int(res.QualityScore), nil
 }
 
 func stringToPointer(s string) *string {

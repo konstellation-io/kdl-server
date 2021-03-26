@@ -113,7 +113,7 @@ func (k *k8sClient) checkOrCreateToolsSecrets(slugUsername string) error {
 func (k *k8sClient) createToolSecret(slugUsername, toolName, toolURLName string) error {
 	secretName := fmt.Sprintf("%s-oauth2-secrets-%s", toolName, slugUsername)
 
-	exist, err := k.IsSecretPresent(secretName)
+	exist, err := k.isSecretPresent(secretName)
 	if err != nil {
 		return fmt.Errorf("check %s tool secret: %w", toolName, err)
 	}

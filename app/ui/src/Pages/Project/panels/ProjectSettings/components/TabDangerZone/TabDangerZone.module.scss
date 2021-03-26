@@ -13,8 +13,3 @@
   height: 100%;
   overflow: auto;
 }
-
-.container > div:nth-child(2) > div > div {
-  background-color: palette(lowlight, 800);
-  color: font-color(light);
-}

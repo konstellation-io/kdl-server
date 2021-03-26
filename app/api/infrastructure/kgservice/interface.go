@@ -12,4 +12,5 @@ import (
 type KGService interface {
 	GetGraph(ctx context.Context, description string) (entity.KnowledgeGraph, error)
 	GetItem(ctx context.Context, id string) (entity.KnowledgeGraphItem, error)
+	DescriptionQuality(ctx context.Context, description string) (int, error)
 }

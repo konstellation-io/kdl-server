@@ -35,10 +35,11 @@ $small-square-base: 30px;
   &:hover {
     .bg {
       box-shadow: inset 0 0 0 3px transparent,
-        0 2px 3 * $grid-unit 0 palette(highlight, 900);
+      0 2px 3 * $grid-unit 0 palette(highlight, 900);
       background-color: palette(highlight, 900);
       border-color: palette(highlight);
     }
+
     .content * {
       color: palette(highlight);
     }
@@ -65,8 +66,9 @@ $small-square-base: 30px;
   cursor: pointer;
 
   transition: background-color ease 0.4s, box-shadow ease 0.4s,
-    border-color ease 0.4s;
+  border-color ease 0.4s;
 }
+
 .bgBand {
   position: absolute;
   left: 0;
@@ -74,6 +76,7 @@ $small-square-base: 30px;
   height: $band-height / 2;
   width: 100%;
 }
+
 .content {
   position: absolute;
   top: 0;
@@ -88,9 +91,11 @@ $small-square-base: 30px;
   .bg {
     transform: skew(-45deg);
   }
+
   .bgBand {
     bottom: 0;
   }
+
   .content {
     left: 5 * $grid-unit;
   }
@@ -100,9 +105,11 @@ $small-square-base: 30px;
   .bg {
     transform: skew(45deg);
   }
+
   .bgBand {
     top: 0;
   }
+
   .content {
     top: $band-height / 2;
     display: flex;
@@ -153,6 +160,35 @@ $small-square-base: 30px;
   background-color: palette(base);
 
   clip-path: polygon(0 100%, 0 0, 100% 0, calc(100% - #{$side}) 50%, 100% 100%);
+
+  .otherLabels {
+    display: flex;
+    margin-right: auto;
+
+    .labelArchived,
+    .labelNoAccess {
+      @include font-button;
+
+      text-align: center;
+      line-height: $label-height;
+      height: $label-height;
+      min-width: 100px;
+      padding: 0 5 * $grid-unit;
+      border-radius: 3 * $grid-unit;
+      z-index: 1;
+      margin-left: 1.5 * $grid-unit;
+    }
+
+    .labelArchived {
+      color: font-color(dark);
+      background-color: palette(lowlight);
+    }
+
+    .labelNoAccess {
+      color: font-color(lowlight);
+      background-color: palette(base, 800);
+    }
+  }
 }
 
 .warning {
@@ -171,7 +207,6 @@ $small-square-base: 30px;
   height: $label-height;
   min-width: 150px;
   padding: 0 5 * $grid-unit;
-  margin-right: auto;
 
   border-bottom-right-radius: 3 * $grid-unit;
   border-top-right-radius: 3 * $grid-unit;
@@ -187,7 +222,7 @@ $small-square-base: 30px;
   height: $big-square-base;
   z-index: 1;
 
-  background-color: palette(base);
+  background-color: palette(base, 700);
   transform: rotate(45deg);
 
   .repoType {
@@ -196,7 +231,7 @@ $small-square-base: 30px;
     left: 50%;
     transform: translate(-50%, -50%) rotate(-45deg);
 
-    opacity: 0.7;
+    opacity: 0.8;
   }
 }
 
@@ -209,6 +244,7 @@ $small-square-base: 30px;
     .addProjectBg > div {
       border: 1px solid palette(highlight);
     }
+
     .addProjectLabel {
       color: font-color(highlight);
     }
@@ -233,6 +269,7 @@ $small-square-base: 30px;
       border-bottom-width: 0 !important;
       border-top-color: palette(base, 400);
     }
+
     .addProjectBgLower {
       transform: skew(45deg);
       border-bottom-color: palette(base, 400);
@@ -278,7 +315,26 @@ $small-square-base: 30px;
 
     transition: color ease 0.2s;
   }
+
   .date {
     transition: color ease 0.2s;
+  }
+}
+
+.disabled {
+  &, .bg, .description {
+    pointer-events: none !important;
+  }
+
+  .repoType {
+    opacity: 0.4;
+  }
+
+  .bg {
+    background-color: palette(base, 500);
+  }
+
+  .band {
+    background-color: palette(base, 400);
   }
 }

@@ -1,11 +1,6 @@
-import {
-  ProjectFilters,
-  ProjectOrder,
-  ProjectSelection,
-} from '../models/ProjectFilters';
+import { ProjectFilters, ProjectOrder, ProjectSelection, } from '../models/ProjectFilters';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
-import { ProjectState } from 'Graphql/types/globalTypes';
 import { projectFilters } from './../cache';
 import { sortBy } from 'lodash';
 
@@ -25,21 +20,19 @@ function useProjectFilters() {
     });
   }
 
-  const isProjectActive = (project: GetProjects_projects) =>
-    project.state !== ProjectState.ARCHIVED;
-  const isProjectStarred = (project: GetProjects_projects) => project.favorite;
-  const isProjectArchived = (project: GetProjects_projects) =>
-    project.state === ProjectState.ARCHIVED;
+  const isProjectActive = (project: GetProjects_projects) => !project.needAccess && !project.archived;
+  const isProjectInaccessible = (project: GetProjects_projects) => project.needAccess;
+  const isProjectArchived = (project: GetProjects_projects) => project.archived;
 
   function getProjectCounts(projects: GetProjects_projects[]) {
     const activeProjects = projects.filter(isProjectActive);
-    const starredProjects = projects.filter(isProjectStarred);
+    const inaccessibleProjects = projects.filter(isProjectInaccessible);
     const archivedProjects = projects.filter(isProjectArchived);
 
     return new Map([
       [ProjectSelection.ALL, projects.length],
       [ProjectSelection.ACTIVE, activeProjects.length],
-      [ProjectSelection.STARRED, starredProjects.length],
+      [ProjectSelection.INACCESSIBLE, inaccessibleProjects.length],
       [ProjectSelection.ARCHIVED, archivedProjects.length],
     ]);
   }
@@ -53,7 +46,7 @@ function useProjectFilters() {
     return (
       (selection === ProjectSelection.ARCHIVED && isProjectArchived(project)) ||
       (selection === ProjectSelection.ACTIVE && isProjectActive(project)) ||
-      (selection === ProjectSelection.STARRED && isProjectStarred(project))
+      (selection === ProjectSelection.INACCESSIBLE && isProjectInaccessible(project))
     );
   }
 

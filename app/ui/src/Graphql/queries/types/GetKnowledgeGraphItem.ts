@@ -25,7 +25,7 @@ export interface GetKnowledgeGraphItem_knowledgeGraphItem {
   score: number;
   date: string;
   url: string;
-  topics: (GetKnowledgeGraphItem_knowledgeGraphItem_topics | null)[];
+  topics: GetKnowledgeGraphItem_knowledgeGraphItem_topics[];
 }
 
 export interface GetKnowledgeGraphItem {

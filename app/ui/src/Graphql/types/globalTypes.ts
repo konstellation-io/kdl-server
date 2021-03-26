@@ -18,12 +18,6 @@ export enum KnowledgeGraphItemCat {
   Paper = 'Paper',
 }
 
-export enum ProjectState {
-  ARCHIVED = 'ARCHIVED',
-  STARTED = 'STARTED',
-  STOPPED = 'STOPPED',
-}
-
 export enum RepositoryType {
   EXTERNAL = 'EXTERNAL',
   INTERNAL = 'INTERNAL',

@@ -1,12 +1,11 @@
 export enum ProjectSelection {
   ACTIVE = 'ACTIVE',
-  STARRED = 'STARRED',
+  INACCESSIBLE = 'INACCESSIBLE',
   ARCHIVED = 'ARCHIVED',
   ALL = 'ALL',
 }
 
 export enum ProjectOrder {
-  VISITED = 'VISITED',
   CREATION = 'CREATION',
   AZ = 'AZ',
   ZA = 'ZA',

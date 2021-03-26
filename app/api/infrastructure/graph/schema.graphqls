@@ -177,12 +177,13 @@ type Project {
   description: String!
   favorite: Boolean!
   repository: Repository
-  state: ProjectState!
   creationDate: String!
   lastActivationDate: String!
   error: String
   members: [Member!]!
   toolUrls: ToolUrls!
+  needAccess: Boolean!
+  archived: Boolean!
 }
 
 input RepositoryInput {

@@ -4,8 +4,9 @@ import pandas as pd
 import torch
 from transformers import AutoModel, AutoTokenizer
 
-import compute_vectors
-from recommender import Recommender
+from pipe import compute_vectors
+from server.recommender import Recommender
+
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 TRANSFORMER = AutoModel.from_pretrained(compute_vectors.MODEL_PATH).to(DEVICE)
@@ -21,7 +22,6 @@ def test_vectorize_diferent_batch_size(gen_inputs):
         model=TRANSFORMER,
         tokenizer=TOKENIZER,
     )
-
     vec_1 = rec._compute_query_vector(inputs[0])
     vec_2 = rec._compute_query_vector(inputs[1])
     vec_3 = rec._compute_query_vector(inputs[2])

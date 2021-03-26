@@ -6,7 +6,6 @@ import ResourcesList from './components/ResourcesList/ResourcesList';
 import { orderBy } from 'lodash';
 import { resourcesViz } from '../KGVisualization/KGViz';
 import styles from './ResourceLists.module.scss';
-import NoItems from './components/NoItems/NoItems';
 
 type Props = {
   starredResources: D[];

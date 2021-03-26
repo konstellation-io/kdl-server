@@ -16,7 +16,7 @@ OUTPUT_PATH = ASSET_PATH + "vectors.npy"
 DATASET_PATH = ASSET_PATH + "dataset.pkl.gz"
 
 # Constants
-BATCH_SIZE = 1    # This batch size is a workaround for a padding problem.
+BATCH_SIZE = 1
 
 
 def create_inputs(title: str, abstract: str) -> str:

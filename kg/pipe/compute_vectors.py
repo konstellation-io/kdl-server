@@ -1,4 +1,4 @@
-from typing import Union, List, Dict
+from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -33,7 +33,7 @@ def create_inputs(title: str, abstract: str) -> str:
     return title_abstract_str.replace("\n", " ").replace("**", " ")
 
 
-def get_inputs(input_path: str) -> List[str]:
+def get_inputs(input_path: str) -> list[str]:
     """
     Gets combination of title and abstracts for all the papers of the dataset.
     Args:
@@ -46,7 +46,7 @@ def get_inputs(input_path: str) -> List[str]:
 
 
 def convert_to_batches(input_items: Union[np.ndarray, list, range],
-                       batch_size: int) -> List[List[str]]:
+                       batch_size: int) -> list[list[str]]:
     """
     Converts an iterable of items into a list of list
     of items of the same size.
@@ -75,9 +75,9 @@ def convert_to_batches(input_items: Union[np.ndarray, list, range],
     return output
 
 
-def tokenize_batch(samples: List[str],
+def tokenize_batch(samples: list[str],
                    tokenizer: transformers.PreTrainedTokenizer,
-                   tokenizer_args: Dict,
+                   tokenizer_args: dict,
                    device: torch.device) -> BatchEncoding:
     """
     Convert a list of texts to a BatchEncoding as input for downstream use by the transformer (in the
@@ -96,7 +96,7 @@ def tokenize_batch(samples: List[str],
     return batch_tokens
 
 
-def vectorize_batch(batch: Union[BatchEncoding, Dict],
+def vectorize_batch(batch: Union[BatchEncoding, dict],
                     model: transformers.PreTrainedModel) -> np.ndarray:
     """
     Passes batched tokens for multiple documents to the transformer model for inference,
@@ -136,7 +136,7 @@ def vectorize_batch(batch: Union[BatchEncoding, Dict],
     return vecs_by_doc.cpu()
 
 
-def vectorize(inputs: List[str], batch_size: int,
+def vectorize(inputs: list[str], batch_size: int,
               tokenizer: transformers.PreTrainedTokenizer,
               tokenizer_args: dict,
               model: transformers.PreTrainedModel,

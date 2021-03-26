@@ -44,11 +44,6 @@ function Routes() {
         <Route exact path={ROUTE.NEW_USER} component={NewUser} />
         <Route exact path={ROUTE.USER_SSH_KEY} component={UserSshKey} />
         <Route exact path={ROUTE.USER_API_TOKENS} component={UserApiTokens} />
-        <Route
-          exact
-          path={ROUTE.GENERATE_USER_API_TOKEN}
-          component={GenerateApiToken}
-        />
 
         <Route exact path={ROUTE.NEW_PROJECT} component={NewProject} />
         <Route

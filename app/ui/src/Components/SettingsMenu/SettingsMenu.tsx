@@ -43,10 +43,6 @@ function SettingsMenu() {
     history.push(ROUTE.USER_SSH_KEY);
   }
 
-  function goToUserAPITokens() {
-    history.push(ROUTE.USER_API_TOKENS);
-  }
-
   function UserSettingsSeparator({ label }: CustomOptionProps) {
     return (
       <Button
@@ -64,20 +60,9 @@ function SettingsMenu() {
     );
   }
 
-  function apiTokensButton({ label }: CustomOptionProps) {
-    return (
-      <SettingsButton
-        Icon={LinkIcon}
-        onClick={goToUserAPITokens}
-        label={label}
-      />
-    );
-  }
-
   const optionToButton = {
     'user settings': UserSettingsSeparator,
     'ssh key': SSHKeyButton,
-    'api tokens': apiTokensButton,
   };
 
   return (

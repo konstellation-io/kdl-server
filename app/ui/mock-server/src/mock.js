@@ -129,20 +129,24 @@ module.exports = {
 
       return project;
     },
-    removeApiToken: (_, { input: { apiTokenId } }) => ({
+    removeApiToken: (_, {input: {apiTokenId}}) => ({
       id: apiTokenId,
     }),
-    setStarredKGItem: (_, { input: { kgItemId, starred } }) => ({
+    setStarredKGItem: (_, {input: {kgItemId, starred}}) => ({
       id: kgItemId,
       starred,
     }),
+    regenerateSSHKey: () => ({
+      id: meId,
+      sshKey: this.SSHKey,
+    }),
     addApiToken: this.ApiToken,
-    updateAccessLevel: (_, { input: { userIds, accessLevel } }) =>
+    updateAccessLevel: (_, {input: {userIds, accessLevel}}) =>
       userIds.map((userId) => ({
         id: userId,
         accessLevel,
       })),
-    removeUsers: (_, { input: { userIds } }) =>
+    removeUsers: (_, {input: {userIds}}) =>
       userIds.map((userId) => ({
         id: userId,
       })),

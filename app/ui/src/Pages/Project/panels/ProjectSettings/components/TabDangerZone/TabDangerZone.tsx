@@ -1,9 +1,6 @@
-import MessageActionBox, {
-  BOX_THEME,
-} from 'Components/MessageActionBox/MessageActionBox';
+import MessageActionBox, { BOX_THEME, } from 'Components/MessageActionBox/MessageActionBox';
 
 import IconArchive from '@material-ui/icons/Archive';
-import IconDelete from '@material-ui/icons/Delete';
 import React from 'react';
 import styles from './TabDangerZone.module.scss';
 
@@ -25,17 +22,6 @@ function TabDangerZone() {
           Icon: IconArchive,
         }}
         theme={BOX_THEME.DEFAULT}
-      />
-      <MessageActionBox
-        title="¿Do you want to delete this project? Be carefull"
-        desciption="Deleted projects cannot be recovered, doing this action will delete permanently the actual 
-          project, consider archiving it instead."
-        action={{
-          label: 'DELETE',
-          onClick: () => {},
-          Icon: IconDelete,
-        }}
-        theme={BOX_THEME.ERROR}
       />
     </div>
   );

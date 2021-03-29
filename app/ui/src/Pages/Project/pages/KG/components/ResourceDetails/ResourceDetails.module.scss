@@ -65,6 +65,9 @@
   flex-grow: 1;
   background-color: palette(base);
   padding: 3 * $grid-unit;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
   .sectionTitle {
     @include font-caption;
@@ -72,6 +75,7 @@
 
     margin-bottom: $grid-unit;
   }
+
   .authors {
     .authorsText {
       @include font-subheader;
@@ -105,6 +109,7 @@
 
     margin-top: 4 * $grid-unit;
     overflow-wrap: break-word;
+    overflow: auto;
   }
 
   .frameworks {

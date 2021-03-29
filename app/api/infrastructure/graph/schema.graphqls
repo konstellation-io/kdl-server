@@ -3,7 +3,6 @@ type Query {
   projects: [Project!]!
   project(id: ID!): Project!
   users: [User!]!
-  sshKey: SSHKey!
   qualityProjectDesc(description: String!): QualityProjectDesc!
   knowledgeGraph(projectId: ID!): KnowledgeGraph!
 }
@@ -12,7 +11,7 @@ type Mutation {
   addUser(input: AddUserInput!): User!
   removeUsers(input: RemoveUsersInput!): [User!]!
   updateAccessLevel(input: UpdateAccessLevelInput!): [User!]!
-  regenerateSSHKey: SSHKey!
+  regenerateSSHKey: User!
   createProject(input: CreateProjectInput!): Project!
   updateProject(input: UpdateProjectInput!): Project!
   addMembers(input: AddMembersInput!): Project!
@@ -72,6 +71,7 @@ type User {
   lastActivity: String
   apiTokens: [ApiToken!]!
   areToolsActive: Boolean!
+  sshKey: SSHKey!
 }
 
 type ApiToken {

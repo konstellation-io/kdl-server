@@ -1,8 +1,11 @@
 mutation RegenerateSSHKey {
   regenerateSSHKey {
-    public
-    private
-    creationDate
-    lastActivity
+    id
+    sshKey {
+      public
+      private
+      creationDate
+      lastActivity
+    }
   }
 }

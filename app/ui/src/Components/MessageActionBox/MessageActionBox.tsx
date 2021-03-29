@@ -1,5 +1,5 @@
-import { BUTTON_THEMES, Button, Check } from 'kwc';
-import React, { FunctionComponent, useState } from 'react';
+import { Button, BUTTON_THEMES, Check } from 'kwc';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 
 import { OverrideProps } from '@material-ui/core/OverridableComponent';
 import { SvgIconTypeMap } from '@material-ui/core';
@@ -31,14 +31,53 @@ type Props = {
   desciption: string;
   action?: Action;
   theme?: BOX_THEME;
+  loading?: boolean;
+  customAction?: JSX.Element;
 };
 function MessageActionBox({
-  title,
-  desciption,
-  action,
-  theme = BOX_THEME.DEFAULT,
-}: Props) {
+                            title,
+                            desciption,
+                            action,
+                            customAction,
+                            theme = BOX_THEME.DEFAULT,
+                            loading = false,
+                          }: Props) {
   const [confirmed, setConfirmed] = useState(false);
+
+  useEffect(() => {
+    if (loading) {
+      setConfirmed(false);
+    }
+  }, [loading]);
+
+  function getAction() {
+    if (customAction) return customAction;
+
+    if (action) {
+      return (
+        <div className={styles.action}>
+          {action.needConfirmation && (
+            <div className={styles.confirmation}>
+              <Check checked={confirmed} onChange={(v) => setConfirmed(v)}/>
+              <p className={styles.confirmationText}>{action.message}</p>
+            </div>
+          )}
+          <div className={styles.button}>
+            <Button
+              label={action.label}
+              theme={toButtonTheme.get(theme)}
+              onClick={action.onClick}
+              disabled={action.needConfirmation && !confirmed}
+              loading={loading}
+              height={30}
+              Icon={action.Icon}
+              primary
+            />
+          </div>
+        </div>
+      );
+    }
+  }
 
   return (
     <div
@@ -47,25 +86,7 @@ function MessageActionBox({
     >
       <p className={styles.title}>{title}</p>
       <p className={styles.description}>{desciption}</p>
-      {action && (
-        <div className={styles.action}>
-          {action.needConfirmation && (
-            <div className={styles.confirmation}>
-              <Check checked={confirmed} onChange={(v) => setConfirmed(v)} />
-              <p className={styles.confirmationText}>{action.message}</p>
-            </div>
-          )}
-          <Button
-            label={action.label}
-            theme={toButtonTheme.get(theme)}
-            onClick={action.onClick}
-            disabled={action.needConfirmation && !confirmed}
-            height={30}
-            Icon={action.Icon}
-            primary
-          />
-        </div>
-      )}
+      {getAction()}
     </div>
   );
 }

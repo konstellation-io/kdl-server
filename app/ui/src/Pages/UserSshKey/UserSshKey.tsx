@@ -1,31 +1,49 @@
 import { ErrorMessage, SpinnerCircular } from 'kwc';
 import FAQBox, { BOX_THEME } from './components/FAQBox/FAQBox';
 
+import { GetMe } from 'Graphql/queries/types/GetMe';
 import { GetSSHKey } from 'Graphql/queries/types/GetSSHKey';
 import React from 'react';
 import SSHKey from './components/SSHKey/SSHKey';
 import { copyAndToast } from 'Utils/clipboard';
 import { loader } from 'graphql.macro';
 import styles from './UserSshKey.module.scss';
+import { toast } from 'react-toastify';
 import { useQuery } from '@apollo/client';
 import useSSHKey from 'Graphql/hooks/useSSHKey';
 
 const GetSSHKeys = loader('Graphql/queries/getSSHKey.graphql');
+const GetMeQuery = loader('Graphql/queries/getMe.graphql');
 
 function UserSshKey() {
   const { data, loading, error } = useQuery<GetSSHKey>(GetSSHKeys);
-  const { regenerateSSHKey } = useSSHKey();
+  const { data: dataMe } = useQuery<GetMe>(GetMeQuery);
+  const {
+    regenerateSSHKey: {
+      performMutation: regenerateSSHKey,
+      loading: regenerateSSHKeyLoading,
+    },
+  } = useSSHKey({
+    onRegenerateSSHKeyComplete: () => {
+      toast.info('SSH Key has been regenerated');
+      toast.clearWaitingQueue();
+    },
+  });
+
+  const userToolsRunning = !!dataMe?.me.areToolsActive;
 
   function getContent() {
-    if (loading) return <SpinnerCircular />;
-    if (error || !data) return <ErrorMessage />;
+    if (loading) return <SpinnerCircular/>;
+    if (error || !data) return <ErrorMessage/>;
 
-    const { sshKey } = data;
+    const {
+      me: { sshKey },
+    } = data;
 
     return (
       <>
         <div className={styles.key}>
-          <SSHKey sshKey={sshKey} />
+          <SSHKey sshKey={sshKey}/>
         </div>
         <div className={styles.faqs}>
           <h2>If you need some help, check this</h2>
@@ -60,12 +78,24 @@ function UserSshKey() {
                 you can generate a new one by clicking on the 'REGENERATE' button bellow (note you must confirm this 
                 action). You will not be able to access repositories with the old SSH Key, and you cannot recover previous 
                 SSH keys, so be sure to update the key on all the services you will continue using."
+              customAction={
+                userToolsRunning ? (
+                  <div className={styles.regenWarning}>
+                    <div className={styles.regenWarningTag}>WARNING:</div>
+                    <div className={styles.regenWarningText}>
+                      User tools (Jupyter and VSCode) are running, you need to
+                      stop them in order to regenerate the SSH Key.
+                    </div>
+                  </div>
+                ) : undefined
+              }
               action={{
                 needConfirmation: true,
                 message: 'Sure, I will do it.',
                 label: 'REGENERATE',
                 onClick: regenerateSSHKey,
               }}
+              loading={regenerateSSHKeyLoading}
             />
           </div>
           <FAQBox

@@ -45,8 +45,18 @@ func (r *mutationResolver) UpdateAccessLevel(ctx context.Context, input model.Up
 	return nil, entity.ErrNotImplemented
 }
 
-func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.SSHKey, error) {
-	return nil, entity.ErrNotImplemented
+func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.User, error) {
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	loggedUser, err = r.users.RegenerateSSHKeys(ctx, loggedUser)
+	if err != nil {
+		return nil, err
+	}
+
+	return &loggedUser, nil
 }
 
 func (r *mutationResolver) CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error) {
@@ -255,36 +265,13 @@ func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
 	return r.users.FindAll(ctx)
 }
 
-func (r *queryResolver) SSHKey(ctx context.Context) (*entity.SSHKey, error) {
-	loggedUser, err := r.getLoggedUser(ctx)
+func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
+	q, err := r.kg.DescriptionQuality(ctx, description)
 	if err != nil {
 		return nil, err
 	}
 
-	return &entity.SSHKey{
-		Public:       loggedUser.SSHKey.Public,
-		Private:      loggedUser.SSHKey.Private,
-		CreationDate: loggedUser.SSHKey.CreationDate,
-		LastActivity: loggedUser.SSHKey.LastActivity,
-	}, nil
-}
-
-func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
-	minWords := 50
-	enoughWords := 200
-
-	descriptionWords := len(strings.Fields(description))
-	quality := 0
-
-	if descriptionWords > enoughWords {
-		quality = 100
-	} else if descriptionWords > minWords {
-		quality = (descriptionWords - minWords) * 100 / (enoughWords - minWords)
-	}
-
-	return &model.QualityProjectDesc{
-		Quality: quality,
-	}, nil
+	return &model.QualityProjectDesc{Quality: q}, nil
 }
 
 func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) (*entity.KnowledgeGraph, error) {

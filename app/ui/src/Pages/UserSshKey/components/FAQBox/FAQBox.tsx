@@ -26,15 +26,19 @@ type Props = {
   title: string;
   desciption: string;
   action?: Action;
+  customAction?: JSX.Element;
   theme?: BOX_THEME;
+  loading?: boolean;
 };
 function FAQBox({
-  label,
-  title,
-  desciption,
-  action,
-  theme = BOX_THEME.DEFAULT,
-}: Props) {
+                  label,
+                  title,
+                  desciption,
+                  action,
+                  customAction,
+                  theme = BOX_THEME.DEFAULT,
+                  loading = false,
+                }: Props) {
   const [opened, setOpened] = useState(false);
 
   function toggleOpened() {
@@ -56,7 +60,9 @@ function FAQBox({
         title={title}
         desciption={desciption}
         action={action}
+        customAction={customAction}
         theme={theme}
+        loading={loading}
       />
     </AnimateHeight>
   );

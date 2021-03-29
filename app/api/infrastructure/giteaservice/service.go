@@ -91,6 +91,7 @@ func (g *giteaService) CreateRepo(name, ownerUsername string) error {
 	repo, _, err := g.client.AdminCreateRepo(kdlOrganization, gitea.CreateRepoOption{
 		Name:     name,
 		AutoInit: true,
+		Private:  true,
 	})
 
 	if err != nil {

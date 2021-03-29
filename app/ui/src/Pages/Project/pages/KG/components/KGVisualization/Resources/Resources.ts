@@ -1,7 +1,6 @@
 import { BaseType, Selection } from 'd3-selection';
 import { Quadtree, quadtree } from 'd3-quadtree';
 
-import { D } from '../KGVisualization';
 import { DComplete } from './../../../KGUtils';
 import { ScaleBand } from 'd3-scale';
 import { radialAxes } from '../radialAxis';
@@ -36,7 +35,7 @@ export default class Resources {
   clearCanvas: () => void;
   onShowTooltip: (e: MouseEvent, d: DComplete) => void;
   onHideTooltip: (element: BaseType) => void;
-  onResourceSelection: (d: D, left: number) => void;
+  onResourceSelection: (id: string, name: string, left: number) => void;
   center: { x: number; y: number };
   qt: Quadtree<DComplete>;
   moving: boolean;
@@ -48,7 +47,7 @@ export default class Resources {
     onShowTooltip: (e: MouseEvent, d: DComplete) => void,
     onHideTooltip: (element: BaseType) => void,
     container: Selection<SVGGElement, unknown, null, undefined>,
-    onResourceSelection: (d: D, left: number) => void,
+    onResourceSelection: (id: string, name: string, left: number) => void,
     context: CanvasRenderingContext2D | null,
     clearCanvas: () => void,
     center: { x: number; y: number },
@@ -265,7 +264,7 @@ export default class Resources {
       );
 
       if (resource) {
-        this.onResourceSelection(resource, -e.offsetX / 2);
+        this.onResourceSelection(resource.id, resource.name, -e.offsetX / 2);
       }
     }
   };

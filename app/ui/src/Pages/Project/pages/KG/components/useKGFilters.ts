@@ -1,12 +1,14 @@
-import { D, TopicSections } from './KGVisualization/KGVisualization';
 import { useCallback, useMemo, useState } from 'react';
+
+import { KGItem } from '../KG';
+import { TopicSections } from './KGVisualization/KGVisualization';
 
 export interface KGFilters {
   topics?: string[];
   showOthers?: boolean;
 }
 
-function useKGFilters(sections: TopicSections, resources: D[]) {
+function useKGFilters(sections: TopicSections, resources: KGItem[]) {
   const [filters, setFilters] = useState<KGFilters>({
     topics: Object.keys(sections),
     showOthers: true,
@@ -26,12 +28,11 @@ function useKGFilters(sections: TopicSections, resources: D[]) {
     return selectedTopics;
   }, [filters.topics, filters.showOthers]);
 
-  const filteredResources = useMemo<D[]>(() => {
-    return resources.filter(({ category }) => {
-      const isInCategory = filteredSections.includes(category);
-      return isInCategory;
-    });
-  }, [filters, resources]);
+  const filteredResources = useMemo<KGItem[]>(() => {
+    return resources.filter(({ topic }) =>
+      filteredSections.includes(topic?.name || '')
+    );
+  }, [filteredSections, resources]);
 
   return {
     filters,

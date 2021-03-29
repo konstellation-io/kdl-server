@@ -44,6 +44,7 @@ type Project struct {
 	Error              *string
 	Repository         Repository
 	Members            []Member
+	StarredKGItems     []string
 }
 
 // State is just a hardcoded field because we should think about it.

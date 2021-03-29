@@ -178,12 +178,22 @@ func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.Remo
 	return nil, entity.ErrNotImplemented
 }
 
-func (r *mutationResolver) SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error) {
-	return nil, entity.ErrNotImplemented
-}
+func (r *mutationResolver) SetStarredKGItem(ctx context.Context, input model.SetStarredKGItemInput) (*model.SetStarredKGItemResponse, error) {
+	starred, err := r.projects.UpdateStarred(ctx, project.UpdateStarredOption{
+		ProjectID: input.ProjectID,
+		KGItemID:  input.KgItemID,
+		Starred:   input.Starred,
+	})
+	res := model.SetStarredKGItemResponse{
+		ID:      input.ProjectID,
+		Starred: starred,
+	}
 
-func (r *mutationResolver) SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error) {
-	return nil, entity.ErrNotImplemented
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, nil
 }
 
 func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error) {
@@ -274,17 +284,13 @@ func (r *queryResolver) QualityProjectDesc(ctx context.Context, description stri
 	return &model.QualityProjectDesc{Quality: q}, nil
 }
 
-func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) (*entity.KnowledgeGraph, error) {
-	kg, err := r.kg.Get(ctx, description)
+func (r *queryResolver) KnowledgeGraph(ctx context.Context, projectID string) (*entity.KnowledgeGraph, error) {
+	p, err := r.projects.GetByID(ctx, projectID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &kg, nil
-}
-
-func (r *queryResolver) KnowledgeGraphItem(ctx context.Context, id string) (*entity.KnowledgeGraphItem, error) {
-	kg, err := r.kg.GetItem(ctx, id)
+	kg, err := r.kg.Graph(ctx, p)
 	if err != nil {
 		return nil, err
 	}
@@ -365,3 +371,23 @@ type queryResolver struct{ *Resolver }
 type repositoryResolver struct{ *Resolver }
 type sSHKeyResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) SSHKey(ctx context.Context) (*entity.SSHKey, error) {
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entity.SSHKey{
+		Public:       loggedUser.SSHKey.Public,
+		Private:      loggedUser.SSHKey.Private,
+		CreationDate: loggedUser.SSHKey.CreationDate,
+		LastActivity: loggedUser.SSHKey.LastActivity,
+	}, nil
+}

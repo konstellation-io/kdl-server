@@ -35,37 +35,7 @@ func (m *MockKGService) EXPECT() *MockKGServiceMockRecorder {
 	return m.recorder
 }
 
-// GetGraph mocks base method.
-func (m *MockKGService) GetGraph(ctx context.Context, description string) (entity.KnowledgeGraph, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetGraph", ctx, description)
-	ret0, _ := ret[0].(entity.KnowledgeGraph)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetGraph indicates an expected call of GetGraph.
-func (mr *MockKGServiceMockRecorder) GetGraph(ctx, description interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGraph", reflect.TypeOf((*MockKGService)(nil).GetGraph), ctx, description)
-}
-
-// GetItem mocks base method.
-func (m *MockKGService) GetItem(ctx context.Context, id string) (entity.KnowledgeGraphItem, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetItem", ctx, id)
-	ret0, _ := ret[0].(entity.KnowledgeGraphItem)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetItem indicates an expected call of GetItem.
-func (mr *MockKGServiceMockRecorder) GetItem(ctx, id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetItem", reflect.TypeOf((*MockKGService)(nil).GetItem), ctx, id)
-}
-
-// DescriptionQuality mocks base method
+// DescriptionQuality mocks base method.
 func (m *MockKGService) DescriptionQuality(ctx context.Context, description string) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DescriptionQuality", ctx, description)
@@ -74,8 +44,23 @@ func (m *MockKGService) DescriptionQuality(ctx context.Context, description stri
 	return ret0, ret1
 }
 
-// DescriptionQuality indicates an expected call of DescriptionQuality
+// DescriptionQuality indicates an expected call of DescriptionQuality.
 func (mr *MockKGServiceMockRecorder) DescriptionQuality(ctx, description interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescriptionQuality", reflect.TypeOf((*MockKGService)(nil).DescriptionQuality), ctx, description)
+}
+
+// Graph mocks base method.
+func (m *MockKGService) Graph(ctx context.Context, description string) (entity.KnowledgeGraph, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Graph", ctx, description)
+	ret0, _ := ret[0].(entity.KnowledgeGraph)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Graph indicates an expected call of Graph.
+func (mr *MockKGServiceMockRecorder) Graph(ctx, description interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Graph", reflect.TypeOf((*MockKGService)(nil).Graph), ctx, description)
 }

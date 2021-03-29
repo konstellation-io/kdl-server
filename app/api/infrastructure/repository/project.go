@@ -194,9 +194,7 @@ func (m *projectMongoDBRepo) SetStarredKGItem(ctx context.Context, projectID, kg
 
 	upd := bson.M{
 		"$push": bson.M{
-			"starred_kg_items": bson.M{
-				"$each": kgItemID,
-			},
+			"starred_kg_items": kgItemID,
 		},
 	}
 
@@ -218,9 +216,7 @@ func (m *projectMongoDBRepo) UnsetStarredKGItem(ctx context.Context, projectID, 
 
 	upd := bson.M{
 		"pull": bson.M{
-			"starred_kg_items": bson.M{
-				"$each": kgItemID,
-			},
+			"starred_kg_items": kgItemID,
 		},
 	}
 

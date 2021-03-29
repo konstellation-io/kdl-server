@@ -71,15 +71,15 @@ type SetBoolFieldInput struct {
 	Value bool   `json:"value"`
 }
 
-type SetStarredKGItemInput struct {
+type SetKGStarredInput struct {
 	ProjectID string `json:"projectId"`
 	KgItemID  string `json:"kgItemId"`
 	Starred   bool   `json:"starred"`
 }
 
-type SetStarredKGItemResponse struct {
-	ID      string `json:"id"`
-	Starred bool   `json:"starred"`
+type SetKGStarredRes struct {
+	KgItemID string `json:"kgItemId"`
+	Starred  bool   `json:"starred"`
 }
 
 type UpdateAccessLevelInput struct {

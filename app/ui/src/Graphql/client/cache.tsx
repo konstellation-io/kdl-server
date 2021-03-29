@@ -13,6 +13,8 @@ import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTool
 import { NewProject } from './models/NewProject';
 import { PanelInfo } from './models/Panel';
 
+type ToolName = keyof GetUserTools_project_toolUrls;
+
 export const initialProjectFilters: ProjectFilters = {
   name: '',
   selection: ProjectSelection.ACTIVE,
@@ -60,8 +62,6 @@ const initialStateUserSettings: UserSettings = {
     accessLevel: null,
   },
 };
-
-type ToolName = keyof GetUserTools_project_toolUrls;
 
 export const projectFilters = makeVar(initialProjectFilters);
 export const newProject = makeVar(initialNewProject);

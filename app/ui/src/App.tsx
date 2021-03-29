@@ -5,7 +5,7 @@ import {
   HttpLink,
 } from '@apollo/client';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
-import { Slide, ToastContainer, toast } from 'react-toastify';
+import { Slide, toast, ToastContainer } from 'react-toastify';
 
 import { CONFIG } from 'index';
 import GenerateApiToken from 'Pages/GenerateApiToken/GenerateApiToken';

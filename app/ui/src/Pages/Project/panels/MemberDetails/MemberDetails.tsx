@@ -1,25 +1,25 @@
 import { Button, Select } from 'kwc';
+import {
+  GetProjectMembers,
+  GetProjectMembersVariables,
+  GetProjectMembers_project_members,
+} from 'Graphql/queries/types/GetProjectMembers';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import ActionsBar from 'Components/Layout/ActionsBar/ActionsBar';
 import ConfirmAction from 'Components/Layout/ConfirmAction/ConfirmAction';
+import { GetMe } from 'Graphql/queries/types/GetMe';
 import Gravatar from 'react-gravatar';
 import IconDate from '@material-ui/icons/Today';
 import IconRemove from '@material-ui/icons/Delete';
 import IconTime from '@material-ui/icons/Schedule';
 import { formatDate } from 'Utils/format';
+import { loader } from 'graphql.macro';
 import styles from './MemberDetails.module.scss';
 import { useForm } from 'react-hook-form';
 import useMember from 'Graphql/hooks/useMember';
-import {
-  GetProjectMembers,
-  GetProjectMembers_project_members,
-  GetProjectMembersVariables,
-} from 'Graphql/queries/types/GetProjectMembers';
 import { useQuery } from '@apollo/client';
-import { GetMe } from 'Graphql/queries/types/GetMe';
-import { loader } from 'graphql.macro';
 
 const GetMeQuery = loader('Graphql/queries/getMe.graphql');
 const GetMembersQuery = loader('Graphql/queries/getProjectMembers.graphql');

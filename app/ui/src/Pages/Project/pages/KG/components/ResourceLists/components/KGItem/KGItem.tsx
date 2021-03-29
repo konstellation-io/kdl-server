@@ -1,34 +1,25 @@
 import React, { FC } from 'react';
 
-import { D } from '../../../KGVisualization/KGVisualization';
 import IconStar from '@material-ui/icons/Star';
 import IconTime from '@material-ui/icons/AccessTime';
+import { KGItem as KGItemType } from 'Pages/Project/pages/KG/KG';
 import Score from '../../../KGVisualization/Score';
 import cx from 'classnames';
 import { formatDate } from 'Utils/format';
 import styles from './KGItem.module.scss';
 
 type Props = {
-  resource: D;
-  onClick: (resource: D) => void;
+  resource: KGItemType;
+  onClick: (resource: KGItemType) => void;
   onEnter: (name: string) => void;
   onLeave: () => void;
-  idToFullResource: { [key: string]: any };
 };
-const KGItem: FC<Props> = ({
-  resource,
-  onClick,
-  onLeave,
-  onEnter,
-  idToFullResource,
-}: Props) => {
-  const fullResource = idToFullResource[resource.id];
-
+const KGItem: FC<Props> = ({ resource, onClick, onLeave, onEnter }: Props) => {
   return (
     <div
       key={resource.id}
       className={cx(styles.resource, { [styles.starred]: resource.starred })}
-      onMouseEnter={() => onEnter(resource.name)}
+      onMouseEnter={() => onEnter(resource.title)}
       onMouseLeave={onLeave}
       onClick={() => onClick(resource)}
     >
@@ -37,15 +28,15 @@ const KGItem: FC<Props> = ({
           <div className={styles.timeField}>
             <IconTime className="icon-regular" />
             <span className={styles.rType}>
-              {formatDate(fullResource.date)}
+              {formatDate(new Date(resource.date))}
             </span>
           </div>
-          {fullResource.topics.length !== 0 && (
+          {resource.topics.length !== 0 && (
             <div className={styles.topics}>
-              <span className={styles.topic}>{resource.category}</span>
-              {fullResource.topics.length > 1 && (
+              <span className={styles.topic}>{resource.topics[0].name}</span>
+              {resource.topics.length > 1 && (
                 <span className={styles.topic}>
-                  + {fullResource.topics.length - 1}
+                  + {resource.topics.length - 1}
                 </span>
               )}
             </div>
@@ -59,9 +50,9 @@ const KGItem: FC<Props> = ({
             <IconStar className="icon-small" />
           </div>
         )}
-        {resource.name}
+        {resource.title}
       </div>
-      <div className={styles.rCategory}>{resource.type}</div>
+      <div className={styles.rCategory}>{resource.category}</div>
     </div>
   );
 };

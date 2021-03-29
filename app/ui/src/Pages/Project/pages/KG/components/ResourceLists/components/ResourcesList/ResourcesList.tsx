@@ -1,19 +1,18 @@
-import { D } from '../../../KGVisualization/KGVisualization';
 import IconSearch from '@material-ui/icons/Search';
 import KGItem from '../KGItem/KGItem';
+import { KGItem as KGItemType } from 'Pages/Project/pages/KG/KG';
 import React from 'react';
 import { TextInput } from 'kwc';
 import styles from './ResourcesList.module.scss';
 
 type Props = {
-  onClick: (resource: D) => void;
+  onClick: (resource: KGItemType) => void;
   onEnter: (name: string) => void;
   onLeave: () => void;
   onChangeFilterText: (filter: string) => void;
   filterText: string;
-  resources: D[];
+  resources: KGItemType[];
   header?: JSX.Element | null;
-  idToFullResource: { [key: string]: any };
 };
 function ResourcesList({
   header = null,
@@ -23,7 +22,6 @@ function ResourcesList({
   onLeave,
   onChangeFilterText,
   filterText,
-  idToFullResource,
 }: Props) {
   return (
     <div className={styles.list}>
@@ -47,7 +45,6 @@ function ResourcesList({
             onLeave={onLeave}
             onClick={onClick}
             resource={r}
-            idToFullResource={idToFullResource}
           />
         ))}
       </div>

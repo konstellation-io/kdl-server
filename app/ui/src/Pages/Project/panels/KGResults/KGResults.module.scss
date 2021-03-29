@@ -16,6 +16,10 @@
   flex-grow: 1;
   height: 100%;
   width: 100%;
+
+  & > div {
+    padding: 1.25 * $grid-unit 0 1.25 * $grid-unit 1.25 * $grid-unit;
+  }
 }
 
 .info {

@@ -13,7 +13,6 @@ type Props = {
   onResourceClick: (d: D, left: number) => void;
   scores?: [number, number];
   idToFullResource: { [key: string]: any };
-  showTopResources?: boolean;
 };
 function ResourceLists({
   starredResources,
@@ -21,7 +20,6 @@ function ResourceLists({
   onResourceClick,
   scores = [1, 0],
   idToFullResource,
-  showTopResources = true,
 }: Props) {
   const [listFilterText, setListFilterText] = useState('');
 
@@ -76,31 +74,27 @@ function ResourceLists({
         className={styles.tabSection}
       >
         <TabList>
-          {showTopResources && (
-            <Tab>{`LIST (${filteredAllTopics.length})`}</Tab>
-          )}
+          <Tab>{`LIST (${filteredAllTopics.length})`}</Tab>
           <Tab>{`STARRED (${starredResources.length})`}</Tab>
         </TabList>
         <div className={styles.tabContainer}>
-          {showTopResources && (
-            <TabPanel>
-              <ResourcesList
-                header={listHeader}
-                resources={filteredAllTopics}
-                filterText={listFilterText}
-                onClick={onSelectResource}
-                onEnter={onEnter}
-                onLeave={onLeave}
-                onChangeFilterText={setListFilterText}
-                idToFullResource={idToFullResource}
-                noItems={{
-                  title: 'No items in the KG!',
-                  subTitle:
-                    'Please, provide us a better description of your project.',
-                }}
-              />
-            </TabPanel>
-          )}
+          <TabPanel>
+            <ResourcesList
+              header={listHeader}
+              resources={filteredAllTopics}
+              filterText={listFilterText}
+              onClick={onSelectResource}
+              onEnter={onEnter}
+              onLeave={onLeave}
+              onChangeFilterText={setListFilterText}
+              idToFullResource={idToFullResource}
+              noItems={{
+                title: 'No items in the KG!',
+                subTitle:
+                  'Please, provide us a better description of your project.',
+              }}
+            />
+          </TabPanel>
           <TabPanel>
             <ResourcesList
               resources={starredResources}
@@ -112,7 +106,8 @@ function ResourceLists({
               idToFullResource={idToFullResource}
               noItems={{
                 title: 'No starred items yet!',
-                subTitle: "Once you favourite an item you'll see them here.",
+                subTitle:
+                  "Once you favourite an item you'll see them here. Go to the KG to choose your favorites.",
               }}
             />
           </TabPanel>

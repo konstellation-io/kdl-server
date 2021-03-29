@@ -11,8 +11,8 @@ import styles from './KGItem.module.scss';
 type Props = {
   resource: D;
   onClick: (resource: D) => void;
-  onEnter: (name: string) => void;
-  onLeave: () => void;
+  onEnter?: (name: string) => void;
+  onLeave?: () => void;
   idToFullResource: { [key: string]: any };
 };
 const KGItem: FC<Props> = ({
@@ -28,7 +28,7 @@ const KGItem: FC<Props> = ({
     <div
       key={resource.id}
       className={cx(styles.resource, { [styles.starred]: resource.starred })}
-      onMouseEnter={() => onEnter(resource.name)}
+      onMouseEnter={() => onEnter && onEnter(resource.name)}
       onMouseLeave={onLeave}
       onClick={() => onClick(resource)}
     >

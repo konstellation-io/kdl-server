@@ -8,8 +8,8 @@ import NoItems, { NoItemsProps } from '../NoItems/NoItems';
 
 type Props = {
   onClick: (resource: D) => void;
-  onEnter: (name: string) => void;
-  onLeave: () => void;
+  onEnter?: (name: string) => void;
+  onLeave?: () => void;
   onChangeFilterText: (filter: string) => void;
   filterText: string;
   resources: D[];

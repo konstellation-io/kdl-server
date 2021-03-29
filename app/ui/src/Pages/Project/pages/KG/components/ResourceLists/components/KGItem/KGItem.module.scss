@@ -76,5 +76,10 @@
     padding: 0.5 * $grid-unit $grid-unit;
     border-radius: 0.5 * $grid-unit;
     margin-right: $grid-unit;
+
+    white-space: pre;
+    max-width: 15 * $grid-unit;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 }

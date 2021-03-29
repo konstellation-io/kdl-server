@@ -7,6 +7,7 @@ import Score from '../../../KGVisualization/Score';
 import cx from 'classnames';
 import { formatDate } from 'Utils/format';
 import styles from './KGItem.module.scss';
+import { GetKnowledgeGraph_knowledgeGraph_items_topics } from 'Graphql/queries/types/GetKnowledgeGraph';
 
 type Props = {
   resource: D;
@@ -23,6 +24,9 @@ const KGItem: FC<Props> = ({
   idToFullResource,
 }: Props) => {
   const fullResource = idToFullResource[resource.id];
+  const allTopicsButFirst = fullResource.topics
+    .slice(1)
+    .map((t: GetKnowledgeGraph_knowledgeGraph_items_topics) => t.name);
 
   return (
     <div
@@ -42,9 +46,14 @@ const KGItem: FC<Props> = ({
           </div>
           {fullResource.topics.length !== 0 && (
             <div className={styles.topics}>
-              <span className={styles.topic}>{resource.category}</span>
+              <span className={styles.topic} title={resource.category}>
+                {resource.category}
+              </span>
               {fullResource.topics.length > 1 && (
-                <span className={styles.topic}>
+                <span
+                  className={styles.topic}
+                  title={allTopicsButFirst.join('\n')}
+                >
                   + {fullResource.topics.length - 1}
                 </span>
               )}

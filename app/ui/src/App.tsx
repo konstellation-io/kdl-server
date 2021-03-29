@@ -28,7 +28,6 @@ const routesWithTopBar = [
   ROUTE.HOME,
   ROUTE.PROJECT,
   ROUTE.USER_SSH_KEY,
-  ROUTE.USER_API_TOKENS,
 ];
 
 function Routes() {

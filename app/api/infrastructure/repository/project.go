@@ -183,7 +183,7 @@ func (m *projectMongoDBRepo) UpdateDescription(ctx context.Context, projectID, d
 
 // SetStarredKGItem adds a kgItem to starred list.
 func (m *projectMongoDBRepo) SetStarredKGItem(ctx context.Context, projectID, kgItemID string) error {
-	m.logger.Debugf("Starring %d in project \"%s\"...", kgItemID, projectID)
+	m.logger.Debugf("Starring %s in project \"%s\"...", kgItemID, projectID)
 
 	pID, err := primitive.ObjectIDFromHex(projectID)
 	if err != nil {
@@ -205,7 +205,7 @@ func (m *projectMongoDBRepo) SetStarredKGItem(ctx context.Context, projectID, kg
 
 // UnsetStarredKGItem unsets a kgItem from starred list.
 func (m *projectMongoDBRepo) UnsetStarredKGItem(ctx context.Context, projectID, kgItemID string) error {
-	m.logger.Debugf("Unstarring %d in project \"%s\"...", kgItemID, projectID)
+	m.logger.Debugf("Unstarring %s in project \"%s\"...", kgItemID, projectID)
 
 	pID, err := primitive.ObjectIDFromHex(projectID)
 	if err != nil {
@@ -215,7 +215,7 @@ func (m *projectMongoDBRepo) UnsetStarredKGItem(ctx context.Context, projectID, 
 	filter := bson.M{"_id": pID}
 
 	upd := bson.M{
-		"pull": bson.M{
+		"$pull": bson.M{
 			"starred_kg_items": kgItemID,
 		},
 	}

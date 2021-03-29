@@ -130,6 +130,10 @@ module.exports = {
     removeApiToken: (_, {input: {apiTokenId}}) => ({
       id: apiTokenId,
     }),
+    regenerateSSHKey: () => ({
+      id: meId,
+      sshKey: this.SSHKey,
+    }),
     setKGStarred: (_, {input: {kgItemId, starred}}) => ({
       kgItemId,
       starred,

@@ -18,6 +18,10 @@ class KGServiceStub:
         request: global___DescriptionQualityReq,
     ) -> global___DescriptionQualityRes: ...
 
+    def GetDescriptionQuality(self,
+        request: global___DescriptionQualityReq,
+    ) -> global___DescriptionQualityRes: ...
+
 
 class KGServiceServicer(metaclass=abc.ABCMeta):
     @abc.abstractmethod
@@ -25,6 +29,12 @@ class KGServiceServicer(metaclass=abc.ABCMeta):
         request: global___GetGraphReq,
         context: grpc.ServicerContext,
     ) -> global___GetGraphRes: ...
+
+    @abc.abstractmethod
+    def GetDescriptionQuality(self,
+        request: global___DescriptionQualityReq,
+        context: grpc.ServicerContext,
+    ) -> global___DescriptionQualityRes: ...
 
     @abc.abstractmethod
     def GetDescriptionQuality(self,

@@ -185,7 +185,7 @@ func (r *mutationResolver) SetKGStarred(ctx context.Context, input model.SetKGSt
 		Starred:   input.Starred,
 	})
 	res := model.SetKGStarredRes{
-		KgItemID: input.ProjectID,
+		KgItemID: input.KgItemID,
 		Starred:  starred,
 	}
 

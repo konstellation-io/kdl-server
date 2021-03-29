@@ -46,9 +46,3 @@ func (i *interactor) DescriptionQuality(ctx context.Context, description string)
 	i.logger.Infof("Getting quality of description  \"%s\"", description)
 	return i.kgService.DescriptionQuality(ctx, description)
 }
-
-// DescriptionQuality gets description quality.
-func (i *interactor) DescriptionQuality(ctx context.Context, description string) (int, error) {
-	i.logger.Infof("Getting quality of description  \"%s\"", description)
-	return i.kgService.DescriptionQuality(ctx, description)
-}

@@ -1,6 +1,6 @@
-mutation SetStarredKGItem($input: SetStarredKGItemInput!) {
-  setStarredKGItem(input: $input) {
-    id
+mutation SetStarredKGItem($input: SetKGStarredInput!) {
+  setKGStarred(input: $input) {
+    kgItemId
     starred
   }
 }

@@ -1,13 +1,5 @@
-import {
-  InMemoryCache,
-  defaultDataIdFromObject,
-  makeVar,
-} from '@apollo/client';
-import {
-  ProjectFilters,
-  ProjectOrder,
-  ProjectSelection,
-} from './models/ProjectFilters';
+import { defaultDataIdFromObject, InMemoryCache, makeVar, } from '@apollo/client';
+import { ProjectFilters, ProjectOrder, ProjectSelection, } from './models/ProjectFilters';
 import { UserSelection, UserSettings } from './models/UserSettings';
 
 import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
@@ -107,8 +99,8 @@ const cache = new InMemoryCache({
   },
   dataIdFromObject(responseObj) {
     switch (responseObj.__typename) {
-      case 'SetStarredKGItemResponse':
-        return `KnowledgeGraphItem:${responseObj.id}`;
+      case 'SetKGStarredRes':
+        return `KnowledgeGraphItem:${responseObj.kgItemId}`;
       default:
         return defaultDataIdFromObject(responseObj);
     }

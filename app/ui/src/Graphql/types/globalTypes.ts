@@ -85,7 +85,7 @@ export interface SetActiveUserToolsInput {
   active: boolean;
 }
 
-export interface SetStarredKGItemInput {
+export interface SetKGStarredInput {
   projectId: string;
   kgItemId: string;
   starred: boolean;

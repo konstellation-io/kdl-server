@@ -120,27 +120,27 @@ module.exports = {
 
       return project;
     },
-    updateMember: (_, { input: { userId, accessLevel, projectId } }) => {
-      const project = projects.find(({ id }) => id === projectId);
-      const member = project.members.find(({ user }) => user.id === userId);
+    updateMember: (_, {input: {userId, accessLevel, projectId}}) => {
+      const project = projects.find(({id}) => id === projectId);
+      const member = project.members.find(({user}) => user.id === userId);
       member.accessLevel = accessLevel;
 
       return project;
     },
-    removeApiToken: (_, { input: { apiTokenId } }) => ({
+    removeApiToken: (_, {input: {apiTokenId}}) => ({
       id: apiTokenId,
     }),
-    setStarredKGItem: (_, { input: { kgItemId, starred } }) => ({
-      id: kgItemId,
+    setKGStarred: (_, {input: {kgItemId, starred}}) => ({
+      kgItemId,
       starred,
     }),
     addApiToken: this.ApiToken,
-    updateAccessLevel: (_, { input: { userIds, accessLevel } }) =>
+    updateAccessLevel: (_, {input: {userIds, accessLevel}}) =>
       userIds.map((userId) => ({
         id: userId,
         accessLevel,
       })),
-    removeUsers: (_, { input: { userIds } }) =>
+    removeUsers: (_, {input: {userIds}}) =>
       userIds.map((userId) => ({
         id: userId,
       })),

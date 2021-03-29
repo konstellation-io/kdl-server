@@ -65,10 +65,6 @@ export interface RemoveMemberInput {
   userId: string;
 }
 
-export interface RemoveUsersInput {
-  userIds: string[];
-}
-
 export interface RepositoryInput {
   type: RepositoryType;
   external?: ExternalRepository | null;

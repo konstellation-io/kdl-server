@@ -1,4 +1,4 @@
-import { Check, ContextMenu, MenuCallToAction } from 'kwc';
+import { Check, Select } from 'kwc';
 import { Column, Row, useRowSelect, useSortBy, useTable } from 'react-table';
 import {
   GET_USER_SETTINGS,
@@ -6,13 +6,12 @@ import {
   GetUserSettings_filters,
 } from 'Graphql/client/queries/getUserSettings.graphql';
 import React, { useEffect, useMemo } from 'react';
-import { capitalize, get } from 'lodash';
+import { get } from 'lodash';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import { GetUsers_users } from 'Graphql/queries/types/GetUsers';
 import IconArrowDown from '@material-ui/icons/ArrowDropDown';
 import IconArrowUp from '@material-ui/icons/ArrowDropUp';
-import IconOptions from '@material-ui/icons/MoreVert';
 import Message from 'Components/Message/Message';
 import { UserSelection } from 'Graphql/client/models/UserSettings';
 import cx from 'classnames';
@@ -20,6 +19,7 @@ import { formatDate } from 'Utils/format';
 import styles from './UserList.module.scss';
 import { useQuery } from '@apollo/client';
 import useUserSettings from 'Graphql/client/hooks/useUserSettings';
+import useUser from '../../../../Graphql/hooks/useUser';
 
 type Data = {
   creationDate: string;
@@ -29,37 +29,6 @@ type Data = {
   lastActivity: string | null;
   selectedRowIds?: string[];
 };
-
-const columns: Column<Data>[] = [
-  {
-    Header: 'Date added',
-    accessor: 'creationDate',
-    Cell: ({ value }) => formatDate(new Date(value)),
-  },
-  {
-    Header: 'User email',
-    accessor: 'email',
-  },
-  {
-    Header: 'Username',
-    accessor: 'username',
-  },
-  {
-    Header: 'Access level',
-    accessor: 'accessLevel',
-    Cell: ({ value }) => capitalize(value),
-  },
-  {
-    Header: 'Last activity',
-    accessor: 'lastActivity',
-    Cell: ({ value }) => {
-      if (value === null) {
-        return '-';
-      }
-      return formatDate(new Date(value), true);
-    },
-  },
-];
 
 function TableColCheck({
   indeterminate,
@@ -91,10 +60,11 @@ function rowNotFiltered(row: GetUsers_users, filters: GetUserSettings_filters) {
 
 type Props = {
   users: GetUsers_users[];
-  contextMenuActions: MenuCallToAction[];
 };
-function UsersTable({ users, contextMenuActions }: Props) {
+
+function UsersTable({ users }: Props) {
   const { updateSelection } = useUserSettings();
+  const { updateUsersAccessLevel } = useUser();
 
   const { data: localData } = useQuery<GetUserSettings>(GET_USER_SETTINGS);
   const userSelection = get(
@@ -115,6 +85,60 @@ function UsersTable({ users, contextMenuActions }: Props) {
   const actSelectedUsers = localData?.userSettings.selectedUserIds || [];
   const initialStateSelectedRowIds = Object.fromEntries(
     data.map((user, idx) => [idx, actSelectedUsers.includes(user.id)])
+  );
+
+  const columns: Column<Data>[] = useMemo(
+    () => [
+      {
+        Header: 'Date added',
+        accessor: 'creationDate',
+        Cell: ({ value }) => formatDate(new Date(value)),
+      },
+      {
+        Header: 'User email',
+        accessor: 'email',
+      },
+      {
+        Header: 'Username',
+        accessor: 'username',
+      },
+      {
+        Header: 'Access level',
+        accessor: 'accessLevel',
+        Cell: ({ value, row }) => {
+          return (
+            <div className={styles.levelSelector}>
+              <Select
+                options={Object.keys(AccessLevel)}
+                formSelectedOption={value}
+                valuesMapper={{
+                  [AccessLevel.ADMIN]: 'Administrator',
+                  [AccessLevel.MANAGER]: 'Manager',
+                  [AccessLevel.VIEWER]: 'Viewer',
+                }}
+                height={30}
+                onChange={(newValue: AccessLevel) => {
+                  // @ts-ignore
+                  updateUsersAccessLevel([row.original.id], newValue);
+                }}
+                hideError
+              />
+            </div>
+          );
+        },
+      },
+      {
+        Header: 'Last activity',
+        accessor: 'lastActivity',
+        Cell: ({ value }) => {
+          if (value === null) {
+            return '-';
+          }
+          return formatDate(new Date(value), true);
+        },
+      },
+    ],
+    []
   );
 
   const {
@@ -150,20 +174,6 @@ function UsersTable({ users, contextMenuActions }: Props) {
           ),
         },
         ...cols,
-        {
-          id: 'options',
-          Cell: ({ row }: { row: Row }) => (
-            <ContextMenu
-              actions={contextMenuActions}
-              contextObject={get(row, 'original.id', '')}
-              openOnLeftClick
-            >
-              <div className={styles.options}>
-                <IconOptions className="icon-regular" />
-              </div>
-            </ContextMenu>
-          ),
-        },
       ]);
     }
   );
@@ -213,34 +223,35 @@ function UsersTable({ users, contextMenuActions }: Props) {
     return <Message text="There are no users with the applied filters" />;
 
   return (
-    <table {...getTableProps()} className={styles.table}>
-      <thead>
+    <div className={styles.container}>
+      <table {...getTableProps()} className={styles.table}>
+        <thead>
         {headerGroups.map((headerGroup) => (
           <tr {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
               <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                 {column.render('Header')}
                 <span>
-                  {column.isSorted ? (
-                    column.isSortedDesc ? (
-                      <span className={styles.sortIcon}>
-                        <IconArrowDown className="icon-regular" />
-                      </span>
+                    {column.isSorted ? (
+                      column.isSortedDesc ? (
+                        <span className={styles.sortIcon}>
+                          <IconArrowDown className="icon-regular"/>
+                        </span>
+                      ) : (
+                        <span className={styles.sortIcon}>
+                          <IconArrowUp className="icon-regular"/>
+                        </span>
+                      )
                     ) : (
-                      <span className={styles.sortIcon}>
-                        <IconArrowUp className="icon-regular" />
-                      </span>
-                    )
-                  ) : (
-                    ''
-                  )}
-                </span>
+                      ''
+                    )}
+                  </span>
               </th>
             ))}
           </tr>
         ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
+        </thead>
+        <tbody {...getTableBodyProps()}>
         {rows.map((row) => {
           prepareRow(row);
           return (
@@ -251,8 +262,9 @@ function UsersTable({ users, contextMenuActions }: Props) {
             </tr>
           );
         })}
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
   );
 }
 

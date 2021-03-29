@@ -1,28 +1,52 @@
 import { Button, Left, Right } from 'kwc';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
-import ROUTE from 'Constants/routes';
 import React from 'react';
 import UserActions from './UserActions';
 import UserFilters from './UserFilters';
+import IconSync from '@material-ui/icons/Cached';
 import styles from './UserFiltersAndActions.module.scss';
+import { useMutation } from '@apollo/client';
+import { loader } from 'graphql.macro';
+
+import { SyncUsers } from 'Graphql/mutations/types/SyncUsers';
+
+const syncUsersMutation = loader('Graphql/mutations/syncUsers.graphql');
 
 type Props = {
-  onDeleteUsers: () => void;
   onUpdateAccessLevel: (newAccessLevel: AccessLevel) => void;
 };
-function UserFiltersAndActions({ onDeleteUsers, onUpdateAccessLevel }: Props) {
+
+function UserFiltersAndActions({ onUpdateAccessLevel }: Props) {
+  const [syncUsers, { loading }] = useMutation<SyncUsers>(syncUsersMutation);
+
+  function onManageUsers() {
+    window.open();
+  }
+
+  function onSync() {
+    syncUsers();
+  }
+
   return (
     <div className={styles.container}>
       <Left className={styles.left}>
-        <UserFilters />
-        <UserActions
-          onDeleteUsers={onDeleteUsers}
-          onUpdateUsers={onUpdateAccessLevel}
-        />
+        <UserFilters/>
+        <UserActions onUpdateUsers={onUpdateAccessLevel}/>
       </Left>
-      <Right>
-        <Button label="NEW USER" to={ROUTE.NEW_USER} border />
+      <Right className={styles.buttons}>
+        <div>
+          <Button
+            Icon={IconSync}
+            label="SYNCHRONIZE"
+            onClick={onSync}
+            loading={loading}
+            border
+          />
+        </div>
+        <div>
+          <Button label="MANAGE USERS" onClick={onManageUsers} border/>
+        </div>
       </Right>
     </div>
   );

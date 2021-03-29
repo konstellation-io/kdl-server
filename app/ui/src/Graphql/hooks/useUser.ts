@@ -1,21 +1,13 @@
 import { AddUser, AddUserVariables } from 'Graphql/mutations/types/AddUser';
 import { ApolloCache, FetchResult, useMutation } from '@apollo/client';
 import { GetUsers, GetUsers_users } from 'Graphql/queries/types/GetUsers';
-import {
-  RemoveUsers,
-  RemoveUsersVariables,
-} from './../mutations/types/RemoveUsers';
-import {
-  UpdateAccessLevel,
-  UpdateAccessLevelVariables,
-} from './../mutations/types/UpdateAccessLevel';
+import { UpdateAccessLevel, UpdateAccessLevelVariables, } from '../mutations/types/UpdateAccessLevel';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import { loader } from 'graphql.macro';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 
 const AddUserMutation = loader('Graphql/mutations/addUser.graphql');
-const RemoveUsersMutation = loader('Graphql/mutations/removeUsers.graphql');
 const UpdateAccessLevelMutation = loader(
   'Graphql/mutations/updateAccessLevel.graphql'
 );
@@ -38,14 +30,6 @@ export default function useUser(onCompleteAddUser?: () => void) {
     update: updateCacheAdd,
   });
 
-  const [mutationRemoveUsers] = useMutation<RemoveUsers, RemoveUsersVariables>(
-    RemoveUsersMutation,
-    {
-      onError: (e) => console.error(`removeUsers: ${e}`),
-      update: updateCacheRemove,
-    }
-  );
-
   const [mutationUpdateAccessLevel] = useMutation<
     UpdateAccessLevel,
     UpdateAccessLevelVariables
@@ -54,7 +38,7 @@ export default function useUser(onCompleteAddUser?: () => void) {
   });
 
   function updateCache(
-    cache: ApolloCache<AddUser | RemoveUsers>,
+    cache: ApolloCache<AddUser>,
     write: (users: GetUsers_users[]) => void
   ) {
     const cacheResult = cache.readQuery<GetUsers>({
@@ -82,33 +66,8 @@ export default function useUser(onCompleteAddUser?: () => void) {
     }
   }
 
-  function updateCacheRemove(
-    cache: ApolloCache<RemoveUsers>,
-    { data: dataRemove }: FetchResult<RemoveUsers>
-  ) {
-    if (dataRemove && dataRemove.removeUsers) {
-      updateCache(cache, (users) =>
-        cache.writeQuery({
-          query: GetUsersQuery,
-          data: {
-            users: users.filter(
-              (user) =>
-                !dataRemove.removeUsers
-                  .map((removedUser) => removedUser.id)
-                  .includes(user.id)
-            ),
-          },
-        })
-      );
-    }
-  }
-
   function addNewUser(newUser: NewUserParams) {
     mutationAddUser(mutationPayloadHelper(newUser));
-  }
-
-  function removeUsersById(userIds: string[]) {
-    mutationRemoveUsers(mutationPayloadHelper({ userIds }));
   }
 
   function updateUsersAccessLevel(userIds: string[], accessLevel: AccessLevel) {
@@ -117,7 +76,6 @@ export default function useUser(onCompleteAddUser?: () => void) {
 
   return {
     addNewUser,
-    removeUsersById,
     updateUsersAccessLevel,
     add: { loading, error },
   };

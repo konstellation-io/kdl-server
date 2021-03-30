@@ -90,6 +90,16 @@ export interface UpdateAccessLevelInput {
   accessLevel: AccessLevel;
 }
 
+export interface UpdateExternalRepositoryInput {
+  url: string;
+  username: string;
+  token: string;
+}
+
+export interface UpdateInternalRepositoryInput {
+  name: string;
+}
+
 export interface UpdateMemberInput {
   projectId: string;
   userId: string;
@@ -104,7 +114,9 @@ export interface UpdateProjectInput {
 }
 
 export interface UpdateProjectRepositoryInput {
-  url: string;
+  type: RepositoryType;
+  external?: UpdateExternalRepositoryInput | null;
+  internal?: UpdateInternalRepositoryInput | null;
 }
 
 //==============================================================

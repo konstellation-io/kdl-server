@@ -137,7 +137,19 @@ input UpdateMemberInput {
 }
 
 input UpdateProjectRepositoryInput {
+  type: RepositoryType!
+  external: UpdateExternalRepositoryInput
+  internal: UpdateInternalRepositoryInput
+}
+
+input UpdateInternalRepositoryInput {
+  name: String!
+}
+
+input UpdateExternalRepositoryInput {
   url: String!
+  username: String!
+  token: String!
 }
 
 input RemoveUsersInput {

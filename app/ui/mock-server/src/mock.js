@@ -147,8 +147,12 @@ module.exports = {
         ...generatedProject,
         ...input,
         repository: {
-          ...input.repository,
-          connected: false,
+          type: input.repository.type,
+          url:
+            input.repository.type === 'INTERNAL'
+              ? `${casual.url}${input.repository.internal.name}`
+              : input.repository.external.url,
+          error: false,
         },
         members: [],
       };
@@ -181,7 +185,7 @@ module.exports = {
     id: casual.uuid,
     type: casual.random_element(['INTERNAL', 'EXTERNAL']),
     url: casual.url,
-    connected: casual.boolean,
+    error: false,
   }),
   SSHKey: () => ({
     public: casual.uuid,

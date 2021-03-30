@@ -10,10 +10,10 @@ import { toast } from 'react-toastify';
 
 type Props = {
   projectId: string;
-  isArchived: boolean;
+  archived: boolean;
 };
 
-function TabDangerZone({ projectId, isArchived }: Props) {
+function TabDangerZone({ projectId, archived }: Props) {
   const {
     archiveProjectAction: { updateProjectArchived, loading },
   } = useProject({ onUpdateCompleted: handleUpdateCompleted });
@@ -35,7 +35,7 @@ function TabDangerZone({ projectId, isArchived }: Props) {
           default, archived projects are hidden)."
         action={{
           label: 'ARCHIVE',
-          onClick: () => updateProjectArchived(projectId, !isArchived),
+          onClick: () => updateProjectArchived(projectId, !archived),
           Icon: IconArchive,
           disabled: loading,
           loading,

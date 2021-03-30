@@ -51,10 +51,7 @@ function ProjectSettings({
             <TabMembers projectId={project.id} />
           </TabPanel>
           <TabPanel>
-            <TabDangerZone
-              projectId={project.id}
-              isArchived={project.archived}
-            />
+            <TabDangerZone projectId={project.id} archived={project.archived} />
           </TabPanel>
         </div>
       </Tabs>

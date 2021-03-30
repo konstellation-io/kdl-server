@@ -4,14 +4,13 @@ import styles from './ProjectIcon.module.scss';
 import cx from 'classnames';
 
 interface AdditionalProps {
-  isArchived: boolean;
+  archived: boolean;
 }
 
 const ProjectIcon = (props: AdditionalProps & SvgIconProps) => (
   <SvgIcon
-    className={cx(props.className, {
-      [styles.STARTED]: !props.isArchived,
-      [styles.ARCHIVED]: props.isArchived,
+    className={cx(styles.icon, props.className, {
+      [styles.ARCHIVED]: props.archived,
     })}
   >
     <g>

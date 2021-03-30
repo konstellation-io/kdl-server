@@ -73,7 +73,7 @@ function useBreadcrumbs() {
     crumbs.push({
       crumbText: name,
       LeftIconComponent: (
-        <ProjectIcon className="icon-regular" isArchived={archived} />
+        <ProjectIcon className="icon-regular" archived={archived} />
       ),
       RightIconComponent: ExpandMoreIcon,
       BottomComponent: (props: BottomComponentProps) => (

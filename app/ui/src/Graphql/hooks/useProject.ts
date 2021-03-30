@@ -101,12 +101,12 @@ export default function useProject(options?: UseProjectParams) {
 
   function updateProjectInternalRepo(
     id: string,
-    name: UpdateInternalRepositoryInput
+    internal: UpdateInternalRepositoryInput
   ) {
     mutationUpdateProject(
       mutationPayloadHelper({
         id,
-        repository: { type: RepositoryType.INTERNAL, name },
+        repository: { type: RepositoryType.INTERNAL, internal },
       })
     );
   }

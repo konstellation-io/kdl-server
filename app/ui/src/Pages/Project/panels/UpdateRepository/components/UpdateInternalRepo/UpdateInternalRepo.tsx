@@ -15,7 +15,7 @@ function UpdateInternalRepo({ close, project }: UpdateRepoProps) {
   const { updateProjectInternalRepo } = useProject();
 
   const url = project.repository?.url || '';
-  const extractedSlug = url.split('/').pop();
+  const extractedName = url.split('/').pop();
 
   const {
     handleSubmit,
@@ -26,20 +26,20 @@ function UpdateInternalRepo({ close, project }: UpdateRepoProps) {
     unregister,
   } = useForm({
     defaultValues: {
-      slug: extractedSlug,
+      name: extractedName,
     },
   });
 
   useEffect(() => {
-    register('slug', {
+    register('name', {
       required: 'This field is mandatory',
       validate: validateSlug,
     });
-    return () => unregister('slug');
+    return () => unregister('name');
   }, [register, unregister]);
 
-  const slug = watch('slug');
-  const { slug: slugError } = errors;
+  const name = watch('name');
+  const { name: nameError } = errors;
 
   function onSubmit(data: UpdateInternalRepositoryInput) {
     updateProjectInternalRepo(project.id, data);
@@ -64,9 +64,9 @@ function UpdateInternalRepo({ close, project }: UpdateRepoProps) {
         <TextInput
           customClassname={styles.slugInput}
           label="repository name"
-          onChange={(value: string) => setValue('slug', value)}
-          error={slugError && slugError.message}
-          formValue={slug}
+          onChange={(value: string) => setValue('name', value)}
+          error={nameError && nameError.message}
+          formValue={name}
           autoFocus
           showClearButton
         />

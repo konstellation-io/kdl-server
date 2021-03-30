@@ -39,7 +39,7 @@ const buildProject = () => ({
   name: casual.name,
   description: casual.words(200),
   favorite: casual.boolean,
-  repository: this.Repository,
+  repository: buildRepository(),
   creationDate: () => new Date().toISOString(),
   lastActivationDate: () => new Date().toISOString(),
   error: casual.random_element([null, casual.error]),
@@ -83,6 +83,19 @@ const buildRandomMembers = (memberCount) => {
   return members;
 };
 
+function buildRepository() {
+  const type = casual.random_element(['INTERNAL', 'EXTERNAL']);
+  let url = casual.url;
+  if (type === 'INTERNAL')
+    url = `${casual.url}${casual.array_of_words(3).join('-')}`;
+
+  return {
+    type,
+    url,
+    error: casual.boolean,
+  };
+}
+
 const projects = Array(8).fill(0).map(buildProject);
 
 module.exports = {
@@ -100,11 +113,20 @@ module.exports = {
     }),
   }),
   Mutation: () => ({
-    updateProject: (_, { input: { id, name, description, archived } }) => {
+    updateProject: (
+      _,
+      { input: { id, name, description, archived, repository } }
+    ) => {
       const project = projects.find((project) => project.id === id);
       if (name) project.name = name;
       if (description) project.description = description;
       if (archived !== undefined) project.archived = archived;
+      if (repository && repository.type === 'INTERNAL') {
+        project.repository.url = `${project.repository.url}${repository.internal.name}`;
+      }
+      if (repository && repository.type === 'EXTERNAL') {
+        project.repository.url = repository.external.url;
+      }
 
       return project;
     },
@@ -196,7 +218,6 @@ module.exports = {
   Member: buildMember,
   Project: buildProject,
   Repository: () => ({
-    id: casual.uuid,
     type: casual.random_element(['INTERNAL', 'EXTERNAL']),
     url: casual.url,
     error: false,

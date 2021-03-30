@@ -15,7 +15,8 @@
 }
 
 .formSelect {
-  width: 17 * $grid-unit;
+  width: 20 * $grid-unit;
+
   & > div > div {
     background-color: transparent !important;
   }

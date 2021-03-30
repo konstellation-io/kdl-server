@@ -110,6 +110,7 @@ type ComplexityRoot struct {
 		LastActivationDate func(childComplexity int) int
 		Members            func(childComplexity int) int
 		Name               func(childComplexity int) int
+		NeedAccess         func(childComplexity int) int
 		Repository         func(childComplexity int) int
 		ToolUrls           func(childComplexity int) int
 	}
@@ -196,6 +197,7 @@ type ProjectResolver interface {
 	CreationDate(ctx context.Context, obj *entity.Project) (string, error)
 
 	ToolUrls(ctx context.Context, obj *entity.Project) (*entity.ToolUrls, error)
+	NeedAccess(ctx context.Context, obj *entity.Project) (bool, error)
 }
 type QueryResolver interface {
 	Me(ctx context.Context) (*entity.User, error)
@@ -610,6 +612,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.Name(childComplexity), true
 
+	case "Project.needAccess":
+		if e.complexity.Project.NeedAccess == nil {
+			break
+		}
+
+		return e.complexity.Project.NeedAccess(childComplexity), true
+
 	case "Project.repository":
 		if e.complexity.Project.Repository == nil {
 			break
@@ -986,9 +995,9 @@ type KnowledgeGraphItem {
   starred: Boolean!
 
   # optional fields
-  repoUrls: [String]
+  repoUrls: [String!]
   externalId: ID # for example: arxivId
-  frameworks: [String]
+  frameworks: [String!]
 }
 
 type SSHKey {
@@ -1129,6 +1138,7 @@ type Project {
   error: String
   members: [Member!]!
   toolUrls: ToolUrls!
+  needAccess: Boolean!
   archived: Boolean!
 }
 
@@ -2073,7 +2083,7 @@ func (ec *executionContext) _KnowledgeGraphItem_repoUrls(ctx context.Context, fi
 	}
 	res := resTmp.([]string)
 	fc.Result = res
-	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _KnowledgeGraphItem_externalId(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
@@ -2137,7 +2147,7 @@ func (ec *executionContext) _KnowledgeGraphItem_frameworks(ctx context.Context, 
 	}
 	res := resTmp.([]string)
 	fc.Result = res
-	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Member_user(ctx context.Context, field graphql.CollectedField, obj *entity.Member) (ret graphql.Marshaler) {
@@ -3123,6 +3133,41 @@ func (ec *executionContext) _Project_toolUrls(ctx context.Context, field graphql
 	res := resTmp.(*entity.ToolUrls)
 	fc.Result = res
 	return ec.marshalNToolUrls2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolUrls(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_needAccess(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Project().NeedAccess(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Project_archived(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
@@ -6382,6 +6427,20 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 				}
 				return res
 			})
+		case "needAccess":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Project_needAccess(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "archived":
 			out.Values[i] = ec._Project_archived(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -7985,7 +8044,7 @@ func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.S
 	return graphql.MarshalString(v)
 }
 
-func (ec *executionContext) unmarshalOString2ᚕstring(ctx context.Context, v interface{}) ([]string, error) {
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -8001,7 +8060,7 @@ func (ec *executionContext) unmarshalOString2ᚕstring(ctx context.Context, v in
 	res := make([]string, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOString2string(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -8009,13 +8068,13 @@ func (ec *executionContext) unmarshalOString2ᚕstring(ctx context.Context, v in
 	return res, nil
 }
 
-func (ec *executionContext) marshalOString2ᚕstring(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	ret := make(graphql.Array, len(v))
 	for i := range v {
-		ret[i] = ec.marshalOString2string(ctx, sel, v[i])
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
 	}
 
 	return ret

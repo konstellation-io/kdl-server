@@ -245,6 +245,21 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 	}, nil
 }
 
+func (r *projectResolver) NeedAccess(ctx context.Context, obj *entity.Project) (bool, error) {
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return true, err
+	}
+
+	for _, member := range obj.Members {
+		if member.UserID == loggedUser.ID {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
 func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
 	loggedUser, err := r.getLoggedUser(ctx)
 	if err != nil {
@@ -255,12 +270,7 @@ func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
 }
 
 func (r *queryResolver) Projects(ctx context.Context) ([]entity.Project, error) {
-	loggedUser, err := r.getLoggedUser(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.projects.FindByUserID(ctx, loggedUser.ID)
+	return r.projects.FindAll(ctx)
 }
 
 func (r *queryResolver) Project(ctx context.Context, id string) (*entity.Project, error) {

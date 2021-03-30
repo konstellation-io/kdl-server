@@ -26,7 +26,6 @@ function ProjectsOrder() {
 
   const options = Object.values(ProjectOrder);
   const optionsMapper = {
-    [ProjectOrder.VISITED]: 'Recently visited',
     [ProjectOrder.CREATION]: 'Creation date',
     [ProjectOrder.AZ]: 'From A to Z',
     [ProjectOrder.ZA]: 'From Z to A',
@@ -41,7 +40,7 @@ function ProjectsOrder() {
         hideError
         options={options}
         theme={SelectTheme.DARK}
-        defaultOption={ProjectOrder.VISITED}
+        defaultOption={ProjectOrder.CREATION}
         formSelectedOption={filters?.order}
         valuesMapper={optionsMapper}
       />

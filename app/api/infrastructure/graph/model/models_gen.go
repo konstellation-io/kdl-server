@@ -71,6 +71,17 @@ type SetBoolFieldInput struct {
 	Value bool   `json:"value"`
 }
 
+type SetKGStarredInput struct {
+	ProjectID string `json:"projectId"`
+	KgItemID  string `json:"kgItemId"`
+	Starred   bool   `json:"starred"`
+}
+
+type SetKGStarredRes struct {
+	KgItemID string `json:"kgItemId"`
+	Starred  bool   `json:"starred"`
+}
+
 type UpdateAccessLevelInput struct {
 	UserIds     []string           `json:"userIds"`
 	AccessLevel entity.AccessLevel `json:"accessLevel"`
@@ -87,6 +98,7 @@ type UpdateProjectInput struct {
 	Name        *string                       `json:"name"`
 	Description *string                       `json:"description"`
 	Repository  *UpdateProjectRepositoryInput `json:"repository"`
+	Archived    *bool                         `json:"archived"`
 }
 
 type UpdateProjectRepositoryInput struct {

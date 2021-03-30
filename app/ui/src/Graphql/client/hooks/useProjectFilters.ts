@@ -5,8 +5,7 @@ import {
 } from '../models/ProjectFilters';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
-import { ProjectState } from 'Graphql/types/globalTypes';
-import { projectFilters } from './../cache';
+import { projectFilters } from 'Graphql/client/cache';
 import { sortBy } from 'lodash';
 
 export type NewFilters = {
@@ -25,11 +24,9 @@ function useProjectFilters() {
     });
   }
 
-  const isProjectActive = (project: GetProjects_projects) =>
-    project.state !== ProjectState.ARCHIVED;
+  const isProjectActive = (project: GetProjects_projects) => !project.archived;
   const isProjectStarred = (project: GetProjects_projects) => project.favorite;
-  const isProjectArchived = (project: GetProjects_projects) =>
-    project.state === ProjectState.ARCHIVED;
+  const isProjectArchived = (project: GetProjects_projects) => project.archived;
 
   function getProjectCounts(projects: GetProjects_projects[]) {
     const activeProjects = projects.filter(isProjectActive);

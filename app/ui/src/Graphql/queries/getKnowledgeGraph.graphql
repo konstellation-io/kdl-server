@@ -1,5 +1,5 @@
-query GetKnowledgeGraph($description: String!) {
-  knowledgeGraph(description: $description) {
+query GetKnowledgeGraph($projectId: ID!) {
+  knowledgeGraph(projectId: $projectId) {
     items {
       id
       category
@@ -9,6 +9,9 @@ query GetKnowledgeGraph($description: String!) {
       score
       date
       url
+      starred
+      frameworks
+      repoUrls
       topics {
         name
         relevance

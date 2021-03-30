@@ -1,6 +1,8 @@
 import { INNER_R, getInnerDimensions, resourcesViz } from './KGViz';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
+import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
+import { KGItem } from '../../KG';
 import KGViz from './KGViz';
 import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 import { ParentSize } from '@visx/responsive';
@@ -39,10 +41,10 @@ export interface TopicSections {
 }
 
 type WrapperProps = {
-  data: D[];
+  data: KGItem[];
+  kgItems: KGItem[];
   sections: string[];
   selectedResource: string;
-  idToFullResource: { [key: string]: any };
 };
 function KGVisualizationWrapper(props: WrapperProps) {
   return (
@@ -65,15 +67,30 @@ function KGVisualization({
   data,
   sections,
   selectedResource,
-  idToFullResource,
 }: Props) {
   const scores = useReactiveVar(kgScore);
   const { updateScore } = useKGFilters();
 
   const [containerLeft, setContainerLeft] = useState(0);
-  const [openedPaper, setOpenedPaper] = useState<D | null>(null);
+  const [
+    openedPaper,
+    setOpenedPaper,
+  ] = useState<GetKnowledgeGraph_knowledgeGraph_items | null>(null);
   const [hoveredPaper, setHoveredPaper] = useState<D | null>(null);
   const { tooltipInfo, updateTooltip, hideTooltip } = useTooltip<D>();
+
+  const vizData: D[] = useMemo(
+    () =>
+      data.map((d) => ({
+        id: d.id,
+        category: d.topic?.name || 'Others',
+        type: d.category,
+        name: d.title,
+        score: d.score,
+        starred: d.starred,
+      })),
+    [data]
+  );
 
   const containerStyles = useMemo(
     () => ({
@@ -100,8 +117,8 @@ function KGVisualization({
   const starredResources = useMemo(() => data.filter((d) => d.starred), [data]);
 
   useEffect(() => {
-    if (animating && data) {
-      const allScores = data.map((d) => d.score);
+    if (animating && vizData) {
+      const allScores = vizData.map((d) => d.score);
       const mn2 = Math.min(...allScores);
       const mx2 = Math.max(...allScores);
 
@@ -119,28 +136,34 @@ function KGVisualization({
         })
         .on('end', () => setAnimating(false));
     }
-  }, [data]);
+  }, [vizData]);
 
   useEffect(() => {
-    const allScores = data.map((d) => d.score);
+    const allScores = vizData.map((d) => d.score);
     const min = Math.min(...allScores);
     const max = Math.max(...allScores);
     if (!animating) {
       updateScore([max, min]);
     }
     setBorderScores([max + 0.01, 0]);
-  }, [data, animating]);
+  }, [vizData, animating]);
+
+  useEffect(() => {
+    if (openedPaper) {
+      setOpenedPaper(data.find((d) => d.id === openedPaper.id) || null);
+    }
+  }, [data, openedPaper]);
 
   const { outerR } = getInnerDimensions(width, height);
 
   const SCORE_R = outerR - RESOURCE_R - (INNER_R + RESOURCE_R);
   const scoreUnitPerPx = (scores[0] - scores[1]) / SCORE_R;
 
-  function openResourceDetails(resource: D, left: number) {
-    setOpenedPaper(resource);
+  function openResourceDetails(id: string, name: string, left: number) {
+    setOpenedPaper(data.find((r) => r.id === id) || null);
     centerContainer(left);
-    resourcesViz.lockHighlight = resource.name;
-    resourcesViz.highlightResource(resource.name, true);
+    resourcesViz.lockHighlight = name;
+    resourcesViz.highlightResource(name, true);
     setHoveredPaper(null);
   }
   function closeResourceDetails() {
@@ -245,7 +268,7 @@ function KGVisualization({
   // We want to completelly update the visualization when there are changes
   // that affects the data
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(update, [data]);
+  useEffect(update, [vizData]);
 
   useEffect(updateScores, [scores]);
 
@@ -263,7 +286,7 @@ function KGVisualization({
         parent: svgRef.current,
         canvas: canvasRef.current,
         // minimapRef: minimapRef.current,
-        data,
+        data: vizData,
         width,
         height,
         tooltipOpen: tooltipInfo.open,
@@ -280,9 +303,9 @@ function KGVisualization({
   }
 
   function update() {
-    if (data) {
+    if (vizData) {
       if (viz.current !== null) {
-        viz.current.update(data, scores);
+        viz.current.update(vizData, scores);
       } else {
         initialize();
       }
@@ -290,9 +313,9 @@ function KGVisualization({
   }
 
   function updateScores() {
-    if (data) {
+    if (vizData) {
       if (viz.current !== null) {
-        viz.current.updateScores(data, scores);
+        viz.current.updateScores(vizData, scores);
       } else {
         initialize();
       }
@@ -344,7 +367,6 @@ function KGVisualization({
             starredResources={starredResources}
             scores={scores}
             onResourceClick={openResourceDetails}
-            idToFullResource={idToFullResource}
           />
         </div>
         <div
@@ -355,7 +377,6 @@ function KGVisualization({
           <ResourceDetails
             resource={openedPaper}
             onClose={closeResourceDetails}
-            idToFullResource={idToFullResource}
           />
         </div>
       </div>

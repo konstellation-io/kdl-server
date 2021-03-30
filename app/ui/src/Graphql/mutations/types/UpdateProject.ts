@@ -14,6 +14,7 @@ export interface UpdateProject_updateProject {
   id: string;
   name: string;
   description: string;
+  archived: boolean;
 }
 
 export interface UpdateProject {

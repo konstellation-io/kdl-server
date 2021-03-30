@@ -34,6 +34,7 @@
   .box {
     margin-bottom: 2 * $grid-unit;
   }
+
   h2 {
     padding-left: 4 * $grid-unit;
   }
@@ -55,6 +56,7 @@
 
     margin-right: $grid-unit;
   }
+
   .regenWarningText {
     @include font-small;
     color: font-color(lowlight);

@@ -49,6 +49,7 @@ export interface GetProjects_projects {
   creationDate: string;
   lastActivationDate: string;
   repository: GetProjects_projects_repository | null;
+  needAccess: boolean;
   archived: boolean;
   error: string | null;
   toolUrls: GetProjects_projects_toolUrls;

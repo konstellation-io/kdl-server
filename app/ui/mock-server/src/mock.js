@@ -43,6 +43,7 @@ const buildProject = () => ({
   creationDate: () => new Date().toISOString(),
   lastActivationDate: () => new Date().toISOString(),
   error: casual.random_element([null, casual.error]),
+  needAccess: casual.boolean,
   members: buildRandomMembers(casual.integer(1, 5)),
   archived: casual.boolean,
   toolUrls: () => ({

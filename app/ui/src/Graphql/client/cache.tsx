@@ -22,7 +22,7 @@ type ToolName = keyof GetUserTools_project_toolUrls;
 export const initialProjectFilters: ProjectFilters = {
   name: '',
   selection: ProjectSelection.ACTIVE,
-  order: ProjectOrder.AZ,
+  order: ProjectOrder.CREATION,
   nFiltered: 0,
 };
 

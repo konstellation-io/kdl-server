@@ -18,4 +18,5 @@ const ProjectIcon = (props: AdditionalProps & SvgIconProps) => (
     </g>
   </SvgIcon>
 );
+
 export default ProjectIcon;

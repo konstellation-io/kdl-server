@@ -26,6 +26,7 @@ type memberDTO struct {
 
 type projectDTO struct {
 	ID               primitive.ObjectID    `bson:"_id"`
+	Archived         bool                  `bson:"archived"`
 	Name             string                `bson:"name"`
 	Description      string                `bson:"description"`
 	CreationDate     time.Time             `bson:"creation_date"`
@@ -181,6 +182,11 @@ func (m *projectMongoDBRepo) UpdateDescription(ctx context.Context, projectID, d
 	return m.updateProjectFields(ctx, projectID, bson.M{"description": description})
 }
 
+// UpdateArchived changes the archived field for the given project.
+func (m *projectMongoDBRepo) UpdateArchived(ctx context.Context, projectID string, archived bool) error {
+	return m.updateProjectFields(ctx, projectID, bson.M{"archived": archived})
+}
+
 // SetStarredKGItem adds a kgItem to starred list.
 func (m *projectMongoDBRepo) SetStarredKGItem(ctx context.Context, projectID, kgItemID string) error {
 	m.logger.Debugf("Starring %s in project \"%s\"...", kgItemID, projectID)
@@ -278,6 +284,7 @@ func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 		ExternalRepoURL:  p.Repository.ExternalRepoURL,
 		RepoName:         p.Repository.RepoName,
 		StarredKGItems:   p.StarredKGItems,
+		Archived:         p.Archived,
 	}
 
 	if p.ID != "" {
@@ -331,6 +338,7 @@ func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 			InternalRepoName: dto.InternalRepoName,
 			RepoName:         dto.RepoName,
 		},
+		Archived: dto.Archived,
 	}
 
 	p.Members = make([]entity.Member, len(dto.Members))

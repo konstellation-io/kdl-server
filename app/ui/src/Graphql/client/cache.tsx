@@ -1,5 +1,13 @@
-import { defaultDataIdFromObject, InMemoryCache, makeVar, } from '@apollo/client';
-import { ProjectFilters, ProjectOrder, ProjectSelection, } from './models/ProjectFilters';
+import {
+  defaultDataIdFromObject,
+  InMemoryCache,
+  makeVar,
+} from '@apollo/client';
+import {
+  ProjectFilters,
+  ProjectOrder,
+  ProjectSelection,
+} from './models/ProjectFilters';
 import { UserSelection, UserSettings } from './models/UserSettings';
 
 import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';

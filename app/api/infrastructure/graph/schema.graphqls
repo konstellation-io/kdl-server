@@ -113,6 +113,7 @@ input UpdateProjectInput {
   name: String
   description: String
   repository: UpdateProjectRepositoryInput
+  archived: Boolean
 }
 
 input SetKGStarredInput {
@@ -187,12 +188,12 @@ type Project {
   description: String!
   favorite: Boolean!
   repository: Repository
-  state: ProjectState!
   creationDate: String!
   lastActivationDate: String!
   error: String
   members: [Member!]!
   toolUrls: ToolUrls!
+  archived: Boolean!
 }
 
 input RepositoryInput {
@@ -220,12 +221,6 @@ type Repository {
 enum RepositoryType {
   INTERNAL
   EXTERNAL
-}
-
-enum ProjectState {
-  STARTED
-  STOPPED
-  ARCHIVED
 }
 
 enum KnowledgeGraphItemCat {

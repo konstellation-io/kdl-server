@@ -101,6 +101,7 @@ type ComplexityRoot struct {
 	}
 
 	Project struct {
+		Archived           func(childComplexity int) int
 		CreationDate       func(childComplexity int) int
 		Description        func(childComplexity int) int
 		Error              func(childComplexity int) int
@@ -110,7 +111,6 @@ type ComplexityRoot struct {
 		Members            func(childComplexity int) int
 		Name               func(childComplexity int) int
 		Repository         func(childComplexity int) int
-		State              func(childComplexity int) int
 		ToolUrls           func(childComplexity int) int
 	}
 
@@ -547,6 +547,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateProject(childComplexity, args["input"].(model.UpdateProjectInput)), true
 
+	case "Project.archived":
+		if e.complexity.Project.Archived == nil {
+			break
+		}
+
+		return e.complexity.Project.Archived(childComplexity), true
+
 	case "Project.creationDate":
 		if e.complexity.Project.CreationDate == nil {
 			break
@@ -609,13 +616,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Project.Repository(childComplexity), true
-
-	case "Project.state":
-		if e.complexity.Project.State == nil {
-			break
-		}
-
-		return e.complexity.Project.State(childComplexity), true
 
 	case "Project.toolUrls":
 		if e.complexity.Project.ToolUrls == nil {
@@ -1049,6 +1049,7 @@ input UpdateProjectInput {
   name: String
   description: String
   repository: UpdateProjectRepositoryInput
+  archived: Boolean
 }
 
 input SetKGStarredInput {
@@ -1123,12 +1124,12 @@ type Project {
   description: String!
   favorite: Boolean!
   repository: Repository
-  state: ProjectState!
   creationDate: String!
   lastActivationDate: String!
   error: String
   members: [Member!]!
   toolUrls: ToolUrls!
+  archived: Boolean!
 }
 
 input RepositoryInput {
@@ -1156,12 +1157,6 @@ type Repository {
 enum RepositoryType {
   INTERNAL
   EXTERNAL
-}
-
-enum ProjectState {
-  STARTED
-  STOPPED
-  ARCHIVED
 }
 
 enum KnowledgeGraphItemCat {
@@ -2958,41 +2953,6 @@ func (ec *executionContext) _Project_repository(ctx context.Context, field graph
 	return ec.marshalORepository2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepository(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Project_state(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Project",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.State(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entity.ProjectState)
-	fc.Result = res
-	return ec.marshalNProjectState2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProjectState(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Project_creationDate(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3163,6 +3123,41 @@ func (ec *executionContext) _Project_toolUrls(ctx context.Context, field graphql
 	res := resTmp.(*entity.ToolUrls)
 	fc.Result = res
 	return ec.marshalNToolUrls2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolUrls(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_archived(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Archived, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _QualityProjectDesc_quality(ctx context.Context, field graphql.CollectedField, obj *model.QualityProjectDesc) (ret graphql.Marshaler) {
@@ -5972,6 +5967,14 @@ func (ec *executionContext) unmarshalInputUpdateProjectInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "archived":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("archived"))
+			it.Archived, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -6339,11 +6342,6 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "repository":
 			out.Values[i] = ec._Project_repository(ctx, field, obj)
-		case "state":
-			out.Values[i] = ec._Project_state(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "creationDate":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -6384,6 +6382,11 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 				}
 				return res
 			})
+		case "archived":
+			out.Values[i] = ec._Project_archived(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7421,22 +7424,6 @@ func (ec *executionContext) marshalNProject2ᚖgithubᚗcomᚋkonstellationᚑio
 		return graphql.Null
 	}
 	return ec._Project(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNProjectState2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProjectState(ctx context.Context, v interface{}) (entity.ProjectState, error) {
-	tmp, err := graphql.UnmarshalString(v)
-	res := entity.ProjectState(tmp)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNProjectState2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProjectState(ctx context.Context, sel ast.SelectionSet, v entity.ProjectState) graphql.Marshaler {
-	res := graphql.MarshalString(string(v))
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-	}
-	return res
 }
 
 func (ec *executionContext) marshalNQualityProjectDesc2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐQualityProjectDesc(ctx context.Context, sel ast.SelectionSet, v model.QualityProjectDesc) graphql.Marshaler {

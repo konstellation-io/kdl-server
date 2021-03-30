@@ -1,7 +1,6 @@
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { NavLink } from 'react-router-dom';
 import ProjectSelector from './ProjectSelector';
-import { ProjectState } from 'Graphql/types/globalTypes';
 import React from 'react';
 import { shallow } from 'enzyme';
 
@@ -15,7 +14,7 @@ const project: GetProjects_projects = {
   favorite: true,
   lastActivationDate: 'barfoo',
   repository: null,
-  state: ProjectState.STARTED,
+  state: 'STARTED',
 };
 const projects: GetProjects_projects[] = [project];
 

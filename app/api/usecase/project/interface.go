@@ -20,6 +20,7 @@ type Repository interface {
 	UpdateDescription(ctx context.Context, projectID, description string) error
 	SetStarredKGItem(ctx context.Context, projectID, kgItemID string) error
 	UnsetStarredKGItem(ctx context.Context, projectID, kgItemID string) error
+	UpdateArchived(ctx context.Context, projectID string, archived bool) error
 }
 
 // UseCase interface to manage all operations related with projects.

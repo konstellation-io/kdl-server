@@ -13,7 +13,7 @@ query GetProjects {
       url
       error
     }
-    state
+    archived
     error
     toolUrls {
       drone

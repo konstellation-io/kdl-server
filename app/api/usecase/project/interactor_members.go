@@ -13,6 +13,7 @@ type UpdateProjectOption struct {
 	ProjectID   string
 	Name        *string
 	Description *string
+	Archived    *bool
 }
 
 // UpdateMemberOption options when updating a project member.

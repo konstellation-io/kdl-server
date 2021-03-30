@@ -41,8 +41,8 @@ const buildProject = () => ({
   creationDate: () => new Date().toISOString(),
   lastActivationDate: () => new Date().toISOString(),
   error: casual.random_element([null, casual.error]),
-  state: casual.random_element(['STARTED', 'STOPPED', 'ARCHIVED']),
   members: buildRandomMembers(casual.integer(1, 5)),
+  archived: casual.boolean,
   toolUrls: () => ({
     gitea: 'https://gitea.io/en-us/',
     minio: 'https://min.io/',
@@ -98,10 +98,11 @@ module.exports = {
     }),
   }),
   Mutation: () => ({
-    updateProject: (_, { input: { id, name, description } }) => {
+    updateProject: (_, { input: { id, name, description, archived } }) => {
       const project = projects.find((project) => project.id === id);
       if (name) project.name = name;
       if (description) project.description = description;
+      if (archived !== undefined) project.archived = archived;
 
       return project;
     },

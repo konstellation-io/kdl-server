@@ -12,7 +12,7 @@ import (
 type Repository interface {
 	Get(ctx context.Context, id string) (entity.Project, error)
 	Create(ctx context.Context, project entity.Project) (string, error)
-	FindByUserID(ctx context.Context, userID string) ([]entity.Project, error)
+	FindAll(ctx context.Context) ([]entity.Project, error)
 	AddMembers(ctx context.Context, projectID string, members []entity.Member) error
 	RemoveMember(ctx context.Context, projectID, userID string) error
 	UpdateMemberAccessLevel(ctx context.Context, projectID, userID string, accessLevel entity.AccessLevel) error
@@ -26,7 +26,7 @@ type Repository interface {
 // UseCase interface to manage all operations related with projects.
 type UseCase interface {
 	Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error)
-	FindByUserID(ctx context.Context, userID string) ([]entity.Project, error)
+	FindAll(ctx context.Context) ([]entity.Project, error)
 	GetByID(ctx context.Context, id string) (entity.Project, error)
 	AddMembers(ctx context.Context, opt AddMembersOption) (entity.Project, error)
 	RemoveMember(ctx context.Context, opt RemoveMemberOption) (entity.Project, error)

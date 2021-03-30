@@ -25,6 +25,8 @@ export interface CreateProject_createProject {
   creationDate: string;
   lastActivationDate: string;
   repository: CreateProject_createProject_repository | null;
+  needAccess: boolean;
+  archived: boolean;
   error: string | null;
 }
 

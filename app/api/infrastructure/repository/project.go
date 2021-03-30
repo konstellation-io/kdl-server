@@ -79,13 +79,8 @@ func (m *projectMongoDBRepo) Create(ctx context.Context, p entity.Project) (stri
 }
 
 // FindByUserID retrieves the projects of the given user.
-func (m *projectMongoDBRepo) FindByUserID(ctx context.Context, userID string) ([]entity.Project, error) {
-	objID, err := primitive.ObjectIDFromHex(userID)
-	if err != nil {
-		return nil, err
-	}
-
-	return m.find(ctx, bson.M{"members.user_id": objID})
+func (m *projectMongoDBRepo) FindAll(ctx context.Context) ([]entity.Project, error) {
+	return m.find(ctx, bson.M{})
 }
 
 // AddMembers creates a new user in the member list for the given project.

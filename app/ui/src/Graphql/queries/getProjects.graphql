@@ -16,6 +16,7 @@ query GetProjects {
         username
       }
     }
+    needAccess
     archived
     error
     toolUrls {

@@ -21,20 +21,23 @@ const sizePixels = {
 
 type Props = {
   squareLocation: LOCATION;
+  customSize?: number;
   size?: SIZE;
   shouldAnimate?: boolean;
 };
 function RepositoryTypeComponent({
   squareLocation,
   size = SIZE.MEDIUM,
+  customSize,
   shouldAnimate = true,
 }: Props) {
+  const side = customSize ? customSize : sizePixels[size];
   return (
     <div
       className={cx(styles.square, styles[squareLocation], styles[size], {
         [styles.notAnimate]: !shouldAnimate,
       })}
-      style={{ height: sizePixels[size], width: sizePixels[size] }}
+      style={{ height: side, width: side }}
     >
       <div className={styles.s4} />
       <div className={styles.s3} />

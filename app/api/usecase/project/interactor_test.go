@@ -206,16 +206,14 @@ func TestInteractor_FindByUserID(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
-	const userID = "user.1234"
-
 	ctx := context.Background()
 	expectedProjects := []entity.Project{
 		entity.NewProject("project-x", "Project X"),
 	}
 
-	s.mocks.repo.EXPECT().FindByUserID(ctx, userID).Return(expectedProjects, nil)
+	s.mocks.repo.EXPECT().FindAll(ctx).Return(expectedProjects, nil)
 
-	p, err := s.interactor.FindByUserID(ctx, userID)
+	p, err := s.interactor.FindAll(ctx)
 
 	require.NoError(t, err)
 	require.Equal(t, p, expectedProjects)

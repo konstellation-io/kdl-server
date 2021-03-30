@@ -11,6 +11,8 @@ mutation CreateProject($input: CreateProjectInput!) {
       url
       error
     }
+    needAccess
+    archived
     error
   }
 }

@@ -93,6 +93,9 @@ function buildRepository() {
     type,
     url,
     error: casual.boolean,
+    external: {
+      username: casual.username,
+    },
   };
 }
 

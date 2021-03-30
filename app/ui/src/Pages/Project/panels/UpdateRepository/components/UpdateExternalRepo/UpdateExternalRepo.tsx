@@ -10,6 +10,8 @@ import IconLink from '@material-ui/icons/Link';
 import { UpdateRepoProps } from '../../UpdateRepository';
 import { UpdateExternalRepositoryInput } from 'Graphql/types/globalTypes';
 
+const DEFAULT_TOKEN = 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz';
+
 function UpdateExternalRepo({ close, project }: UpdateRepoProps) {
   const { updateProjectExternalRepo } = useProject();
   const {
@@ -22,8 +24,8 @@ function UpdateExternalRepo({ close, project }: UpdateRepoProps) {
   } = useForm({
     defaultValues: {
       url: project.repository?.url,
-      username: '',
-      token: '',
+      username: project.repository?.external?.username,
+      token: DEFAULT_TOKEN,
     },
   });
 
@@ -41,7 +43,11 @@ function UpdateExternalRepo({ close, project }: UpdateRepoProps) {
   const { url: urlError, username: usernameError, token: tokenError } = errors;
 
   function onSubmit(data: UpdateExternalRepositoryInput) {
-    updateProjectExternalRepo(project.id, data);
+    const input: UpdateExternalRepositoryInput = {
+      ...data,
+      token: data.token !== DEFAULT_TOKEN ? data.token : '',
+    };
+    updateProjectExternalRepo(project.id, input);
   }
 
   return (
@@ -74,6 +80,7 @@ function UpdateExternalRepo({ close, project }: UpdateRepoProps) {
           formValue={token}
           showClearButton
           hidden
+          hidePwEye
         />
       </div>
     </FormPanel>

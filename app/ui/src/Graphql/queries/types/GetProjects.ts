@@ -9,11 +9,17 @@ import { RepositoryType, AccessLevel } from './../../types/globalTypes';
 // GraphQL query operation: GetProjects
 // ====================================================
 
+export interface GetProjects_projects_repository_external {
+  __typename: 'ExternalRepository';
+  username: string;
+}
+
 export interface GetProjects_projects_repository {
   __typename: 'Repository';
   type: RepositoryType;
   url: string;
   error: string | null;
+  external: GetProjects_projects_repository_external | null;
 }
 
 export interface GetProjects_projects_toolUrls {

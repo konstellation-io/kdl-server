@@ -12,6 +12,9 @@ query GetProjects {
       type
       url
       error
+      external {
+        username
+      }
     }
     archived
     error

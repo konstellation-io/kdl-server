@@ -36,8 +36,8 @@ func NewKGService(logger logging.Logger, url string) (KGService, error) {
 	}, nil
 }
 
-// GetGraph gets a entity.KnowledgeGraph from the server for a given description.
-func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.KnowledgeGraph, error) {
+// Graph gets a Knowledge Graph from the server.
+func (kg *kgService) Graph(ctx context.Context, description string) (entity.KnowledgeGraph, error) {
 	req := kgpb.GetGraphReq{Description: description}
 	res, err := kg.client.GetGraph(ctx, &req)
 
@@ -63,7 +63,7 @@ func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.K
 			Date:       value.Date,
 			URL:        value.Url,
 			Topics:     convertTopics(value.Topics),
-			IsStarred:  false,
+			Starred:    false,
 			RepoURLs:   value.RepoUrls,
 			ExternalID: stringToPointer(value.ExternalId),
 			Frameworks: value.Frameworks,
@@ -73,39 +73,6 @@ func (kg *kgService) GetGraph(ctx context.Context, description string) (entity.K
 	topics := convertTopics(res.Topics)
 
 	return entity.KnowledgeGraph{Items: items, Topics: topics}, nil
-}
-
-// GetItem gets a entity.KnowledgeGraphItem for a given id.
-func (kg *kgService) GetItem(ctx context.Context, id string) (entity.KnowledgeGraphItem, error) {
-	req := kgpb.GetItemReq{Id: id}
-
-	res, err := kg.client.GetItem(ctx, &req)
-	if err != nil {
-		return entity.KnowledgeGraphItem{}, err
-	}
-
-	cat, err := parseValidateCategory(res.Item)
-	if err != nil {
-		return entity.KnowledgeGraphItem{}, err
-	}
-
-	item := entity.KnowledgeGraphItem{
-		ID:         res.Item.Id,
-		Category:   cat,
-		Title:      res.Item.Title,
-		Abstract:   res.Item.Abstract,
-		Authors:    res.Item.Authors,
-		Score:      float64(res.Item.Score),
-		Date:       res.Item.Date,
-		URL:        res.Item.Url,
-		Topics:     convertTopics(res.Item.Topics),
-		IsStarred:  false,
-		RepoURLs:   res.Item.RepoUrls,
-		ExternalID: stringToPointer(res.Item.ExternalId),
-		Frameworks: res.Item.Frameworks,
-	}
-
-	return item, nil
 }
 
 // DescriptionQuality gets the quality score of a given description.

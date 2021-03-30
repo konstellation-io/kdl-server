@@ -4,22 +4,24 @@ import {
   GetKnowledgeGraphVariables,
 } from 'Graphql/queries/types/GetKnowledgeGraph';
 import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { openedProject, resourceDetails } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { useQuery, useReactiveVar } from '@apollo/client';
 
 import { PANEL_ID } from 'Graphql/client/models/Panel';
-import ResourceLists from 'Pages/Project/pages/KG/components/ResourceLists/ResourceLists';
 import { loader } from 'graphql.macro';
 import styles from './KGResults.module.scss';
 import useResourceDetails from 'Graphql/client/hooks/useResourceDetails';
+import ResourcesList from '../../pages/KG/components/ResourceLists/components/ResourcesList/ResourcesList';
+import { KGItem as KGItemType } from '../../pages/KG/KG';
 
 const GetKnowledgeGraphQuery = loader(
   'Graphql/queries/getKnowledgeGraph.graphql'
 );
 
 function KGResults() {
+  const [listFilterText, setListFilterText] = useState('');
   const { updateResourceDetails } = useResourceDetails();
 
   const resourceDetailsData = useReactiveVar(resourceDetails);
@@ -39,12 +41,9 @@ function KGResults() {
   });
 
   const openDetails = useCallback(
-    (id: string, name: string, left: number) => {
-      const resource = data?.knowledgeGraph.items.find((r) => r.id === id);
-      if (resource) {
-        updateResourceDetails(resource);
-        openPanel();
-      }
+    (resource: KGItemType) => {
+      updateResourceDetails(resource);
+      openPanel();
     },
     [updateResourceDetails, openPanel, data]
   );
@@ -58,6 +57,15 @@ function KGResults() {
     }
   }, [data, resourceDetailsData, updateResourceDetails]);
 
+  const resources = useMemo(() => {
+    if (!data) return [];
+    return data.knowledgeGraph.items.filter(
+      (item) =>
+        item.starred &&
+        item.title.toLowerCase().includes(listFilterText.toLowerCase())
+    );
+  }, [listFilterText, data?.knowledgeGraph.items]);
+
   if (loading || !data)
     return (
       <div className={styles.container}>
@@ -68,11 +76,16 @@ function KGResults() {
 
   return (
     <div className={styles.container}>
-      <ResourceLists
-        resources={data.knowledgeGraph.items}
-        starredResources={data.knowledgeGraph.items.filter((r) => r.starred)}
-        onResourceClick={openDetails}
-        scores={[1, 0]}
+      <ResourcesList
+        onClick={openDetails}
+        onChangeFilterText={(filter) => setListFilterText(filter)}
+        filterText={listFilterText}
+        resources={resources}
+        noItems={{
+          title: 'No starred items yet!',
+          subTitle:
+            "Once you favourite an item you'll see them here. Go to the KG to choose your favorites.",
+        }}
       />
     </div>
   );

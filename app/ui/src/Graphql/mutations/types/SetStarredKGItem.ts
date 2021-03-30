@@ -3,22 +3,22 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { SetStarredKGItemInput } from './../../types/globalTypes';
+import { SetKGStarredInput } from './../../types/globalTypes';
 
 // ====================================================
 // GraphQL mutation operation: SetStarredKGItem
 // ====================================================
 
-export interface SetStarredKGItem_setStarredKGItem {
-  __typename: 'SetStarredKGItemResponse';
-  id: string;
+export interface SetStarredKGItem_setKGStarred {
+  __typename: 'SetKGStarredRes';
+  kgItemId: string;
   starred: boolean;
 }
 
 export interface SetStarredKGItem {
-  setStarredKGItem: SetStarredKGItem_setStarredKGItem;
+  setKGStarred: SetStarredKGItem_setKGStarred;
 }
 
 export interface SetStarredKGItemVariables {
-  input: SetStarredKGItemInput;
+  input: SetKGStarredInput;
 }

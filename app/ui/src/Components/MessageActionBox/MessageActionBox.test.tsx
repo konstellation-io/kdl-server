@@ -10,7 +10,7 @@ const onActionMock = jest.fn();
 const component = shallow(
   <MessageActionBox
     title="Some title"
-    desciption="Some description"
+    description="Some description"
     action={{
       needConfirmation: true,
       message: 'Some message',

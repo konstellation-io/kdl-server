@@ -66,7 +66,7 @@ function ResourceDetails({ resource, onClose }: Props) {
           <Button Icon={IconClose} label="" onClick={onClose} />
         </div>
       </div>
-      {resource !== null && (
+      {
         <>
           <div
             className={cx(styles.resourceTitleAndTopics, {
@@ -94,7 +94,7 @@ function ResourceDetails({ resource, onClose }: Props) {
                 <div className={styles.sectionTitle}>TOPICS</div>
               )}
               {resource.topics.map(({ name, relevance }: any) => (
-                <div className={styles.topicScore}>
+                <div className={styles.topicScore} key={name}>
                   <Score value={relevance} inline />
                   <span>{name}</span>
                 </div>
@@ -111,7 +111,9 @@ function ResourceDetails({ resource, onClose }: Props) {
                 <div className={styles.sectionTitle}>CODE REPOSITORIES</div>
                 <div className={styles.repoUrlText}>
                   {resource.repoUrls.map((repoUrl) => (
-                    <URL className={styles.repoUrlText}>{repoUrl}</URL>
+                    <URL className={styles.repoUrlText} key={repoUrl}>
+                      {repoUrl}
+                    </URL>
                   ))}
                 </div>
               </div>
@@ -119,7 +121,7 @@ function ResourceDetails({ resource, onClose }: Props) {
             <div className={styles.abstract}>{resource.abstract}</div>
           </div>
         </>
-      )}
+      }
     </div>
   );
 }

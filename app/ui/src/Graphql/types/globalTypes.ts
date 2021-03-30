@@ -18,12 +18,6 @@ export enum KnowledgeGraphItemCat {
   Paper = 'Paper',
 }
 
-export enum ProjectState {
-  ARCHIVED = 'ARCHIVED',
-  STARTED = 'STARTED',
-  STOPPED = 'STOPPED',
-}
-
 export enum RepositoryType {
   EXTERNAL = 'EXTERNAL',
   INTERNAL = 'INTERNAL',
@@ -85,7 +79,7 @@ export interface SetActiveUserToolsInput {
   active: boolean;
 }
 
-export interface SetStarredKGItemInput {
+export interface SetKGStarredInput {
   projectId: string;
   kgItemId: string;
   starred: boolean;
@@ -107,6 +101,7 @@ export interface UpdateProjectInput {
   name?: string | null;
   description?: string | null;
   repository?: UpdateProjectRepositoryInput | null;
+  archived?: boolean | null;
 }
 
 export interface UpdateProjectRepositoryInput {

@@ -17,13 +17,29 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
   const areToolsActive = data?.me.areToolsActive;
   const overviewRoute = buildRoute(ROUTE.PROJECT_OVERVIEW, openedProject.id);
 
+  function redirectIfArchived() {
+    return (
+      openedProject.archived && (
+        <Redirect from={ROUTE.PROJECT} to={ROUTE.PROJECTS} />
+      )
+    );
+  }
+
+  function redirectIfToolsActives() {
+    return (
+      !areToolsActive &&
+      [ROUTE.PROJECT_TOOL_JUPYTER, ROUTE.PROJECT_TOOL_VSCODE].map((r) => (
+        <Redirect key={r} from={r} to={overviewRoute} />
+      ))
+    );
+  }
+
   return (
     <Switch>
       <Redirect exact from={ROUTE.PROJECT} to={overviewRoute} />
-      {!areToolsActive &&
-        [ROUTE.PROJECT_TOOL_JUPYTER, ROUTE.PROJECT_TOOL_VSCODE].map((r) => (
-          <Redirect key={r} from={r} to={overviewRoute} />
-        ))}
+
+      {redirectIfArchived()}
+      {redirectIfToolsActives()}
 
       <Route
         exact

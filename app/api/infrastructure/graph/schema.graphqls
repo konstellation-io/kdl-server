@@ -19,7 +19,7 @@ type Mutation {
   updateMember(input: UpdateMemberInput!): Project!
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
-  setStarredKGItem(input: SetStarredKGItemInput!): SetStarredKGItemResponse!
+  setKGStarred(input: SetKGStarredInput!): SetKGStarredRes!
   setActiveUserTools(input: SetActiveUserToolsInput!): User!
 }
 
@@ -113,9 +113,10 @@ input UpdateProjectInput {
   name: String
   description: String
   repository: UpdateProjectRepositoryInput
+  archived: Boolean
 }
 
-input SetStarredKGItemInput {
+input SetKGStarredInput {
   projectId: ID!
   kgItemId: ID!
   starred: Boolean!
@@ -176,8 +177,8 @@ input SetActiveUserToolsInput {
   active: Boolean!
 }
 
-type SetStarredKGItemResponse {
-  id: ID!
+type SetKGStarredRes {
+  kgItemId: ID!
   starred: Boolean!
 }
 
@@ -187,12 +188,12 @@ type Project {
   description: String!
   favorite: Boolean!
   repository: Repository
-  state: ProjectState!
   creationDate: String!
   lastActivationDate: String!
   error: String
   members: [Member!]!
   toolUrls: ToolUrls!
+  archived: Boolean!
 }
 
 input RepositoryInput {
@@ -220,12 +221,6 @@ type Repository {
 enum RepositoryType {
   INTERNAL
   EXTERNAL
-}
-
-enum ProjectState {
-  STARTED
-  STOPPED
-  ARCHIVED
 }
 
 enum KnowledgeGraphItemCat {

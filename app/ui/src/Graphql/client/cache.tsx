@@ -1,6 +1,6 @@
 import {
-  InMemoryCache,
   defaultDataIdFromObject,
+  InMemoryCache,
   makeVar,
 } from '@apollo/client';
 import {
@@ -16,6 +16,8 @@ import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTools';
 import { NewProject } from './models/NewProject';
 import { PanelInfo } from './models/Panel';
+
+type ToolName = keyof GetUserTools_project_toolUrls;
 
 export const initialProjectFilters: ProjectFilters = {
   name: '',
@@ -65,8 +67,6 @@ const initialStateUserSettings: UserSettings = {
   },
 };
 
-type ToolName = keyof GetUserTools_project_toolUrls;
-
 export const projectFilters = makeVar(initialProjectFilters);
 export const newProject = makeVar(initialNewProject);
 export const openedProject = makeVar<GetProjects_projects | null>(null);
@@ -107,8 +107,8 @@ const cache = new InMemoryCache({
   },
   dataIdFromObject(responseObj) {
     switch (responseObj.__typename) {
-      case 'SetStarredKGItemResponse':
-        return `KnowledgeGraphItem:${responseObj.id}`;
+      case 'SetKGStarredRes':
+        return `KnowledgeGraphItem:${responseObj.kgItemId}`;
       default:
         return defaultDataIdFromObject(responseObj);
     }

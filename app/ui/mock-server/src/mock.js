@@ -17,8 +17,8 @@ const kgData = data.map((d, idx) => ({
   title: d.title,
   abstract: d.abstract,
   authors: ['Xingyi Zhou', 'Vladlen Koltun', 'Philipp Krähenbühl'],
-  frameworks: null,
-  repoUrls: null,
+  frameworks: ['Pytorch', 'TensorFlow'],
+  repoUrls: [casual.url, casual.url, casual.url],
   score: d.score,
   date: new Date().toISOString(),
   starred: starredItems.includes(idx),
@@ -43,8 +43,8 @@ const buildProject = () => ({
   creationDate: () => new Date().toISOString(),
   lastActivationDate: () => new Date().toISOString(),
   error: casual.random_element([null, casual.error]),
-  state: casual.random_element(['STARTED', 'STOPPED', 'ARCHIVED']),
   members: buildRandomMembers(casual.integer(1, 5)),
+  archived: casual.boolean,
   toolUrls: () => ({
     gitea: 'https://gitea.io/en-us/',
     minio: 'https://min.io/',
@@ -100,10 +100,11 @@ module.exports = {
     }),
   }),
   Mutation: () => ({
-    updateProject: (_, { input: { id, name, description } }) => {
+    updateProject: (_, { input: { id, name, description, archived } }) => {
       const project = projects.find((project) => project.id === id);
       if (name) project.name = name;
       if (description) project.description = description;
+      if (archived !== undefined) project.archived = archived;
 
       return project;
     },
@@ -129,10 +130,10 @@ module.exports = {
 
       return project;
     },
-    removeApiToken: (_, {input: {apiTokenId}}) => ({
+    removeApiToken: (_, { input: { apiTokenId } }) => ({
       id: apiTokenId,
     }),
-    setStarredKGItem: (_, {input: {kgItemId, starred}}) => ({
+    setStarredKGItem: (_, { input: { kgItemId, starred } }) => ({
       id: kgItemId,
       starred,
     }),
@@ -140,13 +141,17 @@ module.exports = {
       id: meId,
       sshKey: this.SSHKey,
     }),
+    setKGStarred: (_, { input: { kgItemId, starred } }) => ({
+      kgItemId,
+      starred,
+    }),
     addApiToken: this.ApiToken,
-    updateAccessLevel: (_, {input: {userIds, accessLevel}}) =>
+    updateAccessLevel: (_, { input: { userIds, accessLevel } }) =>
       userIds.map((userId) => ({
         id: userId,
         accessLevel,
       })),
-    removeUsers: (_, {input: {userIds}}) =>
+    removeUsers: (_, { input: { userIds } }) =>
       userIds.map((userId) => ({
         id: userId,
       })),

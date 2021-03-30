@@ -25,7 +25,7 @@ func (i *interactor) Graph(ctx context.Context, project entity.Project) (entity.
 
 	graph, err := i.kgService.Graph(ctx, project.Description)
 	if err != nil {
-		return entity.KnowledgeGraph{}, nil
+		return entity.KnowledgeGraph{}, err
 	}
 
 	starred := project.StarredKGItems

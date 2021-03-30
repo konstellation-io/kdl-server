@@ -29,7 +29,7 @@ function TabDangerZone({ projectId, archived }: Props) {
       </p>
       <MessageActionBox
         title="Archive project"
-        desciption="This project will be accessible and you will be able to recover it, but while it is 
+        description="This project will be accessible and you will be able to recover it, but while it is
           archived you will not be able to make changes or use any resources associated with this project. To 
           access this project again after being archived, go to server projects and filter by ARCHIVED (by 
           default, archived projects are hidden)."
@@ -37,7 +37,6 @@ function TabDangerZone({ projectId, archived }: Props) {
           label: 'ARCHIVE',
           onClick: () => updateProjectArchived(projectId, !archived),
           Icon: IconArchive,
-          disabled: loading,
           loading,
         }}
         theme={BOX_THEME.DEFAULT}

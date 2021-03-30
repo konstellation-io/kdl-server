@@ -18,40 +18,37 @@ const toButtonTheme = new Map([
   [BOX_THEME.ERROR, BUTTON_THEMES.ERROR],
 ]);
 
-type Action = {
+export type BoxAction = {
   needConfirmation?: boolean;
   message?: string;
   label: string;
   onClick: () => void;
   Icon?: FunctionComponent<OverrideProps<SvgIconTypeMap<{}, 'svg'>, 'svg'>>;
   loading?: boolean;
-  disabled?: boolean;
 };
 
 type Props = {
   title: string;
-  desciption: string;
-  action?: Action;
+  description: string;
+  action?: BoxAction;
   theme?: BOX_THEME;
-  loading?: boolean;
   customAction?: JSX.Element;
 };
 
 function MessageActionBox({
   title,
-  desciption,
+  description,
   action,
   customAction,
   theme = BOX_THEME.DEFAULT,
-  loading = false,
 }: Props) {
   const [confirmed, setConfirmed] = useState(false);
 
   useEffect(() => {
-    if (loading) {
+    if (action?.loading) {
       setConfirmed(false);
     }
-  }, [loading]);
+  }, [action?.loading]);
 
   function getAction() {
     if (customAction) return customAction;
@@ -71,9 +68,9 @@ function MessageActionBox({
               theme={toButtonTheme.get(theme)}
               onClick={action.onClick}
               disabled={
-                (action.needConfirmation && !confirmed) || action.disabled
+                (action.needConfirmation && !confirmed) || action.loading
               }
-              loading={loading || action.loading}
+              loading={action.loading}
               height={30}
               Icon={action.Icon}
               primary
@@ -90,7 +87,7 @@ function MessageActionBox({
       onClick={(e) => e.stopPropagation()}
     >
       <p className={styles.title}>{title}</p>
-      <p className={styles.description}>{desciption}</p>
+      <p className={styles.description}>{description}</p>
       {getAction()}
     </div>
   );

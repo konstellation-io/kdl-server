@@ -29,19 +29,19 @@ function ResourcesList({
   const hasResources = resources.length > 0;
 
   function renderListContent() {
-    if (hasResources) {
-      return resources.map((r) => (
-        <KGItem
-          key={r.id}
-          onEnter={onEnter}
-          onLeave={onLeave}
-          onClick={onClick}
-          resource={r}
-        />
-      ));
-    }
-    return <NoItems {...noItems} />;
+    if (!hasResources) return <NoItems {...noItems} />;
+
+    return resources.map((r) => (
+      <KGItem
+        key={r.id}
+        onEnter={onEnter}
+        onLeave={onLeave}
+        onClick={onClick}
+        resource={r}
+      />
+    ));
   }
+
   return (
     <div className={styles.list}>
       <div className={styles.top}>

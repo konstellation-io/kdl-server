@@ -7,17 +7,28 @@ import { orderBy } from 'lodash';
 import { resourcesViz } from '../KGVisualization/KGViz';
 import styles from './ResourceLists.module.scss';
 
+const NO_ITEMS_MESSAGE = {
+  title: 'No items in the KG!',
+  subTitle: 'Please, provide us a better description of your project.',
+};
+const NO_STARRED_ITEMS_MESSAGE = {
+  title: 'No starred items yet!',
+  subTitle:
+    "Once you favourite an item you'll see them here. Go to the KG to choose your favorites.",
+};
+
 type Props = {
   starredResources: KGItem[];
-  resources?: KGItem[];
+  resources: KGItem[];
   onResourceClick: (id: string, name: string, left: number) => void;
-  scores?: [number, number];
+  scores: [number, number];
 };
+
 function ResourceLists({
   starredResources,
-  resources = [],
+  resources,
   onResourceClick,
-  scores = [1, 0],
+  scores,
 }: Props) {
   const [listFilterText, setListFilterText] = useState('');
 
@@ -85,11 +96,7 @@ function ResourceLists({
               onEnter={onEnter}
               onLeave={onLeave}
               onChangeFilterText={setListFilterText}
-              noItems={{
-                title: 'No items in the KG!',
-                subTitle:
-                  'Please, provide us a better description of your project.',
-              }}
+              noItems={NO_ITEMS_MESSAGE}
             />
           </TabPanel>
           <TabPanel>
@@ -100,11 +107,7 @@ function ResourceLists({
               onEnter={onEnter}
               onLeave={onLeave}
               onChangeFilterText={setListFilterText}
-              noItems={{
-                title: 'No starred items yet!',
-                subTitle:
-                  "Once you favourite an item you'll see them here. Go to the KG to choose your favorites.",
-              }}
+              noItems={NO_STARRED_ITEMS_MESSAGE}
             />
           </TabPanel>
         </div>

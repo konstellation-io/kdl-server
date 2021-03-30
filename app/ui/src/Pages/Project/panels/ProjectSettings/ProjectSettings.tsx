@@ -1,7 +1,3 @@
-import {
-  GET_OPENED_PROJECT,
-  GetOpenedProject,
-} from 'Graphql/client/queries/getOpenedProject.graphql';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 import { ErrorMessage } from 'kwc';

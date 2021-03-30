@@ -12,8 +12,8 @@ import { GetKnowledgeGraph_knowledgeGraph_items_topics } from 'Graphql/queries/t
 type Props = {
   resource: KGItemType;
   onClick: (resource: KGItemType) => void;
-  onEnter: (name: string) => void;
-  onLeave: () => void;
+  onEnter?: (name: string) => void;
+  onLeave?: () => void;
 };
 
 function KGItem({ resource, onClick, onLeave, onEnter }: Props) {
@@ -25,7 +25,7 @@ function KGItem({ resource, onClick, onLeave, onEnter }: Props) {
     <div
       key={resource.id}
       className={cx(styles.resource, { [styles.starred]: resource.starred })}
-      onMouseEnter={() => onEnter(resource.title)}
+      onMouseEnter={() => onEnter && onEnter(resource.title)}
       onMouseLeave={onLeave}
       onClick={() => onClick(resource)}
     >
@@ -40,7 +40,7 @@ function KGItem({ resource, onClick, onLeave, onEnter }: Props) {
           {resource.topics.length !== 0 && (
             <div className={styles.topics}>
               <span className={styles.topic} title={resource.category}>
-                {resource.category}
+                {resource.topics[0].name}
               </span>
               {resource.topics.length > 1 && (
                 <span

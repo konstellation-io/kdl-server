@@ -36,7 +36,7 @@ function UpdateInternalRepo({ close, project }: UpdateRepoProps) {
       validate: validateSlug,
     });
     return () => unregister('slug');
-  }, []);
+  }, [register, unregister]);
 
   const slug = watch('slug');
   const { slug: slugError } = errors;

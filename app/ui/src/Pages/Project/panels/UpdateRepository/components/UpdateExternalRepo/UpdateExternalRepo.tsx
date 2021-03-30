@@ -34,10 +34,8 @@ function UpdateExternalRepo({ close, project }: UpdateRepoProps) {
     });
     register('username', { required: 'This field is mandatory' });
     register('token', { required: 'This field is mandatory' });
-    return () => {
-      unregister(['url', 'username', 'token']);
-    };
-  }, []);
+    return () => unregister(['url', 'username', 'token']);
+  }, [register, unregister]);
 
   const { url, username, token } = watch(['url', 'username', 'token']);
   const { url: urlError, username: usernameError, token: tokenError } = errors;

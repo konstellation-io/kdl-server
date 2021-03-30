@@ -18,7 +18,7 @@ const toButtonTheme = new Map([
   [BOX_THEME.ERROR, BUTTON_THEMES.ERROR],
 ]);
 
-export type BoxAction = {
+export type BoxActionProps = {
   needConfirmation?: boolean;
   message?: string;
   label: string;
@@ -30,7 +30,7 @@ export type BoxAction = {
 type Props = {
   title: string;
   description: string;
-  action?: BoxAction;
+  action?: BoxActionProps;
   theme?: BOX_THEME;
   customAction?: JSX.Element;
 };

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import AnimateHeight from 'react-animate-height';
 import IconHelp from '@material-ui/icons/Help';
 import MessageActionBox, {
-  BoxAction,
+  BoxActionProps,
 } from 'Components/MessageActionBox/MessageActionBox';
 import cx from 'classnames';
 import styles from './FAQBox.module.scss';
@@ -20,7 +20,7 @@ type Props = {
   label: string;
   title: string;
   description: string;
-  action?: BoxAction;
+  action?: BoxActionProps;
   customAction?: JSX.Element;
   theme?: BOX_THEME;
 };

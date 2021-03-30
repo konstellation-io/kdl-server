@@ -37,11 +37,10 @@ def split_text_into_chunks(text: str, n_chunks: int) -> list[str]:
 
     first_in_chunk = list(range(0, n_words, int(words_per_chunk)))
 
-    chunks = [" ".join(words[i*words_per_chunk : int(min(i*words_per_chunk + words_per_chunk, n_words))])
+    chunks = [" ".join(words[i * words_per_chunk:int(min(i * words_per_chunk + words_per_chunk, n_words))])
               for i, start in enumerate(first_in_chunk)]
 
     return chunks
-
 
 
 class Recommender:
@@ -108,7 +107,8 @@ class Recommender:
 
         else:
             query_chunks = split_text_into_chunks(raw_query_text, n_chunks=np.ceil(n_tokens / self.max_tokens))
-            tokens_by_chunk = tokenize_batch(query_chunks, tokenizer=self.tokenizer, device=device, tokenizer_args={})  # also tokenizer_args
+            tokens_by_chunk = tokenize_batch(query_chunks, tokenizer=self.tokenizer, device=device,
+                                             tokenizer_args={})
             vecs_by_chunk = vectorize_batch(tokens_by_chunk, model=self.model)
             query_vector = torch.mean(vecs_by_chunk, dim=0).cpu().numpy()
 

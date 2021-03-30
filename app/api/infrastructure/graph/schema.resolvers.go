@@ -270,7 +270,7 @@ func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
 }
 
 func (r *queryResolver) Projects(ctx context.Context) ([]entity.Project, error) {
-	return r.projects.GetAll(ctx)
+	return r.projects.FindAll(ctx)
 }
 
 func (r *queryResolver) Project(ctx context.Context, id string) (*entity.Project, error) {

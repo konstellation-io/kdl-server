@@ -194,10 +194,10 @@ func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity
 	return i.repo.Get(ctx, insertedID)
 }
 
-// GetAll returns all the projects.
-func (i interactor) GetAll(ctx context.Context) ([]entity.Project, error) {
+// FindAll returns all the projects.
+func (i interactor) FindAll(ctx context.Context) ([]entity.Project, error) {
 	i.logger.Info("Finding all projects")
-	return i.repo.GetAll(ctx)
+	return i.repo.FindAll(ctx)
 }
 
 // GetByID returns the project with the desired identifier.

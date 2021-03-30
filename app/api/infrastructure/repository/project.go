@@ -79,7 +79,7 @@ func (m *projectMongoDBRepo) Create(ctx context.Context, p entity.Project) (stri
 }
 
 // FindByUserID retrieves the projects of the given user.
-func (m *projectMongoDBRepo) GetAll(ctx context.Context) ([]entity.Project, error) {
+func (m *projectMongoDBRepo) FindAll(ctx context.Context) ([]entity.Project, error) {
 	return m.find(ctx, bson.M{})
 }
 

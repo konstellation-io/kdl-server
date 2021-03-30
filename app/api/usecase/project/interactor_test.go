@@ -211,9 +211,9 @@ func TestInteractor_FindByUserID(t *testing.T) {
 		entity.NewProject("project-x", "Project X"),
 	}
 
-	s.mocks.repo.EXPECT().GetAll(ctx).Return(expectedProjects, nil)
+	s.mocks.repo.EXPECT().FindAll(ctx).Return(expectedProjects, nil)
 
-	p, err := s.interactor.GetAll(ctx)
+	p, err := s.interactor.FindAll(ctx)
 
 	require.NoError(t, err)
 	require.Equal(t, p, expectedProjects)

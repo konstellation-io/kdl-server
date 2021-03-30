@@ -195,7 +195,6 @@ type Project {
   toolUrls: ToolUrls!
   needAccess: Boolean!
   archived: Boolean!
-  needAccess: Boolean!
 }
 
 input RepositoryInput {

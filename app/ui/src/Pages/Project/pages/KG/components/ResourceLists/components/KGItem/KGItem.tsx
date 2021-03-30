@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React from 'react';
 
 import IconStar from '@material-ui/icons/Star';
 import IconTime from '@material-ui/icons/AccessTime';
@@ -7,6 +7,7 @@ import Score from '../../../KGVisualization/Score';
 import cx from 'classnames';
 import { formatDate } from 'Utils/format';
 import styles from './KGItem.module.scss';
+import { GetKnowledgeGraph_knowledgeGraph_items_topics } from 'Graphql/queries/types/GetKnowledgeGraph';
 
 type Props = {
   resource: KGItemType;
@@ -14,7 +15,12 @@ type Props = {
   onEnter: (name: string) => void;
   onLeave: () => void;
 };
-const KGItem: FC<Props> = ({ resource, onClick, onLeave, onEnter }: Props) => {
+
+function KGItem({ resource, onClick, onLeave, onEnter }: Props) {
+  const allTopicsButFirst = resource.topics
+    .slice(1)
+    .map((t: GetKnowledgeGraph_knowledgeGraph_items_topics) => t.name);
+
   return (
     <div
       key={resource.id}
@@ -33,9 +39,14 @@ const KGItem: FC<Props> = ({ resource, onClick, onLeave, onEnter }: Props) => {
           </div>
           {resource.topics.length !== 0 && (
             <div className={styles.topics}>
-              <span className={styles.topic}>{resource.topics[0].name}</span>
+              <span className={styles.topic} title={resource.category}>
+                {resource.category}
+              </span>
               {resource.topics.length > 1 && (
-                <span className={styles.topic}>
+                <span
+                  className={styles.topic}
+                  title={allTopicsButFirst.join('\n')}
+                >
                   + {resource.topics.length - 1}
                 </span>
               )}
@@ -55,6 +66,6 @@ const KGItem: FC<Props> = ({ resource, onClick, onLeave, onEnter }: Props) => {
       <div className={styles.rCategory}>{resource.category}</div>
     </div>
   );
-};
+}
 
 export default KGItem;

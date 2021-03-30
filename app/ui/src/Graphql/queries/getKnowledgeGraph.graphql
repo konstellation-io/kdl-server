@@ -10,6 +10,8 @@ query GetKnowledgeGraph($projectId: ID!) {
       date
       url
       starred
+      frameworks
+      repoUrls
       topics {
         name
         relevance

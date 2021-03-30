@@ -17,6 +17,8 @@ const kgData = data.map((d, idx) => ({
   title: d.title,
   abstract: d.abstract,
   authors: ['Xingyi Zhou', 'Vladlen Koltun', 'Philipp Krähenbühl'],
+  frameworks: ['Pytorch', 'TensorFlow'],
+  repoUrls: [casual.url, casual.url, casual.url],
   score: d.score,
   date: new Date().toISOString(),
   starred: starredItems.includes(idx),
@@ -121,31 +123,35 @@ module.exports = {
 
       return project;
     },
-    updateMember: (_, {input: {userId, accessLevel, projectId}}) => {
-      const project = projects.find(({id}) => id === projectId);
-      const member = project.members.find(({user}) => user.id === userId);
+    updateMember: (_, { input: { userId, accessLevel, projectId } }) => {
+      const project = projects.find(({ id }) => id === projectId);
+      const member = project.members.find(({ user }) => user.id === userId);
       member.accessLevel = accessLevel;
 
       return project;
     },
-    removeApiToken: (_, {input: {apiTokenId}}) => ({
+    removeApiToken: (_, { input: { apiTokenId } }) => ({
       id: apiTokenId,
+    }),
+    setStarredKGItem: (_, { input: { kgItemId, starred } }) => ({
+      id: kgItemId,
+      starred,
     }),
     regenerateSSHKey: () => ({
       id: meId,
       sshKey: this.SSHKey,
     }),
-    setKGStarred: (_, {input: {kgItemId, starred}}) => ({
+    setKGStarred: (_, { input: { kgItemId, starred } }) => ({
       kgItemId,
       starred,
     }),
     addApiToken: this.ApiToken,
-    updateAccessLevel: (_, {input: {userIds, accessLevel}}) =>
+    updateAccessLevel: (_, { input: { userIds, accessLevel } }) =>
       userIds.map((userId) => ({
         id: userId,
         accessLevel,
       })),
-    removeUsers: (_, {input: {userIds}}) =>
+    removeUsers: (_, { input: { userIds } }) =>
       userIds.map((userId) => ({
         id: userId,
       })),

@@ -11,6 +11,7 @@ import IconUnstar from '@material-ui/icons/StarBorder';
 import React from 'react';
 import { RouteProjectParams } from 'Constants/routes';
 import Score from '../KGVisualization/Score';
+import URL from 'Components/URL/URL';
 import cx from 'classnames';
 import { loader } from 'graphql.macro';
 import { mutationPayloadHelper } from 'Utils/formUtils';
@@ -65,7 +66,7 @@ function ResourceDetails({ resource, onClose }: Props) {
           <Button Icon={IconClose} label="" onClick={onClose} />
         </div>
       </div>
-      {resource !== null && (
+      {
         <>
           <div
             className={cx(styles.resourceTitleAndTopics, {
@@ -87,27 +88,40 @@ function ResourceDetails({ resource, onClose }: Props) {
               </div>
             </div>
             <div className={styles.type}>{resource.category}</div>
-            <div
-              className={styles.url}
-              onClick={() => window.open(resource.url)}
-            >
-              {resource.url}
-            </div>
+            <URL className={styles.repoUrl}>{resource.url}</URL>
             <div className={styles.topicsG}>
               {resource.topics.length > 0 && (
                 <div className={styles.sectionTitle}>TOPICS</div>
               )}
               {resource.topics.map(({ name, relevance }: any) => (
-                <div className={styles.topicScore}>
+                <div className={styles.topicScore} key={name}>
                   <Score value={relevance} inline />
                   <span>{name}</span>
                 </div>
               ))}
             </div>
+            {resource.frameworks && (
+              <div className={styles.frameworks}>
+                <div className={styles.sectionTitle}>FRAMEWORKS</div>
+                <div>{resource.frameworks?.join(', ')}</div>
+              </div>
+            )}
+            {resource.repoUrls && (
+              <div className={styles.repoUrls}>
+                <div className={styles.sectionTitle}>CODE REPOSITORIES</div>
+                <div className={styles.repoUrlText}>
+                  {resource.repoUrls.map((repoUrl) => (
+                    <URL className={styles.repoUrlText} key={repoUrl}>
+                      {repoUrl}
+                    </URL>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className={styles.abstract}>{resource.abstract}</div>
           </div>
         </>
-      )}
+      }
     </div>
   );
 }

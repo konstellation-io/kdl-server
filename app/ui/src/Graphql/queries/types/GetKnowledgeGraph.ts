@@ -26,6 +26,8 @@ export interface GetKnowledgeGraph_knowledgeGraph_items {
   date: string;
   url: string;
   starred: boolean;
+  frameworks: string[] | null;
+  repoUrls: string[] | null;
   topics: GetKnowledgeGraph_knowledgeGraph_items_topics[];
 }
 

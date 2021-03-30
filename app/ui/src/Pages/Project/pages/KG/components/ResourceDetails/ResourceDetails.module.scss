@@ -75,6 +75,7 @@
 
     margin-bottom: $grid-unit;
   }
+
   .authors {
     .authorsText {
       @include font-subheader;
@@ -83,18 +84,7 @@
   }
   .type {
     color: font-color(light);
-    margin-top: 2 * $grid-unit;
-  }
-  .url {
-    color: font-color(lowlight);
-    margin-top: 2 * $grid-unit;
-    cursor: pointer;
-
-    transition: color ease 0.3s;
-
-    &:hover {
-      color: palette(highlight);
-    }
+    margin: 2 * $grid-unit 0 $grid-unit 0;
   }
   .topicsG {
     margin-top: 2 * $grid-unit;
@@ -120,5 +110,18 @@
     margin-top: 4 * $grid-unit;
     overflow-wrap: break-word;
     overflow: auto;
+  }
+
+  .frameworks {
+    margin-bottom: 2 * $grid-unit;
+  }
+
+  .repoUrls {
+    .repoUrlText {
+      @include font-small;
+      color: font-color(lowlight);
+
+      margin-bottom: 0.5 * $grid-unit;
+    }
   }
 }

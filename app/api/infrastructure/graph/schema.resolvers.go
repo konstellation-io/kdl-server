@@ -42,7 +42,7 @@ func (r *mutationResolver) RemoveUsers(ctx context.Context, input model.RemoveUs
 }
 
 func (r *mutationResolver) UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]entity.User, error) {
-	return nil, entity.ErrNotImplemented
+	return r.users.UpdateAccessLevel(ctx, input.UserIds, input.AccessLevel)
 }
 
 func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.User, error) {

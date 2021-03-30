@@ -463,3 +463,33 @@ func TestInteractor_RegenerateSSHKeys_UserToolsRunning(t *testing.T) {
 	require.Equal(t, userData, entity.User{})
 	require.Equal(t, err, user.ErrUserToolsActive)
 }
+
+func TestInteractor_UpdateAccessLevel(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		id          = "user.1234"
+		username    = "john.doe"
+		accessLevel = entity.AccessLevelAdmin
+	)
+
+	ctx := context.Background()
+
+	targetUser := entity.User{
+		ID:          id,
+		Username:    username,
+		AccessLevel: accessLevel,
+	}
+
+	ids := []string{id}
+	users := []entity.User{targetUser}
+
+	s.mocks.repo.EXPECT().UpdateAccessLevel(ctx, ids, accessLevel).Return(nil)
+	s.mocks.repo.EXPECT().FindByIDs(ctx, ids).Return(users, nil)
+
+	returnedUsers, err := s.interactor.UpdateAccessLevel(ctx, ids, accessLevel)
+
+	require.NoError(t, err)
+	require.Equal(t, users, returnedUsers)
+}

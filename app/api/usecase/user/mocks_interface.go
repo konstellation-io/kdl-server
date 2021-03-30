@@ -139,6 +139,20 @@ func (mr *MockRepositoryMockRecorder) GetByUsername(ctx, username interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByUsername", reflect.TypeOf((*MockRepository)(nil).GetByUsername), ctx, username)
 }
 
+// UpdateSSHKey mocks base method.
+func (m *MockRepository) UpdateSSHKey(ctx context.Context, username string, SSHKey entity.SSHKey) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSSHKey", ctx, username, SSHKey)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateSSHKey indicates an expected call of UpdateSSHKey.
+func (mr *MockRepositoryMockRecorder) UpdateSSHKey(ctx, username, SSHKey interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSSHKey", reflect.TypeOf((*MockRepository)(nil).UpdateSSHKey), ctx, username, SSHKey)
+}
+
 // MockUseCase is a mock of UseCase interface.
 type MockUseCase struct {
 	ctrl     *gomock.Controller
@@ -250,6 +264,21 @@ func (m *MockUseCase) GetByID(ctx context.Context, userID string) (entity.User, 
 func (mr *MockUseCaseMockRecorder) GetByID(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockUseCase)(nil).GetByID), ctx, userID)
+}
+
+// RegenerateSSHKeys mocks base method.
+func (m *MockUseCase) RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RegenerateSSHKeys", ctx, user)
+	ret0, _ := ret[0].(entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RegenerateSSHKeys indicates an expected call of RegenerateSSHKeys.
+func (mr *MockUseCaseMockRecorder) RegenerateSSHKeys(ctx, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegenerateSSHKeys", reflect.TypeOf((*MockUseCase)(nil).RegenerateSSHKeys), ctx, user)
 }
 
 // StartTools mocks base method.

@@ -79,6 +79,12 @@ export interface SetActiveUserToolsInput {
   active: boolean;
 }
 
+export interface SetKGStarredInput {
+  projectId: string;
+  kgItemId: string;
+  starred: boolean;
+}
+
 export interface UpdateAccessLevelInput {
   userIds: string[];
   accessLevel: AccessLevel;

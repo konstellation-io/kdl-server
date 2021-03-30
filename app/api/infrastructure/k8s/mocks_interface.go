@@ -90,3 +90,17 @@ func (mr *MockK8sClientMockRecorder) IsUserToolPODRunning(username interface{}) 
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUserToolPODRunning", reflect.TypeOf((*MockK8sClient)(nil).IsUserToolPODRunning), username)
 }
+
+// UpdateSecret mocks base method.
+func (m *MockK8sClient) UpdateSecret(name string, values map[string]string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSecret", name, values)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateSecret indicates an expected call of UpdateSecret.
+func (mr *MockK8sClientMockRecorder) UpdateSecret(name, values interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSecret", reflect.TypeOf((*MockK8sClient)(nil).UpdateSecret), name, values)
+}

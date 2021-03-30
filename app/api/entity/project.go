@@ -11,14 +11,15 @@ type Project struct {
 	Description        string
 	CreationDate       time.Time
 	LastActivationDate string
+	Favorite           bool
+	Archived           bool
 	Error              *string
 	Repository         Repository
 	Members            []Member
-	Favorite           bool
-	Archived           bool
+	StarredKGItems     []string
 }
 
 // NewProject is a constructor function.
 func NewProject(name, description string) Project {
-	return Project{Name: name, Description: description, Archived: false}
+	return Project{Name: name, Description: description, StarredKGItems: []string{}}
 }

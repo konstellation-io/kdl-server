@@ -131,3 +131,17 @@ func (mr *MockGiteaClientMockRecorder) UpdateCollaboratorPermissions(repoName, u
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCollaboratorPermissions", reflect.TypeOf((*MockGiteaClient)(nil).UpdateCollaboratorPermissions), repoName, username, accessLevel)
 }
+
+// UpdateSSHKey mocks base method.
+func (m *MockGiteaClient) UpdateSSHKey(username, newPublicSSHKey string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSSHKey", username, newPublicSSHKey)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateSSHKey indicates an expected call of UpdateSSHKey.
+func (mr *MockGiteaClientMockRecorder) UpdateSSHKey(username, newPublicSSHKey interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSSHKey", reflect.TypeOf((*MockGiteaClient)(nil).UpdateSSHKey), username, newPublicSSHKey)
+}

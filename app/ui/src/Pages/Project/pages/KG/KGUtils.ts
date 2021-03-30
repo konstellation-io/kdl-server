@@ -7,6 +7,7 @@ import { D, TopicSections } from './components/KGVisualization/KGVisualization';
 import { RGBColor, color } from 'd3-color';
 
 import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
+import { KGItem } from './KG';
 import { orderBy } from 'lodash';
 import { scaleLinear } from '@visx/scale';
 
@@ -90,14 +91,16 @@ export function groupData(
   });
 }
 
-export function getSectionsAndNames(newData: D[]) {
+export function getSectionsAndNames(newData: KGItem[]) {
   const result: TopicSections = {};
 
   const sortedData = orderBy(newData, ['score'], ['desc']);
 
-  sortedData.forEach(({ name, category }) => {
-    if (category in result) result[category].push(name);
-    else result[category] = [name];
+  sortedData.forEach(({ title, topic }) => {
+    if (topic === undefined) return;
+
+    if (topic.name in result) result[topic.name].push(title);
+    else result[topic.name] = [title];
   });
 
   return result;

@@ -14,8 +14,9 @@ import (
 )
 
 var (
-	ErrStartUserTools = errors.New("cannot start running user tools")
-	ErrStopUserTools  = errors.New("cannot stop uninitialized user tools")
+	ErrStartUserTools  = errors.New("cannot start running user tools")
+	ErrStopUserTools   = errors.New("cannot stop uninitialized user tools")
+	ErrUserToolsActive = errors.New("it is not possible to regenerate SSH keys with the usertools active")
 )
 
 type interactor struct {
@@ -109,11 +110,8 @@ func (i *interactor) Create(ctx context.Context, email, username, password strin
 
 	i.logger.Infof("The user \"%s\" (%s) was created with ID \"%s\"", user.Username, user.Email, insertedID)
 
-	secretName := fmt.Sprintf("%s-ssh-keys", user.UsernameSlug())
-	err = i.k8sClient.CreateSecret(secretName, map[string]string{
-		"KDL_USER_PUBLIC_SSH_KEY":  keys.Public,
-		"KDL_USER_PRIVATE_SSH_KEY": keys.Private,
-	})
+	secretName, k8sKeys := i.newUserSSHKeySecret(user, keys.Public, keys.Private)
+	err = i.k8sClient.CreateSecret(secretName, k8sKeys)
 
 	if err != nil {
 		return entity.User{}, err
@@ -201,4 +199,66 @@ func (i *interactor) FindByIDs(ctx context.Context, userIDs []string) ([]entity.
 // GetByID retrieve the user for the given identifier.
 func (i *interactor) GetByID(ctx context.Context, userID string) (entity.User, error) {
 	return i.repo.Get(ctx, userID)
+}
+
+// RegenerateSSHKeys generate new SSH key pair for the given user.
+// - Check if user exists. (if no, returns ErrUserNotFound error)
+// - Check if userTools are Running. (if yes, returns ErrUserNotFound error
+// - Generate a new ssh key pair
+// - Check if k8s secret exists. If yes, update it. Else, create it.
+// - Update public key on Gitea
+// - Update ssh keys for user in database.
+func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error) {
+	i.logger.Infof("Regenerating user SSH keys for user \"%s\" ", user.Username)
+
+	// Check if userTools are running
+	userToolsRunning, err := i.AreToolsRunning(user.Username)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	if userToolsRunning {
+		return entity.User{}, ErrUserToolsActive
+	}
+
+	// Create new SSH public and private keys
+	keys, err := i.sshGenerator.NewKeys()
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	// Check if k8s secret exists. If exists, update it. Otherwise, create it.
+	secretName, k8sKeys := i.newUserSSHKeySecret(user, keys.Public, keys.Private)
+
+	err = i.k8sClient.UpdateSecret(secretName, k8sKeys)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	// Update public key on Gitea
+	err = i.giteaService.UpdateSSHKey(user.Username, keys.Public)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	// Update the user ssh keys in the DB.
+	err = i.repo.UpdateSSHKey(ctx, user.Username, keys)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	i.logger.Infof("The SSH keys for user \"%s\" has been successfully regenerated", user.Username)
+
+	return i.repo.GetByUsername(ctx, user.Username)
+}
+
+// newUserSSHKeySecret returns the name and the k8s secret for public and private SSH keys.
+func (i *interactor) newUserSSHKeySecret(user entity.User, public, private string) (secretName string, k8sKeys map[string]string) {
+	secretName = fmt.Sprintf("%s-ssh-keys", user.UsernameSlug())
+	k8sKeys = map[string]string{
+		"KDL_USER_PUBLIC_SSH_KEY":  public,
+		"KDL_USER_PRIVATE_SSH_KEY": private,
+	}
+
+	return secretName, k8sKeys
 }

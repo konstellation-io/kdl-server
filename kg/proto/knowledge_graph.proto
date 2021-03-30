@@ -7,8 +7,12 @@ message GetGraphReq {
     string description = 1;
 }
 
-message GetItemReq {
-    string id = 1;
+message DescriptionQualityReq {
+    string description = 1;
+}
+
+message DescriptionQualityRes {
+    int32 quality_score = 1;
 }
 
 message GraphItem {
@@ -36,11 +40,7 @@ message GetGraphRes {
     repeated Topic topics = 2;
 }
 
-message GetItemRes {
-    GraphItem item = 1;
-}
-
 service KGService {
     rpc GetGraph (GetGraphReq) returns (GetGraphRes) {};
-    rpc GetItem  (GetItemReq) returns (GetItemRes) {};
+    rpc GetDescriptionQuality (DescriptionQualityReq) returns (DescriptionQualityRes) {};
 };

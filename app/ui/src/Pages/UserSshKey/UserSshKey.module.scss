@@ -38,3 +38,25 @@
     padding-left: 4 * $grid-unit;
   }
 }
+
+.regenWarning {
+  display: flex;
+  align-items: center;
+
+  border-left: solid 3px palette(alert);
+
+  margin-top: 4 * $grid-unit;
+  padding-left: $grid-unit;
+  height: 3 * $grid-unit;
+
+  .regenWarningTag {
+    @include font-caption;
+    color: palette(alert);
+
+    margin-right: $grid-unit;
+  }
+  .regenWarningText {
+    @include font-small;
+    color: font-color(lowlight);
+  }
+}

@@ -65,7 +65,7 @@
   flex-grow: 1;
   background-color: palette(base);
   padding: 3 * $grid-unit;
-  overflow: hidden;
+  overflow: auto;
   display: flex;
   flex-direction: column;
 
@@ -109,7 +109,6 @@
 
     margin-top: 4 * $grid-unit;
     overflow-wrap: break-word;
-    overflow: auto;
   }
 
   .frameworks {

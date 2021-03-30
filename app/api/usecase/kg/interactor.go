@@ -21,7 +21,7 @@ func NewInteractor(logger logging.Logger, kgService kgservice.KGService) UseCase
 
 // Graph returns the knowledge graph for the desired description.
 func (i *interactor) Graph(ctx context.Context, project entity.Project) (entity.KnowledgeGraph, error) {
-	i.logger.Infof("Getting KG with description \"%s\"", project.Description)
+	i.logger.Infof("Getting KG for project \"%s\"", project.ID)
 
 	graph, err := i.kgService.Graph(ctx, project.Description)
 	if err != nil {

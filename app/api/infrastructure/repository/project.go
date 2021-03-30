@@ -34,6 +34,7 @@ type projectDTO struct {
 	ExternalRepoURL  string                `bson:"external_repo_url"`
 	RepoName         string                `bson:"repo_name"`
 	Members          []memberDTO           `bson:"members"`
+	StarredKGItems   []string              `bson:"starred_kg_items"`
 }
 
 type projectMongoDBRepo struct {
@@ -180,6 +181,50 @@ func (m *projectMongoDBRepo) UpdateDescription(ctx context.Context, projectID, d
 	return m.updateProjectFields(ctx, projectID, bson.M{"description": description})
 }
 
+// SetStarredKGItem adds a kgItem to starred list.
+func (m *projectMongoDBRepo) SetStarredKGItem(ctx context.Context, projectID, kgItemID string) error {
+	m.logger.Debugf("Starring %s in project \"%s\"...", kgItemID, projectID)
+
+	pID, err := primitive.ObjectIDFromHex(projectID)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": pID}
+
+	upd := bson.M{
+		"$push": bson.M{
+			"starred_kg_items": kgItemID,
+		},
+	}
+
+	_, err = m.collection.UpdateOne(ctx, filter, upd)
+
+	return err
+}
+
+// UnsetStarredKGItem unsets a kgItem from starred list.
+func (m *projectMongoDBRepo) UnsetStarredKGItem(ctx context.Context, projectID, kgItemID string) error {
+	m.logger.Debugf("Unstarring %s in project \"%s\"...", kgItemID, projectID)
+
+	pID, err := primitive.ObjectIDFromHex(projectID)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": pID}
+
+	upd := bson.M{
+		"$pull": bson.M{
+			"starred_kg_items": kgItemID,
+		},
+	}
+
+	_, err = m.collection.UpdateOne(ctx, filter, upd)
+
+	return err
+}
+
 func (m *projectMongoDBRepo) updateProjectFields(ctx context.Context, projectID string, fields bson.M) error {
 	m.logger.Debugf("Updating the project \"%s\" with \"%s\"...", projectID, fields)
 
@@ -232,6 +277,7 @@ func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 		InternalRepoName: p.Repository.InternalRepoName,
 		ExternalRepoURL:  p.Repository.ExternalRepoURL,
 		RepoName:         p.Repository.RepoName,
+		StarredKGItems:   p.StarredKGItems,
 	}
 
 	if p.ID != "" {
@@ -274,10 +320,11 @@ func (m *projectMongoDBRepo) membersToDTOs(members []entity.Member) ([]memberDTO
 
 func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 	p := entity.Project{
-		ID:           dto.ID.Hex(),
-		Name:         dto.Name,
-		Description:  dto.Description,
-		CreationDate: dto.CreationDate,
+		ID:             dto.ID.Hex(),
+		Name:           dto.Name,
+		Description:    dto.Description,
+		CreationDate:   dto.CreationDate,
+		StarredKGItems: dto.StarredKGItems,
 		Repository: entity.Repository{
 			Type:             dto.RepositoryType,
 			ExternalRepoURL:  dto.ExternalRepoURL,

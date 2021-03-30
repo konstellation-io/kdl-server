@@ -1,8 +1,8 @@
-import React, { FC } from 'react';
+import React from 'react';
 
-import { D } from '../../../KGVisualization/KGVisualization';
 import IconStar from '@material-ui/icons/Star';
 import IconTime from '@material-ui/icons/AccessTime';
+import { KGItem as KGItemType } from 'Pages/Project/pages/KG/KG';
 import Score from '../../../KGVisualization/Score';
 import cx from 'classnames';
 import { formatDate } from 'Utils/format';
@@ -10,21 +10,14 @@ import styles from './KGItem.module.scss';
 import { GetKnowledgeGraph_knowledgeGraph_items_topics } from 'Graphql/queries/types/GetKnowledgeGraph';
 
 type Props = {
-  resource: D;
-  onClick: (resource: D) => void;
+  resource: KGItemType;
+  onClick: (resource: KGItemType) => void;
   onEnter: (name: string) => void;
   onLeave: () => void;
-  idToFullResource: { [key: string]: any };
 };
-const KGItem: FC<Props> = ({
-  resource,
-  onClick,
-  onLeave,
-  onEnter,
-  idToFullResource,
-}: Props) => {
-  const fullResource = idToFullResource[resource.id];
-  const allTopicsButFirst = fullResource.topics
+
+function KGItem({ resource, onClick, onLeave, onEnter }: Props) {
+  const allTopicsButFirst = resource.topics
     .slice(1)
     .map((t: GetKnowledgeGraph_knowledgeGraph_items_topics) => t.name);
 
@@ -32,7 +25,7 @@ const KGItem: FC<Props> = ({
     <div
       key={resource.id}
       className={cx(styles.resource, { [styles.starred]: resource.starred })}
-      onMouseEnter={() => onEnter(resource.name)}
+      onMouseEnter={() => onEnter(resource.title)}
       onMouseLeave={onLeave}
       onClick={() => onClick(resource)}
     >
@@ -41,20 +34,20 @@ const KGItem: FC<Props> = ({
           <div className={styles.timeField}>
             <IconTime className="icon-regular" />
             <span className={styles.rType}>
-              {formatDate(fullResource.date)}
+              {formatDate(new Date(resource.date))}
             </span>
           </div>
-          {fullResource.topics.length !== 0 && (
+          {resource.topics.length !== 0 && (
             <div className={styles.topics}>
               <span className={styles.topic} title={resource.category}>
                 {resource.category}
               </span>
-              {fullResource.topics.length > 1 && (
+              {resource.topics.length > 1 && (
                 <span
                   className={styles.topic}
                   title={allTopicsButFirst.join('\n')}
                 >
-                  + {fullResource.topics.length - 1}
+                  + {resource.topics.length - 1}
                 </span>
               )}
             </div>
@@ -68,11 +61,11 @@ const KGItem: FC<Props> = ({
             <IconStar className="icon-small" />
           </div>
         )}
-        {resource.name}
+        {resource.title}
       </div>
-      <div className={styles.rCategory}>{resource.type}</div>
+      <div className={styles.rCategory}>{resource.category}</div>
     </div>
   );
-};
+}
 
 export default KGItem;

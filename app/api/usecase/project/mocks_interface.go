@@ -108,6 +108,34 @@ func (mr *MockRepositoryMockRecorder) RemoveMember(ctx, projectID, userID interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMember", reflect.TypeOf((*MockRepository)(nil).RemoveMember), ctx, projectID, userID)
 }
 
+// SetStarredKGItem mocks base method.
+func (m *MockRepository) SetStarredKGItem(ctx context.Context, projectID, kgItemID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetStarredKGItem", ctx, projectID, kgItemID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetStarredKGItem indicates an expected call of SetStarredKGItem.
+func (mr *MockRepositoryMockRecorder) SetStarredKGItem(ctx, projectID, kgItemID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetStarredKGItem", reflect.TypeOf((*MockRepository)(nil).SetStarredKGItem), ctx, projectID, kgItemID)
+}
+
+// UnsetStarredKGItem mocks base method.
+func (m *MockRepository) UnsetStarredKGItem(ctx context.Context, projectID, kgItemID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UnsetStarredKGItem", ctx, projectID, kgItemID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UnsetStarredKGItem indicates an expected call of UnsetStarredKGItem.
+func (mr *MockRepositoryMockRecorder) UnsetStarredKGItem(ctx, projectID, kgItemID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnsetStarredKGItem", reflect.TypeOf((*MockRepository)(nil).UnsetStarredKGItem), ctx, projectID, kgItemID)
+}
+
 // UpdateDescription mocks base method.
 func (m *MockRepository) UpdateDescription(ctx context.Context, projectID, description string) error {
 	m.ctrl.T.Helper()
@@ -276,4 +304,19 @@ func (m *MockUseCase) UpdateMember(ctx context.Context, opt UpdateMemberOption) 
 func (mr *MockUseCaseMockRecorder) UpdateMember(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMember", reflect.TypeOf((*MockUseCase)(nil).UpdateMember), ctx, opt)
+}
+
+// UpdateStarred mocks base method.
+func (m *MockUseCase) UpdateStarred(ctx context.Context, opt UpdateStarredOption) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateStarred", ctx, opt)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateStarred indicates an expected call of UpdateStarred.
+func (mr *MockUseCaseMockRecorder) UpdateStarred(ctx, opt interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateStarred", reflect.TypeOf((*MockUseCase)(nil).UpdateStarred), ctx, opt)
 }

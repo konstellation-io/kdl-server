@@ -25,6 +25,7 @@ export interface GetKnowledgeGraph_knowledgeGraph_items {
   score: number;
   date: string;
   url: string;
+  starred: boolean;
   topics: GetKnowledgeGraph_knowledgeGraph_items_topics[];
 }
 
@@ -45,5 +46,5 @@ export interface GetKnowledgeGraph {
 }
 
 export interface GetKnowledgeGraphVariables {
-  description: string;
+  projectId: string;
 }

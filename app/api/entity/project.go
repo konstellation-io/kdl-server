@@ -44,6 +44,7 @@ type Project struct {
 	Error              *string
 	Repository         Repository
 	Members            []Member
+	StarredKGItems     []string
 }
 
 // State is just a hardcoded field because we should think about it.
@@ -53,5 +54,5 @@ func (p Project) State() ProjectState {
 
 // NewProject is a constructor function.
 func NewProject(name, description string) Project {
-	return Project{Name: name, Description: description}
+	return Project{Name: name, Description: description, StarredKGItems: []string{}}
 }

@@ -1,7 +1,5 @@
 import { Check } from 'kwc';
 import React from 'react';
-import { Topic } from '../../Filters';
-import cx from 'classnames';
 import styles from './ShowOthersFilter.module.scss';
 
 interface Props {

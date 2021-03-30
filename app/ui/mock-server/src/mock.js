@@ -3,7 +3,9 @@ const data = require('./data0.json');
 const relevances = require('./topic_relevance.json');
 const casual = require('casual');
 
-const kgData = data.map((d) => ({
+const starredItems = [0, 1, 4, 6, 12, 34, 35, 65, 120, 144, 365, 456, 754, 942];
+
+const kgData = data.map((d, idx) => ({
   id: d.id,
   category: casual.random_element(['Code', 'Paper']),
   topics: Object.entries(JSON.parse(d.topics.replace(/[']+/g, '"'))).map(
@@ -17,6 +19,7 @@ const kgData = data.map((d) => ({
   authors: ['Xingyi Zhou', 'Vladlen Koltun', 'Philipp Krähenbühl'],
   score: d.score,
   date: new Date().toISOString(),
+  starred: starredItems.includes(idx),
   url: 'https://paperswithcode.com/paper/probabilistic-two-stage-detection',
 }));
 
@@ -117,27 +120,31 @@ module.exports = {
 
       return project;
     },
-    updateMember: (_, { input: { userId, accessLevel, projectId } }) => {
-      const project = projects.find(({ id }) => id === projectId);
-      const member = project.members.find(({ user }) => user.id === userId);
+    updateMember: (_, {input: {userId, accessLevel, projectId}}) => {
+      const project = projects.find(({id}) => id === projectId);
+      const member = project.members.find(({user}) => user.id === userId);
       member.accessLevel = accessLevel;
 
       return project;
     },
-    removeApiToken: (_, { input: { apiTokenId } }) => ({
+    removeApiToken: (_, {input: {apiTokenId}}) => ({
       id: apiTokenId,
     }),
     regenerateSSHKey: () => ({
       id: meId,
       sshKey: this.SSHKey,
     }),
+    setKGStarred: (_, {input: {kgItemId, starred}}) => ({
+      kgItemId,
+      starred,
+    }),
     addApiToken: this.ApiToken,
-    updateAccessLevel: (_, { input: { userIds, accessLevel } }) =>
+    updateAccessLevel: (_, {input: {userIds, accessLevel}}) =>
       userIds.map((userId) => ({
         id: userId,
         accessLevel,
       })),
-    removeUsers: (_, { input: { userIds } }) =>
+    removeUsers: (_, {input: {userIds}}) =>
       userIds.map((userId) => ({
         id: userId,
       })),

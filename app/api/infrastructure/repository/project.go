@@ -182,7 +182,7 @@ func (m *projectMongoDBRepo) UpdateDescription(ctx context.Context, projectID, d
 	return m.updateProjectFields(ctx, projectID, bson.M{"description": description})
 }
 
-// UpdateDescription changes the description for the given project.
+// UpdateArchived changes the archived field for the given project.
 func (m *projectMongoDBRepo) UpdateArchived(ctx context.Context, projectID string, archived bool) error {
 	return m.updateProjectFields(ctx, projectID, bson.M{"archived": archived})
 }

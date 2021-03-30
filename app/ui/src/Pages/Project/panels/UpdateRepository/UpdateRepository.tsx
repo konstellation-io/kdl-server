@@ -11,14 +11,13 @@ export type UpdateRepoProps = {
 };
 function UpdateRepository(props: UpdateRepoProps) {
   const isExternal = props.project.repository?.type === RepositoryType.EXTERNAL;
+  const UpdateRepoComponent = isExternal
+    ? UpdateExternalRepo
+    : UpdateInternalRepo;
 
   return (
     <div className={styles.wrapper}>
-      {isExternal ? (
-        <UpdateExternalRepo {...props} />
-      ) : (
-        <UpdateInternalRepo {...props} />
-      )}
+      <UpdateRepoComponent {...props} />
     </div>
   );
 }

@@ -136,6 +136,20 @@ func (mr *MockRepositoryMockRecorder) UnsetStarredKGItem(ctx, projectID, kgItemI
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnsetStarredKGItem", reflect.TypeOf((*MockRepository)(nil).UnsetStarredKGItem), ctx, projectID, kgItemID)
 }
 
+// UpdateArchived mocks base method.
+func (m *MockRepository) UpdateArchived(ctx context.Context, projectID string, archived bool) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateArchived", ctx, projectID, archived)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateArchived indicates an expected call of UpdateArchived.
+func (mr *MockRepositoryMockRecorder) UpdateArchived(ctx, projectID, archived interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateArchived", reflect.TypeOf((*MockRepository)(nil).UpdateArchived), ctx, projectID, archived)
+}
+
 // UpdateDescription mocks base method.
 func (m *MockRepository) UpdateDescription(ctx context.Context, projectID, description string) error {
 	m.ctrl.T.Helper()

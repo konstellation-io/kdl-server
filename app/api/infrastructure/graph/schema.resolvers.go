@@ -210,10 +210,6 @@ func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.S
 	return &u, err
 }
 
-func (r *projectResolver) Favorite(ctx context.Context, obj *entity.Project) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project) (string, error) {
 	return obj.CreationDate.Format(time.RFC3339), nil
 }
@@ -247,10 +243,6 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 		Drone:   droneWithFolder,
 		MLFlow:  r.cfg.MLFlow.URL,
 	}, nil
-}
-
-func (r *projectResolver) Archived(ctx context.Context, obj *entity.Project) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {

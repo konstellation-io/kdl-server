@@ -1,36 +1,66 @@
+import {
+  SetStarredKGItem,
+  SetStarredKGItemVariables,
+} from 'Graphql/mutations/types/SetStarredKGItem';
+
 import { Button } from 'kwc';
-import { D } from '../KGVisualization/KGVisualization';
+import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
 import IconClose from '@material-ui/icons/Close';
 import IconStar from '@material-ui/icons/Star';
 import IconUnstar from '@material-ui/icons/StarBorder';
 import React from 'react';
+import { RouteProjectParams } from 'Constants/routes';
 import Score from '../KGVisualization/Score';
 import cx from 'classnames';
+import { loader } from 'graphql.macro';
+import { mutationPayloadHelper } from 'Utils/formUtils';
 import styles from './ResourceDetails.module.scss';
+import { useMutation } from '@apollo/client';
+import { useParams } from 'react-router';
+
+const SetStarredKGItemMutation = loader(
+  'Graphql/mutations/setStarredKGItem.graphql'
+);
 
 type Props = {
-  resource: D | null;
+  resource: GetKnowledgeGraph_knowledgeGraph_items | null;
   onClose: () => void;
-  idToFullResource: { [key: string]: any };
 };
-function ResourceDetails({
-  resource: tempResource,
-  onClose,
-  idToFullResource,
-}: Props) {
-  const resource: any = idToFullResource[tempResource?.id || ''] || null;
-  const starred = tempResource?.starred;
+function ResourceDetails({ resource, onClose }: Props) {
+  const { projectId } = useParams<RouteProjectParams>();
+
+  const [setStarredKGItem] = useMutation<
+    SetStarredKGItem,
+    SetStarredKGItemVariables
+  >(SetStarredKGItemMutation);
+
+  if (resource === null) return null;
+
+  function toggleStarred() {
+    if (resource !== null) {
+      setStarredKGItem(
+        mutationPayloadHelper({
+          projectId,
+          kgItemId: resource.id,
+          starred: !resource.starred,
+        })
+      );
+    }
+  }
 
   return (
     <div className={styles.container}>
       <div className={styles.title}>
         <div className={styles.titleText}>Resource Details</div>
         <div className={styles.actions}>
-          <div className={styles.starredText}>{starred ? 'Starred' : ''}</div>
+          <div className={styles.starredText}>
+            {resource.starred ? 'Starred' : ''}
+          </div>
           <Button
-            Icon={starred ? IconStar : IconUnstar}
+            Icon={resource.starred ? IconStar : IconUnstar}
             label=""
-            className={cx({ [styles.starred]: starred })}
+            className={cx({ [styles.starred]: resource.starred })}
+            onClick={toggleStarred}
           />
           <Button Icon={IconClose} label="" onClick={onClose} />
         </div>
@@ -39,7 +69,7 @@ function ResourceDetails({
         <>
           <div
             className={cx(styles.resourceTitleAndTopics, {
-              [styles.starred]: starred,
+              [styles.starred]: resource.starred,
             })}
           >
             <div className={styles.nameAndTopics}>
@@ -56,7 +86,7 @@ function ResourceDetails({
                 {resource.authors.join(', ')}
               </div>
             </div>
-            <div className={styles.type}>{'Paper'}</div>
+            <div className={styles.type}>{resource.category}</div>
             <div
               className={styles.url}
               onClick={() => window.open(resource.url)}

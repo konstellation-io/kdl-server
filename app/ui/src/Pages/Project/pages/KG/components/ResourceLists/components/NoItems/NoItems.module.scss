@@ -12,6 +12,6 @@
   flex-direction: column;
 
   .title {
-    @include font-body
+    @include font-body;
   }
 }

@@ -178,12 +178,22 @@ func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.Remo
 	return nil, entity.ErrNotImplemented
 }
 
-func (r *mutationResolver) SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error) {
-	return nil, entity.ErrNotImplemented
-}
+func (r *mutationResolver) SetKGStarred(ctx context.Context, input model.SetKGStarredInput) (*model.SetKGStarredRes, error) {
+	starred, err := r.projects.UpdateStarred(ctx, project.UpdateStarredOption{
+		ProjectID: input.ProjectID,
+		KGItemID:  input.KgItemID,
+		Starred:   input.Starred,
+	})
+	res := model.SetKGStarredRes{
+		KgItemID: input.KgItemID,
+		Starred:  starred,
+	}
 
-func (r *mutationResolver) SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error) {
-	return nil, entity.ErrNotImplemented
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, nil
 }
 
 func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error) {
@@ -274,17 +284,13 @@ func (r *queryResolver) QualityProjectDesc(ctx context.Context, description stri
 	return &model.QualityProjectDesc{Quality: q}, nil
 }
 
-func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) (*entity.KnowledgeGraph, error) {
-	kg, err := r.kg.Get(ctx, description)
+func (r *queryResolver) KnowledgeGraph(ctx context.Context, projectID string) (*entity.KnowledgeGraph, error) {
+	p, err := r.projects.GetByID(ctx, projectID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &kg, nil
-}
-
-func (r *queryResolver) KnowledgeGraphItem(ctx context.Context, id string) (*entity.KnowledgeGraphItem, error) {
-	kg, err := r.kg.GetItem(ctx, id)
+	kg, err := r.kg.Graph(ctx, p)
 	if err != nil {
 		return nil, err
 	}

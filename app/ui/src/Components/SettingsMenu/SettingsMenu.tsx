@@ -1,6 +1,6 @@
 import {
-  BUTTON_ALIGN,
   Button,
+  BUTTON_ALIGN,
   CustomOptionProps,
   Select,
   SelectTheme,
@@ -11,7 +11,6 @@ import { useHistory } from 'react-router-dom';
 
 import { GetMe } from 'Graphql/queries/types/GetMe';
 import KeyIcon from '@material-ui/icons/VpnKey';
-import LinkIcon from '@material-ui/icons/Link';
 import { loader } from 'graphql.macro';
 import styles from './SettingsMenu.module.scss';
 import { useQuery } from '@apollo/client';
@@ -43,10 +42,6 @@ function SettingsMenu() {
     history.push(ROUTE.USER_SSH_KEY);
   }
 
-  function goToUserAPITokens() {
-    history.push(ROUTE.USER_API_TOKENS);
-  }
-
   function UserSettingsSeparator({ label }: CustomOptionProps) {
     return (
       <Button
@@ -64,20 +59,9 @@ function SettingsMenu() {
     );
   }
 
-  function apiTokensButton({ label }: CustomOptionProps) {
-    return (
-      <SettingsButton
-        Icon={LinkIcon}
-        onClick={goToUserAPITokens}
-        label={label}
-      />
-    );
-  }
-
   const optionToButton = {
     'user settings': UserSettingsSeparator,
     'ssh key': SSHKeyButton,
-    'api tokens': apiTokensButton,
   };
 
   return (

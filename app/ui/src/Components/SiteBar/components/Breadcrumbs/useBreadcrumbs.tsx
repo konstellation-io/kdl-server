@@ -69,10 +69,12 @@ function useBreadcrumbs() {
   // Check if we are in a project
   if (routeMatch && project) {
     // Add crumb for the project
-    const { name, state } = project;
+    const { name, archived } = project;
     crumbs.push({
       crumbText: name,
-      LeftIconComponent: <ProjectIcon className="icon-regular" state={state} />,
+      LeftIconComponent: (
+        <ProjectIcon className="icon-regular" archived={archived} />
+      ),
       RightIconComponent: ExpandMoreIcon,
       BottomComponent: (props: BottomComponentProps) => (
         <ProjectSelector options={projectsData.projects} {...props} />

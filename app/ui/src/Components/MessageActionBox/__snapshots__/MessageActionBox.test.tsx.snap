@@ -48,7 +48,6 @@ exports[`MessageActionBox component Component match snapshot 1`] = `
         disabled={true}
         height={30}
         label="Some label"
-        loading={false}
         onClick={[MockFunction]}
         primary={true}
         theme="default"

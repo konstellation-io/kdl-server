@@ -5,7 +5,6 @@ isort:skip_file
 import abc
 
 import grpc
-
 from proto.knowledge_graph_pb2 import *
 
 
@@ -15,9 +14,9 @@ class KGServiceStub:
         request: global___GetGraphReq,
     ) -> global___GetGraphRes: ...
 
-    def GetItem(self,
-        request: global___GetItemReq,
-    ) -> global___GetItemRes: ...
+    def GetDescriptionQuality(self,
+        request: global___DescriptionQualityReq,
+    ) -> global___DescriptionQualityRes: ...
 
     def GetDescriptionQuality(self,
         request: global___DescriptionQualityReq,
@@ -32,10 +31,10 @@ class KGServiceServicer(metaclass=abc.ABCMeta):
     ) -> global___GetGraphRes: ...
 
     @abc.abstractmethod
-    def GetItem(self,
-        request: global___GetItemReq,
+    def GetDescriptionQuality(self,
+        request: global___DescriptionQualityReq,
         context: grpc.ServicerContext,
-    ) -> global___GetItemRes: ...
+    ) -> global___DescriptionQualityRes: ...
 
     @abc.abstractmethod
     def GetDescriptionQuality(self,

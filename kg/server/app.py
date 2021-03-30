@@ -1,4 +1,3 @@
-import copy
 import logging
 from concurrent import futures
 
@@ -8,7 +7,6 @@ import config
 import proto.knowledge_graph_pb2 as kg_pb2
 import proto.knowledge_graph_pb2_grpc as kg_grpc_pb2
 from description_evaluator import DescriptionEvaluator
-from outputs import RecommendedItem
 from recommender import Recommender
 from tools.assets import AssetLoader
 
@@ -37,21 +35,6 @@ class KnowledgeGraphService(kg_grpc_pb2.KGServiceServicer):
         self.log.debug(f"Output items:\n {recommended_items}")
 
         return recommended_items.to_grpc()
-
-    def GetItem(self, request: kg_pb2.GetItemReq, context: grpc.ServicerContext) -> kg_pb2.GetItemRes:
-        match = self.assets.dataset.loc[self.assets.dataset['id'] == request.id]
-        if match.id.count() == 0:
-            context.set_code(grpc.StatusCode.NOT_FOUND)
-            item = None
-        else:
-            # Setting fields for messaging format
-            res_item = copy.copy(match)
-            res_item['score'] = 0.0
-            item = RecommendedItem(res_item.iloc[0].to_dict()).to_grpc()
-
-        res = kg_pb2.GetItemRes(item=item)
-
-        return res
 
     def GetDescriptionQuality(self, request: kg_pb2.DescriptionQualityReq, context: grpc.ServicerContext):
         description_score = self.evaluator.get_description_quality(request.description, config.MIN_WORDS)

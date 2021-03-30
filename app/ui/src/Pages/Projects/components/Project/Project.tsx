@@ -1,4 +1,4 @@
-import { ProjectState, RepositoryType } from 'Graphql/types/globalTypes';
+import { RepositoryType } from 'Graphql/types/globalTypes';
 import ROUTE, { buildRoute } from 'Constants/routes';
 import React, { FC, MouseEvent } from 'react';
 
@@ -16,13 +16,11 @@ type Props = {
 };
 
 const Project: FC<Props> = ({ project }) => {
-  const isProjectArchived = project.state === ProjectState.ARCHIVED;
-
   return (
     <Link to={buildRoute(ROUTE.PROJECT, project.id)}>
       <div
         className={cx(styles.container, {
-          [styles.archived]: isProjectArchived,
+          [styles.archived]: project.archived,
         })}
       >
         <UpperBg project={project} />
@@ -95,8 +93,13 @@ const LowerBg: FC<Props> = ({ project }) => (
 
 const Band: FC<Props> = ({ project }) => (
   <div className={styles.band}>
-    <div className={cx(styles.label, styles[project.state])}>
-      {project.state.replace('_', ' ')}
+    <div
+      className={cx(styles.label, {
+        [styles.STARTED]: !project.archived,
+        [styles.ARCHIVED]: project.archived,
+      })}
+    >
+      {project.archived ? 'ARCHIVED' : 'STARTED'}
     </div>
     {project.error && <div className={styles.warning}>WARNING</div>}
   </div>
@@ -104,7 +107,12 @@ const Band: FC<Props> = ({ project }) => (
 
 const Square: FC<Props> = ({ project }) => (
   <div className={styles.square}>
-    <div className={cx(styles.state, styles[project.state])} />
+    <div
+      className={cx(styles.state, {
+        [styles.STARTED]: !project.archived,
+        [styles.ARCHIVED]: project.archived,
+      })}
+    />
   </div>
 );
 

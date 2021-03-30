@@ -3,17 +3,17 @@
 ## Project Structure
 
 ```bash
-├── assets  # Output assets directory.
-├── inputs  # Input datasets.
-├── pipe    # Source folder for data/model generation.
-├── proto   # Proto file schema definition.
-├── scripts # Utility scripts for the project.
-├── server # gRPC server code
-│    ├── proto
-│    └── tools
-└── tests # Test for grpc server
-    ├── integration
-    └── unit
+├── assets     # Output assets directory.
+├── inputs     # Input datasets.
+├── proto      # Protobufer schemas
+├── scripts    # Utility scripts for the project.
+├── src        # Sourcecode folder
+│   ├── pipe   # Code for data/model generation.
+│   └── server # Code for gRPC server code
+└── tests      # Test directory
+    ├── files  # Auxiliary file folder
+    ├── pipe   # Test for data generation pipeline
+    └── server # Test for grpc server
 ```
 ## Server
 ### Generate protobuf code

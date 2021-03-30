@@ -6,9 +6,9 @@ import numpy as np
 import pandas as pd
 import torch
 import transformers
+from pipe.compute_vectors import tokenize_batch, vectorize_batch
 from scipy import spatial
 
-from compute_vectors import tokenize_batch, vectorize_batch  # TODO: Move to src, cannot import from app.py
 from outputs import RecommendedList
 from topics import get_relevant_topics
 

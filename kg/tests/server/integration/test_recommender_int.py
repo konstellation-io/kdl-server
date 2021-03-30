@@ -1,9 +1,12 @@
+import numpy as np
 import pandas as pd
 import pytest
+from scipy import spatial
 
 import config
 from recommender import Recommender
 from tools.assets import AssetLoader
+
 
 ASSETS = AssetLoader(config.ASSET_ROUTE)
 RECOMMENDER = Recommender(
@@ -14,7 +17,7 @@ RECOMMENDER = Recommender(
 )
 
 
-class TestRecommenderIntegration:
+class TestRecommenderDataIntegration:
     @staticmethod
     def get_cases_from_load_dataset(n: int = 1) -> pd.DataFrame:
         return ASSETS.dataset.head(n=n)
@@ -56,3 +59,36 @@ class TestRecommenderIntegration:
         asset_vec = ASSETS.vectors[0].reshape(1, ASSETS.vectors.shape[1])
         distances = spatial.distance.cdist(vec, asset_vec, metric="cosine")
         assert distances[0][0] < 0.01
+
+
+class TestRecommenderHandlingLongDescriptions:
+
+    @pytest.mark.int
+    def test_description_parts_after_512_tokens_are_not_ignored(self):
+        """
+        The model that we are using is limited by its architecture to process text sequences up
+        to 512 tokens long. The common solution and the default behaviour beyond 512 tokens is to simply
+        truncate the input to the length of 512 tokens and ignore the rest. However, this introduces a
+        problem: a user may write a long project description, and spend time on improving the description
+        beyond the length of 512 tokens, only to find that the outputs did not change at all compared to a
+        previous shorter description, wasting time. To avoid this pitfall, we require a way of processing long
+        descriptions (most obviously by computing embeddings by parts and combining them together). Irrespective
+        of the implementation, this test assures that tokens beyond the 512th token do affect the computed query
+        vector.
+
+        WARNING: Takes a long time to execute on CPU (20+ seconds)
+        """
+        description_512 = "This is a short description. " * 85  # A description that contains exactly 512 tokens.
+        extension = "A project about computer vision, aerial image segmentation and object detection."
+        description_longer = description_512 + extension
+
+        vec_512 = RECOMMENDER._compute_query_vector(description_512)
+        vec_longer = RECOMMENDER._compute_query_vector(description_longer)
+
+        vector_dim = RECOMMENDER.model.config.dim
+        distance = spatial.distance.cdist(vec_512.reshape(1, vector_dim),
+                                          vec_longer.reshape(1, vector_dim),
+                                          metric='cosine')[0, 0]
+
+        assert distance > 10e-3
+        assert not np.allclose(vec_longer, vec_512)

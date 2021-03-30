@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 import torch
 import transformers
-from torchnlp.encoders.text import stack_and_pad_tensors
 from transformers import AutoModel, AutoTokenizer
+from transformers.tokenization_utils_base import BatchEncoding
 
 from data_checks.vectors import check_vector_size
 
@@ -16,8 +16,7 @@ OUTPUT_PATH = ASSET_PATH + "vectors.npy"
 DATASET_PATH = ASSET_PATH + "dataset.pkl.gz"
 
 # Constants
-VECTOR_DIMS = 768
-BATCH_SIZE = 1  # This batch size is a workaround for a padding problem.
+BATCH_SIZE = 1
 
 
 def create_inputs(title: str, abstract: str) -> str:
@@ -27,34 +26,33 @@ def create_inputs(title: str, abstract: str) -> str:
         title: paper title
         abstract: paper abstract
     Return:
-        Clean and concatenated paper + abstract with format:
+        Clean and concatenated title + abstract with format:
         "title. abstract"
     """
     title_abstract_str = f"{title}. {abstract}"
     return title_abstract_str.replace("\n", " ").replace("**", " ")
 
 
-def get_inputs(input_path: str) -> np.ndarray:
+def get_inputs(input_path: str) -> list[str]:
     """
     Gets combination of title and abstracts for all the papers of the dataset.
     Args:
         input_path: dataset route
     Return:
-        returns a numpy array with shape (number_of_inputs, 1)
+        returns a list of strings with length (number_of_inputs)
     """
     df = pd.read_pickle(input_path, compression="gzip")[['title', 'abstract']]
-    return np.vectorize(create_inputs)(df['title'], df['abstract'])
+    return np.vectorize(create_inputs)(df['title'], df['abstract']).tolist()
 
 
-def convert_to_batches(input_items: Union[np.ndarray, range],
-                       batch_size: int) -> list[list[np.str_]]:
+def convert_to_batches(input_items: Union[np.ndarray, list, range],
+                       batch_size: int) -> list[list[str]]:
     """
     Converts an iterable of items into a list of list
     of items of the same size.
 
     Args:
-        input_items: list of input items can be list of inputs
-        or range of indexes.
+        input_items: list of input items can be list of inputs range of indexes.
         batch_size: batch size
 
     Returns:
@@ -79,88 +77,101 @@ def convert_to_batches(input_items: Union[np.ndarray, range],
 
 def tokenize_batch(samples: list[str],
                    tokenizer: transformers.PreTrainedTokenizer,
-                   tokenizer_args: dict[str],
-                   device: torch.device) -> torch.Tensor:
+                   tokenizer_args: dict,
+                   device: torch.device) -> BatchEncoding:
     """
-    Convert a list of texts to a list of tokens as input for
-    downstream use by the transformer (in the vectorize_batch function).
+    Convert a list of texts to a BatchEncoding as input for downstream use by the transformer (in the
+    vectorize_batch function).
 
     Args:
         samples: (iterable of str) each string is a document (eg. paper abstract)
         tokenizer: (huggingface tokenizer object)
-        tokenizer_args: dict with tokenizer config
-        device: device to save the tensors to
+        tokenizer_args: dict with tokenizer config, excluding padding and return_tensors which are mandatory.
+        device: device to pass the outputs to
 
     Returns:
-        (torch.Tensor)
+        (transformers.tokenization_utils_base.BatchEncoding)
     """
-    batch = []
-    for sequence in samples:
-        doc_tokens = torch.tensor(tokenizer.encode(sequence, **tokenizer_args)).to(device)
-        batch.append(doc_tokens)
-
-    stack_tensors = stack_and_pad_tensors(batch, tokenizer.pad_token_id)[0]
-    assert stack_tensors[-1].shape == doc_tokens.shape
-
-    return stack_tensors
+    batch_tokens = tokenizer(samples, padding=True, return_tensors='pt', **tokenizer_args).to(device)
+    return batch_tokens
 
 
-def vectorize_batch(batch, model):
+def vectorize_batch(batch: Union[BatchEncoding, dict],
+                    model: transformers.PreTrainedModel) -> np.ndarray:
     """
-    Passes a list of tokens to the transformer model for inference,
-    returning a vector embedding for each input. Operates in batches.
+    Passes batched tokens for multiple documents to the transformer model for inference,
+    aggregates all token vectors in a document into a document vector for that document,
+    and returns a vector for each input document in the batch.
 
     Args:
-        batch: (iterable) a list with one element
-         per document, each element containing document tokens,
-            e.g.  [['tokens', 'for', 'first', 'paper', 'in', 'batch'],
-            ['tokens', 'for', 'second', 'paper'], ...]
-        model: (huggingface transformer model)
+        batch: (transformers BatchEncoding or dict), containing:
+            'input_ids': a tensor with one row per document, each row containing tokens for that document,
+                e.g. [[101, 4905, 2855, ... , 102,  0],   # Tokens for first doc in batch (padded by one),
+                      [101, 823, 3338, ..., 1012, 102],   # Tokens for next doc (unpadded; longest in batch)
+                      [101, 2219,  2800,  ..., 0,   0]    # Tokens for final doc (padded at the end)
+            'attention_mask': a tensor with one row per document, each row containing attention mask for that doc
+                e.g. [[1, 1, 1, ..., 1, 0],  # Attention mask for first paper, etc.
+                      [1, 1, 1, ..., 1, 1],
+                      [1, 1, 1, ..., 0, 0]]
+
+        model: (transformers.PreTrainedModel)
+
+    Returns:
+        (torch Tensor) of shape (batch_size, vector_dims)
     """
+    assert len(batch['input_ids'].shape) == 2  # dimension 1: docs in batch, dimension 2: tokens in doc
+    batch_size = batch['input_ids'].shape[0]
+    vecs_by_doc = torch.zeros(batch_size, model.config.dim)
 
     with torch.no_grad():
-        vecs_by_token = model(batch)[0].detach()
-        vecs_by_doc = torch.mean(vecs_by_token, dim=1)  # Doc vector is a simple mean of token vectors
 
-    return vecs_by_doc.to("cpu")
+        vecs_by_token = model(input_ids=batch['input_ids'].to(model.device),
+                              attention_mask=batch['attention_mask'].to(model.device))[0].detach()
+
+        # Attention masks are not sufficient to completely ignore the padding tokens when computing the doc vector
+        for i, (ids, mask) in enumerate(zip(batch['input_ids'], batch['attention_mask'])):
+            n_unmasked_tokens = mask.sum().item()
+            vecs_by_doc[i, :] = torch.mean(vecs_by_token[i, :n_unmasked_tokens, :], dim=0)
+
+    return vecs_by_doc.cpu()
 
 
-def vectorize(inputs: np.ndarray, batch_size: int,
+def vectorize(inputs: list[str], batch_size: int,
               tokenizer: transformers.PreTrainedTokenizer,
-              tokenizer_args: dict[str],
+              tokenizer_args: dict,
               model: transformers.PreTrainedModel,
-              device: torch.device) -> np.ndarray:
+              device: torch.device,
+              verbose: bool = True) -> np.ndarray:
     """
     Main function of compute vectors gets an numpy array of strings
     and computes the vectors for it in batches for a given model and tokenizer
     a device can be specified (cpu/gpu).
     Args:
-        inputs: An array of strings of shape (dataset rows).
+        inputs: An iterable of strings, typically documents to be vectorized (shape: (n_documents)).
         batch_size: Size of the computation batches.
         tokenizer: A pretrained tokenizer from the transformer library.
+        tokenizer_args: arguments for calling the tokenizer.
+            Recommended values {'truncation': True, 'max_length': model.config.max_position_embeddings}
         model: A pretrained model from the transformer library loaded.
-        device: The device where the computation will be performed
-        either cpu or gpu
+        device: The device where the computation will be performed, either cpu or gpu
+        verbose: if True, print progress for every processed batch
     Return:
         Returns an array of shape (number of inputs, vector_size)
     """
     # Convert inputs to batches
-    batches = convert_to_batches(inputs, batch_size=batch_size)
+    batches_of_docs = convert_to_batches(inputs, batch_size=batch_size)
     batch_idx = convert_to_batches(range(len(inputs)), batch_size=batch_size)
 
-    # Tokenize per batch
-    tokens_arxiv = list()
-    for batch in batches:
-        tokens_arxiv.append(tokenize_batch(batch,
-                                           tokenizer=tokenizer,
-                                           tokenizer_args=tokenizer_args,
-                                           device=device))
+    tokens_batch_generator = (
+        tokenize_batch(batch, tokenizer=tokenizer, tokenizer_args=tokenizer_args, device=device)
+        for batch in batches_of_docs)
 
-    # Allocate arrays for output vectors
-    vecs = np.zeros(shape=(len(inputs), VECTOR_DIMS))
+    # Allocate array for output vectors
+    vecs = np.zeros(shape=(len(inputs), model.config.dim))
 
-    for idx, batch_tokens in zip(batch_idx, tokens_arxiv):
-        print("Vectorizing batch idx", idx)
+    for idx, batch_tokens in zip(batch_idx, tokens_batch_generator):
+        if verbose:
+            print("Vectorizing batch idx", idx)
         vecs[idx, :] = vectorize_batch(batch_tokens, model=model)
 
     return vecs

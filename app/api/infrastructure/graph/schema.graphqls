@@ -4,8 +4,7 @@ type Query {
   project(id: ID!): Project!
   users: [User!]!
   qualityProjectDesc(description: String!): QualityProjectDesc!
-  knowledgeGraph(description: String!): KnowledgeGraph!
-  knowledgeGraphItem(id: ID!): KnowledgeGraphItem!
+  knowledgeGraph(projectId: ID!): KnowledgeGraph!
 }
 
 type Mutation {
@@ -20,8 +19,7 @@ type Mutation {
   updateMember(input: UpdateMemberInput!): Project!
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
-  setStarredKGItem(input: SetBoolFieldInput!): KnowledgeGraphItem!
-  setDiscardedKGItem(input: SetBoolFieldInput!): KnowledgeGraphItem!
+  setKGStarred(input: SetKGStarredInput!): SetKGStarredRes!
   setActiveUserTools(input: SetActiveUserToolsInput!): User!
 }
 
@@ -49,11 +47,12 @@ type KnowledgeGraphItem {
   date: String!
   url: String!
   topics: [Topic!]!
+  starred: Boolean!
 
   # optional fields
-  repoUrls: [String]
+  repoUrls: [String!]
   externalId: ID # for example: arxivId
-  frameworks: [String]
+  frameworks: [String!]
 }
 
 type SSHKey {
@@ -114,6 +113,13 @@ input UpdateProjectInput {
   name: String
   description: String
   repository: UpdateProjectRepositoryInput
+  archived: Boolean
+}
+
+input SetKGStarredInput {
+  projectId: ID!
+  kgItemId: ID!
+  starred: Boolean!
 }
 
 input AddMembersInput {
@@ -171,18 +177,23 @@ input SetActiveUserToolsInput {
   active: Boolean!
 }
 
+type SetKGStarredRes {
+  kgItemId: ID!
+  starred: Boolean!
+}
+
 type Project {
   id: ID!
   name: String!
   description: String!
   favorite: Boolean!
   repository: Repository
-  state: ProjectState!
   creationDate: String!
   lastActivationDate: String!
   error: String
   members: [Member!]!
   toolUrls: ToolUrls!
+  archived: Boolean!
   needAccess: Boolean!
 }
 
@@ -211,12 +222,6 @@ type Repository {
 enum RepositoryType {
   INTERNAL
   EXTERNAL
-}
-
-enum ProjectState {
-  STARTED
-  STOPPED
-  ARCHIVED
 }
 
 enum KnowledgeGraphItemCat {

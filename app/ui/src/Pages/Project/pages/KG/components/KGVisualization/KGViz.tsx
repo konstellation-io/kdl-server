@@ -65,7 +65,7 @@ type Props = {
   hideTooltip: () => void;
   // minimapRef: SVGSVGElement;
   tooltipOpen: boolean;
-  onResourceSelection: (d: D, left: number) => void;
+  onResourceSelection: (id: string, name: string, left: number) => void;
   centerText: string;
   onScroll: (dS: number) => void;
   scores: [number, number];

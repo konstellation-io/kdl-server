@@ -1,25 +1,34 @@
 import React, { useMemo, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
-import { D } from '../KGVisualization/KGVisualization';
+import { KGItem } from '../../KG';
 import ResourcesList from './components/ResourcesList/ResourcesList';
 import { orderBy } from 'lodash';
 import { resourcesViz } from '../KGVisualization/KGViz';
 import styles from './ResourceLists.module.scss';
 
-type Props = {
-  starredResources: D[];
-  resources: D[];
-  onResourceClick: (d: D, left: number) => void;
-  scores: [number, number];
-  idToFullResource: { [key: string]: any };
+const NO_ITEMS_MESSAGE = {
+  title: 'No items in the KG!',
+  subTitle: 'Please, provide us a better description of your project.',
 };
+const NO_STARRED_ITEMS_MESSAGE = {
+  title: 'No starred items yet!',
+  subTitle:
+    "Once you favourite an item you'll see them here. Go to the KG to choose your favorites.",
+};
+
+type Props = {
+  starredResources: KGItem[];
+  resources: KGItem[];
+  onResourceClick: (id: string, name: string, left: number) => void;
+  scores: [number, number];
+};
+
 function ResourceLists({
   starredResources,
   resources,
   onResourceClick,
   scores,
-  idToFullResource,
 }: Props) {
   const [listFilterText, setListFilterText] = useState('');
 
@@ -30,7 +39,7 @@ function ResourceLists({
 
   const filteredAllTopics = useMemo(() => {
     return top25.filter((resource) =>
-      resource.name.toLowerCase().includes(listFilterText.toLowerCase())
+      resource.title.toLowerCase().includes(listFilterText.toLowerCase())
     );
   }, [top25, listFilterText]);
 
@@ -42,7 +51,7 @@ function ResourceLists({
     resourcesViz?.highlightResource(null);
   }
 
-  function onSelectResource(resource: D) {
+  function onSelectResource(resource: KGItem) {
     let left = 0;
 
     if (resourcesViz) {
@@ -50,7 +59,7 @@ function ResourceLists({
       left = (target?.x || 0) + resourcesViz.center.x;
     }
 
-    onResourceClick(resource, -left / 2);
+    onResourceClick(resource.id, resource.title, -left / 2);
   }
 
   function formatScore(score: number) {
@@ -87,7 +96,7 @@ function ResourceLists({
               onEnter={onEnter}
               onLeave={onLeave}
               onChangeFilterText={setListFilterText}
-              idToFullResource={idToFullResource}
+              noItems={NO_ITEMS_MESSAGE}
             />
           </TabPanel>
           <TabPanel>
@@ -98,7 +107,7 @@ function ResourceLists({
               onEnter={onEnter}
               onLeave={onLeave}
               onChangeFilterText={setListFilterText}
-              idToFullResource={idToFullResource}
+              noItems={NO_STARRED_ITEMS_MESSAGE}
             />
           </TabPanel>
         </div>

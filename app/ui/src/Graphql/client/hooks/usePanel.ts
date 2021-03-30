@@ -1,14 +1,8 @@
-import {
-  GET_SECONDARY_PANEL,
-  GetSecondaryPanel,
-} from 'Graphql/client/queries/getSecondaryPanel.graphql';
 import { PANEL_ID, PanelInfo } from '../models/Panel';
 import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
 import { primaryPanel, secondaryPanel } from '../cache';
 
-import { GET_PRIMARY_PANEL } from 'Graphql/client/queries/getPrimaryPanel.graphql';
-import { GetPrimaryPanel } from 'Graphql/client/queries/getPrimaryPanel.graphql';
-import { useQuery } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
 
 export enum PanelType {
   PRIMARY,
@@ -32,18 +26,12 @@ function usePanel(
     fixedWidth: null,
   }
 ) {
-  const { data: primaryPanelData } = useQuery<GetPrimaryPanel>(
-    GET_PRIMARY_PANEL
-  );
-  const { data: secondaryPanelData } = useQuery<GetSecondaryPanel>(
-    GET_SECONDARY_PANEL
-  );
+  const primaryPanelData = useReactiveVar(primaryPanel);
+  const secondaryPanelData = useReactiveVar(secondaryPanel);
 
   const panel = type === PanelType.PRIMARY ? primaryPanel : secondaryPanel;
   const data =
-    type === PanelType.PRIMARY
-      ? primaryPanelData?.primaryPanel
-      : secondaryPanelData?.secondaryPanel;
+    type === PanelType.PRIMARY ? primaryPanelData : secondaryPanelData;
   // null value in graphql is "null" not "undefined", we need to make sure we use "null"
   const panelProps: PanelInfo = {
     isDark: null,

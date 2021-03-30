@@ -238,10 +238,6 @@ $small-square-base: 30px;
     background-color: palette(success);
   }
 
-  &.STOPPED {
-    background-color: palette(feedback);
-  }
-
   &.ARCHIVED {
     background-color: palette(base, 300);
   }
@@ -268,11 +264,6 @@ $small-square-base: 30px;
 
     &.STARTED {
       background-color: palette(success);
-    }
-
-    &.STOPPED {
-      background-color: transparent;
-      border: solid 1px palette(feedback);
     }
 
     &.ARCHIVED {

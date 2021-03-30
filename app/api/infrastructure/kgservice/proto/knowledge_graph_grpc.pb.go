@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type KGServiceClient interface {
 	GetGraph(ctx context.Context, in *GetGraphReq, opts ...grpc.CallOption) (*GetGraphRes, error)
-	GetItem(ctx context.Context, in *GetItemReq, opts ...grpc.CallOption) (*GetItemRes, error)
+	GetDescriptionQuality(ctx context.Context, in *DescriptionQualityReq, opts ...grpc.CallOption) (*DescriptionQualityRes, error)
 }
 
 type kGServiceClient struct {
@@ -39,9 +39,9 @@ func (c *kGServiceClient) GetGraph(ctx context.Context, in *GetGraphReq, opts ..
 	return out, nil
 }
 
-func (c *kGServiceClient) GetItem(ctx context.Context, in *GetItemReq, opts ...grpc.CallOption) (*GetItemRes, error) {
-	out := new(GetItemRes)
-	err := c.cc.Invoke(ctx, "/kg.KGService/GetItem", in, out, opts...)
+func (c *kGServiceClient) GetDescriptionQuality(ctx context.Context, in *DescriptionQualityReq, opts ...grpc.CallOption) (*DescriptionQualityRes, error) {
+	out := new(DescriptionQualityRes)
+	err := c.cc.Invoke(ctx, "/kg.KGService/GetDescriptionQuality", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (c *kGServiceClient) GetItem(ctx context.Context, in *GetItemReq, opts ...g
 // for forward compatibility
 type KGServiceServer interface {
 	GetGraph(context.Context, *GetGraphReq) (*GetGraphRes, error)
-	GetItem(context.Context, *GetItemReq) (*GetItemRes, error)
+	GetDescriptionQuality(context.Context, *DescriptionQualityReq) (*DescriptionQualityRes, error)
 	mustEmbedUnimplementedKGServiceServer()
 }
 
@@ -64,8 +64,8 @@ type UnimplementedKGServiceServer struct {
 func (UnimplementedKGServiceServer) GetGraph(context.Context, *GetGraphReq) (*GetGraphRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetGraph not implemented")
 }
-func (UnimplementedKGServiceServer) GetItem(context.Context, *GetItemReq) (*GetItemRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetItem not implemented")
+func (UnimplementedKGServiceServer) GetDescriptionQuality(context.Context, *DescriptionQualityReq) (*DescriptionQualityRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDescriptionQuality not implemented")
 }
 func (UnimplementedKGServiceServer) mustEmbedUnimplementedKGServiceServer() {}
 
@@ -98,20 +98,20 @@ func _KGService_GetGraph_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _KGService_GetItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetItemReq)
+func _KGService_GetDescriptionQuality_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DescriptionQualityReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KGServiceServer).GetItem(ctx, in)
+		return srv.(KGServiceServer).GetDescriptionQuality(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/kg.KGService/GetItem",
+		FullMethod: "/kg.KGService/GetDescriptionQuality",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KGServiceServer).GetItem(ctx, req.(*GetItemReq))
+		return srv.(KGServiceServer).GetDescriptionQuality(ctx, req.(*DescriptionQualityReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -128,8 +128,8 @@ var KGService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _KGService_GetGraph_Handler,
 		},
 		{
-			MethodName: "GetItem",
-			Handler:    _KGService_GetItem_Handler,
+			MethodName: "GetDescriptionQuality",
+			Handler:    _KGService_GetDescriptionQuality_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

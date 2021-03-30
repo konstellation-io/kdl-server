@@ -43,5 +43,5 @@ type KnowledgeGraphItem struct {
 	Frameworks []string
 	Topics     []Topic
 	Score      float64
-	IsStarred  bool
+	Starred    bool
 }

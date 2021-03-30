@@ -10,6 +10,6 @@ import (
 
 // KGService interface defines all Knowledge Graph operations.
 type KGService interface {
-	GetGraph(ctx context.Context, description string) (entity.KnowledgeGraph, error)
-	GetItem(ctx context.Context, id string) (entity.KnowledgeGraphItem, error)
+	Graph(ctx context.Context, description string) (entity.KnowledgeGraph, error)
+	DescriptionQuality(ctx context.Context, description string) (int, error)
 }

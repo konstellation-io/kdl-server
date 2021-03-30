@@ -19,10 +19,15 @@ class KGServiceStub(object):
                 request_serializer=knowledge__graph__pb2.GetGraphReq.SerializeToString,
                 response_deserializer=knowledge__graph__pb2.GetGraphRes.FromString,
                 )
-        self.GetItem = channel.unary_unary(
-                '/kg.KGService/GetItem',
-                request_serializer=knowledge__graph__pb2.GetItemReq.SerializeToString,
-                response_deserializer=knowledge__graph__pb2.GetItemRes.FromString,
+        self.GetDescriptionQuality = channel.unary_unary(
+                '/kg.KGService/GetDescriptionQuality',
+                request_serializer=knowledge__graph__pb2.DescriptionQualityReq.SerializeToString,
+                response_deserializer=knowledge__graph__pb2.DescriptionQualityRes.FromString,
+                )
+        self.GetDescriptionQuality = channel.unary_unary(
+                '/kg.KGService/GetDescriptionQuality',
+                request_serializer=knowledge__graph__pb2.DescriptionQualityReq.SerializeToString,
+                response_deserializer=knowledge__graph__pb2.DescriptionQualityRes.FromString,
                 )
 
 
@@ -35,7 +40,13 @@ class KGServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetItem(self, request, context):
+    def GetDescriptionQuality(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetDescriptionQuality(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -49,10 +60,15 @@ def add_KGServiceServicer_to_server(servicer, server):
                     request_deserializer=knowledge__graph__pb2.GetGraphReq.FromString,
                     response_serializer=knowledge__graph__pb2.GetGraphRes.SerializeToString,
             ),
-            'GetItem': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetItem,
-                    request_deserializer=knowledge__graph__pb2.GetItemReq.FromString,
-                    response_serializer=knowledge__graph__pb2.GetItemRes.SerializeToString,
+            'GetDescriptionQuality': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetDescriptionQuality,
+                    request_deserializer=knowledge__graph__pb2.DescriptionQualityReq.FromString,
+                    response_serializer=knowledge__graph__pb2.DescriptionQualityRes.SerializeToString,
+            ),
+            'GetDescriptionQuality': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetDescriptionQuality,
+                    request_deserializer=knowledge__graph__pb2.DescriptionQualityReq.FromString,
+                    response_serializer=knowledge__graph__pb2.DescriptionQualityRes.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -82,7 +98,7 @@ class KGService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def GetItem(request,
+    def GetDescriptionQuality(request,
             target,
             options=(),
             channel_credentials=None,
@@ -92,8 +108,25 @@ class KGService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/kg.KGService/GetItem',
-            knowledge__graph__pb2.GetItemReq.SerializeToString,
-            knowledge__graph__pb2.GetItemRes.FromString,
+        return grpc.experimental.unary_unary(request, target, '/kg.KGService/GetDescriptionQuality',
+            knowledge__graph__pb2.DescriptionQualityReq.SerializeToString,
+            knowledge__graph__pb2.DescriptionQualityRes.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetDescriptionQuality(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/kg.KGService/GetDescriptionQuality',
+            knowledge__graph__pb2.DescriptionQualityReq.SerializeToString,
+            knowledge__graph__pb2.DescriptionQualityRes.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -39,6 +39,13 @@ type CreateProjectOption struct {
 	Owner                entity.User
 }
 
+// UpdateStarredOption options when updating starred kgItem.
+type UpdateStarredOption struct {
+	ProjectID string
+	KGItemID  string
+	Starred   bool
+}
+
 // Validate check that the CreateProjectOption properties are valid.
 func (c CreateProjectOption) Validate() error {
 	if c.Name == "" {
@@ -215,7 +222,26 @@ func (i interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity
 		}
 	}
 
+	if opt.Archived != nil {
+		err := i.repo.UpdateArchived(ctx, opt.ProjectID, *opt.Archived)
+		if err != nil {
+			return entity.Project{}, err
+		}
+	}
+
 	return i.repo.Get(ctx, opt.ProjectID)
+}
+
+// UpdateStarred set/unsets kgItem from starred list.
+func (i interactor) UpdateStarred(ctx context.Context, opt UpdateStarredOption) (bool, error) {
+	if opt.Starred {
+		err := i.repo.SetStarredKGItem(ctx, opt.ProjectID, opt.KGItemID)
+		return true, err
+	}
+
+	err := i.repo.UnsetStarredKGItem(ctx, opt.ProjectID, opt.KGItemID)
+
+	return false, err
 }
 
 // getRepoNameFromURL extracts the name of the repo from the external repo url.

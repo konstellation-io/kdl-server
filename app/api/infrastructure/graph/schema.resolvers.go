@@ -42,7 +42,7 @@ func (r *mutationResolver) RemoveUsers(ctx context.Context, input model.RemoveUs
 }
 
 func (r *mutationResolver) UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]entity.User, error) {
-	return nil, entity.ErrNotImplemented
+	return r.users.UpdateAccessLevel(ctx, input.UserIds, input.AccessLevel)
 }
 
 func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.User, error) {
@@ -104,6 +104,7 @@ func (r *mutationResolver) UpdateProject(ctx context.Context, input model.Update
 		ProjectID:   input.ID,
 		Name:        input.Name,
 		Description: input.Description,
+		Archived:    input.Archived,
 	})
 
 	return &p, err
@@ -178,12 +179,22 @@ func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.Remo
 	return nil, entity.ErrNotImplemented
 }
 
-func (r *mutationResolver) SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error) {
-	return nil, entity.ErrNotImplemented
-}
+func (r *mutationResolver) SetKGStarred(ctx context.Context, input model.SetKGStarredInput) (*model.SetKGStarredRes, error) {
+	starred, err := r.projects.UpdateStarred(ctx, project.UpdateStarredOption{
+		ProjectID: input.ProjectID,
+		KGItemID:  input.KgItemID,
+		Starred:   input.Starred,
+	})
+	res := model.SetKGStarredRes{
+		KgItemID: input.KgItemID,
+		Starred:  starred,
+	}
 
-func (r *mutationResolver) SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error) {
-	return nil, entity.ErrNotImplemented
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, nil
 }
 
 func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error) {
@@ -276,34 +287,21 @@ func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
 }
 
 func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
-	minWords := 50
-	enoughWords := 200
-
-	descriptionWords := len(strings.Fields(description))
-	quality := 0
-
-	if descriptionWords > enoughWords {
-		quality = 100
-	} else if descriptionWords > minWords {
-		quality = (descriptionWords - minWords) * 100 / (enoughWords - minWords)
-	}
-
-	return &model.QualityProjectDesc{
-		Quality: quality,
-	}, nil
-}
-
-func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) (*entity.KnowledgeGraph, error) {
-	kg, err := r.kg.Get(ctx, description)
+	q, err := r.kg.DescriptionQuality(ctx, description)
 	if err != nil {
 		return nil, err
 	}
 
-	return &kg, nil
+	return &model.QualityProjectDesc{Quality: q}, nil
 }
 
-func (r *queryResolver) KnowledgeGraphItem(ctx context.Context, id string) (*entity.KnowledgeGraphItem, error) {
-	kg, err := r.kg.GetItem(ctx, id)
+func (r *queryResolver) KnowledgeGraph(ctx context.Context, projectID string) (*entity.KnowledgeGraph, error) {
+	p, err := r.projects.GetByID(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	kg, err := r.kg.Graph(ctx, p)
 	if err != nil {
 		return nil, err
 	}

@@ -72,6 +72,7 @@ type ComplexityRoot struct {
 		ID         func(childComplexity int) int
 		RepoURLs   func(childComplexity int) int
 		Score      func(childComplexity int) int
+		Starred    func(childComplexity int) int
 		Title      func(childComplexity int) int
 		Topics     func(childComplexity int) int
 		URL        func(childComplexity int) int
@@ -93,14 +94,14 @@ type ComplexityRoot struct {
 		RemoveMember       func(childComplexity int, input model.RemoveMemberInput) int
 		RemoveUsers        func(childComplexity int, input model.RemoveUsersInput) int
 		SetActiveUserTools func(childComplexity int, input model.SetActiveUserToolsInput) int
-		SetDiscardedKGItem func(childComplexity int, input model.SetBoolFieldInput) int
-		SetStarredKGItem   func(childComplexity int, input model.SetBoolFieldInput) int
+		SetKGStarred       func(childComplexity int, input model.SetKGStarredInput) int
 		UpdateAccessLevel  func(childComplexity int, input model.UpdateAccessLevelInput) int
 		UpdateMember       func(childComplexity int, input model.UpdateMemberInput) int
 		UpdateProject      func(childComplexity int, input model.UpdateProjectInput) int
 	}
 
 	Project struct {
+		Archived           func(childComplexity int) int
 		CreationDate       func(childComplexity int) int
 		Description        func(childComplexity int) int
 		Error              func(childComplexity int) int
@@ -111,7 +112,6 @@ type ComplexityRoot struct {
 		Name               func(childComplexity int) int
 		NeedAccess         func(childComplexity int) int
 		Repository         func(childComplexity int) int
-		State              func(childComplexity int) int
 		ToolUrls           func(childComplexity int) int
 	}
 
@@ -120,8 +120,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		KnowledgeGraph     func(childComplexity int, description string) int
-		KnowledgeGraphItem func(childComplexity int, id string) int
+		KnowledgeGraph     func(childComplexity int, projectID string) int
 		Me                 func(childComplexity int) int
 		Project            func(childComplexity int, id string) int
 		Projects           func(childComplexity int) int
@@ -140,6 +139,11 @@ type ComplexityRoot struct {
 		LastActivity func(childComplexity int) int
 		Private      func(childComplexity int) int
 		Public       func(childComplexity int) int
+	}
+
+	SetKGStarredRes struct {
+		KgItemID func(childComplexity int) int
+		Starred  func(childComplexity int) int
 	}
 
 	ToolUrls struct {
@@ -186,14 +190,14 @@ type MutationResolver interface {
 	UpdateMember(ctx context.Context, input model.UpdateMemberInput) (*entity.Project, error)
 	AddAPIToken(ctx context.Context, input *model.APITokenInput) (*entity.APIToken, error)
 	RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error)
-	SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error)
-	SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error)
+	SetKGStarred(ctx context.Context, input model.SetKGStarredInput) (*model.SetKGStarredRes, error)
 	SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error)
 }
 type ProjectResolver interface {
 	CreationDate(ctx context.Context, obj *entity.Project) (string, error)
 
 	ToolUrls(ctx context.Context, obj *entity.Project) (*entity.ToolUrls, error)
+
 	NeedAccess(ctx context.Context, obj *entity.Project) (bool, error)
 }
 type QueryResolver interface {
@@ -202,8 +206,7 @@ type QueryResolver interface {
 	Project(ctx context.Context, id string) (*entity.Project, error)
 	Users(ctx context.Context) ([]entity.User, error)
 	QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error)
-	KnowledgeGraph(ctx context.Context, description string) (*entity.KnowledgeGraph, error)
-	KnowledgeGraphItem(ctx context.Context, id string) (*entity.KnowledgeGraphItem, error)
+	KnowledgeGraph(ctx context.Context, projectID string) (*entity.KnowledgeGraph, error)
 }
 type RepositoryResolver interface {
 	URL(ctx context.Context, obj *entity.Repository) (string, error)
@@ -346,6 +349,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.KnowledgeGraphItem.Score(childComplexity), true
+
+	case "KnowledgeGraphItem.starred":
+		if e.complexity.KnowledgeGraphItem.Starred == nil {
+			break
+		}
+
+		return e.complexity.KnowledgeGraphItem.Starred(childComplexity), true
 
 	case "KnowledgeGraphItem.title":
 		if e.complexity.KnowledgeGraphItem.Title == nil {
@@ -492,29 +502,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.SetActiveUserTools(childComplexity, args["input"].(model.SetActiveUserToolsInput)), true
 
-	case "Mutation.setDiscardedKGItem":
-		if e.complexity.Mutation.SetDiscardedKGItem == nil {
+	case "Mutation.setKGStarred":
+		if e.complexity.Mutation.SetKGStarred == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_setDiscardedKGItem_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_setKGStarred_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.SetDiscardedKGItem(childComplexity, args["input"].(model.SetBoolFieldInput)), true
-
-	case "Mutation.setStarredKGItem":
-		if e.complexity.Mutation.SetStarredKGItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_setStarredKGItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.SetStarredKGItem(childComplexity, args["input"].(model.SetBoolFieldInput)), true
+		return e.complexity.Mutation.SetKGStarred(childComplexity, args["input"].(model.SetKGStarredInput)), true
 
 	case "Mutation.updateAccessLevel":
 		if e.complexity.Mutation.UpdateAccessLevel == nil {
@@ -551,6 +549,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateProject(childComplexity, args["input"].(model.UpdateProjectInput)), true
+
+	case "Project.archived":
+		if e.complexity.Project.Archived == nil {
+			break
+		}
+
+		return e.complexity.Project.Archived(childComplexity), true
 
 	case "Project.creationDate":
 		if e.complexity.Project.CreationDate == nil {
@@ -622,13 +627,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.Repository(childComplexity), true
 
-	case "Project.state":
-		if e.complexity.Project.State == nil {
-			break
-		}
-
-		return e.complexity.Project.State(childComplexity), true
-
 	case "Project.toolUrls":
 		if e.complexity.Project.ToolUrls == nil {
 			break
@@ -653,19 +651,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.KnowledgeGraph(childComplexity, args["description"].(string)), true
-
-	case "Query.knowledgeGraphItem":
-		if e.complexity.Query.KnowledgeGraphItem == nil {
-			break
-		}
-
-		args, err := ec.field_Query_knowledgeGraphItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.KnowledgeGraphItem(childComplexity, args["id"].(string)), true
+		return e.complexity.Query.KnowledgeGraph(childComplexity, args["projectId"].(string)), true
 
 	case "Query.me":
 		if e.complexity.Query.Me == nil {
@@ -760,6 +746,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.SSHKey.Public(childComplexity), true
+
+	case "SetKGStarredRes.kgItemId":
+		if e.complexity.SetKGStarredRes.KgItemID == nil {
+			break
+		}
+
+		return e.complexity.SetKGStarredRes.KgItemID(childComplexity), true
+
+	case "SetKGStarredRes.starred":
+		if e.complexity.SetKGStarredRes.Starred == nil {
+			break
+		}
+
+		return e.complexity.SetKGStarredRes.Starred(childComplexity), true
 
 	case "ToolUrls.drone":
 		if e.complexity.ToolUrls.Drone == nil {
@@ -950,8 +950,7 @@ var sources = []*ast.Source{
   project(id: ID!): Project!
   users: [User!]!
   qualityProjectDesc(description: String!): QualityProjectDesc!
-  knowledgeGraph(description: String!): KnowledgeGraph!
-  knowledgeGraphItem(id: ID!): KnowledgeGraphItem!
+  knowledgeGraph(projectId: ID!): KnowledgeGraph!
 }
 
 type Mutation {
@@ -966,8 +965,7 @@ type Mutation {
   updateMember(input: UpdateMemberInput!): Project!
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
-  setStarredKGItem(input: SetBoolFieldInput!): KnowledgeGraphItem!
-  setDiscardedKGItem(input: SetBoolFieldInput!): KnowledgeGraphItem!
+  setKGStarred(input: SetKGStarredInput!): SetKGStarredRes!
   setActiveUserTools(input: SetActiveUserToolsInput!): User!
 }
 
@@ -995,11 +993,12 @@ type KnowledgeGraphItem {
   date: String!
   url: String!
   topics: [Topic!]!
+  starred: Boolean!
 
   # optional fields
-  repoUrls: [String]
+  repoUrls: [String!]
   externalId: ID # for example: arxivId
-  frameworks: [String]
+  frameworks: [String!]
 }
 
 type SSHKey {
@@ -1060,6 +1059,13 @@ input UpdateProjectInput {
   name: String
   description: String
   repository: UpdateProjectRepositoryInput
+  archived: Boolean
+}
+
+input SetKGStarredInput {
+  projectId: ID!
+  kgItemId: ID!
+  starred: Boolean!
 }
 
 input AddMembersInput {
@@ -1117,18 +1123,23 @@ input SetActiveUserToolsInput {
   active: Boolean!
 }
 
+type SetKGStarredRes {
+  kgItemId: ID!
+  starred: Boolean!
+}
+
 type Project {
   id: ID!
   name: String!
   description: String!
   favorite: Boolean!
   repository: Repository
-  state: ProjectState!
   creationDate: String!
   lastActivationDate: String!
   error: String
   members: [Member!]!
   toolUrls: ToolUrls!
+  archived: Boolean!
   needAccess: Boolean!
 }
 
@@ -1157,12 +1168,6 @@ type Repository {
 enum RepositoryType {
   INTERNAL
   EXTERNAL
-}
-
-enum ProjectState {
-  STARTED
-  STOPPED
-  ARCHIVED
 }
 
 enum KnowledgeGraphItemCat {
@@ -1297,28 +1302,13 @@ func (ec *executionContext) field_Mutation_setActiveUserTools_args(ctx context.C
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_setDiscardedKGItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_setKGStarred_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.SetBoolFieldInput
+	var arg0 model.SetKGStarredInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNSetBoolFieldInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSetBoolFieldInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_setStarredKGItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.SetBoolFieldInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNSetBoolFieldInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSetBoolFieldInput(ctx, tmp)
+		arg0, err = ec.unmarshalNSetKGStarredInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSetKGStarredInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1387,33 +1377,18 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_knowledgeGraphItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_knowledgeGraph_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["projectId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
 		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_knowledgeGraph_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["description"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["description"] = arg0
+	args["projectId"] = arg0
 	return args, nil
 }
 
@@ -2045,6 +2020,41 @@ func (ec *executionContext) _KnowledgeGraphItem_topics(ctx context.Context, fiel
 	return ec.marshalNTopic2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐTopicᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _KnowledgeGraphItem_starred(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "KnowledgeGraphItem",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Starred, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _KnowledgeGraphItem_repoUrls(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2074,7 +2084,7 @@ func (ec *executionContext) _KnowledgeGraphItem_repoUrls(ctx context.Context, fi
 	}
 	res := resTmp.([]string)
 	fc.Result = res
-	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _KnowledgeGraphItem_externalId(ctx context.Context, field graphql.CollectedField, obj *entity.KnowledgeGraphItem) (ret graphql.Marshaler) {
@@ -2138,7 +2148,7 @@ func (ec *executionContext) _KnowledgeGraphItem_frameworks(ctx context.Context, 
 	}
 	res := resTmp.([]string)
 	fc.Result = res
-	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Member_user(ctx context.Context, field graphql.CollectedField, obj *entity.Member) (ret graphql.Marshaler) {
@@ -2698,7 +2708,7 @@ func (ec *executionContext) _Mutation_removeApiToken(ctx context.Context, field 
 	return ec.marshalNApiToken2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPIToken(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_setStarredKGItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_setKGStarred(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2715,7 +2725,7 @@ func (ec *executionContext) _Mutation_setStarredKGItem(ctx context.Context, fiel
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_setStarredKGItem_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_setKGStarred_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -2723,7 +2733,7 @@ func (ec *executionContext) _Mutation_setStarredKGItem(ctx context.Context, fiel
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SetStarredKGItem(rctx, args["input"].(model.SetBoolFieldInput))
+		return ec.resolvers.Mutation().SetKGStarred(rctx, args["input"].(model.SetKGStarredInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2735,51 +2745,9 @@ func (ec *executionContext) _Mutation_setStarredKGItem(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*entity.KnowledgeGraphItem)
+	res := resTmp.(*model.SetKGStarredRes)
 	fc.Result = res
-	return ec.marshalNKnowledgeGraphItem2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItem(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_setDiscardedKGItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_setDiscardedKGItem_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SetDiscardedKGItem(rctx, args["input"].(model.SetBoolFieldInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*entity.KnowledgeGraphItem)
-	fc.Result = res
-	return ec.marshalNKnowledgeGraphItem2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItem(ctx, field.Selections, res)
+	return ec.marshalNSetKGStarredRes2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSetKGStarredRes(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_setActiveUserTools(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2996,41 +2964,6 @@ func (ec *executionContext) _Project_repository(ctx context.Context, field graph
 	return ec.marshalORepository2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepository(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Project_state(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Project",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.State(), nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entity.ProjectState)
-	fc.Result = res
-	return ec.marshalNProjectState2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProjectState(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Project_creationDate(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3201,6 +3134,41 @@ func (ec *executionContext) _Project_toolUrls(ctx context.Context, field graphql
 	res := resTmp.(*entity.ToolUrls)
 	fc.Result = res
 	return ec.marshalNToolUrls2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolUrls(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_archived(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Archived, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Project_needAccess(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
@@ -3487,7 +3455,7 @@ func (ec *executionContext) _Query_knowledgeGraph(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().KnowledgeGraph(rctx, args["description"].(string))
+		return ec.resolvers.Query().KnowledgeGraph(rctx, args["projectId"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3502,48 +3470,6 @@ func (ec *executionContext) _Query_knowledgeGraph(ctx context.Context, field gra
 	res := resTmp.(*entity.KnowledgeGraph)
 	fc.Result = res
 	return ec.marshalNKnowledgeGraph2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraph(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_knowledgeGraphItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_knowledgeGraphItem_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().KnowledgeGraphItem(rctx, args["id"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*entity.KnowledgeGraphItem)
-	fc.Result = res
-	return ec.marshalNKnowledgeGraphItem2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3854,6 +3780,76 @@ func (ec *executionContext) _SSHKey_lastActivity(ctx context.Context, field grap
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SetKGStarredRes_kgItemId(ctx context.Context, field graphql.CollectedField, obj *model.SetKGStarredRes) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SetKGStarredRes",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.KgItemID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SetKGStarredRes_starred(ctx context.Context, field graphql.CollectedField, obj *model.SetKGStarredRes) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SetKGStarredRes",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Starred, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ToolUrls_gitea(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
@@ -5879,6 +5875,42 @@ func (ec *executionContext) unmarshalInputSetBoolFieldInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputSetKGStarredInput(ctx context.Context, obj interface{}) (model.SetKGStarredInput, error) {
+	var it model.SetKGStarredInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "projectId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+			it.ProjectID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "kgItemId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("kgItemId"))
+			it.KgItemID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "starred":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("starred"))
+			it.Starred, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateAccessLevelInput(ctx context.Context, obj interface{}) (model.UpdateAccessLevelInput, error) {
 	var it model.UpdateAccessLevelInput
 	var asMap = obj.(map[string]interface{})
@@ -5978,6 +6010,14 @@ func (ec *executionContext) unmarshalInputUpdateProjectInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("repository"))
 			it.Repository, err = ec.unmarshalOUpdateProjectRepositoryInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUpdateProjectRepositoryInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "archived":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("archived"))
+			it.Archived, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6150,6 +6190,11 @@ func (ec *executionContext) _KnowledgeGraphItem(ctx context.Context, sel ast.Sel
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "starred":
+			out.Values[i] = ec._KnowledgeGraphItem_starred(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "repoUrls":
 			out.Values[i] = ec._KnowledgeGraphItem_repoUrls(ctx, field, obj)
 		case "externalId":
@@ -6289,13 +6334,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "setStarredKGItem":
-			out.Values[i] = ec._Mutation_setStarredKGItem(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "setDiscardedKGItem":
-			out.Values[i] = ec._Mutation_setDiscardedKGItem(ctx, field)
+		case "setKGStarred":
+			out.Values[i] = ec._Mutation_setKGStarred(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -6348,11 +6388,6 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "repository":
 			out.Values[i] = ec._Project_repository(ctx, field, obj)
-		case "state":
-			out.Values[i] = ec._Project_state(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "creationDate":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -6393,6 +6428,11 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 				}
 				return res
 			})
+		case "archived":
+			out.Values[i] = ec._Project_archived(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "needAccess":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -6544,20 +6584,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "knowledgeGraphItem":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_knowledgeGraphItem(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -6662,6 +6688,38 @@ func (ec *executionContext) _SSHKey(ctx context.Context, sel ast.SelectionSet, o
 				res = ec._SSHKey_lastActivity(ctx, field, obj)
 				return res
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var setKGStarredResImplementors = []string{"SetKGStarredRes"}
+
+func (ec *executionContext) _SetKGStarredRes(ctx context.Context, sel ast.SelectionSet, obj *model.SetKGStarredRes) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, setKGStarredResImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SetKGStarredRes")
+		case "kgItemId":
+			out.Values[i] = ec._SetKGStarredRes_kgItemId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "starred":
+			out.Values[i] = ec._SetKGStarredRes_starred(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7320,16 +7378,6 @@ func (ec *executionContext) marshalNKnowledgeGraphItem2ᚕgithubᚗcomᚋkonstel
 	return ret
 }
 
-func (ec *executionContext) marshalNKnowledgeGraphItem2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItem(ctx context.Context, sel ast.SelectionSet, v *entity.KnowledgeGraphItem) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._KnowledgeGraphItem(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNKnowledgeGraphItemCat2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐKnowledgeGraphItemCat(ctx context.Context, v interface{}) (entity.KnowledgeGraphItemCat, error) {
 	tmp, err := graphql.UnmarshalString(v)
 	res := entity.KnowledgeGraphItemCat(tmp)
@@ -7438,22 +7486,6 @@ func (ec *executionContext) marshalNProject2ᚖgithubᚗcomᚋkonstellationᚑio
 	return ec._Project(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNProjectState2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProjectState(ctx context.Context, v interface{}) (entity.ProjectState, error) {
-	tmp, err := graphql.UnmarshalString(v)
-	res := entity.ProjectState(tmp)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNProjectState2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProjectState(ctx context.Context, sel ast.SelectionSet, v entity.ProjectState) graphql.Marshaler {
-	res := graphql.MarshalString(string(v))
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-	}
-	return res
-}
-
 func (ec *executionContext) marshalNQualityProjectDesc2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐQualityProjectDesc(ctx context.Context, sel ast.SelectionSet, v model.QualityProjectDesc) graphql.Marshaler {
 	return ec._QualityProjectDesc(ctx, sel, &v)
 }
@@ -7508,9 +7540,23 @@ func (ec *executionContext) unmarshalNSetActiveUserToolsInput2githubᚗcomᚋkon
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNSetBoolFieldInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSetBoolFieldInput(ctx context.Context, v interface{}) (model.SetBoolFieldInput, error) {
-	res, err := ec.unmarshalInputSetBoolFieldInput(ctx, v)
+func (ec *executionContext) unmarshalNSetKGStarredInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSetKGStarredInput(ctx context.Context, v interface{}) (model.SetKGStarredInput, error) {
+	res, err := ec.unmarshalInputSetKGStarredInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNSetKGStarredRes2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSetKGStarredRes(ctx context.Context, sel ast.SelectionSet, v model.SetKGStarredRes) graphql.Marshaler {
+	return ec._SetKGStarredRes(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSetKGStarredRes2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSetKGStarredRes(ctx context.Context, sel ast.SelectionSet, v *model.SetKGStarredRes) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._SetKGStarredRes(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -7999,7 +8045,7 @@ func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.S
 	return graphql.MarshalString(v)
 }
 
-func (ec *executionContext) unmarshalOString2ᚕstring(ctx context.Context, v interface{}) ([]string, error) {
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -8015,7 +8061,7 @@ func (ec *executionContext) unmarshalOString2ᚕstring(ctx context.Context, v in
 	res := make([]string, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOString2string(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -8023,13 +8069,13 @@ func (ec *executionContext) unmarshalOString2ᚕstring(ctx context.Context, v in
 	return res, nil
 }
 
-func (ec *executionContext) marshalOString2ᚕstring(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	ret := make(graphql.Array, len(v))
 	for i := range v {
-		ret[i] = ec.marshalOString2string(ctx, sel, v[i])
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
 	}
 
 	return ret

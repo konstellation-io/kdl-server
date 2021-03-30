@@ -3,7 +3,7 @@ import {
   GET_NEW_PROJECT,
   GetNewProject,
 } from 'Graphql/client/queries/getNewProject.graphql';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import RepositoryTypeComponent, {
   LOCATION,
   SIZE,
@@ -24,6 +24,8 @@ import cx from 'classnames';
 import styles from './NewProject.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 import { useQuery } from '@apollo/client';
+import { Prompt } from 'react-router-dom';
+import useUnloadPrompt from 'Hooks/useUnloadPrompt/useUnloadPrompt';
 
 enum Steps {
   INFORMATION,
@@ -68,6 +70,10 @@ export const repoTypeToStepName: {
 };
 
 function NewProject() {
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const [isPromptEnabled, setIsPromptEnabled] = useState(false);
+
+  const { enableUnloadPrompt, disableUnloadPrompt } = useUnloadPrompt();
   const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
 
   const { clearAll } = useNewProject('information');
@@ -88,6 +94,10 @@ function NewProject() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => () => clearAll(), []);
 
+  // We want to execute this on on component mount and unmount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => disableUnloadPrompt, []);
+
   const {
     direction,
     goToStep,
@@ -100,6 +110,29 @@ function NewProject() {
   } = useStepper({
     data: stepperSteps,
   });
+
+  useEffect(() => {
+    if (data) {
+      const isSomeInputDirty = stepsWithData.some((step) => {
+        const stepByIndex = data.newProject[step];
+        return (
+          stepByIndex &&
+          Object.values(stepByIndex.values).some((value) => !!value)
+        );
+      });
+      setIsFormDirty(isSomeInputDirty);
+    }
+  }, [data, stepsWithData]);
+
+  useEffect(() => {
+    if (isFormDirty && actStep !== Steps.SUMMARY) {
+      enableUnloadPrompt();
+      setIsPromptEnabled(true);
+    } else {
+      disableUnloadPrompt();
+      setIsPromptEnabled(false);
+    }
+  }, [isFormDirty, actStep]);
 
   function getActions() {
     const onNextClick = () => {
@@ -196,6 +229,10 @@ function NewProject() {
       actions={getActions()}
     >
       <>
+        <Prompt
+          when={isPromptEnabled}
+          message="You are going to leave this page. You'll lose your changes, please confirm."
+        />
         {type && <SidebarTop>{getSidebarTopComponent()}</SidebarTop>}
         <div className={styles.container}>
           <div className={styles.steps}>

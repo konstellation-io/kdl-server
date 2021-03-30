@@ -18,6 +18,9 @@ type Repository interface {
 	UpdateMemberAccessLevel(ctx context.Context, projectID, userID string, accessLevel entity.AccessLevel) error
 	UpdateName(ctx context.Context, projectID, name string) error
 	UpdateDescription(ctx context.Context, projectID, description string) error
+	SetStarredKGItem(ctx context.Context, projectID, kgItemID string) error
+	UnsetStarredKGItem(ctx context.Context, projectID, kgItemID string) error
+	UpdateArchived(ctx context.Context, projectID string, archived bool) error
 }
 
 // UseCase interface to manage all operations related with projects.
@@ -29,4 +32,5 @@ type UseCase interface {
 	RemoveMember(ctx context.Context, opt RemoveMemberOption) (entity.Project, error)
 	UpdateMember(ctx context.Context, opt UpdateMemberOption) (entity.Project, error)
 	Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error)
+	UpdateStarred(ctx context.Context, opt UpdateStarredOption) (bool, error)
 }

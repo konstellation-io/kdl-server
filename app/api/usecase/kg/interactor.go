@@ -8,7 +8,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
-// Interactor implements the UseCase interface.
+// interactor implements the UseCase interface.
 type interactor struct {
 	logger    logging.Logger
 	kgService kgservice.KGService
@@ -19,14 +19,30 @@ func NewInteractor(logger logging.Logger, kgService kgservice.KGService) UseCase
 	return &interactor{logger: logger, kgService: kgService}
 }
 
-// Get returns the knowledge graph for the desired description.
-func (i *interactor) Get(ctx context.Context, description string) (entity.KnowledgeGraph, error) {
-	i.logger.Infof("Getting KG with description \"%s\"", description)
-	return i.kgService.GetGraph(ctx, description)
+// Graph returns the knowledge graph for the desired description.
+func (i *interactor) Graph(ctx context.Context, project entity.Project) (entity.KnowledgeGraph, error) {
+	i.logger.Infof("Getting KG for project \"%s\"", project.ID)
+
+	graph, err := i.kgService.Graph(ctx, project.Description)
+	if err != nil {
+		return entity.KnowledgeGraph{}, err
+	}
+
+	starred := project.StarredKGItems
+
+	for idx, item := range graph.Items {
+		for _, id := range starred {
+			if item.ID == id {
+				graph.Items[idx].Starred = true
+			}
+		}
+	}
+
+	return graph, nil
 }
 
-// GetItem gets an item for a given id.
-func (i *interactor) GetItem(ctx context.Context, id string) (entity.KnowledgeGraphItem, error) {
-	i.logger.Infof("Getting KG item with id \"%s\"", id)
-	return i.kgService.GetItem(ctx, id)
+// DescriptionQuality gets description quality.
+func (i *interactor) DescriptionQuality(ctx context.Context, description string) (int, error) {
+	i.logger.Infof("Getting quality of description  \"%s\"", description)
+	return i.kgService.DescriptionQuality(ctx, description)
 }

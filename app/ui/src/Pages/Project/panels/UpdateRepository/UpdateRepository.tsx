@@ -9,15 +9,15 @@ export type UpdateRepoProps = {
   project: GetProjects_projects;
   close: () => void;
 };
-function UpdateRepository({ project, close }: UpdateRepoProps) {
-  const isExternalRepo = project.repository?.type === RepositoryType.EXTERNAL;
+function UpdateRepository(props: UpdateRepoProps) {
+  const isExternal = props.project.repository?.type === RepositoryType.EXTERNAL;
 
   return (
     <div className={styles.wrapper}>
-      {isExternalRepo ? (
-        <UpdateExternalRepo close={close} project={project} />
+      {isExternal ? (
+        <UpdateExternalRepo {...props} />
       ) : (
-        <UpdateInternalRepo close={close} project={project} />
+        <UpdateInternalRepo {...props} />
       )}
     </div>
   );

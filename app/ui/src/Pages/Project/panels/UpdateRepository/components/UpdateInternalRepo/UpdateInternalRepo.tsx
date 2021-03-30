@@ -35,7 +35,7 @@ function UpdateInternalRepo({ close, project }: UpdateRepoProps) {
       required: 'This field is mandatory',
       validate: validateSlug,
     });
-    return () => unregister(['slug']);
+    return () => unregister('slug');
   }, []);
 
   const slug = watch('slug');

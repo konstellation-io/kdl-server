@@ -122,40 +122,36 @@ func (m *userMongoDBRepo) Create(ctx context.Context, u entity.User) (string, er
 
 // FindByIDs retrieves the users for the given user identifiers.
 func (m *userMongoDBRepo) FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error) {
-	objIDs := make([]primitive.ObjectID, len(userIDs))
-
-	for i, id := range userIDs {
-		objID, err := primitive.ObjectIDFromHex(id)
-		if err != nil {
-			return nil, err
-		}
-
-		objIDs[i] = objID
+	objIDs, err := m.toObjectIDs(userIDs)
+	if err != nil {
+		return nil, err
 	}
 
 	return m.find(ctx, bson.M{"_id": bson.M{"$in": objIDs}})
 }
 
 // UpdateAccessLevel update the user access level for the given user identifiers.
-func (m *userMongoDBRepo) UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error) {
-	users, err := m.FindByIDs(ctx, userIds)
+func (m *userMongoDBRepo) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) error {
+	objIDs, err := m.toObjectIDs(userIDs)
 	if err != nil {
-		return []entity.User{}, err
+		return err
 	}
 
-	for _, user := range users {
-		err = m.updateUserFields(ctx, user.Username, bson.M{"access_level": level})
-		if err != nil {
-			return []entity.User{}, err
-		}
+	filter := bson.M{
+		"_id": bson.M{
+			"$in": objIDs,
+		},
 	}
 
-	users, err = m.FindByIDs(ctx, userIds)
-	if err != nil {
-		return []entity.User{}, err
+	upd := bson.M{
+		"$set": bson.M{
+			"access_level": level,
+		},
 	}
 
-	return users, nil
+	_, err = m.collection.UpdateMany(ctx, filter, upd)
+
+	return err
 }
 
 func (m *userMongoDBRepo) UpdateSSHKey(ctx context.Context, username string, sshKey entity.SSHKey) error {
@@ -178,6 +174,21 @@ func (m *userMongoDBRepo) updateUserFields(ctx context.Context, username string,
 	})
 
 	return err
+}
+
+func (m *userMongoDBRepo) toObjectIDs(userIDs []string) ([]primitive.ObjectID, error) {
+	objIDs := make([]primitive.ObjectID, len(userIDs))
+
+	for i, id := range userIDs {
+		objID, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+
+		objIDs[i] = objID
+	}
+
+	return objIDs, nil
 }
 
 func (m *userMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.User, error) {

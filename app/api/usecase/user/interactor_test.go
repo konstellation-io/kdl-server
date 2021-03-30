@@ -485,7 +485,8 @@ func TestInteractor_UpdateAccessLevel(t *testing.T) {
 	ids := []string{id}
 	users := []entity.User{targetUser}
 
-	s.mocks.repo.EXPECT().UpdateAccessLevel(ctx, ids, accessLevel).Return(users, nil)
+	s.mocks.repo.EXPECT().UpdateAccessLevel(ctx, ids, accessLevel).Return(nil)
+	s.mocks.repo.EXPECT().FindByIDs(ctx, ids).Return(users, nil)
 
 	returnedUsers, err := s.interactor.UpdateAccessLevel(ctx, ids, accessLevel)
 

@@ -202,8 +202,13 @@ func (i *interactor) GetByID(ctx context.Context, userID string) (entity.User, e
 }
 
 // UpdateAccessLevel update access level for the given identifiers.
-func (i *interactor) UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error) {
-	return i.repo.UpdateAccessLevel(ctx, userIds, level)
+func (i *interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error) {
+	err := i.repo.UpdateAccessLevel(ctx, userIDs, level)
+	if err != nil {
+		return nil, err
+	}
+
+	return i.repo.FindByIDs(ctx, userIDs)
 }
 
 // RegenerateSSHKeys generate new SSH key pair for the given user.

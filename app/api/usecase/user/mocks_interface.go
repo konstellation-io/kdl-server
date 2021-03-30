@@ -140,18 +140,17 @@ func (mr *MockRepositoryMockRecorder) GetByUsername(ctx, username interface{}) *
 }
 
 // UpdateAccessLevel mocks base method.
-func (m *MockRepository) UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error) {
+func (m *MockRepository) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateAccessLevel", ctx, userIds, level)
-	ret0, _ := ret[0].([]entity.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "UpdateAccessLevel", ctx, userIDs, level)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // UpdateAccessLevel indicates an expected call of UpdateAccessLevel.
-func (mr *MockRepositoryMockRecorder) UpdateAccessLevel(ctx, userIds, level interface{}) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) UpdateAccessLevel(ctx, userIDs, level interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccessLevel", reflect.TypeOf((*MockRepository)(nil).UpdateAccessLevel), ctx, userIds, level)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccessLevel", reflect.TypeOf((*MockRepository)(nil).UpdateAccessLevel), ctx, userIDs, level)
 }
 
 // UpdateSSHKey mocks base method.

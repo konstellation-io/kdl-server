@@ -1,5 +1,5 @@
 import { BUTTON_THEMES, Button, Check } from 'kwc';
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 
 import { OverrideProps } from '@material-ui/core/OverridableComponent';
 import { SvgIconTypeMap } from '@material-ui/core';
@@ -18,36 +18,43 @@ const toButtonTheme = new Map([
   [BOX_THEME.ERROR, BUTTON_THEMES.ERROR],
 ]);
 
-type Action = {
+export type BoxActionProps = {
   needConfirmation?: boolean;
   message?: string;
   label: string;
   onClick: () => void;
   Icon?: FunctionComponent<OverrideProps<SvgIconTypeMap<{}, 'svg'>, 'svg'>>;
+  loading?: boolean;
 };
 
 type Props = {
   title: string;
-  desciption: string;
-  action?: Action;
+  description: string;
+  action?: BoxActionProps;
   theme?: BOX_THEME;
+  customAction?: JSX.Element;
 };
+
 function MessageActionBox({
   title,
-  desciption,
+  description,
   action,
+  customAction,
   theme = BOX_THEME.DEFAULT,
 }: Props) {
   const [confirmed, setConfirmed] = useState(false);
 
-  return (
-    <div
-      className={cx(styles.container, styles[theme])}
-      onClick={(e) => e.stopPropagation()}
-    >
-      <p className={styles.title}>{title}</p>
-      <p className={styles.description}>{desciption}</p>
-      {action && (
+  useEffect(() => {
+    if (action?.loading) {
+      setConfirmed(false);
+    }
+  }, [action?.loading]);
+
+  function getAction() {
+    if (customAction) return customAction;
+
+    if (action) {
+      return (
         <div className={styles.action}>
           {action.needConfirmation && (
             <div className={styles.confirmation}>
@@ -55,17 +62,33 @@ function MessageActionBox({
               <p className={styles.confirmationText}>{action.message}</p>
             </div>
           )}
-          <Button
-            label={action.label}
-            theme={toButtonTheme.get(theme)}
-            onClick={action.onClick}
-            disabled={action.needConfirmation && !confirmed}
-            height={30}
-            Icon={action.Icon}
-            primary
-          />
+          <div className={styles.button}>
+            <Button
+              label={action.label}
+              theme={toButtonTheme.get(theme)}
+              onClick={action.onClick}
+              disabled={
+                (action.needConfirmation && !confirmed) || action.loading
+              }
+              loading={action.loading}
+              height={30}
+              Icon={action.Icon}
+              primary
+            />
+          </div>
         </div>
-      )}
+      );
+    }
+  }
+
+  return (
+    <div
+      className={cx(styles.container, styles[theme])}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <p className={styles.title}>{title}</p>
+      <p className={styles.description}>{description}</p>
+      {getAction()}
     </div>
   );
 }

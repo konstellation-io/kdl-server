@@ -1,7 +1,11 @@
-import { ProjectFilters, ProjectOrder, ProjectSelection, } from '../models/ProjectFilters';
+import {
+  ProjectFilters,
+  ProjectOrder,
+  ProjectSelection,
+} from '../models/ProjectFilters';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
-import { projectFilters } from './../cache';
+import { projectFilters } from 'Graphql/client/cache';
 import { sortBy } from 'lodash';
 
 export type NewFilters = {
@@ -20,8 +24,10 @@ function useProjectFilters() {
     });
   }
 
-  const isProjectActive = (project: GetProjects_projects) => !project.needAccess && !project.archived;
-  const isProjectInaccessible = (project: GetProjects_projects) => project.needAccess;
+  const isProjectActive = (project: GetProjects_projects) =>
+    !project.needAccess && !project.archived;
+  const isProjectInaccessible = (project: GetProjects_projects) =>
+    project.needAccess;
   const isProjectArchived = (project: GetProjects_projects) => project.archived;
 
   function getProjectCounts(projects: GetProjects_projects[]) {
@@ -46,7 +52,8 @@ function useProjectFilters() {
     return (
       (selection === ProjectSelection.ARCHIVED && isProjectArchived(project)) ||
       (selection === ProjectSelection.ACTIVE && isProjectActive(project)) ||
-      (selection === ProjectSelection.INACCESSIBLE && isProjectInaccessible(project))
+      (selection === ProjectSelection.INACCESSIBLE &&
+        isProjectInaccessible(project))
     );
   }
 

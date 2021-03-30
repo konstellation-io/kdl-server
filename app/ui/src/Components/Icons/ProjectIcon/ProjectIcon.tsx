@@ -3,11 +3,20 @@ import React from 'react';
 import styles from './ProjectIcon.module.scss';
 import cx from 'classnames';
 
-const ProjectIcon = (props: SvgIconProps) => (
-  <SvgIcon {...props} className={cx(props.className, styles.icon)}>
+interface AdditionalProps {
+  archived: boolean;
+}
+
+const ProjectIcon = (props: AdditionalProps & SvgIconProps) => (
+  <SvgIcon
+    className={cx(styles.icon, props.className, {
+      [styles.ARCHIVED]: props.archived,
+    })}
+  >
     <g>
-      <polygon points="2,12 6,3 22,3 18,12 22,21 6,21"/>
+      <polygon points="2,12 6,3 22,3 18,12 22,21 6,21" />
     </g>
   </SvgIcon>
 );
+
 export default ProjectIcon;

@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 
 import AnimateHeight from 'react-animate-height';
 import IconHelp from '@material-ui/icons/Help';
-import MessageActionBox from 'Components/MessageActionBox/MessageActionBox';
+import MessageActionBox, {
+  BoxActionProps,
+} from 'Components/MessageActionBox/MessageActionBox';
 import cx from 'classnames';
 import styles from './FAQBox.module.scss';
 
@@ -14,25 +16,20 @@ export enum BOX_THEME {
   ERROR = 'error',
 }
 
-type Action = {
-  needConfirmation?: boolean;
-  message?: string;
-  label: string;
-  onClick: () => void;
-};
-
 type Props = {
   label: string;
   title: string;
-  desciption: string;
-  action?: Action;
+  description: string;
+  action?: BoxActionProps;
+  customAction?: JSX.Element;
   theme?: BOX_THEME;
 };
 function FAQBox({
   label,
   title,
-  desciption,
+  description,
   action,
+  customAction,
   theme = BOX_THEME.DEFAULT,
 }: Props) {
   const [opened, setOpened] = useState(false);
@@ -54,8 +51,9 @@ function FAQBox({
       </div>
       <MessageActionBox
         title={title}
-        desciption={desciption}
+        description={description}
         action={action}
+        customAction={customAction}
         theme={theme}
       />
     </AnimateHeight>

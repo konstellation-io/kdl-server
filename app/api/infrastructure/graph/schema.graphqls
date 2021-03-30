@@ -3,17 +3,15 @@ type Query {
   projects: [Project!]!
   project(id: ID!): Project!
   users: [User!]!
-  sshKey: SSHKey!
   qualityProjectDesc(description: String!): QualityProjectDesc!
-  knowledgeGraph(description: String!): KnowledgeGraph!
-  knowledgeGraphItem(id: ID!): KnowledgeGraphItem!
+  knowledgeGraph(projectId: ID!): KnowledgeGraph!
 }
 
 type Mutation {
   addUser(input: AddUserInput!): User!
   removeUsers(input: RemoveUsersInput!): [User!]!
   updateAccessLevel(input: UpdateAccessLevelInput!): [User!]!
-  regenerateSSHKey: SSHKey!
+  regenerateSSHKey: User!
   createProject(input: CreateProjectInput!): Project!
   updateProject(input: UpdateProjectInput!): Project!
   addMembers(input: AddMembersInput!): Project!
@@ -21,8 +19,7 @@ type Mutation {
   updateMember(input: UpdateMemberInput!): Project!
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
-  setStarredKGItem(input: SetBoolFieldInput!): KnowledgeGraphItem!
-  setDiscardedKGItem(input: SetBoolFieldInput!): KnowledgeGraphItem!
+  setKGStarred(input: SetKGStarredInput!): SetKGStarredRes!
   setActiveUserTools(input: SetActiveUserToolsInput!): User!
 }
 
@@ -50,11 +47,12 @@ type KnowledgeGraphItem {
   date: String!
   url: String!
   topics: [Topic!]!
+  starred: Boolean!
 
   # optional fields
-  repoUrls: [String]
+  repoUrls: [String!]
   externalId: ID # for example: arxivId
-  frameworks: [String]
+  frameworks: [String!]
 }
 
 type SSHKey {
@@ -73,6 +71,7 @@ type User {
   lastActivity: String
   apiTokens: [ApiToken!]!
   areToolsActive: Boolean!
+  sshKey: SSHKey!
 }
 
 type ApiToken {
@@ -114,6 +113,13 @@ input UpdateProjectInput {
   name: String
   description: String
   repository: UpdateProjectRepositoryInput
+  archived: Boolean
+}
+
+input SetKGStarredInput {
+  projectId: ID!
+  kgItemId: ID!
+  starred: Boolean!
 }
 
 input AddMembersInput {
@@ -171,6 +177,11 @@ input SetActiveUserToolsInput {
   active: Boolean!
 }
 
+type SetKGStarredRes {
+  kgItemId: ID!
+  starred: Boolean!
+}
+
 type Project {
   id: ID!
   name: String!
@@ -211,12 +222,6 @@ type Repository {
 enum RepositoryType {
   INTERNAL
   EXTERNAL
-}
-
-enum ProjectState {
-  STARTED
-  STOPPED
-  ARCHIVED
 }
 
 enum KnowledgeGraphItemCat {

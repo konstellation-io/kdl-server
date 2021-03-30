@@ -1,5 +1,8 @@
 import { ErrorMessage, Select, SelectTheme, SpinnerCircular } from 'kwc';
-import { GET_PROJECT_FILTERS, GetProjectFilters, } from 'Graphql/client/queries/getProjectsFilters.graphql';
+import {
+  GET_PROJECT_FILTERS,
+  GetProjectFilters,
+} from 'Graphql/client/queries/getProjectsFilters.graphql';
 
 import { GetProjects } from 'Graphql/queries/types/GetProjects';
 import { ProjectOrder } from 'Graphql/client/models/ProjectFilters';

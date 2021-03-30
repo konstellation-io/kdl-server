@@ -5,34 +5,35 @@
 package droneservice
 
 import (
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
-// MockDroneService is a mock of DroneService interface
+// MockDroneService is a mock of DroneService interface.
 type MockDroneService struct {
 	ctrl     *gomock.Controller
 	recorder *MockDroneServiceMockRecorder
 }
 
-// MockDroneServiceMockRecorder is the mock recorder for MockDroneService
+// MockDroneServiceMockRecorder is the mock recorder for MockDroneService.
 type MockDroneServiceMockRecorder struct {
 	mock *MockDroneService
 }
 
-// NewMockDroneService creates a new mock instance
+// NewMockDroneService creates a new mock instance.
 func NewMockDroneService(ctrl *gomock.Controller) *MockDroneService {
 	mock := &MockDroneService{ctrl: ctrl}
 	mock.recorder = &MockDroneServiceMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockDroneService) EXPECT() *MockDroneServiceMockRecorder {
 	return m.recorder
 }
 
-// ActivateRepository mocks base method
+// ActivateRepository mocks base method.
 func (m *MockDroneService) ActivateRepository(repoName string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ActivateRepository", repoName)
@@ -40,7 +41,7 @@ func (m *MockDroneService) ActivateRepository(repoName string) error {
 	return ret0
 }
 
-// ActivateRepository indicates an expected call of ActivateRepository
+// ActivateRepository indicates an expected call of ActivateRepository.
 func (mr *MockDroneServiceMockRecorder) ActivateRepository(repoName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ActivateRepository", reflect.TypeOf((*MockDroneService)(nil).ActivateRepository), repoName)

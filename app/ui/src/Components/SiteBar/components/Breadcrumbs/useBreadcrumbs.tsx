@@ -1,6 +1,9 @@
 import { BottomComponentProps, CrumbProps } from './components/Crumb/Crumb';
 import { useLocation, useRouteMatch } from 'react-router-dom';
-import useProjectNavigation, { EnhancedRouteConfiguration, RoutesConfiguration, } from 'Hooks/useProjectNavigation';
+import useProjectNavigation, {
+  EnhancedRouteConfiguration,
+  RoutesConfiguration,
+} from 'Hooks/useProjectNavigation';
 import { useQuery, useReactiveVar } from '@apollo/client';
 
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
@@ -66,13 +69,15 @@ function useBreadcrumbs() {
   // Check if we are in a project
   if (routeMatch && project) {
     // Add crumb for the project
-    const { name } = project;
+    const { name, archived } = project;
     crumbs.push({
       crumbText: name,
-      LeftIconComponent: <ProjectIcon className="icon-regular"/>,
+      LeftIconComponent: (
+        <ProjectIcon className="icon-regular" archived={archived} />
+      ),
       RightIconComponent: ExpandMoreIcon,
       BottomComponent: (props: BottomComponentProps) => (
-          <ProjectSelector options={projectsData.projects} {...props} />
+        <ProjectSelector options={projectsData.projects} {...props} />
       ),
     });
 

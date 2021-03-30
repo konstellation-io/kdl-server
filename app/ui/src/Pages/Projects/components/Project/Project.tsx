@@ -2,7 +2,9 @@ import { RepositoryType } from 'Graphql/types/globalTypes';
 import ROUTE, { buildRoute } from 'Constants/routes';
 import React, { FC } from 'react';
 import { capitalize } from 'lodash';
-import RepositoryTypeComponent, { LOCATION, } from 'Pages/NewProject/pages/Repository/components/RepositoryTypeComponent/RepositoryTypeComponent';
+import RepositoryTypeComponent, {
+  LOCATION,
+} from 'Pages/NewProject/pages/Repository/components/RepositoryTypeComponent/RepositoryTypeComponent';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { Link } from 'react-router-dom';
@@ -17,17 +19,19 @@ type Props = {
 const Project: FC<Props> = ({ project }) => (
   <Link
     to={buildRoute(ROUTE.PROJECT, project.id)}
-    className={cx({ [styles.disabled]: project.needAccess || project.archived })}
+    className={cx({
+      [styles.disabled]: project.needAccess || project.archived,
+    })}
   >
     <div
       className={cx(styles.container, {
         [styles.archived]: project.archived,
       })}
     >
-      <UpperBg project={project}/>
-      <LowerBg project={project}/>
-      <Band project={project}/>
-      <Square project={project}/>
+      <UpperBg project={project} />
+      <LowerBg project={project} />
+      <Band project={project} />
+      <Square project={project} />
     </div>
   </Link>
 );
@@ -35,7 +39,7 @@ const Project: FC<Props> = ({ project }) => (
 const UpperBg: FC<Props> = ({ project }) => (
   <div className={styles.sup}>
     <div className={styles.bg}>
-      <div className={styles.bgBand}/>
+      <div className={styles.bgBand} />
     </div>
     <div className={styles.content}>
       <p className={styles.name}>{project.name}</p>
@@ -46,7 +50,7 @@ const UpperBg: FC<Props> = ({ project }) => (
 const LowerBg: FC<Props> = ({ project }) => (
   <div className={styles.inf}>
     <div className={styles.bg}>
-      <div className={styles.bgBand}/>
+      <div className={styles.bgBand} />
     </div>
     <div className={styles.content}>
       <p className={styles.description} title={project.description}>
@@ -64,11 +68,12 @@ const LowerBg: FC<Props> = ({ project }) => (
 
 const Band: FC<Props> = ({ project }) => (
   <div className={styles.band}>
-    <div className={styles.label}>{capitalize(project.repository?.type)}
-    </div>
+    <div className={styles.label}>{capitalize(project.repository?.type)}</div>
     <div className={styles.otherLabels}>
       {project.archived && <div className={styles.labelArchived}>Archived</div>}
-      {project.needAccess && <div className={styles.labelNoAccess}>No Access</div>}
+      {project.needAccess && (
+        <div className={styles.labelNoAccess}>No Access</div>
+      )}
     </div>
     {project.error && <div className={styles.warning}>WARNING</div>}
   </div>

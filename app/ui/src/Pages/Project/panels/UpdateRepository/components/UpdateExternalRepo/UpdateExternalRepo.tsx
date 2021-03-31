@@ -10,6 +10,7 @@ import IconLink from '@material-ui/icons/Link';
 import { UpdateRepoProps } from '../../UpdateRepository';
 import { UpdateExternalRepositoryInput } from 'Graphql/types/globalTypes';
 
+// This will make the user think the input for the repo token is complete with the previous value
 const DEFAULT_TOKEN = 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz';
 
 function UpdateExternalRepo({ close, project }: UpdateRepoProps) {
@@ -45,7 +46,7 @@ function UpdateExternalRepo({ close, project }: UpdateRepoProps) {
   function onSubmit(data: UpdateExternalRepositoryInput) {
     const input: UpdateExternalRepositoryInput = {
       ...data,
-      token: data.token !== DEFAULT_TOKEN ? data.token : '',
+      token: data.token !== DEFAULT_TOKEN ? data.token : null,
     };
     updateProjectExternalRepo(project.id, input);
   }

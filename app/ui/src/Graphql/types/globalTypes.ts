@@ -93,7 +93,7 @@ export interface UpdateAccessLevelInput {
 export interface UpdateExternalRepositoryInput {
   url: string;
   username: string;
-  token: string;
+  token?: string | null;
 }
 
 export interface UpdateInternalRepositoryInput {

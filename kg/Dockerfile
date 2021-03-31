@@ -24,7 +24,7 @@ COPY Pipfile* ./
 RUN python3 -m pip install pipenv && \
     pipenv install --system --deploy
 
-COPY server server
+COPY src/server server
 
 WORKDIR /kg/assets
 

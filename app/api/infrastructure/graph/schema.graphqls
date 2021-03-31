@@ -155,7 +155,7 @@ input UpdateInternalRepositoryInput {
 input UpdateExternalRepositoryInput {
   url: String!
   username: String!
-  token: String!
+  token: String
 }
 
 input RemoveUsersInput {

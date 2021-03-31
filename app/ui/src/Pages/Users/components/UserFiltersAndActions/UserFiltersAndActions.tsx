@@ -12,6 +12,7 @@ import { loader } from 'graphql.macro';
 import { SyncUsers } from 'Graphql/mutations/types/SyncUsers';
 import { toast } from 'react-toastify';
 import useActionDisableDelay from 'Hooks/useActionDisableDelay';
+import { CONFIG } from 'index';
 
 const syncUsersMutation = loader('Graphql/mutations/syncUsers.graphql');
 
@@ -31,7 +32,7 @@ function UserFiltersAndActions({ onUpdateAccessLevel }: Props) {
   });
 
   function onManageUsers() {
-    window.open();
+    window.open(`${CONFIG.GITEA_URL}/admin/users`);
   }
 
   function onSync() {

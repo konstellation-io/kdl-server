@@ -24,7 +24,7 @@ function UserFiltersAndActions({ onUpdateAccessLevel }: Props) {
   const [syncUsers, { loading }] = useMutation<SyncUsers>(syncUsersMutation, {
     onCompleted: () => {
       toast.dismiss();
-      toast.info(`Sync started`);
+      toast.info(`User synchronization has started`);
 
       disableSyncAction();
     },

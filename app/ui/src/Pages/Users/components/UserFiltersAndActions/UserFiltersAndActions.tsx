@@ -10,6 +10,8 @@ import { useMutation } from '@apollo/client';
 import { loader } from 'graphql.macro';
 
 import { SyncUsers } from 'Graphql/mutations/types/SyncUsers';
+import { toast } from 'react-toastify';
+import useActionDisableDelay from 'Hooks/useActionDisableDelay';
 
 const syncUsersMutation = loader('Graphql/mutations/syncUsers.graphql');
 
@@ -18,7 +20,15 @@ type Props = {
 };
 
 function UserFiltersAndActions({ onUpdateAccessLevel }: Props) {
-  const [syncUsers, { loading }] = useMutation<SyncUsers>(syncUsersMutation);
+  const [syncDisabled, disableSyncAction] = useActionDisableDelay(3000);
+  const [syncUsers, { loading }] = useMutation<SyncUsers>(syncUsersMutation, {
+    onCompleted: () => {
+      toast.dismiss();
+      toast.info(`Sync started`);
+
+      disableSyncAction();
+    },
+  });
 
   function onManageUsers() {
     window.open();
@@ -31,8 +41,8 @@ function UserFiltersAndActions({ onUpdateAccessLevel }: Props) {
   return (
     <div className={styles.container}>
       <Left className={styles.left}>
-        <UserFilters/>
-        <UserActions onUpdateUsers={onUpdateAccessLevel}/>
+        <UserFilters />
+        <UserActions onUpdateUsers={onUpdateAccessLevel} />
       </Left>
       <Right className={styles.buttons}>
         <div>
@@ -41,11 +51,12 @@ function UserFiltersAndActions({ onUpdateAccessLevel }: Props) {
             label="SYNCHRONIZE"
             onClick={onSync}
             loading={loading}
+            disabled={syncDisabled}
             border
           />
         </div>
         <div>
-          <Button label="MANAGE USERS" onClick={onManageUsers} border/>
+          <Button label="MANAGE USERS" onClick={onManageUsers} border />
         </div>
       </Right>
     </div>

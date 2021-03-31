@@ -60,7 +60,7 @@ function InternalRepository({ showErrors }: Props) {
           <IconLink className="icon-regular" />
           <span
             className={styles.urlContent}
-          >{`${CONFIG.INTERNAL_REPO_BASE_URL}/`}</span>
+          >{`${CONFIG.GITEA_URL}/kdl/`}</span>
         </div>
       </div>
       <TextInput

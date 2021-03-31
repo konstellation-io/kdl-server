@@ -50,7 +50,7 @@ function Summary() {
 
   function getRepositoryUrl() {
     let { url } = repoTypeDetails.values;
-    return isExternalRepo ? url : `${CONFIG.INTERNAL_REPO_BASE_URL}/${url}`;
+    return isExternalRepo ? url : `${CONFIG.GITEA_URL}/kdl/${url}`;
   }
 
   return (

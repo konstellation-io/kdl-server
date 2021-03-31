@@ -32,7 +32,6 @@ function UserFilters() {
     errors,
     watch,
   } = useForm<FormData>();
-
   const users = [...new Set(data?.users.map((user) => user.email))];
 
   useEffect(() => {

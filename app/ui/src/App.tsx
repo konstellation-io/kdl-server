@@ -1,4 +1,9 @@
-import { ApolloClient, ApolloLink, ApolloProvider, HttpLink, } from '@apollo/client';
+import {
+  ApolloClient,
+  ApolloLink,
+  ApolloProvider,
+  HttpLink,
+} from '@apollo/client';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { Slide, toast, ToastContainer } from 'react-toastify';
 

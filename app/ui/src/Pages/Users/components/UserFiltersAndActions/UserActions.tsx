@@ -1,5 +1,8 @@
 import { Check, CustomOptionProps, Select } from 'kwc';
-import { GET_USER_SETTINGS, GetUserSettings, } from 'Graphql/client/queries/getUserSettings.graphql';
+import {
+  GET_USER_SETTINGS,
+  GetUserSettings,
+} from 'Graphql/client/queries/getUserSettings.graphql';
 import React, { FC } from 'react';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';

@@ -138,6 +138,8 @@ function UsersTable({ users }: Props) {
         },
       },
     ],
+    // We want to execute this only when mounting/unmounting
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
@@ -226,42 +228,42 @@ function UsersTable({ users }: Props) {
     <div className={styles.container}>
       <table {...getTableProps()} className={styles.table}>
         <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                {column.render('Header')}
-                <span>
+          {headerGroups.map((headerGroup) => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => (
+                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                  {column.render('Header')}
+                  <span>
                     {column.isSorted ? (
                       column.isSortedDesc ? (
                         <span className={styles.sortIcon}>
-                          <IconArrowDown className="icon-regular"/>
+                          <IconArrowDown className="icon-regular" />
                         </span>
                       ) : (
                         <span className={styles.sortIcon}>
-                          <IconArrowUp className="icon-regular"/>
+                          <IconArrowUp className="icon-regular" />
                         </span>
                       )
                     ) : (
                       ''
                     )}
                   </span>
-              </th>
-            ))}
-          </tr>
-        ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map((cell) => (
-                <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                </th>
               ))}
             </tr>
-          );
-        })}
+          ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row) => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()}>
+                {row.cells.map((cell) => (
+                  <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                ))}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

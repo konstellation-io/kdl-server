@@ -1,6 +1,18 @@
-import { ErrorMessage, ModalContainer, ModalLayoutConfirmList, SpinnerCircular, } from 'kwc';
-import { GET_USER_SETTINGS, GetUserSettings, } from 'Graphql/client/queries/getUserSettings.graphql';
-import { defaultModalInfo, getModalInfo, ModalInfo, } from './confirmationModals';
+import {
+  ErrorMessage,
+  ModalContainer,
+  ModalLayoutConfirmList,
+  SpinnerCircular,
+} from 'kwc';
+import {
+  GET_USER_SETTINGS,
+  GetUserSettings,
+} from 'Graphql/client/queries/getUserSettings.graphql';
+import {
+  defaultModalInfo,
+  getModalInfo,
+  ModalInfo,
+} from './confirmationModals';
 import React, { useRef } from 'react';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
@@ -59,8 +71,8 @@ function Users() {
 
     return (
       <>
-        <UserFiltersAndActions onUpdateAccessLevel={onUpdateAccessLevel}/>
-        <UsersTable users={data.users}/>
+        <UserFiltersAndActions onUpdateAccessLevel={onUpdateAccessLevel} />
+        <UsersTable users={data.users} />
       </>
     );
   }

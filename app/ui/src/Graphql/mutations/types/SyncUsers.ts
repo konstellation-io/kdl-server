@@ -7,6 +7,11 @@
 // GraphQL mutation operation: SyncUsers
 // ====================================================
 
+export interface SyncUsers_syncUsers {
+  __typename: 'SyncUsersResponse';
+  msg: string;
+}
+
 export interface SyncUsers {
-  syncUsers: boolean;
+  syncUsers: SyncUsers_syncUsers;
 }

@@ -15,7 +15,7 @@ export default function useActionDisableDelay(
     if (disabled) {
       disableTimeout = window.setTimeout(() => setDisabled(false), delay);
     }
-  }, [disabled]);
+  }, [disabled, delay]);
 
   function disableAction() {
     setDisabled(true);

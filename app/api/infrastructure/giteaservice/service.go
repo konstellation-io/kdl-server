@@ -3,7 +3,6 @@ package giteaservice
 import (
 	"code.gitea.io/sdk/gitea"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
@@ -27,25 +26,6 @@ func NewGiteaService(logger logging.Logger, url, adminUser, adminPassword string
 	}
 
 	return &giteaService{logger: logger, client: client}, nil
-}
-
-// CreateUser creates a new user in Gitea.
-func (g *giteaService) CreateUser(email, username, password string) error {
-	mustChangePassword := true
-	user, _, err := g.client.AdminCreateUser(gitea.CreateUserOption{
-		Email:              email,
-		Password:           password,
-		Username:           username,
-		MustChangePassword: &mustChangePassword,
-	})
-
-	if err != nil {
-		return err
-	}
-
-	g.logger.Infof("Created user \"%s\" in Gitea with id \"%d\"", user.UserName, user.ID)
-
-	return nil
 }
 
 // AddSSHKey adds a new public SSH key to a user.
@@ -184,4 +164,46 @@ func (g *giteaService) getUserSSHKey(username string) (*gitea.PublicKey, error) 
 	}
 
 	return nil, nil
+}
+
+// GetAllUsers returns all users from Gitea.
+func (g *giteaService) FindAllUsers() ([]entity.User, error) {
+	const pageSize = 1
+
+	var result []entity.User
+
+	page := 0
+	lastNumberOfUsers := 0
+
+	for moreResults := true; moreResults; moreResults = lastNumberOfUsers == pageSize {
+		g.logger.Debugf("Request users from Gitea: page number = %d, page size = %d", page, pageSize)
+
+		users, _, err := g.client.AdminListUsers(gitea.AdminListUsersOptions{
+			ListOptions: gitea.ListOptions{
+				Page:     page,
+				PageSize: pageSize,
+			},
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
+		for _, u := range users {
+			result = append(result, entity.User{
+				Username: u.UserName,
+				Email:    u.Email,
+			})
+		}
+
+		lastNumberOfUsers = len(users)
+
+		g.logger.Debugf("There are %d users in the page %d", lastNumberOfUsers, page)
+
+		page++
+	}
+
+	g.logger.Debugf("Downloaded a total of %d users from Gitea", len(result))
+
+	return result, nil
 }

@@ -82,6 +82,10 @@ type SetKGStarredRes struct {
 	Starred  bool   `json:"starred"`
 }
 
+type SyncUsersResponse struct {
+	Msg string `json:"msg"`
+}
+
 type UpdateAccessLevelInput struct {
 	UserIds     []string           `json:"userIds"`
 	AccessLevel entity.AccessLevel `json:"accessLevel"`

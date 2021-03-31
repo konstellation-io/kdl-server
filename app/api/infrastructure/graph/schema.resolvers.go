@@ -28,15 +28,6 @@ func (r *memberResolver) AddedDate(ctx context.Context, obj *entity.Member) (str
 	return obj.AddedDate.Format(time.RFC3339), nil
 }
 
-func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error) {
-	user, err := r.users.Create(ctx, input.Email, input.Username, input.Password, input.AccessLevel)
-	if err != nil {
-		return nil, err
-	}
-
-	return &user, nil
-}
-
 func (r *mutationResolver) RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error) {
 	return nil, entity.ErrNotImplemented
 }
@@ -208,6 +199,12 @@ func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.S
 	u, err := r.users.StopTools(ctx, username)
 
 	return &u, err
+}
+
+func (r *mutationResolver) SyncUsers(ctx context.Context) (*model.SyncUsersResponse, error) {
+	r.users.RunSyncUsersCronJob()
+
+	return &model.SyncUsersResponse{Msg: "External user data synchronization has started."}, nil
 }
 
 func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project) (string, error) {

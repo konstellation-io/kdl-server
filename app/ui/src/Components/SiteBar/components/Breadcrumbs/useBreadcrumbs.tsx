@@ -56,6 +56,10 @@ function useBreadcrumbs() {
   if (loading || !projectsData) return { loading, crumbs };
   if (error) throw Error('cannot retrieve data at useBreadcrumbs');
 
+  const activeProjects = projectsData.projects.filter(
+    (p) => !p.archived && !p.needAccess
+  );
+
   // Add server crumb
   crumbs.push({
     crumbText: CONFIG.SERVER_NAME,
@@ -77,7 +81,7 @@ function useBreadcrumbs() {
       ),
       RightIconComponent: ExpandMoreIcon,
       BottomComponent: (props: BottomComponentProps) => (
-        <ProjectSelector options={projectsData.projects} {...props} />
+        <ProjectSelector options={activeProjects} {...props} />
       ),
     });
 

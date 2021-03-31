@@ -1,0 +1,31 @@
+#import '../fragments/memberFragment.graphql'
+
+query GetProject($id: ID!) {
+  project(id: $id) {
+    id
+    name
+    description
+    favorite
+    creationDate
+    lastActivationDate
+    repository {
+      type
+      url
+      error
+    }
+    needAccess
+    archived
+    error
+    toolUrls {
+      drone
+      gitea
+      jupyter
+      minio
+      mlflow
+      vscode
+    }
+    members {
+      ...MemberFields
+    }
+  }
+}

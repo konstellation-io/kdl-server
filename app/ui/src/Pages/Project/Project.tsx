@@ -54,7 +54,7 @@ function Project() {
     <div className={styles.container}>
       <ProjectNavigation />
       <div className={styles.contentLayer}>
-        <ProjectContentRoutes openedProject={project} />
+        <ProjectContentRoutes />
         {openedToolsData.map((toolName) => (
           <Tool
             key={toolName}

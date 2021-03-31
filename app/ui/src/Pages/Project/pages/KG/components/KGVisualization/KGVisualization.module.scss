@@ -251,4 +251,5 @@ $state-to-color: (
   position: absolute;
   top: 3 * $grid-unit;
   left: 3 * $grid-unit;
+  z-index: 1;
 }

@@ -182,6 +182,15 @@ func (m *projectMongoDBRepo) UpdateArchived(ctx context.Context, projectID strin
 	return m.updateProjectFields(ctx, projectID, bson.M{"archived": archived})
 }
 
+func (m *projectMongoDBRepo) UpdateInternalRepo(ctx context.Context, projectID string, internalRepoName string) error {
+	return m.updateProjectFields(ctx, projectID, bson.M{"name": internalRepoName, "internal_repo_name": internalRepoName})
+}
+
+func (m *projectMongoDBRepo) UpdateExternalRepo(ctx context.Context, projectID, externalRepoUrl, externalRepoUsername, externalRepoToken string) error {
+	// TODO implement it
+	return nil
+}
+
 // SetStarredKGItem adds a kgItem to starred list.
 func (m *projectMongoDBRepo) SetStarredKGItem(ctx context.Context, projectID, kgItemID string) error {
 	m.logger.Debugf("Starring %s in project \"%s\"...", kgItemID, projectID)

@@ -229,6 +229,73 @@ func (i interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity
 		}
 	}
 
+	if opt.RepoType != nil {
+		// get repo data
+		repo, err := i.repo.Get(ctx, opt.ProjectID)
+		if err != nil {
+			return entity.Project{}, err
+		}
+
+		if repo.Repository.Type != *opt.RepoType {
+			return entity.Project{}, entity.ErrInvalidRepoType
+		}
+
+		oldRepoName := ""
+		newRepoName := ""
+
+		switch *opt.RepoType {
+		case entity.RepositoryTypeInternal:
+			if !kdlutil.IsNilOrEmpty(opt.InternalRepoName) {
+				oldRepoName = repo.Repository.InternalRepoName
+				newRepoName = *opt.InternalRepoName
+				// TODO: ask how frontend cleans project name to form internalRepoName
+				err = i.repo.UpdateInternalRepo(ctx, opt.ProjectID, *opt.InternalRepoName)
+				if err != nil {
+					return entity.Project{}, err
+				}
+			} else {
+				// TODO return real error
+				return entity.Project{}, nil
+			}
+
+		case entity.RepositoryTypeExternal:
+			if !kdlutil.IsNilOrEmpty(opt.ExternalRepoURL) {
+				oldRepoName = repo.Repository.RepoName
+				newRepoName, err = i.getRepoNameFromURL(*opt.ExternalRepoURL)
+				if err != nil {
+					return entity.Project{}, err
+				}
+				err := i.repo.UpdateExternalRepo(ctx, opt.ProjectID, *opt.ExternalRepoURL, *opt.ExternalRepoUsername, *opt.ExternalRepoToken)
+				if err != nil {
+					return entity.Project{}, err
+				}
+
+			}
+		}
+
+		if newRepoName != "" {
+			// update gitea repo
+			// TODO: store repo owner to be able to update it
+			owner := "owner"
+			err = i.giteaService.UpdateRepoName(owner, oldRepoName, newRepoName)
+			if err != nil {
+				return entity.Project{}, err
+			}
+			// minio bucket
+			err = i.minioService.UpdateBucketName(oldRepoName, newRepoName)
+			if err != nil {
+				return entity.Project{}, err
+			}
+
+			// drone repository
+			// TODO: something to do with old repository?
+			err = i.droneService.ActivateRepository(newRepoName)
+			if err != nil {
+				return entity.Project{}, err
+			}
+		}
+	}
+
 	return i.repo.Get(ctx, opt.ProjectID)
 }
 

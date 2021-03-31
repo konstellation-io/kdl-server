@@ -100,11 +100,41 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 }
 
 func (r *mutationResolver) UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error) {
+	// TODO duplicated code here
+	internalRepoName := ""
+	externalRepoURL := ""
+	externalRepoUsername := ""
+	externalRepoToken := ""
+	var repoType entity.RepositoryType
+
+	if input.Repository != nil {
+		repoType := input.Repository.Type
+		switch repoType {
+		case entity.RepositoryTypeInternal:
+			if input.Repository.Internal != nil {
+				internalRepoName = input.Repository.Internal.Name
+			}
+		case entity.RepositoryTypeExternal:
+			if input.Repository.External != nil {
+				externalRepoURL = input.Repository.External.URL
+				externalRepoUsername = input.Repository.External.Username
+				externalRepoToken = *input.Repository.External.Token
+			}
+		default:
+			return nil, entity.ErrInvalidRepoType
+		}
+	}
+
 	p, err := r.projects.Update(ctx, project.UpdateProjectOption{
-		ProjectID:   input.ID,
-		Name:        input.Name,
-		Description: input.Description,
-		Archived:    input.Archived,
+		ProjectID:            input.ID,
+		Name:                 input.Name,
+		Description:          input.Description,
+		Archived:             input.Archived,
+		RepoType:             &repoType,
+		InternalRepoName:     &internalRepoName,
+		ExternalRepoURL:      &externalRepoURL,
+		ExternalRepoUsername: &externalRepoUsername,
+		ExternalRepoToken:    &externalRepoToken,
 	})
 
 	return &p, err
@@ -318,6 +348,10 @@ func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (s
 	}
 
 	return "", nil
+}
+
+func (r *repositoryResolver) External(ctx context.Context, obj *entity.Repository) (*model.ExternalRepository, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *sSHKeyResolver) CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error) {

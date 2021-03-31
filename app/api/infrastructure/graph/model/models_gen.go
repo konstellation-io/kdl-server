@@ -30,12 +30,16 @@ type CreateProjectInput struct {
 }
 
 type ExternalRepository struct {
+	Username string `json:"username"`
+}
+
+type ExternalRepositoryInput struct {
 	URL      string `json:"url"`
 	Username string `json:"username"`
 	Token    string `json:"token"`
 }
 
-type InternalRepository struct {
+type InternalRepositoryInput struct {
 	Name string `json:"name"`
 }
 
@@ -57,9 +61,9 @@ type RemoveUsersInput struct {
 }
 
 type RepositoryInput struct {
-	Type     entity.RepositoryType `json:"type"`
-	External *ExternalRepository   `json:"external"`
-	Internal *InternalRepository   `json:"internal"`
+	Type     entity.RepositoryType    `json:"type"`
+	External *ExternalRepositoryInput `json:"external"`
+	Internal *InternalRepositoryInput `json:"internal"`
 }
 
 type SetActiveUserToolsInput struct {
@@ -87,6 +91,16 @@ type UpdateAccessLevelInput struct {
 	AccessLevel entity.AccessLevel `json:"accessLevel"`
 }
 
+type UpdateExternalRepositoryInput struct {
+	URL      string  `json:"url"`
+	Username string  `json:"username"`
+	Token    *string `json:"token"`
+}
+
+type UpdateInternalRepositoryInput struct {
+	Name string `json:"name"`
+}
+
 type UpdateMemberInput struct {
 	ProjectID   string             `json:"projectId"`
 	UserID      string             `json:"userId"`
@@ -102,5 +116,7 @@ type UpdateProjectInput struct {
 }
 
 type UpdateProjectRepositoryInput struct {
-	URL string `json:"url"`
+	Type     entity.RepositoryType          `json:"type"`
+	External *UpdateExternalRepositoryInput `json:"external"`
+	Internal *UpdateInternalRepositoryInput `json:"internal"`
 }

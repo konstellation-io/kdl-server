@@ -10,16 +10,16 @@ const loremIpsum = 'Lorem ipsum dolor sit amet.';
 describe('InformationUtils', () => {
   describe('validateProjectName', () => {
     it.each`
-      projectName                                      | expected
+      name                                             | expected
       ${''}                                            | ${'This field cannot be empty'}
       ${loremIpsum.padStart(maxProjectNameLength + 1)} | ${`This field cannot be longer than ${maxProjectNameLength}`}
       ${loremIpsum}                                    | ${true}
     `(
-      'should return $expected when projectName is $projectName',
-      ({ projectName, expected }) => {
+      'should return $expected when projectName is $name',
+      ({ name, expected }) => {
         // Arrange.
         // Act.
-        const result = validateProjectName(projectName);
+        const result = validateProjectName(name);
         // Assert.
         expect(result).toBe(expected);
       }

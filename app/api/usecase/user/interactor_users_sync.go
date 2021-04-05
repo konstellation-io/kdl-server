@@ -40,11 +40,15 @@ func (i *interactor) syncUsers() {
 		return
 	}
 
+	usersMap := i.userListToMap(users)
+
 	giteaUsers, err := i.giteaService.FindAllUsers()
 	if err != nil {
 		i.logger.Errorf("Error getting users from Gitea: %s", err)
 		return
 	}
+
+	giteaUsersMap := i.userListToMap(giteaUsers)
 
 	//nolint:prealloc // the final slice length is unknown
 	var (
@@ -56,7 +60,7 @@ func (i *interactor) syncUsers() {
 
 	// Get the users to update or to add
 	for _, giteaUser := range giteaUsers {
-		if found, u := i.getUserFromList(giteaUser.Username, users); found {
+		if u, found := usersMap[giteaUser.Username]; found {
 			if u.Deleted {
 				i.logger.Debugf("The gitea user \"%s\" has been restored", u.Username)
 
@@ -82,7 +86,7 @@ func (i *interactor) syncUsers() {
 			continue
 		}
 
-		if found, _ := i.getUserFromList(u.Username, giteaUsers); found {
+		if _, found := giteaUsersMap[u.Username]; found {
 			continue
 		}
 
@@ -162,12 +166,12 @@ func (i *interactor) syncRestoreUsers(ctx context.Context, users []entity.User, 
 	}
 }
 
-func (i *interactor) getUserFromList(username string, users []entity.User) (bool, entity.User) {
+func (i *interactor) userListToMap(users []entity.User) map[string]entity.User {
+	usersMap := map[string]entity.User{}
+
 	for _, u := range users {
-		if u.Username == username {
-			return true, u
-		}
+		usersMap[u.Username] = u
 	}
 
-	return false, entity.User{}
+	return usersMap
 }

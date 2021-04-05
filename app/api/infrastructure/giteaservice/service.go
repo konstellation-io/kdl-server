@@ -166,9 +166,9 @@ func (g *giteaService) getUserSSHKey(username string) (*gitea.PublicKey, error) 
 	return nil, nil
 }
 
-// GetAllUsers returns all users from Gitea.
+// FindAllUsers returns all users from Gitea.
 func (g *giteaService) FindAllUsers() ([]entity.User, error) {
-	const pageSize = 1
+	const pageSize = 40
 
 	var result []entity.User
 

@@ -302,36 +302,36 @@ func TestInteractor_FindAll_Err(t *testing.T) {
 	require.Equal(t, emptyUsers, users)
 }
 
-func TestInteractor_GetByEmail(t *testing.T) {
+func TestInteractor_GetByUsername(t *testing.T) {
 	s := newUserSuite(t)
 	defer s.ctrl.Finish()
 
-	const email = "john@email.com"
+	const username = "john"
 
 	ctx := context.Background()
-	expectedUser := entity.User{Username: "john"}
+	expectedUser := entity.User{Username: username}
 
-	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(expectedUser, nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
 
-	u, err := s.interactor.GetByEmail(ctx, email)
+	u, err := s.interactor.GetByUsername(ctx, username)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, u)
 }
 
-func TestInteractor_GetByEmail_Err(t *testing.T) {
+func TestInteractor_GetByUsername_Err(t *testing.T) {
 	s := newUserSuite(t)
 	defer s.ctrl.Finish()
 
-	const email = "john@email.com"
+	const username = "john"
 
 	ctx := context.Background()
 	someErr := entity.ErrUserNotFound
 	emptyUser := entity.User{}
 
-	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(emptyUser, someErr)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(emptyUser, someErr)
 
-	u, err := s.interactor.GetByEmail(ctx, email)
+	u, err := s.interactor.GetByUsername(ctx, username)
 
 	require.Equal(t, someErr, err)
 	require.Equal(t, emptyUser, u)

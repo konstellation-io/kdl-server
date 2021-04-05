@@ -122,10 +122,10 @@ func (i *interactor) FindAll(ctx context.Context) ([]entity.User, error) {
 	return i.repo.FindAll(ctx, false)
 }
 
-// GetByEmail returns the user with the desired email or returns entity.ErrUserNotFound if the user doesn't exist.
-func (i *interactor) GetByEmail(ctx context.Context, email string) (entity.User, error) {
-	i.logger.Infof("Getting user by email \"%s\"", email)
-	return i.repo.GetByEmail(ctx, email)
+// GetByUsername returns the user with the desired username or returns entity.ErrUserNotFound if the user doesn't exist.
+func (i *interactor) GetByUsername(ctx context.Context, username string) (entity.User, error) {
+	i.logger.Infof("Getting user by username \"%s\"", username)
+	return i.repo.GetByUsername(ctx, username)
 }
 
 // StartTools creates a user-tools CustomResource in K8s to initialize the VSCode and Jupyter for the given username.

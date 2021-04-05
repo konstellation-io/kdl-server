@@ -70,3 +70,12 @@
 .filterTypes {
   margin-right: 2 * $grid-unit;
 }
+
+.buttons {
+  display: flex;
+
+  & > div {
+    margin-left: $grid-unit;
+    width: 20 * $grid-unit;
+  }
+}

@@ -60,24 +60,26 @@ func (i *interactor) syncUsers() {
 
 	// Get the users to update or to add
 	for _, giteaUser := range giteaUsers {
-		if u, found := usersMap[giteaUser.Username]; found {
-			if u.Deleted {
-				i.logger.Debugf("The gitea user \"%s\" has been restored", u.Username)
+		u, found := usersMap[giteaUser.Username]
 
-				usersToRestore = append(usersToRestore, giteaUser)
-			}
-
-			if u.Email != giteaUser.Email {
-				i.logger.Debugf("The gitea user \"%s\" has changed their email", u.Username)
-
-				usersToUpd = append(usersToUpd, giteaUser)
-			}
+		if !found {
+			i.logger.Debugf("The gitea user \"%s\" is a new user", giteaUser.Username)
+			usersToAdd = append(usersToAdd, giteaUser)
 
 			continue
 		}
 
-		i.logger.Debugf("The gitea user \"%s\" is a new user", giteaUser.Username)
-		usersToAdd = append(usersToAdd, giteaUser)
+		if u.Deleted {
+			i.logger.Debugf("The gitea user \"%s\" has been restored", u.Username)
+
+			usersToRestore = append(usersToRestore, giteaUser)
+		}
+
+		if u.Email != giteaUser.Email {
+			i.logger.Debugf("The gitea user \"%s\" has changed their email", u.Username)
+
+			usersToUpd = append(usersToUpd, giteaUser)
+		}
 	}
 
 	// Get the users to delete

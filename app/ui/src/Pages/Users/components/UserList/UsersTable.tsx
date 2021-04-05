@@ -10,8 +10,6 @@ import { get } from 'lodash';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import { GetUsers_users } from 'Graphql/queries/types/GetUsers';
-import IconArrowDown from '@material-ui/icons/ArrowDropDown';
-import IconArrowUp from '@material-ui/icons/ArrowDropUp';
 import Message from 'Components/Message/Message';
 import { UserSelection } from 'Graphql/client/models/UserSettings';
 import cx from 'classnames';
@@ -19,9 +17,10 @@ import { formatDate } from 'Utils/format';
 import styles from './UserList.module.scss';
 import { useQuery } from '@apollo/client';
 import useUserSettings from 'Graphql/client/hooks/useUserSettings';
+import TableHeader from './TableHeader';
 import useUser from '../../../../Graphql/hooks/useUser';
 
-type Data = {
+export type Data = {
   creationDate: string;
   email: string;
   username: string;
@@ -231,24 +230,7 @@ function UsersTable({ users }: Props) {
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                  {column.render('Header')}
-                  <span>
-                    {column.isSorted ? (
-                      column.isSortedDesc ? (
-                        <span className={styles.sortIcon}>
-                          <IconArrowDown className="icon-regular" />
-                        </span>
-                      ) : (
-                        <span className={styles.sortIcon}>
-                          <IconArrowUp className="icon-regular" />
-                        </span>
-                      )
-                    ) : (
-                      ''
-                    )}
-                  </span>
-                </th>
+                <TableHeader column={column} />
               ))}
             </tr>
           ))}

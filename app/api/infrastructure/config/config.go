@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/kelseyhightower/envconfig"
 	"gopkg.in/yaml.v3"
@@ -61,6 +62,11 @@ type Config struct {
 	KGservice struct {
 		URL string `envconfig:"KG_URL"`
 	}
+	ScheduledJob struct {
+		UsersSync struct {
+			Interval time.Duration `yaml:"interval" envconfig:"CRONJOB_USERS_SYNC_INTERVAL"`
+		} `yaml:"usersSync"`
+	} `yaml:"scheduledJob"`
 }
 
 // NewConfig will read the config.yml file and override values with env vars.

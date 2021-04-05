@@ -9,7 +9,6 @@ import { Slide, toast, ToastContainer } from 'react-toastify';
 
 import { CONFIG } from 'index';
 import NewProject from 'Pages/NewProject/NewProject';
-import NewUser from 'Pages/NewUser/NewUser';
 import Project from 'Pages/Project/Project';
 import ProjectCreation from 'Pages/ProjectCreation/ProjectCreation';
 import Projects from 'Pages/Projects/Projects';
@@ -38,7 +37,6 @@ function Routes() {
         <Redirect exact from={ROUTE.HOME} to={ROUTE.PROJECTS} />
 
         <Route exact path={ROUTE.USERS} component={Users} />
-        <Route exact path={ROUTE.NEW_USER} component={NewUser} />
         <Route exact path={ROUTE.USER_SSH_KEY} component={UserSshKey} />
 
         <Route exact path={ROUTE.NEW_PROJECT} component={NewProject} />

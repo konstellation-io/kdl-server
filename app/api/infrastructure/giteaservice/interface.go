@@ -8,7 +8,6 @@ import (
 
 // GiteaClient defines all Gitea operations.
 type GiteaClient interface {
-	CreateUser(email, username, password string) error
 	AddSSHKey(username, publicSSHKey string) error
 	UpdateSSHKey(username string, newPublicSSHKey string) error
 	CreateRepo(name string, ownerUsername string) error
@@ -16,4 +15,5 @@ type GiteaClient interface {
 	RemoveCollaborator(repoName, username string) error
 	UpdateCollaboratorPermissions(repoName, username string, accessLevel entity.AccessLevel) error
 	MirrorRepo(url, repoName, userName, userToken string) error
+	FindAllUsers() ([]entity.User, error)
 }

@@ -28,6 +28,7 @@ type User struct {
 	ID           string
 	Email        string
 	Username     string
+	Deleted      bool
 	CreationDate time.Time
 	AccessLevel  AccessLevel
 	SSHKey       SSHKey

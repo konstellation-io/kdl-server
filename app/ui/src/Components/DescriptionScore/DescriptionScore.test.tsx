@@ -88,9 +88,7 @@ describe('DescriptionScore utils', () => {
   describe('scoreText', () => {
     it('should match snapshot', () => {
       // Arrange.
-
       // Act.
-
       // Assert.
       expect(scoreText).toMatchSnapshot();
     });

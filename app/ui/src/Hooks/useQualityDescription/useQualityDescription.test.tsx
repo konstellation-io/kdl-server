@@ -24,8 +24,11 @@ function buildWrapper(description, options = {}) {
 describe('useQualityDescription hook', () => {
   it('should skip the first call by default', async () => {
     // Arrange.
-    buildWrapper(skipFirstCall);
     // Act.
+    await act(async () => {
+      buildWrapper(skipFirstCall);
+      await wait();
+    });
     await wait();
     // Assert.
     expect(mockSkipResult).not.toHaveBeenCalled();
@@ -33,8 +36,12 @@ describe('useQualityDescription hook', () => {
 
   it('should call the query if skipFirstCall is false', async () => {
     // Arrange.
-    buildWrapper(skipFirstCall, { skipFirstRun: false });
+    let wrapper;
     // Act.
+    await act(async () => {
+      wrapper = buildWrapper(skipFirstCall, { skipFirstRun: false });
+      await wait();
+    });
     await wait();
     // Assert.
     expect(mockSkipResult).toHaveBeenCalled();
@@ -42,8 +49,12 @@ describe('useQualityDescription hook', () => {
 
   it('should set the description score returned by the response', async () => {
     // Arrange.
-    let wrapper = buildWrapper(skipFirstCall, { skipFirstRun: false });
+    let wrapper;
     // Act.
+    await act(async () => {
+      wrapper = buildWrapper(skipFirstCall, { skipFirstRun: false });
+      await wait();
+    });
     await wait();
     wrapper.update();
     // Assert.

@@ -164,6 +164,34 @@ func (mr *MockRepositoryMockRecorder) UpdateDescription(ctx, projectID, descript
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDescription", reflect.TypeOf((*MockRepository)(nil).UpdateDescription), ctx, projectID, description)
 }
 
+// UpdateExternalRepo mocks base method.
+func (m *MockRepository) UpdateExternalRepo(ctx context.Context, projectID, externalRepoUrl, repoName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateExternalRepo", ctx, projectID, externalRepoUrl, repoName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateExternalRepo indicates an expected call of UpdateExternalRepo.
+func (mr *MockRepositoryMockRecorder) UpdateExternalRepo(ctx, projectID, externalRepoUrl, repoName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateExternalRepo", reflect.TypeOf((*MockRepository)(nil).UpdateExternalRepo), ctx, projectID, externalRepoUrl, repoName)
+}
+
+// UpdateInternalRepo mocks base method.
+func (m *MockRepository) UpdateInternalRepo(ctx context.Context, projectID, internalRepoName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateInternalRepo", ctx, projectID, internalRepoName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateInternalRepo indicates an expected call of UpdateInternalRepo.
+func (mr *MockRepositoryMockRecorder) UpdateInternalRepo(ctx, projectID, internalRepoName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateInternalRepo", reflect.TypeOf((*MockRepository)(nil).UpdateInternalRepo), ctx, projectID, internalRepoName)
+}
+
 // UpdateMemberAccessLevel mocks base method.
 func (m *MockRepository) UpdateMemberAccessLevel(ctx context.Context, projectID, userID string, accessLevel entity.AccessLevel) error {
 	m.ctrl.T.Helper()

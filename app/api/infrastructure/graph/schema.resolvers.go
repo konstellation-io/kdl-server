@@ -108,7 +108,7 @@ func (r *mutationResolver) UpdateProject(ctx context.Context, input model.Update
 	var repoType entity.RepositoryType
 
 	if input.Repository != nil {
-		repoType := input.Repository.Type
+		repoType = input.Repository.Type
 		switch repoType {
 		case entity.RepositoryTypeInternal:
 			if input.Repository.Internal != nil {
@@ -260,6 +260,11 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 		return &entity.ToolUrls{}, err
 	}
 
+	minioWithFolder, err := kdlutil.JoinToURL(r.cfg.Minio.URL, folderName)
+	if err != nil {
+		return &entity.ToolUrls{}, err
+	}
+
 	jupyterWithUsername := strings.Replace(r.cfg.Jupyter.URL, "USERNAME", slugUserName, 1)
 	jupyterWithUsernameAndFolder := strings.Replace(jupyterWithUsername, "REPO_FOLDER", folderName, 2)
 	vscodeWithUsername := strings.Replace(r.cfg.VSCode.URL, "USERNAME", slugUserName, 1)
@@ -267,7 +272,7 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 
 	return &entity.ToolUrls{
 		Gitea:   giteaWithFolder,
-		Minio:   r.cfg.Minio.URL,
+		Minio:   minioWithFolder,
 		Jupyter: jupyterWithUsernameAndFolder,
 		VSCode:  vscodeWithUsernameAndFolder,
 		Drone:   droneWithFolder,
@@ -351,7 +356,7 @@ func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (s
 }
 
 func (r *repositoryResolver) External(ctx context.Context, obj *entity.Repository) (*model.ExternalRepository, error) {
-	panic(fmt.Errorf("not implemented"))
+	return &model.ExternalRepository{Username: obj.ExternalRepoUsername}, nil
 }
 
 func (r *sSHKeyResolver) CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error) {

@@ -18,6 +18,7 @@ type droneService struct {
 	client drone.Client
 }
 
+// NewDroneService is a constructor function.
 func NewDroneService(logger logging.Logger, url, token string) DroneService {
 	config := new(oauth2.Config)
 	auth := config.Client(
@@ -36,6 +37,7 @@ func NewDroneService(logger logging.Logger, url, token string) DroneService {
 	}
 }
 
+// ActivateRepository activates a repository in drone
 func (d *droneService) ActivateRepository(repoName string) error {
 	d.logger.Infof("Activating \"%s\" repository in Drone...", repoName)
 

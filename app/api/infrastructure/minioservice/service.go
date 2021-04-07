@@ -52,6 +52,11 @@ func (m *minioService) CreateBucket(bucketName string) error {
 	return fmt.Errorf("%w: bucket name \"%s\"", ErrBucketAlreadyExists, bucketName)
 }
 
+// UpdateBucketName update bucket name in Minio.
+// - Checks repo existency
+// - Creates new bucket
+// - Copies all objects from old bucket to new bucket, and remove them from old bucket
+// - Removes old empty bucket
 func (m *minioService) UpdateBucketName(oldBucketName, newBucketName string) error {
 	exists, err := m.client.BucketExists(context.Background(), oldBucketName)
 	if err != nil {
@@ -59,7 +64,7 @@ func (m *minioService) UpdateBucketName(oldBucketName, newBucketName string) err
 	}
 
 	if !exists {
-		fmt.Errorf("impossible change bucket name. Bucket \"%s\" doesn't exists", oldBucketName)
+		return fmt.Errorf("impossible change bucket name. Bucket \"%s\" doesn't exists", oldBucketName)
 	}
 
 	err = m.CreateBucket(newBucketName)
@@ -67,29 +72,38 @@ func (m *minioService) UpdateBucketName(oldBucketName, newBucketName string) err
 		return err
 	}
 
-	objectCh := m.client.ListObjects(context.Background(), oldBucketName, minio.ListObjectsOptions{
+	objects := m.client.ListObjects(context.Background(), oldBucketName, minio.ListObjectsOptions{
 		Recursive: true,
 	})
 
-	for object := range objectCh {
+	for object := range objects {
 		if object.Err != nil {
-			fmt.Println(object.Err)
-			srcOpts := minio.CopySrcOptions{
-				Bucket: oldBucketName,
-				Object: object.Key,
-			}
+			return object.Err
+		}
+	}
 
-			// Destination object
-			dstOpts := minio.CopyDestOptions{
-				Bucket: newBucketName,
-				Object: object.Key,
-			}
+	for object := range objects {
+		srcOpts := minio.CopySrcOptions{
+			Bucket: oldBucketName,
+			Object: object.Key,
+		}
 
-			// Copy object call
-			_, err := m.client.CopyObject(context.Background(), dstOpts, srcOpts)
-			if err != nil {
-				return err
-			}
+		// Destination object
+		dstOpts := minio.CopyDestOptions{
+			Bucket: newBucketName,
+			Object: object.Key,
+		}
+
+		// Copy object call
+		_, err := m.client.CopyObject(context.Background(), dstOpts, srcOpts)
+		if err != nil {
+			return err
+		}
+
+		// Delete object call
+		err = m.client.RemoveObject(context.Background(), oldBucketName, object.Key, minio.RemoveObjectOptions{})
+		if err != nil {
+			return err
 		}
 	}
 

@@ -46,3 +46,17 @@ func (mr *MockMinioServiceMockRecorder) CreateBucket(bucketName interface{}) *go
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateBucket", reflect.TypeOf((*MockMinioService)(nil).CreateBucket), bucketName)
 }
+
+// UpdateBucketName mocks base method.
+func (m *MockMinioService) UpdateBucketName(oldBucketName, newBucketName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateBucketName", oldBucketName, newBucketName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateBucketName indicates an expected call of UpdateBucketName.
+func (mr *MockMinioServiceMockRecorder) UpdateBucketName(oldBucketName, newBucketName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBucketName", reflect.TypeOf((*MockMinioService)(nil).UpdateBucketName), oldBucketName, newBucketName)
+}

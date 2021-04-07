@@ -123,13 +123,13 @@ func (g *giteaService) MirrorRepo(url, repoName, userName, userToken string) err
 	return nil
 }
 
-func (g *giteaService) UpdateRepoName(owner, oldRepoName, newRepoName string) error {
+// UpdateRepoName updates the repo name in Gitea
+func (g *giteaService) UpdateRepoName(oldRepoName, newRepoName string) error {
 	g.logger.Infof("Updating repository name from \"%s\" to \"%s\" in Gitea...", oldRepoName, newRepoName)
 	editRepoOptions := gitea.EditRepoOption{
 		Name: &newRepoName,
 	}
-	// TODO: change owner to real one
-	_, _, err := g.client.EditRepo(owner, oldRepoName, editRepoOptions)
+	_, _, err := g.client.EditRepo(kdlOrganization, oldRepoName, editRepoOptions)
 
 	if err != nil {
 		return err

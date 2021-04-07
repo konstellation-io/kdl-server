@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DescriptionScore component should render without crashing 1`] = `
+<Memo(DescriptionScore)
+  score={10}
+>
+  <div
+    className="container"
+  >
+    <span
+      className="scoreLabel LOW"
+    >
+      10%
+    </span>
+    <div
+      className="scoreLevels"
+    >
+      <div
+        className="scoreLevel LOW"
+        key="LOW"
+      />
+      <div
+        className="scoreLevel"
+        key="MEDIUM"
+      />
+      <div
+        className="scoreLevel"
+        key="HIGH"
+      />
+      <div
+        className="scoreLevel"
+        key="VERY_HIGH"
+      />
+    </div>
+    <span
+      className="hintLabel"
+    >
+      Description is incomplete for Knowledge Galaxy.
+    </span>
+  </div>
+</Memo(DescriptionScore)>
+`;
+
+exports[`DescriptionScore utils scoreText should match snapshot 1`] = `
+Map {
+  "LOW" => "Description is incomplete for Knowledge Galaxy.",
+  "MEDIUM" => "Please, write some more text in description.",
+  "HIGH" => "Your description is good enough to be indexed.",
+  "VERY_HIGH" => "Nice, your description is fully indexable.",
+}
+`;

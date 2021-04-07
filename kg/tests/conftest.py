@@ -1,13 +1,13 @@
+import sys
 from collections import OrderedDict
 from pathlib import Path
-import sys
 from typing import List
 
-from faker import Faker
 import pytest
+from faker import Faker
 
-pipe = Path(Path.cwd(), 'pipe')
-server = Path(Path.cwd(), 'server')
+pipe = Path(Path.cwd(), 'src/pipe')
+server = Path(Path.cwd(), 'src/server')
 sys.path.append(str(pipe))
 sys.path.append(str(server))
 

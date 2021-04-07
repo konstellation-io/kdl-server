@@ -11,7 +11,7 @@ function ShowOthersFilter({ showOthers, onUpdate }: Props) {
   return (
     <div className={styles.container}>
       <Check checked={showOthers} onChange={onUpdate} />
-      <div className={styles.text}>Other Topics</div>
+      <div className={styles.text}>Show Others</div>
     </div>
   );
 }

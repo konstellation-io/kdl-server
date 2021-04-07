@@ -6,7 +6,6 @@ import {
 import React, { FC } from 'react';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
-import IconDelete from '@material-ui/icons/Delete';
 import { UserSelection } from 'Graphql/client/models/UserSettings';
 import cx from 'classnames';
 import { get } from 'lodash';
@@ -32,18 +31,11 @@ const CheckSelectAll: FC<CheckSelectAllPros> = ({
   </div>
 );
 
-const CustomRemove: FC<CustomOptionProps> = ({ label }) => (
-  <div className={styles.customOption}>
-    <IconDelete className="icon-small" />
-    <div>{label}</div>
-  </div>
-);
 const CustomSeparator: FC<CustomOptionProps> = ({ label }) => (
   <div className={cx(styles.customOption, styles.separator)}>{label}</div>
 );
 
 enum Actions {
-  DELETE = 'DELETE',
   CHANGE_ACCESS_LEVEL_TO = 'CHANGE ACCESS LEVEL TO',
   VIEWER = 'VIEWER',
   MANAGER = 'MANAGER',
@@ -53,10 +45,10 @@ enum Actions {
 const types = Object.values(Actions);
 
 type Props = {
-  onDeleteUsers: () => void;
   onUpdateUsers: (newAccessLevel: AccessLevel) => void;
 };
-function UserActions({ onDeleteUsers, onUpdateUsers }: Props) {
+
+function UserActions({ onUpdateUsers }: Props) {
   const { changeUserSelection } = useUserSettings();
 
   const { data: localData } = useQuery<GetUserSettings>(GET_USER_SETTINGS);
@@ -72,9 +64,6 @@ function UserActions({ onDeleteUsers, onUpdateUsers }: Props) {
 
   function onAction(action: Actions) {
     switch (action) {
-      case Actions.DELETE:
-        onDeleteUsers();
-        break;
       case Actions.VIEWER:
         onUpdateUsers(AccessLevel.VIEWER);
         break;
@@ -121,9 +110,8 @@ function UserActions({ onDeleteUsers, onUpdateUsers }: Props) {
           showSelectAllOption={false}
           shouldSort={false}
           disabled={nSelections === 0}
-          disabledOptions={[types[1]]}
+          disabledOptions={[types[0]]}
           CustomOptions={{
-            [Actions.DELETE]: CustomRemove,
             [Actions.CHANGE_ACCESS_LEVEL_TO]: CustomSeparator,
           }}
         />

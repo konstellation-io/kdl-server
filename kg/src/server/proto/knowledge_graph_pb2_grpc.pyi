@@ -5,6 +5,7 @@ isort:skip_file
 import abc
 
 import grpc
+
 from proto.knowledge_graph_pb2 import *
 
 

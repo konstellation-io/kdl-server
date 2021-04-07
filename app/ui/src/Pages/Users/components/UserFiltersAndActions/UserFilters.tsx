@@ -32,7 +32,6 @@ function UserFilters() {
     errors,
     watch,
   } = useForm<FormData>();
-
   const users = [...new Set(data?.users.map((user) => user.email))];
 
   useEffect(() => {
@@ -73,7 +72,7 @@ function UserFilters() {
           }}
           error={get(errors.userType, 'message') as string}
           formSelectedOption={watch('userType')}
-          placeholder="Activity type"
+          placeholder="Access Level"
         />
       </div>
     </div>

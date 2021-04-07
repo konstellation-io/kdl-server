@@ -91,7 +91,6 @@ type ComplexityRoot struct {
 	Mutation struct {
 		AddAPIToken        func(childComplexity int, input *model.APITokenInput) int
 		AddMembers         func(childComplexity int, input model.AddMembersInput) int
-		AddUser            func(childComplexity int, input model.AddUserInput) int
 		CreateProject      func(childComplexity int, input model.CreateProjectInput) int
 		RegenerateSSHKey   func(childComplexity int) int
 		RemoveAPIToken     func(childComplexity int, input *model.RemoveAPITokenInput) int
@@ -99,6 +98,7 @@ type ComplexityRoot struct {
 		RemoveUsers        func(childComplexity int, input model.RemoveUsersInput) int
 		SetActiveUserTools func(childComplexity int, input model.SetActiveUserToolsInput) int
 		SetKGStarred       func(childComplexity int, input model.SetKGStarredInput) int
+		SyncUsers          func(childComplexity int) int
 		UpdateAccessLevel  func(childComplexity int, input model.UpdateAccessLevelInput) int
 		UpdateMember       func(childComplexity int, input model.UpdateMemberInput) int
 		UpdateProject      func(childComplexity int, input model.UpdateProjectInput) int
@@ -151,6 +151,10 @@ type ComplexityRoot struct {
 		Starred  func(childComplexity int) int
 	}
 
+	SyncUsersResponse struct {
+		Msg func(childComplexity int) int
+	}
+
 	ToolUrls struct {
 		Drone   func(childComplexity int) int
 		Gitea   func(childComplexity int) int
@@ -184,7 +188,6 @@ type MemberResolver interface {
 	AddedDate(ctx context.Context, obj *entity.Member) (string, error)
 }
 type MutationResolver interface {
-	AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error)
 	RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error)
 	UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]entity.User, error)
 	RegenerateSSHKey(ctx context.Context) (*entity.User, error)
@@ -197,6 +200,7 @@ type MutationResolver interface {
 	RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error)
 	SetKGStarred(ctx context.Context, input model.SetKGStarredInput) (*model.SetKGStarredRes, error)
 	SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error)
+	SyncUsers(ctx context.Context) (*model.SyncUsersResponse, error)
 }
 type ProjectResolver interface {
 	CreationDate(ctx context.Context, obj *entity.Project) (string, error)
@@ -436,18 +440,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddMembers(childComplexity, args["input"].(model.AddMembersInput)), true
 
-	case "Mutation.addUser":
-		if e.complexity.Mutation.AddUser == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_addUser_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.AddUser(childComplexity, args["input"].(model.AddUserInput)), true
-
 	case "Mutation.createProject":
 		if e.complexity.Mutation.CreateProject == nil {
 			break
@@ -526,6 +518,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.SetKGStarred(childComplexity, args["input"].(model.SetKGStarredInput)), true
+
+	case "Mutation.syncUsers":
+		if e.complexity.Mutation.SyncUsers == nil {
+			break
+		}
+
+		return e.complexity.Mutation.SyncUsers(childComplexity), true
 
 	case "Mutation.updateAccessLevel":
 		if e.complexity.Mutation.UpdateAccessLevel == nil {
@@ -781,6 +780,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SetKGStarredRes.Starred(childComplexity), true
 
+	case "SyncUsersResponse.msg":
+		if e.complexity.SyncUsersResponse.Msg == nil {
+			break
+		}
+
+		return e.complexity.SyncUsersResponse.Msg(childComplexity), true
+
 	case "ToolUrls.drone":
 		if e.complexity.ToolUrls.Drone == nil {
 			break
@@ -974,7 +980,6 @@ var sources = []*ast.Source{
 }
 
 type Mutation {
-  addUser(input: AddUserInput!): User!
   removeUsers(input: RemoveUsersInput!): [User!]!
   updateAccessLevel(input: UpdateAccessLevelInput!): [User!]!
   regenerateSSHKey: User!
@@ -987,6 +992,7 @@ type Mutation {
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
   setKGStarred(input: SetKGStarredInput!): SetKGStarredRes!
   setActiveUserTools(input: SetActiveUserToolsInput!): User!
+  syncUsers: SyncUsersResponse!
 }
 
 type QualityProjectDesc {
@@ -1211,6 +1217,10 @@ enum KnowledgeGraphItemCat {
   Paper
   Code
 }
+
+type SyncUsersResponse {
+  msg: String!
+}
 `, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -1241,21 +1251,6 @@ func (ec *executionContext) field_Mutation_addMembers_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNAddMembersInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAddMembersInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_addUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.AddUserInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNAddUserInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAddUserInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2328,48 +2323,6 @@ func (ec *executionContext) _Member_addedDate(ctx context.Context, field graphql
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_addUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_addUser_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddUser(rctx, args["input"].(model.AddUserInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*entity.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Mutation_removeUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2862,6 +2815,41 @@ func (ec *executionContext) _Mutation_setActiveUserTools(ctx context.Context, fi
 	res := resTmp.(*entity.User)
 	fc.Result = res
 	return ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_syncUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().SyncUsers(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.SyncUsersResponse)
+	fc.Result = res
+	return ec.marshalNSyncUsersResponse2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSyncUsersResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Project_id(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
@@ -3954,6 +3942,41 @@ func (ec *executionContext) _SetKGStarredRes_starred(ctx context.Context, field 
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SyncUsersResponse_msg(ctx context.Context, field graphql.CollectedField, obj *model.SyncUsersResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SyncUsersResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Msg, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ToolUrls_gitea(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
@@ -6485,11 +6508,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "addUser":
-			out.Values[i] = ec._Mutation_addUser(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "removeUsers":
 			out.Values[i] = ec._Mutation_removeUsers(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -6544,6 +6562,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "setActiveUserTools":
 			out.Values[i] = ec._Mutation_setActiveUserTools(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "syncUsers":
+			out.Values[i] = ec._Mutation_syncUsers(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -6931,6 +6954,33 @@ func (ec *executionContext) _SetKGStarredRes(ctx context.Context, sel ast.Select
 			}
 		case "starred":
 			out.Values[i] = ec._SetKGStarredRes_starred(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var syncUsersResponseImplementors = []string{"SyncUsersResponse"}
+
+func (ec *executionContext) _SyncUsersResponse(ctx context.Context, sel ast.SelectionSet, obj *model.SyncUsersResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, syncUsersResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SyncUsersResponse")
+		case "msg":
+			out.Values[i] = ec._SyncUsersResponse_msg(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -7386,11 +7436,6 @@ func (ec *executionContext) unmarshalNAddMembersInput2githubᚗcomᚋkonstellati
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNAddUserInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐAddUserInput(ctx context.Context, v interface{}) (model.AddUserInput, error) {
-	res, err := ec.unmarshalInputAddUserInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) marshalNApiToken2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAPIToken(ctx context.Context, sel ast.SelectionSet, v entity.APIToken) graphql.Marshaler {
 	return ec._ApiToken(ctx, sel, &v)
 }
@@ -7816,6 +7861,20 @@ func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalNSyncUsersResponse2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSyncUsersResponse(ctx context.Context, sel ast.SelectionSet, v model.SyncUsersResponse) graphql.Marshaler {
+	return ec._SyncUsersResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSyncUsersResponse2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSyncUsersResponse(ctx context.Context, sel ast.SelectionSet, v *model.SyncUsersResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._SyncUsersResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNToolUrls2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolUrls(ctx context.Context, sel ast.SelectionSet, v entity.ToolUrls) graphql.Marshaler {

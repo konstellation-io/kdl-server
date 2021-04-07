@@ -16,6 +16,8 @@ import styles from './KGVisualization.module.scss';
 export const PADDING_H = 0.25;
 export const PADDING_V = 0.15;
 
+const MARGIN_TOP = 30;
+
 const TOOLTIP_WIDTH = 300;
 export const INNER_R = 53.5;
 const GUIDE_STROKE = 1;
@@ -118,9 +120,9 @@ class KGViz {
 
     const { innerWidth, innerHeight, outerR } = getInnerDimensions(
       props.width,
-      props.height
+      props.height - MARGIN_TOP
     );
-    this.center = { x: props.width / 2, y: props.height / 2 };
+    this.center = { x: props.width / 2, y: props.height / 2 + MARGIN_TOP };
     this.outerR = outerR;
     this.size = {
       innerWidth,

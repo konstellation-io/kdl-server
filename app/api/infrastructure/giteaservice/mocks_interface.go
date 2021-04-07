@@ -76,18 +76,19 @@ func (mr *MockGiteaClientMockRecorder) CreateRepo(name, ownerUsername interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRepo", reflect.TypeOf((*MockGiteaClient)(nil).CreateRepo), name, ownerUsername)
 }
 
-// CreateUser mocks base method.
-func (m *MockGiteaClient) CreateUser(email, username, password string) error {
+// FindAllUsers mocks base method.
+func (m *MockGiteaClient) FindAllUsers() ([]entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUser", email, username, password)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "FindAllUsers")
+	ret0, _ := ret[0].([]entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// CreateUser indicates an expected call of CreateUser.
-func (mr *MockGiteaClientMockRecorder) CreateUser(email, username, password interface{}) *gomock.Call {
+// FindAllUsers indicates an expected call of FindAllUsers.
+func (mr *MockGiteaClientMockRecorder) FindAllUsers() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockGiteaClient)(nil).CreateUser), email, username, password)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAllUsers", reflect.TypeOf((*MockGiteaClient)(nil).FindAllUsers))
 }
 
 // MirrorRepo mocks base method.

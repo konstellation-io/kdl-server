@@ -5,6 +5,7 @@ ENV USER=kdl
 ENV UID=10001
 ENV ASSET_COMMIT="558ea7724d7ac7c4787856535372503e7c4bbf73"
 ENV REPO_URL="https://github.com/konstellation-io/kdl-server"
+ENV PYTHONPATH="/kg/src"
 
 RUN adduser \
     --disabled-password \
@@ -24,7 +25,7 @@ COPY Pipfile* ./
 RUN python3 -m pip install pipenv && \
     pipenv install --system --deploy
 
-COPY server server
+COPY src/ src/
 
 WORKDIR /kg/assets
 
@@ -43,4 +44,4 @@ RUN chown -R kdl:0 /kg \
 
 USER kdl
 
-CMD ["sh","-c","/usr/local/bin/python3 /kg/server/app.py 2>&1 | tee -a /var/log/app/app.log"]
+CMD ["sh","-c","/usr/local/bin/python3 /kg/src/server/app.py 2>&1 | tee -a /var/log/app/app.log"]

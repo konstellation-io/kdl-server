@@ -1,4 +1,4 @@
-import ROUTE, { buildRoute } from 'Constants/routes';
+import ROUTE from 'Constants/routes';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
 import { GetMe } from 'Graphql/queries/types/GetMe';
@@ -15,7 +15,6 @@ const GetMeQuery = loader('Graphql/queries/getMe.graphql');
 function ProjectContentRoutes({ openedProject }: ProjectRoute) {
   const { data } = useQuery<GetMe>(GetMeQuery);
   const areToolsActive = data?.me.areToolsActive;
-  const overviewRoute = buildRoute(ROUTE.PROJECT_OVERVIEW, openedProject.id);
 
   function redirectIfArchived() {
     return (
@@ -29,14 +28,14 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
     return (
       !areToolsActive &&
       [ROUTE.PROJECT_TOOL_JUPYTER, ROUTE.PROJECT_TOOL_VSCODE].map((r) => (
-        <Redirect key={r} from={r} to={overviewRoute} />
+        <Redirect key={r} from={r} to={ROUTE.PROJECT_OVERVIEW} />
       ))
     );
   }
 
   return (
     <Switch>
-      <Redirect exact from={ROUTE.PROJECT} to={overviewRoute} />
+      <Redirect exact from={ROUTE.PROJECT} to={ROUTE.PROJECT_OVERVIEW} />
 
       {redirectIfArchived()}
       {redirectIfToolsActives()}

@@ -13,11 +13,11 @@
     align-items: center;
     flex-direction: row-reverse;
     padding-right: $grid-unit * 2;
-    width: 22 * $grid-unit;
+    width: 20 * $grid-unit;
 
     svg {
       transition: transform ease 0.3s;
-      margin-left: $grid-unit * 4;
+      margin-left: 2 * $grid-unit;
       margin-right: 0;
     }
 

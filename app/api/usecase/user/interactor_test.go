@@ -71,7 +71,6 @@ func TestInteractor_Create(t *testing.T) {
 	const (
 		id            = "user.1234"
 		email         = "user@email.com"
-		password      = "p4$sword"
 		username      = "john.doe"
 		accessLevel   = entity.AccessLevelAdmin
 		publicSSHKey  = "test-ssh-key-public"
@@ -116,11 +115,10 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
-	s.mocks.giteaService.EXPECT().CreateUser(email, username, password).Return(nil)
 	s.mocks.giteaService.EXPECT().AddSSHKey(username, sshKey.Public).Return(nil)
 	s.mocks.k8sClientMock.EXPECT().CreateSecret(secretName, secretValues)
 
-	createdUser, err := s.interactor.Create(ctx, email, username, password, accessLevel)
+	createdUser, err := s.interactor.Create(ctx, email, username, accessLevel)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, createdUser)
@@ -132,7 +130,6 @@ func TestInteractor_Create_UserDuplEmail(t *testing.T) {
 
 	const (
 		email       = "user@email.com"
-		password    = "p4$sword"
 		username    = "john"
 		accessLevel = entity.AccessLevelAdmin
 	)
@@ -142,7 +139,7 @@ func TestInteractor_Create_UserDuplEmail(t *testing.T) {
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, nil)
 
-	createdUser, err := s.interactor.Create(ctx, email, username, password, accessLevel)
+	createdUser, err := s.interactor.Create(ctx, email, username, accessLevel)
 	require.Equal(t, createdUser, entity.User{})
 	require.Equal(t, err, entity.ErrDuplicatedUser)
 }
@@ -153,7 +150,6 @@ func TestInteractor_Create_UserDuplUsername(t *testing.T) {
 
 	const (
 		email       = "user@email.com"
-		password    = "p4$sword"
 		username    = "john"
 		accessLevel = entity.AccessLevelAdmin
 	)
@@ -162,7 +158,7 @@ func TestInteractor_Create_UserDuplUsername(t *testing.T) {
 
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, nil)
 
-	createdUser, err := s.interactor.Create(ctx, email, username, password, accessLevel)
+	createdUser, err := s.interactor.Create(ctx, email, username, accessLevel)
 	require.Equal(t, createdUser, entity.User{})
 	require.Equal(t, err, entity.ErrDuplicatedUser)
 }
@@ -281,7 +277,7 @@ func TestInteractor_FindAll(t *testing.T) {
 	ctx := context.Background()
 	expectedUsers := []entity.User{{Username: "john"}}
 
-	s.mocks.repo.EXPECT().FindAll(ctx).Return(expectedUsers, nil)
+	s.mocks.repo.EXPECT().FindAll(ctx, false).Return(expectedUsers, nil)
 
 	users, err := s.interactor.FindAll(ctx)
 
@@ -298,7 +294,7 @@ func TestInteractor_FindAll_Err(t *testing.T) {
 	someErr := errUnexpected
 	ctx := context.Background()
 
-	s.mocks.repo.EXPECT().FindAll(ctx).Return(emptyUsers, someErr)
+	s.mocks.repo.EXPECT().FindAll(ctx, false).Return(emptyUsers, someErr)
 
 	users, err := s.interactor.FindAll(ctx)
 
@@ -306,36 +302,36 @@ func TestInteractor_FindAll_Err(t *testing.T) {
 	require.Equal(t, emptyUsers, users)
 }
 
-func TestInteractor_GetByEmail(t *testing.T) {
+func TestInteractor_GetByUsername(t *testing.T) {
 	s := newUserSuite(t)
 	defer s.ctrl.Finish()
 
-	const email = "john@email.com"
+	const username = "john"
 
 	ctx := context.Background()
-	expectedUser := entity.User{Username: "john"}
+	expectedUser := entity.User{Username: username}
 
-	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(expectedUser, nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
 
-	u, err := s.interactor.GetByEmail(ctx, email)
+	u, err := s.interactor.GetByUsername(ctx, username)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, u)
 }
 
-func TestInteractor_GetByEmail_Err(t *testing.T) {
+func TestInteractor_GetByUsername_Err(t *testing.T) {
 	s := newUserSuite(t)
 	defer s.ctrl.Finish()
 
-	const email = "john@email.com"
+	const username = "john"
 
 	ctx := context.Background()
 	someErr := entity.ErrUserNotFound
 	emptyUser := entity.User{}
 
-	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(emptyUser, someErr)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(emptyUser, someErr)
 
-	u, err := s.interactor.GetByEmail(ctx, email)
+	u, err := s.interactor.GetByUsername(ctx, username)
 
 	require.Equal(t, someErr, err)
 	require.Equal(t, emptyUser, u)
@@ -436,7 +432,6 @@ func TestInteractor_RegenerateSSHKeys_UserToolsRunning(t *testing.T) {
 		accessLevel   = entity.AccessLevelAdmin
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"
-		secretName    = "john-doe-ssh-keys" //nolint:gosec // it is a unit test
 	)
 
 	ctx := context.Background()

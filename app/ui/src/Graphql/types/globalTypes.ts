@@ -28,13 +28,6 @@ export interface AddMembersInput {
   userIds: string[];
 }
 
-export interface AddUserInput {
-  email: string;
-  username: string;
-  password: string;
-  accessLevel: AccessLevel;
-}
-
 export interface ApiTokenInput {
   userId: string;
   name?: string | null;
@@ -63,10 +56,6 @@ export interface RemoveApiTokenInput {
 export interface RemoveMemberInput {
   projectId: string;
   userId: string;
-}
-
-export interface RemoveUsersInput {
-  userIds: string[];
 }
 
 export interface RepositoryInput {

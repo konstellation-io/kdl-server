@@ -7,8 +7,7 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
-
-from data_checks import dataset
+from pipe.data_checks import dataset
 
 BASE_DIR = "inputs/"
 

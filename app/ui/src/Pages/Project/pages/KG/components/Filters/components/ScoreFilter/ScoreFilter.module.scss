@@ -6,7 +6,8 @@
 .container {
   display: flex;
   align-items: center;
-  width: $grid-unit * 39;
+  max-width: $grid-unit * 39;
+  width: 16vw;
   height: $grid-unit * 5;
   padding: $grid-unit $grid-unit * 1.25 $grid-unit $grid-unit * 2;
 

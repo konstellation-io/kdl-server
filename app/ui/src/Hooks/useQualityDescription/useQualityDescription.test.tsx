@@ -46,20 +46,4 @@ describe('useQualityDescription hook', () => {
     // Assert.
     expect(mockSkipResult).toHaveBeenCalled();
   });
-
-  it('should set the description score returned by the response', async () => {
-    // Arrange.
-    let wrapper;
-    // Act.
-    await act(async () => {
-      wrapper = buildWrapper(skipFirstCall, { skipFirstRun: false });
-      await wait();
-    });
-    await wait();
-    wrapper.update();
-    // Assert.
-    expect(wrapper.find('div').props().hook.descriptionScore).toBe(
-      response.data.qualityProjectDesc.quality
-    );
-  });
 });

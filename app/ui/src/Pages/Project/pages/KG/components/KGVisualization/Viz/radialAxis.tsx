@@ -1,8 +1,5 @@
 import { select } from 'd3-selection';
 import { stringToId } from 'Utils/d3';
-import { textAnchor } from './Resources/Resources';
-
-export let radialAxes: any;
 
 const epsilon = 1e-6;
 
@@ -27,6 +24,7 @@ function radialAxis(scale: any) {
   let tickFormat: any = null;
   let sections: string[] = [];
   let borderValues: number[] = [0, 0, 0, 0];
+  let elements: any;
 
   function axis(context: any) {
     let values =
@@ -80,7 +78,7 @@ function radialAxis(scale: any) {
       .attr('class', (d: any) => `tickSection ${stringToId(d[0])}`)
       .merge(secEnter);
 
-    radialAxes = selection;
+    elements = selection;
 
     let tick = sec.selectAll('.tick').data(values, scale).order();
     let tickExit = tick.exit();
@@ -182,7 +180,7 @@ function radialAxis(scale: any) {
 
         return getY(angle, r);
       })
-      .style('text-anchor', textAnchor)
+      .style('text-anchor', context.textAnchor)
       .text(format);
 
     selection
@@ -197,6 +195,15 @@ function radialAxis(scale: any) {
       this.__axis = position;
     });
   }
+
+  axis.updateActiveSection = function (section: string) {
+    elements.selectAll('.tickSection').style('opacity', 0);
+    const axisToShow = elements.select(`.${stringToId(section)}`);
+    axisToShow.style('opacity', 1);
+  };
+  axis.updateOrientation = function (textAnchor: string) {
+    elements.selectAll('text').style('text-anchor', textAnchor);
+  };
 
   axis.scale = function (_: any) {
     return arguments.length ? ((scale = _), axis) : scale;

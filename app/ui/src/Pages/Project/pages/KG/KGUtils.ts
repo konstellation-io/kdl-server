@@ -2,14 +2,17 @@ import {
   CoordData,
   CoordOptions,
   CoordOut,
-} from './components/KGVisualization/KGViz';
-import { D, TopicSections } from './components/KGVisualization/KGVisualization';
-import { RGBColor, color } from 'd3-color';
+  D,
+} from './components/KGVisualization/Viz/KGViz';
+import { color, RGBColor } from 'd3-color';
 
-import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
 import { KGItem } from './KG';
 import { orderBy } from 'lodash';
 import { scaleLinear } from '@visx/scale';
+
+export interface TopicSections {
+  [key: string]: string[];
+}
 
 const TEXT_COLOR_THRESHOLD = 120;
 const TEXT_COLOR = {
@@ -60,15 +63,27 @@ function getOffset(outsideMin: boolean, outsideMax: boolean) {
   return 0;
 }
 
+export function buildD(d: KGItem): D {
+  return {
+    id: d.id,
+    category: d.topic?.name || 'Others',
+    type: d.category,
+    name: d.title,
+    score: d.score,
+    starred: d.starred,
+  };
+}
+
 export function groupData(
   data: D[],
   coord: (
     { category, score, name }: CoordData,
     options: CoordOptions
   ) => CoordOut,
-  minScore: number = 0,
-  maxScore: number = 1
+  scores: [number, number]
 ): DComplete[] {
+  const [maxScore, minScore] = scores;
+
   return data.map((d) => {
     const outsideMin = d.score < minScore;
     const outsideMax = d.score > maxScore;
@@ -104,20 +119,4 @@ export function getSectionsAndNames(newData: KGItem[]) {
   });
 
   return result;
-}
-
-export function buildKGItem({
-  score,
-  category,
-  title,
-  id,
-}: GetKnowledgeGraph_knowledgeGraph_items): D {
-  return {
-    id,
-    category: 'Others',
-    name: title,
-    type: category,
-    starred: false,
-    score,
-  };
 }

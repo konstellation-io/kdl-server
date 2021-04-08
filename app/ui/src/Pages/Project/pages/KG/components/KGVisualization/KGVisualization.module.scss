@@ -3,8 +3,6 @@
 @import 'Styles/colors';
 @import 'Styles/shadows';
 
-$tooltipWidth: 300px;
-
 .container {
   position: absolute;
   top: 0;
@@ -15,19 +13,66 @@ $tooltipWidth: 300px;
   transition: top ease 0.5s, left ease 0.5s;
 }
 
-.label1,
-.tick,
-.axisG,
-.label4 {
-  fill-opacity: 1;
-}
-
 .svg,
 .canvas {
   position: absolute;
   top: 0;
   left: 0;
 }
+
+.panels {
+  position: fixed;
+  right: 0;
+  height: calc(100% - 40px);
+  display: flex;
+  flex-direction: row;
+  z-index: 5;
+
+  .listPanel {
+    height: 100%;
+    width: 25vw;
+    min-width: 44 * $grid-unit;
+    max-width: 60 * $grid-unit;
+  }
+
+  .detailsPanel {
+    height: 100%;
+
+    width: 37.5vw;
+    max-width: 0;
+    min-width: 0;
+    overflow: hidden;
+
+    transition: max-width ease 0.4s, min-width ease 0.4s;
+
+    &.opened {
+      min-width: 44 * $grid-unit;
+      max-width: 90 * $grid-unit;
+    }
+  }
+}
+
+.shield {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1 !important;
+
+  &.show {
+    @include shield;
+    pointer-events: all;
+    cursor: pointer;
+  }
+}
+
+.staticTooltip {
+  position: absolute;
+  top: 3 * $grid-unit;
+  left: 3 * $grid-unit;
+  z-index: 1;
+}
+
 
 .sectionAndNamesG {
   opacity: 1;
@@ -142,114 +187,4 @@ $tooltipWidth: 300px;
     bottom: -2 * $grid-unit + 6px;
     transform: rotateZ(45deg);
   }
-}
-
-$state-to-color: (
-  good: palette(success),
-  notSoBad: palette(feedback),
-  notGood: palette(alert),
-  bad: palette(error),
-);
-
-@each $class, $color in $state-to-color {
-  .scoreContainer.#{$class} {
-    .value {
-      @include font-small;
-      color: $color;
-      text-align: end;
-    }
-    .bars {
-      position: relative;
-      width: 6.5 * $grid-unit;
-      height: 2px;
-
-      .barBg {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 100%;
-        background-color: palette(base, 300);
-      }
-      .barValue {
-        position: absolute;
-        right: 0;
-        bottom: 0;
-        background-color: $color;
-        height: 100%;
-      }
-    }
-
-    &.inline {
-      display: flex;
-
-      align-items: center;
-
-      .value {
-        width: 5 * $grid-unit;
-
-        text-align: start;
-      }
-      .bars {
-        height: 0.5 * $grid-unit;
-        width: 8 * $grid-unit;
-
-        .barValue {
-          left: 0;
-        }
-      }
-    }
-  }
-}
-
-.panels {
-  position: fixed;
-  right: 0;
-  height: calc(100% - 40px);
-  display: flex;
-  flex-direction: row;
-  z-index: 5;
-
-  .listPanel {
-    height: 100%;
-    width: 25vw;
-    min-width: 44 * $grid-unit;
-    max-width: 60 * $grid-unit;
-  }
-
-  .detailsPanel {
-    height: 100%;
-
-    width: 37.5vw;
-    max-width: 0;
-    min-width: 0;
-    overflow: hidden;
-
-    transition: max-width ease 0.4s, min-width ease 0.4s;
-
-    &.opened {
-      min-width: 44 * $grid-unit;
-      max-width: 90 * $grid-unit;
-    }
-  }
-}
-
-.shield {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1 !important;
-
-  &.show {
-    @include shield;
-    pointer-events: all;
-    cursor: pointer;
-  }
-}
-
-.staticTooltip {
-  position: absolute;
-  top: 3 * $grid-unit;
-  left: 3 * $grid-unit;
-  z-index: 1;
 }

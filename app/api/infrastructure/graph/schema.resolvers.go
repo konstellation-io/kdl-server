@@ -96,6 +96,7 @@ func (r *mutationResolver) UpdateProject(ctx context.Context, input model.Update
 	externalRepoURL := ""
 	externalRepoUsername := ""
 	externalRepoToken := ""
+
 	var repoType entity.RepositoryType
 
 	if input.Repository != nil {

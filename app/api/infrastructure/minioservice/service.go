@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -11,6 +12,7 @@ import (
 
 var (
 	ErrBucketAlreadyExists = errors.New("bucket already exists in Minio")
+	ErrChangingBucketName  = errors.New("impossible change bucket name")
 )
 
 type minioService struct {
@@ -56,7 +58,7 @@ func (m *minioService) CreateBucket(bucketName string) error {
 // - Checks repo existency
 // - Creates new bucket
 // - Copies all objects from old bucket to new bucket, and remove them from old bucket
-// - Removes old empty bucket
+// - Removes old empty bucket.
 func (m *minioService) UpdateBucketName(oldBucketName, newBucketName string) error {
 	exists, err := m.client.BucketExists(context.Background(), oldBucketName)
 	if err != nil {
@@ -64,7 +66,7 @@ func (m *minioService) UpdateBucketName(oldBucketName, newBucketName string) err
 	}
 
 	if !exists {
-		return fmt.Errorf("impossible change bucket name. Bucket \"%s\" doesn't exists", oldBucketName)
+		return fmt.Errorf("%w: bucket \"%s\" doesn't exists", ErrChangingBucketName, oldBucketName)
 	}
 
 	err = m.CreateBucket(newBucketName)

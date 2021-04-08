@@ -165,9 +165,9 @@ func (mr *MockRepositoryMockRecorder) UpdateDescription(ctx, projectID, descript
 }
 
 // UpdateExternalRepo mocks base method.
-func (m *MockRepository) UpdateExternalRepo(ctx context.Context, projectID, externalRepoUrl, repoName string) error {
+func (m *MockRepository) UpdateExternalRepo(ctx context.Context, projectID, externalRepoURL, repoName string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateExternalRepo", ctx, projectID, externalRepoUrl, repoName)
+	ret := m.ctrl.Call(m, "UpdateExternalRepo", ctx, projectID, externalRepoURL, repoName)
 	ret0, _ := ret[0].(error)
 	return ret0
 }

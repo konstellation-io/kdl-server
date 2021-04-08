@@ -279,21 +279,6 @@ func (mr *MockUseCaseMockRecorder) FindByIDs(ctx, userIDs interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByIDs", reflect.TypeOf((*MockUseCase)(nil).FindByIDs), ctx, userIDs)
 }
 
-// GetByEmail mocks base method.
-func (m *MockUseCase) GetByEmail(ctx context.Context, email string) (entity.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByEmail", ctx, email)
-	ret0, _ := ret[0].(entity.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetByEmail indicates an expected call of GetByEmail.
-func (mr *MockUseCaseMockRecorder) GetByEmail(ctx, email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmail", reflect.TypeOf((*MockUseCase)(nil).GetByEmail), ctx, email)
-}
-
 // GetByID mocks base method.
 func (m *MockUseCase) GetByID(ctx context.Context, userID string) (entity.User, error) {
 	m.ctrl.T.Helper()
@@ -307,6 +292,21 @@ func (m *MockUseCase) GetByID(ctx context.Context, userID string) (entity.User, 
 func (mr *MockUseCaseMockRecorder) GetByID(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockUseCase)(nil).GetByID), ctx, userID)
+}
+
+// GetByUsername mocks base method.
+func (m *MockUseCase) GetByUsername(ctx context.Context, username string) (entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByUsername", ctx, username)
+	ret0, _ := ret[0].(entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByUsername indicates an expected call of GetByUsername.
+func (mr *MockUseCaseMockRecorder) GetByUsername(ctx, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByUsername", reflect.TypeOf((*MockUseCase)(nil).GetByUsername), ctx, username)
 }
 
 // RegenerateSSHKeys mocks base method.

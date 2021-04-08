@@ -264,7 +264,7 @@ func (i interactor) getRepoNameFromURL(url string) (string, error) {
 	return matches[1], nil
 }
 
-// updateRepoData update the repo data (name for internal; url, username and token for external)
+// updateRepoData updates the repo data (name for internal; url, username and token for external).
 func (i interactor) updateRepoData(ctx context.Context, opt UpdateProjectOption) error {
 	// get repo data
 	repo, err := i.repo.Get(ctx, opt.ProjectID)
@@ -284,6 +284,7 @@ func (i interactor) updateRepoData(ctx context.Context, opt UpdateProjectOption)
 		if !kdlutil.IsNilOrEmpty(opt.InternalRepoName) {
 			oldRepoName = repo.Repository.InternalRepoName
 			newRepoName = *opt.InternalRepoName
+
 			err = i.repo.UpdateInternalRepo(ctx, opt.ProjectID, *opt.InternalRepoName)
 			if err != nil {
 				return err
@@ -295,10 +296,12 @@ func (i interactor) updateRepoData(ctx context.Context, opt UpdateProjectOption)
 	case entity.RepositoryTypeExternal:
 		if !kdlutil.IsNilOrEmpty(opt.ExternalRepoURL) {
 			oldRepoName = repo.Repository.RepoName
+
 			newRepoName, err = i.getRepoNameFromURL(*opt.ExternalRepoURL)
 			if err != nil {
 				return err
 			}
+
 			err := i.repo.UpdateExternalRepo(ctx, opt.ProjectID, *opt.ExternalRepoURL, newRepoName)
 			if err != nil {
 				return err
@@ -321,12 +324,14 @@ func (i interactor) updateRepoData(ctx context.Context, opt UpdateProjectOption)
 	return nil
 }
 
+// updateRepoName updates the repo name in gitea, minio and drone.
 func (i interactor) updateRepoName(oldRepoName, newRepoName string) error {
 	// update gitea repo
 	err := i.giteaService.UpdateRepoName(oldRepoName, newRepoName)
 	if err != nil {
 		return err
 	}
+
 	// update minio bucket
 	err = i.minioService.UpdateBucketName(oldRepoName, newRepoName)
 	if err != nil {

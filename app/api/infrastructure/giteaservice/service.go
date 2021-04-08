@@ -103,9 +103,10 @@ func (g *giteaService) MirrorRepo(url, repoName, userName, userToken string) err
 	return nil
 }
 
-// UpdateRepoName updates the repo name in Gitea
+// UpdateRepoName updates the repo name in Gitea.
 func (g *giteaService) UpdateRepoName(oldRepoName, newRepoName string) error {
 	g.logger.Infof("Updating repository name from \"%s\" to \"%s\" in Gitea...", oldRepoName, newRepoName)
+
 	editRepoOptions := gitea.EditRepoOption{
 		Name: &newRepoName,
 	}
@@ -114,6 +115,7 @@ func (g *giteaService) UpdateRepoName(oldRepoName, newRepoName string) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 

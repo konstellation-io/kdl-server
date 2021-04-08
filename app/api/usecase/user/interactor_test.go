@@ -466,6 +466,7 @@ func TestInteractor_UpdateAccessLevel(t *testing.T) {
 	const (
 		id          = "user.1234"
 		username    = "john.doe"
+		email       = "john@doe.com"
 		accessLevel = entity.AccessLevelAdmin
 	)
 
@@ -474,6 +475,7 @@ func TestInteractor_UpdateAccessLevel(t *testing.T) {
 	targetUser := entity.User{
 		ID:          id,
 		Username:    username,
+		Email:       email,
 		AccessLevel: accessLevel,
 	}
 
@@ -481,7 +483,8 @@ func TestInteractor_UpdateAccessLevel(t *testing.T) {
 	users := []entity.User{targetUser}
 
 	s.mocks.repo.EXPECT().UpdateAccessLevel(ctx, ids, accessLevel).Return(nil)
-	s.mocks.repo.EXPECT().FindByIDs(ctx, ids).Return(users, nil)
+	s.mocks.repo.EXPECT().FindByIDs(ctx, ids).Return(users, nil).AnyTimes()
+	s.mocks.giteaService.EXPECT().UpdateUserPermissions(username, email, accessLevel).Return(nil)
 
 	returnedUsers, err := s.interactor.UpdateAccessLevel(ctx, ids, accessLevel)
 

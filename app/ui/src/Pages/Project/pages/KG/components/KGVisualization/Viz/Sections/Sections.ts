@@ -1,6 +1,5 @@
 import styles from './Sections.module.scss';
-import { INNER_R } from '../KGViz';
-import { CoordData, CoordOptions, CoordOut } from '../KGViz';
+import { CoordData, CoordOptions, CoordOut, INNER_R } from '../KGViz';
 import { select, Selection } from 'd3-selection';
 import { ScaleBand } from 'd3-scale';
 

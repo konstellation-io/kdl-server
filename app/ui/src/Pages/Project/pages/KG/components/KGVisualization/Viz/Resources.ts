@@ -219,6 +219,8 @@ class Resources {
       qt,
       draw,
       sectionScale,
+      getMouseAngle,
+      getTextAnchor,
       props: {
         onHoverResource,
         center,
@@ -227,13 +229,30 @@ class Resources {
       },
     } = this;
 
-    let textAnchor = 'start';
-
     const dx = e.offsetX - center.x;
     const dy = e.offsetY - center.y;
 
     const hovered = qt.find(dx, dy, 50);
 
+    const { angle, realAngle } = getMouseAngle(dx, dy);
+    const textAnchor = getTextAnchor(realAngle);
+
+    const sliceSize = this.sectionScale.step();
+    const sectionIndex = Math.floor(angle / sliceSize);
+    const activeSection = sectionScale.domain()[sectionIndex];
+
+    updateActiveSection(activeSection);
+    updateAxisOrientation(textAnchor);
+
+    this.isMouseMoving = true;
+    this.hoveredResource = hovered || null;
+    onHoverResource(this.hoveredResource);
+    draw();
+  };
+
+  getMouseAngle = (dx: number, dy: number) => {
+    // Get polar coordinates from cartesian coordinates:
+    // https://www.mathsisfun.com/polar-cartesian-coordinates.html#:~:text=Summary%3A%20to%20convert%20from%20Polar,%3D%20r%20%C3%97%20sin(%20%CE%B8%20)
     let angle = Math.atan(dy / dx);
     angle *= 180 / Math.PI;
 
@@ -246,6 +265,9 @@ class Resources {
 
     const sliceSize = this.sectionScale.step();
 
+    // Adjust the angle so a section cannot be located between the upper and lower side of the chart
+    // We do not want this as we do not want the axis labels to flip when mouse goes through the middle
+    // of the chart inside a given section.
     const rem = angle % sliceSize;
     const secondHalf = rem > sliceSize / 2;
 
@@ -253,27 +275,28 @@ class Resources {
 
     if (angle > 360) angle = 0;
 
-    const sectionIndex = Math.floor(angle / sliceSize);
-    const activeSection = sectionScale.domain()[sectionIndex];
+    return { angle, realAngle };
+  };
 
-    updateActiveSection(activeSection);
+  getTextAnchor = (angle: number) => {
+    let textAnchor = 'start';
 
-    let bottom = realAngle > 90 && realAngle < 270;
+    const sliceSize = this.sectionScale.step();
 
-    if (bottom && secondHalf && realAngle + sliceSize / 2 > 270) bottom = false;
-    if (bottom && !secondHalf && realAngle - sliceSize / 2 < 90) bottom = false;
+    const rem = angle % sliceSize;
+    const secondHalf = rem > sliceSize / 2;
+
+    let bottom = angle > 90 && angle < 270;
+
+    if (bottom && secondHalf && angle + sliceSize / 2 > 270) bottom = false;
+    if (bottom && !secondHalf && angle - sliceSize / 2 < 90) bottom = false;
 
     if (bottom && secondHalf) textAnchor = 'end';
     if (bottom && !secondHalf) textAnchor = 'start';
     if (!bottom && secondHalf) textAnchor = 'start';
     if (!bottom && !secondHalf) textAnchor = 'end';
 
-    updateAxisOrientation(textAnchor);
-
-    this.isMouseMoving = true;
-    this.hoveredResource = hovered || null;
-    onHoverResource(this.hoveredResource);
-    draw();
+    return textAnchor;
   };
 
   onMouseDown = () => {
@@ -281,9 +304,7 @@ class Resources {
   };
 
   onMouseUp = (e: MouseEvent) => {
-    const {
-      props: { center },
-    } = this;
+    const center = this.props.center;
 
     if (!this.isMouseMoving) {
       const resource = this.qt.find(

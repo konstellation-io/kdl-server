@@ -10,6 +10,19 @@ function getY(angle: number, r: number) {
   return Math.sin(((angle - 90) * Math.PI) / 180) * r;
 }
 
+function getSectionX(r: number) {
+  const secData: any = select(this.parentNode.parentNode).datum();
+  const angle = secData[1];
+
+  return getX(angle, r);
+}
+function getSectionY(r: number) {
+  const secData: any = select(this.parentNode.parentNode).datum();
+  const angle = secData[1];
+
+  return getY(angle, r);
+}
+
 function number(scale: any) {
   return (d: any) => +scale(d);
 }
@@ -27,12 +40,10 @@ function radialAxis(scale: any) {
   let elements: any;
 
   function axis(context: any) {
-    let values =
-      tickValues === null
-        ? scale.ticks
-          ? scale.ticks.apply(scale, tickArguments)
-          : scale.domain()
-        : tickValues;
+    const scaleTicks = scale.ticks
+      ? scale.ticks.apply(scale, tickArguments)
+      : scale.domain();
+    let values = tickValues === null ? scaleTicks : tickValues;
     const mx = scale.domain()[0];
     const mn = scale.domain()[1];
     const df = mx - mn;
@@ -42,12 +53,10 @@ function radialAxis(scale: any) {
     values = [mn, ...values, mx];
     borderValues = [...borderValues.slice(2, 4), mn, mx];
 
-    const format =
-      tickFormat == null
-        ? scale.tickFormat
-          ? scale.tickFormat.apply(scale, tickArguments)
-          : (x: any) => x
-        : tickFormat;
+    const scaleTickFormat = scale.tickFormat
+      ? scale.tickFormat.apply(scale, tickArguments)
+      : (x: any) => x;
+    const format = tickFormat == null ? scaleTickFormat : tickFormat;
     const selection = context.selection ? context.selection() : context;
     const position = number(scale.copy());
     const outside = (d: any) => borderValues.includes(d);
@@ -64,6 +73,33 @@ function radialAxis(scale: any) {
       const half = min + (max - min) / 2;
 
       return d < half ? 400 : 0;
+    }
+
+    function getTickEnterX(d: any) {
+      const r = outside(d) ? position(d) : initialPosition(d);
+      return getSectionX.bind(this)(r);
+    }
+    function getTickEnterY(d: any) {
+      const r = outside(d) ? position(d) : initialPosition(d);
+      return getSectionY.bind(this)(r);
+    }
+
+    function getTickUpdateX(d: any) {
+      return getSectionX.bind(this)(position(d));
+    }
+    function getTickUpdateY(d: any) {
+      return getSectionY.bind(this)(position(d));
+    }
+
+    function getTickExitX(d: any) {
+      if (outside(d)) return select(this).attr('x');
+
+      return getSectionX.bind(this)(initialPosition(d));
+    }
+    function getTickExitY(d: any) {
+      if (outside(d)) return select(this).attr('y');
+
+      return getSectionY.bind(this)(initialPosition(d));
     }
 
     let sec = selection
@@ -107,20 +143,8 @@ function radialAxis(scale: any) {
         .classed('edgeAxisLabel', outside)
         .attr('fill', 'currentColor')
         .attr('dy', '0.71em')
-        .attr('x', function (d: any) {
-          const secData: any = select(this.parentNode.parentNode).datum();
-          const r = outside(d) ? position(d) : initialPosition(d);
-          const angle = secData[1];
-
-          return getX(angle, r);
-        })
-        .attr('y', function (d: any) {
-          const secData: any = select(this.parentNode.parentNode).datum();
-          const r = outside(d) ? position(d) : initialPosition(d);
-          const angle = secData[1];
-
-          return getY(angle, r);
-        })
+        .attr('x', getTickEnterX)
+        .attr('y', getTickEnterY)
     );
 
     if (context !== selection) {
@@ -132,26 +156,7 @@ function radialAxis(scale: any) {
       tickExit.attr('opacity', epsilon);
       circleExit.attr('opacity', epsilon);
       tickExit.select('circle').attr('r', initialZeroPosition);
-      tickExit
-        .select('text')
-        .attr('x', function (d: any) {
-          if (outside(d)) return select(this).attr('x');
-
-          const secData: any = select(this.parentNode.parentNode).datum();
-          const r = initialPosition(d);
-          const angle = secData[1];
-
-          return getX(angle, r);
-        })
-        .attr('y', function (d: any) {
-          if (outside(d)) return select(this).attr('y');
-
-          const secData: any = select(this.parentNode.parentNode).datum();
-          const r = initialPosition(d);
-          const angle = secData[1];
-
-          return getY(angle, r);
-        });
+      tickExit.select('text').attr('x', getTickExitX).attr('y', getTickExitY);
 
       tickEnter.attr('opacity', epsilon);
       circleEnter.attr('opacity', epsilon);
@@ -166,20 +171,8 @@ function radialAxis(scale: any) {
     circle.attr('r', (d: any) => position(d));
 
     text
-      .attr('x', function (d: any) {
-        const secData: any = select(this.parentNode.parentNode).datum();
-        const r = position(d);
-        const angle = secData[1];
-
-        return getX(angle, r);
-      })
-      .attr('y', function (d: any) {
-        const secData: any = select(this.parentNode.parentNode).datum();
-        const r = position(d);
-        const angle = secData[1];
-
-        return getY(angle, r);
-      })
+      .attr('x', getTickUpdateX)
+      .attr('y', getTickUpdateY)
       .style('text-anchor', context.textAnchor)
       .text(format);
 

@@ -4,11 +4,10 @@ import { select, Selection } from 'd3-selection';
 import { Coord, DComplete, getHash, groupData } from '../../../KGUtils';
 import BG from './BG/BG';
 import { scaleBand, scaleLinear } from '@visx/scale';
-import { RESOURCE_R } from './Resources';
-import Resources from './Resources';
+import Resources, { RESOURCE_R } from './Resources';
 import radialAxis from './radialAxis';
 import Sections from './Sections/Sections';
-import { KnowledgeGraphItemCat } from '../../../../../../../Graphql/types/globalTypes';
+import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 
 const MARGIN_TOP = 30;
 export const PADDING_H = 0.25; // 25% each side
@@ -102,10 +101,7 @@ class KGViz {
     this.mainG = select(wrapper);
     this.context = props.canvas.getContext('2d');
 
-    this.center = { x: props.width / 2, y: props.height / 2 + MARGIN_TOP };
-
     this.data = props.data;
-
     this.scores = props.scores;
 
     const { innerWidth, innerHeight, outerR, center } = getVizDimensions(

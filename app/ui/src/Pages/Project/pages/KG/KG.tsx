@@ -5,7 +5,7 @@ import {
   GetKnowledgeGraph_knowledgeGraph_items,
   GetKnowledgeGraph_knowledgeGraph_items_topics,
 } from 'Graphql/queries/types/GetKnowledgeGraph';
-import KGVisualization from './components/KGVisualization/KGVisualization';
+import KGVisualizationWrapper from './components/KGVisualization/KGVisualizationWrapper';
 import React, { useMemo } from 'react';
 
 import { ProjectRoute } from '../../ProjectPanels';
@@ -90,7 +90,7 @@ function KG({ openedProject }: ProjectRoute) {
             onFiltersChange={handleFiltersChange}
           />
         </div>
-        <KGVisualization data={filteredResources} />
+        <KGVisualizationWrapper data={filteredResources} />
       </div>
       <div className={styles.panelSafeArea} />
     </div>

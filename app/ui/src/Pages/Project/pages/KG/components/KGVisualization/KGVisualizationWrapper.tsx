@@ -17,7 +17,7 @@ import ResourceDetails from '../ResourceDetails/ResourceDetails';
 import ResourceLists from '../ResourceLists/ResourceLists';
 import ResourceTooltip from './ResourceTooltip/ResourceTooltip';
 import cx from 'classnames';
-import styles from './KGVisualization.module.scss';
+import styles from './KGVisualizationWrapper.module.scss';
 import { buildD } from '../../KGUtils';
 
 let mouseDown = false;

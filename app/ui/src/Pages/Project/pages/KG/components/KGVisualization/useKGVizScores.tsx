@@ -53,14 +53,10 @@ function useKGVizScores(data: D[]) {
 
     const diff = max - min;
     const rev = 1 / diff;
+    const dScore: number = zoomAmount / (500 * rev); // 50 000
 
     const scoreFactorMin = 1 - pivotPosition;
     const scoreFactorMax = pivotPosition;
-
-    // const deltaYNormalized = -(e.deltaY / height) / 10;
-
-    const dScore: number = zoomAmount / (500 * rev); // 50 000
-    // const dScore: number = deltaYNormalized; // 50 000
 
     const newMin = Math.min(
       max,

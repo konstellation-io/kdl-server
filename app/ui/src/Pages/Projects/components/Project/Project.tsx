@@ -63,7 +63,7 @@ function UpperBg({ project, showAdmins }: Props) {
       <div className={styles.content}>
         <p className={styles.name}>{project.name}</p>
         {project.needAccess && (
-          <div className={styles.contactInfo} onClick={() => onContactAdmins()}>
+          <div className={styles.contactInfo} onClick={onContactAdmins}>
             Need access?
           </div>
         )}

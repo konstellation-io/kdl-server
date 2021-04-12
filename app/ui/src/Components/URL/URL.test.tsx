@@ -18,12 +18,10 @@ describe('URL component', () => {
   describe('behavior', () => {
     it('should call open function when clicked', () => {
       // Arrange.
-      // @ts-ignore
       global.open = jest.fn();
       // Act.
       wrapper.simulate('click');
       // Assert.
-      // @ts-ignore
       expect(global.open).toHaveBeenCalled();
     });
   });

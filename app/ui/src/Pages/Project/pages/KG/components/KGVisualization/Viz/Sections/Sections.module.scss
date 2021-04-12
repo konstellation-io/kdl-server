@@ -1,0 +1,34 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.sectionsWrapper,
+.sectionAndNamesG,
+.sectionAndNamesGuide {
+  opacity: 1;
+}
+
+.grid {
+  stroke: palette(lowlight, 700);
+  stroke-width: 1px;
+  stroke-dasharray: 4 4;
+}
+
+.sectionLabel {
+  @include font-small;
+  color: font-color(lowlight);
+
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  border-radius: 0.75 * $grid-unit;
+  padding: $grid-unit $grid-unit;
+
+  background-color: palette(lowlight, 900);
+  pointer-events: none;
+}

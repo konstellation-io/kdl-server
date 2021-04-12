@@ -13,9 +13,6 @@ beforeEach(() => {
 });
 describe('DescriptionScore component', () => {
   it('should render without crashing', () => {
-    // Arrange.
-    // Act.
-    // Assert.
     expect(wrapper).toMatchSnapshot();
   });
 

@@ -13,23 +13,55 @@
 
   transition: background-color ease 0.4s;
 
-  &.active,
   &:hover {
-    background-color: palette(base, 400);
+    background-color: palette(base, 200);
   }
-}
 
-.email {
-  @include font-body;
-  margin-left: $grid-unit;
-}
+  .check {
+    flex-shrink: 0;
+  }
 
-.level {
-  @include font-caption;
+  .infoContainer {
+    margin-left: $grid-unit;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-grow: 1;
 
-  margin-left: 4 * $grid-unit;
-}
+    .leftWrapper {
+      display: flex;
+      align-items: center;
 
-.button {
-  margin-left: auto;
+      .email {
+        @include font-body;
+        margin-left: $grid-unit;
+        word-break: break-all;
+        margin-right: $grid-unit;
+      }
+    }
+
+    .rightWrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .accessLevel {
+        @include font-caption;
+        text-transform: uppercase;
+      }
+
+      .button {
+        margin-left: $grid-unit;
+      }
+
+      .accessLevelSelector {
+        & > div > div:first-child {
+          min-height: 30px;
+          border: unset;
+        }
+      }
+    }
+
+
+  }
 }

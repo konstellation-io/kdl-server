@@ -34,6 +34,9 @@ type Props = {
   projectId: string;
 };
 function TabMembers({ projectId }: Props) {
+  const [checkedMembers, setCheckedMembers] = useState<
+    GetProjectMembers_project_members[]
+  >([]);
   const { data: dataMe } = useQuery<GetMe>(GetMeQuery);
   const [memberSelection, setMemberSelection] = useState<string[]>([]);
   const [error, setError] = useState<string>('');
@@ -75,7 +78,7 @@ function TabMembers({ projectId }: Props) {
     [updateMemberDetails, openPanel]
   );
 
-  const canAddMembers = useMemo(() => {
+  const canManageMembers = useMemo(() => {
     if (dataMe?.me && dataMembers?.project) {
       const meAsMember = dataMembers.project.members.find(
         ({ user }) => user.email === dataMe.me.email
@@ -96,6 +99,22 @@ function TabMembers({ projectId }: Props) {
     // We want to execute this on when members get an update
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataMembers]);
+
+  function handleCheckClick(
+    member: GetProjectMembers_project_members,
+    selected: boolean
+  ) {
+    if (selected) setCheckedMembers([...checkedMembers, member]);
+    else
+      setCheckedMembers(checkedMembers.filter((m) => m.user !== member.user));
+  }
+
+  function handleChangeMemberLevel(
+    member: GetProjectMembers_project_members,
+    newAccessLevel: AccessLevel
+  ) {
+    console.log(member, newAccessLevel);
+  }
 
   if (loadingMembers || loadingUsers) return <SpinnerCircular />;
   if (!dataMembers || !dataUsers || errorMembers || errorUsers)
@@ -118,10 +137,16 @@ function TabMembers({ projectId }: Props) {
     }
   }
 
+  function isMemberSelected(
+    member: GetProjectMembers_project_members
+  ): boolean {
+    return !!checkedMembers.find((m) => m.user.email === member.user.email);
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.formSearch}>
-        {canAddMembers && (
+        {canManageMembers && (
           <>
             <SearchSelect
               options={options}
@@ -159,7 +184,16 @@ function TabMembers({ projectId }: Props) {
       </div>
       <div className={styles.members}>
         {dataMembers.project.members.map((member) => (
-          <Member key={member.user.id} member={member} onOpen={openDetails} />
+          <Member
+            key={member.user.id}
+            member={member}
+            checked={isMemberSelected(member)}
+            canBeSelected={member.user.email !== dataMe?.me.email}
+            canManageMembers={canManageMembers}
+            onInfoClick={openDetails}
+            onChangeMemberLevel={handleChangeMemberLevel}
+            onCheckClick={handleCheckClick}
+          />
         ))}
       </div>
     </div>

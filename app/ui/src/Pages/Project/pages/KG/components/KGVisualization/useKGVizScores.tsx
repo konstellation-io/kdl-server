@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { select } from 'd3-selection';
 import { D } from './Viz/KGViz';
 import { useReactiveVar } from '@apollo/client';
-import { kgScore } from '../../../../../../Graphql/client/cache';
-import useKGFilters from '../../../../../../Graphql/client/hooks/useKGFilters';
+import { kgScore } from 'Graphql/client/cache';
+import useKGFilters from 'Graphql/client/hooks/useKGFilters';
 
 function useKGVizScores(data: D[]) {
   const scores = useReactiveVar(kgScore);
@@ -33,6 +33,8 @@ function useKGVizScores(data: D[]) {
         })
         .on('end', () => setAnimating(false));
     }
+    // We want to execute this only when data updates
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   // Resets scores when getting new data
@@ -45,6 +47,8 @@ function useKGVizScores(data: D[]) {
       updateScore([max, min]);
     }
     setBorderScores([max + 0.01, 0]);
+    // We want to reset scores only when data updates
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, animating]);
 
   function zoomScore(zoomAmount: number, pivotPosition: number) {

@@ -21,8 +21,6 @@ import styles from './KGVisualizationWrapper.module.scss';
 import { buildD } from '../../KGUtils';
 
 let mouseDown = false;
-document.body.onmousedown = () => (mouseDown = true);
-document.body.onmouseup = () => (mouseDown = false);
 
 type WrapperProps = {
   data: KGItem[];
@@ -67,6 +65,16 @@ function KGVisualization({ width, height, data }: Props) {
     () => data.filter((d) => d.score >= scores[1] && d.score <= scores[0]),
     [data, scores]
   );
+
+  useEffect(() => {
+    document.body.onmousedown = () => (mouseDown = true);
+    document.body.onmouseup = () => (mouseDown = false);
+
+    return () => {
+      document.body.onmousedown = null;
+      document.body.onmouseup = null;
+    };
+  }, []);
 
   // Updates opened paper if its data has been updated
   useEffect(() => {

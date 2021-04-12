@@ -3,7 +3,6 @@ import Gravatar from 'react-gravatar';
 import IconOpen from '@material-ui/icons/ArrowForward';
 import { Check, Select } from 'kwc';
 import React from 'react';
-import cx from 'classnames';
 import styles from './Member.module.scss';
 import { AccessLevel } from 'Graphql/types/globalTypes';
 

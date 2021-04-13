@@ -19,9 +19,10 @@ stages:
     cmd: python src/pipe/compute_vectors.py
     deps:
     - assets/dataset.pkl.gz
+    - assets/model
     - src/pipe/compute_vectors.py
     outs:
-    - assets/vectors.npy
+    - assets/vectors.faiss
   compute-topics:
     cmd: python src/pipe/compute_topics.py
     deps:

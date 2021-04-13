@@ -1,4 +1,5 @@
 import copy
+import faiss
 import logging
 import math
 
@@ -7,7 +8,6 @@ import pandas as pd
 import torch
 import transformers
 from pipe.compute_vectors import tokenize_batch, vectorize_batch
-from scipy import spatial
 
 from outputs import RecommendedList
 from topics import get_relevant_topics
@@ -59,7 +59,7 @@ class Recommender:
         self,
         model: transformers.PreTrainedModel,
         tokenizer: transformers.PreTrainedTokenizer,
-        vectors: np.ndarray,
+        vectors: faiss.IndexFlatL2,
         dataset: pd.DataFrame,
     ):
         self.log = logging.getLogger("Recommender")
@@ -103,36 +103,16 @@ class Recommender:
         if n_tokens <= 512:
             query_token_vecs = self.model(input_ids=tokens['input_ids'].to(device),
                                           attention_mask=tokens['attention_mask'].to(device))[0].detach().squeeze()
-            query_vector = torch.mean(query_token_vecs, dim=0).cpu().numpy()
+            query_vector = torch.mean(query_token_vecs, dim=0).cpu().numpy().astype("float32")
 
         else:
             query_chunks = split_text_into_chunks(raw_query_text, n_chunks=np.ceil(n_tokens / self.max_tokens))
             tokens_by_chunk = tokenize_batch(query_chunks, tokenizer=self.tokenizer, device=device,
                                              tokenizer_args={})
             vecs_by_chunk = vectorize_batch(tokens_by_chunk, model=self.model)
-            query_vector = torch.mean(vecs_by_chunk, dim=0).cpu().numpy()
+            query_vector = torch.mean(vecs_by_chunk, dim=0).cpu().numpy().astype("float32")
 
         return query_vector
-
-    @staticmethod
-    def _compute_cosine_distances(vectors_1: np.ndarray, vectors_2: np.ndarray) -> np.ndarray:
-        """
-        Computes pairwise cosine distances between vectors_1 (array) and vectors_2 (array).
-        Args:
-            vectors_1: numpy array representing
-            the query vector shape(1, vector_dimensions).
-            vectors_2: numpy array representing the
-            dataset vectors shape(dataset_papers, vector_dimensions).
-        Returns:
-            distances: numpy array with the distance("relevance") between the
-             input description and each paper. shape(dataset_papers, 1)
-        """
-        assert (
-            vectors_1.shape[1] == vectors_2.shape[1]
-        ), "Vectors in the two input arrays should have the same number of dimensions"
-        distances = spatial.distance.cdist(vectors_1, vectors_2, metric="cosine")
-
-        return distances
 
     @staticmethod
     def _compute_scores(distance: float, shift: float = 0.75, scale: int = 20) -> float:
@@ -152,10 +132,13 @@ class Recommender:
         query_vec = self._compute_query_vector(raw_query_text)
         query_vec = query_vec.reshape(1, len(query_vec))
 
-        distances = self._compute_cosine_distances(query_vec, self.vectors)
-        df_subset = copy.copy(self.dataset)
-        df_subset["distance"] = distances[0]
-        df_subset = df_subset.sort_values(by=["distance"], ascending=True, ignore_index=True).head(n_hits)
+        faiss.normalize_L2(query_vec)
+
+        similarity, idxs = self.vectors.search(query_vec, k=n_hits)
+        df_subset = copy.copy(self.dataset.iloc[idxs[0].tolist()])
+        df_subset["distance"] = similarity[0]
+        # Transform similarity to distance
+        df_subset["distance"] = df_subset.distance.apply(lambda x: 1 - x)
 
         df_subset["score"] = df_subset.distance.apply(self._compute_scores)
 

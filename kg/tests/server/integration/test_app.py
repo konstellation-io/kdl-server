@@ -11,7 +11,6 @@ from proto.knowledge_graph_pb2 import DESCRIPTOR, DescriptionQualityRes, GetGrap
 
 
 class TestKnowledgeGraphService:
-
     @staticmethod
     def set_client() -> StubClient:
         service_descriptor = DESCRIPTOR.services_by_name["KGService"]

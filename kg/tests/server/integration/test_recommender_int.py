@@ -7,7 +7,6 @@ import config
 from recommender import Recommender
 from tools.assets import AssetLoader
 
-
 ASSETS = AssetLoader(config.ASSET_ROUTE)
 RECOMMENDER = Recommender(
     model=ASSETS.model,
@@ -54,11 +53,12 @@ class TestRecommenderDataIntegration:
         case = self.get_cases_from_load_dataset(1).iloc[0]
         query = f"{case.title}. {case.abstract}".replace("\n", " ").replace("**", " ")
         vec = RECOMMENDER._compute_query_vector(query)
+        import faiss
         vec = vec.reshape(1, vec.shape[0])
-        from scipy import spatial
-        asset_vec = ASSETS.vectors[0].reshape(1, ASSETS.vectors.shape[1])
-        distances = spatial.distance.cdist(vec, asset_vec, metric="cosine")
-        assert distances[0][0] < 0.01
+        faiss.normalize_L2(vec)
+        dist, idx = ASSETS.vectors.search(vec, k=2)
+        assert idx[0][0] == 0
+        assert dist[0][0] - 1 < 0.01
 
 
 class TestRecommenderHandlingLongDescriptions:

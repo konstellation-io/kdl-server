@@ -45,7 +45,10 @@ function useQualityDescription(
   }
 
   useEffect(() => {
-    if (!skipFirstRun) fetchDescriptionScore();
+    if (!skipFirstRun) {
+      setLoading(true);
+      fetchDescriptionScore();
+    }
     // We want to run this only on hook instantiation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

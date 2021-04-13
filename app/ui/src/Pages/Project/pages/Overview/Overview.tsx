@@ -21,7 +21,6 @@ function Overview({ openedProject }: Props) {
     error,
   } = useQualityDescription(openedProject.description, { skipFirstRun: false });
 
-  if (loading) return <SpinnerCircular />;
   if (error) return <ErrorMessage />;
 
   return (
@@ -37,7 +36,7 @@ function Overview({ openedProject }: Props) {
           <div className={styles.description}>{openedProject.description}</div>
         </div>
         <div className={styles.section}>
-          <DescriptionScore score={descriptionScore} />
+          <DescriptionScore score={descriptionScore} loading={loading} />
         </div>
         <div className={styles.section}>
           <div className={styles.repoType}>

@@ -22,7 +22,7 @@ func (k *k8sClient) CreateSecret(name string, values map[string]string) error {
 	return nil
 }
 
-// CreateSecret updates a k8s secret.
+// UpdateSecret updates a k8s secret.
 func (k *k8sClient) UpdateSecret(name string, values map[string]string) error {
 	k.logger.Infof("Updating secret \"%s\" in k8s...", name)
 

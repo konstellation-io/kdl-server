@@ -39,7 +39,7 @@ oauth2Proxy:
 giteaOauth2Setup:
   image:
     repository: terminus7/gitea-oauth2-setup
-    tag: 1.1.5
+    tag: latest
     pullPolicy: IfNotPresent
 
 droneAuthorizer:

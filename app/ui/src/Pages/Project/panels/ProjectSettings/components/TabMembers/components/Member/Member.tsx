@@ -10,6 +10,12 @@ const gravatarStyle = {
   borderRadius: '50%',
 };
 
+export const mapAccessLevel = {
+  [AccessLevel.ADMIN]: 'Admin',
+  [AccessLevel.MANAGER]: 'Manager',
+  [AccessLevel.VIEWER]: 'Viewer',
+};
+
 type Props = {
   member: GetProjectMembers_project_members;
   onInfoClick: (member: GetProjectMembers_project_members) => void;
@@ -34,12 +40,6 @@ function Member({
   canBeSelected = false,
   canManageMembers = false,
 }: Props) {
-  const mapAccessLevel = {
-    [AccessLevel.ADMIN]: 'Admin',
-    [AccessLevel.MANAGER]: 'Manager',
-    [AccessLevel.VIEWER]: 'Viewer',
-  };
-
   return (
     <div className={styles.container}>
       {canManageMembers && (
@@ -64,7 +64,7 @@ function Member({
               options={Object.keys(AccessLevel)}
               formSelectedOption={member.accessLevel}
               valuesMapper={mapAccessLevel}
-              height={20}
+              height={30}
               onChange={(newLevel: AccessLevel) =>
                 onChangeMemberLevel(member, newLevel)
               }

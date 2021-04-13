@@ -1,10 +1,4 @@
-import {
-  Button,
-  ErrorMessage,
-  SearchSelect,
-  SearchSelectTheme,
-  SpinnerCircular,
-} from 'kwc';
+import { ErrorMessage, SpinnerCircular } from 'kwc';
 import {
   GetProjectMembers,
   GetProjectMembers_project_members,
@@ -19,12 +13,14 @@ import { PANEL_ID } from 'Graphql/client/models/Panel';
 import { PANEL_THEME } from 'Components/Layout/Panel/Panel';
 import { loader } from 'graphql.macro';
 import styles from './TabMembers.module.scss';
-import useMember from 'Graphql/hooks/useMember';
+import useMembers from 'Graphql/hooks/useMembers';
 import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
 import { useQuery, useReactiveVar } from '@apollo/client';
 import { memberDetails } from 'Graphql/client/cache';
 import { GetMe } from 'Graphql/queries/types/GetMe';
 import { AccessLevel } from 'Graphql/types/globalTypes';
+import ManageMembers from './components/ManageMembers/ManageMembers';
+import AddMembers from './components/AddMembers/AddMembers';
 
 const GetMeQuery = loader('Graphql/queries/getMe.graphql');
 const GetUsersQuery = loader('Graphql/queries/getUsers.graphql');
@@ -34,16 +30,12 @@ type Props = {
   projectId: string;
 };
 function TabMembers({ projectId }: Props) {
+  const { data: dataMe } = useQuery<GetMe>(GetMeQuery);
+
   const [checkedMembers, setCheckedMembers] = useState<
     GetProjectMembers_project_members[]
   >([]);
-  const { data: dataMe } = useQuery<GetMe>(GetMeQuery);
-  const [memberSelection, setMemberSelection] = useState<string[]>([]);
-  const [error, setError] = useState<string>('');
-
-  const { addMembersById } = useMember(projectId, {
-    onCompleteAdd: () => setMemberSelection([]),
-  });
+  const { updateMembersAccessLevel } = useMembers(projectId);
 
   const { updateMemberDetails } = useMemberDetails();
   const { openPanel } = usePanel(PanelType.SECONDARY, {
@@ -58,6 +50,7 @@ function TabMembers({ projectId }: Props) {
     loading: loadingUsers,
     error: errorUsers,
   } = useQuery<GetUsers>(GetUsersQuery);
+
   const {
     data: dataMembers,
     loading: loadingMembers,
@@ -100,88 +93,45 @@ function TabMembers({ projectId }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataMembers]);
 
+  if (loadingMembers || loadingUsers) return <SpinnerCircular />;
+  if (!dataMembers || !dataUsers || errorMembers || errorUsers)
+    return <ErrorMessage />;
+
   function handleCheckClick(
     member: GetProjectMembers_project_members,
     selected: boolean
   ) {
     if (selected) setCheckedMembers([...checkedMembers, member]);
     else
-      setCheckedMembers(checkedMembers.filter((m) => m.user !== member.user));
+      setCheckedMembers(
+        checkedMembers.filter(({ user }) => user.id !== member.user.id)
+      );
   }
 
-  function handleChangeMemberLevel(
+  const handleChangeMemberLevel = (
     member: GetProjectMembers_project_members,
     newAccessLevel: AccessLevel
-  ) {
-    console.log(member, newAccessLevel);
-  }
+  ) => updateMembersAccessLevel([member.user.id], newAccessLevel);
 
-  if (loadingMembers || loadingUsers) return <SpinnerCircular />;
-  if (!dataMembers || !dataUsers || errorMembers || errorUsers)
-    return <ErrorMessage />;
-
-  const users = dataUsers.users.map((user) => user.email);
-  const members = dataMembers.project.members.map(
-    (member) => member.user.email
-  );
-  const allMembers = [...members, ...memberSelection];
-
-  const options = users.filter((email) => !allMembers.includes(email));
-
-  function performAddMembers() {
-    if (dataUsers) {
-      const emailToId = Object.fromEntries(
-        dataUsers.users.map((user) => [user.email, user.id])
-      );
-      addMembersById(memberSelection.map((member) => emailToId[member]));
-    }
-  }
-
-  function isMemberSelected(
-    member: GetProjectMembers_project_members
-  ): boolean {
-    return !!checkedMembers.find((m) => m.user.email === member.user.email);
-  }
+  const isMemberSelected = (member: GetProjectMembers_project_members) =>
+    !!checkedMembers.find(({ user }) => user.id === member.user.id);
 
   return (
     <div className={styles.container}>
-      <div className={styles.formSearch}>
-        {canManageMembers && (
-          <>
-            <SearchSelect
-              options={options}
-              theme={SearchSelectTheme.LIGHT}
-              chipSelection={memberSelection}
-              onRemoveChip={(email) =>
-                setMemberSelection(memberSelection.filter((m) => m !== email))
-              }
-              onChange={(value: string) => {
-                setError('');
-                if (value) {
-                  if (users.includes(value)) {
-                    setMemberSelection([...memberSelection, value]);
-                  } else {
-                    setError('Add a user from the Server users');
-                  }
-                }
-              }}
-              className={styles.formInput}
-              placeholder="Find a new member..."
-              error={error}
-              showSearchIcon
-              hideLabel
-              showClear
-              hideError
-            />
-            <Button
-              label="ADD"
-              height={44}
-              onClick={performAddMembers}
-              disabled={!memberSelection.length}
-            />
-          </>
-        )}
-      </div>
+      {canManageMembers && (
+        <>
+          <AddMembers
+            projectId={projectId}
+            users={dataUsers.users}
+            members={dataMembers.project.members}
+          />
+          <ManageMembers
+            projectId={projectId}
+            checkedMembers={checkedMembers}
+            onCompleteRemove={() => setCheckedMembers([])}
+          />
+        </>
+      )}
       <div className={styles.members}>
         {dataMembers.project.members.map((member) => (
           <Member

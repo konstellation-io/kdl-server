@@ -141,30 +141,30 @@ function NewProject() {
     switch (actStep) {
       case 0:
         return [
-          <ActionButton key="cancel" label="CANCEL" to={ROUTE.HOME} />,
+          <ActionButton key="cancel" label="Cancel" to={ROUTE.HOME} />,
           <ActionButton
             key="next"
-            label="NEXT"
+            label="Next"
             primary
             onClick={onNextClick}
           />,
         ];
       case stepperSteps.length - 1:
         return [
-          <ActionButton key="key" label="BACK" onClick={prevStep} />,
+          <ActionButton key="key" label="Back" onClick={prevStep} />,
           <ActionButton
             key="create"
-            label="CREATE"
+            label="Create"
             to={ROUTE.PROJECT_CREATION}
             primary
           />,
         ];
       default:
         return [
-          <ActionButton key="back" label="BACK" onClick={prevStep} />,
+          <ActionButton key="back" label="Back" onClick={prevStep} />,
           <ActionButton
             key="next"
-            label="NEXT"
+            label="Next"
             primary
             onClick={onNextClick}
           />,

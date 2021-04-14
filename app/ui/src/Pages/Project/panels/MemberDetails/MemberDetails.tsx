@@ -146,7 +146,7 @@ function MemberDetail({ member, projectId, close }: Props) {
                 warning
               >
                 <Button
-                  label="REMOVE FROM PROJECT"
+                  label="Remove from project"
                   Icon={IconRemove}
                   className={styles.removeButton}
                 />
@@ -158,13 +158,13 @@ function MemberDetail({ member, projectId, close }: Props) {
       {canManageMember && (
         <ActionsBar className={styles.actions}>
           <Button
-            label="SAVE"
+            label="Save"
             onClick={handleSubmit(handleUpdateMember)}
             disabled={!done && !accessLevelChanged}
             success={done}
             primary
           />
-          <Button label="CANCEL" onClick={close} />
+          <Button label="Cancel" onClick={close} />
         </ActionsBar>
       )}
     </div>

@@ -15,7 +15,7 @@ const ProjectsBar = () => (
     </Left>
     <Right>
       <Button
-        label="ADD PROJECT"
+        label="Add project"
         Icon={IconAdd}
         className={styles.addProjectButton}
         to={ROUTE.NEW_PROJECT}

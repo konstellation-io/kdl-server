@@ -55,10 +55,7 @@ function UpdateRepository({ project, close }: Props) {
     register('url', { validate: validateUrl });
     register('skipTest');
 
-    return () => {
-      unregister('url');
-      unregister('skipTest');
-    };
+    return () => unregister(['url', 'skipTest']);
   }, [register, unregister]);
 
   function onSubmit() {
@@ -136,12 +133,12 @@ function UpdateRepository({ project, close }: Props) {
       </div>
       <ActionsBar className={styles.actions}>
         <Button
-          label="SAVE"
+          label="Save"
           onClick={handleOnSave}
           disabled={!(connectionOk || (!connectionOk && watch('skipTest')))}
           primary
         />
-        <Button label="CANCEL" onClick={close} />
+        <Button label="Cancel" onClick={close} />
       </ActionsBar>
     </div>
   );

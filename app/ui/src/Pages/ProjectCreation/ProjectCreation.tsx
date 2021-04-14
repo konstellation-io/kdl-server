@@ -84,12 +84,12 @@ function ProjectCreation() {
         </p>
         <div className={styles.buttonsContainer}>
           <Button
-            label="GO TO HOME"
+            label="Go to home"
             className={styles.button}
             to={ROUTE.HOME}
           />
           <Button
-            label="GO TO PROJECT"
+            label="Go to project"
             to={buildRoute(
               ROUTE.PROJECT,
               dataCreateProject?.createProject.id || ''

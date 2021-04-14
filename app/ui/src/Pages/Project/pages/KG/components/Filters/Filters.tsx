@@ -9,6 +9,7 @@ import styles from './Filters.module.scss';
 export interface Topic {
   name: string;
   nResources: number;
+  relevance: number;
 }
 
 const MAX_SCORE = 100;

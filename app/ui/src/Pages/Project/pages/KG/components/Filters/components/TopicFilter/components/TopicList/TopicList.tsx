@@ -11,32 +11,45 @@ export interface TopicListProps {
 }
 function TopicList({ topics, selectedTopics, onSelectOption }: TopicListProps) {
   return (
-    <ul className={styles.listContainer}>
-      {topics.map((topic) => {
-        return (
-          <li
-            key={topic.name}
-            className={styles.lineWrapper}
-            onClick={() => onSelectOption(topic)}
-          >
-            <Check
-              checked={selectedTopics.includes(topic.name)}
-              onChange={() => onSelectOption(topic)}
-            />
-            <span className={styles.lineText}>{topic.name}</span>
-            <span
-              className={styles.paperCount}
-              style={{
-                backgroundColor: colorScale(topic.nResources),
-                color: getColorNumber(topic.nResources),
-              }}
+    <>
+      <div className={styles.titlesContainer}>
+        <span className={styles.title}>TOPICS</span>
+        <span className={styles.paperCount}>PAPERS</span>
+        <span className={styles.relevance}>RELEVANCE</span>
+      </div>
+      <ul className={styles.listContainer}>
+        {topics.map((topic) => {
+          return (
+            <li
+              key={topic.name}
+              className={styles.lineWrapper}
+              onClick={() => onSelectOption(topic)}
             >
-              {topic.nResources}
-            </span>
-          </li>
-        );
-      })}
-    </ul>
+              <div className={styles.titleInfoWrapper}>
+                <Check
+                  className={styles.check}
+                  checked={selectedTopics.includes(topic.name)}
+                  onChange={() => onSelectOption(topic)}
+                />
+                <span className={styles.lineText}>{topic.name}</span>
+              </div>
+              <div className={styles.infoWrapper}>
+                <span
+                  className={styles.paperCount}
+                  style={{
+                    backgroundColor: colorScale(topic.nResources),
+                    color: getColorNumber(topic.nResources),
+                  }}
+                >
+                  {topic.nResources}
+                </span>
+                <span className={styles.relevance}>{topic.relevance}</span>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </>
   );
 }
 

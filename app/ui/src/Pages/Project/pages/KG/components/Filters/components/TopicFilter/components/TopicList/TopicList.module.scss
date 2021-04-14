@@ -2,33 +2,84 @@
 @import 'Styles/mixins';
 @import 'Styles/colors';
 
+.titlesContainer {
+  display: flex;
+  align-items: center;
+
+  margin-top: 2*$grid-unit;
+  margin-left: $grid-unit * 4;
+
+  .title {
+    @include font-caption
+    color: font-color(regular);
+    flex-grow: 1;
+  }
+
+  .paperCount {
+    @include font-caption
+    color: font-color(regular);
+  }
+
+  .relevance {
+    @include font-caption
+    color: font-color(regular);
+    margin-left: 2 * $grid-unit;
+  }
+}
+
 .listContainer {
   list-style-type: none;
   padding: 0;
   overflow: auto;
+  margin-top: $grid-unit;
 
   .lineWrapper {
     display: flex;
     align-items: center;
     padding: $grid-unit $grid-unit $grid-unit 0;
     cursor: pointer;
+    justify-content: space-between;
 
-    .lineText {
-      @include font-small;
-      color: font-color(lowlight);
-      margin-left: $grid-unit * 1.5;
-      max-width: 32 * $grid-unit;
-    }
-
-    .paperCount {
-      margin-left: $grid-unit * 2;
-      border-radius: 100%;
-      font-weight: bold;
-      width: 20px;
-      height: 20px;
+    .titleInfoWrapper {
       display: flex;
       align-items: center;
-      justify-content: center;
+
+      .check {
+        flex-shrink: 0;
+      }
+
+      .lineText {
+        @include font-small;
+        color: font-color(lowlight);
+        margin-left: $grid-unit * 1.5;
+        max-width: 32 * $grid-unit;
+        flex-grow: 1;
+      }
+    }
+
+    .infoWrapper {
+      display: flex;
+      align-items: center;
+
+      .paperCount {
+        margin-left: $grid-unit;
+        margin-right: $grid-unit;
+        border-radius: 100%;
+        font-weight: bold;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .relevance {
+        @include font-small
+        flex-shrink: 0;
+        margin-left: 5 * $grid-unit;
+        min-width: 5 * $grid-unit;
+        text-align: right;
+      }
     }
   }
 }

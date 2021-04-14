@@ -5,6 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"go.mongodb.org/mongo-driver/mongo/options"
+
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
 
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
@@ -78,7 +80,7 @@ func (m *projectMongoDBRepo) Create(ctx context.Context, p entity.Project) (stri
 	return result.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
-// FindByUserID retrieves the projects of the given user.
+// FindAll retrieves all projects.
 func (m *projectMongoDBRepo) FindAll(ctx context.Context) ([]entity.Project, error) {
 	return m.find(ctx, bson.M{})
 }
@@ -160,20 +162,21 @@ func (m *projectMongoDBRepo) UpdateMembersAccessLevel(
 
 	filter := bson.M{
 		"_id": pObjID,
-		"members.user_id": bson.M{
-			"$in": uObjIDs,
-		},
 	}
 
 	upd := bson.M{
 		"$set": bson.M{
-			"members.$.access_level": accessLevel,
+			"members.$[member].access_level": accessLevel,
 		},
 	}
 
-	_, err = m.collection.UpdateMany(ctx, filter, upd)
+	aF := options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+		Filters: []interface{}{bson.M{"member.user_id": bson.M{"$in": uObjIDs}}},
+	})
 
-	return err
+	document := m.collection.FindOneAndUpdate(ctx, filter, upd, aF)
+
+	return document.Err()
 }
 
 // UpdateName changes the name for the given project.

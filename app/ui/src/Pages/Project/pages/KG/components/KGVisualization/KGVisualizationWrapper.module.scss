@@ -78,3 +78,48 @@
   left: 3 * $grid-unit;
   z-index: 1;
 }
+
+$circle-d: $grid-unit;
+.selectedAnim {
+  position: absolute;
+  display: none;
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: $circle-d;
+    height: $circle-d;
+    background-color: white;
+    border-radius: 50%;
+  }
+
+  &.show {
+    display: initial;
+
+    &:after {
+      animation: highlight-anim 1.2s ease 0s infinite;
+    }
+  }
+}
+
+@mixin set-anim-state($diameter, $opacity) {
+  width: $diameter;
+  height: $diameter;
+  top: -($diameter - $circle-d) / 2;
+  left: -($diameter - $circle-d) / 2;
+  opacity: $opacity;
+}
+
+$circle-increase: 2.5 * $circle-d;
+$circle-diameter-end: $circle-d + $circle-increase;
+@keyframes highlight-anim {
+  0% {
+    @include set-anim-state($circle-d, 0.6);
+  }
+  60%,
+  100% {
+    @include set-anim-state($circle-diameter-end, 0);
+  }
+}

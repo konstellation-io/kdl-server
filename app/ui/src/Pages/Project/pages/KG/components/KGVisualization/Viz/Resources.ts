@@ -5,6 +5,8 @@ import { select, Selection } from 'd3-selection';
 import { D } from './KGViz';
 import { scaleBand } from '@visx/scale';
 import { OrientationH, OrientationV } from './radialAxis/radialAxis';
+import vizStyles from '../KGVisualizationWrapper.module.scss';
+import { px } from 'Utils/d3';
 
 export const RESOURCE_R = 4;
 
@@ -127,14 +129,21 @@ class Resources {
       highlightedResource,
       hideTooltipLink,
       data,
+      startResourceAnimation,
+      stopResourceAnimation,
     } = this;
 
     const highlightedElements: DComplete[] = [];
     if (hoveredResource) highlightedElements.push(hoveredResource);
-    if (highlightedResource)
-      highlightedElements.push(
-        data.find((d) => d.name === highlightedResource) as DComplete
-      );
+
+    if (highlightedResource) {
+      const d = data.find((el) => el.name === highlightedResource) as DComplete;
+
+      highlightedElements.push(d);
+      startResourceAnimation(d);
+    } else {
+      stopResourceAnimation();
+    }
 
     context.globalCompositeOperation = 'screen';
 
@@ -217,6 +226,19 @@ class Resources {
 
     context.stroke();
     context.closePath();
+  };
+
+  startResourceAnimation = (d: DComplete) => {
+    const { center } = this.props;
+
+    select(`.${vizStyles.selectedAnim}`)
+      .classed(vizStyles.show, true)
+      .style('top', px(center.y + d.y - RESOURCE_R))
+      .style('left', px(center.x + d.x - RESOURCE_R));
+  };
+
+  stopResourceAnimation = () => {
+    select(`.${vizStyles.selectedAnim}`).classed(vizStyles.show, false);
   };
 
   onMouseMove = (e: MouseEvent) => {

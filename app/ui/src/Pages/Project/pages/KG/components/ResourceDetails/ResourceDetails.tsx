@@ -4,13 +4,16 @@ import {
 } from 'Graphql/mutations/types/SetStarredKGItem';
 
 import { Button } from 'kwc';
-import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
+import {
+  GetKnowledgeGraph_knowledgeGraph_items,
+  GetKnowledgeGraph_knowledgeGraph_items_topics,
+} from 'Graphql/queries/types/GetKnowledgeGraph';
 import IconClose from '@material-ui/icons/Close';
 import IconStar from '@material-ui/icons/Star';
 import IconUnstar from '@material-ui/icons/StarBorder';
 import React from 'react';
 import { RouteProjectParams } from 'Constants/routes';
-import Score from '../KGVisualization/Score';
+import Score from '../KGVisualization/Score/Score';
 import URL from 'Components/URL/URL';
 import cx from 'classnames';
 import { loader } from 'graphql.macro';
@@ -93,12 +96,17 @@ function ResourceDetails({ resource, onClose }: Props) {
               {resource.topics.length > 0 && (
                 <div className={styles.sectionTitle}>TOPICS</div>
               )}
-              {resource.topics.map(({ name, relevance }: any) => (
-                <div className={styles.topicScore} key={name}>
-                  <Score value={relevance} inline />
-                  <span>{name}</span>
-                </div>
-              ))}
+              {resource.topics.map(
+                ({
+                  name,
+                  relevance,
+                }: GetKnowledgeGraph_knowledgeGraph_items_topics) => (
+                  <div className={styles.topicScore} key={name}>
+                    <Score value={relevance} inline />
+                    <span>{name}</span>
+                  </div>
+                )
+              )}
             </div>
             {resource.frameworks && (
               <div className={styles.frameworks}>

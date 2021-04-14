@@ -5,20 +5,16 @@ import {
   GetKnowledgeGraph_knowledgeGraph_items,
   GetKnowledgeGraph_knowledgeGraph_items_topics,
 } from 'Graphql/queries/types/GetKnowledgeGraph';
-import KGVisualization, {
-  TopicSections,
-} from './components/KGVisualization/KGVisualization';
+import KGVisualizationWrapper from './components/KGVisualization/KGVisualizationWrapper';
 import React, { useMemo } from 'react';
 
 import { ProjectRoute } from '../../ProjectPanels';
 import { SpinnerCircular } from 'kwc';
-import { getSectionsAndNames } from './KGUtils';
+import { getSectionsAndNames, TopicSections } from './KGUtils';
 import { loader } from 'graphql.macro';
 import styles from './KG.module.scss';
 import useKGFilters from './components/useKGFilters';
 import { useQuery } from '@apollo/client';
-
-const selectedResource = 'My project';
 
 const GetKnowledgeGraphQuery = loader(
   'Graphql/queries/getKnowledgeGraph.graphql'
@@ -65,12 +61,10 @@ function KG({ openedProject }: ProjectRoute) {
     return [_sections, _topics];
   }, [kgItems, topTopics]);
 
-  const {
-    handleFiltersChange,
-    filteredResources,
-    filteredSections,
-    filters,
-  } = useKGFilters(sections, kgItems);
+  const { handleFiltersChange, filteredResources, filters } = useKGFilters(
+    sections,
+    kgItems
+  );
 
   if (data === undefined) return null;
   if (loading) return <SpinnerCircular />;
@@ -96,12 +90,7 @@ function KG({ openedProject }: ProjectRoute) {
             onFiltersChange={handleFiltersChange}
           />
         </div>
-        <KGVisualization
-          data={filteredResources}
-          kgItems={kgItems}
-          sections={filteredSections}
-          selectedResource={selectedResource}
-        />
+        <KGVisualizationWrapper data={filteredResources} />
       </div>
       <div className={styles.panelSafeArea} />
     </div>

@@ -3,7 +3,7 @@ import React from 'react';
 import IconStar from '@material-ui/icons/Star';
 import IconTime from '@material-ui/icons/AccessTime';
 import { KGItem as KGItemType } from 'Pages/Project/pages/KG/KG';
-import Score from '../../../KGVisualization/Score';
+import Score from '../../../KGVisualization/Score/Score';
 import cx from 'classnames';
 import { formatDate } from 'Utils/format';
 import styles from './KGItem.module.scss';

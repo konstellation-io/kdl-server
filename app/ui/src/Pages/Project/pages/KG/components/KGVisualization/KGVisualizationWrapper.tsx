@@ -56,6 +56,7 @@ function KGVisualization({ width, height, data }: Props) {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const labelsSvgRef = useRef<SVGSVGElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gRef = useRef<SVGGElement>(null);
   const viz = useRef<KGViz | null>(null);
@@ -164,13 +165,14 @@ function KGVisualization({ width, height, data }: Props) {
   function initialize() {
     if (
       containerRef.current !== null &&
-      svgRef.current !== null &&
+      labelsSvgRef.current !== null &&
       gRef.current !== null &&
       canvasRef.current !== null
     ) {
       const vizProps = {
         container: containerRef.current,
         canvas: canvasRef.current,
+        labelsSvg: labelsSvgRef.current,
         data: vizData,
         width,
         height,
@@ -205,6 +207,12 @@ function KGVisualization({ width, height, data }: Props) {
           onWheel={onScroll}
           onMouseDown={dragStart}
           onMouseMove={drag}
+        />
+        <svg
+          className={styles.labelsSvg}
+          ref={labelsSvgRef}
+          width={width}
+          height={height}
         />
       </div>
       <div className={styles.staticTooltip}>

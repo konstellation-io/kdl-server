@@ -21,6 +21,27 @@ const COLORS = {
 const x = (d: DComplete) => d.x;
 const y = (d: DComplete) => d.y;
 
+function getOrientations(
+  right: boolean,
+  bottom: boolean,
+  secondHalf: boolean
+): [OrientationV, OrientationH] {
+  let orientationV: OrientationV, orientationH: OrientationH;
+
+  if (right) {
+    orientationV = secondHalf ? OrientationV.BOTTOM : OrientationV.TOP;
+  } else {
+    orientationV = secondHalf ? OrientationV.TOP : OrientationV.BOTTOM;
+  }
+  if (bottom) {
+    orientationH = secondHalf ? OrientationH.LEFT : OrientationH.RIGHT;
+  } else {
+    orientationH = secondHalf ? OrientationH.RIGHT : OrientationH.LEFT;
+  }
+
+  return [orientationV, orientationH];
+}
+
 type Props = {
   data: DComplete[];
   canvas: HTMLCanvasElement;
@@ -305,10 +326,7 @@ class Resources {
     return { angle, realAngle };
   };
 
-  getTextOrientations = (angle: number): [OrientationV, OrientationH] => {
-    let orientationV: OrientationV;
-    let orientationH: OrientationH;
-
+  getTextOrientations = (angle: number) => {
     const sliceSize = this.sectionScale.step();
 
     const rem = angle % sliceSize;
@@ -320,18 +338,7 @@ class Resources {
     if (bottom && secondHalf && angle + sliceSize / 2 > 270) bottom = false;
     if (bottom && !secondHalf && angle - sliceSize / 2 < 90) bottom = false;
 
-    if (right) {
-      orientationV = secondHalf ? OrientationV.BOTTOM : OrientationV.TOP;
-    } else {
-      orientationV = secondHalf ? OrientationV.TOP : OrientationV.BOTTOM;
-    }
-    if (bottom) {
-      orientationH = secondHalf ? OrientationH.LEFT : OrientationH.RIGHT;
-    } else {
-      orientationH = secondHalf ? OrientationH.RIGHT : OrientationH.LEFT;
-    }
-
-    return [orientationV, orientationH];
+    return getOrientations(right, bottom, secondHalf);
   };
 
   onMouseDown = () => {

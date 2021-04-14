@@ -35,16 +35,20 @@ type Props = {
   onCompleteRemove: () => void;
 };
 function ManageMembers({ projectId, checkedMembers, onCompleteRemove }: Props) {
-  const { toggle: toggleModal, value: isModalVisible } = useBoolState();
+  const {
+    activate: showModal,
+    deactivate: closeModal,
+    value: isModalVisible,
+  } = useBoolState();
   const modalInfo = useRef<ModalInfo>(defaultModalInfo);
 
   const { updateMembersAccessLevel, removeMembersById } = useMembers(
     projectId,
     {
-      onCompleteUpdate: toggleModal,
+      onCompleteUpdate: closeModal,
       onCompleteRemove: () => {
         onCompleteRemove();
-        toggleModal();
+        closeModal();
       },
     }
   );
@@ -59,7 +63,7 @@ function ManageMembers({ projectId, checkedMembers, onCompleteRemove }: Props) {
       action: () => updateMembersAccessLevel(membersIds(), accessLevel),
       accessLevel: accessLevel,
     });
-    toggleModal();
+    showModal();
   }
 
   function showRemoveModal() {
@@ -68,7 +72,7 @@ function ManageMembers({ projectId, checkedMembers, onCompleteRemove }: Props) {
       type: 'remove',
       action: () => removeMembersById(membersIds()),
     });
-    toggleModal();
+    showModal();
   }
 
   const removeMembersButton = () => (
@@ -123,7 +127,7 @@ function ManageMembers({ projectId, checkedMembers, onCompleteRemove }: Props) {
         <ModalContainer
           title={modalInfo.current.title}
           onAccept={modalInfo.current.action}
-          onCancel={toggleModal}
+          onCancel={closeModal}
           actionButtonLabel={modalInfo.current.acceptLabel}
           warning={modalInfo.current.warning}
           error={modalInfo.current.error}

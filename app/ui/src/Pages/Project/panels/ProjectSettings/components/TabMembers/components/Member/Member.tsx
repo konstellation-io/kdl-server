@@ -19,10 +19,7 @@ export const mapAccessLevel = {
 type Props = {
   member: GetProjectMembers_project_members;
   onInfoClick: (member: GetProjectMembers_project_members) => void;
-  onChangeMemberLevel: (
-    member: GetProjectMembers_project_members,
-    newAccessLevel: AccessLevel
-  ) => void;
+  onChangeMemberLevel: (userIds: string[], accessLevel: AccessLevel) => void;
   onCheckClick: (
     member: GetProjectMembers_project_members,
     selected: boolean
@@ -66,7 +63,7 @@ function Member({
               valuesMapper={mapAccessLevel}
               height={30}
               onChange={(newLevel: AccessLevel) =>
-                onChangeMemberLevel(member, newLevel)
+                onChangeMemberLevel([member.user.id], newLevel)
               }
               disabled={!canBeSelected}
               hideError

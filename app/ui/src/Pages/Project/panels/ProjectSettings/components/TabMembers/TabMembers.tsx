@@ -32,7 +32,7 @@ type Props = {
 function TabMembers({ projectId }: Props) {
   const { data: dataMe } = useQuery<GetMe>(GetMeQuery);
 
-  const [checkedMembers, setCheckedMembers] = useState<
+  const [selectedMembers, setSelectedMembers] = useState<
     GetProjectMembers_project_members[]
   >([]);
   const { updateMembersAccessLevel } = useMembers(projectId);
@@ -101,20 +101,15 @@ function TabMembers({ projectId }: Props) {
     member: GetProjectMembers_project_members,
     selected: boolean
   ) {
-    if (selected) setCheckedMembers([...checkedMembers, member]);
+    if (selected) setSelectedMembers([...selectedMembers, member]);
     else
-      setCheckedMembers(
-        checkedMembers.filter(({ user }) => user.id !== member.user.id)
+      setSelectedMembers(
+        selectedMembers.filter(({ user }) => user.id !== member.user.id)
       );
   }
 
-  const handleChangeMemberLevel = (
-    member: GetProjectMembers_project_members,
-    newAccessLevel: AccessLevel
-  ) => updateMembersAccessLevel([member.user.id], newAccessLevel);
-
   const isMemberSelected = (member: GetProjectMembers_project_members) =>
-    !!checkedMembers.find(({ user }) => user.id === member.user.id);
+    !!selectedMembers.find(({ user }) => user.id === member.user.id);
 
   return (
     <div className={styles.container}>
@@ -127,8 +122,8 @@ function TabMembers({ projectId }: Props) {
           />
           <ManageMembers
             projectId={projectId}
-            checkedMembers={checkedMembers}
-            onCompleteRemove={() => setCheckedMembers([])}
+            checkedMembers={selectedMembers}
+            onCompleteRemove={() => setSelectedMembers([])}
           />
         </>
       )}
@@ -141,7 +136,7 @@ function TabMembers({ projectId }: Props) {
             canBeSelected={member.user.email !== dataMe?.me.email}
             canManageMembers={canManageMembers}
             onInfoClick={openDetails}
-            onChangeMemberLevel={handleChangeMemberLevel}
+            onChangeMemberLevel={updateMembersAccessLevel}
             onCheckClick={handleCheckClick}
           />
         ))}

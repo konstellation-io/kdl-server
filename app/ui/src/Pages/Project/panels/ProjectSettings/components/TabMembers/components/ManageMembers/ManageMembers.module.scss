@@ -8,8 +8,8 @@
   padding: 0 2 * $grid-unit 2 * $grid-unit 2 * $grid-unit;
 
   .checkedMembers {
-    min-width: 16 * $grid-unit;
     @include font-body
+    min-width: 16 * $grid-unit;
   }
 
   .accessLevelSelector {

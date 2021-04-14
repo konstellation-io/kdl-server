@@ -31,7 +31,7 @@ exports[`ProjectSelector component should render without crashing 1`] = `
       }
     }
     className="addProjectButton"
-    label="NEW PROJECT"
+    label="New project"
     to="/new-project"
   />
 </div>

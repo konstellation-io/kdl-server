@@ -45,7 +45,7 @@ function KGResults() {
       updateResourceDetails(resource);
       openPanel();
     },
-    [updateResourceDetails, openPanel, data]
+    [updateResourceDetails, openPanel]
   );
 
   useEffect(() => {
@@ -64,7 +64,7 @@ function KGResults() {
         item.starred &&
         item.title.toLowerCase().includes(listFilterText.toLowerCase())
     );
-  }, [listFilterText, data?.knowledgeGraph.items]);
+  }, [data, listFilterText]);
 
   if (loading || !data)
     return (

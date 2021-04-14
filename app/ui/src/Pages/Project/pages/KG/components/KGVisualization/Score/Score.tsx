@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 
 import cx from 'classnames';
-import styles from './KGVisualization.module.scss';
+import styles from './Score.module.scss';
 
 function getColorClass(value: number) {
   let className = '';

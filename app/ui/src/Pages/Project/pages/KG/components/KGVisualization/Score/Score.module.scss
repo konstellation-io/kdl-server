@@ -1,0 +1,61 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+$state-to-color: (
+        good: palette(success),
+        notSoBad: palette(feedback),
+        notGood: palette(alert),
+        bad: palette(error),
+);
+
+@each $class, $color in $state-to-color {
+  .scoreContainer.#{$class} {
+    .value {
+      @include font-small;
+      color: $color;
+      text-align: end;
+    }
+    .bars {
+      position: relative;
+      width: 6.5 * $grid-unit;
+      height: 2px;
+
+      .barBg {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        background-color: palette(base, 300);
+      }
+      .barValue {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        background-color: $color;
+        height: 100%;
+      }
+    }
+
+    &.inline {
+      display: flex;
+
+      align-items: center;
+
+      .value {
+        width: 5 * $grid-unit;
+
+        text-align: start;
+      }
+      .bars {
+        height: 0.5 * $grid-unit;
+        width: 8 * $grid-unit;
+
+        .barValue {
+          left: 0;
+        }
+      }
+    }
+  }
+}

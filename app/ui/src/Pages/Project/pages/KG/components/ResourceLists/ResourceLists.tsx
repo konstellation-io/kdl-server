@@ -4,7 +4,6 @@ import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { KGItem } from '../../KG';
 import ResourcesList from './components/ResourcesList/ResourcesList';
 import { orderBy } from 'lodash';
-import { resourcesViz } from '../KGVisualization/KGViz';
 import styles from './ResourceLists.module.scss';
 
 const NO_ITEMS_MESSAGE = {
@@ -20,8 +19,11 @@ const NO_STARRED_ITEMS_MESSAGE = {
 type Props = {
   starredResources: KGItem[];
   resources: KGItem[];
-  onResourceClick: (id: string, name: string, left: number) => void;
+  onResourceClick: (id: string, name: string) => void;
   scores: [number, number];
+  hoverResource?:
+    | ((resourceName: string | null, skipTooltipLink?: boolean) => void)
+    | null;
 };
 
 function ResourceLists({
@@ -29,6 +31,7 @@ function ResourceLists({
   resources,
   onResourceClick,
   scores,
+  hoverResource,
 }: Props) {
   const [listFilterText, setListFilterText] = useState('');
 
@@ -44,22 +47,15 @@ function ResourceLists({
   }, [top25, listFilterText]);
 
   function onEnter(name: string) {
-    resourcesViz?.highlightResource(name, true);
+    hoverResource && hoverResource(name, true);
   }
 
   function onLeave() {
-    resourcesViz?.highlightResource(null);
+    hoverResource && hoverResource(null);
   }
 
   function onSelectResource(resource: KGItem) {
-    let left = 0;
-
-    if (resourcesViz) {
-      const target = resourcesViz.data.find((d) => d.id === resource.id);
-      left = (target?.x || 0) + resourcesViz.center.x;
-    }
-
-    onResourceClick(resource.id, resource.title, -left / 2);
+    onResourceClick(resource.id, resource.title);
   }
 
   function formatScore(score: number) {

@@ -50,7 +50,7 @@
       .lineText {
         @include font-small;
         color: font-color(lowlight);
-        margin-left: $grid-unit * 1.5;
+        margin-left: 1.5 * $grid-unit;
         max-width: 32 * $grid-unit;
         flex-grow: 1;
       }

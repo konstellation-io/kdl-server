@@ -1,11 +1,11 @@
 const { MockList } = require('apollo-server');
 
-const relevances = require('./topic_relevance.json');
+const relevances = require('./mocks/topic_relevance.json');
 const casual = require('casual');
-const buildProject = require('./projectMock');
-const kgData = require('./kgMock');
-const { buildMember, buildMeAsMember } = require('./membersMock');
-const { meId, me } = require('./meMock');
+const buildProject = require('./mocks/projectMock');
+const kgData = require('./mocks/kgMock');
+const { buildMember, meAsMember } = require('./mocks/membersMock');
+const { meId, me } = require('./mocks/meMock');
 
 const projects = Array(8).fill(0).map(buildProject);
 
@@ -88,7 +88,7 @@ module.exports = {
           ...input.repository,
           connected: false,
         },
-        members: [buildMeAsMember()],
+        members: [meAsMember],
         archived: false,
       };
       projects.push(newProject);

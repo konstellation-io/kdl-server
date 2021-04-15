@@ -1,20 +1,14 @@
 const casual = require('casual');
-const { meId, me } = require('./meMock.js');
+const { me } = require('./meMock.js');
 
-function buildMeAsMember() {
-  return {
-    user: {
-      id: meId,
-      email: me.email,
-      lastActivity: new Date().toUTCString(),
-    },
-    accessLevel: 'ADMIN',
-    addedDate: new Date().toUTCString(),
-  };
-}
+const meAsMember = {
+  user: me,
+  accessLevel: 'ADMIN',
+  addedDate: new Date().toUTCString(),
+};
 
 function buildRandomMembers(memberCount) {
-  const members = [buildMeAsMember()];
+  const members = [meAsMember];
   for (let i = 0; i < memberCount; i++) {
     members.push(buildMember());
   }
@@ -33,4 +27,4 @@ function buildMember() {
   };
 }
 
-module.exports = { buildRandomMembers, buildMeAsMember, buildMember };
+module.exports = { buildRandomMembers, meAsMember, buildMember };

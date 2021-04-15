@@ -3,13 +3,12 @@ import { SearchSelect, Select } from 'kwc';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import { GetUsers } from 'Graphql/queries/types/GetUsers';
-import { get } from 'lodash';
+import { get, capitalize } from 'lodash';
 import { loader } from 'graphql.macro';
 import styles from './UserFiltersAndActions.module.scss';
 import { useForm } from 'react-hook-form';
 import { useQuery } from '@apollo/client';
 import useUserSettings from 'Graphql/client/hooks/useUserSettings';
-import { capitalize } from 'lodash';
 
 const GetUsersQuery = loader('Graphql/queries/getUsers.graphql');
 

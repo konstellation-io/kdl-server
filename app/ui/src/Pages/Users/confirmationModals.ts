@@ -1,7 +1,7 @@
 import { AccessLevel } from 'Graphql/types/globalTypes';
 
 export type ModalInfo = {
-  action: () => void;
+  action?: () => void;
   title: string;
   userIds: string[];
   message: string;
@@ -9,7 +9,7 @@ export type ModalInfo = {
 };
 
 export const defaultModalInfo: ModalInfo = {
-  action: () => {},
+  action: undefined,
   title: '',
   userIds: [],
   message: '',

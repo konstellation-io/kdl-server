@@ -3,7 +3,7 @@ import {
   GET_NEW_PROJECT,
   GetNewProject,
 } from 'Graphql/client/queries/getNewProject.graphql';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import RepositoryTypeComponent, {
   LOCATION,
   SIZE,
@@ -84,11 +84,13 @@ function NewProject() {
     | StepNames.REPOSITORY
     | StepNames.INTERNAL
     | StepNames.EXTERNAL
-  )[] = [
-    StepNames.INFORMATION,
-    StepNames.REPOSITORY,
-    repoTypeToStepName[type || ''],
-  ];
+  )[] = useMemo(() => {
+    return [
+      StepNames.INFORMATION,
+      StepNames.REPOSITORY,
+      repoTypeToStepName[type || ''],
+    ];
+  }, [type]);
 
   // We want to execute this on on component unmount
   // eslint-disable-next-line react-hooks/exhaustive-deps

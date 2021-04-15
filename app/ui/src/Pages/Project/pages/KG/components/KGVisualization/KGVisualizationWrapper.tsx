@@ -197,6 +197,7 @@ function KGVisualization({ width, height, data }: Props) {
         <svg className={styles.svg} ref={svgRef} width={width} height={height}>
           <g ref={gRef} />
         </svg>
+        <div className={styles.selectedAnim} />
         <canvas
           className={styles.canvas}
           ref={canvasRef}

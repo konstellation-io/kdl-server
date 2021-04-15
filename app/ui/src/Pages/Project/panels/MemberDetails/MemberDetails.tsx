@@ -18,7 +18,7 @@ import { formatDate } from 'Utils/format';
 import { loader } from 'graphql.macro';
 import styles from './MemberDetails.module.scss';
 import { useForm } from 'react-hook-form';
-import useMember from 'Graphql/hooks/useMember';
+import useMembers from 'Graphql/hooks/useMembers';
 import { useQuery } from '@apollo/client';
 
 const GetMeQuery = loader('Graphql/queries/getMe.graphql');
@@ -49,9 +49,12 @@ function MemberDetail({ member, projectId, close }: Props) {
   });
 
   const [done, setDone] = useState(false);
-  const { removeMemberById, updateMemberAccessLevel } = useMember(projectId, {
-    onCompleteUpdate: () => setDone(true),
-  });
+  const { removeMembersById, updateMembersAccessLevel } = useMembers(
+    projectId,
+    {
+      onCompleteUpdate: () => setDone(true),
+    }
+  );
 
   const { handleSubmit, setValue, unregister, register, watch } = useForm<
     FormData
@@ -86,11 +89,11 @@ function MemberDetail({ member, projectId, close }: Props) {
 
   function handleUpdateMember({ accessLevel }: FormData) {
     if (accessLevelChanged) {
-      updateMemberAccessLevel(member.user.id, accessLevel);
+      updateMembersAccessLevel([member.user.id], accessLevel);
     }
   }
   function handleRemoveMember() {
-    removeMemberById(member.user.id);
+    removeMembersById([member.user.id]);
     close();
   }
 

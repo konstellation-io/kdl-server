@@ -90,13 +90,13 @@ type ComplexityRoot struct {
 		CreateProject      func(childComplexity int, input model.CreateProjectInput) int
 		RegenerateSSHKey   func(childComplexity int) int
 		RemoveAPIToken     func(childComplexity int, input *model.RemoveAPITokenInput) int
-		RemoveMember       func(childComplexity int, input model.RemoveMemberInput) int
+		RemoveMembers      func(childComplexity int, input model.RemoveMembersInput) int
 		RemoveUsers        func(childComplexity int, input model.RemoveUsersInput) int
 		SetActiveUserTools func(childComplexity int, input model.SetActiveUserToolsInput) int
 		SetKGStarred       func(childComplexity int, input model.SetKGStarredInput) int
 		SyncUsers          func(childComplexity int) int
 		UpdateAccessLevel  func(childComplexity int, input model.UpdateAccessLevelInput) int
-		UpdateMember       func(childComplexity int, input model.UpdateMemberInput) int
+		UpdateMembers      func(childComplexity int, input model.UpdateMembersInput) int
 		UpdateProject      func(childComplexity int, input model.UpdateProjectInput) int
 	}
 
@@ -189,8 +189,8 @@ type MutationResolver interface {
 	CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error)
 	UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error)
 	AddMembers(ctx context.Context, input model.AddMembersInput) (*entity.Project, error)
-	RemoveMember(ctx context.Context, input model.RemoveMemberInput) (*entity.Project, error)
-	UpdateMember(ctx context.Context, input model.UpdateMemberInput) (*entity.Project, error)
+	RemoveMembers(ctx context.Context, input model.RemoveMembersInput) (*entity.Project, error)
+	UpdateMembers(ctx context.Context, input model.UpdateMembersInput) (*entity.Project, error)
 	AddAPIToken(ctx context.Context, input *model.APITokenInput) (*entity.APIToken, error)
 	RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error)
 	SetKGStarred(ctx context.Context, input model.SetKGStarredInput) (*model.SetKGStarredRes, error)
@@ -457,17 +457,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RemoveAPIToken(childComplexity, args["input"].(*model.RemoveAPITokenInput)), true
 
-	case "Mutation.removeMember":
-		if e.complexity.Mutation.RemoveMember == nil {
+	case "Mutation.removeMembers":
+		if e.complexity.Mutation.RemoveMembers == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_removeMember_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_removeMembers_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.RemoveMember(childComplexity, args["input"].(model.RemoveMemberInput)), true
+		return e.complexity.Mutation.RemoveMembers(childComplexity, args["input"].(model.RemoveMembersInput)), true
 
 	case "Mutation.removeUsers":
 		if e.complexity.Mutation.RemoveUsers == nil {
@@ -524,17 +524,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateAccessLevel(childComplexity, args["input"].(model.UpdateAccessLevelInput)), true
 
-	case "Mutation.updateMember":
-		if e.complexity.Mutation.UpdateMember == nil {
+	case "Mutation.updateMembers":
+		if e.complexity.Mutation.UpdateMembers == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_updateMember_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateMembers_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateMember(childComplexity, args["input"].(model.UpdateMemberInput)), true
+		return e.complexity.Mutation.UpdateMembers(childComplexity, args["input"].(model.UpdateMembersInput)), true
 
 	case "Mutation.updateProject":
 		if e.complexity.Mutation.UpdateProject == nil {
@@ -965,8 +965,8 @@ type Mutation {
   createProject(input: CreateProjectInput!): Project!
   updateProject(input: UpdateProjectInput!): Project!
   addMembers(input: AddMembersInput!): Project!
-  removeMember(input: RemoveMemberInput!): Project!
-  updateMember(input: UpdateMemberInput!): Project!
+  removeMembers(input: RemoveMembersInput!): Project!
+  updateMembers(input: UpdateMembersInput!): Project!
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
   setKGStarred(input: SetKGStarredInput!): SetKGStarredRes!
@@ -1078,18 +1078,18 @@ input AddMembersInput {
   userIds: [ID!]!
 }
 
-input RemoveMemberInput {
+input RemoveMembersInput {
   projectId: ID!
-  userId: ID!
+  userIds: [ID!]!
 }
 
 input RemoveApiTokenInput {
   apiTokenId: ID!
 }
 
-input UpdateMemberInput {
+input UpdateMembersInput {
   projectId: ID!
-  userId: ID!
+  userIds: [ID!]!
   accessLevel: AccessLevel!
 }
 
@@ -1251,13 +1251,13 @@ func (ec *executionContext) field_Mutation_removeApiToken_args(ctx context.Conte
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_removeMember_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_removeMembers_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.RemoveMemberInput
+	var arg0 model.RemoveMembersInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNRemoveMemberInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRemoveMemberInput(ctx, tmp)
+		arg0, err = ec.unmarshalNRemoveMembersInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRemoveMembersInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1326,13 +1326,13 @@ func (ec *executionContext) field_Mutation_updateAccessLevel_args(ctx context.Co
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateMember_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateMembers_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.UpdateMemberInput
+	var arg0 model.UpdateMembersInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdateMemberInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUpdateMemberInput(ctx, tmp)
+		arg0, err = ec.unmarshalNUpdateMembersInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUpdateMembersInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2495,7 +2495,7 @@ func (ec *executionContext) _Mutation_addMembers(ctx context.Context, field grap
 	return ec.marshalNProject2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_removeMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_removeMembers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2512,7 +2512,7 @@ func (ec *executionContext) _Mutation_removeMember(ctx context.Context, field gr
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_removeMember_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_removeMembers_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -2520,7 +2520,7 @@ func (ec *executionContext) _Mutation_removeMember(ctx context.Context, field gr
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RemoveMember(rctx, args["input"].(model.RemoveMemberInput))
+		return ec.resolvers.Mutation().RemoveMembers(rctx, args["input"].(model.RemoveMembersInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2537,7 +2537,7 @@ func (ec *executionContext) _Mutation_removeMember(ctx context.Context, field gr
 	return ec.marshalNProject2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_updateMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_updateMembers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2554,7 +2554,7 @@ func (ec *executionContext) _Mutation_updateMember(ctx context.Context, field gr
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_updateMember_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_updateMembers_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -2562,7 +2562,7 @@ func (ec *executionContext) _Mutation_updateMember(ctx context.Context, field gr
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateMember(rctx, args["input"].(model.UpdateMemberInput))
+		return ec.resolvers.Mutation().UpdateMembers(rctx, args["input"].(model.UpdateMembersInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5765,8 +5765,8 @@ func (ec *executionContext) unmarshalInputRemoveApiTokenInput(ctx context.Contex
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputRemoveMemberInput(ctx context.Context, obj interface{}) (model.RemoveMemberInput, error) {
-	var it model.RemoveMemberInput
+func (ec *executionContext) unmarshalInputRemoveMembersInput(ctx context.Context, obj interface{}) (model.RemoveMembersInput, error) {
+	var it model.RemoveMembersInput
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
@@ -5779,11 +5779,11 @@ func (ec *executionContext) unmarshalInputRemoveMemberInput(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
-		case "userId":
+		case "userIds":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-			it.UserID, err = ec.unmarshalNID2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIds"))
+			it.UserIds, err = ec.unmarshalNID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5961,8 +5961,8 @@ func (ec *executionContext) unmarshalInputUpdateAccessLevelInput(ctx context.Con
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateMemberInput(ctx context.Context, obj interface{}) (model.UpdateMemberInput, error) {
-	var it model.UpdateMemberInput
+func (ec *executionContext) unmarshalInputUpdateMembersInput(ctx context.Context, obj interface{}) (model.UpdateMembersInput, error) {
+	var it model.UpdateMembersInput
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
@@ -5975,11 +5975,11 @@ func (ec *executionContext) unmarshalInputUpdateMemberInput(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
-		case "userId":
+		case "userIds":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-			it.UserID, err = ec.unmarshalNID2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIds"))
+			it.UserIds, err = ec.unmarshalNID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6334,13 +6334,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "removeMember":
-			out.Values[i] = ec._Mutation_removeMember(ctx, field)
+		case "removeMembers":
+			out.Values[i] = ec._Mutation_removeMembers(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "updateMember":
-			out.Values[i] = ec._Mutation_updateMember(ctx, field)
+		case "updateMembers":
+			out.Values[i] = ec._Mutation_updateMembers(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -7544,8 +7544,8 @@ func (ec *executionContext) marshalNQualityProjectDesc2ᚖgithubᚗcomᚋkonstel
 	return ec._QualityProjectDesc(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNRemoveMemberInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRemoveMemberInput(ctx context.Context, v interface{}) (model.RemoveMemberInput, error) {
-	res, err := ec.unmarshalInputRemoveMemberInput(ctx, v)
+func (ec *executionContext) unmarshalNRemoveMembersInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRemoveMembersInput(ctx context.Context, v interface{}) (model.RemoveMembersInput, error) {
+	res, err := ec.unmarshalInputRemoveMembersInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -7722,8 +7722,8 @@ func (ec *executionContext) unmarshalNUpdateAccessLevelInput2githubᚗcomᚋkons
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateMemberInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUpdateMemberInput(ctx context.Context, v interface{}) (model.UpdateMemberInput, error) {
-	res, err := ec.unmarshalInputUpdateMemberInput(ctx, v)
+func (ec *executionContext) unmarshalNUpdateMembersInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐUpdateMembersInput(ctx context.Context, v interface{}) (model.UpdateMembersInput, error) {
+	res, err := ec.unmarshalInputUpdateMembersInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

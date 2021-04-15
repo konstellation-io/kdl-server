@@ -14,21 +14,31 @@
   stroke-dasharray: 4 4;
 }
 
-.sectionLabel {
+.sectionContainer {
   @include font-small;
   color: font-color(lowlight);
 
-  position: absolute;
-  z-index: 1;
-  width: 100%;
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-
+  width: 100%;
   border-radius: 0.75 * $grid-unit;
-  padding: $grid-unit $grid-unit;
-
   background-color: palette(lowlight, 900);
   pointer-events: none;
+}
+
+.sectionOrder {
+  @include font-button;
+  color: font-color(dark);
+
+  border-radius: 0.75 * $grid-unit 0 0 0.75 * $grid-unit;
+  background-color: palette(lowlight, 500);
+  padding: $grid-unit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.sectionLabel {
+  padding: $grid-unit;
+  word-break: break-word;
 }

@@ -116,18 +116,21 @@ module.exports = {
 
       return project;
     },
-    removeMember: (_, { input: { projectId, userId } }) => {
+    removeMembers: (_, { input: { projectId, userIds } }) => {
       const project = projects.find(({ id }) => id === projectId);
       project.members = project.members.filter(
-        ({ user }) => user.id !== userId
+        ({ user }) => !userIds.includes(user.id)
       );
 
       return project;
     },
-    updateMember: (_, { input: { userId, accessLevel, projectId } }) => {
+    updateMembers: (_, { input: { userIds, accessLevel, projectId } }) => {
       const project = projects.find(({ id }) => id === projectId);
-      const member = project.members.find(({ user }) => user.id === userId);
-      member.accessLevel = accessLevel;
+
+      userIds.forEach((userId) => {
+        const member = project.members.find(({ user }) => user.id === userId);
+        member.accessLevel = accessLevel;
+      });
 
       return project;
     },

@@ -53,9 +53,9 @@ export interface RemoveApiTokenInput {
   apiTokenId: string;
 }
 
-export interface RemoveMemberInput {
+export interface RemoveMembersInput {
   projectId: string;
-  userId: string;
+  userIds: string[];
 }
 
 export interface RepositoryInput {
@@ -79,9 +79,9 @@ export interface UpdateAccessLevelInput {
   accessLevel: AccessLevel;
 }
 
-export interface UpdateMemberInput {
+export interface UpdateMembersInput {
   projectId: string;
-  userId: string;
+  userIds: string[];
   accessLevel: AccessLevel;
 }
 

@@ -78,23 +78,34 @@ class Sections {
       .selectAll(`foreignObject.${styles.sectionAndNamesGuide}`)
       .data(data)
       .join(
-        (enter) =>
-          enter
+        (enter) => {
+          const parent = enter
             .append('foreignObject')
             .classed(styles.sectionAndNamesGuide, true)
             .attr('x', getLabelX)
             .attr('y', getLabelY)
-            .attr('width', 2 * INNER_R)
+            .attr('width', 2.5 * INNER_R)
             .attr('height', 2 * INNER_R)
             .append('xhtml:div')
+            .classed(styles.sectionContainer, true);
+          parent
+            .append('xhtml:div')
+            .classed(styles.sectionOrder, true)
+            .html((_, i) => `${i + 1}`);
+          parent
+            .append('xhtml:div')
             .classed(styles.sectionLabel, true)
-            .html((d) => d),
-        (update) =>
-          update
-            .attr('x', getLabelX)
-            .attr('y', getLabelY)
-            .select(`.${styles.sectionLabel}`)
-            .html((d) => d)
+            .html((d) => d);
+
+          return parent;
+        },
+        (update) => {
+          const parent = update.attr('x', getLabelX).attr('y', getLabelY);
+          parent.select(`.${styles.sectionLabel}`).html((d) => d);
+          parent.select(`.${styles.sectionOrder}`).html((_, i) => `${i + 1}`);
+
+          return update;
+        }
       );
   }
 

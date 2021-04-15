@@ -31,10 +31,14 @@ const accessLevelSeparator = () => (
 
 type Props = {
   projectId: string;
-  checkedMembers: GetProjectMembers_project_members[];
+  selectedMembers: GetProjectMembers_project_members[];
   onCompleteRemove: () => void;
 };
-function ManageMembers({ projectId, checkedMembers, onCompleteRemove }: Props) {
+function ManageMembers({
+  projectId,
+  selectedMembers,
+  onCompleteRemove,
+}: Props) {
   const {
     activate: showModal,
     deactivate: closeModal,
@@ -53,12 +57,13 @@ function ManageMembers({ projectId, checkedMembers, onCompleteRemove }: Props) {
     }
   );
 
-  const hasNotMembersSelected = checkedMembers.length === 0;
-  const membersIds = () => checkedMembers.map(({ user }) => user.id);
+  const nMembers = selectedMembers.length;
+  const hasNotMembersSelected = nMembers === 0;
+  const membersIds = () => selectedMembers.map(({ user }) => user.id);
 
   function showAccessLevelModal(accessLevel: AccessLevel) {
     modalInfo.current = getModalInfo({
-      nMembers: checkedMembers.length,
+      nMembers,
       type: 'update',
       action: () => updateMembersAccessLevel(membersIds(), accessLevel),
       accessLevel: accessLevel,
@@ -68,7 +73,7 @@ function ManageMembers({ projectId, checkedMembers, onCompleteRemove }: Props) {
 
   function showRemoveModal() {
     modalInfo.current = getModalInfo({
-      nMembers: checkedMembers.length,
+      nMembers,
       type: 'remove',
       action: () => removeMembersById(membersIds()),
     });
@@ -104,15 +109,14 @@ function ManageMembers({ projectId, checkedMembers, onCompleteRemove }: Props) {
     viewer: () => AccessLevelButton(AccessLevel.VIEWER),
   };
 
+  const selectionText =
+    nMembers === 1 ? `${nMembers} User selected` : `${nMembers} Users selected`;
+
   return (
     <div className={styles.container}>
-      <span className={styles.checkedMembers}>
-        {checkedMembers.length === 1
-          ? `${checkedMembers.length} User selected`
-          : `${checkedMembers.length} Users selected`}
-      </span>
+      <span className={styles.actionsLabel}>ACTIONS</span>
       <Select
-        placeholder="Select one"
+        placeholder={selectionText}
         className={styles.accessLevelSelector}
         options={Object.keys(optionToButton)}
         CustomOptions={optionToButton}
@@ -134,7 +138,7 @@ function ManageMembers({ projectId, checkedMembers, onCompleteRemove }: Props) {
           blocking
         >
           <ModalLayoutConfirmList message={modalInfo.current.message}>
-            {checkedMembers.map((m) => (
+            {selectedMembers.map((m) => (
               <MemberItem key={m.user.id} member={m} />
             ))}
           </ModalLayoutConfirmList>

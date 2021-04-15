@@ -5,6 +5,7 @@ import { Check, Select } from 'kwc';
 import React from 'react';
 import styles from './Member.module.scss';
 import { AccessLevel } from 'Graphql/types/globalTypes';
+import cx from 'classnames';
 
 const gravatarStyle = {
   borderRadius: '50%',
@@ -38,12 +39,15 @@ function Member({
   canManageMembers = false,
 }: Props) {
   return (
-    <div className={styles.container}>
-      {canManageMembers && (
+    <div
+      className={cx(styles.container, {
+        [styles.saveCheckSpace]: canManageMembers && !canBeSelected,
+      })}
+    >
+      {canBeSelected && canManageMembers && (
         <Check
           className={styles.check}
           checked={checked}
-          indeterminate={!canBeSelected}
           onChange={(selected) =>
             canBeSelected && onCheckClick(member, selected)
           }

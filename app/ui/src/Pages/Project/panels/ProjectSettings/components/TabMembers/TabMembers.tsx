@@ -122,7 +122,7 @@ function TabMembers({ projectId }: Props) {
           />
           <ManageMembers
             projectId={projectId}
-            checkedMembers={selectedMembers}
+            selectedMembers={selectedMembers}
             onCompleteRemove={() => setSelectedMembers([])}
           />
         </>

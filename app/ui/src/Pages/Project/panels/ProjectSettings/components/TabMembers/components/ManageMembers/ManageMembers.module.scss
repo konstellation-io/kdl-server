@@ -5,11 +5,14 @@
 .container {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   padding: 0 2 * $grid-unit 2 * $grid-unit 2 * $grid-unit;
 
-  .checkedMembers {
-    @include font-body
-    min-width: 16 * $grid-unit;
+  .actionsLabel {
+    @include font-caption;
+    color: font-color(regular);
+
+    margin-right: $grid-unit;
   }
 
   .accessLevelSelector {

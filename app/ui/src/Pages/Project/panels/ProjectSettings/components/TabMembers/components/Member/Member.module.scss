@@ -13,6 +13,10 @@
 
   transition: background-color ease 0.4s;
 
+  &.saveCheckSpace .infoContainer {
+    margin-left: 3.25 * $grid-unit;
+  }
+
   &:hover {
     background-color: palette(base, 200);
   }

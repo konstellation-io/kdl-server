@@ -4,7 +4,6 @@ import {
   CoordOut,
   D,
 } from './components/KGVisualization/Viz/KGViz';
-import { color, RGBColor } from 'd3-color';
 
 import { KGItem } from './KG';
 import { orderBy } from 'lodash';

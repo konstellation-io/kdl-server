@@ -140,7 +140,7 @@ func (m *projectMongoDBRepo) RemoveMembers(ctx context.Context, projectID string
 		},
 	}
 
-	_, err = m.collection.UpdateMany(ctx, filter, upd)
+	_, err = m.collection.UpdateOne(ctx, filter, upd)
 
 	return err
 }

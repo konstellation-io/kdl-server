@@ -215,19 +215,18 @@ func (i interactor) getMember(userID string, members []entity.Member) (bool, ent
 
 // checkAtLeastOneAdmin indicates if there is at least one admin inside the members ignoring the given users.
 func (i interactor) checkAtLeastOneAdmin(skipUsers []entity.User, members []entity.Member) bool {
+	skipUsersMap := make(map[string]struct{}, len(skipUsers))
+	for _, u := range skipUsers {
+		skipUsersMap[u.ID] = struct{}{}
+	}
+
 	for _, m := range members {
+		if _, found := skipUsersMap[m.UserID]; found {
+			continue
+		}
+
 		if m.AccessLevel == entity.AccessLevelAdmin {
-			skipped := false
-
-			for _, u := range skipUsers {
-				if u.ID == m.UserID {
-					skipped = true
-				}
-			}
-
-			if !skipped {
-				return true
-			}
+			return true
 		}
 	}
 

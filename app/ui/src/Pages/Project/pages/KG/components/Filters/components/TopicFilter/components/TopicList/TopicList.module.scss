@@ -22,7 +22,7 @@
   .relevance {
     @include font-caption
     color: font-color(regular);
-    margin-left: $grid-unit * 2;
+    margin-left: 2 * $grid-unit;
   }
 }
 

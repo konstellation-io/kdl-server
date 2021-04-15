@@ -32,12 +32,12 @@ const accessLevelSeparator = () => (
 type Props = {
   projectId: string;
   selectedMembers: GetProjectMembers_project_members[];
-  onCompleteRemove: () => void;
+  onCompleteManage: () => void;
 };
 function ManageMembers({
   projectId,
   selectedMembers,
-  onCompleteRemove,
+  onCompleteManage,
 }: Props) {
   const {
     activate: showModal,
@@ -46,14 +46,16 @@ function ManageMembers({
   } = useBoolState();
   const modalInfo = useRef<ModalInfo>(defaultModalInfo);
 
+  function onComplete() {
+    closeModal();
+    onCompleteManage();
+  }
+
   const { updateMembersAccessLevel, removeMembersById } = useMembers(
     projectId,
     {
-      onCompleteUpdate: closeModal,
-      onCompleteRemove: () => {
-        onCompleteRemove();
-        closeModal();
-      },
+      onCompleteUpdate: onComplete,
+      onCompleteRemove: onComplete,
     }
   );
 

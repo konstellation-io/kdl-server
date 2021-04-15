@@ -123,7 +123,7 @@ function TabMembers({ projectId }: Props) {
           <ManageMembers
             projectId={projectId}
             selectedMembers={selectedMembers}
-            onCompleteRemove={() => setSelectedMembers([])}
+            onCompleteManage={() => setSelectedMembers([])}
           />
         </>
       )}
@@ -132,7 +132,7 @@ function TabMembers({ projectId }: Props) {
           <Member
             key={member.user.id}
             member={member}
-            checked={isMemberSelected(member)}
+            selected={isMemberSelected(member)}
             canBeSelected={member.user.email !== dataMe?.me.email}
             canManageMembers={canManageMembers}
             onInfoClick={openDetails}

@@ -4,4 +4,9 @@
 
 .container {
   @include font-body;
+
+  height: 5 * $grid-unit;
+  line-height: 5 * $grid-unit;
+  padding: 0 $grid-unit;
+  background-color: palette(base);
 }

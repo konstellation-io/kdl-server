@@ -6,7 +6,7 @@ type Props = {
   member: GetProjectMembers_project_members;
 };
 const MemberItem: FC<Props> = ({ member }) => (
-  <p className={styles.container}>{member.user.email}</p>
+  <div className={styles.container}>{member.user.email}</div>
 );
 
 export default MemberItem;

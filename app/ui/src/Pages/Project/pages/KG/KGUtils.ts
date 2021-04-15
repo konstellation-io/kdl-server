@@ -14,12 +14,7 @@ export interface TopicSections {
   [key: string]: string[];
 }
 
-const TEXT_COLOR_THRESHOLD = 120;
-const TEXT_COLOR = {
-  DARK: '#00252E',
-  LIGHT: '#CCF5FF',
-};
-const COLOR_SCALE_COLORS = ['#176177', '#D6FFFF'];
+const COLOR_SCALE_COLORS = ['#0C3448', '#E52E3D'];
 
 export type Coord = {
   x: number;
@@ -37,13 +32,6 @@ export const colorScale = scaleLinear({
   domain: [1, 10],
   range: COLOR_SCALE_COLORS,
 });
-
-export function getColorNumber(elementsCount: number) {
-  const c: RGBColor = color(colorScale(elementsCount).toString()) as RGBColor;
-  return c.r * 0.299 + c.g * 0.587 + c.b * 0.114 > TEXT_COLOR_THRESHOLD
-    ? TEXT_COLOR.DARK
-    : TEXT_COLOR.LIGHT;
-}
 
 export function getHash(text: string) {
   let hash = 0;

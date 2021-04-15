@@ -19,6 +19,12 @@
   top: 0;
   left: 0;
 }
+.labelsSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
 
 .panels {
   position: fixed;

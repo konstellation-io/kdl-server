@@ -1,0 +1,28 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.tick {
+   rect {
+     fill: palette(base, 700);
+     stroke: palette(base, 300);
+   }
+  text {
+    fill: currentColor;
+    dominant-baseline: middle;
+    text-anchor: middle;
+  }
+}
+
+.radialGuide {
+  stroke: grey;
+  stroke-opacity: 0.3;
+}
+
+.edgeAxisLabelBg {
+  fill: palette(base, 900) !important;
+}
+
+.edgeAxisLabel {
+  fill: palette(highlight) !important;
+}

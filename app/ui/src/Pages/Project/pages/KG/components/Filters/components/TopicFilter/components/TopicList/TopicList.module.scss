@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
 
-  margin-top: 2*$grid-unit;
+  margin-top: $grid-unit * 2;
   margin-left: $grid-unit * 4;
 
   .title {
@@ -23,7 +23,7 @@
   .relevance {
     @include font-caption
     color: font-color(regular);
-    margin-left: 2 * $grid-unit;
+    margin-left: $grid-unit * 2;
   }
 }
 

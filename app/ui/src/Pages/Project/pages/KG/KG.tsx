@@ -33,7 +33,7 @@ function KG({ openedProject }: ProjectRoute) {
   });
 
   const topTopics = useMemo(
-    () => data?.knowledgeGraph.topics.map((t) => t).slice(0, 9) || [],
+    () => data?.knowledgeGraph.topics.slice(0, 9) || [],
     [data]
   );
 

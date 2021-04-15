@@ -1,88 +1,11 @@
 const { MockList } = require('apollo-server');
-const data = require('./data0.json');
-const relevances = require('./topic_relevance.json');
+
+const relevances = require('./mocks/topic_relevance.json');
 const casual = require('casual');
-
-const starredItems = [0, 1, 4, 6, 12, 34, 35, 65, 120, 144, 365, 456, 754, 942];
-
-const kgData = data.map((d, idx) => ({
-  id: d.id,
-  category: casual.random_element(['Code', 'Paper']),
-  topics: Object.entries(JSON.parse(d.topics.replace(/[']+/g, '"'))).map(
-    ([name, relevance]) => ({
-      name,
-      relevance,
-    })
-  ),
-  title: d.title,
-  abstract: d.abstract,
-  authors: ['Xingyi Zhou', 'Vladlen Koltun', 'Philipp Krähenbühl'],
-  frameworks: ['Pytorch', 'TensorFlow'],
-  repoUrls: [casual.url, casual.url, casual.url],
-  score: d.score,
-  date: new Date().toISOString(),
-  starred: starredItems.includes(idx),
-  url: 'https://paperswithcode.com/paper/probabilistic-two-stage-detection',
-}));
-
-const meId = casual.uuid;
-const me = {
-  id: meId,
-  email: 'admin@intelygenz.com',
-  username: 'admin',
-  areToolsActive: true,
-  apiTokens: () => new MockList([4, 8]),
-};
-
-const buildProject = () => ({
-  id: casual.uuid,
-  name: casual.name,
-  description: casual.words(200),
-  favorite: casual.boolean,
-  repository: this.Repository,
-  creationDate: () => new Date().toISOString(),
-  lastActivationDate: () => new Date().toISOString(),
-  error: casual.random_element([null, casual.error]),
-  needAccess: casual.boolean,
-  members: buildRandomMembers(casual.integer(1, 5)),
-  archived: casual.boolean,
-  toolUrls: () => ({
-    gitea: 'https://gitea.io/en-us/',
-    minio: 'https://min.io/',
-    jupyter: 'https://jupyter.org/',
-    vscode: 'https://code.visualstudio.com/',
-    drone: 'https://www.drone.io/',
-    mlflow: 'https://mlflow.org/',
-  }),
-});
-
-const buildMember = () => ({
-  user: {
-    id: casual.uuid,
-    email: casual.email,
-    lastActivity: new Date().toUTCString(),
-  },
-  accessLevel: casual.random_element(['ADMIN', 'VIEWER', 'MANAGER']),
-  addedDate: new Date().toUTCString(),
-});
-
-const buildRandomMembers = (memberCount) => {
-  const members = [
-    {
-      user: {
-        id: meId,
-        email: me.email,
-        lastActivity: new Date().toUTCString(),
-      },
-      accessLevel: 'ADMIN',
-      addedDate: new Date().toUTCString(),
-    },
-  ];
-  for (let i = 0; i < memberCount; i++) {
-    members.push(buildMember());
-  }
-  return members;
-};
+const buildProject = require('./mocks/projectMock');
+const kgData = require('./mocks/kgMock');
+const { buildMember, meAsMember } = require('./mocks/membersMock');
+const { meId, me } = require('./mocks/meMock');
 
 const projects = Array(8).fill(0).map(buildProject);
 
@@ -168,7 +91,8 @@ module.exports = {
           ...input.repository,
           connected: false,
         },
-        members: [],
+        members: [meAsMember],
+        archived: false,
       };
       projects.push(newProject);
       return newProject;

@@ -25,7 +25,7 @@ type Props = {
     member: GetProjectMembers_project_members,
     selected: boolean
   ) => void;
-  checked: boolean;
+  selected: boolean;
   canBeSelected?: boolean;
   canManageMembers?: boolean;
 };
@@ -34,7 +34,7 @@ function Member({
   onInfoClick,
   onChangeMemberLevel,
   onCheckClick,
-  checked,
+  selected,
   canBeSelected = false,
   canManageMembers = false,
 }: Props) {
@@ -47,9 +47,9 @@ function Member({
       {canBeSelected && canManageMembers && (
         <Check
           className={styles.check}
-          checked={checked}
-          onChange={(selected) =>
-            canBeSelected && onCheckClick(member, selected)
+          checked={selected}
+          onChange={(isSelected) =>
+            canBeSelected && onCheckClick(member, isSelected)
           }
         />
       )}

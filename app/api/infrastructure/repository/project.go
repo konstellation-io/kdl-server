@@ -170,13 +170,13 @@ func (m *projectMongoDBRepo) UpdateMembersAccessLevel(
 		},
 	}
 
-	aF := options.FindOneAndUpdate().SetArrayFilters(options.ArrayFilters{
+	opts := options.Update().SetArrayFilters(options.ArrayFilters{
 		Filters: []interface{}{bson.M{"member.user_id": bson.M{"$in": uObjIDs}}},
 	})
 
-	document := m.collection.FindOneAndUpdate(ctx, filter, upd, aF)
+	_, err = m.collection.UpdateOne(ctx, filter, upd, opts)
 
-	return document.Err()
+	return err
 }
 
 // UpdateName changes the name for the given project.

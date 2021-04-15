@@ -34,6 +34,7 @@ function ResourceLists({
   hoverResource,
 }: Props) {
   const [listFilterText, setListFilterText] = useState('');
+  const [starredFilterText, setStarredFilterText] = useState('');
 
   const top25 = useMemo(
     () => orderBy(resources, ['score'], ['desc']).slice(0, 25),
@@ -45,6 +46,14 @@ function ResourceLists({
       resource.title.toLowerCase().includes(listFilterText.toLowerCase())
     );
   }, [top25, listFilterText]);
+
+  const filteredStarredResources = useMemo(
+    () =>
+      starredResources.filter((r) =>
+        r.title.toLowerCase().includes(starredFilterText.toLowerCase())
+      ),
+    [starredResources, starredFilterText]
+  );
 
   function onEnter(name: string) {
     hoverResource && hoverResource(name, true);
@@ -80,7 +89,7 @@ function ResourceLists({
       >
         <TabList>
           <Tab>{`LIST (${filteredAllTopics.length})`}</Tab>
-          <Tab>{`STARRED (${starredResources.length})`}</Tab>
+          <Tab>{`STARRED (${filteredStarredResources.length})`}</Tab>
         </TabList>
         <div className={styles.tabContainer}>
           <TabPanel>
@@ -97,12 +106,12 @@ function ResourceLists({
           </TabPanel>
           <TabPanel>
             <ResourcesList
-              resources={starredResources}
-              filterText={listFilterText}
+              resources={filteredStarredResources}
+              filterText={starredFilterText}
               onClick={onSelectResource}
               onEnter={onEnter}
               onLeave={onLeave}
-              onChangeFilterText={setListFilterText}
+              onChangeFilterText={setStarredFilterText}
               noItems={NO_STARRED_ITEMS_MESSAGE}
             />
           </TabPanel>

@@ -26,10 +26,8 @@ function ResourcesList({
   filterText,
   noItems,
 }: Props) {
-  const hasResources = resources.length > 0;
-
   function renderListContent() {
-    if (!hasResources) return <NoItems {...noItems} />;
+    if (resources.length === 0) return <NoItems {...noItems} />;
 
     return resources.map((r) => (
       <KGItem
@@ -46,17 +44,15 @@ function ResourcesList({
     <div className={styles.list}>
       <div className={styles.top}>
         {header}
-        {hasResources && (
-          <TextInput
-            formValue={filterText}
-            onChange={(value: string) => onChangeFilterText(value)}
-            Icon={IconSearch}
-            placeholder={'Find a paper...'}
-            showClearButton
-            hideLabel
-            hideBottomText
-          />
-        )}
+        <TextInput
+          formValue={filterText}
+          onChange={(value: string) => onChangeFilterText(value)}
+          Icon={IconSearch}
+          placeholder={'Find a paper...'}
+          showClearButton
+          hideLabel
+          hideBottomText
+        />
       </div>
       <div className={styles.listWrapper}>{renderListContent()}</div>
     </div>

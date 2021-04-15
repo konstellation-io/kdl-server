@@ -46,7 +46,7 @@ function ResourcesList({
         {header}
         <TextInput
           formValue={filterText}
-          onChange={(value: string) => onChangeFilterText(value)}
+          onChange={onChangeFilterText}
           Icon={IconSearch}
           placeholder={'Find a paper...'}
           showClearButton

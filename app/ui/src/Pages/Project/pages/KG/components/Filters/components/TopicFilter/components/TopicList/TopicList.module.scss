@@ -6,8 +6,7 @@
   display: flex;
   align-items: center;
 
-  margin-top: $grid-unit * 2;
-  margin-left: $grid-unit * 4;
+  margin: 2 * $grid-unit 0 0 4 * $grid-unit;
 
   .title {
     @include font-caption

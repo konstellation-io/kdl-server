@@ -19,7 +19,7 @@ exports[`ProjectSelector component should render without crashing 1`] = `
       </li>
     </NavLink>
   </ul>
-  <T
+  <P
     Icon={
       Object {
         "$$typeof": Symbol(react.memo),

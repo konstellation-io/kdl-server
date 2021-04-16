@@ -12,7 +12,7 @@ import radialAxis, {
 import Sections from './Sections/Sections';
 import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 
-const MARGIN_TOP = 30;
+const MARGIN_TOP = 50;
 export const PADDING_H = 0.25; // 25% each side
 export const PADDING_V = 0.15; // 15% each side
 

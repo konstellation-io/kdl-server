@@ -4,7 +4,7 @@ import {
   GetKnowledgeGraphVariables,
 } from 'Graphql/queries/types/GetKnowledgeGraph';
 import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
-import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import React, { useCallback, useMemo, useEffect } from 'react';
 import { openedProject, resourceDetails } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { useQuery, useReactiveVar } from '@apollo/client';
@@ -21,7 +21,6 @@ const GetKnowledgeGraphQuery = loader(
 );
 
 function KGResults() {
-  const [listFilterText, setListFilterText] = useState('');
   const { updateResourceDetails } = useResourceDetails();
 
   const resourceDetailsData = useReactiveVar(resourceDetails);
@@ -59,12 +58,8 @@ function KGResults() {
 
   const resources = useMemo(() => {
     if (!data) return [];
-    return data.knowledgeGraph.items.filter(
-      (item) =>
-        item.starred &&
-        item.title.toLowerCase().includes(listFilterText.toLowerCase())
-    );
-  }, [data, listFilterText]);
+    return data.knowledgeGraph.items.filter((item) => item.starred);
+  }, [data]);
 
   if (loading || !data)
     return (
@@ -78,8 +73,6 @@ function KGResults() {
     <div className={styles.container}>
       <ResourcesList
         onClick={openDetails}
-        onChangeFilterText={(filter) => setListFilterText(filter)}
-        filterText={listFilterText}
         resources={resources}
         noItems={{
           title: 'No starred items yet!',

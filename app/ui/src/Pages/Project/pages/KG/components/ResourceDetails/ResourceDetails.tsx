@@ -22,7 +22,7 @@ import { mutationPayloadHelper } from 'Utils/formUtils';
 import styles from './ResourceDetails.module.scss';
 import { useMutation } from '@apollo/client';
 import { useParams } from 'react-router';
-import useBoolState from '../../../../../../Hooks/useBoolState';
+import useBoolState from 'Hooks/useBoolState';
 
 const SetStarredKGItemMutation = loader(
   'Graphql/mutations/setStarredKGItem.graphql'

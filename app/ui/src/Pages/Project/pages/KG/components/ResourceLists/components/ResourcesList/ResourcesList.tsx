@@ -1,7 +1,7 @@
 import IconSearch from '@material-ui/icons/Search';
 import KGItem from '../KGItem/KGItem';
 import { KGItem as KGItemType } from 'Pages/Project/pages/KG/KG';
-import React from 'react';
+import React, { useState } from 'react';
 import { TextInput } from 'kwc';
 import styles from './ResourcesList.module.scss';
 import NoItems, { NoItemsProps } from '../NoItems/NoItems';
@@ -10,8 +10,6 @@ type Props = {
   onClick: (resource: KGItemType) => void;
   onEnter?: (name: string) => void;
   onLeave?: () => void;
-  onChangeFilterText: (filter: string) => void;
-  filterText: string;
   resources: KGItemType[];
   header?: JSX.Element | null;
   noItems: NoItemsProps;
@@ -22,14 +20,17 @@ function ResourcesList({
   onClick,
   onEnter,
   onLeave,
-  onChangeFilterText,
-  filterText,
   noItems,
 }: Props) {
-  function renderListContent() {
-    if (resources.length === 0) return <NoItems {...noItems} />;
+  const [filterText, setFilterText] = useState('');
 
-    return resources.map((r) => (
+  function renderListContent() {
+    const filteredResources = resources.filter((r) =>
+      r.title.toLowerCase().includes(filterText.toLowerCase())
+    );
+    if (filteredResources.length === 0) return <NoItems {...noItems} />;
+
+    return filteredResources.map((r) => (
       <KGItem
         key={r.id}
         onEnter={onEnter}
@@ -46,7 +47,7 @@ function ResourcesList({
         {header}
         <TextInput
           formValue={filterText}
-          onChange={onChangeFilterText}
+          onChange={setFilterText}
           Icon={IconSearch}
           placeholder={'Find a paper...'}
           showClearButton

@@ -1,9 +1,9 @@
-import React, { useMemo, useState } from 'react';
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import React, {useMemo} from 'react';
+import {Tab, TabList, TabPanel, Tabs} from 'react-tabs';
 
-import { KGItem } from '../../KG';
+import {KGItem} from '../../KG';
 import ResourcesList from './components/ResourcesList/ResourcesList';
-import { orderBy } from 'lodash';
+import {orderBy} from 'lodash';
 import styles from './ResourceLists.module.scss';
 
 const NO_ITEMS_MESSAGE = {
@@ -33,26 +33,9 @@ function ResourceLists({
   scores,
   hoverResource,
 }: Props) {
-  const [listFilterText, setListFilterText] = useState('');
-  const [starredFilterText, setStarredFilterText] = useState('');
-
   const top25 = useMemo(
     () => orderBy(resources, ['score'], ['desc']).slice(0, 25),
     [resources]
-  );
-
-  const filteredAllTopics = useMemo(() => {
-    return top25.filter((resource) =>
-      resource.title.toLowerCase().includes(listFilterText.toLowerCase())
-    );
-  }, [top25, listFilterText]);
-
-  const filteredStarredResources = useMemo(
-    () =>
-      starredResources.filter((r) =>
-        r.title.toLowerCase().includes(starredFilterText.toLowerCase())
-      ),
-    [starredResources, starredFilterText]
   );
 
   function onEnter(name: string) {
@@ -88,30 +71,26 @@ function ResourceLists({
         className={styles.tabSection}
       >
         <TabList>
-          <Tab>{`LIST (${filteredAllTopics.length})`}</Tab>
-          <Tab>{`STARRED (${filteredStarredResources.length})`}</Tab>
+          <Tab>{`LIST (${top25.length})`}</Tab>
+          <Tab>{`STARRED (${starredResources.length})`}</Tab>
         </TabList>
         <div className={styles.tabContainer}>
           <TabPanel>
             <ResourcesList
               header={listHeader}
-              resources={filteredAllTopics}
-              filterText={listFilterText}
+              resources={top25}
               onClick={onSelectResource}
               onEnter={onEnter}
               onLeave={onLeave}
-              onChangeFilterText={setListFilterText}
               noItems={NO_ITEMS_MESSAGE}
             />
           </TabPanel>
           <TabPanel>
             <ResourcesList
-              resources={filteredStarredResources}
-              filterText={starredFilterText}
+              resources={starredResources}
               onClick={onSelectResource}
               onEnter={onEnter}
               onLeave={onLeave}
-              onChangeFilterText={setStarredFilterText}
               noItems={NO_STARRED_ITEMS_MESSAGE}
             />
           </TabPanel>

@@ -7,13 +7,10 @@ import {
 
 import { KGItem } from './KG';
 import { orderBy } from 'lodash';
-import { scaleLinear } from '@visx/scale';
 
 export interface TopicSections {
   [key: string]: string[];
 }
-
-const COLOR_SCALE_COLORS = ['#0C3448', '#E52E3D'];
 
 export type Coord = {
   x: number;
@@ -26,11 +23,6 @@ export interface DComplete extends D {
   outsideMin: boolean;
   outsideMax: boolean;
 }
-
-export const colorScale = scaleLinear({
-  domain: [1, 10],
-  range: COLOR_SCALE_COLORS,
-});
 
 export function getHash(text: string) {
   let hash = 0;

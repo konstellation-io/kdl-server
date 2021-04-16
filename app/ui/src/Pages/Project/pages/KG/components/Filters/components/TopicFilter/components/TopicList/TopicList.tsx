@@ -1,8 +1,10 @@
 import React from 'react';
 import styles from './TopicList.module.scss';
 import { Check } from 'kwc';
-import { colorScale } from '../../../../../../KGUtils';
 import { Topic } from '../../../../Filters';
+import { scaleLinear } from '@visx/scale';
+
+const COLOR_SCALE_COLORS = ['#0C3448', '#E52E3D'];
 
 export interface TopicListProps {
   topics: Topic[];
@@ -10,6 +12,15 @@ export interface TopicListProps {
   onSelectOption: (topic: Topic) => void;
 }
 function TopicList({ topics, selectedTopics, onSelectOption }: TopicListProps) {
+  const nPaperInTopics = topics.map((t) => t.nResources);
+  const min = Math.min(...nPaperInTopics);
+  const max = Math.max(...nPaperInTopics);
+
+  const colorScale = scaleLinear({
+    domain: [min, max],
+    range: COLOR_SCALE_COLORS,
+  });
+
   return (
     <>
       <div className={styles.titlesContainer}>

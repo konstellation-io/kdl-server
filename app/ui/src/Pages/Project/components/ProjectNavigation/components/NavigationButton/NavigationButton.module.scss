@@ -23,7 +23,6 @@
     @include font-button;
     margin-left: $grid-unit/4;
     white-space: nowrap;
-    text-transform: capitalize;
   }
 
   &:hover {

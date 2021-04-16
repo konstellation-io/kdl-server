@@ -94,18 +94,18 @@ func (mr *MockRepositoryMockRecorder) Get(ctx, id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockRepository)(nil).Get), ctx, id)
 }
 
-// RemoveMember mocks base method.
-func (m *MockRepository) RemoveMember(ctx context.Context, projectID, userID string) error {
+// RemoveMembers mocks base method.
+func (m *MockRepository) RemoveMembers(ctx context.Context, projectID string, users []entity.User) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RemoveMember", ctx, projectID, userID)
+	ret := m.ctrl.Call(m, "RemoveMembers", ctx, projectID, users)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// RemoveMember indicates an expected call of RemoveMember.
-func (mr *MockRepositoryMockRecorder) RemoveMember(ctx, projectID, userID interface{}) *gomock.Call {
+// RemoveMembers indicates an expected call of RemoveMembers.
+func (mr *MockRepositoryMockRecorder) RemoveMembers(ctx, projectID, users interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMember", reflect.TypeOf((*MockRepository)(nil).RemoveMember), ctx, projectID, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMembers", reflect.TypeOf((*MockRepository)(nil).RemoveMembers), ctx, projectID, users)
 }
 
 // SetStarredKGItem mocks base method.
@@ -164,18 +164,18 @@ func (mr *MockRepositoryMockRecorder) UpdateDescription(ctx, projectID, descript
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDescription", reflect.TypeOf((*MockRepository)(nil).UpdateDescription), ctx, projectID, description)
 }
 
-// UpdateMemberAccessLevel mocks base method.
-func (m *MockRepository) UpdateMemberAccessLevel(ctx context.Context, projectID, userID string, accessLevel entity.AccessLevel) error {
+// UpdateMembersAccessLevel mocks base method.
+func (m *MockRepository) UpdateMembersAccessLevel(ctx context.Context, projectID string, users []entity.User, accessLevel entity.AccessLevel) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateMemberAccessLevel", ctx, projectID, userID, accessLevel)
+	ret := m.ctrl.Call(m, "UpdateMembersAccessLevel", ctx, projectID, users, accessLevel)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// UpdateMemberAccessLevel indicates an expected call of UpdateMemberAccessLevel.
-func (mr *MockRepositoryMockRecorder) UpdateMemberAccessLevel(ctx, projectID, userID, accessLevel interface{}) *gomock.Call {
+// UpdateMembersAccessLevel indicates an expected call of UpdateMembersAccessLevel.
+func (mr *MockRepositoryMockRecorder) UpdateMembersAccessLevel(ctx, projectID, users, accessLevel interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMemberAccessLevel", reflect.TypeOf((*MockRepository)(nil).UpdateMemberAccessLevel), ctx, projectID, userID, accessLevel)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMembersAccessLevel", reflect.TypeOf((*MockRepository)(nil).UpdateMembersAccessLevel), ctx, projectID, users, accessLevel)
 }
 
 // UpdateName mocks base method.
@@ -275,19 +275,19 @@ func (mr *MockUseCaseMockRecorder) GetByID(ctx, id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockUseCase)(nil).GetByID), ctx, id)
 }
 
-// RemoveMember mocks base method.
-func (m *MockUseCase) RemoveMember(ctx context.Context, opt RemoveMemberOption) (entity.Project, error) {
+// RemoveMembers mocks base method.
+func (m *MockUseCase) RemoveMembers(ctx context.Context, opt RemoveMembersOption) (entity.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RemoveMember", ctx, opt)
+	ret := m.ctrl.Call(m, "RemoveMembers", ctx, opt)
 	ret0, _ := ret[0].(entity.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// RemoveMember indicates an expected call of RemoveMember.
-func (mr *MockUseCaseMockRecorder) RemoveMember(ctx, opt interface{}) *gomock.Call {
+// RemoveMembers indicates an expected call of RemoveMembers.
+func (mr *MockUseCaseMockRecorder) RemoveMembers(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMember", reflect.TypeOf((*MockUseCase)(nil).RemoveMember), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMembers", reflect.TypeOf((*MockUseCase)(nil).RemoveMembers), ctx, opt)
 }
 
 // Update mocks base method.
@@ -305,19 +305,19 @@ func (mr *MockUseCaseMockRecorder) Update(ctx, opt interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUseCase)(nil).Update), ctx, opt)
 }
 
-// UpdateMember mocks base method.
-func (m *MockUseCase) UpdateMember(ctx context.Context, opt UpdateMemberOption) (entity.Project, error) {
+// UpdateMembers mocks base method.
+func (m *MockUseCase) UpdateMembers(ctx context.Context, opt UpdateMembersOption) (entity.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateMember", ctx, opt)
+	ret := m.ctrl.Call(m, "UpdateMembers", ctx, opt)
 	ret0, _ := ret[0].(entity.Project)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UpdateMember indicates an expected call of UpdateMember.
-func (mr *MockUseCaseMockRecorder) UpdateMember(ctx, opt interface{}) *gomock.Call {
+// UpdateMembers indicates an expected call of UpdateMembers.
+func (mr *MockUseCaseMockRecorder) UpdateMembers(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMember", reflect.TypeOf((*MockUseCase)(nil).UpdateMember), ctx, opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMembers", reflect.TypeOf((*MockUseCase)(nil).UpdateMembers), ctx, opt)
 }
 
 // UpdateStarred mocks base method.

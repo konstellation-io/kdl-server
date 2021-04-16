@@ -92,7 +92,7 @@ function UserSshKey() {
               action={{
                 needConfirmation: true,
                 message: 'Sure, I will do it.',
-                label: 'REGENERATE',
+                label: 'Regenerate',
                 onClick: regenerateSSHKey,
                 loading: regenerateSSHKeyLoading,
               }}
@@ -107,7 +107,7 @@ function UserSshKey() {
               key."
             theme={BOX_THEME.WARN}
             action={{
-              label: 'COPY PRIVATE KEY',
+              label: 'Copy private key',
               onClick: () => copyAndToast(sshKey.private),
             }}
           />

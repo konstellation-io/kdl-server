@@ -30,7 +30,7 @@ const ProjectSelector: FC<Props & BottomComponentProps> = ({
     </ul>
     <Button
       Icon={IconAdd}
-      label="NEW PROJECT"
+      label="New project"
       className={styles.addProjectButton}
       to={ROUTE.NEW_PROJECT}
     />

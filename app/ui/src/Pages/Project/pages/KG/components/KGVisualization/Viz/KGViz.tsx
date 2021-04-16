@@ -5,7 +5,10 @@ import { Coord, DComplete, getHash, groupData } from '../../../KGUtils';
 import BG from './BG/BG';
 import { scaleBand, scaleLinear } from '@visx/scale';
 import Resources, { RESOURCE_R } from './Resources';
-import radialAxis from './radialAxis';
+import radialAxis, {
+  OrientationH,
+  OrientationV,
+} from './radialAxis/radialAxis';
 import Sections from './Sections/Sections';
 import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 
@@ -32,6 +35,7 @@ type Props = {
   data: D[];
   container: HTMLDivElement;
   canvas: HTMLCanvasElement;
+  labelsSvg: SVGSVGElement;
   height: number;
   width: number;
   scores: [number, number];
@@ -72,6 +76,7 @@ class KGViz {
   wrapper: Selection<SVGGElement, unknown, null, undefined>;
   context: CanvasRenderingContext2D | null;
   mainG: Selection<SVGGElement, unknown, null, undefined>;
+  labelsSvg: Selection<SVGSVGElement, unknown, null, undefined>;
 
   data: D[];
   groupedData: DComplete[];
@@ -99,6 +104,7 @@ class KGViz {
     this.parent = props.container;
     this.wrapper = select(wrapper);
     this.mainG = select(wrapper);
+    this.labelsSvg = select(props.labelsSvg);
     this.context = props.canvas.getContext('2d');
 
     this.data = props.data;
@@ -149,6 +155,8 @@ class KGViz {
 
   cleanup = () => {
     this.wrapper.selectAll('*').remove();
+    this.labelsSvg.selectAll('*').remove();
+    this.resources.clearCanvas();
   };
 
   sectionDomain = () => Array.from(new Set(this.data.map(section)));
@@ -163,17 +171,20 @@ class KGViz {
       sections,
       sectionScale,
       scores,
+      labelsSvg,
     } = this;
 
     this.mainG = wrapper
       .append('g')
       .attr('transform', `translate(${center.x}, ${center.y})`);
+    this.axisG = labelsSvg
+      .append('g')
+      .attr('transform', `translate(${center.x}, ${center.y})`);
 
     bg.initialize(this.mainG, outerR);
-    resources.initialize();
+    resources.initialize(this.sectionScale);
     sections.initialize(this.mainG, sectionScale, scores);
 
-    this.axisG = this.mainG.append('g');
     this.axisG.call(this.axis);
   };
 
@@ -193,8 +204,11 @@ class KGViz {
     this.resources.update(this.groupedData, this.sectionScale);
   };
 
-  updateAxisOrientation = (textAnchor: string) => {
-    this.axis.updateOrientation(textAnchor);
+  updateAxisOrientation = (
+    newOrientationV: OrientationV,
+    newOrientationH: OrientationH
+  ) => {
+    this.axis.updateOrientation(newOrientationV, newOrientationH);
   };
   updateActiveSection = (activeSection: string | undefined) => {
     this.axis.updateActiveSection(activeSection);

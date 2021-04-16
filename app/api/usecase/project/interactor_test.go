@@ -295,7 +295,7 @@ func TestInteractor_AddMembers(t *testing.T) {
 	require.Equal(t, p, expectedProject)
 }
 
-func TestInteractor_RemoveMember(t *testing.T) {
+func TestInteractor_RemoveMembers(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
@@ -310,11 +310,18 @@ func TestInteractor_RemoveMember(t *testing.T) {
 		UserID: loggedUser.ID, AccessLevel: entity.AccessLevelAdmin, AddedDate: time.Now().UTC(),
 	}
 
-	userToRemove := entity.User{ID: "userA", Username: "user_a"}
+	usersToRemove := []entity.User{
+		{ID: "userA", Username: "user_a"},
+		{ID: "userB", Username: "user_b"},
+	}
 
 	p := entity.NewProject("project-x", "Project X")
 	p.ID = someProjectID
-	p.Members = []entity.Member{adminMember, {UserID: userToRemove.ID}}
+	p.Members = []entity.Member{
+		adminMember,
+		{UserID: usersToRemove[0].ID},
+		{UserID: usersToRemove[1].ID},
+	}
 	p.Repository = entity.Repository{
 		Type:             entity.RepositoryTypeInternal,
 		InternalRepoName: "repo-A",
@@ -326,15 +333,18 @@ func TestInteractor_RemoveMember(t *testing.T) {
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
 	s.mocks.giteaService.EXPECT().
-		RemoveCollaborator(p.Repository.InternalRepoName, userToRemove.Username).
+		RemoveCollaborator(p.Repository.InternalRepoName, usersToRemove[0].Username).
+		Return(nil)
+	s.mocks.giteaService.EXPECT().
+		RemoveCollaborator(p.Repository.InternalRepoName, usersToRemove[1].Username).
 		Return(nil)
 
-	s.mocks.repo.EXPECT().RemoveMember(ctx, p.ID, userToRemove.ID).Return(nil)
+	s.mocks.repo.EXPECT().RemoveMembers(ctx, p.ID, usersToRemove).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
 
-	p, err := s.interactor.RemoveMember(ctx, project.RemoveMemberOption{
+	p, err := s.interactor.RemoveMembers(ctx, project.RemoveMembersOption{
 		ProjectID:  p.ID,
-		User:       userToRemove,
+		Users:      usersToRemove,
 		LoggedUser: loggedUser,
 	})
 
@@ -342,7 +352,7 @@ func TestInteractor_RemoveMember(t *testing.T) {
 	require.Equal(t, p, expectedProject)
 }
 
-func TestInteractor_RemoveMember_ErrNoMoreAdmins(t *testing.T) {
+func TestInteractor_RemoveMembers_ErrNoMoreAdmins(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
@@ -363,9 +373,9 @@ func TestInteractor_RemoveMember_ErrNoMoreAdmins(t *testing.T) {
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
 
-	p, err := s.interactor.RemoveMember(ctx, project.RemoveMemberOption{
+	p, err := s.interactor.RemoveMembers(ctx, project.RemoveMembersOption{
 		ProjectID:  p.ID,
-		User:       loggedUser,
+		Users:      []entity.User{loggedUser},
 		LoggedUser: loggedUser,
 	})
 
@@ -373,7 +383,7 @@ func TestInteractor_RemoveMember_ErrNoMoreAdmins(t *testing.T) {
 	require.Equal(t, entity.Project{}, p)
 }
 
-func TestInteractor_UpdateMember(t *testing.T) {
+func TestInteractor_UpdateMembers(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
@@ -390,11 +400,18 @@ func TestInteractor_UpdateMember(t *testing.T) {
 		UserID: loggedUser.ID, AccessLevel: entity.AccessLevelAdmin, AddedDate: time.Now().UTC(),
 	}
 
-	userToUpd := entity.User{ID: "userA", Username: "user_a"}
+	usersToUpd := []entity.User{
+		{ID: "userA", Username: "user_a"},
+		{ID: "userB", Username: "user_b"},
+	}
 
 	p := entity.NewProject("project-x", "Project X")
 	p.ID = someProjectID
-	p.Members = []entity.Member{adminMember, {UserID: userToUpd.ID}}
+	p.Members = []entity.Member{
+		adminMember,
+		{UserID: usersToUpd[0].ID},
+		{UserID: usersToUpd[1].ID},
+	}
 	p.Repository = entity.Repository{
 		Type:             entity.RepositoryTypeInternal,
 		InternalRepoName: "repo-A",
@@ -406,15 +423,18 @@ func TestInteractor_UpdateMember(t *testing.T) {
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
 	s.mocks.giteaService.EXPECT().
-		UpdateCollaboratorPermissions(p.Repository.InternalRepoName, userToUpd.Username, newAccessLevel).
+		UpdateCollaboratorPermissions(p.Repository.InternalRepoName, usersToUpd[0].Username, newAccessLevel).
+		Return(nil)
+	s.mocks.giteaService.EXPECT().
+		UpdateCollaboratorPermissions(p.Repository.InternalRepoName, usersToUpd[1].Username, newAccessLevel).
 		Return(nil)
 
-	s.mocks.repo.EXPECT().UpdateMemberAccessLevel(ctx, p.ID, userToUpd.ID, newAccessLevel).Return(nil)
+	s.mocks.repo.EXPECT().UpdateMembersAccessLevel(ctx, p.ID, usersToUpd, newAccessLevel).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
 
-	p, err := s.interactor.UpdateMember(ctx, project.UpdateMemberOption{
+	p, err := s.interactor.UpdateMembers(ctx, project.UpdateMembersOption{
 		ProjectID:   p.ID,
-		User:        userToUpd,
+		Users:       usersToUpd,
 		AccessLevel: newAccessLevel,
 		LoggedUser:  loggedUser,
 	})
@@ -423,7 +443,7 @@ func TestInteractor_UpdateMember(t *testing.T) {
 	require.Equal(t, p, expectedProject)
 }
 
-func TestInteractor_UpdateMember_ErrNoMoreAdmins(t *testing.T) {
+func TestInteractor_UpdateMembers_ErrNoMoreAdmins(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
@@ -446,9 +466,9 @@ func TestInteractor_UpdateMember_ErrNoMoreAdmins(t *testing.T) {
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
 
-	p, err := s.interactor.UpdateMember(ctx, project.UpdateMemberOption{
+	p, err := s.interactor.UpdateMembers(ctx, project.UpdateMembersOption{
 		ProjectID:   p.ID,
-		User:        loggedUser,
+		Users:       []entity.User{loggedUser},
 		AccessLevel: newAccessLevel,
 		LoggedUser:  loggedUser,
 	})

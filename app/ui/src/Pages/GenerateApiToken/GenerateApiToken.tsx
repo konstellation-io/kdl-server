@@ -82,10 +82,10 @@ function GenerateApiToken() {
       title="Please, write a name to generate your API token"
       subtitle="A new API token will be generated labeled with this name. You cannot set a custom token."
       actions={[
-        <ActionButton key="cancel" label="CANCEL" to={ROUTE.USER_API_TOKENS} />,
+        <ActionButton key="cancel" label="Cancel" to={ROUTE.USER_API_TOKENS} />,
         <ActionButton
           key="accept"
-          label="ACCEPT"
+          label="Accept"
           onClick={handleAcceptClick}
           disabled={!dataAddToken}
           primary

@@ -23,7 +23,7 @@ const SSHKey: FC<Props> = ({
       <p className={styles.copyPre}>TO SEE THE KEY, JUST</p>
       <Button
         className={styles.copy}
-        label="COPY IT"
+        label="Copy it"
         onClick={() => copyAndToast(key)}
         height={30}
       />

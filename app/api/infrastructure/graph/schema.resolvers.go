@@ -121,40 +121,40 @@ func (r *mutationResolver) AddMembers(ctx context.Context, input model.AddMember
 	return &p, err
 }
 
-func (r *mutationResolver) RemoveMember(ctx context.Context, input model.RemoveMemberInput) (*entity.Project, error) {
+func (r *mutationResolver) RemoveMembers(ctx context.Context, input model.RemoveMembersInput) (*entity.Project, error) {
 	loggedUser, err := r.getLoggedUser(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := r.users.GetByID(ctx, input.UserID)
+	users, err := r.users.FindByIDs(ctx, input.UserIds)
 	if err != nil {
 		return nil, err
 	}
 
-	p, err := r.projects.RemoveMember(ctx, project.RemoveMemberOption{
+	p, err := r.projects.RemoveMembers(ctx, project.RemoveMembersOption{
 		ProjectID:  input.ProjectID,
-		User:       user,
+		Users:      users,
 		LoggedUser: loggedUser,
 	})
 
 	return &p, err
 }
 
-func (r *mutationResolver) UpdateMember(ctx context.Context, input model.UpdateMemberInput) (*entity.Project, error) {
+func (r *mutationResolver) UpdateMembers(ctx context.Context, input model.UpdateMembersInput) (*entity.Project, error) {
 	loggedUser, err := r.getLoggedUser(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := r.users.GetByID(ctx, input.UserID)
+	users, err := r.users.FindByIDs(ctx, input.UserIds)
 	if err != nil {
 		return nil, err
 	}
 
-	p, err := r.projects.UpdateMember(ctx, project.UpdateMemberOption{
+	p, err := r.projects.UpdateMembers(ctx, project.UpdateMembersOption{
 		ProjectID:   input.ProjectID,
-		User:        user,
+		Users:       users,
 		AccessLevel: input.AccessLevel,
 		LoggedUser:  loggedUser,
 	})
@@ -222,11 +222,6 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 		return &entity.ToolUrls{}, err
 	}
 
-	droneWithFolder, err := kdlutil.JoinToURL(r.cfg.Drone.URL, "kdl", folderName)
-	if err != nil {
-		return &entity.ToolUrls{}, err
-	}
-
 	jupyterWithUsername := strings.Replace(r.cfg.Jupyter.URL, "USERNAME", slugUserName, 1)
 	jupyterWithUsernameAndFolder := strings.Replace(jupyterWithUsername, "REPO_FOLDER", folderName, 2)
 	vscodeWithUsername := strings.Replace(r.cfg.VSCode.URL, "USERNAME", slugUserName, 1)
@@ -237,7 +232,7 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 		Minio:   r.cfg.Minio.URL,
 		Jupyter: jupyterWithUsernameAndFolder,
 		VSCode:  vscodeWithUsernameAndFolder,
-		Drone:   droneWithFolder,
+		Drone:   r.cfg.Drone.URL,
 		MLFlow:  r.cfg.MLFlow.URL,
 	}, nil
 }

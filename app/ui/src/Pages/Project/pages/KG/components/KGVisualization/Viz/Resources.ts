@@ -1,9 +1,10 @@
 import { Coord, DComplete } from '../../../KGUtils';
 import { quadtree, Quadtree } from 'd3-quadtree';
 import { ScaleBand } from 'd3-scale';
-import { Selection, select } from 'd3-selection';
+import { select, Selection } from 'd3-selection';
 import { D } from './KGViz';
 import { scaleBand } from '@visx/scale';
+import { OrientationH, OrientationV } from './radialAxis/radialAxis';
 import vizStyles from '../KGVisualizationWrapper.module.scss';
 import { px } from 'Utils/d3';
 
@@ -20,6 +21,27 @@ const COLORS = {
 const x = (d: DComplete) => d.x;
 const y = (d: DComplete) => d.y;
 
+function getOrientations(
+  right: boolean,
+  bottom: boolean,
+  secondHalf: boolean
+): [OrientationV, OrientationH] {
+  let orientationV: OrientationV, orientationH: OrientationH;
+
+  if (right) {
+    orientationV = secondHalf ? OrientationV.BOTTOM : OrientationV.TOP;
+  } else {
+    orientationV = secondHalf ? OrientationV.TOP : OrientationV.BOTTOM;
+  }
+  if (bottom) {
+    orientationH = secondHalf ? OrientationH.LEFT : OrientationH.RIGHT;
+  } else {
+    orientationH = secondHalf ? OrientationH.RIGHT : OrientationH.LEFT;
+  }
+
+  return [orientationV, orientationH];
+}
+
 type Props = {
   data: DComplete[];
   canvas: HTMLCanvasElement;
@@ -29,7 +51,10 @@ type Props = {
   onResourceSelection: (id: string, name: string) => void;
   onHoverResource: (d: D | null) => void;
   updateActiveSection: (v: string | undefined) => void;
-  updateAxisOrientation: (v: string) => void;
+  updateAxisOrientation: (
+    newOrientationV: OrientationV,
+    newOrientationH: OrientationH
+  ) => void;
 };
 
 class Resources {
@@ -61,7 +86,7 @@ class Resources {
     this.context.clearRect(0, 0, this.props.width, this.props.height);
   };
 
-  initialize = () => {
+  initialize = (sectionScale: ScaleBand<string>) => {
     const {
       canvas,
       onMouseMove,
@@ -71,6 +96,7 @@ class Resources {
       data,
       draw,
     } = this;
+    this.sectionScale = sectionScale;
 
     qt.addAll(data);
 
@@ -242,7 +268,7 @@ class Resources {
       draw,
       sectionScale,
       getMouseAngle,
-      getTextAnchor,
+      getTextOrientations,
       props: {
         onHoverResource,
         center,
@@ -257,14 +283,14 @@ class Resources {
     const hovered = qt.find(dx, dy, 50);
 
     const { angle, realAngle } = getMouseAngle(dx, dy);
-    const textAnchor = getTextAnchor(realAngle);
+    const [orientationV, orientationH] = getTextOrientations(realAngle);
 
     const sliceSize = this.sectionScale.step();
     const sectionIndex = Math.floor(angle / sliceSize);
     const activeSection = sectionScale.domain()[sectionIndex];
 
     updateActiveSection(activeSection);
-    updateAxisOrientation(textAnchor);
+    updateAxisOrientation(orientationV, orientationH);
 
     this.isMouseMoving = true;
     this.hoveredResource = hovered || null;
@@ -300,25 +326,19 @@ class Resources {
     return { angle, realAngle };
   };
 
-  getTextAnchor = (angle: number) => {
-    let textAnchor = 'start';
-
+  getTextOrientations = (angle: number) => {
     const sliceSize = this.sectionScale.step();
 
     const rem = angle % sliceSize;
     const secondHalf = rem > sliceSize / 2;
 
     let bottom = angle > 90 && angle < 270;
+    let right = angle > 0 && angle < 180;
 
     if (bottom && secondHalf && angle + sliceSize / 2 > 270) bottom = false;
     if (bottom && !secondHalf && angle - sliceSize / 2 < 90) bottom = false;
 
-    if (bottom && secondHalf) textAnchor = 'end';
-    if (bottom && !secondHalf) textAnchor = 'start';
-    if (!bottom && secondHalf) textAnchor = 'start';
-    if (!bottom && !secondHalf) textAnchor = 'end';
-
-    return textAnchor;
+    return getOrientations(right, bottom, secondHalf);
   };
 
   onMouseDown = () => {

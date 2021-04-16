@@ -14,8 +14,8 @@ type Mutation {
   createProject(input: CreateProjectInput!): Project!
   updateProject(input: UpdateProjectInput!): Project!
   addMembers(input: AddMembersInput!): Project!
-  removeMember(input: RemoveMemberInput!): Project!
-  updateMember(input: UpdateMemberInput!): Project!
+  removeMembers(input: RemoveMembersInput!): Project!
+  updateMembers(input: UpdateMembersInput!): Project!
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
   setKGStarred(input: SetKGStarredInput!): SetKGStarredRes!
@@ -127,18 +127,18 @@ input AddMembersInput {
   userIds: [ID!]!
 }
 
-input RemoveMemberInput {
+input RemoveMembersInput {
   projectId: ID!
-  userId: ID!
+  userIds: [ID!]!
 }
 
 input RemoveApiTokenInput {
   apiTokenId: ID!
 }
 
-input UpdateMemberInput {
+input UpdateMembersInput {
   projectId: ID!
-  userId: ID!
+  userIds: [ID!]!
   accessLevel: AccessLevel!
 }
 

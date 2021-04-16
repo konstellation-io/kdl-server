@@ -4,7 +4,7 @@ import {
   GetKnowledgeGraphVariables,
 } from 'Graphql/queries/types/GetKnowledgeGraph';
 import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
-import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import React, { useCallback, useMemo, useEffect } from 'react';
 import { openedProject, resourceDetails } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { useQuery, useReactiveVar } from '@apollo/client';

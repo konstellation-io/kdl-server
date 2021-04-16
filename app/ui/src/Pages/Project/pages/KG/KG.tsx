@@ -9,7 +9,7 @@ import KGVisualizationWrapper from './components/KGVisualization/KGVisualization
 import React, { useMemo } from 'react';
 
 import { ProjectRoute } from '../../ProjectPanels';
-import { SpinnerCircular } from 'kwc';
+import { ErrorMessage, SpinnerCircular } from 'kwc';
 import { getSectionsAndNames, TopicSections } from './KGUtils';
 import { loader } from 'graphql.macro';
 import styles from './KG.module.scss';
@@ -25,7 +25,7 @@ export interface KGItem extends GetKnowledgeGraph_knowledgeGraph_items {
 }
 
 function KG({ openedProject }: ProjectRoute) {
-  const { data, loading } = useQuery<
+  const { data, error, loading } = useQuery<
     GetKnowledgeGraph,
     GetKnowledgeGraphVariables
   >(GetKnowledgeGraphQuery, {
@@ -66,8 +66,8 @@ function KG({ openedProject }: ProjectRoute) {
     kgItems
   );
 
-  if (data === undefined) return null;
   if (loading) return <SpinnerCircular />;
+  if (!data || error) return <ErrorMessage />;
 
   const filtersOrder = [...topTopics, 'Others'];
   const filtersOrderDict = Object.fromEntries(

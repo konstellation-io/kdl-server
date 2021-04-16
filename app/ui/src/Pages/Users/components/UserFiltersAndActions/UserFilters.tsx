@@ -3,7 +3,7 @@ import { SearchSelect, Select } from 'kwc';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import { GetUsers } from 'Graphql/queries/types/GetUsers';
-import { get } from 'lodash';
+import { get, capitalize } from 'lodash';
 import { loader } from 'graphql.macro';
 import styles from './UserFiltersAndActions.module.scss';
 import { useForm } from 'react-hook-form';
@@ -12,7 +12,7 @@ import useUserSettings from 'Graphql/client/hooks/useUserSettings';
 
 const GetUsersQuery = loader('Graphql/queries/getUsers.graphql');
 
-const types = Object.values(AccessLevel);
+const types = Object.values(AccessLevel).map((al) => capitalize(al));
 
 type FormData = {
   userEmail?: string;

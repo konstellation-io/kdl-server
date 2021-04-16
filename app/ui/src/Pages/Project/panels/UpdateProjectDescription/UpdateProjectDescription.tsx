@@ -85,13 +85,13 @@ function UpdateProjectDescription({ project, close }: Props) {
       </div>
       <ActionsBar className={styles.actions}>
         <Button
-          label="SAVE"
+          label="Save"
           onClick={handleSubmit(submit)}
           disabled={!completed && descriptionValue === project.description}
           success={completed}
           primary
         />
-        <Button label="CANCEL" onClick={close} />
+        <Button label="Cancel" onClick={close} />
       </ActionsBar>
     </div>
   );

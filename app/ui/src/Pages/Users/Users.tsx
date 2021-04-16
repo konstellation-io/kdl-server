@@ -87,6 +87,7 @@ function Users() {
           onAccept={modalInfo.current.action}
           onCancel={hideModal}
           actionButtonLabel={modalInfo.current.acceptLabel}
+          actionButtonCancel="Cancel"
           className={styles.modal}
           blocking
         >

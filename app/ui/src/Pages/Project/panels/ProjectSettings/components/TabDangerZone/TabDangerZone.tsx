@@ -10,10 +10,9 @@ import { toast } from 'react-toastify';
 
 type Props = {
   projectId: string;
-  archived: boolean;
 };
 
-function TabDangerZone({ projectId, archived }: Props) {
+function TabDangerZone({ projectId }: Props) {
   const {
     archiveProjectAction: { updateProjectArchived, loading },
   } = useProject({ onUpdateCompleted: handleUpdateCompleted });
@@ -34,8 +33,8 @@ function TabDangerZone({ projectId, archived }: Props) {
           access this project again after being archived, go to server projects and filter by ARCHIVED (by 
           default, archived projects are hidden)."
         action={{
-          label: 'ARCHIVE',
-          onClick: () => updateProjectArchived(projectId, !archived),
+          label: 'Archive',
+          onClick: () => updateProjectArchived(projectId, true),
           Icon: IconArchive,
           loading,
         }}

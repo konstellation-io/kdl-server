@@ -64,7 +64,8 @@ function Projects() {
       {showProjectAdmins !== null && (
         <ModalContainer
           title={showProjectAdmins.projectName}
-          actionButtonLabel="CLOSE"
+          actionButtonLabel="Close"
+          actionButtonCancel="Cancel"
           onAccept={() => setShowProjectAdmins(null)}
           className={styles.adminsModal}
           blocking

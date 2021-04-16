@@ -33,30 +33,32 @@ function KG({ openedProject }: ProjectRoute) {
   });
 
   const topTopics = useMemo(
-    () => data?.knowledgeGraph.topics.map((t) => t.name).slice(0, 9) || [],
+    () => data?.knowledgeGraph.topics.slice(0, 9) || [],
     [data]
   );
 
-  const kgItems: KGItem[] = useMemo(
-    () =>
+  const kgItems: KGItem[] = useMemo(() => {
+    const topTopicsName = topTopics.map((t) => t.name);
+    return (
       data?.knowledgeGraph.items.map((r) => {
         const mainTopic = r.topics[0];
-        const isInTop = topTopics.includes(mainTopic?.name);
+        const isInTop = topTopicsName.includes(mainTopic?.name);
         return {
           ...r,
           topic: isInTop
             ? mainTopic
             : { name: 'Others', relevance: 0, __typename: 'Topic' },
         };
-      }) || [],
-    [data, topTopics]
-  );
+      }) || []
+    );
+  }, [data, topTopics]);
 
   const [sections, topics]: [TopicSections, Topic[]] = useMemo(() => {
     const _sections = getSectionsAndNames(kgItems);
     const _topics: Topic[] = topTopics.map((topic) => ({
-      name: topic,
-      nResources: _sections[topic].length,
+      name: topic.name,
+      relevance: Math.round(topic.relevance * 100) / 100,
+      nResources: _sections[topic.name].length,
     }));
     return [_sections, _topics];
   }, [kgItems, topTopics]);

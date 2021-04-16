@@ -8,6 +8,7 @@
   align-items: center;
   border-left: solid 2px palette(base);
 
+
   .button {
     display: flex;
     align-items: center;
@@ -33,7 +34,7 @@
     z-index: 1;
     background-color: palette(base, 900);
     cursor: initial;
-    width: 46 * $grid-unit;
+    width: 54.5 * $grid-unit;
     border-radius: 0.75 * $grid-unit;
     overflow: hidden;
 

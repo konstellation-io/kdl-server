@@ -3,8 +3,9 @@ import styles from './TopicList.module.scss';
 import { Check } from 'kwc';
 import { Topic } from '../../../../Filters';
 import { scaleLinear } from '@visx/scale';
+import { extent } from 'd3-array';
 
-const COLOR_SCALE_COLORS = ['#0C3448', '#E52E3D'];
+const COLOR_SCALE_COLORS = ['#0C3448', '#D02F3F'];
 
 export interface TopicListProps {
   topics: Topic[];
@@ -13,11 +14,9 @@ export interface TopicListProps {
 }
 function TopicList({ topics, selectedTopics, onSelectOption }: TopicListProps) {
   const nPaperInTopics = topics.map((t) => t.nResources);
-  const min = Math.min(...nPaperInTopics);
-  const max = Math.max(...nPaperInTopics);
 
   const colorScale = scaleLinear({
-    domain: [min, max],
+    domain: extent(nPaperInTopics) as [number, number],
     range: COLOR_SCALE_COLORS,
   });
 

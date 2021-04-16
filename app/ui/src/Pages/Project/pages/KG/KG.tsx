@@ -25,7 +25,7 @@ export interface KGItem extends GetKnowledgeGraph_knowledgeGraph_items {
 }
 
 function KG({ openedProject }: ProjectRoute) {
-  const { data, loading } = useQuery<
+  const { data, error, loading } = useQuery<
     GetKnowledgeGraph,
     GetKnowledgeGraphVariables
   >(GetKnowledgeGraphQuery, {
@@ -67,7 +67,7 @@ function KG({ openedProject }: ProjectRoute) {
   );
 
   if (loading) return <SpinnerCircular />;
-  if (!data) return <ErrorMessage />;
+  if (!data || error) return <ErrorMessage />;
 
   const filtersOrder = [...topTopics, 'Others'];
   const filtersOrderDict = Object.fromEntries(

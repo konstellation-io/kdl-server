@@ -28,7 +28,7 @@ exports[`Panel component Component match snapshot 1`] = `
         >
           Some title
         </p>
-        <T
+        <P
           Icon={
             Object {
               "$$typeof": Symbol(react.memo),

@@ -63,7 +63,7 @@ function AddMembers({ projectId, users, members }: Props) {
         hideError
       />
       <Button
-        label="ADD"
+        label="Add"
         height={44}
         onClick={performAddMembers}
         disabled={!memberSelection.length}

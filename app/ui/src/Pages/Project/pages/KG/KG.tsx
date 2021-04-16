@@ -20,6 +20,12 @@ const GetKnowledgeGraphQuery = loader(
   'Graphql/queries/getKnowledgeGraph.graphql'
 );
 
+const topicOthers: GetKnowledgeGraph_knowledgeGraph_items_topics = {
+  name: 'Others',
+  relevance: 0,
+  __typename: 'Topic',
+};
+
 export interface KGItem extends GetKnowledgeGraph_knowledgeGraph_items {
   topic?: GetKnowledgeGraph_knowledgeGraph_items_topics;
 }
@@ -45,9 +51,7 @@ function KG({ openedProject }: ProjectRoute) {
         const isInTop = topTopicsName.includes(mainTopic?.name);
         return {
           ...r,
-          topic: isInTop
-            ? mainTopic
-            : { name: 'Others', relevance: 0, __typename: 'Topic' },
+          topic: isInTop ? mainTopic : topicOthers,
         };
       }) || []
     );
@@ -71,15 +75,15 @@ function KG({ openedProject }: ProjectRoute) {
   if (loading) return <SpinnerCircular />;
   if (!data || error) return <ErrorMessage />;
 
-  const filtersOrder = [...topTopics, 'Others'];
+  const filtersOrder = [...topTopics, topicOthers];
   const filtersOrderDict = Object.fromEntries(
-    filtersOrder.map((f, idx) => [f, idx])
+    filtersOrder.map((f, idx) => [f.name, idx])
   );
-  const sortFilters = (a: KGItem, b: KGItem) =>
+  const sortResources = (a: KGItem, b: KGItem) =>
     filtersOrderDict[a.topic?.name || ''] -
       filtersOrderDict[b.topic?.name || ''] ||
     (a.topic?.name || '').localeCompare(b.topic?.name || '');
-  filteredResources.sort(sortFilters);
+  filteredResources.sort(sortResources);
 
   return (
     <div className={styles.container}>

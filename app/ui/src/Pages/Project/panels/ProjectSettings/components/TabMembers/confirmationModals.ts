@@ -38,8 +38,8 @@ export function getModalInfo({
           : `The following member will be removed from the project:`;
       const acceptLabelDelete =
         nMembers > 1
-          ? `REMOVE ${nMembers} MEMBERS`
-          : `REMOVE ${nMembers} MEMBER`;
+          ? `Remove ${nMembers} members`
+          : `Remove ${nMembers} member`;
       return {
         action,
         title: 'Members deletion',
@@ -55,8 +55,8 @@ export function getModalInfo({
           : `The following member access levels will be updated to the level of ${accessLevel}:`;
       const acceptLabelUpdate =
         nMembers > 1
-          ? `CHANGE ${nMembers} MEMBERS`
-          : `CHANGE ${nMembers} MEMBER`;
+          ? `Change ${nMembers} members`
+          : `Change ${nMembers} member`;
       return {
         action,
         title: 'Members access level update',

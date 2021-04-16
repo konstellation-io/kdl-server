@@ -18,6 +18,7 @@ import { GetProjectMembers_project_members } from 'Graphql/queries/types/GetProj
 import MemberItem from './components/MemberItem/MemberItem';
 import DeleteIcon from '@material-ui/icons/Delete';
 import useBoolState from 'Hooks/useBoolState';
+import capitalize from 'lodash.capitalize';
 
 const accessLevelSeparator = () => (
   <Button
@@ -83,7 +84,7 @@ function ManageMembers({
   const removeMembersButton = () => (
     <Button
       key="remove"
-      label="REMOVE MEMBERS"
+      label="Remove members"
       onClick={showRemoveModal}
       className={styles.manageMemberButton}
       Icon={DeleteIcon}
@@ -94,7 +95,7 @@ function ManageMembers({
   const AccessLevelButton = (accessLevel: AccessLevel) => (
     <Button
       key={accessLevel}
-      label={accessLevel.toUpperCase()}
+      label={capitalize(accessLevel)}
       onClick={() => showAccessLevelModal(accessLevel)}
       className={styles.manageMemberButton}
       align={BUTTON_ALIGN.LEFT}
@@ -133,6 +134,7 @@ function ManageMembers({
           onAccept={modalInfo.current.action}
           onCancel={closeModal}
           actionButtonLabel={modalInfo.current.acceptLabel}
+          actionButtonCancel="Cancel"
           warning={modalInfo.current.warning}
           error={modalInfo.current.error}
           blocking

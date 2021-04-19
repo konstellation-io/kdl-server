@@ -8,7 +8,6 @@ import { useQuery, useReactiveVar } from '@apollo/client';
 
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { CONFIG } from 'index';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { GetProjects } from 'Graphql/queries/types/GetProjects';
 import NavigationSelector from '../NavigationSelector/NavigationSelector';
 import PersonIcon from '@material-ui/icons/Person';
@@ -64,7 +63,6 @@ function useBreadcrumbs() {
   crumbs.push({
     crumbText: CONFIG.SERVER_NAME,
     LeftIconComponent: <ServerIcon className="icon-regular" />,
-    RightIconComponent: ExpandMoreIcon,
     BottomComponent: (props: BottomComponentProps) => (
       <NavigationSelector options={serverSections} {...props} />
     ),
@@ -79,7 +77,6 @@ function useBreadcrumbs() {
       LeftIconComponent: (
         <ProjectIcon className="icon-regular" archived={archived} />
       ),
-      RightIconComponent: ExpandMoreIcon,
       BottomComponent: (props: BottomComponentProps) => (
         <ProjectSelector options={activeProjects} {...props} />
       ),
@@ -94,7 +91,6 @@ function useBreadcrumbs() {
       crumbs.push({
         crumbText,
         LeftIconComponent: <Icon className="icon-small" />,
-        RightIconComponent: ExpandMoreIcon,
         BottomComponent: (props: BottomComponentProps) => (
           <NavigationSelector options={allRoutes} {...props} />
         ),

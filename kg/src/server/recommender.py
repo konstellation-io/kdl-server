@@ -1,8 +1,8 @@
 import copy
-import faiss
 import logging
 import math
 
+import faiss
 import numpy as np
 import pandas as pd
 import torch
@@ -100,7 +100,7 @@ class Recommender:
         tokens = self._tokenize(processed_query)
         n_tokens = len(tokens['input_ids'][0])
 
-        if n_tokens <= 512:
+        if n_tokens <= self.tokenizer.model_max_length:
             query_token_vecs = self.model(input_ids=tokens['input_ids'].to(device),
                                           attention_mask=tokens['attention_mask'].to(device))[0].detach().squeeze()
             query_vector = torch.mean(query_token_vecs, dim=0).cpu().numpy().astype("float32")
@@ -136,9 +136,9 @@ class Recommender:
 
         similarity, idxs = self.vectors.search(query_vec, k=n_hits)
         df_subset = copy.copy(self.dataset.iloc[idxs[0].tolist()])
-        df_subset["distance"] = similarity[0]
+        df_subset["similarity"] = similarity[0]
         # Transform similarity to distance
-        df_subset["distance"] = df_subset.distance.apply(lambda x: 1 - x)
+        df_subset["distance"] = df_subset.similarity.apply(lambda x: 1 - x)
 
         df_subset["score"] = df_subset.distance.apply(self._compute_scores)
 

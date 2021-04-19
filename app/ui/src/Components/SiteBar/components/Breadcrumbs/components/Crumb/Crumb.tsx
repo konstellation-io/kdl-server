@@ -3,8 +3,7 @@ import styles from './Crumb.module.scss';
 import AnimateHeight from 'react-animate-height';
 import { useClickOutside } from 'kwc';
 import cx from 'classnames';
-import { OverridableComponent } from '@material-ui/core/OverridableComponent';
-import { SvgIconTypeMap } from '@material-ui/core';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 export interface BottomComponentProps {
   closeComponent: () => void;
@@ -12,21 +11,17 @@ export interface BottomComponentProps {
 export type CrumbProps = {
   crumbText: string;
   LeftIconComponent: React.ReactElement;
-  RightIconComponent?: OverridableComponent<SvgIconTypeMap<{}, 'svg'>>;
   BottomComponent: FC<BottomComponentProps>;
 };
 
-function Crumb({
-  crumbText,
-  LeftIconComponent,
-  RightIconComponent,
-  BottomComponent,
-}: CrumbProps) {
+function Crumb({ crumbText, LeftIconComponent, BottomComponent }: CrumbProps) {
   const crumbRef = useRef(null);
   const [showComponent, setShowComponent] = useState(false);
+  const hideComponent = () => setShowComponent(false);
+
   const { addClickOutsideEvents, removeClickOutsideEvents } = useClickOutside({
     componentRef: crumbRef,
-    action: () => setShowComponent(false),
+    action: hideComponent,
   });
 
   useEffect(() => {
@@ -42,20 +37,18 @@ function Crumb({
       >
         {LeftIconComponent}
         <span className={styles.crumbText}>{crumbText}</span>
-        {RightIconComponent && (
-          <RightIconComponent
-            className={cx(styles.rightIcon, 'icon-regular', {
-              [styles.opened]: showComponent,
-            })}
-          />
-        )}
+        <ExpandMoreIcon
+          className={cx(styles.rightIcon, 'icon-regular', {
+            [styles.opened]: showComponent,
+          })}
+        />
       </div>
       <AnimateHeight
         height={showComponent ? 'auto' : 0}
         duration={300}
         className={styles.content}
       >
-        <BottomComponent closeComponent={() => setShowComponent(false)} />
+        <BottomComponent closeComponent={hideComponent} />
       </AnimateHeight>
     </div>
   );

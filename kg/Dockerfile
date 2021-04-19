@@ -3,7 +3,7 @@ FROM python:3.9-slim
 # Create kdl user.
 ENV USER=kdl
 ENV UID=10001
-ENV ASSET_COMMIT="558ea7724d7ac7c4787856535372503e7c4bbf73"
+ENV ASSET_COMMIT="c5cd785ac260fd537f20edbead7b31e21741a69b"
 ENV REPO_URL="https://github.com/konstellation-io/kdl-server"
 ENV PYTHONPATH="/kg/src"
 

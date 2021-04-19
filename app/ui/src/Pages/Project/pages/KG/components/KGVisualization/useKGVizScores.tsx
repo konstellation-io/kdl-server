@@ -5,6 +5,9 @@ import { useReactiveVar } from '@apollo/client';
 import { kgScore } from 'Graphql/client/cache';
 import useKGFilters from 'Graphql/client/hooks/useKGFilters';
 
+const ZOOM_STEP_SIZE = 100; // The lower the size the higher the number of steps are
+const ZOOM_STEP_DIV = 8; // 100 / 8 = 12.5% -> amount of zoom that applies each step
+
 function useKGVizScores(data: D[]) {
   const scores = useReactiveVar(kgScore);
   const [borderScores, setBorderScores] = useState<[number, number]>([1, 0]);
@@ -51,24 +54,39 @@ function useKGVizScores(data: D[]) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, animating]);
 
-  function zoomScore(zoomAmount: number, pivotPosition: number) {
-    const [max, min] = scores;
-    const [maxScore, minScore] = borderScores;
-
-    const diff = max - min;
-    const rev = 1 / diff;
-    const dScore: number = zoomAmount / (500 * rev); // 50 000
-
+  function zoomScore(zoomAmountInPx: number, pivotPosition: number) {
+    // pivot position is used to keep the mouse over the hovered element:
+    //   if mouse is at min score, min score will not me affected by the zoom
+    //   if mouse is at 25% from min score, a 25% of zoom will be applied to min score
+    //     and a 75% to max score
     const scoreFactorMin = 1 - pivotPosition;
     const scoreFactorMax = pivotPosition;
 
-    const newMin = Math.min(
-      max,
-      Math.max(minScore, min + dScore * scoreFactorMin)
-    );
+    const [maxScore, minScore] = borderScores;
+    const [max, min] = scores;
+    const diff = max - min;
+
+    // Amount of zoom that each step applies (ex. 12.5% o a difference of 0.6 in scores)
+    const zoomMultPerStep = diff / ZOOM_STEP_DIV;
+
+    // Zooming in will decrease the distance between max and min zoom.
+    const isZoomingIn = zoomAmountInPx > 0;
+    const effectiveZoomMult = isZoomingIn
+      ? 1 - zoomMultPerStep
+      : 1 + zoomMultPerStep;
+
+    // We apply the zoom multiplier nStep times. An step is a normalization of the scroll pixels.
+    const nSteps = Math.ceil(Math.abs(zoomAmountInPx / ZOOM_STEP_SIZE));
+    const totalMultiplier = Math.pow(effectiveZoomMult, nSteps) - 1;
+
+    // Final multiplier is distributed between min and max scores
+    const minMultiplier = totalMultiplier * scoreFactorMin;
+    const maxMultiplier = totalMultiplier * scoreFactorMax;
+
+    const newMin = Math.min(max, Math.max(minScore, min + min * minMultiplier));
     const newMax = Math.max(
       newMin + 0.0001,
-      Math.min(maxScore, max - dScore * scoreFactorMax)
+      Math.min(maxScore, max - max * maxMultiplier)
     );
 
     updateScore([newMax, newMin]);

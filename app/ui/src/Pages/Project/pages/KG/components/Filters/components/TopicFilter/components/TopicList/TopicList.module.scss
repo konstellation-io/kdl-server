@@ -9,18 +9,18 @@
   margin: 2 * $grid-unit 0 0 4 * $grid-unit;
 
   .title {
-    @include font-caption
+    @include font-caption;
     color: font-color(regular);
     flex-grow: 1;
   }
 
   .paperCount {
-    @include font-caption
+    @include font-caption;
     color: font-color(regular);
   }
 
   .relevance {
-    @include font-caption
+    @include font-caption;
     color: font-color(regular);
     margin-left: 2 * $grid-unit;
   }
@@ -73,7 +73,7 @@
       }
 
       .relevance {
-        @include font-small
+        @include font-small;
         flex-shrink: 0;
         margin-left: 5 * $grid-unit;
         min-width: 5 * $grid-unit;

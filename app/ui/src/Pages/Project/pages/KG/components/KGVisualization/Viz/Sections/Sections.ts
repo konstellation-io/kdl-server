@@ -3,7 +3,9 @@ import { CoordData, CoordOptions, CoordOut, INNER_R } from '../KGViz';
 import { select, Selection } from 'd3-selection';
 import { ScaleBand } from 'd3-scale';
 
-const OFFSET_SECTION_GUIDES = 50;
+const OFFSET_SECTION_GUIDES = 65;
+const BOX_PADDING_V = 20;
+const BOX_LINE_HEIGHT = 8;
 
 class Sections {
   data: string[] = [];
@@ -129,10 +131,17 @@ class Sections {
       scores: [, minR],
     } = this;
 
-    return coord(
-      { category: d, score: minR },
-      { bisector: true, offset: OFFSET_SECTION_GUIDES }
-    ).y;
+    // We estimate the number of lines so we can have an estimation of the box height
+    const nTextLinesEstimation = Math.ceil(d.length / 10);
+    const boxHeight = BOX_PADDING_V + nTextLinesEstimation * BOX_LINE_HEIGHT;
+
+    return (
+      coord(
+        { category: d, score: minR },
+        { bisector: true, offset: OFFSET_SECTION_GUIDES }
+      ).y -
+      boxHeight / 2
+    );
   };
 }
 

@@ -37,9 +37,9 @@
 }
 
 .disabled {
-  display: block;
   pointer-events: none;
-  & .navButton {
+
+  .navButton, .label, .icon {
     color: palette(lowlight, 300);
     opacity: 0.5;
   }

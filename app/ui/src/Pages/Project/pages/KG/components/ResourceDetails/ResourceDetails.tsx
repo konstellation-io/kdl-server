@@ -147,7 +147,7 @@ function ResourceDetails({ resource, onClose }: Props) {
                 <div className={styles.sectionTitle}>CODE REPOSITORIES</div>
                 <div className={styles.repoUrlTextList}>
                   {resource.repoUrls.map((repoUrl) => (
-                    <div className={styles.urlRow}>
+                    <div className={styles.urlRow} key={repoUrl}>
                       <div className={styles.linkIcon}>
                         <IconLink className="icon-small" />
                       </div>

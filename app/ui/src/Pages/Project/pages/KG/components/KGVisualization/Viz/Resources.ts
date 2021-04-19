@@ -292,6 +292,7 @@ class Resources {
     updateActiveSection(activeSection);
     updateAxisOrientation(orientationV, orientationH);
 
+    this.hideTooltipLink = false;
     this.isMouseMoving = true;
     this.hoveredResource = hovered || null;
     onHoverResource(this.hoveredResource);

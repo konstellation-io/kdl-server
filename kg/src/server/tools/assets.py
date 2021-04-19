@@ -1,7 +1,7 @@
+import faiss
 import logging
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import transformers
 from transformers import PreTrainedModel, PreTrainedTokenizer
@@ -21,7 +21,7 @@ class AssetLoader:
         self.path = path
 
         self.dataset = self._merge_dataset_topics()
-        self.vectors = self._load_dataset_vectors()
+        self.vectors = self._load_vectors_index()
 
         self.model = self._load_model()
         self.tokenizer = self._load_tokenizer()
@@ -32,10 +32,10 @@ class AssetLoader:
         """
         Integrity checks for all the assets.
         """
-        if not len(self.dataset) == len(self.vectors):
+        if not len(self.dataset) == self.vectors.ntotal:
             message = (
                 f"The specified dataset (n={len(self.dataset)}) "
-                f"and the vectors (available for {len(self.vectors)} documents) do not match. "
+                f"and the vectors (available for {self.vectors.ntotal} documents) do not match. "
                 "Please check the inputs."
             )
             raise AssetLoadingException(message)
@@ -51,14 +51,14 @@ class AssetLoader:
 
         return df
 
-    def _load_dataset_vectors(self) -> np.ndarray:
+    def _load_vectors_index(self) -> faiss.IndexFlatL2:
         """
         Loads vectors from the dataset papers computed using the model.
         """
-        path = Path(self.path, "vectors.npy")
-        self.log.debug(f"Loading vectors from: {path}")
+        path = Path(self.path, "vectors.faiss")
+        self.log.debug(f"Loading vectors index from: {path}")
 
-        return np.load(str(path))
+        return faiss.read_index(str(path))
 
     def _load_topics(self) -> pd.DataFrame:
         """

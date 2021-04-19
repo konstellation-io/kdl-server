@@ -14,7 +14,7 @@ import cx from 'classnames';
 import navButtonStyles from './components/NavigationButton/NavigationButton.module.scss';
 import styles from './ProjectNavigation.module.scss';
 import { useReactiveVar } from '@apollo/client';
-import { primaryPanel } from '../../../../Graphql/client/cache';
+import { primaryPanel } from 'Graphql/client/cache';
 
 export const NavButtonLink: FC<any> = ({ children, ...props }) => {
   return (

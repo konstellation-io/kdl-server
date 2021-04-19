@@ -27,7 +27,11 @@ type WrapperProps = {
 };
 function KGVisualizationWrapper(props: WrapperProps) {
   return (
-    <ParentSize className={styles.container} debounceTime={10}>
+    <ParentSize
+      className={styles.container}
+      debounceTime={0}
+      enableDebounceLeadingCall={false}
+    >
       {({ width, height }) =>
         width &&
         height && <KGVisualization width={width} height={height} {...props} />

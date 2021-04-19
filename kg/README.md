@@ -15,64 +15,43 @@
     ├── pipe   # Test for data generation pipeline
     └── server # Test for grpc server
 ```
-## Server
-### Generate protobuf code
+## Installation
+
+### Faiss
+For the creation of the vector asset we use Faiss which is hard to install
+you can follow the instructions to build from source [here](https://github.com/facebookresearch/faiss/blob/master/INSTALL.md#building-from-source).
+
+Then you have to move the resulting build code to the site-packages of the python version
+where you want to use it.
+
+### Caveats with PyTorch versions
+The current installed version is a gpu+cpu version if you have any problems with your environment change the version
+to cpu only.
+
+### Local Installation
+- [Install pyenv](https://github.com/pyenv/pyenv#installation) to manage python versions
+- Install python version 3.9.1 ```pyenv install 3.9.1```
+- Set local python version ```pyenv local 3.9.1```
+- Install pipenv ```pip install pipenv```
+- Install dependencies ```pipenv install --dev```
+- Move the faiss build code to the virtualenv i.e.:
+  ```
+  cp -r build/faiss/python/build/lib/faiss ~/.local/share/virtualenvs/kdl-server/lib/python3.9/site-packages
+  ```
+
+## Generate protobuf code
 To generate the golang and python code you have to run the following script:
 ```bash
 # from kg directory
 bash scripts/generate_proto.sh
 ```
 
-### Asset download
-You have to install [dvc](https://dvc.org/doc/install)
+## Asset download
+You have to install [dvc](https://dvc.org/doc/install) or be inside the project virtualenv
 
 After that you have to run the following command:
 ```
 dvc pull
-```
-
-### Configuration
-Most of the configuration is done through environment variables:
-```bash
-# Mandatory
-KG_ASSET_ROUTE="/home/assets" # Asset route this is a mandatory variable
-
-# Server Settings
-KG_WORKERS=1 # Number of threads for the server defaults to 1
-KG_HOST="localhost" # Address for the server defaults to localhost
-KG_PORT=5555 # KG server port defaults to 5555
-
-# Recommender Settings
-KG_N_HITS=1000 # Number of outputs that the recommender outputs defaults to 1000
-
-# Log file
-KG_LOG_FILE="/var/log/kg.log" # Log file path defaults to /var/log/kg.log
-KG_LOG_LEVEL="INFO" # Log level defaults to info
-```
-
-### Run server
-
-Install the dependencies using `pipenv`:
-```
-pipenv install
-```
-
-and then run:
-```
-pipenv run python server/app.py
-```
-
-to run in minikube create dev environment:
-```
-kdlctl.sh dev
-```
-
-### Requests to the server
-To use this examples you will have to install [grpcurl](https://github.com/fullstorydev/grpcurl)
-```
-grpcurl -import-path .. -proto knowledge_graph.proto \
- -plaintext -d '{"description": "test"}'\
- localhost:5555 kg.KGService.GetGraph
 ```
 
 ### Testing and linters
@@ -108,7 +87,7 @@ mypy [file-to-analyze]
 To run the integration tests you have to set up a server:
 
 ```bash
-pipenv run python server/app.py
+pipenv run python src/server/app.py
 ```
 
 and then run:
@@ -116,33 +95,3 @@ and then run:
 ```bash
 pipenv run python -m pytest int
 ```
-### Caveats with PyTorch versions
-
-The current installed version is a gpu+cpu version if you have any problems with your environment change the version
-to cpu only.
-
-## Data pipeline:
-
-### Structure
-![pipeline](pipeline.svg)
-
-### Run data/asset creation:
-You have to install [dvc](https://dvc.org/doc/install) and then run to reproduce the full data pipeline:
-```
-dvc repro
-```
-
-The pipeline consists of the following steps:
-```
-check-inputs
-create-dataset
-compute-vectors
-compute-topics
-```
-
-You can rerun an specific step with the following command:
-```
-dvc repro [step-name]
-```
-
-

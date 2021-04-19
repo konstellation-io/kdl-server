@@ -14,6 +14,9 @@ exports[`Crumb component should render without crashing 1`] = `
     >
       foo
     </span>
+    <Memo(ForwardRef(ExpandMoreIcon))
+      className="rightIcon icon-regular"
+    />
   </div>
   <AnimateHeight
     animateOpacity={false}

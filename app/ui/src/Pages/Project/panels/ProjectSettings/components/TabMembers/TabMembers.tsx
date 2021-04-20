@@ -11,7 +11,6 @@ import { GetUsers } from 'Graphql/queries/types/GetUsers';
 import Member from './components/Member/Member';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
 import { PANEL_THEME } from 'Components/Layout/Panel/Panel';
-import { loader } from 'graphql.macro';
 import styles from './TabMembers.module.scss';
 import useMembers from 'Graphql/hooks/useMembers';
 import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
@@ -22,9 +21,9 @@ import { AccessLevel } from 'Graphql/types/globalTypes';
 import ManageMembers from './components/ManageMembers/ManageMembers';
 import AddMembers from './components/AddMembers/AddMembers';
 
-const GetMeQuery = loader('Graphql/queries/getMe.graphql');
-const GetUsersQuery = loader('Graphql/queries/getUsers.graphql');
-const GetMembersQuery = loader('Graphql/queries/getProjectMembers.graphql');
+import GetMeQuery from 'Graphql/queries/getMe';
+import GetUsersQuery from 'Graphql/queries/getUsers';
+import GetMembersQuery from 'Graphql/queries/getProjectMembers';
 
 type Props = {
   projectId: string;

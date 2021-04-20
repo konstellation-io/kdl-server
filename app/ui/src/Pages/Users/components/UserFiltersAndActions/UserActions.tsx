@@ -1,17 +1,13 @@
 import { Check, CustomOptionProps, Select } from 'kwc';
-import {
-  GET_USER_SETTINGS,
-  GetUserSettings,
-} from 'Graphql/client/queries/getUserSettings.graphql';
 import React, { FC } from 'react';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import { UserSelection } from 'Graphql/client/models/UserSettings';
 import cx from 'classnames';
-import { get } from 'lodash';
 import styles from './UserFiltersAndActions.module.scss';
-import { useQuery } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
 import useUserSettings from 'Graphql/client/hooks/useUserSettings';
+import { userSettings } from '../../../../Graphql/client/cache';
 
 type CheckSelectAllPros = {
   handleCheckClick: (value: boolean) => void;
@@ -51,14 +47,9 @@ type Props = {
 function UserActions({ onUpdateUsers }: Props) {
   const { changeUserSelection } = useUserSettings();
 
-  const { data: localData } = useQuery<GetUserSettings>(GET_USER_SETTINGS);
+  const { selectedUserIds, userSelection } = useReactiveVar(userSettings);
 
-  const nSelections = localData?.userSettings.selectedUserIds.length || 0;
-  const userSelection = get(
-    localData?.userSettings,
-    'userSelection',
-    UserSelection.NONE
-  );
+  const nSelections = selectedUserIds.length || 0;
 
   const nSelectionsText = `(${nSelections} selected)`;
 

@@ -1,25 +1,19 @@
 import { ErrorMessage, Select, SelectTheme, SpinnerCircular } from 'kwc';
-import {
-  GET_PROJECT_FILTERS,
-  GetProjectFilters,
-} from 'Graphql/client/queries/getProjectsFilters.graphql';
 
 import { GetProjects } from 'Graphql/queries/types/GetProjects';
 import { ProjectOrder } from 'Graphql/client/models/ProjectFilters';
 import React from 'react';
-import { loader } from 'graphql.macro';
 import styles from './ProjectsOrder.module.scss';
 import useProjectFilters from 'Graphql/client/hooks/useProjectFilters';
-import { useQuery } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
 
-const GetProjectsQuery = loader('Graphql/queries/getProjects.graphql');
+import GetProjectsQuery from 'Graphql/queries/getProjects';
+import { projectFilters } from '../../../../Graphql/client/cache';
 
 function ProjectsOrder() {
   const { data, error, loading } = useQuery<GetProjects>(GetProjectsQuery);
-  const { data: localData } = useQuery<GetProjectFilters>(GET_PROJECT_FILTERS);
+  const { order } = useReactiveVar(projectFilters);
   const { updateFilters } = useProjectFilters();
-
-  const filters = localData?.projectFilters;
 
   if (loading) return <SpinnerCircular />;
   if (error || !data) return <ErrorMessage />;
@@ -35,13 +29,15 @@ function ProjectsOrder() {
     <div className={styles.container}>
       <p className={styles.label}>SORT BY</p>
       <Select
-        onChange={(order: ProjectOrder) => updateFilters({ order })}
+        onChange={(newOrder: ProjectOrder) =>
+          updateFilters({ order: newOrder })
+        }
         label=""
         hideError
         options={options}
         theme={SelectTheme.DARK}
         defaultOption={ProjectOrder.CREATION}
-        formSelectedOption={filters?.order}
+        formSelectedOption={order}
         valuesMapper={optionsMapper}
       />
     </div>

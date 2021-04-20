@@ -1,8 +1,4 @@
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import {
-  GET_NEW_PROJECT,
-  GetNewProject,
-} from 'Graphql/client/queries/getNewProject.graphql';
 import React, { useEffect, useMemo, useState } from 'react';
 import RepositoryTypeComponent, {
   LOCATION,
@@ -17,15 +13,15 @@ import Repository from './pages/Repository/Repository';
 import RepositoryDetails from './pages/RepositoryDetails/RepositoryDetails';
 import { RepositoryType } from 'Graphql/types/globalTypes';
 import SidebarTop from 'Components/Layout/Page/DefaultPage/SidebarTop';
-import { SpinnerCircular } from 'kwc';
 import Stepper from 'Components/Stepper/Stepper';
 import Summary from './pages/Summary/Summary';
 import cx from 'classnames';
 import styles from './NewProject.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
-import { useQuery } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
 import { Prompt } from 'react-router-dom';
 import useUnloadPrompt from 'Hooks/useUnloadPrompt/useUnloadPrompt';
+import { newProject } from '../../Graphql/client/cache';
 
 enum Steps {
   INFORMATION,
@@ -74,10 +70,10 @@ function NewProject() {
   const [isPromptEnabled, setIsPromptEnabled] = useState(false);
 
   const { enableUnloadPrompt, disableUnloadPrompt } = useUnloadPrompt();
-  const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
+  const data = useReactiveVar(newProject);
 
   const { clearAll } = useNewProject('information');
-  const type = data?.newProject.repository.values.type || null;
+  const type = data.repository.values.type;
 
   const stepsWithData: (
     | StepNames.INFORMATION
@@ -114,16 +110,14 @@ function NewProject() {
   });
 
   useEffect(() => {
-    if (data) {
-      const isSomeInputDirty = stepsWithData.some((step) => {
-        const stepByIndex = data.newProject[step];
-        return (
-          stepByIndex &&
-          Object.values(stepByIndex.values).some((value) => !!value)
-        );
-      });
-      setIsFormDirty(isSomeInputDirty);
-    }
+    const isSomeInputDirty = stepsWithData.some((step) => {
+      const stepByIndex = data[step];
+      return (
+        stepByIndex &&
+        Object.values(stepByIndex.values).some((value) => !!value)
+      );
+    });
+    setIsFormDirty(isSomeInputDirty);
   }, [data, stepsWithData]);
 
   useEffect(() => {
@@ -134,7 +128,13 @@ function NewProject() {
       disableUnloadPrompt();
       setIsPromptEnabled(false);
     }
-  }, [isFormDirty, actStep]);
+  }, [
+    isFormDirty,
+    actStep,
+    enableUnloadPrompt,
+    disableUnloadPrompt,
+    setIsPromptEnabled,
+  ]);
 
   function getActions() {
     const onNextClick = () => {
@@ -174,14 +174,11 @@ function NewProject() {
     }
   }
 
-  if (!data) return <SpinnerCircular />;
-
   // Updates completed and error step states
   function validateStep() {
     const stepData = stepsWithData[actStep];
-    if (data && stepData !== null && actStep !== Steps.SUMMARY) {
-      // @ts-ignore
-      const actStepData = data.newProject[stepData];
+    if (stepData !== null && actStep !== Steps.SUMMARY) {
+      const actStepData = data[stepData];
 
       const error =
         actStepData.errors && Object.values(actStepData.errors).some((e) => e);

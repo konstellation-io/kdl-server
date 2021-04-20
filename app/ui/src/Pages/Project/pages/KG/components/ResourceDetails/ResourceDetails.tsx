@@ -17,16 +17,13 @@ import { RouteProjectParams } from 'Constants/routes';
 import Score from '../KGVisualization/Score/Score';
 import URL from 'Components/URL/URL';
 import cx from 'classnames';
-import { loader } from 'graphql.macro';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 import styles from './ResourceDetails.module.scss';
 import { useMutation } from '@apollo/client';
 import { useParams } from 'react-router';
 import useBoolState from 'Hooks/useBoolState';
 
-const SetStarredKGItemMutation = loader(
-  'Graphql/mutations/setStarredKGItem.graphql'
-);
+import SetStarredKGItemMutation from 'Graphql/mutations/setStarredKGItem';
 
 function formatAbstract(abstract: string, completed: boolean) {
   return completed ? abstract : `${abstract.slice(0, 350)}...`;

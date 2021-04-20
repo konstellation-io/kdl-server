@@ -1,9 +1,9 @@
 import Filters, { Topic } from './components/Filters/Filters';
 import {
   GetKnowledgeGraph,
-  GetKnowledgeGraphVariables,
   GetKnowledgeGraph_knowledgeGraph_items,
   GetKnowledgeGraph_knowledgeGraph_items_topics,
+  GetKnowledgeGraphVariables,
 } from 'Graphql/queries/types/GetKnowledgeGraph';
 import KGVisualizationWrapper from './components/KGVisualization/KGVisualizationWrapper';
 import React, { useMemo } from 'react';
@@ -11,14 +11,11 @@ import React, { useMemo } from 'react';
 import { ProjectRoute } from '../../ProjectPanels';
 import { ErrorMessage, SpinnerCircular } from 'kwc';
 import { getSectionsAndNames, TopicSections } from './KGUtils';
-import { loader } from 'graphql.macro';
 import styles from './KG.module.scss';
 import useKGFilters from './components/useKGFilters';
 import { useQuery } from '@apollo/client';
 
-const GetKnowledgeGraphQuery = loader(
-  'Graphql/queries/getKnowledgeGraph.graphql'
-);
+import GetKnowledgeGraphQuery from 'Graphql/queries/getKnowledgeGraph';
 
 const topicOthers: GetKnowledgeGraph_knowledgeGraph_items_topics = {
   name: 'Others',

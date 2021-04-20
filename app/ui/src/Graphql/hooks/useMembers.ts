@@ -10,12 +10,11 @@ import {
 } from 'Graphql/mutations/types/UpdateMembers';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
-import { loader } from 'graphql.macro';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 
-const UpdateMembersMutation = loader('Graphql/mutations/updateMembers.graphql');
-const RemoveMembersMutation = loader('Graphql/mutations/removeMembers.graphql');
-const AddMembersMutation = loader('Graphql/mutations/addMembers.graphql');
+import UpdateMembersMutation from 'Graphql/mutations/updateMembers';
+import RemoveMembersMutation from 'Graphql/mutations/removeMembers';
+import AddMembersMutation from 'Graphql/mutations/addMembers';
 
 type Options = {
   onCompleteAdd?: () => void;

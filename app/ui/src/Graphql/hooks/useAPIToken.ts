@@ -1,20 +1,19 @@
 import {
   AddApiToken,
   AddApiTokenVariables,
-} from './../mutations/types/AddApiToken';
+} from 'Graphql/mutations/types/AddApiToken';
 import { ApolloCache, FetchResult, useMutation } from '@apollo/client';
 import { GetMe, GetMe_me } from 'Graphql/queries/types/GetMe';
 
-import { RemoveApiToken } from 'Graphql/mutations/types/RemoveApiToken';
-import { RemoveApiTokenVariables } from './../mutations/types/RemoveApiToken';
-import { loader } from 'graphql.macro';
+import {
+  RemoveApiToken,
+  RemoveApiTokenVariables,
+} from 'Graphql/mutations/types/RemoveApiToken';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 
-const AddApiTokenMutation = loader('Graphql/mutations/addApiToken.graphql');
-const RemoveApiTokenMutation = loader(
-  'Graphql/mutations/removeApiToken.graphql'
-);
-const GetMeQuery = loader('Graphql/queries/getMe.graphql');
+import AddApiTokenMutation from 'Graphql/mutations/addApiToken';
+import RemoveApiTokenMutation from 'Graphql/mutations/removeApiToken';
+import GetMeQuery from 'Graphql/queries/getMe';
 
 export default function useAPIToken() {
   const [mutationAddApiToken, { loading, data }] = useMutation<

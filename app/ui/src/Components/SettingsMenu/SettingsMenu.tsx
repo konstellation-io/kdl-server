@@ -11,11 +11,10 @@ import { useHistory } from 'react-router-dom';
 
 import { GetMe } from 'Graphql/queries/types/GetMe';
 import KeyIcon from '@material-ui/icons/VpnKey';
-import { loader } from 'graphql.macro';
 import styles from './SettingsMenu.module.scss';
 import { useQuery } from '@apollo/client';
 
-const GetMeQuery = loader('Graphql/queries/getMe.graphql');
+import GetMeQuery from 'Graphql/queries/getMe';
 
 function SettingsMenu() {
   const history = useHistory();

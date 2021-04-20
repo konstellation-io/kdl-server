@@ -3,13 +3,10 @@ import {
   SetActiveUserToolsVariables,
 } from '../mutations/types/SetActiveUserTools';
 
-import { loader } from 'graphql.macro';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 import { useMutation } from '@apollo/client';
 
-const SetActiveProjectToolsMutation = loader(
-  'Graphql/mutations/setActiveUserTools.graphql'
-);
+import SetActiveProjectToolsMutation from 'Graphql/mutations/setActiveUserTools';
 
 export default function useTool() {
   const [mutationSetActiveProjectTools, { loading }] = useMutation<

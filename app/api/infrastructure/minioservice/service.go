@@ -12,7 +12,6 @@ import (
 
 var (
 	ErrBucketAlreadyExists = errors.New("bucket already exists in Minio")
-	ErrChangingBucketName  = errors.New("impossible change bucket name")
 )
 
 type minioService struct {

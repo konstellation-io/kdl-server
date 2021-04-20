@@ -194,24 +194,6 @@ func (m *projectMongoDBRepo) UpdateArchived(ctx context.Context, projectID strin
 	return m.updateProjectFields(ctx, projectID, bson.M{"archived": archived})
 }
 
-func (m *projectMongoDBRepo) UpdateInternalRepo(ctx context.Context, projectID, internalRepoName string) error {
-	fields := bson.M{
-		"internal_repo_name": internalRepoName,
-		"repo_name":          internalRepoName,
-	}
-
-	return m.updateProjectFields(ctx, projectID, fields)
-}
-
-func (m *projectMongoDBRepo) UpdateExternalRepo(ctx context.Context, projectID, externalRepoURL, repoName string) error {
-	fields := bson.M{
-		"external_repo_url": externalRepoURL,
-		"repo_name":         repoName,
-	}
-
-	return m.updateProjectFields(ctx, projectID, fields)
-}
-
 // SetStarredKGItem adds a kgItem to starred list.
 func (m *projectMongoDBRepo) SetStarredKGItem(ctx context.Context, projectID, kgItemID string) error {
 	m.logger.Debugf("Starring %s in project \"%s\"...", kgItemID, projectID)

@@ -29,10 +29,6 @@ type CreateProjectInput struct {
 	Repository  *RepositoryInput `json:"repository"`
 }
 
-type ExternalRepository struct {
-	Username string `json:"username"`
-}
-
 type ExternalRepositoryInput struct {
 	URL      string `json:"url"`
 	Username string `json:"username"`

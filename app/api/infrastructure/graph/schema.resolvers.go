@@ -317,10 +317,6 @@ func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (s
 	return "", nil
 }
 
-func (r *repositoryResolver) External(ctx context.Context, obj *entity.Repository) (*model.ExternalRepository, error) {
-	return &model.ExternalRepository{Username: obj.ExternalRepoUsername}, nil
-}
-
 func (r *sSHKeyResolver) CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error) {
 	return obj.CreationDate.Format(time.RFC3339), nil
 }

@@ -212,11 +212,6 @@ type Repository {
   type: RepositoryType!
   url: String!
   error: String
-  external: ExternalRepository
-}
-
-type ExternalRepository {
-  username: String!
 }
 
 enum RepositoryType {

@@ -57,10 +57,6 @@ type ComplexityRoot struct {
 		Token        func(childComplexity int) int
 	}
 
-	ExternalRepository struct {
-		Username func(childComplexity int) int
-	}
-
 	KnowledgeGraph struct {
 		Items  func(childComplexity int) int
 		Topics func(childComplexity int) int
@@ -133,10 +129,9 @@ type ComplexityRoot struct {
 	}
 
 	Repository struct {
-		Error    func(childComplexity int) int
-		External func(childComplexity int) int
-		Type     func(childComplexity int) int
-		URL      func(childComplexity int) int
+		Error func(childComplexity int) int
+		Type  func(childComplexity int) int
+		URL   func(childComplexity int) int
 	}
 
 	SSHKey struct {
@@ -218,8 +213,6 @@ type QueryResolver interface {
 }
 type RepositoryResolver interface {
 	URL(ctx context.Context, obj *entity.Repository) (string, error)
-
-	External(ctx context.Context, obj *entity.Repository) (*model.ExternalRepository, error)
 }
 type SSHKeyResolver interface {
 	CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error)
@@ -282,13 +275,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.APIToken.Token(childComplexity), true
-
-	case "ExternalRepository.username":
-		if e.complexity.ExternalRepository.Username == nil {
-			break
-		}
-
-		return e.complexity.ExternalRepository.Username(childComplexity), true
 
 	case "KnowledgeGraph.items":
 		if e.complexity.KnowledgeGraph.Items == nil {
@@ -716,13 +702,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Repository.Error(childComplexity), true
-
-	case "Repository.external":
-		if e.complexity.Repository.External == nil {
-			break
-		}
-
-		return e.complexity.Repository.External(childComplexity), true
 
 	case "Repository.type":
 		if e.complexity.Repository.Type == nil {
@@ -1184,11 +1163,6 @@ type Repository {
   type: RepositoryType!
   url: String!
   error: String
-  external: ExternalRepository
-}
-
-type ExternalRepository {
-  username: String!
 }
 
 enum RepositoryType {
@@ -1634,41 +1608,6 @@ func (ec *executionContext) _ApiToken_token(ctx context.Context, field graphql.C
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Token, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _ExternalRepository_username(ctx context.Context, field graphql.CollectedField, obj *model.ExternalRepository) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "ExternalRepository",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Username, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3686,38 +3625,6 @@ func (ec *executionContext) _Repository_error(ctx context.Context, field graphql
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Repository_external(ctx context.Context, field graphql.CollectedField, obj *entity.Repository) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Repository",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Repository().External(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.ExternalRepository)
-	fc.Result = res
-	return ec.marshalOExternalRepository2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐExternalRepository(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _SSHKey_public(ctx context.Context, field graphql.CollectedField, obj *entity.SSHKey) (ret graphql.Marshaler) {
@@ -6184,33 +6091,6 @@ func (ec *executionContext) _ApiToken(ctx context.Context, sel ast.SelectionSet,
 	return out
 }
 
-var externalRepositoryImplementors = []string{"ExternalRepository"}
-
-func (ec *executionContext) _ExternalRepository(ctx context.Context, sel ast.SelectionSet, obj *model.ExternalRepository) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, externalRepositoryImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ExternalRepository")
-		case "username":
-			out.Values[i] = ec._ExternalRepository_username(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var knowledgeGraphImplementors = []string{"KnowledgeGraph"}
 
 func (ec *executionContext) _KnowledgeGraph(ctx context.Context, sel ast.SelectionSet, obj *entity.KnowledgeGraph) graphql.Marshaler {
@@ -6740,17 +6620,6 @@ func (ec *executionContext) _Repository(ctx context.Context, sel ast.SelectionSe
 			})
 		case "error":
 			out.Values[i] = ec._Repository_error(ctx, field, obj)
-		case "external":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Repository_external(ctx, field, obj)
-				return res
-			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8147,13 +8016,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
-}
-
-func (ec *executionContext) marshalOExternalRepository2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐExternalRepository(ctx context.Context, sel ast.SelectionSet, v *model.ExternalRepository) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._ExternalRepository(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOExternalRepositoryInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐExternalRepositoryInput(ctx context.Context, v interface{}) (*model.ExternalRepositoryInput, error) {

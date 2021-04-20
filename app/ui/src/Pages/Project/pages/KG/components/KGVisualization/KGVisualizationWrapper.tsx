@@ -132,7 +132,7 @@ function KGVisualization({ width, height, data }: Props) {
       let mouseR = getMouseR(e);
 
       const mouseInScale = mouseR - INNER_R;
-      const mousePivot = mouseInScale / SCORE_R;
+      const mousePivot = Math.max(0, Math.min(1, mouseInScale / SCORE_R));
 
       zoomScore(e.deltaY, mousePivot);
       setHoveredPaper(null);

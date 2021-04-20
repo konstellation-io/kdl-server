@@ -10,15 +10,10 @@ import (
 
 // UpdateProjectOption options when updating a project member.
 type UpdateProjectOption struct {
-	ProjectID            string
-	Name                 *string
-	Description          *string
-	Archived             *bool
-	RepoType             *entity.RepositoryType
-	InternalRepoName     *string
-	ExternalRepoURL      *string
-	ExternalRepoUsername *string
-	ExternalRepoToken    *string
+	ProjectID   string
+	Name        *string
+	Description *string
+	Archived    *bool
 }
 
 // UpdateMembersOption options when updating a project member.

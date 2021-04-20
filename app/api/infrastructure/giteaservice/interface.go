@@ -17,5 +17,4 @@ type GiteaClient interface {
 	UpdateUserPermissions(username, email string, level entity.AccessLevel) error
 	MirrorRepo(url, repoName, userName, userToken string) error
 	FindAllUsers() ([]entity.User, error)
-	UpdateRepoName(oldRepoName, newRepoName string) error
 }

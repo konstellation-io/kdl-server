@@ -23,9 +23,8 @@ var (
 	ErrCreateProjectValidation = errors.New("create project validation error")
 	// This regexp extracts the repository name from a https URL like:
 	//  https://github.com/konstellation-io/kre.git
-	repoNameRegexp     = regexp.MustCompile(`([^/]+)\.git$`)
-	ErrInvalidRepoURL  = errors.New("the repository URL is invalid")
-	ErrRepoNameMissing = errors.New("repository name is missing")
+	repoNameRegexp    = regexp.MustCompile(`([^/]+)\.git$`)
+	ErrInvalidRepoURL = errors.New("the repository URL is invalid")
 )
 
 // CreateProjectOption options when creating project.
@@ -230,13 +229,6 @@ func (i interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity
 		}
 	}
 
-	if opt.RepoType != nil {
-		err := i.updateRepoData(ctx, opt)
-		if err != nil {
-			return entity.Project{}, err
-		}
-	}
-
 	return i.repo.Get(ctx, opt.ProjectID)
 }
 
@@ -262,87 +254,4 @@ func (i interactor) getRepoNameFromURL(url string) (string, error) {
 	}
 
 	return matches[1], nil
-}
-
-// updateRepoData updates the repo data (name for internal; url, username and token for external).
-func (i interactor) updateRepoData(ctx context.Context, opt UpdateProjectOption) error {
-	// get repo data
-	repo, err := i.repo.Get(ctx, opt.ProjectID)
-	if err != nil {
-		return err
-	}
-
-	if repo.Repository.Type != *opt.RepoType {
-		return entity.ErrInvalidRepoType
-	}
-
-	oldRepoName := ""
-	newRepoName := ""
-
-	switch *opt.RepoType {
-	case entity.RepositoryTypeInternal:
-		if !kdlutil.IsNilOrEmpty(opt.InternalRepoName) {
-			oldRepoName = repo.Repository.InternalRepoName
-			newRepoName = *opt.InternalRepoName
-
-			err = i.repo.UpdateInternalRepo(ctx, opt.ProjectID, *opt.InternalRepoName)
-			if err != nil {
-				return err
-			}
-		} else {
-			return ErrRepoNameMissing
-		}
-
-	case entity.RepositoryTypeExternal:
-		if !kdlutil.IsNilOrEmpty(opt.ExternalRepoURL) {
-			oldRepoName = repo.Repository.RepoName
-
-			newRepoName, err = i.getRepoNameFromURL(*opt.ExternalRepoURL)
-			if err != nil {
-				return err
-			}
-
-			err := i.repo.UpdateExternalRepo(ctx, opt.ProjectID, *opt.ExternalRepoURL, newRepoName)
-			if err != nil {
-				return err
-			}
-		}
-
-		if !kdlutil.IsNilOrEmpty(opt.ExternalRepoUsername) {
-			i.logger.Infof("Not implemented")
-		}
-
-		if !kdlutil.IsNilOrEmpty(opt.ExternalRepoToken) {
-			i.logger.Infof("Not implemented")
-		}
-	}
-
-	if oldRepoName != "" && newRepoName != "" {
-		return i.updateRepoName(oldRepoName, newRepoName)
-	}
-
-	return nil
-}
-
-// updateRepoName updates the repo name in gitea, minio and drone.
-func (i interactor) updateRepoName(oldRepoName, newRepoName string) error {
-	// update gitea repo
-	err := i.giteaService.UpdateRepoName(oldRepoName, newRepoName)
-	if err != nil {
-		return err
-	}
-
-	// update minio bucket
-	err = i.minioService.UpdateBucketName(oldRepoName, newRepoName)
-	if err != nil {
-		return err
-	}
-
-	// update drone repository
-	err = i.droneService.ActivateRepository(newRepoName)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

@@ -95,16 +95,6 @@ type UpdateAccessLevelInput struct {
 	AccessLevel entity.AccessLevel `json:"accessLevel"`
 }
 
-type UpdateExternalRepositoryInput struct {
-	URL      string  `json:"url"`
-	Username string  `json:"username"`
-	Token    *string `json:"token"`
-}
-
-type UpdateInternalRepositoryInput struct {
-	Name string `json:"name"`
-}
-
 type UpdateMembersInput struct {
 	ProjectID   string             `json:"projectId"`
 	UserIds     []string           `json:"userIds"`
@@ -112,15 +102,8 @@ type UpdateMembersInput struct {
 }
 
 type UpdateProjectInput struct {
-	ID          string                        `json:"id"`
-	Name        *string                       `json:"name"`
-	Description *string                       `json:"description"`
-	Repository  *UpdateProjectRepositoryInput `json:"repository"`
-	Archived    *bool                         `json:"archived"`
-}
-
-type UpdateProjectRepositoryInput struct {
-	Type     entity.RepositoryType          `json:"type"`
-	External *UpdateExternalRepositoryInput `json:"external"`
-	Internal *UpdateInternalRepositoryInput `json:"internal"`
+	ID          string  `json:"id"`
+	Name        *string `json:"name"`
+	Description *string `json:"description"`
+	Archived    *bool   `json:"archived"`
 }

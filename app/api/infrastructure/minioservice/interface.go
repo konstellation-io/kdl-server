@@ -5,5 +5,4 @@ package minioservice
 // MinioService defines all Minio operations.
 type MinioService interface {
 	CreateBucket(bucketName string) error
-	UpdateBucketName(oldBucketName, newBucketName string) error
 }

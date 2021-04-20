@@ -3,21 +3,48 @@
 ## Structure
 ![pipeline](pipeline.svg)
 
-## Run data/asset creation:
-You have to install [dvc](https://dvc.org/doc/install) and then run to reproduce the full data pipeline:
+## Run data/asset creation
+First you have to execute the download script to get the latest versions of the inputs:
 ```
-dvc repro
+pipenv run src/pipe/download_datasets.py
+```
+
+To run the entire dataset update dataset:
+```
+pipenv run dvc repro
 ```
 
 The pipeline consists of the following steps:
 ```
 check-inputs
 create-dataset
+train-transformer (freezed)
+train-topics (freezed)
 compute-vectors
 compute-topics
 ```
 
-You can rerun an specific step with the following command:
+To unfreeze the training steps:
 ```
-dvc repro [step-name]
+dvc unfreeze [training-step-name]
 ```
+## Update and store data
+
+Once you have run the pipeline you can commit your current data using:
+```
+dvc commit
+```
+This will commit in dvc the current version of output data.
+
+After that you can store in an external storage:
+```
+dvc push -r s3
+```
+Now you can version the dvc.lock file with git and push it to the remote repo:
+```
+git add dvc.lock
+git commit ...
+git push origin ...
+```
+After this you have to update ```Dockerfile``` variable ```ASSET_COMMIT``` with your last
+commit hash.

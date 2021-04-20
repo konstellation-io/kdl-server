@@ -112,7 +112,6 @@ input UpdateProjectInput {
   id: ID!
   name: String
   description: String
-  repository: UpdateProjectRepositoryInput
   archived: Boolean
 }
 
@@ -140,22 +139,6 @@ input UpdateMembersInput {
   projectId: ID!
   userIds: [ID!]!
   accessLevel: AccessLevel!
-}
-
-input UpdateProjectRepositoryInput {
-  type: RepositoryType!
-  external: UpdateExternalRepositoryInput
-  internal: UpdateInternalRepositoryInput
-}
-
-input UpdateInternalRepositoryInput {
-  name: String!
-}
-
-input UpdateExternalRepositoryInput {
-  url: String!
-  username: String!
-  token: String
 }
 
 input RemoveUsersInput {

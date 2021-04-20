@@ -5,31 +5,33 @@ import {
   GetKnowledgeGraph_knowledgeGraph_items,
   GetKnowledgeGraph_knowledgeGraph_items_topics,
 } from 'Graphql/queries/types/GetKnowledgeGraph';
-import KGVisualization, {
-  TopicSections,
-} from './components/KGVisualization/KGVisualization';
+import KGVisualizationWrapper from './components/KGVisualization/KGVisualizationWrapper';
 import React, { useMemo } from 'react';
 
 import { ProjectRoute } from '../../ProjectPanels';
-import { SpinnerCircular } from 'kwc';
-import { getSectionsAndNames } from './KGUtils';
+import { ErrorMessage, SpinnerCircular } from 'kwc';
+import { getSectionsAndNames, TopicSections } from './KGUtils';
 import { loader } from 'graphql.macro';
 import styles from './KG.module.scss';
 import useKGFilters from './components/useKGFilters';
 import { useQuery } from '@apollo/client';
 
-const selectedResource = 'My project';
-
 const GetKnowledgeGraphQuery = loader(
   'Graphql/queries/getKnowledgeGraph.graphql'
 );
+
+const topicOthers: GetKnowledgeGraph_knowledgeGraph_items_topics = {
+  name: 'Others',
+  relevance: 0,
+  __typename: 'Topic',
+};
 
 export interface KGItem extends GetKnowledgeGraph_knowledgeGraph_items {
   topic?: GetKnowledgeGraph_knowledgeGraph_items_topics;
 }
 
 function KG({ openedProject }: ProjectRoute) {
-  const { data, loading } = useQuery<
+  const { data, error, loading } = useQuery<
     GetKnowledgeGraph,
     GetKnowledgeGraphVariables
   >(GetKnowledgeGraphQuery, {
@@ -37,53 +39,51 @@ function KG({ openedProject }: ProjectRoute) {
   });
 
   const topTopics = useMemo(
-    () => data?.knowledgeGraph.topics.map((t) => t.name).slice(0, 9) || [],
+    () => data?.knowledgeGraph.topics.slice(0, 9) || [],
     [data]
   );
 
-  const kgItems: KGItem[] = useMemo(
-    () =>
+  const kgItems: KGItem[] = useMemo(() => {
+    const topTopicsName = topTopics.map((t) => t.name);
+    return (
       data?.knowledgeGraph.items.map((r) => {
         const mainTopic = r.topics[0];
-        const isInTop = topTopics.includes(mainTopic?.name);
+        const isInTop = topTopicsName.includes(mainTopic?.name);
         return {
           ...r,
-          topic: isInTop
-            ? mainTopic
-            : { name: 'Others', relevance: 0, __typename: 'Topic' },
+          topic: isInTop ? mainTopic : topicOthers,
         };
-      }) || [],
-    [data, topTopics]
-  );
+      }) || []
+    );
+  }, [data, topTopics]);
 
   const [sections, topics]: [TopicSections, Topic[]] = useMemo(() => {
     const _sections = getSectionsAndNames(kgItems);
     const _topics: Topic[] = topTopics.map((topic) => ({
-      name: topic,
-      nResources: _sections[topic].length,
+      name: topic.name,
+      relevance: Math.round(topic.relevance * 100) / 100,
+      nResources: _sections[topic.name].length,
     }));
     return [_sections, _topics];
   }, [kgItems, topTopics]);
 
-  const {
-    handleFiltersChange,
-    filteredResources,
-    filteredSections,
-    filters,
-  } = useKGFilters(sections, kgItems);
-
-  if (data === undefined) return null;
-  if (loading) return <SpinnerCircular />;
-
-  const filtersOrder = [...topTopics, 'Others'];
-  const filtersOrderDict = Object.fromEntries(
-    filtersOrder.map((f, idx) => [f, idx])
+  const { handleFiltersChange, filteredResources, filters } = useKGFilters(
+    sections,
+    kgItems
   );
-  const sortFilters = (a: KGItem, b: KGItem) =>
+
+  if (loading) return <SpinnerCircular />;
+  if (!data || error) return <ErrorMessage />;
+
+  const filtersOrder = [...topTopics, topicOthers];
+  const filtersOrderDict = Object.fromEntries(
+    filtersOrder.map((f, idx) => [f.name, idx])
+  );
+  const sortResources = (a: KGItem, b: KGItem) =>
     filtersOrderDict[a.topic?.name || ''] -
       filtersOrderDict[b.topic?.name || ''] ||
     (a.topic?.name || '').localeCompare(b.topic?.name || '');
-  filteredResources.sort(sortFilters);
+  filteredResources.sort(sortResources);
 
   return (
     <div className={styles.container}>
@@ -96,12 +96,7 @@ function KG({ openedProject }: ProjectRoute) {
             onFiltersChange={handleFiltersChange}
           />
         </div>
-        <KGVisualization
-          data={filteredResources}
-          kgItems={kgItems}
-          sections={filteredSections}
-          selectedResource={selectedResource}
-        />
+        <KGVisualizationWrapper data={filteredResources} />
       </div>
       <div className={styles.panelSafeArea} />
     </div>

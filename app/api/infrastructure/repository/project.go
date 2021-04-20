@@ -5,6 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"go.mongodb.org/mongo-driver/mongo/options"
+
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
 
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
@@ -78,7 +80,7 @@ func (m *projectMongoDBRepo) Create(ctx context.Context, p entity.Project) (stri
 	return result.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
-// FindByUserID retrieves the projects of the given user.
+// FindAll retrieves all projects.
 func (m *projectMongoDBRepo) FindAll(ctx context.Context) ([]entity.Project, error) {
 	return m.find(ctx, bson.M{})
 }
@@ -112,16 +114,16 @@ func (m *projectMongoDBRepo) AddMembers(ctx context.Context, projectID string, m
 	return err
 }
 
-// RemoveMember deletes a user from the member list for the given project.
-func (m *projectMongoDBRepo) RemoveMember(ctx context.Context, projectID, userID string) error {
-	m.logger.Debugf("Removing member \"%s\" from project \"%s\"...", userID, projectID)
+// RemoveMembers delete users from the member list for the given project.
+func (m *projectMongoDBRepo) RemoveMembers(ctx context.Context, projectID string, users []entity.User) error {
+	m.logger.Debugf("Removing members from project \"%s\"...", projectID)
 
 	pObjID, err := primitive.ObjectIDFromHex(projectID)
 	if err != nil {
 		return err
 	}
 
-	uObjID, err := primitive.ObjectIDFromHex(userID)
+	uObjIDs, err := m.toObjectIDs(users)
 	if err != nil {
 		return err
 	}
@@ -131,7 +133,9 @@ func (m *projectMongoDBRepo) RemoveMember(ctx context.Context, projectID, userID
 	upd := bson.M{
 		"$pull": bson.M{
 			"members": bson.M{
-				"user_id": uObjID,
+				"user_id": bson.M{
+					"$in": uObjIDs,
+				},
 			},
 		},
 	}
@@ -141,28 +145,36 @@ func (m *projectMongoDBRepo) RemoveMember(ctx context.Context, projectID, userID
 	return err
 }
 
-func (m *projectMongoDBRepo) UpdateMemberAccessLevel(ctx context.Context, projectID, userID string, accessLevel entity.AccessLevel) error {
-	m.logger.Debugf("Updating member \"%s\" access level to \"%s\" from project \"%s\"...", userID, accessLevel, projectID)
+// UpdateMembersAccessLevel delete users from the member list for the given project.
+func (m *projectMongoDBRepo) UpdateMembersAccessLevel(
+	ctx context.Context, projectID string, users []entity.User, accessLevel entity.AccessLevel) error {
+	m.logger.Debugf("Updating members access level to \"%s\" from project \"%s\"...", accessLevel, projectID)
 
 	pObjID, err := primitive.ObjectIDFromHex(projectID)
 	if err != nil {
 		return err
 	}
 
-	uObjID, err := primitive.ObjectIDFromHex(userID)
+	uObjIDs, err := m.toObjectIDs(users)
 	if err != nil {
 		return err
 	}
 
-	filter := bson.M{"_id": pObjID, "members.user_id": uObjID}
+	filter := bson.M{
+		"_id": pObjID,
+	}
 
 	upd := bson.M{
 		"$set": bson.M{
-			"members.$.access_level": accessLevel,
+			"members.$[member].access_level": accessLevel,
 		},
 	}
 
-	_, err = m.collection.UpdateOne(ctx, filter, upd)
+	opts := options.Update().SetArrayFilters(options.ArrayFilters{
+		Filters: []interface{}{bson.M{"member.user_id": bson.M{"$in": uObjIDs}}},
+	})
+
+	_, err = m.collection.UpdateOne(ctx, filter, upd, opts)
 
 	return err
 }
@@ -375,4 +387,19 @@ func (m *projectMongoDBRepo) dtosToEntities(dtos []projectDTO) []entity.Project 
 	}
 
 	return result
+}
+
+func (m *projectMongoDBRepo) toObjectIDs(users []entity.User) ([]primitive.ObjectID, error) {
+	objIDs := make([]primitive.ObjectID, len(users))
+
+	for i, user := range users {
+		objID, err := primitive.ObjectIDFromHex(user.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		objIDs[i] = objID
+	}
+
+	return objIDs, nil
 }

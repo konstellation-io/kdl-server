@@ -199,7 +199,21 @@ func (i *interactor) GetByID(ctx context.Context, userID string) (entity.User, e
 
 // UpdateAccessLevel update access level for the given identifiers.
 func (i *interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error) {
-	err := i.repo.UpdateAccessLevel(ctx, userIDs, level)
+	// Update user permissions in Gitea
+	users, err := i.FindByIDs(ctx, userIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, user := range users {
+		err := i.giteaService.UpdateUserPermissions(user.Username, user.Email, level)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Update access level in our DataBase
+	err = i.repo.UpdateAccessLevel(ctx, userIDs, level)
 	if err != nil {
 		return nil, err
 	}

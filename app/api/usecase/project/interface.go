@@ -14,8 +14,8 @@ type Repository interface {
 	Create(ctx context.Context, project entity.Project) (string, error)
 	FindAll(ctx context.Context) ([]entity.Project, error)
 	AddMembers(ctx context.Context, projectID string, members []entity.Member) error
-	RemoveMember(ctx context.Context, projectID, userID string) error
-	UpdateMemberAccessLevel(ctx context.Context, projectID, userID string, accessLevel entity.AccessLevel) error
+	RemoveMembers(ctx context.Context, projectID string, users []entity.User) error
+	UpdateMembersAccessLevel(ctx context.Context, projectID string, users []entity.User, accessLevel entity.AccessLevel) error
 	UpdateName(ctx context.Context, projectID, name string) error
 	UpdateDescription(ctx context.Context, projectID, description string) error
 	SetStarredKGItem(ctx context.Context, projectID, kgItemID string) error
@@ -31,8 +31,8 @@ type UseCase interface {
 	FindAll(ctx context.Context) ([]entity.Project, error)
 	GetByID(ctx context.Context, id string) (entity.Project, error)
 	AddMembers(ctx context.Context, opt AddMembersOption) (entity.Project, error)
-	RemoveMember(ctx context.Context, opt RemoveMemberOption) (entity.Project, error)
-	UpdateMember(ctx context.Context, opt UpdateMemberOption) (entity.Project, error)
+	RemoveMembers(ctx context.Context, opt RemoveMembersOption) (entity.Project, error)
+	UpdateMembers(ctx context.Context, opt UpdateMembersOption) (entity.Project, error)
 	Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error)
 	UpdateStarred(ctx context.Context, opt UpdateStarredOption) (bool, error)
 }

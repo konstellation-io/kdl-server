@@ -51,7 +51,10 @@ function rowNotFiltered(row: GetUsers_users, filters: GetUserSettings_filters) {
   let filtered = false;
 
   if (filters.email && !row.email.includes(filters.email)) filtered = true;
-  if (filters.accessLevel && row.accessLevel !== filters.accessLevel)
+  if (
+    filters.accessLevel &&
+    row.accessLevel.toLowerCase() !== filters.accessLevel.toLowerCase()
+  )
     filtered = true;
 
   return !filtered;

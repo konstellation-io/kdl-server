@@ -1,0 +1,44 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+
+.sectionsWrapper,
+.sectionAndNamesG,
+.sectionAndNamesGuide {
+  opacity: 1;
+}
+
+.grid {
+  stroke: palette(lowlight, 700);
+  stroke-width: 1px;
+  stroke-dasharray: 4 4;
+}
+
+.sectionContainer {
+  @include font-small;
+  color: font-color(lowlight);
+
+  display: flex;
+  width: 100%;
+  border-radius: 0.75 * $grid-unit;
+  background-color: palette(lowlight, 900);
+  pointer-events: none;
+}
+
+.sectionOrder {
+  @include font-button;
+  color: font-color(dark);
+
+  border-radius: 0.75 * $grid-unit 0 0 0.75 * $grid-unit;
+  background-color: palette(lowlight, 500);
+  padding: $grid-unit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.sectionLabel {
+  padding: $grid-unit;
+  word-break: break-word;
+}

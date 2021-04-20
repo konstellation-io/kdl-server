@@ -49,7 +49,7 @@ function UserFiltersAndActions({ onUpdateAccessLevel }: Props) {
         <div>
           <Button
             Icon={IconSync}
-            label="SYNCHRONIZE"
+            label="Synchronize"
             onClick={onSync}
             loading={loading}
             disabled={syncDisabled}
@@ -57,7 +57,7 @@ function UserFiltersAndActions({ onUpdateAccessLevel }: Props) {
           />
         </div>
         <div>
-          <Button label="MANAGE USERS" onClick={onManageUsers} border />
+          <Button label="Manage users" onClick={onManageUsers} border />
         </div>
       </Right>
     </div>

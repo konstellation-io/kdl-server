@@ -1,10 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 import { KGItem } from '../../KG';
 import ResourcesList from './components/ResourcesList/ResourcesList';
 import { orderBy } from 'lodash';
-import { resourcesViz } from '../KGVisualization/KGViz';
 import styles from './ResourceLists.module.scss';
 
 const NO_ITEMS_MESSAGE = {
@@ -20,8 +19,11 @@ const NO_STARRED_ITEMS_MESSAGE = {
 type Props = {
   starredResources: KGItem[];
   resources: KGItem[];
-  onResourceClick: (id: string, name: string, left: number) => void;
+  onResourceClick: (id: string, name: string) => void;
   scores: [number, number];
+  hoverResource?:
+    | ((resourceName: string | null, skipTooltipLink?: boolean) => void)
+    | null;
 };
 
 function ResourceLists({
@@ -29,37 +31,23 @@ function ResourceLists({
   resources,
   onResourceClick,
   scores,
+  hoverResource,
 }: Props) {
-  const [listFilterText, setListFilterText] = useState('');
-
   const top25 = useMemo(
     () => orderBy(resources, ['score'], ['desc']).slice(0, 25),
     [resources]
   );
 
-  const filteredAllTopics = useMemo(() => {
-    return top25.filter((resource) =>
-      resource.title.toLowerCase().includes(listFilterText.toLowerCase())
-    );
-  }, [top25, listFilterText]);
-
   function onEnter(name: string) {
-    resourcesViz?.highlightResource(name, true);
+    hoverResource && hoverResource(name, true);
   }
 
   function onLeave() {
-    resourcesViz?.highlightResource(null);
+    hoverResource && hoverResource(null);
   }
 
   function onSelectResource(resource: KGItem) {
-    let left = 0;
-
-    if (resourcesViz) {
-      const target = resourcesViz.data.find((d) => d.id === resource.id);
-      left = (target?.x || 0) + resourcesViz.center.x;
-    }
-
-    onResourceClick(resource.id, resource.title, -left / 2);
+    onResourceClick(resource.id, resource.title);
   }
 
   function formatScore(score: number) {
@@ -83,30 +71,26 @@ function ResourceLists({
         className={styles.tabSection}
       >
         <TabList>
-          <Tab>{`LIST (${filteredAllTopics.length})`}</Tab>
+          <Tab>{`LIST (${top25.length})`}</Tab>
           <Tab>{`STARRED (${starredResources.length})`}</Tab>
         </TabList>
         <div className={styles.tabContainer}>
           <TabPanel>
             <ResourcesList
               header={listHeader}
-              resources={filteredAllTopics}
-              filterText={listFilterText}
+              resources={top25}
               onClick={onSelectResource}
               onEnter={onEnter}
               onLeave={onLeave}
-              onChangeFilterText={setListFilterText}
               noItems={NO_ITEMS_MESSAGE}
             />
           </TabPanel>
           <TabPanel>
             <ResourcesList
               resources={starredResources}
-              filterText={listFilterText}
               onClick={onSelectResource}
               onEnter={onEnter}
               onLeave={onLeave}
-              onChangeFilterText={setListFilterText}
               noItems={NO_STARRED_ITEMS_MESSAGE}
             />
           </TabPanel>

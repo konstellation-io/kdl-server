@@ -1,0 +1,10 @@
+#import '../fragments/memberFragment.graphql'
+
+mutation UpdateMembers($input: UpdateMembersInput!) {
+  updateMembers(input: $input) {
+    id
+    members {
+      ...MemberFields
+    }
+  }
+}

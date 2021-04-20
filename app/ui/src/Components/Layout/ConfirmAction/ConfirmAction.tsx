@@ -94,6 +94,7 @@ const ConfirmAction: FC<Props> = ({
           subtitle={subtitle}
           onAccept={handleSubmit(onSubmit)}
           actionButtonLabel={actionLabel}
+          actionButtonCancel="Cancel"
           onCancel={hideModal}
           warning={warning}
           error={error}

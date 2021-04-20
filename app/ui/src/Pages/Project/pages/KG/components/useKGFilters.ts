@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { KGItem } from '../KG';
-import { TopicSections } from './KGVisualization/KGVisualization';
+import { TopicSections } from '../KGUtils';
 
 export interface KGFilters {
   topics?: string[];
@@ -38,7 +38,6 @@ function useKGFilters(sections: TopicSections, resources: KGItem[]) {
     filters,
     handleFiltersChange,
     filteredResources,
-    filteredSections,
   };
 }
 

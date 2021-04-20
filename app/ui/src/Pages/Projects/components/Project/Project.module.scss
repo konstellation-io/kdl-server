@@ -7,7 +7,7 @@
 $label-height: 3 * $grid-unit;
 $shape-height: 20 * $grid-unit;
 
-$min-shape-width: 50 * $grid-unit;
+$min-shape-width: 75 * $grid-unit;
 $max-shape-width: 100 * $grid-unit;
 $shape-width: 40vw;
 
@@ -83,8 +83,20 @@ $small-square-base: 30px;
   left: 8 * $grid-unit;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   height: calc(100% - #{$band-height / 2});
   width: calc(100% - #{12 * $grid-unit});
+
+  .contactInfo {
+    @include font-small;
+
+    pointer-events: all;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: font-color(light);
+    margin-left: $grid-unit;
+  }
 }
 
 .sup {
@@ -338,5 +350,37 @@ $small-square-base: 30px;
 
   .band {
     background-color: palette(base, 400);
+  }
+
+  .name {
+    color: font-color(regular);
+  }
+
+  .container:hover {
+    .bg {
+      box-shadow: inherit;
+      background-color: palette(base, 500);
+      border-color: palette(base, 800);
+    }
+
+    .content * {
+      color: font-color(regular);
+    }
+    .date {
+      color: font-color(lowlight);
+    }
+    .contactInfo {
+      color: font-color(highlight);
+    }
+  }
+
+  .addProjectContainer:hover {
+    .addProjectBg > div {
+      border: inherit;
+    }
+
+    .addProjectLabel {
+      color: inherit;
+    }
   }
 }

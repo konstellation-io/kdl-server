@@ -24,7 +24,7 @@ describe('Crumb component', () => {
   describe('behavior', () => {
     it('should show the bottom component when click on crumb', () => {
       // Arrange.
-      const container = component.find('.crumbContainer');
+      const container = component.find('.container');
       const contentProps = component.find(AnimateHeight).props();
       const heightBeforeClick = contentProps.height;
 

@@ -6,7 +6,7 @@ import {
   SelectTheme,
 } from 'kwc';
 import ROUTE from 'Constants/routes';
-import React, { FunctionComponent, memo } from 'react';
+import React, { memo } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { GetMe } from 'Graphql/queries/types/GetMe';
@@ -16,23 +16,6 @@ import styles from './SettingsMenu.module.scss';
 import { useQuery } from '@apollo/client';
 
 const GetMeQuery = loader('Graphql/queries/getMe.graphql');
-
-interface SettingsButtonProps extends CustomOptionProps {
-  onClick: () => void;
-  Icon: FunctionComponent;
-}
-function SettingsButton({ label, onClick, Icon }: SettingsButtonProps) {
-  return (
-    <Button
-      label={label.toUpperCase()}
-      onClick={onClick}
-      Icon={Icon}
-      key={`button${label}`}
-      className={styles.settingButton}
-      align={BUTTON_ALIGN.LEFT}
-    />
-  );
-}
 
 function SettingsMenu() {
   const history = useHistory();
@@ -53,9 +36,16 @@ function SettingsMenu() {
     );
   }
 
-  function SSHKeyButton({ label }: CustomOptionProps) {
+  function SSHKeyButton() {
     return (
-      <SettingsButton Icon={KeyIcon} onClick={goToUserSSHKeys} label={label} />
+      <Button
+        label="SSH key"
+        key="SSH key"
+        onClick={goToUserSSHKeys}
+        Icon={KeyIcon}
+        className={styles.settingButton}
+        align={BUTTON_ALIGN.LEFT}
+      />
     );
   }
 

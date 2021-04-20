@@ -51,9 +51,9 @@ type RemoveAPITokenInput struct {
 	APITokenID string `json:"apiTokenId"`
 }
 
-type RemoveMemberInput struct {
-	ProjectID string `json:"projectId"`
-	UserID    string `json:"userId"`
+type RemoveMembersInput struct {
+	ProjectID string   `json:"projectId"`
+	UserIds   []string `json:"userIds"`
 }
 
 type RemoveUsersInput struct {
@@ -105,9 +105,9 @@ type UpdateInternalRepositoryInput struct {
 	Name string `json:"name"`
 }
 
-type UpdateMemberInput struct {
+type UpdateMembersInput struct {
 	ProjectID   string             `json:"projectId"`
-	UserID      string             `json:"userId"`
+	UserIds     []string           `json:"userIds"`
 	AccessLevel entity.AccessLevel `json:"accessLevel"`
 }
 

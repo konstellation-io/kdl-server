@@ -34,7 +34,7 @@ exports[`MessageActionBox component Component match snapshot 1`] = `
     <div
       className="button"
     >
-      <T
+      <P
         Icon={
           Object {
             "$$typeof": Symbol(react.memo),

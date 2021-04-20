@@ -3,7 +3,7 @@ import {
   GET_NEW_PROJECT,
   GetNewProject,
 } from 'Graphql/client/queries/getNewProject.graphql';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import RepositoryTypeComponent, {
   LOCATION,
   SIZE,
@@ -84,11 +84,13 @@ function NewProject() {
     | StepNames.REPOSITORY
     | StepNames.INTERNAL
     | StepNames.EXTERNAL
-  )[] = [
-    StepNames.INFORMATION,
-    StepNames.REPOSITORY,
-    repoTypeToStepName[type || ''],
-  ];
+  )[] = useMemo(() => {
+    return [
+      StepNames.INFORMATION,
+      StepNames.REPOSITORY,
+      repoTypeToStepName[type || ''],
+    ];
+  }, [type]);
 
   // We want to execute this on on component unmount
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -141,30 +143,30 @@ function NewProject() {
     switch (actStep) {
       case 0:
         return [
-          <ActionButton key="cancel" label="CANCEL" to={ROUTE.HOME} />,
+          <ActionButton key="cancel" label="Cancel" to={ROUTE.HOME} />,
           <ActionButton
             key="next"
-            label="NEXT"
+            label="Next"
             primary
             onClick={onNextClick}
           />,
         ];
       case stepperSteps.length - 1:
         return [
-          <ActionButton key="key" label="BACK" onClick={prevStep} />,
+          <ActionButton key="key" label="Back" onClick={prevStep} />,
           <ActionButton
             key="create"
-            label="CREATE"
+            label="Create"
             to={ROUTE.PROJECT_CREATION}
             primary
           />,
         ];
       default:
         return [
-          <ActionButton key="back" label="BACK" onClick={prevStep} />,
+          <ActionButton key="back" label="Back" onClick={prevStep} />,
           <ActionButton
             key="next"
-            label="NEXT"
+            label="Next"
             primary
             onClick={onNextClick}
           />,

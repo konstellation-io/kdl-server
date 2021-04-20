@@ -1,3 +1,4 @@
+import faiss
 from typing import Union
 
 import numpy as np
@@ -11,7 +12,7 @@ from transformers.tokenization_utils_base import BatchEncoding
 # Paths
 ASSET_PATH = "assets/"
 MODEL_PATH = ASSET_PATH + "model/"
-OUTPUT_PATH = ASSET_PATH + "vectors.npy"
+OUTPUT_PATH = ASSET_PATH + "vectors.faiss"
 DATASET_PATH = ASSET_PATH + "dataset.pkl.gz"
 
 # Constants
@@ -176,6 +177,22 @@ def vectorize(inputs: list[str], batch_size: int,
     return vecs
 
 
+def create_vector_index(vecs: np.ndarray) -> faiss.Index:
+    """
+    A utility function to create the vector index for searches and distance computation
+    Args:
+        vecs: an array of shape (number_of_vectors, vector_dimensions)
+    Return:
+        index: a faiss index of type FlatIP
+    """
+    vecs = vecs.astype("float32")
+    index = faiss.IndexFlatIP(vecs.shape[1])
+    faiss.normalize_L2(vecs)
+    index.add(vecs)
+
+    return index
+
+
 if __name__ == "__main__":
     print("Starting vector computation stage")
 
@@ -202,7 +219,10 @@ if __name__ == "__main__":
     print("Starting checks")
     check_vector_size(vectors, dataset_inputs)
 
+    # Computing index
+    print("Starting index computation")
+    vector_index = create_vector_index(vectors)
     # Saving output
-    print("Saving vectors")
-    np.save(OUTPUT_PATH, vectors)
-    print(f"Vectors saved to: {OUTPUT_PATH}")
+    print("Saving vectors index")
+    faiss.write_index(vector_index, OUTPUT_PATH)
+    print(f"Vector index saved to: {OUTPUT_PATH}")

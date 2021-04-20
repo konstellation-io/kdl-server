@@ -1,10 +1,10 @@
 import pickle
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 import pandas as pd
 import torch
+from pipe import utils
 from sklearn.feature_extraction.text import TfidfVectorizer
 from torch import nn
 
@@ -19,48 +19,6 @@ OUTPUT_TOPICS_PATH = ASSET_PATH + "topics.pkl.gz"
 
 # Constants
 BATCH_SIZE = 32
-
-
-# Functions & classes
-def read_list_from_file(input_filepath):
-    # TODO: Move to utils and import
-    with open(input_filepath, 'r') as file:
-        contents = [line.rstrip('\n') for line in file]
-    return contents
-
-
-def create_inputs(title: str, abstract: str) -> str:
-    """
-    TODO: Import from compute_vectors or from shared utils
-    """
-    title_abstract_str = f"{title}. {abstract}"
-    return title_abstract_str.replace("\n", " ").replace("**", " ")
-
-
-def get_inputs(input_path: str) -> np.ndarray:
-    """
-    TODO: Import from compute_vectors or from shared utils
-    """
-    df = pd.read_pickle(input_path, compression="gzip")[['title', 'abstract']]
-    return np.vectorize(create_inputs)(df['title'], df['abstract'])
-
-
-def convert_to_batches(input_items: Union[np.ndarray, range],
-                       batch_size: int) -> list[list[np.str_]]:
-    """
-    TODO: Import from compute_vectors or from shared utils
-    """
-    n_batches = int(np.ceil(len(input_items) / batch_size))
-
-    output = [None] * n_batches
-
-    for batch_no in range(n_batches):
-        start = batch_no * batch_size
-        end = np.min([batch_no * batch_size + batch_size, len(input_items)])
-
-        output[batch_no] = input_items[start:end]
-
-    return output
 
 
 def get_topics_from_probs(topic_probs, topic_names, threshold=0.5):
@@ -155,7 +113,7 @@ class DNNTopicPredictor:
         self.vocab_size = len(self.vectorizer.vocabulary_)
 
         # Load topic names (labels)
-        self.topic_names = read_list_from_file(Path(filepath) / "topic_names.txt")
+        self.topic_names = utils.read_list_from_file(Path(filepath) / "topic_names.txt")
 
         # Create a net with the same structure
         self.model = DNNModel(n_vocab=self.vocab_size, n_labels=len(self.topic_names))
@@ -168,7 +126,7 @@ class DNNTopicPredictor:
 
         # Load excluded topic indices
         self.excluded_topics_idx = np.array(
-            [int(x) for x in read_list_from_file(Path(filepath) / "excluded_topics_idx.txt")])
+            [int(x) for x in utils.read_list_from_file(Path(filepath) / "excluded_topics_idx.txt")])
 
     def vectorize_inputs(self):
 
@@ -233,12 +191,12 @@ def compute_topics():
 
     # Load asset texts on which the topics need to be predicted
     print(f"Getting inputs from path {DATASET_PATH}")
-    texts = get_inputs(DATASET_PATH)
+    texts = utils.get_inputs(DATASET_PATH)
     doc_hashes = pd.read_pickle(DATASET_PATH)['id']
 
     # Convert to batches for higher efficiency of inference computation
-    texts_in_batches = convert_to_batches(texts, batch_size=BATCH_SIZE)
-    hashes_in_batches = convert_to_batches(doc_hashes, batch_size=BATCH_SIZE)
+    texts_in_batches = utils.convert_to_batches(texts, batch_size=BATCH_SIZE)
+    hashes_in_batches = utils.convert_to_batches(doc_hashes, batch_size=BATCH_SIZE)
 
     # Allocate a data frame to store outputs
     df_output = pd.DataFrame([], index=doc_hashes, columns=['topics'])

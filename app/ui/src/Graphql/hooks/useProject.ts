@@ -12,12 +12,7 @@ import {
   UpdateProjectVariables,
 } from '../mutations/types/UpdateProject';
 
-import {
-  CreateProjectInput,
-  RepositoryType,
-  UpdateExternalRepositoryInput,
-  UpdateInternalRepositoryInput,
-} from '../types/globalTypes';
+import { CreateProjectInput, RepositoryType } from '../types/globalTypes';
 import { loader } from 'graphql.macro';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 
@@ -87,30 +82,6 @@ export default function useProject(options?: UseProjectParams) {
     mutationUpdateProject(mutationPayloadHelper({ id, description }));
   }
 
-  function updateProjectExternalRepo(
-    id: string,
-    external: UpdateExternalRepositoryInput
-  ) {
-    mutationUpdateProject(
-      mutationPayloadHelper({
-        id,
-        repository: { type: RepositoryType.EXTERNAL, external },
-      })
-    );
-  }
-
-  function updateProjectInternalRepo(
-    id: string,
-    internal: UpdateInternalRepositoryInput
-  ) {
-    mutationUpdateProject(
-      mutationPayloadHelper({
-        id,
-        repository: { type: RepositoryType.INTERNAL, internal },
-      })
-    );
-  }
-
   function updateProjectArchived(id: string, archived: boolean) {
     mutationUpdateProject(mutationPayloadHelper({ id, archived }));
   }
@@ -119,8 +90,6 @@ export default function useProject(options?: UseProjectParams) {
     addNewProject,
     updateProjectName,
     updateProjectDescription,
-    updateProjectExternalRepo,
-    updateProjectInternalRepo,
     archiveProjectAction: {
       updateProjectArchived,
       loading,

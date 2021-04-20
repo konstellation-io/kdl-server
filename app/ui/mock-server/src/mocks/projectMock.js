@@ -1,5 +1,6 @@
 const casual = require('casual');
 const { buildRandomMembers } = require('./membersMock');
+const buildRepository = require('./repositoryMock');
 
 function buildProject() {
   return {
@@ -7,7 +8,7 @@ function buildProject() {
     name: casual.name,
     description: casual.words(200),
     favorite: casual.boolean,
-    repository: this.Repository,
+    repository: buildRepository(),
     creationDate: () => new Date().toISOString(),
     lastActivationDate: () => new Date().toISOString(),
     error: casual.random_element([null, casual.error]),

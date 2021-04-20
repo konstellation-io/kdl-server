@@ -7,22 +7,6 @@ const kgData = require('./mocks/kgMock');
 const { buildMember, meAsMember } = require('./mocks/membersMock');
 const { meId, me } = require('./mocks/meMock');
 
-function buildRepository() {
-  const type = casual.random_element(['INTERNAL', 'EXTERNAL']);
-  let url = casual.url;
-  if (type === 'INTERNAL')
-    url = `${casual.url}${casual.array_of_words(3).join('-')}`;
-
-  return {
-    type,
-    url,
-    error: casual.boolean,
-    external: {
-      username: casual.username,
-    },
-  };
-}
-
 const projects = Array(8).fill(0).map(buildProject);
 
 module.exports = {
@@ -40,20 +24,11 @@ module.exports = {
     }),
   }),
   Mutation: () => ({
-    updateProject: (
-      _,
-      { input: { id, name, description, archived, repository } }
-    ) => {
+    updateProject: (_, { input: { id, name, description, archived } }) => {
       const project = projects.find((project) => project.id === id);
       if (name) project.name = name;
       if (description) project.description = description;
       if (archived !== undefined) project.archived = archived;
-      if (repository && repository.type === 'INTERNAL') {
-        project.repository.url = `${project.repository.url}${repository.internal.name}`;
-      }
-      if (repository && repository.type === 'EXTERNAL') {
-        project.repository.url = repository.external.url;
-      }
 
       return project;
     },

@@ -3,7 +3,7 @@ import { RepositoryType } from 'Graphql/types/globalTypes';
 import { useReactiveVar } from '@apollo/client';
 import ExternalRepository from './components/ExternalRepository/ExternalRepository';
 import InternalRepository from './components/InternalRepository/InternalRepository';
-import { newProject } from '../../../../Graphql/client/cache';
+import { newProject } from 'Graphql/client/cache';
 
 type Props = {
   showErrors: boolean;

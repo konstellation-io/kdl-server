@@ -21,7 +21,7 @@ import useNewProject from 'Graphql/client/hooks/useNewProject';
 import { useReactiveVar } from '@apollo/client';
 import { Prompt } from 'react-router-dom';
 import useUnloadPrompt from 'Hooks/useUnloadPrompt/useUnloadPrompt';
-import { newProject } from '../../Graphql/client/cache';
+import { newProject } from 'Graphql/client/cache';
 
 enum Steps {
   INFORMATION,

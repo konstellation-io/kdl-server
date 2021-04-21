@@ -7,7 +7,7 @@ import styles from './InternalRepository.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 import { useReactiveVar } from '@apollo/client';
 import { getErrorMsg, replaceAll } from 'Utils/string';
-import { newProject } from '../../../../../../Graphql/client/cache';
+import { newProject } from 'Graphql/client/cache';
 
 function validateProjectSlug(value: string): string {
   const error = CHECK.getValidationError([

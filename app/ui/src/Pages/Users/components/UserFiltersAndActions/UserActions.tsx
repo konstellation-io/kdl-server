@@ -7,7 +7,7 @@ import cx from 'classnames';
 import styles from './UserFiltersAndActions.module.scss';
 import { useReactiveVar } from '@apollo/client';
 import useUserSettings from 'Graphql/client/hooks/useUserSettings';
-import { userSettings } from '../../../../Graphql/client/cache';
+import { userSettings } from 'Graphql/client/cache';
 
 type CheckSelectAllPros = {
   handleCheckClick: (value: boolean) => void;

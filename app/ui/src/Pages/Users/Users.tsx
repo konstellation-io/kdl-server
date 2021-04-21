@@ -22,7 +22,7 @@ import useUser from 'Graphql/hooks/useUser';
 import UsersTable from './components/UserList/UsersTable';
 
 import GetUsersQuery from 'Graphql/queries/getUsers';
-import { userSettings } from '../../Graphql/client/cache';
+import { userSettings } from 'Graphql/client/cache';
 
 function Users() {
   const { data, loading, error } = useQuery<GetUsers>(GetUsersQuery);

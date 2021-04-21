@@ -9,7 +9,7 @@ import useProjectFilters from 'Graphql/client/hooks/useProjectFilters';
 import { useQuery, useReactiveVar } from '@apollo/client';
 
 import GetProjectsQuery from 'Graphql/queries/getProjects';
-import { projectFilters } from '../../../../Graphql/client/cache';
+import { projectFilters } from 'Graphql/client/cache';
 
 function ProjectsFilter() {
   const { data, error, loading } = useQuery<GetProjects>(GetProjectsQuery);

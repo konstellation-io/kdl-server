@@ -6,7 +6,7 @@ import IconLink from '@material-ui/icons/Link';
 import { RepositoryType } from 'Graphql/types/globalTypes';
 import styles from './Summary.module.scss';
 import { useReactiveVar } from '@apollo/client';
-import { newProject } from '../../../../Graphql/client/cache';
+import { newProject } from 'Graphql/client/cache';
 
 type FieldProps = {
   children: JSX.Element | JSX.Element[];

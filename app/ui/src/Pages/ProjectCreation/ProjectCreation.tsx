@@ -9,7 +9,7 @@ import StatusCircle, {
 import styles from './ProjectCreation.module.scss';
 import useProject from 'Graphql/hooks/useProject';
 import { useReactiveVar } from '@apollo/client';
-import { newProject } from '../../Graphql/client/cache';
+import { newProject } from 'Graphql/client/cache';
 
 function ProjectCreation() {
   const [animCanEnd, setAnimCanEnd] = useState(false);

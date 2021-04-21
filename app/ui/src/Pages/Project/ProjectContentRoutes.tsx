@@ -7,10 +7,9 @@ import Overview from './pages/Overview/Overview';
 import { ProjectRoute } from './ProjectPanels';
 import ProjectToolsRoutes from './components/ProjectToolsRoutes/ProjectToolsRoutes';
 import React from 'react';
-import { loader } from 'graphql.macro';
 import { useQuery } from '@apollo/client';
 
-const GetMeQuery = loader('Graphql/queries/getMe.graphql');
+import GetMeQuery from 'Graphql/queries/getMe';
 
 function ProjectContentRoutes({ openedProject }: ProjectRoute) {
   const { data } = useQuery<GetMe>(GetMeQuery);

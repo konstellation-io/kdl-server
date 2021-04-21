@@ -1,8 +1,8 @@
 import { Button, Select } from 'kwc';
 import {
   GetProjectMembers,
-  GetProjectMembersVariables,
   GetProjectMembers_project_members,
+  GetProjectMembersVariables,
 } from 'Graphql/queries/types/GetProjectMembers';
 import React, { useEffect, useMemo, useState } from 'react';
 
@@ -15,14 +15,13 @@ import IconDate from '@material-ui/icons/Today';
 import IconRemove from '@material-ui/icons/Delete';
 import IconTime from '@material-ui/icons/Schedule';
 import { formatDate } from 'Utils/format';
-import { loader } from 'graphql.macro';
 import styles from './MemberDetails.module.scss';
 import { useForm } from 'react-hook-form';
 import useMembers from 'Graphql/hooks/useMembers';
 import { useQuery } from '@apollo/client';
 
-const GetMeQuery = loader('Graphql/queries/getMe.graphql');
-const GetMembersQuery = loader('Graphql/queries/getProjectMembers.graphql');
+import GetMeQuery from 'Graphql/queries/getMe';
+import GetMembersQuery from 'Graphql/queries/getProjectMembers';
 
 const gravatarStyle = {
   borderRadius: '50%',

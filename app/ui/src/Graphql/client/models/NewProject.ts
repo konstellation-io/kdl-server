@@ -31,7 +31,6 @@ export interface ExternalRepositoryErrors {
 }
 
 export interface InternalRepositoryValues {
-  url: string;
   slug: string;
 }
 

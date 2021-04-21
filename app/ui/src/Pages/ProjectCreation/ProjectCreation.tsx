@@ -1,8 +1,4 @@
-import { Button, SpinnerCircular } from 'kwc';
-import {
-  GET_NEW_PROJECT,
-  GetNewProject,
-} from 'Graphql/client/queries/getNewProject.graphql';
+import { Button } from 'kwc';
 import ROUTE, { buildRoute } from 'Constants/routes';
 import React, { useEffect, useState } from 'react';
 import { RepositoryInput, RepositoryType } from 'Graphql/types/globalTypes';
@@ -12,7 +8,8 @@ import StatusCircle, {
 
 import styles from './ProjectCreation.module.scss';
 import useProject from 'Graphql/hooks/useProject';
-import { useQuery } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
+import { newProject } from 'Graphql/client/cache';
 
 function ProjectCreation() {
   const [animCanEnd, setAnimCanEnd] = useState(false);
@@ -22,7 +19,12 @@ function ProjectCreation() {
     create: { data: dataCreateProject },
   } = useProject();
 
-  const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
+  const {
+    repository,
+    information,
+    internalRepository,
+    externalRepository,
+  } = useReactiveVar(newProject);
 
   // Animation should last for at least 3 seconds
   useEffect(() => {
@@ -34,34 +36,27 @@ function ProjectCreation() {
   }, []);
 
   useEffect(() => {
-    if (data) {
-      const { repository, information } = data.newProject;
-      const type = repository.values.type || RepositoryType.EXTERNAL;
+    const type = repository.values.type || RepositoryType.EXTERNAL;
 
-      const inputRepository: RepositoryInput = {
-        type,
+    const inputRepository: RepositoryInput = {
+      type,
+    };
+
+    if (type === RepositoryType.INTERNAL) {
+      inputRepository.internal = {
+        name: internalRepository.values.slug,
       };
-
-      if (type === RepositoryType.INTERNAL) {
-        const { internalRepository } = data.newProject;
-        inputRepository.internal = {
-          name: internalRepository.values.slug,
-        };
-      } else {
-        const { externalRepository } = data.newProject;
-        inputRepository.external = externalRepository.values;
-      }
-
-      addNewProject({
-        ...information.values,
-        repository: inputRepository,
-      });
+    } else {
+      inputRepository.external = externalRepository.values;
     }
+
+    addNewProject({
+      ...information.values,
+      repository: inputRepository,
+    });
     // We want to execute this on on component mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  if (!data) return <SpinnerCircular />;
 
   const projectReady = animCanEnd && dataCreateProject;
 

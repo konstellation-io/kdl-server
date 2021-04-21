@@ -4,21 +4,18 @@ import {
   GetKnowledgeGraphVariables,
 } from 'Graphql/queries/types/GetKnowledgeGraph';
 import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
-import React, { useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { openedProject, resourceDetails } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { useQuery, useReactiveVar } from '@apollo/client';
 
 import { PANEL_ID } from 'Graphql/client/models/Panel';
-import { loader } from 'graphql.macro';
 import styles from './KGResults.module.scss';
 import useResourceDetails from 'Graphql/client/hooks/useResourceDetails';
 import ResourcesList from '../../pages/KG/components/ResourceLists/components/ResourcesList/ResourcesList';
 import { KGItem as KGItemType } from '../../pages/KG/KG';
 
-const GetKnowledgeGraphQuery = loader(
-  'Graphql/queries/getKnowledgeGraph.graphql'
-);
+import GetKnowledgeGraphQuery from 'Graphql/queries/getKnowledgeGraph';
 
 function KGResults() {
   const { updateResourceDetails } = useResourceDetails();

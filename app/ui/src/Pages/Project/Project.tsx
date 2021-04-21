@@ -9,13 +9,12 @@ import ProjectNavigation from './components/ProjectNavigation/ProjectNavigation'
 import ProjectPanels from './ProjectPanels';
 import { RouteProjectParams } from 'Constants/routes';
 import Tool from './pages/Tools/components/Tool/Tool';
-import { loader } from 'graphql.macro';
 import styles from './Project.module.scss';
 import useOpenedProject from 'Graphql/client/hooks/useOpenedProject';
 import { useParams } from 'react-router-dom';
 import useTools from 'Graphql/client/hooks/useTools';
 
-const GetProjectsQuery = loader('Graphql/queries/getProjects.graphql');
+import GetProjectsQuery from 'Graphql/queries/getProjects';
 
 function Project() {
   const { projectId } = useParams<RouteProjectParams>();

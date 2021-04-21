@@ -16,10 +16,10 @@ import ProjectSelector from '../ProjectSelector/ProjectSelector';
 import ROUTE from 'Constants/routes';
 import React from 'react';
 import ServerIcon from 'Components/Icons/ServerIcon/ServerIcon';
-import { loader } from 'graphql.macro';
 import { openedProject } from 'Graphql/client/cache';
 
-const GetProjectsQuery = loader('Graphql/queries/getProjects.graphql');
+import GetProjectsQuery from 'Graphql/queries/getProjects';
+
 const serverSections: EnhancedRouteConfiguration[] = [
   {
     id: 'projects',

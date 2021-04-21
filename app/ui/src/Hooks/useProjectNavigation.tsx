@@ -12,10 +12,9 @@ import MlFlowIcon from 'Components/Icons/MlFlowIcon/MlFlowIcon';
 import { OverridableComponent } from '@material-ui/core/OverridableComponent';
 import { SvgIconTypeMap } from '@material-ui/core';
 import VSIcon from 'Components/Icons/VSIcon/VSIcon';
-import { loader } from 'graphql.macro';
 import { useQuery } from '@apollo/client';
 
-const GetMeQuery = loader('Graphql/queries/getMe.graphql');
+import GetMeQuery from 'Graphql/queries/getMe';
 
 export interface RouteConfiguration {
   id: string;

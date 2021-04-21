@@ -9,14 +9,13 @@ import { GetMe } from 'Graphql/queries/types/GetMe';
 import ROUTE from 'Constants/routes';
 import { copyAndToast } from 'Utils/clipboard';
 import cx from 'classnames';
-import { loader } from 'graphql.macro';
 import styles from './GenerateApiToken.module.scss';
 import useAPIToken from 'Graphql/hooks/useAPIToken';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 
-const GetMeQuery = loader('Graphql/queries/getMe.graphql');
+import GetMeQuery from 'Graphql/queries/getMe';
 
 type FormData = {
   tokenName: string;

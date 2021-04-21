@@ -53,7 +53,7 @@ export const initialNewProject: NewProject = {
     },
   },
   internalRepository: {
-    values: { slug: '', url: '' },
+    values: { slug: '' },
     errors: { slug: '' },
   },
 };
@@ -102,6 +102,11 @@ const cache = new InMemoryCache({
     User: {
       fields: {
         apiTokens: { merge: false },
+      },
+    },
+    Project: {
+      fields: {
+        members: { merge: false },
       },
     },
   },

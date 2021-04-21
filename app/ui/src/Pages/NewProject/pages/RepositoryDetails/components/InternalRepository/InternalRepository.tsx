@@ -1,16 +1,13 @@
-import { CHECK, SpinnerCircular, TextInput } from 'kwc';
-import {
-  GET_NEW_PROJECT,
-  GetNewProject,
-} from 'Graphql/client/queries/getNewProject.graphql';
-import React, { useEffect } from 'react';
+import { CHECK, TextInput } from 'kwc';
+import React from 'react';
 
 import { CONFIG } from 'index';
 import IconLink from '@material-ui/icons/Link';
 import styles from './InternalRepository.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
-import { useQuery } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
 import { getErrorMsg, replaceAll } from 'Utils/string';
+import { newProject } from 'Graphql/client/cache';
 
 function validateProjectSlug(value: string): string {
   const error = CHECK.getValidationError([
@@ -34,21 +31,16 @@ type Props = {
   showErrors: boolean;
 };
 function InternalRepository({ showErrors }: Props) {
-  const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
+  const {
+    internalRepository: { values },
+    internalRepository: { errors },
+  } = useReactiveVar(newProject);
   const { updateValue, updateError, clearError } = useNewProject(
     'internalRepository'
   );
-  const { values } = data?.newProject.internalRepository || {};
-  const { errors } = data?.newProject.internalRepository || {};
 
-  const slug = values?.slug || '';
-  const slugError = errors?.slug;
-
-  useEffect(() => {
-    updateValue('url', `${slug}`);
-  }, [updateValue, slug]);
-
-  if (!data) return <SpinnerCircular />;
+  const slug = values.slug;
+  const slugError = errors.slug;
 
   const slugOk = validateProjectSlug(slug);
 

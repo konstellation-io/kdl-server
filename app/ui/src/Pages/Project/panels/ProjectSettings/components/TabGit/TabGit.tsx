@@ -20,7 +20,7 @@ type Props = {
   project: GetProjects_projects;
 };
 function TabGit({ project }: Props) {
-  const { toolUrls, repository, id, members } = project;
+  const { toolUrls, repository, members } = project;
   const { data: dataMe, loading, error } = useQuery<GetMe>(GetMeQuery);
 
   const isAdmin = useMemo(() => {

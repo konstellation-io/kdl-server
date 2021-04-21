@@ -14,7 +14,7 @@ type GiteaClient interface {
 	AddCollaborator(repoName, username string, accessLevel entity.AccessLevel) error
 	RemoveCollaborator(repoName, username string) error
 	UpdateCollaboratorPermissions(repoName, username string, accessLevel entity.AccessLevel) error
-	UpdateUserPermissions(username, email string, level entity.AccessLevel) error
+	UpdateUserPermissions(username string, level entity.AccessLevel) error
 	MirrorRepo(url, repoName, userName, userToken, ownerUsername string) error
 	FindAllUsers() ([]entity.User, error)
 }

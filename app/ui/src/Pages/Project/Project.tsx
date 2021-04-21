@@ -50,7 +50,6 @@ function Project() {
   if (loading || !project) return <SpinnerCircular />;
   if (error || !data) return <ErrorMessage />;
 
-  console.log('ciao', currentToolData);
   return (
     <div className={styles.container}>
       <ProjectNavigation />

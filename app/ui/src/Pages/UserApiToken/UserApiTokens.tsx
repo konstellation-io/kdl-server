@@ -5,12 +5,11 @@ import { GetMe } from 'Graphql/queries/types/GetMe';
 import Message from 'Components/Message/Message';
 import React from 'react';
 import Token from './components/token/Token';
-import { loader } from 'graphql.macro';
 import styles from './UserApiTokens.module.scss';
 import useAPIToken from 'Graphql/hooks/useAPIToken';
 import { useQuery } from '@apollo/client';
 
-const GetMeQuery = loader('Graphql/queries/getMe.graphql');
+import GetMeQuery from 'Graphql/queries/getMe';
 
 function UserApiTokens() {
   const { data, loading, error } = useQuery<GetMe>(GetMeQuery);

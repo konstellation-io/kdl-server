@@ -1,16 +1,12 @@
-import {
-  GET_NEW_PROJECT,
-  GetNewProject,
-} from 'Graphql/client/queries/getNewProject.graphql';
 import React, { FC } from 'react';
 
 import { CONFIG } from 'index';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
 import IconLink from '@material-ui/icons/Link';
 import { RepositoryType } from 'Graphql/types/globalTypes';
-import { SpinnerCircular } from 'kwc';
 import styles from './Summary.module.scss';
-import { useQuery } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
+import { newProject } from 'Graphql/client/cache';
 
 type FieldProps = {
   children: JSX.Element | JSX.Element[];
@@ -36,21 +32,21 @@ const Section: FC<SectionProps> = ({ title, children }) => (
 );
 
 function Summary() {
-  const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
+  const {
+    information,
+    repository,
+    externalRepository,
+    internalRepository,
+  } = useReactiveVar(newProject);
 
-  if (!data) return <SpinnerCircular />;
-
-  const { information, repository } = data.newProject;
   const type = repository?.values?.type || RepositoryType.EXTERNAL;
   const isExternalRepo = type === RepositoryType.EXTERNAL;
   const { name, description } = information.values;
-  const repoTypeDetails = isExternalRepo
-    ? data.newProject.externalRepository
-    : data.newProject.internalRepository;
 
   function getRepositoryUrl() {
-    let { url } = repoTypeDetails.values;
-    return isExternalRepo ? url : `${CONFIG.GITEA_URL}/kdl/${url}`;
+    return isExternalRepo
+      ? externalRepository.values.url
+      : `${CONFIG.GITEA_URL}/kdl/${internalRepository.values.slug}`;
   }
 
   return (

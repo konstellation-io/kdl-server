@@ -1,6 +1,0 @@
-mutation SetStarredKGItem($input: SetKGStarredInput!) {
-  setKGStarred(input: $input) {
-    kgItemId
-    starred
-  }
-}

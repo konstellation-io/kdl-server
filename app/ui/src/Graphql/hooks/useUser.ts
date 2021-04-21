@@ -2,15 +2,12 @@ import { useMutation } from '@apollo/client';
 import {
   UpdateAccessLevel,
   UpdateAccessLevelVariables,
-} from '../mutations/types/UpdateAccessLevel';
+} from 'Graphql/mutations/types/UpdateAccessLevel';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
-import { loader } from 'graphql.macro';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 
-const UpdateAccessLevelMutation = loader(
-  'Graphql/mutations/updateAccessLevel.graphql'
-);
+import UpdateAccessLevelMutation from 'Graphql/mutations/updateAccessLevel';
 
 export default function useUser() {
   const [mutationUpdateAccessLevel] = useMutation<

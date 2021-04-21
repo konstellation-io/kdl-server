@@ -1,10 +1,7 @@
 import { RegenerateSSHKey } from './../mutations/types/RegenerateSSHKey';
-import { loader } from 'graphql.macro';
 import { useMutation } from '@apollo/client';
 
-const RegenerateSSHKeyMutation = loader(
-  'Graphql/mutations/regenerateSSHKey.graphql'
-);
+import RegenerateSSHKeyMutation from 'Graphql/mutations/regenerateSSHKey';
 
 type Options = {
   onRegenerateSSHKeyComplete?: () => void;

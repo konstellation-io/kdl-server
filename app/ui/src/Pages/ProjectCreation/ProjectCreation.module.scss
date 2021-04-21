@@ -18,12 +18,6 @@
     width: 79 * $grid-unit;
     height: 100%;
 
-    .subtitle {
-      @include font-small;
-      color: font-color(lowlight);
-      margin-top: 1.75 * $grid-unit;
-    }
-
     .infoMessage {
       @include font-small;
       color: font-color(lowlight);

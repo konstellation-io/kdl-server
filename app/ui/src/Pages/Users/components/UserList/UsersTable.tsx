@@ -1,24 +1,22 @@
 import { Check, Select } from 'kwc';
 import { Column, Row, useRowSelect, useSortBy, useTable } from 'react-table';
-import {
-  GET_USER_SETTINGS,
-  GetUserSettings,
-  GetUserSettings_filters,
-} from 'Graphql/client/queries/getUserSettings.graphql';
 import React, { useEffect, useMemo } from 'react';
-import { get } from 'lodash';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import { GetUsers_users } from 'Graphql/queries/types/GetUsers';
 import Message from 'Components/Message/Message';
-import { UserSelection } from 'Graphql/client/models/UserSettings';
+import {
+  UserSelection,
+  UserSettingsFilters,
+} from 'Graphql/client/models/UserSettings';
 import cx from 'classnames';
 import { formatDate } from 'Utils/format';
 import styles from './UserList.module.scss';
-import { useQuery } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
 import useUserSettings from 'Graphql/client/hooks/useUserSettings';
 import TableHeader from './TableHeader';
-import useUser from '../../../../Graphql/hooks/useUser';
+import useUser from 'Graphql/hooks/useUser';
+import { userSettings } from 'Graphql/client/cache';
 
 export type Data = {
   creationDate: string;
@@ -47,7 +45,7 @@ function TableColCheck({
   );
 }
 
-function rowNotFiltered(row: GetUsers_users, filters: GetUserSettings_filters) {
+function rowNotFiltered(row: GetUsers_users, filters: UserSettingsFilters) {
   let filtered = false;
 
   if (filters.email && !row.email.includes(filters.email)) filtered = true;
@@ -68,25 +66,17 @@ function UsersTable({ users }: Props) {
   const { updateSelection } = useUserSettings();
   const { updateUsersAccessLevel } = useUser();
 
-  const { data: localData } = useQuery<GetUserSettings>(GET_USER_SETTINGS);
-  const userSelection = get(
-    localData?.userSettings,
-    'userSelection',
-    UserSelection.NONE
+  const { userSelection, filters, selectedUserIds } = useReactiveVar(
+    userSettings
   );
 
-  const data = useMemo(() => {
-    const filters = localData?.userSettings.filters || {
-      email: null,
-      accessLevel: null,
-    };
+  const data = useMemo(
+    () => users.filter((user) => rowNotFiltered(user, filters)),
+    [filters, users]
+  );
 
-    return users.filter((user) => rowNotFiltered(user, filters));
-  }, [localData, users]);
-
-  const actSelectedUsers = localData?.userSettings.selectedUserIds || [];
   const initialStateSelectedRowIds = Object.fromEntries(
-    data.map((user, idx) => [idx, actSelectedUsers.includes(user.id)])
+    data.map((user, idx) => [idx, selectedUserIds.includes(user.id)])
   );
 
   const columns: Column<Data>[] = useMemo(
@@ -194,12 +184,11 @@ function UsersTable({ users }: Props) {
   }, [userSelection, toggleAllRowsSelected]);
 
   useEffect(() => {
-    const actSelectionUsers = localData?.userSettings.selectedUserIds;
     const newSelectedUsersPos = Object.entries(selectedRowIds)
       .filter(([_, isSelected]) => isSelected)
       .map(([rowId, _]) => rowId);
 
-    if (actSelectionUsers?.length !== newSelectedUsersPos.length) {
+    if (selectedUserIds.length !== newSelectedUsersPos.length) {
       let newUserSelection: UserSelection;
 
       switch (newSelectedUsersPos.length) {
@@ -221,7 +210,7 @@ function UsersTable({ users }: Props) {
 
       updateSelection(newSelectedUsers, newUserSelection);
     }
-  }, [selectedRowIds, updateSelection, data, localData]);
+  }, [selectedRowIds, updateSelection, data, selectedUserIds]);
 
   if (data.length === 0)
     return <Message text="There are no users with the applied filters" />;
@@ -233,7 +222,7 @@ function UsersTable({ users }: Props) {
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
-                <TableHeader column={column} />
+                <TableHeader key={column.id} column={column} />
               ))}
             </tr>
           ))}

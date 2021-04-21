@@ -39,7 +39,7 @@ function KGItem({ resource, onClick, onLeave, onEnter }: Props) {
           </div>
           {resource.topics.length !== 0 && (
             <div className={styles.topics}>
-              <span className={styles.topic} title={resource.category}>
+              <span className={styles.topic} title={resource.topics[0].name}>
                 {resource.topics[0].name}
               </span>
               {resource.topics.length > 1 && (

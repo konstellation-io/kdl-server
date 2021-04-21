@@ -12,14 +12,12 @@ import {
   UpdateProjectVariables,
 } from '../mutations/types/UpdateProject';
 
-import { CreateProjectInput, RepositoryType } from '../types/globalTypes';
-import { loader } from 'graphql.macro';
+import { CreateProjectInput } from '../types/globalTypes';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 
-const GetProjectsQuery = loader('Graphql/queries/getProjects.graphql');
-
-const CreateProjectMutation = loader('Graphql/mutations/createProject.graphql');
-const UpdateProjectMutation = loader('Graphql/mutations/updateProject.graphql');
+import GetProjectsQuery from 'Graphql/queries/getProjects';
+import CreateProjectMutation from 'Graphql/mutations/createProject';
+import UpdateProjectMutation from 'Graphql/mutations/updateProject';
 
 type UseProjectParams = {
   onUpdateCompleted?: () => void;

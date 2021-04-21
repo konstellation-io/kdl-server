@@ -7,14 +7,13 @@ import UserFilters from './UserFilters';
 import IconSync from '@material-ui/icons/Cached';
 import styles from './UserFiltersAndActions.module.scss';
 import { useMutation } from '@apollo/client';
-import { loader } from 'graphql.macro';
 
 import { SyncUsers } from 'Graphql/mutations/types/SyncUsers';
 import { toast } from 'react-toastify';
 import useActionDisableDelay from 'Hooks/useActionDisableDelay';
 import { CONFIG } from 'index';
 
-const syncUsersMutation = loader('Graphql/mutations/syncUsers.graphql');
+import syncUsersMutation from 'Graphql/mutations/syncUsers';
 
 type Props = {
   onUpdateAccessLevel: (newAccessLevel: AccessLevel) => void;

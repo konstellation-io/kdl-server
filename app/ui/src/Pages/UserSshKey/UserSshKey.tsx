@@ -6,14 +6,13 @@ import { GetSSHKey } from 'Graphql/queries/types/GetSSHKey';
 import React from 'react';
 import SSHKey from './components/SSHKey/SSHKey';
 import { copyAndToast } from 'Utils/clipboard';
-import { loader } from 'graphql.macro';
 import styles from './UserSshKey.module.scss';
 import { toast } from 'react-toastify';
 import { useQuery } from '@apollo/client';
 import useSSHKey from 'Graphql/hooks/useSSHKey';
 
-const GetSSHKeys = loader('Graphql/queries/getSSHKey.graphql');
-const GetMeQuery = loader('Graphql/queries/getMe.graphql');
+import GetSSHKeys from 'Graphql/queries/getSSHKey';
+import GetMeQuery from 'Graphql/queries/getMe';
 
 function UserSshKey() {
   const { data, loading, error } = useQuery<GetSSHKey>(GetSSHKeys);

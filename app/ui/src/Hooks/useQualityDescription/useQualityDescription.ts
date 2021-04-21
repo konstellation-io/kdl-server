@@ -4,12 +4,9 @@ import {
 } from 'Graphql/queries/types/GetQualityProjectDesc';
 import { useEffect, useRef, useState } from 'react';
 
-import { loader } from 'graphql.macro';
 import { useLazyQuery } from '@apollo/client';
 
-const GetQualityProjectDescQuery = loader(
-  'Graphql/queries/getQualityProjectDesc.graphql'
-);
+import GetQualityProjectDescQuery from 'Graphql/queries/getQualityProjectDesc';
 
 type Options = {
   skipFirstRun?: boolean;

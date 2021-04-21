@@ -70,12 +70,10 @@ func (i interactor) AddMembers(ctx context.Context, opt AddMembersOption) (entit
 	}
 
 	// Add collaborators to the Gitea repository
-	if p.Repository.Type == entity.RepositoryTypeInternal {
-		for _, u := range opt.Users {
-			err = i.giteaService.AddCollaborator(p.Repository.InternalRepoName, u.Username, MemberAccessLevelOnCreation)
-			if err != nil {
-				return entity.Project{}, err
-			}
+	for _, u := range opt.Users {
+		err = i.giteaService.AddCollaborator(p.Repository.RepoName, u.Username, MemberAccessLevelOnCreation)
+		if err != nil {
+			return entity.Project{}, err
 		}
 	}
 
@@ -126,12 +124,10 @@ func (i interactor) RemoveMembers(ctx context.Context, opt RemoveMembersOption) 
 	}
 
 	// Remove collaborators from the Gitea repository
-	if p.Repository.Type == entity.RepositoryTypeInternal {
-		for _, u := range opt.Users {
-			err = i.giteaService.RemoveCollaborator(p.Repository.InternalRepoName, u.Username)
-			if err != nil {
-				return entity.Project{}, err
-			}
+	for _, u := range opt.Users {
+		err = i.giteaService.RemoveCollaborator(p.Repository.RepoName, u.Username)
+		if err != nil {
+			return entity.Project{}, err
 		}
 	}
 
@@ -172,13 +168,11 @@ func (i interactor) UpdateMembers(ctx context.Context, opt UpdateMembersOption) 
 		}
 	}
 
-	// If the repository is internal, update collaborator permissions in Gitea repository
-	if p.Repository.Type == entity.RepositoryTypeInternal {
-		for _, u := range opt.Users {
-			err = i.giteaService.UpdateCollaboratorPermissions(p.Repository.InternalRepoName, u.Username, opt.AccessLevel)
-			if err != nil {
-				return entity.Project{}, err
-			}
+	// Update collaborator permissions in Gitea repository
+	for _, u := range opt.Users {
+		err = i.giteaService.UpdateCollaboratorPermissions(p.Repository.RepoName, u.Username, opt.AccessLevel)
+		if err != nil {
+			return entity.Project{}, err
 		}
 	}
 

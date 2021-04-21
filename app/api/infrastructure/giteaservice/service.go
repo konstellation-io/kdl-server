@@ -90,7 +90,7 @@ func (g *giteaService) CreateRepo(name, ownerUsername string) error {
 }
 
 // MirrorRepo creates a mirror of an external repository in the KDL organization.
-func (g *giteaService) MirrorRepo(url, repoName, userName, userToken string) error {
+func (g *giteaService) MirrorRepo(url, repoName, userName, userToken, ownerUsername string) error {
 	repo, _, err := g.client.MigrateRepo(gitea.MigrateRepoOption{
 		RepoOwner:    kdlOrganization,
 		RepoName:     repoName,
@@ -98,6 +98,7 @@ func (g *giteaService) MirrorRepo(url, repoName, userName, userToken string) err
 		AuthUsername: userName,
 		AuthToken:    userToken,
 		Mirror:       true,
+		Private:      true,
 	})
 
 	if err != nil {
@@ -106,7 +107,7 @@ func (g *giteaService) MirrorRepo(url, repoName, userName, userToken string) err
 
 	g.logger.Infof("Mirrored repository from \"%s\" in organization \"%s\" in Gitea with id \"%d\"", url, kdlOrganization, repo.ID)
 
-	return nil
+	return g.AddCollaborator(repoName, ownerUsername, entity.AccessLevelAdmin)
 }
 
 // AddCollaborator adds a new collaborator to the given repository.

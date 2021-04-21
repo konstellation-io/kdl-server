@@ -10,11 +10,9 @@ import IconEdit from '@material-ui/icons/Edit';
 import React, { useMemo } from 'react';
 import { AccessLevel, RepositoryType } from 'Graphql/types/globalTypes';
 import styles from './TabGit.module.scss';
-import { GetMe } from 'Graphql/queries/types/GetMe';
 import { useQuery } from '@apollo/client';
-import { loader } from 'graphql.macro';
-
-const GetMeQuery = loader('Graphql/queries/getMe.graphql');
+import GetMeQuery from 'Graphql/queries/getMe';
+import { GetMe } from 'Graphql/queries/types/GetMe';
 
 type Props = {
   project: GetProjects_projects;

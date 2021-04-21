@@ -180,7 +180,7 @@ func TestInteractor_CreateExternal(t *testing.T) {
 		},
 	}
 
-	s.mocks.giteaService.EXPECT().MirrorRepo(externalRepoURL, repoName, externalRepoUsername, externalRepoToken).Return(nil)
+	s.mocks.giteaService.EXPECT().MirrorRepo(externalRepoURL, repoName, externalRepoUsername, externalRepoToken, ownerUsername).Return(nil)
 	s.mocks.minioService.EXPECT().CreateBucket(repoName).Return(nil)
 	s.mocks.droneService.EXPECT().ActivateRepository(repoName).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
@@ -254,8 +254,8 @@ func TestInteractor_AddMembers(t *testing.T) {
 	p.ID = someProjectID
 	p.Members = []entity.Member{adminMember}
 	p.Repository = entity.Repository{
-		Type:             entity.RepositoryTypeInternal,
-		InternalRepoName: "repo-A",
+		Type:     entity.RepositoryTypeInternal,
+		RepoName: "repo-A",
 	}
 
 	usersToAdd := []entity.User{
@@ -275,10 +275,10 @@ func TestInteractor_AddMembers(t *testing.T) {
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
 	gomock.InOrder(
 		s.mocks.giteaService.EXPECT().
-			AddCollaborator(p.Repository.InternalRepoName, usersToAdd[0].Username, project.MemberAccessLevelOnCreation).
+			AddCollaborator(p.Repository.RepoName, usersToAdd[0].Username, project.MemberAccessLevelOnCreation).
 			Return(nil),
 		s.mocks.giteaService.EXPECT().
-			AddCollaborator(p.Repository.InternalRepoName, usersToAdd[1].Username, project.MemberAccessLevelOnCreation).
+			AddCollaborator(p.Repository.RepoName, usersToAdd[1].Username, project.MemberAccessLevelOnCreation).
 			Return(nil),
 	)
 	s.mocks.clock.EXPECT().Now().Return(now)
@@ -323,8 +323,8 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 		{UserID: usersToRemove[1].ID},
 	}
 	p.Repository = entity.Repository{
-		Type:             entity.RepositoryTypeInternal,
-		InternalRepoName: "repo-A",
+		Type:     entity.RepositoryTypeInternal,
+		RepoName: "repo-A",
 	}
 
 	expectedProject := entity.NewProject(p.Name, p.Description)
@@ -333,10 +333,10 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
 	s.mocks.giteaService.EXPECT().
-		RemoveCollaborator(p.Repository.InternalRepoName, usersToRemove[0].Username).
+		RemoveCollaborator(p.Repository.RepoName, usersToRemove[0].Username).
 		Return(nil)
 	s.mocks.giteaService.EXPECT().
-		RemoveCollaborator(p.Repository.InternalRepoName, usersToRemove[1].Username).
+		RemoveCollaborator(p.Repository.RepoName, usersToRemove[1].Username).
 		Return(nil)
 
 	s.mocks.repo.EXPECT().RemoveMembers(ctx, p.ID, usersToRemove).Return(nil)
@@ -413,8 +413,8 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 		{UserID: usersToUpd[1].ID},
 	}
 	p.Repository = entity.Repository{
-		Type:             entity.RepositoryTypeInternal,
-		InternalRepoName: "repo-A",
+		Type:     entity.RepositoryTypeInternal,
+		RepoName: "repo-A",
 	}
 
 	expectedProject := entity.NewProject(p.Name, p.Description)
@@ -423,10 +423,10 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
 	s.mocks.giteaService.EXPECT().
-		UpdateCollaboratorPermissions(p.Repository.InternalRepoName, usersToUpd[0].Username, newAccessLevel).
+		UpdateCollaboratorPermissions(p.Repository.RepoName, usersToUpd[0].Username, newAccessLevel).
 		Return(nil)
 	s.mocks.giteaService.EXPECT().
-		UpdateCollaboratorPermissions(p.Repository.InternalRepoName, usersToUpd[1].Username, newAccessLevel).
+		UpdateCollaboratorPermissions(p.Repository.RepoName, usersToUpd[1].Username, newAccessLevel).
 		Return(nil)
 
 	s.mocks.repo.EXPECT().UpdateMembersAccessLevel(ctx, p.ID, usersToUpd, newAccessLevel).Return(nil)

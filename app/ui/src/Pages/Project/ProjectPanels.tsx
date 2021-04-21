@@ -15,7 +15,6 @@ import Panel from 'Components/Layout/Panel/Panel';
 import ProjectSettings from './panels/ProjectSettings/ProjectSettings';
 import ResourceDetails from './pages/KG/components/ResourceDetails/ResourceDetails';
 import UpdateProjectDescription from './panels/UpdateProjectDescription/UpdateProjectDescription';
-import UpdateRepository from './panels/UpdateRepository/UpdateRepository';
 import styles from './Project.module.scss';
 import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
 import { useReactiveVar } from '@apollo/client';
@@ -65,9 +64,6 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
         settingsOpenedTab={settingsOpenedTab}
         setSettingsOpenedTab={setSettingsOpenedTab}
       />
-    ),
-    [PANEL_ID.REPOSITORY_INFO]: (
-      <UpdateRepository project={openedProject} close={panel2Close} />
     ),
     [PANEL_ID.PROJECT_DESCRIPTION]: (
       <UpdateProjectDescription project={openedProject} close={panel2Close} />

@@ -4,10 +4,10 @@
 @import 'Styles/shadows';
 
 $state-to-color: (
-        good: palette(success),
-        notSoBad: palette(feedback),
-        notGood: palette(alert),
-        bad: palette(error),
+  good: palette(success),
+  notSoBad: palette(feedback),
+  notGood: palette(alert),
+  bad: palette(error),
 );
 
 @each $class, $color in $state-to-color {

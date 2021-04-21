@@ -39,13 +39,13 @@ export interface CreateProjectInput {
   repository: RepositoryInput;
 }
 
-export interface ExternalRepository {
+export interface ExternalRepositoryInput {
   url: string;
   username: string;
   token: string;
 }
 
-export interface InternalRepository {
+export interface InternalRepositoryInput {
   name: string;
 }
 
@@ -60,8 +60,8 @@ export interface RemoveMembersInput {
 
 export interface RepositoryInput {
   type: RepositoryType;
-  external?: ExternalRepository | null;
-  internal?: InternalRepository | null;
+  external?: ExternalRepositoryInput | null;
+  internal?: InternalRepositoryInput | null;
 }
 
 export interface SetActiveUserToolsInput {
@@ -89,12 +89,7 @@ export interface UpdateProjectInput {
   id: string;
   name?: string | null;
   description?: string | null;
-  repository?: UpdateProjectRepositoryInput | null;
   archived?: boolean | null;
-}
-
-export interface UpdateProjectRepositoryInput {
-  url: string;
 }
 
 //==============================================================

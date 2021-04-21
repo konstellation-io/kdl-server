@@ -3,10 +3,10 @@
 @import 'Styles/colors';
 
 .tick {
-   rect {
-     fill: palette(base, 700);
-     stroke: palette(base, 300);
-   }
+  rect {
+    fill: palette(base, 700);
+    stroke: palette(base, 300);
+  }
   text {
     fill: currentColor;
     dominant-baseline: middle;

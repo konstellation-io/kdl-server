@@ -29,13 +29,13 @@ type CreateProjectInput struct {
 	Repository  *RepositoryInput `json:"repository"`
 }
 
-type ExternalRepository struct {
+type ExternalRepositoryInput struct {
 	URL      string `json:"url"`
 	Username string `json:"username"`
 	Token    string `json:"token"`
 }
 
-type InternalRepository struct {
+type InternalRepositoryInput struct {
 	Name string `json:"name"`
 }
 
@@ -57,9 +57,9 @@ type RemoveUsersInput struct {
 }
 
 type RepositoryInput struct {
-	Type     entity.RepositoryType `json:"type"`
-	External *ExternalRepository   `json:"external"`
-	Internal *InternalRepository   `json:"internal"`
+	Type     entity.RepositoryType    `json:"type"`
+	External *ExternalRepositoryInput `json:"external"`
+	Internal *InternalRepositoryInput `json:"internal"`
 }
 
 type SetActiveUserToolsInput struct {
@@ -98,13 +98,8 @@ type UpdateMembersInput struct {
 }
 
 type UpdateProjectInput struct {
-	ID          string                        `json:"id"`
-	Name        *string                       `json:"name"`
-	Description *string                       `json:"description"`
-	Repository  *UpdateProjectRepositoryInput `json:"repository"`
-	Archived    *bool                         `json:"archived"`
-}
-
-type UpdateProjectRepositoryInput struct {
-	URL string `json:"url"`
+	ID          string  `json:"id"`
+	Name        *string `json:"name"`
+	Description *string `json:"description"`
+	Archived    *bool   `json:"archived"`
 }

@@ -1,9 +1,9 @@
-import React, {useMemo} from 'react';
-import {Tab, TabList, TabPanel, Tabs} from 'react-tabs';
+import React, { useMemo } from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
-import {KGItem} from '../../KG';
+import { KGItem } from '../../KG';
 import ResourcesList from './components/ResourcesList/ResourcesList';
-import {orderBy} from 'lodash';
+import { orderBy } from 'lodash';
 import styles from './ResourceLists.module.scss';
 
 const NO_ITEMS_MESSAGE = {

@@ -41,7 +41,7 @@ function ProjectSettings({
             <TabInfo project={project} />
           </TabPanel>
           <TabPanel>
-            <TabGit repository={project.repository} />
+            <TabGit project={project} />
           </TabPanel>
           <TabPanel>
             <TabMembers projectId={project.id} />

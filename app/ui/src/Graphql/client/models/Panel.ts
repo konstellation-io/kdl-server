@@ -10,7 +10,6 @@ export type PanelInfo = {
 
 export enum PANEL_ID {
   SETTINGS = 'settings',
-  REPOSITORY_INFO = 'repositoryInfo',
   PROJECT_DESCRIPTION = 'projectDescription',
   MEMBER_INFO = 'memberInfo',
   KG_RESULTS = 'kgResults',

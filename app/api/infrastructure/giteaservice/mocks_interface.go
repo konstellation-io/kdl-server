@@ -92,17 +92,17 @@ func (mr *MockGiteaClientMockRecorder) FindAllUsers() *gomock.Call {
 }
 
 // MirrorRepo mocks base method.
-func (m *MockGiteaClient) MirrorRepo(url, repoName, userName, userToken string) error {
+func (m *MockGiteaClient) MirrorRepo(url, repoName, userName, userToken, ownerUsername string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MirrorRepo", url, repoName, userName, userToken)
+	ret := m.ctrl.Call(m, "MirrorRepo", url, repoName, userName, userToken, ownerUsername)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // MirrorRepo indicates an expected call of MirrorRepo.
-func (mr *MockGiteaClientMockRecorder) MirrorRepo(url, repoName, userName, userToken interface{}) *gomock.Call {
+func (mr *MockGiteaClientMockRecorder) MirrorRepo(url, repoName, userName, userToken, ownerUsername interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MirrorRepo", reflect.TypeOf((*MockGiteaClient)(nil).MirrorRepo), url, repoName, userName, userToken)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MirrorRepo", reflect.TypeOf((*MockGiteaClient)(nil).MirrorRepo), url, repoName, userName, userToken, ownerUsername)
 }
 
 // RemoveCollaborator mocks base method.

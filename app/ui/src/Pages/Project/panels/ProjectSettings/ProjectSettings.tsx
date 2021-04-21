@@ -10,7 +10,6 @@ import TabMembers from './components/TabMembers/TabMembers';
 import cx from 'classnames';
 import styles from './ProjectSettings.module.scss';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
-import { RepositoryType } from '../../../../Graphql/types/globalTypes';
 
 type Props = {
   project: GetProjects_projects;

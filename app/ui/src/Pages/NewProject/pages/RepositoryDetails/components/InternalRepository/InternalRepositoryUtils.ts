@@ -1,5 +1,5 @@
 import { CHECK } from 'kwc';
-import { replaceAll } from '../../../../../../Utils/string';
+import { replaceAll } from 'Utils/string';
 
 export function validateSlug(value: string) {
   return CHECK.getValidationError([

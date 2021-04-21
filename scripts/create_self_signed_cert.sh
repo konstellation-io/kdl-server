@@ -27,6 +27,7 @@ if [ "$OS" = "Darwin" ]; then
   mv _wildcard.* .certs/toolkit
   echo "Creating K8S secrets with the CA private keys"
   kubectl -n $NAMESPACE create secret tls $DOMAIN-tls-secret --key=$CA_CERTS_FOLDER/_wildcard.$DOMAIN-key.pem --cert=$CA_CERTS_FOLDER/_wildcard.$DOMAIN.pem --dry-run -o yaml | kubectl apply -f -
+  kubectl -n $NAMESPACE create secret generic mkcert-ca --from-file=mkcert-ca.crt=${HOME}/Library/Application\ Support/mkcert/rootCA.pem --dry-run -o yaml | kubectl apply -f -
   exit 0
 fi
 

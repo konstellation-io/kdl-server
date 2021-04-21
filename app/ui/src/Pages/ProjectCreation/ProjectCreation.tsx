@@ -69,9 +69,6 @@ function ProjectCreation() {
     <div className={styles.container}>
       <div className={styles.wrapper}>
         <h1>Your project is creating now</h1>
-        <span className={styles.subtitle}>
-          In order to receive a login link to access
-        </span>
         <div className={styles.animation}>
           <StatusCircle
             label={projectReady ? 'CREATED' : 'CREATING...'}

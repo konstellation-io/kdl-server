@@ -97,6 +97,7 @@ module.exports = {
         },
         members: [meAsMember],
         archived: false,
+        needAccess: false,
       };
       projects.push(newProject);
       return newProject;

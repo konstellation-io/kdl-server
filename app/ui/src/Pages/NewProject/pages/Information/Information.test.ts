@@ -3,6 +3,7 @@ import {
   maxProjectNameLength,
   validateProjectName,
   validateProjectDescription,
+  validateProjectId,
 } from './InformationUtils';
 
 const loremIpsum = 'Lorem ipsum dolor sit amet.';
@@ -38,6 +39,29 @@ describe('InformationUtils', () => {
         // Arrange.
         // Act.
         const result = validateProjectDescription(description);
+        // Assert.
+        expect(result).toBe(expected);
+      }
+    );
+  });
+
+  describe('validateProjectId', function () {
+    it.each`
+      projectId                              | expected
+      ${''}                                  | ${'This field cannot be empty'}
+      ${'A'}                                 | ${`The id must start with a lowercase letter`}
+      ${'4'}                                 | ${`The id must start with a lowercase letter`}
+      ${'aa'}                                | ${`The id must contain at least 3 characters`}
+      ${'ciao-mamma-guarda-come-mi-diverto'} | ${`The id must contain at most 20 characters`}
+      ${'foo?bar'}                           | ${`The id only can contain lowercase alphanumeric and hyphens`}
+      ${'foo-bar-'}                          | ${`The id is not correct`}
+      ${'foo-bar-baz'}                       | ${true}
+    `(
+      'should return $expected when the project id is $projectId',
+      ({ projectId, expected }) => {
+        // Arrange.
+        // Act.
+        const result = validateProjectId(projectId);
         // Assert.
         expect(result).toBe(expected);
       }

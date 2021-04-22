@@ -18,22 +18,30 @@ export function validateProjectDescription(description: string) {
   ]);
 }
 
-export function validateProjectId(value: string) {
+export function validateProjectId(projectId: string) {
   return CHECK.getValidationError([
-    CHECK.isLowerCase(value),
-    CHECK.matches(value, /^[a-z]/, 'The id must start with a lowercase letter'),
-    CHECK.matches(value, /.{3,}/, 'The id must contain at least 3 characters'),
+    CHECK.isFieldNotEmpty(projectId),
     CHECK.matches(
-      value,
+      projectId,
+      /^[a-z]/,
+      'The id must start with a lowercase letter'
+    ),
+    CHECK.matches(
+      projectId,
+      /.{3,}/,
+      'The id must contain at least 3 characters'
+    ),
+    CHECK.matches(
+      projectId,
       /^.{0,20}$/,
       'The id must contain at most 20 characters'
     ),
     CHECK.isAlphanumeric(
-      replaceAll(value, /-/, ''),
+      replaceAll(projectId, /-/, ''),
       'The id only can contain lowercase alphanumeric and hyphens'
     ),
     CHECK.matches(
-      value,
+      projectId,
       /^[a-z]([-a-z0-9]*[a-z0-9])?$/,
       'The id is not correct'
     ),

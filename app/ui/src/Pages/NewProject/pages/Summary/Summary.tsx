@@ -53,7 +53,7 @@ function Summary() {
           <p className={styles.name}>{name}</p>
         </Field>
         <Field title="PROJECT ID">
-          <p className={styles.name}>{id}</p>
+          <p className={styles.id}>{id}</p>
         </Field>
         <Field title="REPOSITORY URL">
           <div className={styles.repository}>

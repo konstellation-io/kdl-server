@@ -22,12 +22,21 @@
 
   .descriptionContainer,
   .url,
-  .name {
-    margin: 0;
+  .name,
+  .id{
+    margin: 0 * $grid-unit;
+  }
+  .name,
+  .id {
+    margin-top: 0.5 * $grid-unit;
   }
   .name {
     @include font-headline;
     color: font-color(light);
+  }
+  .id {
+    @include font-subheader;
+    color: font-color(lowlight);
   }
   .url {
     @include font-body;

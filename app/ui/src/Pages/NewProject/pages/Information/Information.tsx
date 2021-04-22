@@ -53,18 +53,32 @@ function Information({ showErrors }: Props) {
 
   if (!project || loading) return <SpinnerCircular />;
 
+  function handleNameChange(name: string) {
+    const generatedId = generateSlug(name);
+    updateValue('name', name);
+    updateValue('id', generatedId);
+    clearError('name');
+    clearError('id');
+  }
+
+  function validateName() {
+    const isValidName = validateProjectName(name, projectsNames);
+    updateError('name', getErrorMsg(isValidName));
+  }
+
+  function validateId() {
+    const isValidId = validateProjectId(id, projectsIds);
+    updateError('id', getErrorMsg(isValidId));
+  }
+
   return (
     <div className={styles.container}>
       <TextInput
         label="project name"
-        onChange={(v: string) => {
-          updateValue('name', v);
-          clearError('name');
-        }}
+        onChange={handleNameChange}
         onBlur={() => {
-          updateValue('id', generateSlug(name));
-          const isValidName = validateProjectName(name, projectsNames);
-          updateError('name', getErrorMsg(isValidName));
+          validateName();
+          validateId();
         }}
         formValue={name}
         autoFocus
@@ -77,10 +91,7 @@ function Information({ showErrors }: Props) {
           updateValue('id', v);
           clearError('id');
         }}
-        onBlur={() => {
-          const isValidId = validateProjectId(id, projectsIds);
-          updateError('id', getErrorMsg(isValidId));
-        }}
+        onBlur={validateId}
         formValue={id}
         showClearButton
         error={showErrors ? errorId : ''}

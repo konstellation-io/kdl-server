@@ -9,11 +9,11 @@ import MessageActionBox, {
 } from 'Components/MessageActionBox/MessageActionBox';
 
 function InternalRepository() {
-  const warningMessage =
-    "Be careful, once the project has been created you cannot change the project id. We use this id to create all the pieces Konstellation needs in order to offer a better AI dev experience. Also take into account that we are using the project id to create the url, so if you don't like it you are in time to change, you can modify the project id going back to the first step. The url we are generating is unique and will be immutable, you can copy it now or you'll be able to copy it in other sections of the application.";
   const {
     information: { values },
   } = useReactiveVar(newProject);
+
+  const warningMessage = `The id you have picked is: ${values.id}. Be careful, once the project has been created you cannot change the project id. We use this id to create all the pieces Konstellation needs in order to offer a better AI dev experience. Also take into account that we are using the project id to create the url, so if you don't like it you are in time to change, you can modify the project id going back to the first step. The url we are generating is unique and will be immutable, you can copy it now or you'll be able to copy it in other sections of the application.`;
 
   return (
     <div className={styles.repositoryInternal}>

@@ -55,7 +55,7 @@ describe('InformationUtils', () => {
       ${'aa'}                                | ${[]}          | ${`The id must contain at least 3 characters`}
       ${'ciao-mamma-guarda-come-mi-diverto'} | ${[]}          | ${`The id must contain at most 20 characters`}
       ${'foo?bar'}                           | ${[]}          | ${`The id only can contain lowercase alphanumeric and hyphens`}
-      ${'foo-bar-'}                          | ${[]}          | ${`The id is not correct`}
+      ${'foo-bar-'}                          | ${[]}          | ${`Enter a valid id consisting of letters, numbers or hyphens.`}
       ${'foo-bar'}                           | ${['foo-bar']} | ${`Duplicated id. This identifier has been used in another project, please choose a new one`}
       ${'foo-bar-baz'}                       | ${[]}          | ${true}
     `(

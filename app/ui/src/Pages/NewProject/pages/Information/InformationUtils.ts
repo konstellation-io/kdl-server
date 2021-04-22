@@ -36,7 +36,11 @@ export function validateProjectId(id: string, projectsIds: string[] = []) {
       replaceAll(id, /-/, ''),
       'The id only can contain lowercase alphanumeric and hyphens'
     ),
-    CHECK.matches(id, /^[a-z]([-a-z0-9]*[a-z0-9])?$/, 'The id is not correct'),
+    CHECK.matches(
+      id,
+      /^[a-z]([-a-z0-9]*[a-z0-9])?$/,
+      'Enter a valid id consisting of letters, numbers or hyphens.'
+    ),
     CHECK.isItemDuplicated(
       id,
       projectsIds,

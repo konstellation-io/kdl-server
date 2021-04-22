@@ -1,5 +1,5 @@
 import { CHECK } from 'kwc';
-import { replaceAll } from '../../../../Utils/string';
+import { replaceAll } from 'Utils/string';
 
 export const maxProjectNameLength = 100;
 export const maxProjectDescriptionLength = 100000;

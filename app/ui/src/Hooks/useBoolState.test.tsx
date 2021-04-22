@@ -12,20 +12,31 @@ const { value, setValue, toggle, activate, deactivate } = getHook();
 
 describe('useBoolState hook', () => {
   it('shows right initial state', () => {
+    // Arrange.
+    // Act.
+    // Assert.
     expect(value).toBeFalsy();
   });
 
   it('handles state changes', () => {
+    // Arrange.
+    // Act.
     activate();
-    expect(getValue()).toBeTruthy();
+    const defaultValue = getValue();
 
     deactivate();
-    expect(getValue()).toBeFalsy();
+    const deactivatedValue = getValue();
 
     toggle();
-    expect(getValue()).toBeTruthy();
+    const toggledValue = getValue();
 
     setValue(false);
-    expect(getValue()).toBeFalsy();
+    const afterSetValue = getValue();
+
+    // Assert.
+    expect(defaultValue).toBeTruthy();
+    expect(deactivatedValue).toBeFalsy();
+    expect(toggledValue).toBeTruthy();
+    expect(afterSetValue).toBeFalsy();
   });
 });

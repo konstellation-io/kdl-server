@@ -23,39 +23,60 @@ describe('useNavigation hook - loop', () => {
   const getHook = () => wrapper.find('div').props().hook;
 
   it('shows right initial state', () => {
+    // Arrange.
+    // Act.
+    // Assert.
     expect(getHook().actStep).toBe(0);
   });
 
   it('calls beforeGoToStep properly', () => {
+    // Arrange.
+    // Act.
     getHook().goToStep(2);
     getHook().prevStep();
 
+    // Assert.
     expect(beforeGoToStepMock).toHaveBeenCalledTimes(2);
   });
 
   it('moves between steps', () => {
+    // Arrange.
+    // Act.
     getHook().goToStep(3);
-
-    expect(getHook().actStep).toBe(3);
-    expect(getHook().direction).toBe('next');
+    const goToStepStep = getHook().actStep;
+    const goToStepDirection = getHook().direction;
 
     getHook().prevStep();
-    expect(getHook().actStep).toBe(2);
-    expect(getHook().direction).toBe('prev');
+    const prevStepStep = getHook().actStep;
+    const prevStepDirection = getHook().direction;
+
+    // Assert.
+    expect(goToStepStep).toBe(3);
+    expect(goToStepDirection).toBe('next');
+    expect(prevStepStep).toBe(2);
+    expect(prevStepDirection).toBe('prev');
   });
 
   it('handles loop moves', () => {
+    // Arrange.
+    // Act.
     getHook().goToStep(3);
-
-    expect(getHook().actStep).toBe(3);
+    const goToStepStep = getHook().actStep;
 
     getHook().nextStep();
-    expect(getHook().actStep).toBe(0);
-    expect(getHook().direction).toBe('prev');
+    const nextStepStep = getHook().actStep;
+    const nextStepDirection = getHook().direction;
 
     getHook().prevStep();
-    expect(getHook().actStep).toBe(3);
-    expect(getHook().direction).toBe('next');
+    const prevStepStep = getHook().actStep;
+    const prevStepDirection = getHook().direction;
+
+    // Assert.
+    expect(goToStepStep).toBe(3);
+    expect(nextStepStep).toBe(0);
+    expect(nextStepDirection).toBe('prev');
+    expect(prevStepStep).toBe(3);
+    expect(prevStepDirection).toBe('next');
   });
 });
 

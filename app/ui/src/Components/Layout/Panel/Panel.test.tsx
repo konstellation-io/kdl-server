@@ -25,18 +25,27 @@ describe('Panel component', () => {
   });
 
   it('show right texts', () => {
+    // Arrange.
+    // Act.
+    // Assert.
     expect(component.contains('Some title')).toBeTruthy();
   });
 
   it('handles events', () => {
+    // Arrange.
+    // Act.
     component.find(Button).simulate('click');
 
+    // Assert.
     expect(onCloseMock).toHaveBeenCalledTimes(1);
   });
 
   it('hides content when closed', () => {
+    // Arrange.
+    // Act.
     component.setProps({ show: false });
 
+    // Assert.
     expect(component.find('.container').isEmptyRender()).toBeTruthy();
   });
 });

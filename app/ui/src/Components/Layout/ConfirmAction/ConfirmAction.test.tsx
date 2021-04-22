@@ -32,25 +32,27 @@ describe('ConfirmAction component - without input', () => {
   });
 
   it('show right texts', () => {
-    // First, make the modal visible
+    // Arrange.
+    // Act.
     component
       .find('div')
       .first()
       .simulate('click', { stopPropagation() {} });
 
+    // Assert.
     expect(component.contains('Some message')).toBeTruthy();
   });
 
   it('handles events', () => {
-    // First, make the modal visible
+    // Arrange.
+    // Act.
     component
       .find('div')
       .first()
       .simulate('click', { stopPropagation() {} });
-
-    // Then click on Accept button
     component.find(ModalContainer).props().onAccept();
 
+    // Assert.
     expect(actionMock).toHaveBeenCalledTimes(1);
   });
 });
@@ -81,12 +83,14 @@ describe('ConfirmAction component - with input', () => {
   });
 
   it('show right texts', () => {
-    // First, make the modal visible
+    // Arrange.
+    // Act.
     component
       .find('div')
       .first()
       .simulate('click', { stopPropagation() {} });
 
+    // Assert.
     expect(component.contains('Some message')).toBeTruthy();
     expect(component.find(ModalLayoutJustify).props().label).toBe(
       'WRITE "WORD"'

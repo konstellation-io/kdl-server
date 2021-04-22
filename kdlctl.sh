@@ -22,7 +22,6 @@ SKIP_FRONTEND_BUILD=0
 SKIP_OPERATOR_BUILD=0
 OPERATOR_SDK_INSTALLED=0
 MINIKUBE_RESET=0
-MONORUNTIME_MODE=0
 MONGO_POD=""
 ENABLE_TLS=false
 OS=$(uname)
@@ -41,6 +40,7 @@ MONGO_PASS=123456
 . ./scripts/kdlctl/cmd_deploy.sh
 . ./scripts/kdlctl/cmd_restart.sh
 . ./scripts/kdlctl/cmd_login.sh
+. ./scripts/kdlctl/cmd_uninstall.sh
 
 check_requirements
 
@@ -112,10 +112,15 @@ case $COMMAND in
     exit 0
   ;;
 
-  
   restart)
     cmd_restart "$@"
     echo_done "Restart done"
+    exit 0
+  ;;
+
+  uninstall)
+    cmd_uninstall "$@"
+    echo_done "Uninstall done"
     exit 0
   ;;
 
@@ -127,4 +132,3 @@ case $COMMAND in
     exit 1
 
 esac
-

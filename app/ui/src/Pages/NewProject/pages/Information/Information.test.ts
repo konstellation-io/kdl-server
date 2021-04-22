@@ -56,7 +56,7 @@ describe('InformationUtils', () => {
       ${'ciao-mamma-guarda-come-mi-diverto'} | ${[]}          | ${`The id must contain at most 20 characters`}
       ${'foo?bar'}                           | ${[]}          | ${`The id only can contain lowercase alphanumeric and hyphens`}
       ${'foo-bar-'}                          | ${[]}          | ${`The id is not correct`}
-      ${'foo-bar'}                           | ${['foo-bar']} | ${`Duplicated id. Please change it and choose a valid and unique project id.`}
+      ${'foo-bar'}                           | ${['foo-bar']} | ${`Duplicated id. This identifier has been used in another project, please choose a new one`}
       ${'foo-bar-baz'}                       | ${[]}          | ${true}
     `(
       'should return $expected when the project id is $projectId',

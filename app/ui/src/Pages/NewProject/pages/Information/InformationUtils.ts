@@ -40,7 +40,7 @@ export function validateProjectId(id: string, projectsIds: string[] = []) {
     CHECK.isItemDuplicated(
       id,
       projectsIds,
-      'id. Please change it and choose a valid and unique project id.'
+      'id. This identifier has been used in another project, please choose a new one'
     ),
   ]);
 }

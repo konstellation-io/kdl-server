@@ -20,7 +20,7 @@ describe('generateSlug', () => {
     name             | expected
     ${'hello'}       | ${'hello'}
     ${'hel lo'}      | ${'hel-lo'}
-    ${'he'}          | ${'slug-he'}
+    ${'he'}          | ${'he'}
     ${' hello '}     | ${'hello'}
     ${' h#el@l!!o '} | ${'hello'}
   `('formats string properly', ({ name, expected }) => {

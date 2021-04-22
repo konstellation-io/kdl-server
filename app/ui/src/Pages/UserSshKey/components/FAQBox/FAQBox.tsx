@@ -49,13 +49,15 @@ function FAQBox({
         <IconHelp className="icon-small" />
         <p className={styles.label}>{label}</p>
       </div>
-      <MessageActionBox
-        title={title}
-        description={description}
-        action={action}
-        customAction={customAction}
-        theme={theme}
-      />
+      <div className={styles.actionBox}>
+        <MessageActionBox
+          title={title}
+          description={description}
+          action={action}
+          customAction={customAction}
+          theme={theme}
+        />
+      </div>
     </AnimateHeight>
   );
 }

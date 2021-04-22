@@ -26,20 +26,22 @@ function TabDangerZone({ projectId }: Props) {
       <p className={styles.title}>
         Everything you do in this area is dangerous, be careful.
       </p>
-      <MessageActionBox
-        title="Archive project"
-        description="This project will be accessible and you will be able to recover it, but while it is
-          archived you will not be able to make changes or use any resources associated with this project. To 
-          access this project again after being archived, go to server projects and filter by ARCHIVED (by 
+      <div className={styles.actionBox}>
+        <MessageActionBox
+          title="Archive project"
+          description="This project will be accessible and you will be able to recover it, but while it is
+          archived you will not be able to make changes or use any resources associated with this project. To
+          access this project again after being archived, go to server projects and filter by ARCHIVED (by
           default, archived projects are hidden)."
-        action={{
-          label: 'Archive',
-          onClick: () => updateProjectArchived(projectId, true),
-          Icon: IconArchive,
-          loading,
-        }}
-        theme={BOX_THEME.DEFAULT}
-      />
+          action={{
+            label: 'Archive',
+            onClick: () => updateProjectArchived(projectId, true),
+            Icon: IconArchive,
+            loading,
+          }}
+          theme={BOX_THEME.DEFAULT}
+        />
+      </div>
     </div>
   );
 }

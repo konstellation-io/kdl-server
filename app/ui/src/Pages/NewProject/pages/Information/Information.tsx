@@ -66,7 +66,6 @@ function Information({ showErrors }: Props) {
           updateError('id', getErrorMsg(isValidId));
         }}
         formValue={id}
-        autoFocus
         showClearButton
         error={showErrors ? errorId : ''}
         helpText="Once the project is created you cannot change this id"

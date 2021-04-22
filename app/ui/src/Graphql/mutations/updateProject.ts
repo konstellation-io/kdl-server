@@ -6,6 +6,11 @@ export default gql`
       id
       name
       description
+      repository {
+        error
+        type
+        url
+      }
       archived
     }
   }

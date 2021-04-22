@@ -18,7 +18,7 @@ function RepositoryDetails({ showErrors }: Props) {
       {isExternal ? (
         <ExternalRepository showErrors={showErrors} />
       ) : (
-        <InternalRepository showErrors={showErrors} />
+        <InternalRepository />
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 import { CHECK } from 'kwc';
+import { replaceAll } from '../../../../Utils/string';
 
 export const maxProjectNameLength = 100;
 export const maxProjectDescriptionLength = 100000;
@@ -9,9 +10,32 @@ export function validateProjectName(name: string) {
     CHECK.isLengthAllowed(name, maxProjectNameLength),
   ]);
 }
+
 export function validateProjectDescription(description: string) {
   return CHECK.getValidationError([
     CHECK.isFieldNotEmpty(description),
     CHECK.isLengthAllowed(description, maxProjectDescriptionLength),
+  ]);
+}
+
+export function validateProjectId(value: string) {
+  return CHECK.getValidationError([
+    CHECK.isLowerCase(value),
+    CHECK.matches(value, /^[a-z]/, 'The id must start with a lowercase letter'),
+    CHECK.matches(value, /.{3,}/, 'The id must contain at least 3 characters'),
+    CHECK.matches(
+      value,
+      /^.{0,20}$/,
+      'The id must contain at most 20 characters'
+    ),
+    CHECK.isAlphanumeric(
+      replaceAll(value, /-/, ''),
+      'The id only can contain lowercase alphanumeric and hyphens'
+    ),
+    CHECK.matches(
+      value,
+      /^[a-z]([-a-z0-9]*[a-z0-9])?$/,
+      'The id is not correct'
+    ),
   ]);
 }

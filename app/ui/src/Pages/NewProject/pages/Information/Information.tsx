@@ -1,7 +1,8 @@
 import { SpinnerCircular, TextInput } from 'kwc';
-import { generateSlug, getErrorMsg } from 'Utils/string';
+import { getErrorMsg } from 'Utils/string';
 import {
   validateProjectDescription,
+  validateProjectId,
   validateProjectName,
 } from './InformationUtils';
 
@@ -24,13 +25,14 @@ type Props = {
 function Information({ showErrors }: Props) {
   const project = useReactiveVar(newProject);
   const { updateValue, updateError, clearError } = useNewProject('information');
-  const { updateValue: updateInternalRepositoryValue } = useNewProject(
-    'internalRepository'
-  );
 
   const { values, errors } = project.information || {};
-  const { name, description } = values;
-  const { name: errorName, description: errorDescription } = errors;
+  const { name, description, id } = values;
+  const {
+    name: errorName,
+    description: errorDescription,
+    id: errorId,
+  } = errors;
 
   const { descriptionScore, loading } = useQualityDescription(description);
 
@@ -45,7 +47,6 @@ function Information({ showErrors }: Props) {
           clearError('name');
         }}
         onBlur={() => {
-          updateInternalRepositoryValue('slug', generateSlug(name));
           const isValidName = validateProjectName(name);
           updateError('name', getErrorMsg(isValidName));
         }}
@@ -53,6 +54,22 @@ function Information({ showErrors }: Props) {
         autoFocus
         showClearButton
         error={showErrors ? errorName : ''}
+      />
+      <TextInput
+        label="project id"
+        onChange={(v: string) => {
+          updateValue('id', v);
+          clearError('id');
+        }}
+        onBlur={() => {
+          const isValidId = validateProjectId(id);
+          updateError('id', getErrorMsg(isValidId));
+        }}
+        formValue={id}
+        autoFocus
+        showClearButton
+        error={showErrors ? errorId : ''}
+        helpText="Once the project is created you cannot change this id"
       />
       <TextInput
         label="project description"

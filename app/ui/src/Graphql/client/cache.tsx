@@ -28,8 +28,9 @@ export const initialProjectFilters: ProjectFilters = {
 
 export const initialNewProject: NewProject = {
   information: {
-    values: { name: '', description: '' },
+    values: { name: '', description: '', id: '' },
     errors: {
+      id: 'This field is mandatory, please fill it.',
       name: 'This field is mandatory, please fill it.',
       description: 'Please, write a description is important for the project.',
     },
@@ -51,10 +52,6 @@ export const initialNewProject: NewProject = {
       token: 'This field is mandatory',
       username: 'This field is mandatory',
     },
-  },
-  internalRepository: {
-    values: { slug: '' },
-    errors: { slug: '' },
   },
 };
 

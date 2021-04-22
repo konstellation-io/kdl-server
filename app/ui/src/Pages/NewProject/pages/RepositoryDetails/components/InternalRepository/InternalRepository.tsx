@@ -1,31 +1,15 @@
-import { CHECK, TextInput } from 'kwc';
 import React from 'react';
 
 import { CONFIG } from 'index';
 import IconLink from '@material-ui/icons/Link';
 import styles from './InternalRepository.module.scss';
-import useNewProject from 'Graphql/client/hooks/useNewProject';
 import { useReactiveVar } from '@apollo/client';
-import { getErrorMsg } from 'Utils/string';
 import { newProject } from 'Graphql/client/cache';
-import { validateSlug } from './InternalRepositoryUtils';
 
-type Props = {
-  showErrors: boolean;
-};
-function InternalRepository({ showErrors }: Props) {
+function InternalRepository() {
   const {
-    internalRepository: { values },
-    internalRepository: { errors },
+    information: { values },
   } = useReactiveVar(newProject);
-  const { updateValue, updateError, clearError } = useNewProject(
-    'internalRepository'
-  );
-
-  const slug = values.slug;
-  const slugError = errors.slug;
-
-  const slugOk = getErrorMsg(validateSlug(slug));
 
   return (
     <div className={styles.repositoryInternal}>
@@ -35,22 +19,9 @@ function InternalRepository({ showErrors }: Props) {
           <IconLink className="icon-regular" />
           <span
             className={styles.urlContent}
-          >{`${CONFIG.GITEA_URL}/kdl/`}</span>
+          >{`${CONFIG.GITEA_URL}/kdl/${values.id}`}</span>
         </div>
       </div>
-      <TextInput
-        label="repository name"
-        customClassname={styles.slug}
-        onChange={(value: string) => {
-          updateValue('slug', value);
-          clearError('slug');
-        }}
-        onBlur={() => updateError('slug', slugOk)}
-        formValue={slug}
-        error={showErrors ? slugError : ''}
-        helpText="Please write in a URL compatible way"
-        showClearButton
-      />
     </div>
   );
 }

@@ -83,15 +83,15 @@ module.exports = {
         id: userId,
       })),
     createProject: (_, { input }) => {
-      const generatedProject = buildProject();
+      const casualProject = buildProject();
       const newProject = {
-        ...generatedProject,
+        ...casualProject,
         ...input,
         repository: {
           type: input.repository.type,
           url:
             input.repository.type === 'INTERNAL'
-              ? `${casual.url}${input.repository.internal.name}`
+              ? `${casual.url}${input.id}`
               : input.repository.external.url,
           error: false,
         },

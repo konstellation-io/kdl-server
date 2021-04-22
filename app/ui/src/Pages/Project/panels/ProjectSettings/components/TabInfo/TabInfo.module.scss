@@ -7,33 +7,49 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-}
 
-.description {
-  position: relative;
-  background-color: palette(base, 800);
-  flex-grow: 1;
-  padding: $grid-unit 2 * $grid-unit;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  .projectIdWrapper {
+    display: flex;
+    flex-direction: column;
 
-  .title {
-    @include font-caption;
-    color: font-color(regular);
+    .projectIdLabel {
+      @include font-caption;
+      color: font-color(regular);
 
-    margin-bottom: 2 * $grid-unit;
+    }
+    .projectId {
+      @include font-body;
+      margin-top: $grid-unit;
+    }
   }
-  .button {
-    position: absolute;
-    top: 0;
-    right: 0;
-  }
-  .content {
-    @include font-body;
-    color: font-color(light);
 
-    white-space: pre-line;
-    overflow: auto;
+  .description {
+    margin-top: $grid-unit * 3;
+    position: relative;
+    background-color: palette(base, 800);
+    flex-grow: 1;
+    padding: $grid-unit 2 * $grid-unit;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .title {
+      @include font-caption;
+      color: font-color(regular);
+
+      margin-bottom: 2 * $grid-unit;
+    }
+    .button {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+    .content {
+      @include font-body;
+      color: font-color(light);
+
+      white-space: pre-line;
+      overflow: auto;
+    }
   }
 }

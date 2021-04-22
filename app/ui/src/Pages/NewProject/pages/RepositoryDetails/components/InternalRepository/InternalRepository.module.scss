@@ -5,6 +5,8 @@
 .repositoryInternal {
   display: flex;
   align-items: flex-start;
+  flex-direction: column;
+
   .url {
     .urlTitle {
       @include font-caption;
@@ -23,7 +25,9 @@
       margin-left: 3 * $grid-unit;
     }
   }
-  .slug {
-    margin-left: $grid-unit;
+  .warningBox {
+    & > div {
+      margin: 8 * $grid-unit 0 0 0;
+    }
   }
 }

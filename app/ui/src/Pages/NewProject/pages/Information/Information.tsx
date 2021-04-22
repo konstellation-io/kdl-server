@@ -1,5 +1,5 @@
 import { SpinnerCircular, TextInput } from 'kwc';
-import { getErrorMsg } from 'Utils/string';
+import { generateSlug, getErrorMsg } from 'Utils/string';
 import {
   validateProjectDescription,
   validateProjectId,
@@ -7,12 +7,14 @@ import {
 } from './InformationUtils';
 
 import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { newProject } from 'Graphql/client/cache';
 import styles from './Information.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
-import { useReactiveVar } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
+import { GetProjects } from 'Graphql/queries/types/GetProjects';
+import GetProjectsQuery from 'Graphql/queries/getProjects';
 
 const limits = {
   maxHeight: 400,
@@ -34,9 +36,22 @@ function Information({ showErrors }: Props) {
     id: errorId,
   } = errors;
 
-  const { descriptionScore, loading } = useQualityDescription(description);
+  const { data, loading } = useQuery<GetProjects>(GetProjectsQuery);
+  const {
+    descriptionScore,
+    loading: loadingQualityDescription,
+  } = useQualityDescription(description);
 
-  if (!project) return <SpinnerCircular />;
+  const [projectsIds, projectsNames] = useMemo(() => {
+    if (data) {
+      const projectsIds = data.projects.map(({ id }) => id);
+      const projectsNames = data.projects.map(({ name }) => name);
+      return [projectsIds, projectsNames];
+    }
+    return [];
+  }, [data?.projects]);
+
+  if (!project || loading) return <SpinnerCircular />;
 
   return (
     <div className={styles.container}>
@@ -47,7 +62,8 @@ function Information({ showErrors }: Props) {
           clearError('name');
         }}
         onBlur={() => {
-          const isValidName = validateProjectName(name);
+          updateValue('id', generateSlug(name));
+          const isValidName = validateProjectName(name, projectsNames);
           updateError('name', getErrorMsg(isValidName));
         }}
         formValue={name}
@@ -62,7 +78,7 @@ function Information({ showErrors }: Props) {
           clearError('id');
         }}
         onBlur={() => {
-          const isValidId = validateProjectId(id);
+          const isValidId = validateProjectId(id, projectsIds);
           updateError('id', getErrorMsg(isValidId));
         }}
         formValue={id}
@@ -90,7 +106,10 @@ function Information({ showErrors }: Props) {
         textArea
         lockHorizontalGrowth
       />
-      <DescriptionScore score={descriptionScore} loading={loading} />
+      <DescriptionScore
+        score={descriptionScore}
+        loading={loadingQualityDescription}
+      />
     </div>
   );
 }

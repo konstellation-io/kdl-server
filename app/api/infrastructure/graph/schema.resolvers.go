@@ -56,36 +56,21 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 		return nil, err
 	}
 
-	internalRepoName := ""
-	externalRepoURL := ""
-	externalRepoUsername := ""
-	externalRepoToken := ""
-
-	switch input.Repository.Type {
-	case entity.RepositoryTypeInternal:
-		if input.Repository.Internal != nil {
-			internalRepoName = input.Repository.Internal.Name
-		}
-	case entity.RepositoryTypeExternal:
-		if input.Repository.External != nil {
-			externalRepoURL = input.Repository.External.URL
-			externalRepoUsername = input.Repository.External.Username
-			externalRepoToken = input.Repository.External.Token
-		}
-	default:
-		return &entity.Project{}, entity.ErrInvalidRepoType
+	opts := project.CreateProjectOption{
+		ProjectID:   input.ID,
+		Name:        input.Name,
+		Description: input.Description,
+		RepoType:    input.Repository.Type,
+		Owner:       loggedUser,
 	}
 
-	createdProject, err := r.projects.Create(ctx, project.CreateProjectOption{
-		Name:                 input.Name,
-		Description:          input.Description,
-		RepoType:             input.Repository.Type,
-		InternalRepoName:     &internalRepoName,
-		ExternalRepoURL:      &externalRepoURL,
-		ExternalRepoUsername: &externalRepoUsername,
-		ExternalRepoToken:    &externalRepoToken,
-		Owner:                loggedUser,
-	})
+	if input.Repository.External != nil {
+		opts.ExternalRepoURL = &input.Repository.External.URL
+		opts.ExternalRepoUsername = &input.Repository.External.Username
+		opts.ExternalRepoToken = &input.Repository.External.Token
+	}
+
+	createdProject, err := r.projects.Create(ctx, opts)
 
 	return &createdProject, err
 }
@@ -309,7 +294,7 @@ func (r *queryResolver) KnowledgeGraph(ctx context.Context, projectID string) (*
 func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (string, error) {
 	switch obj.Type {
 	case entity.RepositoryTypeInternal:
-		return fmt.Sprintf("%s/kdl/%s", r.cfg.Gitea.URL, obj.InternalRepoName), nil
+		return fmt.Sprintf("%s/kdl/%s", r.cfg.Gitea.URL, obj.RepoName), nil
 	case entity.RepositoryTypeExternal:
 		return obj.ExternalRepoURL, nil
 	}

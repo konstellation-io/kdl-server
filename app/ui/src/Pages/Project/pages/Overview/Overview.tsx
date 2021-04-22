@@ -33,6 +33,10 @@ function Overview({ openedProject }: Props) {
           <div className={styles.name}>{openedProject.name}</div>
         </div>
         <div className={styles.section}>
+          <div className={styles.sectionTitle}>PROJECT ID</div>
+          <div className={styles.name}>{openedProject.id}</div>
+        </div>
+        <div className={styles.section}>
           <div className={styles.sectionTitle}>ABSTRACT</div>
           <div className={styles.description}>{openedProject.description}</div>
         </div>

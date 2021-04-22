@@ -24,6 +24,7 @@ type APITokenInput struct {
 }
 
 type CreateProjectInput struct {
+	ID          string           `json:"id"`
 	Name        string           `json:"name"`
 	Description string           `json:"description"`
 	Repository  *RepositoryInput `json:"repository"`
@@ -33,10 +34,6 @@ type ExternalRepositoryInput struct {
 	URL      string `json:"url"`
 	Username string `json:"username"`
 	Token    string `json:"token"`
-}
-
-type InternalRepositoryInput struct {
-	Name string `json:"name"`
 }
 
 type QualityProjectDesc struct {
@@ -59,7 +56,6 @@ type RemoveUsersInput struct {
 type RepositoryInput struct {
 	Type     entity.RepositoryType    `json:"type"`
 	External *ExternalRepositoryInput `json:"external"`
-	Internal *InternalRepositoryInput `json:"internal"`
 }
 
 type SetActiveUserToolsInput struct {

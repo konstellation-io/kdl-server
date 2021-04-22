@@ -1,11 +1,9 @@
-const ID_MAX_LENGTH = 100;
-const MIN_LENGTH = 3;
+const ID_MAX_LENGTH = 20;
 const INVALID_ID_CHARS_REGEXP = /[^a-z0-9-]/g;
 const SPACES_REGEXP = / +/g;
 
 export function generateSlug(text: string) {
-  const _text = text.length <= MIN_LENGTH ? `slug-${text}` : text;
-  return _text
+  return text
     .trim()
     .toLowerCase()
     .replace(SPACES_REGEXP, '-')

@@ -31,6 +31,10 @@ function TabInfo({ project }: Props) {
         onBlur={() => updateProjectName(project.id, newName)}
         showClearButton
       />
+      <div className={styles.projectIdWrapper}>
+        <span className={styles.projectIdLabel}>PROJECT ID</span>
+        <span className={styles.projectId}>{project.id}</span>
+      </div>
       <div className={styles.description}>
         <p className={styles.title}>ABSTRACT</p>
         <div className={styles.button}>

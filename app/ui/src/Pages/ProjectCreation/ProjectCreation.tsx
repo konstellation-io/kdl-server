@@ -19,12 +19,9 @@ function ProjectCreation() {
     create: { data: dataCreateProject },
   } = useProject();
 
-  const {
-    repository,
-    information,
-    internalRepository,
-    externalRepository,
-  } = useReactiveVar(newProject);
+  const { repository, information, externalRepository } = useReactiveVar(
+    newProject
+  );
 
   // Animation should last for at least 3 seconds
   useEffect(() => {
@@ -42,11 +39,7 @@ function ProjectCreation() {
       type,
     };
 
-    if (type === RepositoryType.INTERNAL) {
-      inputRepository.internal = {
-        name: internalRepository.values.slug,
-      };
-    } else {
+    if (type === RepositoryType.EXTERNAL) {
       inputRepository.external = externalRepository.values;
     }
 

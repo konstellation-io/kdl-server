@@ -32,21 +32,18 @@ const Section: FC<SectionProps> = ({ title, children }) => (
 );
 
 function Summary() {
-  const {
-    information,
-    repository,
-    externalRepository,
-    internalRepository,
-  } = useReactiveVar(newProject);
+  const { information, repository, externalRepository } = useReactiveVar(
+    newProject
+  );
 
   const type = repository?.values?.type || RepositoryType.EXTERNAL;
   const isExternalRepo = type === RepositoryType.EXTERNAL;
-  const { name, description } = information.values;
+  const { name, description, id } = information.values;
 
   function getRepositoryUrl() {
     return isExternalRepo
       ? externalRepository.values.url
-      : `${CONFIG.GITEA_URL}/kdl/${internalRepository.values.slug}`;
+      : `${CONFIG.GITEA_URL}/kdl/${id}`;
   }
 
   return (
@@ -54,6 +51,9 @@ function Summary() {
       <Section title="Information">
         <Field title="PROJECT NAME">
           <p className={styles.name}>{name}</p>
+        </Field>
+        <Field title="PROJECT ID">
+          <p className={styles.id}>{id}</p>
         </Field>
         <Field title="REPOSITORY URL">
           <div className={styles.repository}>

@@ -27,17 +27,16 @@ type memberDTO struct {
 }
 
 type projectDTO struct {
-	ID               primitive.ObjectID    `bson:"_id"`
-	Archived         bool                  `bson:"archived"`
-	Name             string                `bson:"name"`
-	Description      string                `bson:"description"`
-	CreationDate     time.Time             `bson:"creation_date"`
-	RepositoryType   entity.RepositoryType `bson:"repo_type"`
-	InternalRepoName string                `bson:"internal_repo_name"`
-	ExternalRepoURL  string                `bson:"external_repo_url"`
-	RepoName         string                `bson:"repo_name"`
-	Members          []memberDTO           `bson:"members"`
-	StarredKGItems   []string              `bson:"starred_kg_items"`
+	ID              string                `bson:"_id"`
+	Archived        bool                  `bson:"archived"`
+	Name            string                `bson:"name"`
+	Description     string                `bson:"description"`
+	CreationDate    time.Time             `bson:"creation_date"`
+	RepositoryType  entity.RepositoryType `bson:"repo_type"`
+	RepoName        string                `bson:"repo_name"`
+	ExternalRepoURL string                `bson:"external_repo_url"`
+	Members         []memberDTO           `bson:"members"`
+	StarredKGItems  []string              `bson:"starred_kg_items"`
 }
 
 type projectMongoDBRepo struct {
@@ -53,31 +52,24 @@ func NewProjectMongoDBRepo(logger logging.Logger, client *mongo.Client, dbName s
 
 // Get retrieves the project using the identifier.
 func (m *projectMongoDBRepo) Get(ctx context.Context, id string) (entity.Project, error) {
-	idFromHex, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return entity.Project{}, err
-	}
-
-	return m.findOne(ctx, bson.M{"_id": idFromHex})
+	return m.findOne(ctx, bson.M{"_id": id})
 }
 
 // Create inserts into the database a new entity.
 func (m *projectMongoDBRepo) Create(ctx context.Context, p entity.Project) (string, error) {
-	m.logger.Debugf("Creating new project \"%s\"...", p.Name)
+	m.logger.Debugf("Creating new project \"%s\"...", p.ID)
 
 	dto, err := m.entityToDTO(p)
 	if err != nil {
 		return "", err
 	}
 
-	dto.ID = primitive.NewObjectID()
-
 	result, err := m.collection.InsertOne(ctx, dto)
 	if err != nil {
 		return "", err
 	}
 
-	return result.InsertedID.(primitive.ObjectID).Hex(), nil
+	return result.InsertedID.(string), nil
 }
 
 // FindAll retrieves all projects.
@@ -89,12 +81,7 @@ func (m *projectMongoDBRepo) FindAll(ctx context.Context) ([]entity.Project, err
 func (m *projectMongoDBRepo) AddMembers(ctx context.Context, projectID string, members []entity.Member) error {
 	m.logger.Debugf("Adding %d new members to project \"%s\"...", len(members), projectID)
 
-	pID, err := primitive.ObjectIDFromHex(projectID)
-	if err != nil {
-		return err
-	}
-
-	filter := bson.M{"_id": pID}
+	filter := bson.M{"_id": projectID}
 
 	memberDTOS, err := m.membersToDTOs(members)
 	if err != nil {
@@ -118,17 +105,12 @@ func (m *projectMongoDBRepo) AddMembers(ctx context.Context, projectID string, m
 func (m *projectMongoDBRepo) RemoveMembers(ctx context.Context, projectID string, users []entity.User) error {
 	m.logger.Debugf("Removing members from project \"%s\"...", projectID)
 
-	pObjID, err := primitive.ObjectIDFromHex(projectID)
-	if err != nil {
-		return err
-	}
-
 	uObjIDs, err := m.toObjectIDs(users)
 	if err != nil {
 		return err
 	}
 
-	filter := bson.M{"_id": pObjID}
+	filter := bson.M{"_id": projectID}
 
 	upd := bson.M{
 		"$pull": bson.M{
@@ -150,18 +132,13 @@ func (m *projectMongoDBRepo) UpdateMembersAccessLevel(
 	ctx context.Context, projectID string, users []entity.User, accessLevel entity.AccessLevel) error {
 	m.logger.Debugf("Updating members access level to \"%s\" from project \"%s\"...", accessLevel, projectID)
 
-	pObjID, err := primitive.ObjectIDFromHex(projectID)
-	if err != nil {
-		return err
-	}
-
 	uObjIDs, err := m.toObjectIDs(users)
 	if err != nil {
 		return err
 	}
 
 	filter := bson.M{
-		"_id": pObjID,
+		"_id": projectID,
 	}
 
 	upd := bson.M{
@@ -198,12 +175,7 @@ func (m *projectMongoDBRepo) UpdateArchived(ctx context.Context, projectID strin
 func (m *projectMongoDBRepo) SetStarredKGItem(ctx context.Context, projectID, kgItemID string) error {
 	m.logger.Debugf("Starring %s in project \"%s\"...", kgItemID, projectID)
 
-	pID, err := primitive.ObjectIDFromHex(projectID)
-	if err != nil {
-		return err
-	}
-
-	filter := bson.M{"_id": pID}
+	filter := bson.M{"_id": projectID}
 
 	upd := bson.M{
 		"$push": bson.M{
@@ -211,7 +183,7 @@ func (m *projectMongoDBRepo) SetStarredKGItem(ctx context.Context, projectID, kg
 		},
 	}
 
-	_, err = m.collection.UpdateOne(ctx, filter, upd)
+	_, err := m.collection.UpdateOne(ctx, filter, upd)
 
 	return err
 }
@@ -220,12 +192,7 @@ func (m *projectMongoDBRepo) SetStarredKGItem(ctx context.Context, projectID, kg
 func (m *projectMongoDBRepo) UnsetStarredKGItem(ctx context.Context, projectID, kgItemID string) error {
 	m.logger.Debugf("Unstarring %s in project \"%s\"...", kgItemID, projectID)
 
-	pID, err := primitive.ObjectIDFromHex(projectID)
-	if err != nil {
-		return err
-	}
-
-	filter := bson.M{"_id": pID}
+	filter := bson.M{"_id": projectID}
 
 	upd := bson.M{
 		"$pull": bson.M{
@@ -233,7 +200,7 @@ func (m *projectMongoDBRepo) UnsetStarredKGItem(ctx context.Context, projectID, 
 		},
 	}
 
-	_, err = m.collection.UpdateOne(ctx, filter, upd)
+	_, err := m.collection.UpdateOne(ctx, filter, upd)
 
 	return err
 }
@@ -241,14 +208,9 @@ func (m *projectMongoDBRepo) UnsetStarredKGItem(ctx context.Context, projectID, 
 func (m *projectMongoDBRepo) updateProjectFields(ctx context.Context, projectID string, fields bson.M) error {
 	m.logger.Debugf("Updating the project \"%s\" with \"%s\"...", projectID, fields)
 
-	pObjID, err := primitive.ObjectIDFromHex(projectID)
-	if err != nil {
-		return err
-	}
+	filter := bson.M{"_id": projectID}
 
-	filter := bson.M{"_id": pObjID}
-
-	_, err = m.collection.UpdateOne(ctx, filter, bson.M{
+	_, err := m.collection.UpdateOne(ctx, filter, bson.M{
 		"$set": fields,
 	})
 
@@ -283,24 +245,15 @@ func (m *projectMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity
 
 func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 	dto := projectDTO{
-		Name:             p.Name,
-		Description:      p.Description,
-		CreationDate:     p.CreationDate,
-		RepositoryType:   p.Repository.Type,
-		InternalRepoName: p.Repository.InternalRepoName,
-		ExternalRepoURL:  p.Repository.ExternalRepoURL,
-		RepoName:         p.Repository.RepoName,
-		StarredKGItems:   p.StarredKGItems,
-		Archived:         p.Archived,
-	}
-
-	if p.ID != "" {
-		idFromHex, err := primitive.ObjectIDFromHex(p.ID)
-		if err != nil {
-			return projectDTO{}, err
-		}
-
-		dto.ID = idFromHex
+		ID:              p.ID,
+		Name:            p.Name,
+		Description:     p.Description,
+		CreationDate:    p.CreationDate,
+		RepositoryType:  p.Repository.Type,
+		RepoName:        p.Repository.RepoName,
+		ExternalRepoURL: p.Repository.ExternalRepoURL,
+		StarredKGItems:  p.StarredKGItems,
+		Archived:        p.Archived,
 	}
 
 	memberDTOS, err := m.membersToDTOs(p.Members)
@@ -334,16 +287,15 @@ func (m *projectMongoDBRepo) membersToDTOs(members []entity.Member) ([]memberDTO
 
 func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 	p := entity.Project{
-		ID:             dto.ID.Hex(),
+		ID:             dto.ID,
 		Name:           dto.Name,
 		Description:    dto.Description,
 		CreationDate:   dto.CreationDate,
 		StarredKGItems: dto.StarredKGItems,
 		Repository: entity.Repository{
-			Type:             dto.RepositoryType,
-			ExternalRepoURL:  dto.ExternalRepoURL,
-			InternalRepoName: dto.InternalRepoName,
-			RepoName:         dto.RepoName,
+			Type:            dto.RepositoryType,
+			ExternalRepoURL: dto.ExternalRepoURL,
+			RepoName:        dto.RepoName,
 		},
 		Archived: dto.Archived,
 	}
@@ -375,12 +327,12 @@ func (m *projectMongoDBRepo) toObjectIDs(users []entity.User) ([]primitive.Objec
 	objIDs := make([]primitive.ObjectID, len(users))
 
 	for i, user := range users {
-		objID, err := primitive.ObjectIDFromHex(user.ID)
+		idFromHex, err := primitive.ObjectIDFromHex(user.ID)
 		if err != nil {
 			return nil, err
 		}
 
-		objIDs[i] = objID
+		objIDs[i] = idFromHex
 	}
 
 	return objIDs, nil

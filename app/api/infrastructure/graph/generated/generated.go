@@ -1109,6 +1109,7 @@ input UpdateAccessLevelInput {
 }
 
 input CreateProjectInput {
+  id: ID!
   name: String!
   description: String!
   repository: RepositoryInput!
@@ -1146,17 +1147,12 @@ type Project {
 input RepositoryInput {
   type: RepositoryType!
   external: ExternalRepositoryInput
-  internal: InternalRepositoryInput
 }
 
 input ExternalRepositoryInput {
   url: String!
   username: String!
   token: String!
-}
-
-input InternalRepositoryInput {
-  name: String!
 }
 
 type Repository {
@@ -5654,6 +5650,14 @@ func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context
 
 	for k, v := range asMap {
 		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "name":
 			var err error
 
@@ -5711,26 +5715,6 @@ func (ec *executionContext) unmarshalInputExternalRepositoryInput(ctx context.Co
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
 			it.Token, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputInternalRepositoryInput(ctx context.Context, obj interface{}) (model.InternalRepositoryInput, error) {
-	var it model.InternalRepositoryInput
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5827,14 +5811,6 @@ func (ec *executionContext) unmarshalInputRepositoryInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("external"))
 			it.External, err = ec.unmarshalOExternalRepositoryInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐExternalRepositoryInput(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "internal":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("internal"))
-			it.Internal, err = ec.unmarshalOInternalRepositoryInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐInternalRepositoryInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8039,14 +8015,6 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 		return graphql.Null
 	}
 	return graphql.MarshalID(*v)
-}
-
-func (ec *executionContext) unmarshalOInternalRepositoryInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐInternalRepositoryInput(ctx context.Context, v interface{}) (*model.InternalRepositoryInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputInternalRepositoryInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalORemoveApiTokenInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRemoveAPITokenInput(ctx context.Context, v interface{}) (*model.RemoveAPITokenInput, error) {

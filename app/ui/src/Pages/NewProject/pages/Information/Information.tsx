@@ -1,7 +1,8 @@
-import { SpinnerCircular, TextInput } from 'kwc';
+import { ErrorMessage, SpinnerCircular, TextInput } from 'kwc';
 import { generateSlug, getErrorMsg } from 'Utils/string';
 import {
   validateProjectDescription,
+  validateProjectId,
   validateProjectName,
 } from './InformationUtils';
 
@@ -11,7 +12,9 @@ import { newProject } from 'Graphql/client/cache';
 import styles from './Information.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
-import { useReactiveVar } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
+import { GetProjects } from 'Graphql/queries/types/GetProjects';
+import GetProjectsQuery from 'Graphql/queries/getProjects';
 
 const limits = {
   maxHeight: 400,
@@ -24,35 +27,73 @@ type Props = {
 function Information({ showErrors }: Props) {
   const project = useReactiveVar(newProject);
   const { updateValue, updateError, clearError } = useNewProject('information');
-  const { updateValue: updateInternalRepositoryValue } = useNewProject(
-    'internalRepository'
-  );
 
-  const { values, errors } = project.information || {};
-  const { name, description } = values;
-  const { name: errorName, description: errorDescription } = errors;
+  const { values, errors } = project.information;
+  const { name, description, id } = values;
+  const {
+    name: errorName,
+    description: errorDescription,
+    id: errorId,
+  } = errors;
 
-  const { descriptionScore, loading } = useQualityDescription(description);
+  const { data, loading, error } = useQuery<GetProjects>(GetProjectsQuery);
+  const {
+    descriptionScore,
+    loading: loadingQualityDescription,
+  } = useQualityDescription(description);
 
-  if (!project) return <SpinnerCircular />;
+  if (loading) return <SpinnerCircular />;
+  if (!data || error) return <ErrorMessage />;
+
+  function handleNameChange(name: string) {
+    const generatedId = generateSlug(name);
+    updateValue('name', name);
+    updateValue('id', generatedId);
+    clearError('name');
+    clearError('id');
+  }
+
+  function validateName() {
+    if (data) {
+      const projectsNames = data.projects.map(({ name }) => name);
+      const isValidName = validateProjectName(name, projectsNames);
+      updateError('name', getErrorMsg(isValidName));
+    }
+  }
+
+  function validateId() {
+    if (data) {
+      const projectsIds = data.projects.map(({ id }) => id);
+      const isValidId = validateProjectId(id, projectsIds);
+      updateError('id', getErrorMsg(isValidId));
+    }
+  }
 
   return (
     <div className={styles.container}>
       <TextInput
         label="project name"
-        onChange={(v: string) => {
-          updateValue('name', v);
-          clearError('name');
-        }}
+        onChange={handleNameChange}
         onBlur={() => {
-          updateInternalRepositoryValue('slug', generateSlug(name));
-          const isValidName = validateProjectName(name);
-          updateError('name', getErrorMsg(isValidName));
+          validateName();
+          validateId();
         }}
         formValue={name}
         autoFocus
         showClearButton
         error={showErrors ? errorName : ''}
+      />
+      <TextInput
+        label="project id"
+        onChange={(v: string) => {
+          updateValue('id', v);
+          clearError('id');
+        }}
+        onBlur={validateId}
+        formValue={id}
+        showClearButton
+        error={showErrors ? errorId : ''}
+        helpText="Once the project is created you cannot change this id"
       />
       <TextInput
         label="project description"
@@ -74,7 +115,10 @@ function Information({ showErrors }: Props) {
         textArea
         lockHorizontalGrowth
       />
-      <DescriptionScore score={descriptionScore} loading={loading} />
+      <DescriptionScore
+        score={descriptionScore}
+        loading={loadingQualityDescription}
+      />
     </div>
   );
 }

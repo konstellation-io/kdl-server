@@ -34,6 +34,7 @@ export interface ApiTokenInput {
 }
 
 export interface CreateProjectInput {
+  id: string;
   name: string;
   description: string;
   repository: RepositoryInput;
@@ -43,10 +44,6 @@ export interface ExternalRepositoryInput {
   url: string;
   username: string;
   token: string;
-}
-
-export interface InternalRepositoryInput {
-  name: string;
 }
 
 export interface RemoveApiTokenInput {
@@ -61,7 +58,6 @@ export interface RemoveMembersInput {
 export interface RepositoryInput {
   type: RepositoryType;
   external?: ExternalRepositoryInput | null;
-  internal?: InternalRepositoryInput | null;
 }
 
 export interface SetActiveUserToolsInput {

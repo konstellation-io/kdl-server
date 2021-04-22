@@ -20,6 +20,6 @@ type Project struct {
 }
 
 // NewProject is a constructor function.
-func NewProject(name, description string) Project {
-	return Project{Name: name, Description: description, StarredKGItems: []string{}}
+func NewProject(id, name, description string) Project {
+	return Project{ID: id, Name: name, Description: description, StarredKGItems: []string{}}
 }

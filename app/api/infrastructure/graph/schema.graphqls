@@ -158,6 +158,7 @@ input UpdateAccessLevelInput {
 }
 
 input CreateProjectInput {
+  id: ID!
   name: String!
   description: String!
   repository: RepositoryInput!
@@ -195,17 +196,12 @@ type Project {
 input RepositoryInput {
   type: RepositoryType!
   external: ExternalRepositoryInput
-  internal: InternalRepositoryInput
 }
 
 input ExternalRepositoryInput {
   url: String!
   username: String!
   token: String!
-}
-
-input InternalRepositoryInput {
-  name: String!
 }
 
 type Repository {

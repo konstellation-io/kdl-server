@@ -59,10 +59,9 @@ const stepperSteps = [
 ];
 
 export const repoTypeToStepName: {
-  [k: string]: StepNames.EXTERNAL | StepNames.INTERNAL;
+  [k: string]: StepNames.EXTERNAL;
 } = {
   [RepositoryType.EXTERNAL]: StepNames.EXTERNAL,
-  [RepositoryType.INTERNAL]: StepNames.INTERNAL,
 };
 
 function NewProject() {
@@ -78,7 +77,6 @@ function NewProject() {
   const stepsWithData: (
     | StepNames.INFORMATION
     | StepNames.REPOSITORY
-    | StepNames.INTERNAL
     | StepNames.EXTERNAL
   )[] = useMemo(() => {
     return [
@@ -177,7 +175,9 @@ function NewProject() {
   // Updates completed and error step states
   function validateStep() {
     const stepData = stepsWithData[actStep];
-    if (stepData !== null && actStep !== Steps.SUMMARY) {
+    const hasData = !!stepData;
+
+    if (hasData && actStep !== Steps.SUMMARY) {
       const actStepData = data[stepData];
 
       const error =
@@ -190,6 +190,8 @@ function NewProject() {
 
       updateState(completed, error);
       return !error;
+    } else if (!hasData) {
+      updateState(true, false);
     }
     return true;
   }

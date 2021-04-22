@@ -21,18 +21,15 @@ const (
 
 var (
 	ErrCreateProjectValidation = errors.New("create project validation error")
-	// This regexp extracts the repository name from a https URL like:
-	//  https://github.com/konstellation-io/kre.git
-	repoNameRegexp    = regexp.MustCompile(`([^/]+)\.git$`)
-	ErrInvalidRepoURL = errors.New("the repository URL is invalid")
+	ErrInvalidRepoURL          = errors.New("the repository URL is invalid")
 )
 
 // CreateProjectOption options when creating project.
 type CreateProjectOption struct {
+	ProjectID            string
 	Name                 string
 	Description          string
 	RepoType             entity.RepositoryType
-	InternalRepoName     *string
 	ExternalRepoURL      *string
 	ExternalRepoUsername *string
 	ExternalRepoToken    *string
@@ -48,6 +45,30 @@ type UpdateStarredOption struct {
 
 // Validate check that the CreateProjectOption properties are valid.
 func (c CreateProjectOption) Validate() error {
+	const (
+		idMinLen = 3
+		idMaxLen = 20
+	)
+
+	if c.ProjectID == "" {
+		return fmt.Errorf("%w: project id cannot be null", ErrCreateProjectValidation)
+	}
+
+	if len(c.ProjectID) < idMinLen {
+		return fmt.Errorf("%w: project id length must be greater than %d", ErrCreateProjectValidation, idMinLen)
+	}
+
+	if len(c.ProjectID) > idMaxLen {
+		return fmt.Errorf("%w: project id length must be lower than %d", ErrCreateProjectValidation, idMaxLen)
+	}
+
+	projectIDRegExp := regexp.MustCompile("^[a-z]([-a-z0-9]*[a-z0-9])?$")
+
+	if !projectIDRegExp.MatchString(c.ProjectID) {
+		return fmt.Errorf("%w: project id must be lower case and can only contain letters, numbers or hyphens,"+
+			" e.g. my-awesome-project", ErrCreateProjectValidation)
+	}
+
 	if c.Name == "" {
 		return fmt.Errorf("%w: project name cannot be null", ErrCreateProjectValidation)
 	}
@@ -58,12 +79,6 @@ func (c CreateProjectOption) Validate() error {
 
 	if !c.RepoType.IsValid() {
 		return fmt.Errorf("%w: invalid repository type", ErrCreateProjectValidation)
-	}
-
-	if c.RepoType == entity.RepositoryTypeInternal {
-		if kdlutil.IsNilOrEmpty(c.InternalRepoName) {
-			return fmt.Errorf("%w: internal repository name cannot be null", ErrCreateProjectValidation)
-		}
 	}
 
 	if c.RepoType == entity.RepositoryTypeExternal {
@@ -126,7 +141,7 @@ func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity
 
 	now := i.clock.Now()
 
-	project := entity.NewProject(opt.Name, opt.Description)
+	project := entity.NewProject(opt.ProjectID, opt.Name, opt.Description)
 	project.CreationDate = now
 	project.Members = []entity.Member{
 		{
@@ -135,26 +150,22 @@ func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity
 			AddedDate:   now,
 		},
 	}
-	repoName := ""
+	repoName := opt.ProjectID
 
 	// Create repository
 	switch opt.RepoType {
 	case entity.RepositoryTypeInternal:
-		err := i.giteaService.CreateRepo(*opt.InternalRepoName, opt.Owner.Username)
+		err := i.giteaService.CreateRepo(repoName, opt.Owner.Username)
 		if err != nil {
 			return entity.Project{}, err
 		}
 
-		repoName = *opt.InternalRepoName
-
 		project.Repository = entity.Repository{
-			Type:             entity.RepositoryTypeInternal,
-			InternalRepoName: *opt.InternalRepoName,
-			RepoName:         repoName,
+			Type:     entity.RepositoryTypeInternal,
+			RepoName: repoName,
 		}
 
 	case entity.RepositoryTypeExternal:
-		repoName, err = i.getRepoNameFromURL(*opt.ExternalRepoURL)
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -172,13 +183,13 @@ func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity
 	}
 
 	// Create Minio bucket
-	err = i.minioService.CreateBucket(repoName)
+	err = i.minioService.CreateBucket(opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err
 	}
 
 	// Activate Drone.io repo
-	err = i.droneService.ActivateRepository(repoName)
+	err = i.droneService.ActivateRepository(opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err
 	}
@@ -242,16 +253,4 @@ func (i interactor) UpdateStarred(ctx context.Context, opt UpdateStarredOption) 
 	err := i.repo.UnsetStarredKGItem(ctx, opt.ProjectID, opt.KGItemID)
 
 	return false, err
-}
-
-// getRepoNameFromURL extracts the name of the repo from the external repo url.
-func (i interactor) getRepoNameFromURL(url string) (string, error) {
-	const expectedMatches = 2
-
-	matches := repoNameRegexp.FindStringSubmatch(url)
-	if len(matches) != expectedMatches {
-		return "", ErrInvalidRepoURL
-	}
-
-	return matches[1], nil
 }

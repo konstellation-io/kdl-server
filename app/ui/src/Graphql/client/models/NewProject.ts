@@ -1,11 +1,13 @@
 import { RepositoryType } from 'Graphql/types/globalTypes';
 
 export interface InformationValues {
+  id: string;
   name: string;
   description: string;
 }
 
 export interface InformationErrors {
+  id: string;
   name: string;
   description: string;
 }
@@ -62,5 +64,4 @@ export interface NewProject {
   information: NewProject_Information;
   repository: NewProject_Repository;
   externalRepository: NewProject_ExternalRepository;
-  internalRepository: NewProject_InternalRepository;
 }

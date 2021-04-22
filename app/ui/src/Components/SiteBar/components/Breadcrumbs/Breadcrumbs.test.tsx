@@ -14,7 +14,11 @@ jest.mock('./useBreadcrumbs.tsx', () => () => ({
 
 describe('Breadcrumbs component', () => {
   it('should render without crashing', () => {
+    // Arrange.
+    // Act.
     const component = shallow(<Breadcrumbs />);
+
+    // Assert.
     expect(component).toMatchSnapshot();
   });
 });

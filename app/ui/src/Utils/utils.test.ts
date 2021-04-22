@@ -5,40 +5,42 @@ import { generateSlug } from './string';
 
 describe('formatDate', () => {
   it('formats dates properly', () => {
+    // Arrange.
+    // Act.
     const date = new Date(Date.parse('01 Jan 1970 00:00:00 GMT'));
 
+    // Assert.
     expect(formatDate(date)).toBe('Jan 1, 1970');
     expect(formatDate(date, true)).toBe('Jan 1, 1970 12:00 AM');
   });
 });
 
 describe('generateSlug', () => {
-  it('formats string properly', () => {
-    const slug1 = generateSlug('hello');
-    const slug2 = generateSlug('hel lo');
-    const slug3 = generateSlug('he');
-    const slug4 = generateSlug(' hello ');
-    const slug5 = generateSlug(' h#el@l!!o ');
+  it.each`
+    name             | expected
+    ${'hello'}       | ${'hello'}
+    ${'hel lo'}      | ${'hel-lo'}
+    ${'he'}          | ${'slug-he'}
+    ${' hello '}     | ${'hello'}
+    ${' h#el@l!!o '} | ${'hello'}
+  `('formats string properly', ({ name, expected }) => {
+    // Arrange.
+    // Act.
+    const slug = generateSlug(name);
 
-    const expectedSlug1 = 'hello';
-    const expectedSlug2 = 'hel-lo';
-    const expectedSlug3 = 'slug-he';
-    const expectedSlug4 = 'hello';
-    const expectedSlug5 = 'hello';
-
-    expect(slug1).toBe(expectedSlug1);
-    expect(slug2).toBe(expectedSlug2);
-    expect(slug3).toBe(expectedSlug3);
-    expect(slug4).toBe(expectedSlug4);
-    expect(slug5).toBe(expectedSlug5);
+    // Assert.
+    expect(slug).toBe(expected);
   });
 });
 
 describe('mutationPayloadHelper anb queryPayloadHelper', () => {
   it('formats objects properly', () => {
+    // Arrange.
+    // Act.
     const payload1 = mutationPayloadHelper({ hello: 'world' });
     const payload2 = queryPayloadHelper({ hello: 'world' });
 
+    // Assert.
     expect(payload1).toStrictEqual({
       variables: {
         input: {

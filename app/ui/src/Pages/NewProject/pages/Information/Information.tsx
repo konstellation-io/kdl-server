@@ -28,7 +28,7 @@ function Information({ showErrors }: Props) {
   const project = useReactiveVar(newProject);
   const { updateValue, updateError, clearError } = useNewProject('information');
 
-  const { values, errors } = project.information || {};
+  const { values, errors } = project.information;
   const { name, description, id } = values;
   const {
     name: errorName,
@@ -42,7 +42,7 @@ function Information({ showErrors }: Props) {
     loading: loadingQualityDescription,
   } = useQualityDescription(description);
 
-  if (!project || loading) return <SpinnerCircular />;
+  if (loading) return <SpinnerCircular />;
   if (!data || error) return <ErrorMessage />;
 
   function handleNameChange(name: string) {

@@ -1,4 +1,4 @@
-import { SpinnerCircular, TextInput } from 'kwc';
+import { ErrorMessage, SpinnerCircular, TextInput } from 'kwc';
 import { generateSlug, getErrorMsg } from 'Utils/string';
 import {
   validateProjectDescription,
@@ -7,7 +7,7 @@ import {
 } from './InformationUtils';
 
 import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { newProject } from 'Graphql/client/cache';
 import styles from './Information.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
@@ -36,22 +36,14 @@ function Information({ showErrors }: Props) {
     id: errorId,
   } = errors;
 
-  const { data, loading } = useQuery<GetProjects>(GetProjectsQuery);
+  const { data, loading, error } = useQuery<GetProjects>(GetProjectsQuery);
   const {
     descriptionScore,
     loading: loadingQualityDescription,
   } = useQualityDescription(description);
 
-  const [projectsIds, projectsNames] = useMemo(() => {
-    if (data) {
-      const projectsIds = data.projects.map(({ id }) => id);
-      const projectsNames = data.projects.map(({ name }) => name);
-      return [projectsIds, projectsNames];
-    }
-    return [];
-  }, [data?.projects]);
-
   if (!project || loading) return <SpinnerCircular />;
+  if (!data || error) return <ErrorMessage />;
 
   function handleNameChange(name: string) {
     const generatedId = generateSlug(name);
@@ -62,13 +54,19 @@ function Information({ showErrors }: Props) {
   }
 
   function validateName() {
-    const isValidName = validateProjectName(name, projectsNames);
-    updateError('name', getErrorMsg(isValidName));
+    if (data) {
+      const projectsNames = data.projects.map(({ name }) => name);
+      const isValidName = validateProjectName(name, projectsNames);
+      updateError('name', getErrorMsg(isValidName));
+    }
   }
 
   function validateId() {
-    const isValidId = validateProjectId(id, projectsIds);
-    updateError('id', getErrorMsg(isValidId));
+    if (data) {
+      const projectsIds = data.projects.map(({ id }) => id);
+      const isValidId = validateProjectId(id, projectsIds);
+      updateError('id', getErrorMsg(isValidId));
+    }
   }
 
   return (

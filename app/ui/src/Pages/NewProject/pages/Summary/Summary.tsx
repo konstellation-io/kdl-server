@@ -43,7 +43,7 @@ function Summary() {
   function getRepositoryUrl() {
     return isExternalRepo
       ? externalRepository.values.url
-      : `${CONFIG.GITEA_URL}/kdl/${information.values.id}`;
+      : `${CONFIG.GITEA_URL}/kdl/${id}`;
   }
 
   return (

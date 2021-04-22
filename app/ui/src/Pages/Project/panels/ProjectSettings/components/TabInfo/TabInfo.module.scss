@@ -24,7 +24,7 @@
   }
 
   .description {
-    margin-top: $grid-unit * 3;
+    margin-top: 3 * $grid-unit;
     position: relative;
     background-color: palette(base, 800);
     flex-grow: 1;

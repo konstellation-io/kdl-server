@@ -9,14 +9,17 @@
   z-index: 1;
   position: absolute;
   top: 0;
+  background-color: white;
 
   &.hidden {
     z-index: -1;
+    background-color: transparent;
   }
 
   .iframeContainer {
     height: 100%;
     width: 100%;
+    border: none;
   }
 
   .shield {

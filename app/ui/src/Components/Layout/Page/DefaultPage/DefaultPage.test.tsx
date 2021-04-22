@@ -18,6 +18,9 @@ describe('DefaultPage component', () => {
   });
 
   it('show right texts', () => {
+    // Arrange.
+    // Act.
+    // Assert.
     expect(component.contains('Children')).toBeTruthy();
     expect(component.contains('Action 1')).toBeTruthy();
   });

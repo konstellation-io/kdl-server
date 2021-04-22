@@ -28,18 +28,24 @@ describe('MessageActionBox component', () => {
   });
 
   it('show right texts', () => {
+    // Arrange.
+    // Act.
+    // Assert.
     expect(component.contains('Some title')).toBeTruthy();
     expect(component.contains('Some description')).toBeTruthy();
     expect(component.contains('Some message')).toBeTruthy();
   });
 
   it('checks validation before performing action', () => {
-    // Button is disabled until check is clicked
-    expect(component.find(Button).props().disabled).toBeTruthy();
+    // Arrange.
+    const buttonInitialDisabled = component.find(Button).props().disabled;
 
+    // Act.
     component.find(Check).props().onChange(true);
     component.find(Button).props().onClick();
 
+    // Assert.
+    expect(buttonInitialDisabled).toBeTruthy();
     expect(component.find(Button).props().disabled).toBeFalsy();
     expect(onActionMock).toHaveBeenCalledTimes(1);
   });

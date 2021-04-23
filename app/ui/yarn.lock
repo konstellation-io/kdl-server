@@ -9170,10 +9170,10 @@ kleur@^3.0.3:
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
 
-kwc@1.12.1:
-  version "1.12.1"
-  resolved "https://registry.yarnpkg.com/kwc/-/kwc-1.12.1.tgz#932e5d60994669737077d9a8a3b14a9cd271d088"
-  integrity sha512-jYgNU2tsPQJhl3BaYdGv577+B6hKhwzrI5heLsnwEFJTgadmWvNG4mxneHOGUAG/8vtKShOlP9hvx9HCWF+ozg==
+kwc@1.12.2:
+  version "1.12.2"
+  resolved "https://registry.yarnpkg.com/kwc/-/kwc-1.12.2.tgz#ad980ce4dd1cfe372e6c89ba86ce283d652db516"
+  integrity sha512-0/v+M3bx3EFqp6+AS+7/Wf6fLGOeqMq3bCw7VO1MofEaE0ch3ATetJJOMYnme8ITrt1D6UZIWpy21NQ1dyh84w==
   dependencies:
     "@material-ui/core" "^4.11.0"
     "@material-ui/icons" "^4.9.1"

@@ -16,7 +16,7 @@
     "d3-transition": "2.0.0",
     "d3-zoom": "2.0.0",
     "graphql": "15.5.0",
-    "kwc": "1.12.1",
+    "kwc": "1.12.2",
     "lodash.capitalize": "4.2.1",
     "moment-timezone": "0.5.32",
     "node-sass": "4.14.1",

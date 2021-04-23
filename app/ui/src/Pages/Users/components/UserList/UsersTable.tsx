@@ -113,6 +113,7 @@ function UsersTable({ users }: Props) {
                   // @ts-ignore
                   updateUsersAccessLevel([row.original.id], newValue);
                 }}
+                disableScrollOnOpened
                 hideError
               />
             </div>

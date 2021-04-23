@@ -23,7 +23,7 @@ type UseProjectParams = {
   onUpdateCompleted?: () => void;
 };
 export default function useProject(options?: UseProjectParams) {
-  const [mutationCreateProject, { data }] = useMutation<
+  const [mutationCreateProject, { data, error }] = useMutation<
     CreateProject,
     CreateProjectVariables
   >(CreateProjectMutation, {
@@ -92,6 +92,6 @@ export default function useProject(options?: UseProjectParams) {
       updateProjectArchived,
       loading,
     },
-    create: { data },
+    create: { data, error },
   };
 }

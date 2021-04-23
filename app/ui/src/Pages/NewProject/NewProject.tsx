@@ -86,10 +86,6 @@ function NewProject() {
     ];
   }, [type]);
 
-  // We want to execute this on on component unmount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => () => clearAll(), []);
-
   // We want to execute this on on component mount and unmount
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => disableUnloadPrompt, []);

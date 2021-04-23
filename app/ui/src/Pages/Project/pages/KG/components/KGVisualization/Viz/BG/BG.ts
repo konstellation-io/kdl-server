@@ -9,6 +9,12 @@ class BG {
     wrapper: Selection<SVGGElement, unknown, null, undefined>,
     outerR: number
   ) {
+    // OuterCircle
+    wrapper
+      .append('circle')
+      .classed(styles.outerCircle, true)
+      .attr('r', outerR);
+
     // InnerCircle
     const innerCircle = wrapper.append('g');
     innerCircle
@@ -25,12 +31,6 @@ class BG {
       .append('xhtml:div')
       .classed(styles.innerCircleText, true)
       .html(CENTER_TEXT);
-
-    // OuterCircle
-    wrapper
-      .append('circle')
-      .classed(styles.outerCircle, true)
-      .attr('r', outerR);
   }
 }
 

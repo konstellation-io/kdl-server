@@ -14,7 +14,7 @@ import useNewProject from 'Graphql/client/hooks/useNewProject';
 import cx from 'classnames';
 
 function ProjectCreation() {
-  const [resultReady, setResultReady] = useState(false);
+  const [animationFinished, setAnimationFinished] = useState(false);
   const { clearAll } = useNewProject('information');
 
   const {
@@ -26,13 +26,13 @@ function ProjectCreation() {
     newProject
   );
 
-  const error = resultReady && !!createError;
-  const success = resultReady && !!createData;
+  const error = animationFinished && !!createError;
+  const success = animationFinished && !!createData;
 
   // Animation should last for at least 3 seconds
   useEffect(() => {
     let timeout = window.setTimeout(() => {
-      setResultReady(true);
+      setAnimationFinished(true);
     }, 3000);
 
     return () => clearTimeout(timeout);

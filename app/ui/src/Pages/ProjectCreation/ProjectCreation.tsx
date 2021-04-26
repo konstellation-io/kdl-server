@@ -116,7 +116,7 @@ function ProjectCreation() {
         <div
           className={cx(styles.infoMessageWrapper, { [styles.error]: error })}
         >
-          <div className={cx(styles.infoMessage, { [styles.error]: error })}>
+          <div className={styles.infoMessage}>
             {success &&
               'Your project has been created successfully, you can go to the project list or open the project page directly.'}
             {error && createError?.message}

@@ -1,10 +1,12 @@
 @import 'Styles/variables';
+@import 'Styles/colors';
 
 .container {
   display: flex;
   flex-wrap: wrap;
   padding: 4 * $grid-unit 4.5 * $grid-unit 4 * $grid-unit 5 * $grid-unit;
   overflow: auto;
+  background-color: palette(base, 900);
 }
 
 .adminsModal > div:last-child > div > div:last-child {

@@ -68,9 +68,6 @@ function ResourceDetails({ resource, onClose }: Props) {
       <div className={styles.title}>
         <div className={styles.titleText}>Resource Details</div>
         <div className={styles.actions}>
-          <div className={styles.starredText}>
-            {resource.starred ? 'Starred' : ''}
-          </div>
           <Button
             Icon={resource.starred ? IconStar : IconUnstar}
             label=""

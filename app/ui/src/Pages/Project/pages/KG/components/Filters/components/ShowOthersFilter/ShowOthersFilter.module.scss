@@ -17,4 +17,12 @@
 
     margin-left: 2 * $grid-unit;
   }
+
+  .check {
+    background-color: palette(base, 300);
+
+    &:hover {
+      background-color: palette(base, 200);
+    }
+  }
 }

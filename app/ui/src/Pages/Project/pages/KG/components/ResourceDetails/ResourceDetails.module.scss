@@ -4,7 +4,7 @@
 @import 'Styles/shadows';
 
 .container {
-  background-color: palette(lowlight, 900);
+  background-color: palette(base);
   height: 100%;
   width: 100%;
   display: flex;
@@ -19,7 +19,7 @@
   justify-content: space-between;
   align-items: center;
 
-  border-bottom: solid 1px palette(base, 200);
+  border-bottom: solid 1px palette(base, 400);
 
   .actions {
     display: flex;
@@ -27,13 +27,6 @@
 
     .starred {
       color: palette(starred);
-    }
-
-    .starredText {
-      @include font-body;
-      color: palette(starred);
-
-      margin-right: 2 * $grid-unit;
     }
   }
 
@@ -73,14 +66,14 @@
 }
 .content {
   flex-grow: 1;
-  background-color: palette(base);
+  background-color: palette(base, 800);
   padding: 3 * $grid-unit;
   overflow: auto;
   display: flex;
   flex-direction: column;
 
   .sectionTitle {
-    @include font-caption;
+    @include font-code;
     color: font-color(regular);
 
     margin-bottom: $grid-unit;
@@ -94,7 +87,7 @@
   }
   .type {
     color: font-color(light);
-    margin: 2 * $grid-unit 0 $grid-unit 0;
+    margin: 2 * $grid-unit 0 2 * $grid-unit 0;
   }
   .topicsG {
     margin: 2 * $grid-unit 0 $grid-unit 0;
@@ -135,8 +128,9 @@
     .repoUrlTextList {
       @include font-small;
       color: font-color(light);
+      line-height: 2.5 * $grid-unit;
 
-      background-color: palette(base, 400);
+      background-color: palette(base, 500);
       border-radius: 0.5 * $grid-unit;
 
       max-height: 18 * $grid-unit;

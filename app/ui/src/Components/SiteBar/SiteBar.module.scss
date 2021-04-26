@@ -5,8 +5,9 @@
 .container {
   display: flex;
   height: 5 * $grid-unit;
-  background-color: palette(base, 900);
+  background-color: palette(lowlight, 900);
   white-space: nowrap;
+  border-bottom: solid 1px palette(base);
 
   z-index: 999;
 }

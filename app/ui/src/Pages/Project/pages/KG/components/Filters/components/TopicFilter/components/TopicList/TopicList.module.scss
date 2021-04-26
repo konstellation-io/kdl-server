@@ -10,18 +10,18 @@
 
   .title {
     @include font-caption;
-    color: font-color(regular);
+    color: font-color(lowlight);
     flex-grow: 1;
   }
 
   .paperCount {
     @include font-caption;
-    color: font-color(regular);
+    color: font-color(lowlight);
   }
 
   .relevance {
     @include font-caption;
-    color: font-color(regular);
+    color: font-color(lowlight);
     margin-left: 2 * $grid-unit;
   }
 }
@@ -61,6 +61,9 @@
       align-items: center;
 
       .paperCount {
+        @include font-small;
+        text-align: center;
+
         margin-left: $grid-unit;
         margin-right: $grid-unit;
         border-radius: 100%;

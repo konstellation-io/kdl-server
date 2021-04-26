@@ -3,7 +3,11 @@
 @import 'Styles/colors';
 
 .projectTools {
-  background-color: palette(base);
+  background-color: palette(base, 300);
+
+  a:hover > div {
+    background-color: palette(base, 200) !important;
+  }
 
   .userTools {
     border-top: 2px solid palette(base, 400);

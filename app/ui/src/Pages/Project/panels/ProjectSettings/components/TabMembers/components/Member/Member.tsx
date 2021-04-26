@@ -46,32 +46,34 @@ function Member({
     >
       {canBeSelected && canManageMembers && (
         <Check
-          className={styles.check}
+          className={cx(styles.check, { [styles.unselected]: !selected })}
           checked={selected}
           onChange={(isSelected) =>
             canBeSelected && onCheckClick(member, isSelected)
           }
         />
       )}
-      <div className={styles.infoContainer}>
-        <div className={styles.leftWrapper} onClick={() => onInfoClick(member)}>
+      <div className={styles.infoContainer} onClick={() => onInfoClick(member)}>
+        <div className={styles.leftWrapper}>
           <Gravatar email={member.user.email} size={24} style={gravatarStyle} />
           <p className={styles.email}>{member.user.email}</p>
         </div>
         <div className={styles.rightWrapper}>
           {canManageMembers ? (
-            <Select
-              className={styles.accessLevelSelector}
-              options={Object.keys(AccessLevel)}
-              formSelectedOption={member.accessLevel}
-              valuesMapper={mapAccessLevel}
-              height={30}
-              onChange={(newLevel: AccessLevel) =>
-                onChangeMemberLevel([member.user.id], newLevel)
-              }
-              disabled={!canBeSelected}
-              hideError
-            />
+            <div onClick={(e) => e.stopPropagation()}>
+              <Select
+                className={styles.accessLevelSelector}
+                options={Object.keys(AccessLevel)}
+                formSelectedOption={member.accessLevel}
+                valuesMapper={mapAccessLevel}
+                height={30}
+                onChange={(newLevel: AccessLevel) =>
+                  onChangeMemberLevel([member.user.id], newLevel)
+                }
+                disabled={!canBeSelected}
+                hideError
+              />
+            </div>
           ) : (
             <span
               className={styles.accessLevel}
@@ -80,7 +82,7 @@ function Member({
               {mapAccessLevel[member.accessLevel]}
             </span>
           )}
-          <div className={styles.button} onClick={() => onInfoClick(member)}>
+          <div className={styles.button}>
             <IconOpen className="icon-small" />
           </div>
         </div>

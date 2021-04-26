@@ -31,7 +31,7 @@
     top: $grid-unit * 5;
     right: 0;
     z-index: 1;
-    background-color: palette(base, 900);
+    background-color: palette(lowlight, 800);
     cursor: initial;
     width: 54.5 * $grid-unit;
     border-radius: 0.75 * $grid-unit;
@@ -42,6 +42,7 @@
 
       .searchListContainer {
         padding: 0 $grid-unit * 1.75;
+        border-bottom: solid 1px palette(base, 400);
       }
     }
   }

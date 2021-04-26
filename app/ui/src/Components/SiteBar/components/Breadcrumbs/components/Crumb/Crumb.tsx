@@ -19,7 +19,6 @@ function Crumb({ crumbText, LeftIconComponent, BottomComponent }: CrumbProps) {
   const crumbRef = useRef(null);
   const {
     value: opened,
-    activate: showComponent,
     toggle: toggleComponent,
     deactivate: hideComponent,
   } = useBoolState(false);
@@ -40,7 +39,7 @@ function Crumb({ crumbText, LeftIconComponent, BottomComponent }: CrumbProps) {
         <span className={styles.crumbText}>{crumbText}</span>
         <ExpandMoreIcon
           className={cx(styles.rightIcon, 'icon-regular', {
-            [styles.opened]: showComponent,
+            [styles.opened]: opened,
           })}
         />
       </div>

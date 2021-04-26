@@ -3,7 +3,7 @@
 @import 'Styles/colors';
 
 .outerCircle {
-  fill-opacity: 0;
+  fill: palette(base, 600);
   stroke: palette(lowlight, 900);
   stroke-width: 6;
 }
@@ -12,7 +12,7 @@
   fill: palette(base, 900);
   fill-opacity: 0.8;
   stroke: palette(lowlight, 900);
-  stroke-width: 2;
+  stroke-width: 1;
 }
 
 .innerCircleText {

@@ -20,12 +20,12 @@
     position: absolute;
     width: 100%;
     height: 5 * $grid-unit;
-    top: $grid-unit * 3;
+    top: 3 * $grid-unit;
     z-index: 3;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 $grid-unit * 3.5 0 3 * $grid-unit;
+    padding: 0 3.5 * $grid-unit 0 3 * $grid-unit;
     pointer-events: none;
 
     .safeArea {

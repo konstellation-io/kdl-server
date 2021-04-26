@@ -12,7 +12,7 @@ import useKGVizScores from './useKGVizScores';
 import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
 import { KGItem } from '../../KG';
 import { ParentSize } from '@visx/responsive';
-import { RESOURCE_R } from './Viz/Resources';
+import { RESOURCE_R } from './Viz/Resources/Resources';
 import ResourceDetails from '../ResourceDetails/ResourceDetails';
 import ResourceLists from '../ResourceLists/ResourceLists';
 import ResourceTooltip from './ResourceTooltip/ResourceTooltip';

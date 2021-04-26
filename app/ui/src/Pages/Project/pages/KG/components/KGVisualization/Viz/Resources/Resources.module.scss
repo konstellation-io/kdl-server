@@ -1,0 +1,8 @@
+@import 'Styles/colors';
+
+:export {
+  default: palette(feedback, 900);
+  defaultHighlight: palette(highlight);
+  starred: palette(starred, 700);
+  starredHighlight: palette(starred);
+}

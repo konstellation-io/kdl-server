@@ -1,22 +1,17 @@
-import { Coord, DComplete } from '../../../KGUtils';
+import { Coord, DComplete } from '../../../../KGUtils';
 import { quadtree, Quadtree } from 'd3-quadtree';
 import { ScaleBand } from 'd3-scale';
 import { select, Selection } from 'd3-selection';
-import { D } from './KGViz';
+import { D } from '../KGViz';
 import { scaleBand } from '@visx/scale';
-import { OrientationH, OrientationV } from './radialAxis/radialAxis';
-import vizStyles from '../KGVisualizationWrapper.module.scss';
+import { OrientationH, OrientationV } from '../radialAxis/radialAxis';
+import vizStyles from '../../KGVisualizationWrapper.module.scss';
 import { px } from 'Utils/d3';
+import COLORS from './Resources.module.scss';
 
 export const RESOURCE_R = 4;
 
 const MOUSE_HOVER_ACTIVATION_RADIUS = 50;
-const COLORS = {
-  DEFAULT: 'rgb(12,52,72)',
-  DEFAULT_HIGHLIGHT: '#33FFFF',
-  STARRED: '#be8d41',
-  STARRED_HIGHLIGHT: '#FFBB52',
-};
 
 const x = (d: DComplete) => d.x;
 const y = (d: DComplete) => d.y;
@@ -183,7 +178,7 @@ class Resources {
 
     const r = d.outsideMax ? RESOURCE_R * 0.7 : RESOURCE_R;
 
-    context.fillStyle = d.starred ? COLORS.STARRED : COLORS.DEFAULT;
+    context.fillStyle = d.starred ? COLORS.starred : COLORS.default;
 
     context.beginPath();
     context.moveTo(center.x + d.x, center.y + d.y);
@@ -199,8 +194,8 @@ class Resources {
     } = this;
 
     const fillStyle = d.starred
-      ? COLORS.STARRED_HIGHLIGHT
-      : COLORS.DEFAULT_HIGHLIGHT;
+      ? COLORS.starredHighlight
+      : COLORS.defaultHighlight;
 
     context.globalCompositeOperation = 'source-over';
     context.shadowBlur = 10;
@@ -242,8 +237,8 @@ class Resources {
     context.moveTo(center.x + d.x, center.y + d.y);
     context.lineTo(250, 50);
     context.strokeStyle = d.starred
-      ? COLORS.STARRED_HIGHLIGHT
-      : COLORS.DEFAULT_HIGHLIGHT;
+      ? COLORS.starredHighlight
+      : COLORS.defaultHighlight;
 
     context.stroke();
     context.closePath();

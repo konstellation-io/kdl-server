@@ -78,31 +78,43 @@ function ProjectCreation() {
   function renderSuccessButtons() {
     const project = buildRoute(ROUTE.PROJECT, information.values.id);
     return (
-      <>
-        <Button
-          label="Go to projects list"
-          className={styles.button}
-          to={ROUTE.HOME}
-        />
-        <Button label="Go to project" to={project} className={styles.button} />
-      </>
+      <div className={styles.actionButtons}>
+        <div className={styles.actionButton}>
+          <Button
+            label="Go to projects list"
+            className={styles.button}
+            to={ROUTE.HOME}
+          />
+        </div>
+        <div className={styles.actionButton}>
+          <Button
+            label="Go to project"
+            to={project}
+            className={styles.button}
+          />
+        </div>
+      </div>
     );
   }
   function renderErrorButtons() {
     return (
-      <>
-        <Button
-          label="Cancel"
-          className={styles.button}
-          to={ROUTE.HOME}
-          onClick={clearAll}
-        />
-        <Button
-          label="Try again"
-          to={ROUTE.NEW_PROJECT}
-          className={styles.button}
-        />
-      </>
+      <div className={styles.actionButtons}>
+        <div className={styles.actionButton}>
+          <Button
+            label="Cancel"
+            className={styles.button}
+            to={ROUTE.HOME}
+            onClick={clearAll}
+          />
+        </div>
+        <div className={styles.actionButton}>
+          <Button
+            label="Try again"
+            to={ROUTE.NEW_PROJECT}
+            className={styles.button}
+          />
+        </div>
+      </div>
     );
   }
 
@@ -113,6 +125,11 @@ function ProjectCreation() {
         <div className={styles.animation}>
           <StatusCircle {...getCircleProps()} />
         </div>
+        {error && (
+          <p className={styles.errorTitle}>
+            There was an error creating your project
+          </p>
+        )}
         <div
           className={cx(styles.infoMessageWrapper, { [styles.error]: error })}
         >

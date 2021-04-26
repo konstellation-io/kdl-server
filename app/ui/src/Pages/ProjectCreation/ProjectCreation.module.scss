@@ -18,6 +18,14 @@
     width: 79 * $grid-unit;
     height: 100%;
 
+    .errorTitle {
+      @include font-small;
+      color: palette(error);
+
+      width: 100%;
+      text-align: left;
+    }
+
     .infoMessageWrapper {
       @include font-small;
       color: font-color(lowlight);
@@ -31,8 +39,10 @@
       }
 
       .infoMessage {
-        max-height: 10 * $grid-unit;
+        max-height: 17.5 * $grid-unit;
         overflow: auto;
+        padding: 0 10px;
+        white-space: pre-line;
       }
     }
 
@@ -52,4 +62,18 @@
 
 .animation {
   margin: 2 * $grid-unit 0;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  & .actionButton:first-child {
+    margin-right: $grid-unit;
+  }
+
+  .actionButton {
+    flex-grow: 1;
+  }
 }

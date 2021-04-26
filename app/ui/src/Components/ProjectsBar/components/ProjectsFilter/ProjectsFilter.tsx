@@ -29,7 +29,7 @@ function ProjectsFilter() {
   );
 
   return (
-    <div className={styles.container} data-test-id="filterProject">
+    <div className={styles.container}>
       <Select
         onChange={(newSelection: ProjectSelection) =>
           updateFilters({ selection: newSelection })

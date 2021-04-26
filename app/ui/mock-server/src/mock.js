@@ -84,7 +84,7 @@ module.exports = {
       })),
     createProject: (_, { input }) => {
       const hasError = casual.boolean;
-      if (hasError) throw new Error('An error occurred during the project creation, please come back to the wizard and check the data.');
+      if (hasError) throw new Error(casual.words(100));
 
       const casualProject = buildProject();
       const newProject = {

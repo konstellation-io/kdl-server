@@ -11,6 +11,7 @@ import useProject from 'Graphql/hooks/useProject';
 import { useReactiveVar } from '@apollo/client';
 import { newProject } from 'Graphql/client/cache';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
+import cx from 'classnames';
 
 function ProjectCreation() {
   const [resultReady, setResultReady] = useState(false);
@@ -64,7 +65,6 @@ function ProjectCreation() {
   );
 
   function getCircleProps() {
-    console.log(success, error);
     switch (true) {
       case success:
         return { label: 'CREATED', animation: States.SUCCESS };
@@ -113,11 +113,15 @@ function ProjectCreation() {
         <div className={styles.animation}>
           <StatusCircle {...getCircleProps()} />
         </div>
-        <p className={styles.infoMessage}>
-          {success &&
-            'Your project has been created successfully, you can go to the project list or open the project page directly.'}
-          {error && createError?.message}
-        </p>
+        <div
+          className={cx(styles.infoMessageWrapper, { [styles.error]: error })}
+        >
+          <div className={cx(styles.infoMessage, { [styles.error]: error })}>
+            {success &&
+              'Your project has been created successfully, you can go to the project list or open the project page directly.'}
+            {error && createError?.message}
+          </div>
+        </div>
         <div className={styles.buttonsContainer}>
           {success && renderSuccessButtons()}
           {error && renderErrorButtons()}

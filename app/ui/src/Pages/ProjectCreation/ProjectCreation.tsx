@@ -10,23 +10,29 @@ import styles from './ProjectCreation.module.scss';
 import useProject from 'Graphql/hooks/useProject';
 import { useReactiveVar } from '@apollo/client';
 import { newProject } from 'Graphql/client/cache';
+import useNewProject from 'Graphql/client/hooks/useNewProject';
+import cx from 'classnames';
 
 function ProjectCreation() {
-  const [animCanEnd, setAnimCanEnd] = useState(false);
+  const [animationFinished, setAnimationFinished] = useState(false);
+  const { clearAll } = useNewProject('information');
 
   const {
     addNewProject,
-    create: { data: dataCreateProject },
+    create: { data: createData, error: createError },
   } = useProject();
 
   const { repository, information, externalRepository } = useReactiveVar(
     newProject
   );
 
+  const error = animationFinished && !!createError;
+  const success = animationFinished && !!createData;
+
   // Animation should last for at least 3 seconds
   useEffect(() => {
     let timeout = window.setTimeout(() => {
-      setAnimCanEnd(true);
+      setAnimationFinished(true);
     }, 3000);
 
     return () => clearTimeout(timeout);
@@ -51,37 +57,91 @@ function ProjectCreation() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const projectReady = animCanEnd && dataCreateProject;
+  useEffect(
+    () => () => {
+      if (success) clearAll();
+    },
+    [success, error]
+  );
+
+  function getCircleProps() {
+    switch (true) {
+      case success:
+        return { label: 'CREATED', animation: States.SUCCESS };
+      case error:
+        return { label: 'ERROR', animation: States.ERROR };
+      default:
+        return { label: 'CREATING...', animation: States.INITIALIZING };
+    }
+  }
+
+  function renderSuccessButtons() {
+    const project = buildRoute(ROUTE.PROJECT, information.values.id);
+    return (
+      <div className={styles.actionButtons}>
+        <div className={styles.actionButton}>
+          <Button
+            label="Go to projects list"
+            className={styles.button}
+            to={ROUTE.HOME}
+          />
+        </div>
+        <div className={styles.actionButton}>
+          <Button
+            label="Go to project"
+            to={project}
+            className={styles.button}
+          />
+        </div>
+      </div>
+    );
+  }
+  function renderErrorButtons() {
+    return (
+      <div className={styles.actionButtons}>
+        <div className={styles.actionButton}>
+          <Button
+            label="Cancel"
+            className={styles.button}
+            to={ROUTE.HOME}
+            onClick={clearAll}
+          />
+        </div>
+        <div className={styles.actionButton}>
+          <Button
+            label="Try again"
+            to={ROUTE.NEW_PROJECT}
+            className={styles.button}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
         <h1>Your project is creating now</h1>
         <div className={styles.animation}>
-          <StatusCircle
-            label={projectReady ? 'CREATED' : 'CREATING...'}
-            animation={projectReady ? States.SUCCESS : States.INITIALIZING}
-          />
+          <StatusCircle {...getCircleProps()} />
         </div>
-        <p className={styles.infoMessage}>
-          If you don't want to wait, you may go to the project detail while it
-          is being created, or to the Server and see all the projects.
-        </p>
+        {error && (
+          <p className={styles.errorTitle}>
+            There was an error creating your project
+          </p>
+        )}
+        <div
+          className={cx(styles.infoMessageWrapper, { [styles.error]: error })}
+        >
+          <div className={styles.infoMessage}>
+            {success &&
+              'Your project has been created successfully, you can go to the project list or open the project page directly.'}
+            {error && createError?.message}
+          </div>
+        </div>
         <div className={styles.buttonsContainer}>
-          <Button
-            label="Go to home"
-            className={styles.button}
-            to={ROUTE.HOME}
-          />
-          <Button
-            label="Go to project"
-            to={buildRoute(
-              ROUTE.PROJECT,
-              dataCreateProject?.createProject.id || ''
-            )}
-            disabled={!projectReady}
-            className={styles.button}
-          />
+          {success && renderSuccessButtons()}
+          {error && renderErrorButtons()}
         </div>
       </div>
     </div>

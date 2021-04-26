@@ -17,7 +17,6 @@ import Stepper from 'Components/Stepper/Stepper';
 import Summary from './pages/Summary/Summary';
 import cx from 'classnames';
 import styles from './NewProject.module.scss';
-import useNewProject from 'Graphql/client/hooks/useNewProject';
 import { useReactiveVar } from '@apollo/client';
 import { Prompt } from 'react-router-dom';
 import useUnloadPrompt from 'Hooks/useUnloadPrompt/useUnloadPrompt';
@@ -71,7 +70,6 @@ function NewProject() {
   const { enableUnloadPrompt, disableUnloadPrompt } = useUnloadPrompt();
   const data = useReactiveVar(newProject);
 
-  const { clearAll } = useNewProject('information');
   const type = data.repository.values.type;
 
   const stepsWithData: (
@@ -85,10 +83,6 @@ function NewProject() {
       repoTypeToStepName[type || ''],
     ];
   }, [type]);
-
-  // We want to execute this on on component unmount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => () => clearAll(), []);
 
   // We want to execute this on on component mount and unmount
   // eslint-disable-next-line react-hooks/exhaustive-deps

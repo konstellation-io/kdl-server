@@ -14,15 +14,36 @@
     display: flex;
     align-items: center;
     flex-direction: column;
-    padding: 8.5 * $grid-unit 20 * $grid-unit 0 20 * $grid-unit;
+    padding: 8.5 * $grid-unit 19 * $grid-unit 0 19 * $grid-unit;
     width: 79 * $grid-unit;
     height: 100%;
 
-    .infoMessage {
+    .errorTitle {
+      @include font-small;
+      color: palette(error);
+
+      width: 100%;
+      text-align: left;
+    }
+
+    .infoMessageWrapper {
       @include font-small;
       color: font-color(lowlight);
-      text-align: left;
       margin-top: 2 $grid-unit;
+      text-align: left;
+      padding: $grid-unit ;
+
+      &.error {
+        border: 1px solid palette(error, 700);
+        border-radius: 0.5 * $grid-unit;
+      }
+
+      .infoMessage {
+        max-height: 17.5 * $grid-unit;
+        overflow: auto;
+        padding: 0 10px;
+        white-space: pre-line;
+      }
     }
 
     .buttonsContainer {
@@ -41,4 +62,18 @@
 
 .animation {
   margin: 2 * $grid-unit 0;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  & .actionButton:first-child {
+    margin-right: $grid-unit;
+  }
+
+  .actionButton {
+    flex-grow: 1;
+  }
 }

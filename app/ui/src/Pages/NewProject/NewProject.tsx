@@ -17,7 +17,6 @@ import Stepper from 'Components/Stepper/Stepper';
 import Summary from './pages/Summary/Summary';
 import cx from 'classnames';
 import styles from './NewProject.module.scss';
-import useNewProject from 'Graphql/client/hooks/useNewProject';
 import { useReactiveVar } from '@apollo/client';
 import { Prompt } from 'react-router-dom';
 import useUnloadPrompt from 'Hooks/useUnloadPrompt/useUnloadPrompt';

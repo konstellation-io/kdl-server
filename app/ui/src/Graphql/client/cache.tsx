@@ -1,4 +1,8 @@
-import { InMemoryCache, makeVar } from '@apollo/client';
+import {
+  defaultDataIdFromObject,
+  InMemoryCache,
+  makeVar,
+} from '@apollo/client';
 import {
   ProjectFilters,
   ProjectOrder,
@@ -6,24 +10,27 @@ import {
 } from './models/ProjectFilters';
 import { UserSelection, UserSettings } from './models/UserSettings';
 
-import { D } from 'Pages/Project/pages/KG/components/KGVisualization/KGVisualization';
+import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
 import { GetProjectMembers_project_members } from '../queries/types/GetProjectMembers';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTools';
 import { NewProject } from './models/NewProject';
 import { PanelInfo } from './models/Panel';
 
+type ToolName = keyof GetUserTools_project_toolUrls;
+
 export const initialProjectFilters: ProjectFilters = {
   name: '',
   selection: ProjectSelection.ACTIVE,
-  order: ProjectOrder.AZ,
+  order: ProjectOrder.CREATION,
   nFiltered: 0,
 };
 
 export const initialNewProject: NewProject = {
   information: {
-    values: { name: '', description: '' },
+    values: { name: '', description: '', id: '' },
     errors: {
+      id: 'This field is mandatory, please fill it.',
       name: 'This field is mandatory, please fill it.',
       description: 'Please, write a description is important for the project.',
     },
@@ -46,10 +53,6 @@ export const initialNewProject: NewProject = {
       username: 'This field is mandatory',
     },
   },
-  internalRepository: {
-    values: { slug: '', url: '' },
-    errors: { slug: '' },
-  },
 };
 
 const initialStateUserSettings: UserSettings = {
@@ -61,8 +64,6 @@ const initialStateUserSettings: UserSettings = {
   },
 };
 
-type ToolName = keyof GetUserTools_project_toolUrls;
-
 export const projectFilters = makeVar(initialProjectFilters);
 export const newProject = makeVar(initialNewProject);
 export const openedProject = makeVar<GetProjects_projects | null>(null);
@@ -70,7 +71,9 @@ export const userSettings = makeVar<UserSettings>(initialStateUserSettings);
 export const memberDetails = makeVar<GetProjectMembers_project_members | null>(
   null
 );
-export const resourceDetails = makeVar<D | null>(null);
+export const resourceDetails = makeVar<GetKnowledgeGraph_knowledgeGraph_items | null>(
+  null
+);
 export const primaryPanel = makeVar<PanelInfo | null>(null);
 export const secondaryPanel = makeVar<PanelInfo | null>(null);
 export const currentTool = makeVar<ToolName | null>(null);
@@ -98,6 +101,19 @@ const cache = new InMemoryCache({
         apiTokens: { merge: false },
       },
     },
+    Project: {
+      fields: {
+        members: { merge: false },
+      },
+    },
+  },
+  dataIdFromObject(responseObj) {
+    switch (responseObj.__typename) {
+      case 'SetKGStarredRes':
+        return `KnowledgeGraphItem:${responseObj.kgItemId}`;
+      default:
+        return defaultDataIdFromObject(responseObj);
+    }
   },
 });
 

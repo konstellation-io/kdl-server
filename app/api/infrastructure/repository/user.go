@@ -24,6 +24,7 @@ const (
 
 type userDTO struct {
 	ID                 primitive.ObjectID `bson:"_id"`
+	Deleted            bool               `bson:"deleted"`
 	Username           string             `bson:"username"`
 	Email              string             `bson:"email"`
 	CreationDate       time.Time          `bson:"creation_date"`
@@ -93,8 +94,16 @@ func (m *userMongoDBRepo) GetByEmail(ctx context.Context, email string) (entity.
 }
 
 // FindAll retrieves all the existing users.
-func (m *userMongoDBRepo) FindAll(ctx context.Context) ([]entity.User, error) {
-	return m.find(ctx, bson.M{})
+func (m *userMongoDBRepo) FindAll(ctx context.Context, includeDeleted bool) ([]entity.User, error) {
+	var filter bson.M
+
+	if includeDeleted {
+		filter = bson.M{}
+	} else {
+		filter = bson.M{"deleted": bson.M{"$ne": true}}
+	}
+
+	return m.find(ctx, filter)
 }
 
 // Create inserts into the database a new entity.
@@ -122,6 +131,69 @@ func (m *userMongoDBRepo) Create(ctx context.Context, u entity.User) (string, er
 
 // FindByIDs retrieves the users for the given user identifiers.
 func (m *userMongoDBRepo) FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error) {
+	objIDs, err := m.toObjectIDs(userIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	return m.find(ctx, bson.M{"_id": bson.M{"$in": objIDs}})
+}
+
+// UpdateAccessLevel update the user access level for the given user identifiers.
+func (m *userMongoDBRepo) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) error {
+	objIDs, err := m.toObjectIDs(userIDs)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{
+		"_id": bson.M{
+			"$in": objIDs,
+		},
+	}
+
+	upd := bson.M{
+		"$set": bson.M{
+			"access_level": level,
+		},
+	}
+
+	_, err = m.collection.UpdateMany(ctx, filter, upd)
+
+	return err
+}
+
+func (m *userMongoDBRepo) UpdateSSHKey(ctx context.Context, username string, sshKey entity.SSHKey) error {
+	fields := bson.M{
+		"public_ssh_key":        sshKey.Public,
+		"private_ssh_key":       sshKey.Private,
+		"ssh_key_creation_date": sshKey.CreationDate,
+	}
+
+	return m.updateUserFields(ctx, username, fields)
+}
+
+func (m *userMongoDBRepo) UpdateEmail(ctx context.Context, username, email string) error {
+	return m.updateUserFields(ctx, username, bson.M{"email": email})
+}
+
+func (m *userMongoDBRepo) UpdateDeleted(ctx context.Context, username string, deleted bool) error {
+	return m.updateUserFields(ctx, username, bson.M{"deleted": deleted})
+}
+
+func (m *userMongoDBRepo) updateUserFields(ctx context.Context, username string, fields bson.M) error {
+	m.logger.Debugf("Updating user \"%s\" with \"%#v\"...", username, fields)
+
+	filter := bson.M{"username": username}
+
+	_, err := m.collection.UpdateOne(ctx, filter, bson.M{
+		"$set": fields,
+	})
+
+	return err
+}
+
+func (m *userMongoDBRepo) toObjectIDs(userIDs []string) ([]primitive.ObjectID, error) {
 	objIDs := make([]primitive.ObjectID, len(userIDs))
 
 	for i, id := range userIDs {
@@ -133,11 +205,11 @@ func (m *userMongoDBRepo) FindByIDs(ctx context.Context, userIDs []string) ([]en
 		objIDs[i] = objID
 	}
 
-	return m.find(ctx, bson.M{"_id": bson.M{"$in": objIDs}})
+	return objIDs, nil
 }
 
 func (m *userMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.User, error) {
-	m.logger.Debugf("Finding one user by \"%s\" from database...", filters)
+	m.logger.Debugf("Finding one user by \"%#v\" from database...", filters)
 
 	dto := userDTO{}
 
@@ -150,7 +222,7 @@ func (m *userMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.U
 }
 
 func (m *userMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity.User, error) {
-	m.logger.Debugf("Finding users with filters \"%s\"...", filters)
+	m.logger.Debugf("Finding users with filters \"%#v\"...", filters)
 
 	var dtos []userDTO
 
@@ -171,6 +243,7 @@ func (m *userMongoDBRepo) entityToDTO(u entity.User) (userDTO, error) {
 		PublicSSHKey:       u.SSHKey.Public,
 		SSHKeyCreationDate: u.SSHKey.CreationDate,
 		CreationDate:       u.CreationDate,
+		Deleted:            u.Deleted,
 	}
 
 	if u.ID != "" {
@@ -197,6 +270,7 @@ func (m *userMongoDBRepo) dtoToEntity(dto userDTO) entity.User {
 			Private:      dto.PrivateSSHKey,
 			CreationDate: dto.SSHKeyCreationDate,
 		},
+		Deleted: dto.Deleted,
 	}
 }
 

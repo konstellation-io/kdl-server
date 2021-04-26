@@ -18,12 +18,6 @@ export enum KnowledgeGraphItemCat {
   Paper = 'Paper',
 }
 
-export enum ProjectState {
-  ARCHIVED = 'ARCHIVED',
-  STARTED = 'STARTED',
-  STOPPED = 'STOPPED',
-}
-
 export enum RepositoryType {
   EXTERNAL = 'EXTERNAL',
   INTERNAL = 'INTERNAL',
@@ -34,55 +28,46 @@ export interface AddMembersInput {
   userIds: string[];
 }
 
-export interface AddUserInput {
-  email: string;
-  username: string;
-  password: string;
-  accessLevel: AccessLevel;
-}
-
 export interface ApiTokenInput {
   userId: string;
   name?: string | null;
 }
 
 export interface CreateProjectInput {
+  id: string;
   name: string;
   description: string;
   repository: RepositoryInput;
 }
 
-export interface ExternalRepository {
+export interface ExternalRepositoryInput {
   url: string;
   username: string;
   token: string;
-}
-
-export interface InternalRepository {
-  name: string;
 }
 
 export interface RemoveApiTokenInput {
   apiTokenId: string;
 }
 
-export interface RemoveMemberInput {
+export interface RemoveMembersInput {
   projectId: string;
-  userId: string;
-}
-
-export interface RemoveUsersInput {
   userIds: string[];
 }
 
 export interface RepositoryInput {
   type: RepositoryType;
-  external?: ExternalRepository | null;
-  internal?: InternalRepository | null;
+  external?: ExternalRepositoryInput | null;
 }
 
 export interface SetActiveUserToolsInput {
   active: boolean;
+}
+
+export interface SetKGStarredInput {
+  projectId: string;
+  kgItemId: string;
+  starred: boolean;
 }
 
 export interface UpdateAccessLevelInput {
@@ -90,9 +75,9 @@ export interface UpdateAccessLevelInput {
   accessLevel: AccessLevel;
 }
 
-export interface UpdateMemberInput {
+export interface UpdateMembersInput {
   projectId: string;
-  userId: string;
+  userIds: string[];
   accessLevel: AccessLevel;
 }
 
@@ -100,11 +85,7 @@ export interface UpdateProjectInput {
   id: string;
   name?: string | null;
   description?: string | null;
-  repository?: UpdateProjectRepositoryInput | null;
-}
-
-export interface UpdateProjectRepositoryInput {
-  url: string;
+  archived?: boolean | null;
 }
 
 //==============================================================

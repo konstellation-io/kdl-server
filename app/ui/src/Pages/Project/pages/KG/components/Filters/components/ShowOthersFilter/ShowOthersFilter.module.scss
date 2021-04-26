@@ -8,7 +8,7 @@
   align-items: center;
   background-color: palette(base, 900);
   border-left: solid 2px palette(base);
-  padding: 0 3 * $grid-unit;
+  padding: 0 2 * $grid-unit;
   height: 100%;
 
   .text {
@@ -16,5 +16,13 @@
     color: font-color(lowlight);
 
     margin-left: 2 * $grid-unit;
+  }
+
+  .check {
+    background-color: palette(base, 300);
+
+    &:hover {
+      background-color: palette(base, 200);
+    }
   }
 }

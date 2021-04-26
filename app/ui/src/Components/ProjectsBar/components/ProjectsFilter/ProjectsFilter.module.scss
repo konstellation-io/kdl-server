@@ -11,11 +11,12 @@
   align-items: center;
   height: 100%;
 
-  border-right: solid 1px palette(base, 400);
+  border-right: solid 1px palette(base);
 }
 
 .formSelect {
-  width: 17 * $grid-unit;
+  width: 20 * $grid-unit;
+
   & > div > div {
     background-color: transparent !important;
   }

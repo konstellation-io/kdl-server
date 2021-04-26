@@ -13,20 +13,21 @@ type UpdateProjectOption struct {
 	ProjectID   string
 	Name        *string
 	Description *string
+	Archived    *bool
 }
 
-// UpdateMemberOption options when updating a project member.
-type UpdateMemberOption struct {
+// UpdateMembersOption options when updating a project member.
+type UpdateMembersOption struct {
 	ProjectID   string
-	User        entity.User
+	Users       []entity.User
 	AccessLevel entity.AccessLevel
 	LoggedUser  entity.User
 }
 
-// RemoveMemberOption options when removing a project member.
-type RemoveMemberOption struct {
+// RemoveMembersOption options when removing a project member.
+type RemoveMembersOption struct {
 	ProjectID  string
-	User       entity.User
+	Users      []entity.User
 	LoggedUser entity.User
 }
 
@@ -69,12 +70,10 @@ func (i interactor) AddMembers(ctx context.Context, opt AddMembersOption) (entit
 	}
 
 	// Add collaborators to the Gitea repository
-	if p.Repository.Type == entity.RepositoryTypeInternal {
-		for _, u := range opt.Users {
-			err = i.giteaService.AddCollaborator(p.Repository.InternalRepoName, u.Username, MemberAccessLevelOnCreation)
-			if err != nil {
-				return entity.Project{}, err
-			}
+	for _, u := range opt.Users {
+		err = i.giteaService.AddCollaborator(p.Repository.RepoName, u.Username, MemberAccessLevelOnCreation)
+		if err != nil {
+			return entity.Project{}, err
 		}
 	}
 
@@ -98,16 +97,18 @@ func (i interactor) AddMembers(ctx context.Context, opt AddMembersOption) (entit
 	return i.repo.Get(ctx, opt.ProjectID)
 }
 
-// RemoveMember removes a user from the given project.
-func (i interactor) RemoveMember(ctx context.Context, opt RemoveMemberOption) (entity.Project, error) {
+// RemoveMembers removes a user from the given project.
+func (i interactor) RemoveMembers(ctx context.Context, opt RemoveMembersOption) (entity.Project, error) {
 	p, err := i.repo.Get(ctx, opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err
 	}
 
-	// Check the member to remove exists into the project
-	if ok, _ := i.getMember(opt.User.ID, p.Members); !ok {
-		return entity.Project{}, fmt.Errorf("%w: user ID=%s", ErrMemberNotExists, opt.User.ID)
+	// Check the members to remove exist into the project
+	for _, u := range opt.Users {
+		if ok, _ := i.getMember(u.ID, p.Members); !ok {
+			return entity.Project{}, fmt.Errorf("%w: user ID=%s", ErrMemberNotExists, u.ID)
+		}
 	}
 
 	// Check the logged user is admin in this project
@@ -118,20 +119,20 @@ func (i interactor) RemoveMember(ctx context.Context, opt RemoveMemberOption) (e
 	}
 
 	// Check if after removing the user there is at least one administrator
-	if !i.checkAtLeastOneAdmin(opt.User.ID, p.Members) {
+	if !i.checkAtLeastOneAdmin(opt.Users, p.Members) {
 		return entity.Project{}, ErrRemoveNoMoreAdmins
 	}
 
-	// Remove collaborator from the Gitea repository
-	if p.Repository.Type == entity.RepositoryTypeInternal {
-		err = i.giteaService.RemoveCollaborator(p.Repository.InternalRepoName, opt.User.Username)
+	// Remove collaborators from the Gitea repository
+	for _, u := range opt.Users {
+		err = i.giteaService.RemoveCollaborator(p.Repository.RepoName, u.Username)
 		if err != nil {
 			return entity.Project{}, err
 		}
 	}
 
-	// Remove member from stored project in our DataBase
-	err = i.repo.RemoveMember(ctx, opt.ProjectID, opt.User.ID)
+	// Remove members from stored project in our DataBase
+	err = i.repo.RemoveMembers(ctx, opt.ProjectID, opt.Users)
 	if err != nil {
 		return entity.Project{}, err
 	}
@@ -139,8 +140,8 @@ func (i interactor) RemoveMember(ctx context.Context, opt RemoveMemberOption) (e
 	return i.repo.Get(ctx, opt.ProjectID)
 }
 
-// UpdateMember changes the access level for the given member.
-func (i interactor) UpdateMember(ctx context.Context, opt UpdateMemberOption) (entity.Project, error) {
+// UpdateMembers changes the access level for the given member.
+func (i interactor) UpdateMembers(ctx context.Context, opt UpdateMembersOption) (entity.Project, error) {
 	p, err := i.repo.Get(ctx, opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err
@@ -153,28 +154,30 @@ func (i interactor) UpdateMember(ctx context.Context, opt UpdateMemberOption) (e
 		return entity.Project{}, ErrOnlyAdminCanUpdateMember
 	}
 
-	// Check the member to update exists into the project
-	if ok, _ := i.getMember(opt.User.ID, p.Members); !ok {
-		return entity.Project{}, fmt.Errorf("%w: user ID=%s", ErrMemberNotExists, opt.User.ID)
+	// Check the members to update exist into the project
+	for _, u := range opt.Users {
+		if ok, _ := i.getMember(u.ID, p.Members); !ok {
+			return entity.Project{}, fmt.Errorf("%w: user ID=%s", ErrMemberNotExists, u.ID)
+		}
 	}
 
 	// Check if after updating there is at least one administrator
 	if opt.AccessLevel != entity.AccessLevelAdmin {
-		if !i.checkAtLeastOneAdmin(opt.User.ID, p.Members) {
+		if !i.checkAtLeastOneAdmin(opt.Users, p.Members) {
 			return entity.Project{}, ErrUpdateNoMoreAdmins
 		}
 	}
 
-	// If the repository is internal, update collaborator permissions in Gitea repository
-	if p.Repository.Type == entity.RepositoryTypeInternal {
-		err = i.giteaService.UpdateCollaboratorPermissions(p.Repository.InternalRepoName, opt.User.Username, opt.AccessLevel)
+	// Update collaborator permissions in Gitea repository
+	for _, u := range opt.Users {
+		err = i.giteaService.UpdateCollaboratorPermissions(p.Repository.RepoName, u.Username, opt.AccessLevel)
 		if err != nil {
 			return entity.Project{}, err
 		}
 	}
 
-	// Update member from stored project in our DataBase
-	err = i.repo.UpdateMemberAccessLevel(ctx, opt.ProjectID, opt.User.ID, opt.AccessLevel)
+	// Update members from stored project in our DataBase
+	err = i.repo.UpdateMembersAccessLevel(ctx, opt.ProjectID, opt.Users, opt.AccessLevel)
 	if err != nil {
 		return entity.Project{}, err
 	}
@@ -204,10 +207,19 @@ func (i interactor) getMember(userID string, members []entity.Member) (bool, ent
 	return false, entity.Member{}
 }
 
-// checkAtLeastOneAdmin indicates if there is at least one admin inside the members ignoring the given user.
-func (i interactor) checkAtLeastOneAdmin(skipUserID string, members []entity.Member) bool {
+// checkAtLeastOneAdmin indicates if there is at least one admin inside the members ignoring the given users.
+func (i interactor) checkAtLeastOneAdmin(skipUsers []entity.User, members []entity.Member) bool {
+	skipUsersMap := make(map[string]struct{}, len(skipUsers))
+	for _, u := range skipUsers {
+		skipUsersMap[u.ID] = struct{}{}
+	}
+
 	for _, m := range members {
-		if m.UserID != skipUserID && m.AccessLevel == entity.AccessLevelAdmin {
+		if _, found := skipUsersMap[m.UserID]; found {
+			continue
+		}
+
+		if m.AccessLevel == entity.AccessLevelAdmin {
 			return true
 		}
 	}

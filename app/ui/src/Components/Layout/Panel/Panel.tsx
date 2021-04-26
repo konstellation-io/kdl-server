@@ -18,7 +18,7 @@ export enum PANEL_SIZE {
 }
 
 type Props = {
-  title: string;
+  title?: string;
   show: boolean;
   close: () => void;
   children?: JSX.Element | null | false;

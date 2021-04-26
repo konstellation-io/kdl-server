@@ -1,9 +1,5 @@
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import {
-  GET_NEW_PROJECT,
-  GetNewProject,
-} from 'Graphql/client/queries/getNewProject.graphql';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import RepositoryTypeComponent, {
   LOCATION,
   SIZE,
@@ -17,13 +13,15 @@ import Repository from './pages/Repository/Repository';
 import RepositoryDetails from './pages/RepositoryDetails/RepositoryDetails';
 import { RepositoryType } from 'Graphql/types/globalTypes';
 import SidebarTop from 'Components/Layout/Page/DefaultPage/SidebarTop';
-import { SpinnerCircular } from 'kwc';
 import Stepper from 'Components/Stepper/Stepper';
 import Summary from './pages/Summary/Summary';
 import cx from 'classnames';
 import styles from './NewProject.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
-import { useQuery } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
+import { Prompt } from 'react-router-dom';
+import useUnloadPrompt from 'Hooks/useUnloadPrompt/useUnloadPrompt';
+import { newProject } from 'Graphql/client/cache';
 
 enum Steps {
   INFORMATION,
@@ -61,32 +59,40 @@ const stepperSteps = [
 ];
 
 export const repoTypeToStepName: {
-  [k: string]: StepNames.EXTERNAL | StepNames.INTERNAL;
+  [k: string]: StepNames.EXTERNAL;
 } = {
   [RepositoryType.EXTERNAL]: StepNames.EXTERNAL,
-  [RepositoryType.INTERNAL]: StepNames.INTERNAL,
 };
 
 function NewProject() {
-  const { data } = useQuery<GetNewProject>(GET_NEW_PROJECT);
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const [isPromptEnabled, setIsPromptEnabled] = useState(false);
+
+  const { enableUnloadPrompt, disableUnloadPrompt } = useUnloadPrompt();
+  const data = useReactiveVar(newProject);
 
   const { clearAll } = useNewProject('information');
-  const type = data?.newProject.repository.values.type || null;
+  const type = data.repository.values.type;
 
   const stepsWithData: (
     | StepNames.INFORMATION
     | StepNames.REPOSITORY
-    | StepNames.INTERNAL
     | StepNames.EXTERNAL
-  )[] = [
-    StepNames.INFORMATION,
-    StepNames.REPOSITORY,
-    repoTypeToStepName[type || ''],
-  ];
+  )[] = useMemo(() => {
+    return [
+      StepNames.INFORMATION,
+      StepNames.REPOSITORY,
+      repoTypeToStepName[type || ''],
+    ];
+  }, [type]);
 
   // We want to execute this on on component unmount
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => () => clearAll(), []);
+
+  // We want to execute this on on component mount and unmount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => disableUnloadPrompt, []);
 
   const {
     direction,
@@ -101,6 +107,33 @@ function NewProject() {
     data: stepperSteps,
   });
 
+  useEffect(() => {
+    const isSomeInputDirty = stepsWithData.some((step) => {
+      const stepByIndex = data[step];
+      return (
+        stepByIndex &&
+        Object.values(stepByIndex.values).some((value) => !!value)
+      );
+    });
+    setIsFormDirty(isSomeInputDirty);
+  }, [data, stepsWithData]);
+
+  useEffect(() => {
+    if (isFormDirty && actStep !== Steps.SUMMARY) {
+      enableUnloadPrompt();
+      setIsPromptEnabled(true);
+    } else {
+      disableUnloadPrompt();
+      setIsPromptEnabled(false);
+    }
+  }, [
+    isFormDirty,
+    actStep,
+    enableUnloadPrompt,
+    disableUnloadPrompt,
+    setIsPromptEnabled,
+  ]);
+
   function getActions() {
     const onNextClick = () => {
       if (validateStep()) nextStep();
@@ -108,30 +141,30 @@ function NewProject() {
     switch (actStep) {
       case 0:
         return [
-          <ActionButton key="cancel" label="CANCEL" to={ROUTE.HOME} />,
+          <ActionButton key="cancel" label="Cancel" to={ROUTE.HOME} />,
           <ActionButton
             key="next"
-            label="NEXT"
+            label="Next"
             primary
             onClick={onNextClick}
           />,
         ];
       case stepperSteps.length - 1:
         return [
-          <ActionButton key="key" label="BACK" onClick={prevStep} />,
+          <ActionButton key="key" label="Back" onClick={prevStep} />,
           <ActionButton
             key="create"
-            label="CREATE"
+            label="Create"
             to={ROUTE.PROJECT_CREATION}
             primary
           />,
         ];
       default:
         return [
-          <ActionButton key="back" label="BACK" onClick={prevStep} />,
+          <ActionButton key="back" label="Back" onClick={prevStep} />,
           <ActionButton
             key="next"
-            label="NEXT"
+            label="Next"
             primary
             onClick={onNextClick}
           />,
@@ -139,14 +172,13 @@ function NewProject() {
     }
   }
 
-  if (!data) return <SpinnerCircular />;
-
   // Updates completed and error step states
   function validateStep() {
     const stepData = stepsWithData[actStep];
-    if (data && stepData !== null && actStep !== Steps.SUMMARY) {
-      // @ts-ignore
-      const actStepData = data.newProject[stepData];
+    const hasData = !!stepData;
+
+    if (hasData && actStep !== Steps.SUMMARY) {
+      const actStepData = data[stepData];
 
       const error =
         actStepData.errors && Object.values(actStepData.errors).some((e) => e);
@@ -158,6 +190,8 @@ function NewProject() {
 
       updateState(completed, error);
       return !error;
+    } else if (!hasData) {
+      updateState(true, false);
     }
     return true;
   }
@@ -196,6 +230,10 @@ function NewProject() {
       actions={getActions()}
     >
       <>
+        <Prompt
+          when={isPromptEnabled}
+          message="You are going to leave this page. You'll lose your changes, please confirm."
+        />
         {type && <SidebarTop>{getSidebarTopComponent()}</SidebarTop>}
         <div className={styles.container}>
           <div className={styles.steps}>

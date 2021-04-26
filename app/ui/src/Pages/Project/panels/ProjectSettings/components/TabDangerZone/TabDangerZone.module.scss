@@ -14,7 +14,6 @@
   overflow: auto;
 }
 
-.container > div:nth-child(2) > div > div {
-  background-color: palette(lowlight, 800);
-  color: font-color(light);
+.actionBox {
+  padding: 3 * $grid-unit;
 }

@@ -8,27 +8,72 @@
   align-items: center;
   color: font-color(light);
   padding-left: 2 * $grid-unit;
-  background-color: palette(base, 600);
+  cursor: pointer;
+  background-color: transparent;
 
   transition: background-color ease 0.4s;
 
-  &.active,
-  &:hover {
-    background-color: palette(base, 400);
+  &.saveCheckSpace .infoContainer {
+    margin-left: 3.25 * $grid-unit;
   }
-}
 
-.email {
-  @include font-body;
-  margin-left: $grid-unit;
-}
+  &:hover {
+    background-color: palette(base, 200);
+  }
 
-.level {
-  @include font-caption;
+  .check {
+    flex-shrink: 0;
 
-  margin-left: 4 * $grid-unit;
-}
+    &.unselected {
+      background-color: palette(base, 500);
 
-.button {
-  margin-left: auto;
+      &:hover {
+        background-color: palette(base, 400);
+      }
+    }
+  }
+
+  .infoContainer {
+    margin-left: $grid-unit;
+    padding-right: 2 * $grid-unit;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-grow: 1;
+
+    .leftWrapper {
+      display: flex;
+      align-items: center;
+      width: 100%;
+
+      .email {
+        @include font-body;
+        margin-left: $grid-unit;
+        word-break: break-all;
+        margin-right: $grid-unit;
+      }
+    }
+
+    .rightWrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .accessLevel {
+        @include font-caption;
+        text-transform: uppercase;
+      }
+
+      .button {
+        margin-left: $grid-unit;
+      }
+
+      .accessLevelSelector {
+        & > div > div:first-child {
+          min-height: 30px;
+          border: unset;
+        }
+      }
+    }
+  }
 }

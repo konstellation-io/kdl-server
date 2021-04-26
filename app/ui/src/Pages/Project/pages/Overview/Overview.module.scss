@@ -4,6 +4,8 @@
 
 .container {
   padding: 5 * $grid-unit 6.5 * $grid-unit;
+  height: 100%;
+  background-color: palette(base);
 
   h1 {
     text-align: left;
@@ -28,6 +30,7 @@
   .description {
     @include font-small;
     color: font-color(lowlight);
+    white-space: pre-line;
 
     background-color: palette(base, 400);
     margin-top: 2 * $grid-unit;

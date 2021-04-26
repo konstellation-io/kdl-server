@@ -1,7 +1,7 @@
 import { AccessLevel } from 'Graphql/types/globalTypes';
 
 export type ModalInfo = {
-  action: () => void;
+  action?: () => void;
   title: string;
   userIds: string[];
   message: string;
@@ -9,7 +9,7 @@ export type ModalInfo = {
 };
 
 export const defaultModalInfo: ModalInfo = {
-  action: () => {},
+  action: undefined,
   title: '',
   userIds: [],
   message: '',
@@ -39,7 +39,7 @@ export function getModalInfo({
         userIds,
         title: 'User deletion',
         message: `The following user${plural ? 's' : ''} will be deleted:`,
-        acceptLabel: `REMOVE ${nUsers} USER${plural ? 'S' : ''}`,
+        acceptLabel: `Remove ${nUsers} user${plural ? 's' : ''}`,
       };
     case 'update':
       return {
@@ -49,7 +49,7 @@ export function getModalInfo({
         message: `The following user${
           plural ? 's' : ''
         }' Access Level will be updated to ${accessLevel}:`,
-        acceptLabel: `UPDATE ${nUsers} USER${plural ? 'S' : ''}`,
+        acceptLabel: `Update ${nUsers} user${plural ? 's' : ''}`,
       };
     default:
       return defaultModalInfo;

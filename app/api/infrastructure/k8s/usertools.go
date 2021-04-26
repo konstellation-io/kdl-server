@@ -3,7 +3,6 @@ package k8s
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -16,7 +15,8 @@ import (
 
 // DeleteUserToolsCR removes the Custom Resource from Kubernetes.
 func (k *k8sClient) DeleteUserToolsCR(ctx context.Context, username string) error {
-	resName := k.getUserToolsResName(username)
+	slugUsername := k.getSlugUsername(username)
+	resName := k.getUserToolsResName(slugUsername)
 
 	var zero int64 = 0
 
@@ -111,8 +111,9 @@ func (k *k8sClient) checkOrCreateToolsSecrets(slugUsername string) error {
 
 func (k *k8sClient) createToolSecret(slugUsername, toolName, toolURLName string) error {
 	secretName := fmt.Sprintf("%s-oauth2-secrets-%s", toolName, slugUsername)
+	credentialsSecretName := fmt.Sprintf("%s-oauth2-credentials-%s", toolName, slugUsername)
 
-	exist, err := k.IsSecretPresent(secretName)
+	exist, err := k.isSecretPresent(secretName)
 	if err != nil {
 		return fmt.Errorf("check %s tool secret: %w", toolName, err)
 	}
@@ -121,7 +122,6 @@ func (k *k8sClient) createToolSecret(slugUsername, toolName, toolURLName string)
 		return nil
 	}
 
-	upperToolName := strings.ToUpper(toolName)
 	oAuthName := fmt.Sprintf("%s-app-%s", toolName, slugUsername)
 
 	protocol := "http"
@@ -131,12 +131,9 @@ func (k *k8sClient) createToolSecret(slugUsername, toolName, toolURLName string)
 
 	callbackURL := fmt.Sprintf("%s://%s-%s.%s/oauth2/callback", protocol, slugUsername, toolURLName, k.cfg.BaseDomainName)
 	data := map[string]string{}
-	data["DEPLOYMENT_SECRET_NAME"] = secretName
-	data["OAUTH2_CREDENTIALS_PREFIX"] = upperToolName
+	data["DEPLOYMENT_SECRET_NAME"] = credentialsSecretName
 	data["GITEA_REDIRECT_URIS"] = callbackURL
 	data["GITEA_APPLICATION_NAME"] = oAuthName
-	data[upperToolName+"_OAUTH2_CALLBACK_URL"] = callbackURL
-	data[upperToolName+"_OAUTH2_INITIALIZED"] = "no"
 
 	err = k.CreateSecret(secretName, data)
 	if err != nil {

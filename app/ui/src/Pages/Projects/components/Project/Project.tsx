@@ -1,54 +1,58 @@
-import { ProjectState, RepositoryType } from 'Graphql/types/globalTypes';
+import { AccessLevel, RepositoryType } from 'Graphql/types/globalTypes';
 import ROUTE, { buildRoute } from 'Constants/routes';
-import React, { FC, MouseEvent } from 'react';
+import React, { FC } from 'react';
+import { capitalize } from 'lodash';
+import RepositoryTypeComponent, {
+  LOCATION,
+} from 'Pages/NewProject/pages/Repository/components/RepositoryTypeComponent/RepositoryTypeComponent';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
-import IconFav from '@material-ui/icons/Star';
-import IconNoFav from '@material-ui/icons/StarBorder';
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import { formatDate } from 'Utils/format';
 import styles from './Project.module.scss';
-import { toast } from 'react-toastify';
+import { ProjectAdmins } from '../../Projects';
 
-type Props = {
+type BaseProps = {
   project: GetProjects_projects;
 };
 
-const Project: FC<Props> = ({ project }) => {
-  const isProjectArchived = project.state === ProjectState.ARCHIVED;
-
-  return (
-    <Link to={buildRoute(ROUTE.PROJECT, project.id)} data-test-id="project">
-      <div
-        className={cx(styles.container, {
-          [styles.archived]: isProjectArchived,
-        })}
-      >
-        <UpperBg project={project} />
-        <LowerBg project={project} />
-        <Band project={project} />
-        <Square project={project} />
-      </div>
-    </Link>
-  );
+type Props = {
+  showAdmins: (projectAdmins: ProjectAdmins) => void;
+  project: GetProjects_projects;
 };
 
-const UpperBg: FC<Props> = ({ project }) => {
-  const Favorite = project.favorite ? IconFav : IconNoFav;
-  const FavoriteBg = project.favorite ? IconNoFav : IconFav;
+function Project({ project, showAdmins }: Props) {
+  const disabled = project.needAccess || project.archived;
+  const Component = (
+    <div
+      className={cx(styles.container, {
+        [styles.archived]: project.archived,
+      })}
+    >
+      <UpperBg project={project} showAdmins={showAdmins} />
+      <LowerBg project={project} />
+      <Band project={project} />
+      <Square project={project} />
+    </div>
+  );
+  return disabled ? (
+    <div className={styles.disabled}>{Component}</div>
+  ) : (
+    <Link to={buildRoute(ROUTE.PROJECT, project.id)}>{Component}</Link>
+  );
+}
 
-  function onToggleFav(e: MouseEvent<HTMLDivElement>) {
-    e.preventDefault();
-    e.stopPropagation();
-    toast.dismiss();
-    toast.info(
-      `${project.name} ${
-        project.favorite ? 'removed from' : 'added to'
-      } favorites.`
-    );
+function UpperBg({ project, showAdmins }: Props) {
+  function onContactAdmins() {
+    const projectAdmins = project.members
+      .filter((u) => u.accessLevel === AccessLevel.ADMIN)
+      .map((u) => u.user.email);
 
-    // TODO: mutation to change this
+    showAdmins({
+      projectName: project.name,
+      administrators: projectAdmins,
+    });
   }
 
   return (
@@ -57,24 +61,18 @@ const UpperBg: FC<Props> = ({ project }) => {
         <div className={styles.bgBand} />
       </div>
       <div className={styles.content}>
-        <div className={styles.favorite} onClick={onToggleFav}>
-          <Favorite
-            className={cx('icon-regular', styles.fav, {
-              [styles.isFav]: project.favorite,
-            })}
-          />
-          <FavoriteBg className={cx('icon-regular', styles.favBg)} />
-        </div>
         <p className={styles.name}>{project.name}</p>
-        {project.repository?.type === RepositoryType.INTERNAL && (
-          <div className={styles.internalTag}>Internal</div>
+        {project.needAccess && (
+          <div className={styles.contactInfo} onClick={onContactAdmins}>
+            Need access?
+          </div>
         )}
       </div>
     </div>
   );
-};
+}
 
-const LowerBg: FC<Props> = ({ project }) => (
+const LowerBg: FC<BaseProps> = ({ project }) => (
   <div className={styles.inf}>
     <div className={styles.bg}>
       <div className={styles.bgBand} />
@@ -93,18 +91,32 @@ const LowerBg: FC<Props> = ({ project }) => (
   </div>
 );
 
-const Band: FC<Props> = ({ project }) => (
+const Band: FC<BaseProps> = ({ project }) => (
   <div className={styles.band}>
-    <div className={cx(styles.label, styles[project.state])}>
-      {project.state.replace('_', ' ')}
+    <div className={styles.label}>{capitalize(project.repository?.type)}</div>
+    <div className={styles.otherLabels}>
+      {project.archived && <div className={styles.labelArchived}>Archived</div>}
+      {project.needAccess && (
+        <div className={styles.labelNoAccess}>No Access</div>
+      )}
     </div>
     {project.error && <div className={styles.warning}>WARNING</div>}
   </div>
 );
 
-const Square: FC<Props> = ({ project }) => (
+const Square: FC<BaseProps> = ({ project }) => (
   <div className={styles.square}>
-    <div className={cx(styles.state, styles[project.state])} />
+    <div className={styles.repoType}>
+      <RepositoryTypeComponent
+        squareLocation={
+          project.repository?.type === RepositoryType.EXTERNAL
+            ? LOCATION.OUT
+            : LOCATION.IN
+        }
+        customSize={38}
+        shouldAnimate={false}
+      />
+    </div>
   </div>
 );
 

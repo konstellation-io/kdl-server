@@ -1,0 +1,125 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  transition: top ease 0.5s, left ease 0.5s;
+}
+
+.svg,
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.labelsSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.panels {
+  position: fixed;
+  right: 0;
+  height: calc(100% - 40px);
+  display: flex;
+  flex-direction: row;
+  z-index: 5;
+
+  .listPanel {
+    height: 100%;
+    width: 25vw;
+    min-width: 44 * $grid-unit;
+    max-width: 60 * $grid-unit;
+  }
+
+  .detailsPanel {
+    height: 100%;
+
+    width: 37.5vw;
+    max-width: 0;
+    min-width: 0;
+    overflow: hidden;
+
+    transition: max-width ease 0.4s, min-width ease 0.4s;
+
+    &.opened {
+      min-width: 44 * $grid-unit;
+      max-width: 90 * $grid-unit;
+    }
+  }
+}
+
+.shield {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1 !important;
+
+  &.show {
+    @include shield;
+    pointer-events: all;
+    cursor: pointer;
+  }
+}
+
+.staticTooltip {
+  position: absolute;
+  top: 3 * $grid-unit;
+  left: 3 * $grid-unit;
+  z-index: 1;
+}
+
+$circle-d: $grid-unit;
+.selectedAnim {
+  position: absolute;
+  display: none;
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: $circle-d;
+    height: $circle-d;
+    background-color: white;
+    border-radius: 50%;
+  }
+
+  &.show {
+    display: initial;
+
+    &:after {
+      animation: highlight-anim 1.2s ease 0s infinite;
+    }
+  }
+}
+
+@mixin set-anim-state($diameter, $opacity) {
+  width: $diameter;
+  height: $diameter;
+  top: -($diameter - $circle-d) / 2;
+  left: -($diameter - $circle-d) / 2;
+  opacity: $opacity;
+}
+
+$circle-increase: 2.5 * $circle-d;
+$circle-diameter-end: $circle-d + $circle-increase;
+@keyframes highlight-anim {
+  0% {
+    @include set-anim-state($circle-d, 0.6);
+  }
+  60%,
+  100% {
+    @include set-anim-state($circle-diameter-end, 0);
+  }
+}

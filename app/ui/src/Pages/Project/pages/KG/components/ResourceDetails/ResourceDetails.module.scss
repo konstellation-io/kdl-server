@@ -4,7 +4,7 @@
 @import 'Styles/shadows';
 
 .container {
-  background-color: palette(lowlight, 900);
+  background-color: palette(base);
   height: 100%;
   width: 100%;
   display: flex;
@@ -19,7 +19,7 @@
   justify-content: space-between;
   align-items: center;
 
-  border-bottom: solid 1px palette(base, 200);
+  border-bottom: solid 1px palette(base, 400);
 
   .actions {
     display: flex;
@@ -27,13 +27,6 @@
 
     .starred {
       color: palette(starred);
-    }
-
-    .starredText {
-      @include font-body;
-      color: palette(starred);
-
-      margin-right: 2 * $grid-unit;
     }
   }
 
@@ -43,6 +36,16 @@
     padding-left: 2.5 * $grid-unit;
   }
 }
+.urlRow {
+  display: flex;
+  align-items: center;
+}
+
+.linkIcon {
+  color: font-color(lowlight);
+  margin: 0 $grid-unit;
+}
+
 .resourceTitleAndTopics {
   display: flex;
   justify-content: space-between;
@@ -63,15 +66,19 @@
 }
 .content {
   flex-grow: 1;
-  background-color: palette(base);
+  background-color: palette(base, 800);
   padding: 3 * $grid-unit;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
 
   .sectionTitle {
-    @include font-caption;
+    @include font-code;
     color: font-color(regular);
 
     margin-bottom: $grid-unit;
   }
+
   .authors {
     .authorsText {
       @include font-subheader;
@@ -80,21 +87,10 @@
   }
   .type {
     color: font-color(light);
-    margin-top: 2 * $grid-unit;
-  }
-  .url {
-    color: font-color(lowlight);
-    margin-top: 2 * $grid-unit;
-    cursor: pointer;
-
-    transition: color ease 0.3s;
-
-    &:hover {
-      color: palette(highlight);
-    }
+    margin: 2 * $grid-unit 0 2 * $grid-unit 0;
   }
   .topicsG {
-    margin-top: 2 * $grid-unit;
+    margin: 2 * $grid-unit 0 $grid-unit 0;
 
     .topicScore {
       display: flex;
@@ -114,7 +110,35 @@
     text-align: justify;
     line-height: 19px;
 
-    margin-top: 4 * $grid-unit;
+    margin: 2 * $grid-unit 0 4 * $grid-unit 0;
     overflow-wrap: break-word;
+
+    .showAbstractText {
+      color: font-color(highlight);
+      margin-left: $grid-unit;
+      cursor: pointer;
+    }
+  }
+
+  .frameworks {
+    margin-bottom: 3 * $grid-unit;
+  }
+
+  .repoUrls {
+    .repoUrlTextList {
+      @include font-small;
+      color: font-color(light);
+      line-height: 2.5 * $grid-unit;
+
+      background-color: palette(base, 500);
+      border-radius: 0.5 * $grid-unit;
+
+      max-height: 18 * $grid-unit;
+      overflow: auto;
+
+      .repoUrlText {
+        padding: 0.5 * $grid-unit 0;
+      }
+    }
   }
 }

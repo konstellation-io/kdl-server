@@ -7,7 +7,7 @@
 $label-height: 3 * $grid-unit;
 $shape-height: 20 * $grid-unit;
 
-$min-shape-width: 50 * $grid-unit;
+$min-shape-width: 75 * $grid-unit;
 $max-shape-width: 100 * $grid-unit;
 $shape-width: 40vw;
 
@@ -27,7 +27,6 @@ $small-square-base: 30px;
       color: font-color(regular);
     }
 
-    .favorite,
     .warning {
       display: none;
     }
@@ -40,6 +39,7 @@ $small-square-base: 30px;
       background-color: palette(highlight, 900);
       border-color: palette(highlight);
     }
+
     .content * {
       color: palette(highlight);
     }
@@ -68,6 +68,7 @@ $small-square-base: 30px;
   transition: background-color ease 0.4s, box-shadow ease 0.4s,
     border-color ease 0.4s;
 }
+
 .bgBand {
   position: absolute;
   left: 0;
@@ -75,23 +76,38 @@ $small-square-base: 30px;
   height: $band-height / 2;
   width: 100%;
 }
+
 .content {
   position: absolute;
   top: 0;
   left: 8 * $grid-unit;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   height: calc(100% - #{$band-height / 2});
   width: calc(100% - #{12 * $grid-unit});
+
+  .contactInfo {
+    @include font-small;
+
+    pointer-events: all;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: font-color(light);
+    margin-left: $grid-unit;
+  }
 }
 
 .sup {
   .bg {
     transform: skew(-45deg);
   }
+
   .bgBand {
     bottom: 0;
   }
+
   .content {
     left: 5 * $grid-unit;
   }
@@ -101,9 +117,11 @@ $small-square-base: 30px;
   .bg {
     transform: skew(45deg);
   }
+
   .bgBand {
     top: 0;
   }
+
   .content {
     top: $band-height / 2;
     display: flex;
@@ -116,7 +134,7 @@ $small-square-base: 30px;
   @include font-subheader;
   color: font-color(light);
 
-  margin: 0 2 * $grid-unit 0 0;
+  margin: 0 2 * $grid-unit 0 3 * $grid-unit;
 
   transition: color ease 0.4s;
 }
@@ -137,49 +155,6 @@ $small-square-base: 30px;
   transition: color ease 0.4s;
 }
 
-.favorite {
-  position: relative;
-  width: 5 * $grid-unit;
-  height: 5 * $grid-unit;
-  text-align: center;
-  line-height: 5.5 * $grid-unit;
-  color: font-color(lowlight);
-  pointer-events: all;
-  cursor: pointer;
-
-  transition: color ease 0.4s;
-
-  .fav {
-    @include center;
-
-    opacity: 1;
-    transition: opacity ease 0.4s;
-
-    &.isFav {
-      color: palette(highlight);
-    }
-  }
-  .favBg {
-    @include center;
-
-    opacity: 0;
-    transition: opacity ease 0.2s;
-  }
-
-  &:hover {
-    .fav {
-      opacity: 0;
-      display: none;
-    }
-    .favBg {
-      opacity: 1;
-      path {
-        color: font-color(light) !important;
-      }
-    }
-  }
-}
-
 .band {
   $side: $band-height / 2;
 
@@ -197,18 +172,35 @@ $small-square-base: 30px;
   background-color: palette(base);
 
   clip-path: polygon(0 100%, 0 0, 100% 0, calc(100% - #{$side}) 50%, 100% 100%);
-}
 
-.internalTag {
-  @include font-small;
-  color: font-color(lowlight) !important;
-  line-height: 3 * $grid-unit;
+  .otherLabels {
+    display: flex;
+    margin-right: auto;
 
-  background-color: palette(base);
-  height: 3 * $grid-unit;
-  border-radius: $grid-unit / 2;
-  padding: 0 $grid-unit;
-  margin-left: 2 * $grid-unit;
+    .labelArchived,
+    .labelNoAccess {
+      @include font-button;
+
+      text-align: center;
+      line-height: $label-height;
+      height: $label-height;
+      min-width: 100px;
+      padding: 0 5 * $grid-unit;
+      border-radius: 3 * $grid-unit;
+      z-index: 1;
+      margin-left: 1.5 * $grid-unit;
+    }
+
+    .labelArchived {
+      color: font-color(dark);
+      background-color: palette(lowlight);
+    }
+
+    .labelNoAccess {
+      color: font-color(lowlight);
+      background-color: palette(base, 800);
+    }
+  }
 }
 
 .warning {
@@ -223,28 +215,15 @@ $small-square-base: 30px;
   text-align: center;
   line-height: $label-height;
 
+  background-color: palette(feedback, 700);
   height: $label-height;
   min-width: 150px;
   padding: 0 5 * $grid-unit;
-  margin-right: auto;
 
   border-bottom-right-radius: 3 * $grid-unit;
   border-top-right-radius: 3 * $grid-unit;
 
-  transition: background-color ease 0.4s;
   z-index: 1;
-
-  &.STARTED {
-    background-color: palette(success);
-  }
-
-  &.STOPPED {
-    background-color: palette(feedback);
-  }
-
-  &.ARCHIVED {
-    background-color: palette(base, 300);
-  }
 }
 
 .square {
@@ -255,30 +234,16 @@ $small-square-base: 30px;
   height: $big-square-base;
   z-index: 1;
 
-  background-color: palette(base);
+  background-color: palette(base, 700);
   transform: rotate(45deg);
 
-  .state {
-    @include center;
+  .repoType {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
 
-    width: $small-square-base;
-    height: $small-square-base;
-
-    transition: border ease 0.4s, background-color ease 0.4s;
-
-    &.STARTED {
-      background-color: palette(success);
-    }
-
-    &.STOPPED {
-      background-color: transparent;
-      border: solid 1px palette(feedback);
-    }
-
-    &.ARCHIVED {
-      background-color: transparent;
-      border: solid 1px palette(base, 300);
-    }
+    opacity: 0.8;
   }
 }
 
@@ -291,6 +256,7 @@ $small-square-base: 30px;
     .addProjectBg > div {
       border: 1px solid palette(highlight);
     }
+
     .addProjectLabel {
       color: font-color(highlight);
     }
@@ -315,6 +281,7 @@ $small-square-base: 30px;
       border-bottom-width: 0 !important;
       border-top-color: palette(base, 400);
     }
+
     .addProjectBgLower {
       transform: skew(45deg);
       border-bottom-color: palette(base, 400);
@@ -360,7 +327,60 @@ $small-square-base: 30px;
 
     transition: color ease 0.2s;
   }
+
   .date {
     transition: color ease 0.2s;
+  }
+}
+
+.disabled {
+  &,
+  .bg,
+  .description {
+    pointer-events: none !important;
+  }
+
+  .repoType {
+    opacity: 0.4;
+  }
+
+  .bg {
+    background-color: palette(base, 500);
+  }
+
+  .band {
+    background-color: palette(base, 400);
+  }
+
+  .name {
+    color: font-color(regular);
+  }
+
+  .container:hover {
+    .bg {
+      box-shadow: inherit;
+      background-color: palette(base, 500);
+      border-color: palette(base, 800);
+    }
+
+    .content * {
+      color: font-color(regular);
+    }
+    .date {
+      color: font-color(lowlight);
+    }
+    .contactInfo {
+      color: font-color(highlight);
+    }
+  }
+
+  .addProjectContainer:hover {
+    .addProjectBg > div {
+      border: inherit;
+    }
+
+    .addProjectLabel {
+      color: inherit;
+    }
   }
 }

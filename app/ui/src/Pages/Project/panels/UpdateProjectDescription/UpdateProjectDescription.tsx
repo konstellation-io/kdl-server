@@ -1,22 +1,13 @@
 import { Button, TextInput } from 'kwc';
-import {
-  GetQualityProjectDesc,
-  GetQualityProjectDescVariables,
-} from 'Graphql/queries/types/GetQualityProjectDesc';
 import React, { useEffect, useState } from 'react';
 
 import ActionsBar from 'Components/Layout/ActionsBar/ActionsBar';
 import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
-import { loader } from 'graphql.macro';
 import styles from './UpdateProjectDescription.module.scss';
 import { useForm } from 'react-hook-form';
 import useProject from 'Graphql/hooks/useProject';
-import { useQuery } from '@apollo/client';
-
-const GetQualityProjectDescQuery = loader(
-  'Graphql/queries/getQualityProjectDesc.graphql'
-);
+import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
 
 type FormData = {
   description: string;
@@ -28,14 +19,6 @@ type Props = {
 };
 function UpdateProjectDescription({ project, close }: Props) {
   const [completed, setCompleted] = useState(false);
-  const { data: descriptionScore, refetch: getQualityProjectDesc } = useQuery<
-    GetQualityProjectDesc,
-    GetQualityProjectDescVariables
-  >(GetQualityProjectDescQuery, {
-    variables: {
-      description: project.description,
-    },
-  });
 
   const { updateProjectDescription } = useProject({
     onUpdateCompleted: () => setCompleted(true),
@@ -63,6 +46,13 @@ function UpdateProjectDescription({ project, close }: Props) {
 
   const descriptionValue = watch('description');
 
+  const { descriptionScore, loading } = useQualityDescription(
+    descriptionValue,
+    {
+      skipFirstRun: false,
+    }
+  );
+
   function submit({ description }: FormData) {
     updateProjectDescription(project.id, description);
   }
@@ -84,11 +74,6 @@ function UpdateProjectDescription({ project, close }: Props) {
             setCompleted(false);
             clearErrors();
           }}
-          onBlur={() => {
-            if (descriptionValue) {
-              getQualityProjectDesc({ description: descriptionValue });
-            }
-          }}
           error={errors.description?.message}
           whiteColor
           textArea
@@ -96,19 +81,17 @@ function UpdateProjectDescription({ project, close }: Props) {
         />
       </div>
       <div className={styles.score}>
-        <DescriptionScore
-          score={descriptionScore?.qualityProjectDesc.quality ?? 0}
-        />
+        <DescriptionScore score={descriptionScore} loading={loading} />
       </div>
       <ActionsBar className={styles.actions}>
         <Button
-          label="SAVE"
+          label="Save"
           onClick={handleSubmit(submit)}
           disabled={!completed && descriptionValue === project.description}
           success={completed}
           primary
         />
-        <Button label="CANCEL" onClick={close} />
+        <Button label="Cancel" onClick={close} />
       </ActionsBar>
     </div>
   );

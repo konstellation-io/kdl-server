@@ -6,7 +6,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"strings"
 	"time"
 
@@ -29,25 +28,26 @@ func (r *memberResolver) AddedDate(ctx context.Context, obj *entity.Member) (str
 	return obj.AddedDate.Format(time.RFC3339), nil
 }
 
-func (r *mutationResolver) AddUser(ctx context.Context, input model.AddUserInput) (*entity.User, error) {
-	user, err := r.users.Create(ctx, input.Email, input.Username, input.Password, input.AccessLevel)
-	if err != nil {
-		return nil, err
-	}
-
-	return &user, nil
-}
-
 func (r *mutationResolver) RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error) {
 	return nil, entity.ErrNotImplemented
 }
 
 func (r *mutationResolver) UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]entity.User, error) {
-	return nil, entity.ErrNotImplemented
+	return r.users.UpdateAccessLevel(ctx, input.UserIds, input.AccessLevel)
 }
 
-func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.SSHKey, error) {
-	return nil, entity.ErrNotImplemented
+func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.User, error) {
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	loggedUser, err = r.users.RegenerateSSHKeys(ctx, loggedUser)
+	if err != nil {
+		return nil, err
+	}
+
+	return &loggedUser, nil
 }
 
 func (r *mutationResolver) CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error) {
@@ -56,36 +56,21 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 		return nil, err
 	}
 
-	internalRepoName := ""
-	externalRepoURL := ""
-	externalRepoUsername := ""
-	externalRepoToken := ""
-
-	switch input.Repository.Type {
-	case entity.RepositoryTypeInternal:
-		if input.Repository.Internal != nil {
-			internalRepoName = input.Repository.Internal.Name
-		}
-	case entity.RepositoryTypeExternal:
-		if input.Repository.External != nil {
-			externalRepoURL = input.Repository.External.URL
-			externalRepoUsername = input.Repository.External.Username
-			externalRepoToken = input.Repository.External.Token
-		}
-	default:
-		return &entity.Project{}, entity.ErrInvalidRepoType
+	opts := project.CreateProjectOption{
+		ProjectID:   input.ID,
+		Name:        input.Name,
+		Description: input.Description,
+		RepoType:    input.Repository.Type,
+		Owner:       loggedUser,
 	}
 
-	createdProject, err := r.projects.Create(ctx, project.CreateProjectOption{
-		Name:                 input.Name,
-		Description:          input.Description,
-		RepoType:             input.Repository.Type,
-		InternalRepoName:     &internalRepoName,
-		ExternalRepoURL:      &externalRepoURL,
-		ExternalRepoUsername: &externalRepoUsername,
-		ExternalRepoToken:    &externalRepoToken,
-		Owner:                loggedUser,
-	})
+	if input.Repository.External != nil {
+		opts.ExternalRepoURL = &input.Repository.External.URL
+		opts.ExternalRepoUsername = &input.Repository.External.Username
+		opts.ExternalRepoToken = &input.Repository.External.Token
+	}
+
+	createdProject, err := r.projects.Create(ctx, opts)
 
 	return &createdProject, err
 }
@@ -95,6 +80,7 @@ func (r *mutationResolver) UpdateProject(ctx context.Context, input model.Update
 		ProjectID:   input.ID,
 		Name:        input.Name,
 		Description: input.Description,
+		Archived:    input.Archived,
 	})
 
 	return &p, err
@@ -120,40 +106,40 @@ func (r *mutationResolver) AddMembers(ctx context.Context, input model.AddMember
 	return &p, err
 }
 
-func (r *mutationResolver) RemoveMember(ctx context.Context, input model.RemoveMemberInput) (*entity.Project, error) {
+func (r *mutationResolver) RemoveMembers(ctx context.Context, input model.RemoveMembersInput) (*entity.Project, error) {
 	loggedUser, err := r.getLoggedUser(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := r.users.GetByID(ctx, input.UserID)
+	users, err := r.users.FindByIDs(ctx, input.UserIds)
 	if err != nil {
 		return nil, err
 	}
 
-	p, err := r.projects.RemoveMember(ctx, project.RemoveMemberOption{
+	p, err := r.projects.RemoveMembers(ctx, project.RemoveMembersOption{
 		ProjectID:  input.ProjectID,
-		User:       user,
+		Users:      users,
 		LoggedUser: loggedUser,
 	})
 
 	return &p, err
 }
 
-func (r *mutationResolver) UpdateMember(ctx context.Context, input model.UpdateMemberInput) (*entity.Project, error) {
+func (r *mutationResolver) UpdateMembers(ctx context.Context, input model.UpdateMembersInput) (*entity.Project, error) {
 	loggedUser, err := r.getLoggedUser(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := r.users.GetByID(ctx, input.UserID)
+	users, err := r.users.FindByIDs(ctx, input.UserIds)
 	if err != nil {
 		return nil, err
 	}
 
-	p, err := r.projects.UpdateMember(ctx, project.UpdateMemberOption{
+	p, err := r.projects.UpdateMembers(ctx, project.UpdateMembersOption{
 		ProjectID:   input.ProjectID,
-		User:        user,
+		Users:       users,
 		AccessLevel: input.AccessLevel,
 		LoggedUser:  loggedUser,
 	})
@@ -169,12 +155,22 @@ func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.Remo
 	return nil, entity.ErrNotImplemented
 }
 
-func (r *mutationResolver) SetStarredKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error) {
-	return nil, entity.ErrNotImplemented
-}
+func (r *mutationResolver) SetKGStarred(ctx context.Context, input model.SetKGStarredInput) (*model.SetKGStarredRes, error) {
+	starred, err := r.projects.UpdateStarred(ctx, project.UpdateStarredOption{
+		ProjectID: input.ProjectID,
+		KGItemID:  input.KgItemID,
+		Starred:   input.Starred,
+	})
+	res := model.SetKGStarredRes{
+		KgItemID: input.KgItemID,
+		Starred:  starred,
+	}
 
-func (r *mutationResolver) SetDiscardedKGItem(ctx context.Context, input model.SetBoolFieldInput) (*entity.KnowledgeGraphItem, error) {
-	return nil, entity.ErrNotImplemented
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, nil
 }
 
 func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error) {
@@ -188,6 +184,12 @@ func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.S
 	u, err := r.users.StopTools(ctx, username)
 
 	return &u, err
+}
+
+func (r *mutationResolver) SyncUsers(ctx context.Context) (*model.SyncUsersResponse, error) {
+	r.users.RunSyncUsersCronJob()
+
+	return &model.SyncUsersResponse{Msg: "External user data synchronization has started."}, nil
 }
 
 func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project) (string, error) {
@@ -205,7 +207,7 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 		return &entity.ToolUrls{}, err
 	}
 
-	droneWithFolder, err := kdlutil.JoinToURL(r.cfg.Drone.URL, "kdl", folderName)
+	minioWithFolder, err := kdlutil.JoinToURL(r.cfg.Minio.URL, folderName)
 	if err != nil {
 		return &entity.ToolUrls{}, err
 	}
@@ -217,12 +219,27 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 
 	return &entity.ToolUrls{
 		Gitea:   giteaWithFolder,
-		Minio:   r.cfg.Minio.URL,
+		Minio:   minioWithFolder,
 		Jupyter: jupyterWithUsernameAndFolder,
 		VSCode:  vscodeWithUsernameAndFolder,
-		Drone:   droneWithFolder,
+		Drone:   r.cfg.Drone.URL,
 		MLFlow:  r.cfg.MLFlow.URL,
 	}, nil
+}
+
+func (r *projectResolver) NeedAccess(ctx context.Context, obj *entity.Project) (bool, error) {
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return true, err
+	}
+
+	for _, member := range obj.Members {
+		if member.UserID == loggedUser.ID {
+			return false, nil
+		}
+	}
+
+	return true, nil
 }
 
 func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
@@ -235,12 +252,7 @@ func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
 }
 
 func (r *queryResolver) Projects(ctx context.Context) ([]entity.Project, error) {
-	loggedUser, err := r.getLoggedUser(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.projects.FindByUserID(ctx, loggedUser.ID)
+	return r.projects.FindAll(ctx)
 }
 
 func (r *queryResolver) Project(ctx context.Context, id string) (*entity.Project, error) {
@@ -256,43 +268,22 @@ func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
 	return r.users.FindAll(ctx)
 }
 
-func (r *queryResolver) SSHKey(ctx context.Context) (*entity.SSHKey, error) {
-	loggedUser, err := r.getLoggedUser(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return &entity.SSHKey{
-		Public:       loggedUser.SSHKey.Public,
-		Private:      loggedUser.SSHKey.Private,
-		CreationDate: loggedUser.SSHKey.CreationDate,
-		LastActivity: loggedUser.SSHKey.LastActivity,
-	}, nil
-}
-
 func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
-	// We are sending a random number until the feature is developed
-	min := 0
-	max := 100
-	// nolint:gosec // this is a temp workaround
-	randomInt := rand.Intn(max-min) + min
-
-	return &model.QualityProjectDesc{
-		Quality: randomInt,
-	}, nil
-}
-
-func (r *queryResolver) KnowledgeGraph(ctx context.Context, description string) (*entity.KnowledgeGraph, error) {
-	kg, err := r.kg.Get(ctx, description)
+	q, err := r.kg.DescriptionQuality(ctx, description)
 	if err != nil {
 		return nil, err
 	}
 
-	return &kg, nil
+	return &model.QualityProjectDesc{Quality: q}, nil
 }
 
-func (r *queryResolver) KnowledgeGraphItem(ctx context.Context, id string) (*entity.KnowledgeGraphItem, error) {
-	kg, err := r.kg.GetItem(ctx, id)
+func (r *queryResolver) KnowledgeGraph(ctx context.Context, projectID string) (*entity.KnowledgeGraph, error) {
+	p, err := r.projects.GetByID(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	kg, err := r.kg.Graph(ctx, p)
 	if err != nil {
 		return nil, err
 	}
@@ -303,7 +294,7 @@ func (r *queryResolver) KnowledgeGraphItem(ctx context.Context, id string) (*ent
 func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (string, error) {
 	switch obj.Type {
 	case entity.RepositoryTypeInternal:
-		return fmt.Sprintf("%s/kdl/%s", r.cfg.Gitea.URL, obj.InternalRepoName), nil
+		return fmt.Sprintf("%s/kdl/%s", r.cfg.Gitea.URL, obj.RepoName), nil
 	case entity.RepositoryTypeExternal:
 		return obj.ExternalRepoURL, nil
 	}

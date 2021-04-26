@@ -1,7 +1,3 @@
-import {
-  GET_OPENED_PROJECT,
-  GetOpenedProject,
-} from 'Graphql/client/queries/getOpenedProject.graphql';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 import { ErrorMessage } from 'kwc';
@@ -13,22 +9,24 @@ import TabInfo from './components/TabInfo/TabInfo';
 import TabMembers from './components/TabMembers/TabMembers';
 import cx from 'classnames';
 import styles from './ProjectSettings.module.scss';
-import { useQuery } from '@apollo/client';
+import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 
 type Props = {
+  project: GetProjects_projects;
   settingsOpenedTab: number;
   setSettingsOpenedTab: (index: number) => void;
 };
-function ProjectSettings({ settingsOpenedTab, setSettingsOpenedTab }: Props) {
-  const { data: localData } = useQuery<GetOpenedProject>(GET_OPENED_PROJECT);
-  const openedProject = localData?.openedProject;
-
-  if (!openedProject || !openedProject.repository) return <ErrorMessage />;
+function ProjectSettings({
+  settingsOpenedTab,
+  setSettingsOpenedTab,
+  project,
+}: Props) {
+  if (!project.repository) return <ErrorMessage />;
 
   return (
     <div className={styles.container}>
       <div className={styles.info}>
-        <ProjectInfo project={openedProject} />
+        <ProjectInfo project={project} />
       </div>
       <Tabs onSelect={setSettingsOpenedTab} selectedIndex={settingsOpenedTab}>
         <TabList>
@@ -40,16 +38,16 @@ function ProjectSettings({ settingsOpenedTab, setSettingsOpenedTab }: Props) {
 
         <div className={styles.tabContent}>
           <TabPanel>
-            <TabInfo project={openedProject} />
+            <TabInfo project={project} />
           </TabPanel>
           <TabPanel>
-            <TabGit repository={openedProject.repository} />
+            <TabGit project={project} />
           </TabPanel>
           <TabPanel>
-            <TabMembers projectId={openedProject.id} />
+            <TabMembers projectId={project.id} />
           </TabPanel>
           <TabPanel>
-            <TabDangerZone />
+            <TabDangerZone projectId={project.id} />
           </TabPanel>
         </div>
       </Tabs>

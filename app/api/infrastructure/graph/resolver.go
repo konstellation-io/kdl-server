@@ -29,7 +29,7 @@ func NewResolver(cfg config.Config, projectInteractor project.UseCase, userInter
 }
 
 func (r *Resolver) getLoggedUser(ctx context.Context) (entity.User, error) {
-	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
+	username := ctx.Value(middleware.LoggedUserNameKey).(string)
 
-	return r.users.GetByEmail(ctx, email)
+	return r.users.GetByUsername(ctx, username)
 }

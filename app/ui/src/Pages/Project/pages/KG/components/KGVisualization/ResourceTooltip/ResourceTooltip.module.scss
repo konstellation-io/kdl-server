@@ -5,9 +5,8 @@
 
 .container {
   width: 24vw;
-  max-width: 335px;
   max-width: 460px;
-  background-color: palette(base, 900);
+  background-color: palette(base, 400);
   padding: 2 * $grid-unit;
 
   display: flex;

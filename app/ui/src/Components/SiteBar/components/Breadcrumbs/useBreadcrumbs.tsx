@@ -8,7 +8,6 @@ import { useQuery, useReactiveVar } from '@apollo/client';
 
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import { CONFIG } from 'index';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { GetProjects } from 'Graphql/queries/types/GetProjects';
 import NavigationSelector from '../NavigationSelector/NavigationSelector';
 import PersonIcon from '@material-ui/icons/Person';
@@ -17,10 +16,10 @@ import ProjectSelector from '../ProjectSelector/ProjectSelector';
 import ROUTE from 'Constants/routes';
 import React from 'react';
 import ServerIcon from 'Components/Icons/ServerIcon/ServerIcon';
-import { loader } from 'graphql.macro';
 import { openedProject } from 'Graphql/client/cache';
 
-const GetProjectsQuery = loader('Graphql/queries/getProjects.graphql');
+import GetProjectsQuery from 'Graphql/queries/getProjects';
+
 const serverSections: EnhancedRouteConfiguration[] = [
   {
     id: 'projects',
@@ -56,11 +55,14 @@ function useBreadcrumbs() {
   if (loading || !projectsData) return { loading, crumbs };
   if (error) throw Error('cannot retrieve data at useBreadcrumbs');
 
+  const activeProjects = projectsData.projects.filter(
+    (p) => !p.archived && !p.needAccess
+  );
+
   // Add server crumb
   crumbs.push({
     crumbText: CONFIG.SERVER_NAME,
     LeftIconComponent: <ServerIcon className="icon-regular" />,
-    RightIconComponent: ExpandMoreIcon,
     BottomComponent: (props: BottomComponentProps) => (
       <NavigationSelector options={serverSections} {...props} />
     ),
@@ -69,13 +71,14 @@ function useBreadcrumbs() {
   // Check if we are in a project
   if (routeMatch && project) {
     // Add crumb for the project
-    const { name, state } = project;
+    const { name, archived } = project;
     crumbs.push({
       crumbText: name,
-      LeftIconComponent: <ProjectIcon className="icon-regular" state={state} />,
-      RightIconComponent: ExpandMoreIcon,
+      LeftIconComponent: (
+        <ProjectIcon className="icon-regular" archived={archived} />
+      ),
       BottomComponent: (props: BottomComponentProps) => (
-        <ProjectSelector options={projectsData.projects} {...props} />
+        <ProjectSelector options={activeProjects} {...props} />
       ),
     });
 
@@ -88,7 +91,6 @@ function useBreadcrumbs() {
       crumbs.push({
         crumbText,
         LeftIconComponent: <Icon className="icon-small" />,
-        RightIconComponent: ExpandMoreIcon,
         BottomComponent: (props: BottomComponentProps) => (
           <NavigationSelector options={allRoutes} {...props} />
         ),

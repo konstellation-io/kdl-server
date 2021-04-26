@@ -1,9 +1,15 @@
 import { Button, Select } from 'kwc';
+import {
+  GetProjectMembers,
+  GetProjectMembers_project_members,
+  GetProjectMembersVariables,
+} from 'Graphql/queries/types/GetProjectMembers';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import ActionsBar from 'Components/Layout/ActionsBar/ActionsBar';
 import ConfirmAction from 'Components/Layout/ConfirmAction/ConfirmAction';
+import { GetMe } from 'Graphql/queries/types/GetMe';
 import Gravatar from 'react-gravatar';
 import IconDate from '@material-ui/icons/Today';
 import IconRemove from '@material-ui/icons/Delete';
@@ -11,18 +17,11 @@ import IconTime from '@material-ui/icons/Schedule';
 import { formatDate } from 'Utils/format';
 import styles from './MemberDetails.module.scss';
 import { useForm } from 'react-hook-form';
-import useMember from 'Graphql/hooks/useMember';
-import {
-  GetProjectMembers,
-  GetProjectMembers_project_members,
-  GetProjectMembersVariables,
-} from 'Graphql/queries/types/GetProjectMembers';
+import useMembers from 'Graphql/hooks/useMembers';
 import { useQuery } from '@apollo/client';
-import { GetMe } from 'Graphql/queries/types/GetMe';
-import { loader } from 'graphql.macro';
 
-const GetMeQuery = loader('Graphql/queries/getMe.graphql');
-const GetMembersQuery = loader('Graphql/queries/getProjectMembers.graphql');
+import GetMeQuery from 'Graphql/queries/getMe';
+import GetMembersQuery from 'Graphql/queries/getProjectMembers';
 
 const gravatarStyle = {
   borderRadius: '50%',
@@ -49,9 +48,12 @@ function MemberDetail({ member, projectId, close }: Props) {
   });
 
   const [done, setDone] = useState(false);
-  const { removeMemberById, updateMemberAccessLevel } = useMember(projectId, {
-    onCompleteUpdate: () => setDone(true),
-  });
+  const { removeMembersById, updateMembersAccessLevel } = useMembers(
+    projectId,
+    {
+      onCompleteUpdate: () => setDone(true),
+    }
+  );
 
   const { handleSubmit, setValue, unregister, register, watch } = useForm<
     FormData
@@ -86,11 +88,11 @@ function MemberDetail({ member, projectId, close }: Props) {
 
   function handleUpdateMember({ accessLevel }: FormData) {
     if (accessLevelChanged) {
-      updateMemberAccessLevel(member.user.id, accessLevel);
+      updateMembersAccessLevel([member.user.id], accessLevel);
     }
   }
   function handleRemoveMember() {
-    removeMemberById(member.user.id);
+    removeMembersById([member.user.id]);
     close();
   }
 
@@ -146,7 +148,7 @@ function MemberDetail({ member, projectId, close }: Props) {
                 warning
               >
                 <Button
-                  label="REMOVE FROM PROJECT"
+                  label="Remove from project"
                   Icon={IconRemove}
                   className={styles.removeButton}
                 />
@@ -158,13 +160,13 @@ function MemberDetail({ member, projectId, close }: Props) {
       {canManageMember && (
         <ActionsBar className={styles.actions}>
           <Button
-            label="SAVE"
+            label="Save"
             onClick={handleSubmit(handleUpdateMember)}
             disabled={!done && !accessLevelChanged}
             success={done}
             primary
           />
-          <Button label="CANCEL" onClick={close} />
+          <Button label="Cancel" onClick={close} />
         </ActionsBar>
       )}
     </div>

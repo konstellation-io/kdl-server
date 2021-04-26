@@ -10,6 +10,8 @@
   height: 100%;
 
   > div {
-    background-color: palette(base, 900);
+    background-color: palette(base, 400);
+    border-bottom: solid 2px palette(base);
+    height: 5 * $grid-unit;
   }
 }

@@ -24,19 +24,16 @@ type APITokenInput struct {
 }
 
 type CreateProjectInput struct {
+	ID          string           `json:"id"`
 	Name        string           `json:"name"`
 	Description string           `json:"description"`
 	Repository  *RepositoryInput `json:"repository"`
 }
 
-type ExternalRepository struct {
+type ExternalRepositoryInput struct {
 	URL      string `json:"url"`
 	Username string `json:"username"`
 	Token    string `json:"token"`
-}
-
-type InternalRepository struct {
-	Name string `json:"name"`
 }
 
 type QualityProjectDesc struct {
@@ -47,9 +44,9 @@ type RemoveAPITokenInput struct {
 	APITokenID string `json:"apiTokenId"`
 }
 
-type RemoveMemberInput struct {
-	ProjectID string `json:"projectId"`
-	UserID    string `json:"userId"`
+type RemoveMembersInput struct {
+	ProjectID string   `json:"projectId"`
+	UserIds   []string `json:"userIds"`
 }
 
 type RemoveUsersInput struct {
@@ -57,9 +54,8 @@ type RemoveUsersInput struct {
 }
 
 type RepositoryInput struct {
-	Type     entity.RepositoryType `json:"type"`
-	External *ExternalRepository   `json:"external"`
-	Internal *InternalRepository   `json:"internal"`
+	Type     entity.RepositoryType    `json:"type"`
+	External *ExternalRepositoryInput `json:"external"`
 }
 
 type SetActiveUserToolsInput struct {
@@ -71,24 +67,35 @@ type SetBoolFieldInput struct {
 	Value bool   `json:"value"`
 }
 
+type SetKGStarredInput struct {
+	ProjectID string `json:"projectId"`
+	KgItemID  string `json:"kgItemId"`
+	Starred   bool   `json:"starred"`
+}
+
+type SetKGStarredRes struct {
+	KgItemID string `json:"kgItemId"`
+	Starred  bool   `json:"starred"`
+}
+
+type SyncUsersResponse struct {
+	Msg string `json:"msg"`
+}
+
 type UpdateAccessLevelInput struct {
 	UserIds     []string           `json:"userIds"`
 	AccessLevel entity.AccessLevel `json:"accessLevel"`
 }
 
-type UpdateMemberInput struct {
+type UpdateMembersInput struct {
 	ProjectID   string             `json:"projectId"`
-	UserID      string             `json:"userId"`
+	UserIds     []string           `json:"userIds"`
 	AccessLevel entity.AccessLevel `json:"accessLevel"`
 }
 
 type UpdateProjectInput struct {
-	ID          string                        `json:"id"`
-	Name        *string                       `json:"name"`
-	Description *string                       `json:"description"`
-	Repository  *UpdateProjectRepositoryInput `json:"repository"`
-}
-
-type UpdateProjectRepositoryInput struct {
-	URL string `json:"url"`
+	ID          string  `json:"id"`
+	Name        *string `json:"name"`
+	Description *string `json:"description"`
+	Archived    *bool   `json:"archived"`
 }

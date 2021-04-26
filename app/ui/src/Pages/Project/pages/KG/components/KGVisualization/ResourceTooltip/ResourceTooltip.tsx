@@ -1,7 +1,7 @@
-import { D } from '../KGVisualization';
+import { D } from '../Viz/KGViz';
 import IconMouse from '@material-ui/icons/Mouse';
 import React from 'react';
-import Score from '../Score';
+import Score from '../Score/Score';
 import cx from 'classnames';
 import styles from './ResourceTooltip.module.scss';
 

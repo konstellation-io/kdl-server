@@ -3,7 +3,6 @@
 @import 'Styles/colors';
 
 .container {
-  margin: 3 * $grid-unit;
   padding: 3 * $grid-unit;
 
   background-color: palette(base, 500);
@@ -50,4 +49,8 @@
       margin: 0 4 * $grid-unit 0 2 * $grid-unit;
     }
   }
+}
+
+.button {
+  width: 20 * $grid-unit;
 }

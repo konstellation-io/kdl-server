@@ -9,7 +9,7 @@
   width: 25 * $grid-unit;
 
   max-width: 5 * $grid-unit;
-  background-color: palette(base, 900);
+  background-color: palette(lowlight, 900);
 
   flex-shrink: 0;
   display: flex;
@@ -21,10 +21,10 @@
   transition: max-width ease 0.3s;
 
   .bottom {
-    background-color: palette(base, 600);
+    background-color: palette(base);
 
     .navButton:hover {
-      background-color: palette(base, 300);
+      background-color: palette(base, 900);
     }
   }
 

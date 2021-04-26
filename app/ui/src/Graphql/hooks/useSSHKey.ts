@@ -1,17 +1,24 @@
 import { RegenerateSSHKey } from './../mutations/types/RegenerateSSHKey';
-import { loader } from 'graphql.macro';
 import { useMutation } from '@apollo/client';
 
-const RegenerateSSHKeyMutation = loader(
-  'Graphql/mutations/regenerateSSHKey.graphql'
-);
+import RegenerateSSHKeyMutation from 'Graphql/mutations/regenerateSSHKey';
 
-export default function useSSHKey() {
-  const [mutationRegenerateSSHKey] = useMutation<RegenerateSSHKey>(
-    RegenerateSSHKeyMutation
-  );
+type Options = {
+  onRegenerateSSHKeyComplete?: () => void;
+};
+
+export default function useSSHKey(options?: Options) {
+  const [
+    mutationRegenerateSSHKey,
+    { loading: regenerateSSHKeyLoading },
+  ] = useMutation<RegenerateSSHKey>(RegenerateSSHKeyMutation, {
+    onCompleted: options?.onRegenerateSSHKeyComplete,
+  });
 
   return {
-    regenerateSSHKey: mutationRegenerateSSHKey,
+    regenerateSSHKey: {
+      performMutation: mutationRegenerateSSHKey,
+      loading: regenerateSSHKeyLoading,
+    },
   };
 }

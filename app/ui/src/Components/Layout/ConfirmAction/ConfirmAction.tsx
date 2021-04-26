@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 
 type Props = {
   title: string;
-  action: (msg: string) => void;
+  action: (msg?: string) => void;
   actionLabel?: string;
   subtitle?: string;
   warning?: boolean;
@@ -14,6 +14,7 @@ type Props = {
   message?: string;
   showInput?: boolean;
   confirmationWord?: string;
+  skipConfirmation?: boolean;
   children: JSX.Element;
 };
 
@@ -32,6 +33,7 @@ const ConfirmAction: FC<Props> = ({
   showInput = false,
   warning = false,
   error = false,
+  skipConfirmation = false,
 }) => {
   const {
     handleSubmit,
@@ -80,7 +82,8 @@ const ConfirmAction: FC<Props> = ({
       <div
         onClick={(e) => {
           e.stopPropagation();
-          showModal();
+          if (skipConfirmation) action();
+          else showModal();
         }}
       >
         {children}
@@ -91,6 +94,7 @@ const ConfirmAction: FC<Props> = ({
           subtitle={subtitle}
           onAccept={handleSubmit(onSubmit)}
           actionButtonLabel={actionLabel}
+          actionButtonCancel="Cancel"
           onCancel={hideModal}
           warning={warning}
           error={error}

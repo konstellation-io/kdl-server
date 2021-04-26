@@ -3,8 +3,9 @@ FROM python:3.9-slim
 # Create kdl user.
 ENV USER=kdl
 ENV UID=10001
-ENV ASSET_COMMIT="558ea7724d7ac7c4787856535372503e7c4bbf73"
+ENV ASSET_COMMIT="c5cd785ac260fd537f20edbead7b31e21741a69b"
 ENV REPO_URL="https://github.com/konstellation-io/kdl-server"
+ENV PYTHONPATH="/kg/src"
 
 RUN adduser \
     --disabled-password \
@@ -16,7 +17,7 @@ RUN adduser \
     "${USER}"
 
 RUN apt-get update \
-    && apt-get install -y build-essential wget git
+    && apt-get install -y build-essential wget git libblas-dev liblapack-dev swig
 
 WORKDIR /kg
 
@@ -24,11 +25,11 @@ COPY Pipfile* ./
 RUN python3 -m pip install pipenv && \
     pipenv install --system --deploy
 
-COPY server server
+COPY src/ src/
 
 WORKDIR /kg/assets
 
-RUN dvc get $REPO_URL --rev $ASSET_COMMIT kg/assets/vectors.npy && \
+RUN dvc get $REPO_URL --rev $ASSET_COMMIT kg/assets/vectors.faiss && \
     dvc get $REPO_URL --rev $ASSET_COMMIT kg/assets/model && \
     dvc get $REPO_URL --rev $ASSET_COMMIT kg/assets/topics.pkl.gz && \
     dvc get $REPO_URL --rev $ASSET_COMMIT kg/assets/dataset.pkl.gz
@@ -43,4 +44,4 @@ RUN chown -R kdl:0 /kg \
 
 USER kdl
 
-CMD ["sh","-c","/usr/local/bin/python3 /kg/server/app.py 2>&1 | tee -a /var/log/app/app.log"]
+CMD ["sh","-c","/usr/local/bin/python3 /kg/src/server/app.py 2>&1 | tee -a /var/log/app/app.log"]

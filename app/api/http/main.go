@@ -101,10 +101,21 @@ func main() {
 		logger.Errorf("Error creating indexes for users: %s", err)
 	}
 
+	userInteractor := user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaService, k8sClient)
+
+	err = userInteractor.ScheduleUsersSyncJob(cfg.ScheduledJob.UsersSync.Interval)
+	if err != nil {
+		logger.Errorf("Unexpected error creating scheduled job for users synchronization: %s", err)
+
+		defer os.Exit(1)
+
+		return
+	}
+
 	resolvers := graph.NewResolver(
 		cfg,
 		project.NewInteractor(logger, projectRepo, realClock, giteaService, minioService, droneService),
-		user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaService, k8sClient),
+		userInteractor,
 		kg.NewInteractor(logger, kgService),
 	)
 
@@ -127,5 +138,6 @@ func startHTTPServer(logger logging.Logger, port, staticFilesPath string, resolv
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		logger.Errorf("Unexpected error: %s", err)
+		os.Exit(1)
 	}
 }

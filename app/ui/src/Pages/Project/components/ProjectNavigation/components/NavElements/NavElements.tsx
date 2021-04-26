@@ -8,14 +8,14 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import React from 'react';
 import { RouteProjectParams } from 'Constants/routes';
 import cx from 'classnames';
-import { loader } from 'graphql.macro';
 import styles from './NavElements.module.scss';
 import { useParams } from 'react-router-dom';
 import useProjectNavigation from 'Hooks/useProjectNavigation';
 import { useQuery } from '@apollo/client';
 import useTool from 'Graphql/hooks/useTool';
+import ConfirmAction from 'Components/Layout/ConfirmAction/ConfirmAction';
 
-const GetMeQuery = loader('Graphql/queries/getMe.graphql');
+import GetMeQuery from 'Graphql/queries/getMe';
 
 type Props = {
   isOpened: boolean;
@@ -59,7 +59,6 @@ function NavElements({ isOpened }: Props) {
         ))}
         <div
           className={cx(styles.userTools, {
-            [styles.show]: isOpened,
             [styles.started]: areToolsActive,
             [styles.stopped]: !areToolsActive,
           })}
@@ -76,12 +75,20 @@ function NavElements({ isOpened }: Props) {
             className={cx(styles.toggleToolsWrapper, {
               [styles.disabled]: projectActiveTools.loading,
             })}
-            onClick={toggleTools}
           >
-            <NavigationButton
-              label={areToolsActive ? 'Stop tools' : 'Run tools'}
-              Icon={renderToggleToolsIcon()}
-            />
+            <ConfirmAction
+              title="STOP YOUR TOOLS"
+              subtitle="You are going to stop your user tools, please confirm your choice."
+              action={toggleTools}
+              actionLabel="STOP"
+              skipConfirmation={!areToolsActive}
+              warning
+            >
+              <NavigationButton
+                label={areToolsActive ? 'Stop tools' : 'Run tools'}
+                Icon={renderToggleToolsIcon()}
+              />
+            </ConfirmAction>
           </div>
         </div>
       </div>

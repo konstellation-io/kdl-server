@@ -1,39 +1,20 @@
 import {
-  BUTTON_ALIGN,
   Button,
+  BUTTON_ALIGN,
   CustomOptionProps,
   Select,
   SelectTheme,
 } from 'kwc';
 import ROUTE from 'Constants/routes';
-import React, { FunctionComponent, memo } from 'react';
+import React, { memo } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { GetMe } from 'Graphql/queries/types/GetMe';
 import KeyIcon from '@material-ui/icons/VpnKey';
-import LinkIcon from '@material-ui/icons/Link';
-import { loader } from 'graphql.macro';
 import styles from './SettingsMenu.module.scss';
 import { useQuery } from '@apollo/client';
 
-const GetMeQuery = loader('Graphql/queries/getMe.graphql');
-
-interface SettingsButtonProps extends CustomOptionProps {
-  onClick: () => void;
-  Icon: FunctionComponent;
-}
-function SettingsButton({ label, onClick, Icon }: SettingsButtonProps) {
-  return (
-    <Button
-      label={label.toUpperCase()}
-      onClick={onClick}
-      Icon={Icon}
-      key={`button${label}`}
-      className={styles.settingButton}
-      align={BUTTON_ALIGN.LEFT}
-    />
-  );
-}
+import GetMeQuery from 'Graphql/queries/getMe';
 
 function SettingsMenu() {
   const history = useHistory();
@@ -41,10 +22,6 @@ function SettingsMenu() {
 
   function goToUserSSHKeys() {
     history.push(ROUTE.USER_SSH_KEY);
-  }
-
-  function goToUserAPITokens() {
-    history.push(ROUTE.USER_API_TOKENS);
   }
 
   function UserSettingsSeparator({ label }: CustomOptionProps) {
@@ -58,18 +35,15 @@ function SettingsMenu() {
     );
   }
 
-  function SSHKeyButton({ label }: CustomOptionProps) {
+  function SSHKeyButton() {
     return (
-      <SettingsButton Icon={KeyIcon} onClick={goToUserSSHKeys} label={label} />
-    );
-  }
-
-  function apiTokensButton({ label }: CustomOptionProps) {
-    return (
-      <SettingsButton
-        Icon={LinkIcon}
-        onClick={goToUserAPITokens}
-        label={label}
+      <Button
+        label="SSH key"
+        key="SSH key"
+        onClick={goToUserSSHKeys}
+        Icon={KeyIcon}
+        className={styles.settingButton}
+        align={BUTTON_ALIGN.LEFT}
       />
     );
   }
@@ -77,7 +51,6 @@ function SettingsMenu() {
   const optionToButton = {
     'user settings': UserSettingsSeparator,
     'ssh key': SSHKeyButton,
-    'api tokens': apiTokensButton,
   };
 
   return (

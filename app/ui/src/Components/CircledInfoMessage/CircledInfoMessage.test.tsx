@@ -22,12 +22,19 @@ describe('CircledInfoMessage component', () => {
   });
 
   it('contains right classes', () => {
-    expect(component.find('.success').isEmptyRender()).toBeFalsy();
-    expect(component.find('.error').isEmptyRender()).toBeTruthy();
+    // Arrange.
+    // Act.
+    const defaultStateIsSuccess = component.find('.success').isEmptyRender();
+    const defaultStateIsError = component.find('.error').isEmptyRender();
 
     component.setProps({ type: CircledInfoMessageTypes.ERROR });
+    const onErrorStateIsSuccess = component.find('.success').isEmptyRender();
+    const onErrorStateIsError = component.find('.error').isEmptyRender();
 
-    expect(component.find('.success').isEmptyRender()).toBeTruthy();
-    expect(component.find('.error').isEmptyRender()).toBeFalsy();
+    // Assert.
+    expect(defaultStateIsSuccess).toBeFalsy();
+    expect(defaultStateIsError).toBeTruthy();
+    expect(onErrorStateIsSuccess).toBeTruthy();
+    expect(onErrorStateIsError).toBeFalsy();
   });
 });

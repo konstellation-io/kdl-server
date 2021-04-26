@@ -1,36 +1,50 @@
-import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
 import RepositoryTypeComponent, {
   LOCATION,
   SIZE,
 } from 'Pages/NewProject/pages/Repository/components/RepositoryTypeComponent/RepositoryTypeComponent';
-import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 
-import { Button } from 'kwc';
+import { Button, ErrorMessage, SpinnerCircular } from 'kwc';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
-import { GetProjects_projects_repository } from 'Graphql/queries/types/GetProjects';
+import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import IconEdit from '@material-ui/icons/Edit';
-import { PANEL_ID } from 'Graphql/client/models/Panel';
-import React from 'react';
-import { RepositoryType } from 'Graphql/types/globalTypes';
+import React, { useMemo } from 'react';
+import { AccessLevel, RepositoryType } from 'Graphql/types/globalTypes';
 import styles from './TabGit.module.scss';
+import { useQuery } from '@apollo/client';
+import GetMeQuery from 'Graphql/queries/getMe';
+import { GetMe } from 'Graphql/queries/types/GetMe';
 
 type Props = {
-  repository: GetProjects_projects_repository;
+  project: GetProjects_projects;
 };
-function TabGit({ repository }: Props) {
+function TabGit({ project }: Props) {
+  const { toolUrls, repository, members } = project;
+  const { data: dataMe, loading, error } = useQuery<GetMe>(GetMeQuery);
+
+  const isAdmin = useMemo(() => {
+    const meAsMember = members.find((m) => m.user.email === dataMe?.me.email);
+    if (meAsMember) return meAsMember.accessLevel === AccessLevel.ADMIN;
+  }, [dataMe, members]);
+
+  if (loading) return <SpinnerCircular />;
+  if (!repository || error) return <ErrorMessage />;
+
   const isExternal = repository.type === RepositoryType.EXTERNAL;
-  const { openPanel } = usePanel(PanelType.SECONDARY, {
-    id: PANEL_ID.REPOSITORY_INFO,
-    title: 'Edit Repository Information',
-    theme: PANEL_THEME.DARK,
-    size: PANEL_SIZE.BIG,
-  });
+
+  function openExternalRepoSettings() {
+    const projectGiteaUrl = new URL(toolUrls.gitea);
+    projectGiteaUrl.pathname += '/settings';
+
+    window.open(projectGiteaUrl.toString());
+  }
 
   return (
     <div className={styles.container}>
-      <div className={styles.edit}>
-        <Button label="" Icon={IconEdit} onClick={openPanel} />
-      </div>
+      {isAdmin && isExternal && (
+        <div className={styles.edit}>
+          <Button label="" Icon={IconEdit} onClick={openExternalRepoSettings} />
+        </div>
+      )}
       <div className={styles.repoType}>
         <RepositoryTypeComponent
           squareLocation={isExternal ? LOCATION.OUT : LOCATION.IN}
@@ -42,18 +56,6 @@ function TabGit({ repository }: Props) {
       <div className={styles.url}>
         <p>{repository.url}</p>
         <CopyToClipboard>{repository.url}</CopyToClipboard>
-      </div>
-      <div className={styles.log}>
-        <p className={styles.title}>REPOSITORY LOG</p>
-        <div className={styles.content}>
-          {
-            'Commit		65465468798790870654650640\n\
-            Autohor: 	Some Konstellation User <some.konstellation-user@konstellation.io>\n\
-            Date: 		Thu May 21 14:10:05 2020 +0200\n\
-            \n\
-            Add model parameters input reader'
-          }
-        </div>
       </div>
     </div>
   );

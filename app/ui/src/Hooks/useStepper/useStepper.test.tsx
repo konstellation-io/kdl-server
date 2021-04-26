@@ -25,6 +25,9 @@ const { actStep, nextStep, getActStepComponent, steps } = getHook();
 
 describe('useBoolState hook', () => {
   it('shows right initial state', () => {
+    // Arrange.
+    // Act.
+    // Assert.
     expect(actStep).toBe(0);
     expect(getActStepComponent()).toStrictEqual(
       <Component1 showErrors={false} />
@@ -37,8 +40,11 @@ describe('useBoolState hook', () => {
   });
 
   it('handles step change', () => {
+    // Arrange.
+    // Act.
     nextStep();
 
+    // Assert.
     expect(getHook().actStep).toBe(1);
     expect(getHook().getActStepComponent()).toStrictEqual(
       <Component2 showErrors={false} />
@@ -46,9 +52,12 @@ describe('useBoolState hook', () => {
   });
 
   it('handles state updates', () => {
+    // Arrange.
+    // Act.
     getHook().updateState(true, true, 0);
     getHook().updateState(true, false, 1);
 
+    // Assert.
     expect(getHook().steps).toStrictEqual([
       {
         id: 'step1',

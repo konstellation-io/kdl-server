@@ -2,6 +2,10 @@
 @import 'Styles/mixins';
 @import 'Styles/colors';
 
+:export {
+  colorGridLines: palette(lowlight, 900);
+}
+
 .container {
   position: relative;
   background-color: palette(base, 800);

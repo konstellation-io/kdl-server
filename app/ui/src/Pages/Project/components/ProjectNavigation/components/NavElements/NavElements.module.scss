@@ -3,7 +3,11 @@
 @import 'Styles/colors';
 
 .projectTools {
-  background-color: palette(base);
+  background-color: palette(base, 300);
+
+  a:hover > div {
+    background-color: palette(base, 200) !important;
+  }
 
   .userTools {
     border-top: 2px solid palette(base, 400);
@@ -11,11 +15,11 @@
     transition: border-right 0.3s ease;
     border-right: 2px solid transparent;
 
-    &.show.started {
+    &.started {
       border-right: 2px solid palette(success);
     }
 
-    &.show.stopped {
+    &.stopped {
       border-right: 2px solid palette(alert);
     }
 

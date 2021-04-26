@@ -13,13 +13,11 @@ import {
 } from '../mutations/types/UpdateProject';
 
 import { CreateProjectInput } from '../types/globalTypes';
-import { loader } from 'graphql.macro';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 
-const GetProjectsQuery = loader('Graphql/queries/getProjects.graphql');
-
-const CreateProjectMutation = loader('Graphql/mutations/createProject.graphql');
-const UpdateProjectMutation = loader('Graphql/mutations/updateProject.graphql');
+import GetProjectsQuery from 'Graphql/queries/getProjects';
+import CreateProjectMutation from 'Graphql/mutations/createProject';
+import UpdateProjectMutation from 'Graphql/mutations/updateProject';
 
 type UseProjectParams = {
   onUpdateCompleted?: () => void;
@@ -33,7 +31,7 @@ export default function useProject(options?: UseProjectParams) {
     update: updateCacheAdd,
   });
 
-  const [mutationUpdateProject] = useMutation<
+  const [mutationUpdateProject, { loading }] = useMutation<
     UpdateProject,
     UpdateProjectVariables
   >(UpdateProjectMutation, {
@@ -82,15 +80,18 @@ export default function useProject(options?: UseProjectParams) {
     mutationUpdateProject(mutationPayloadHelper({ id, description }));
   }
 
-  function updateProjectRepositoryUrl(id: string, url: string) {
-    mutationUpdateProject(mutationPayloadHelper({ id, repository: { url } }));
+  function updateProjectArchived(id: string, archived: boolean) {
+    mutationUpdateProject(mutationPayloadHelper({ id, archived }));
   }
 
   return {
     addNewProject,
     updateProjectName,
     updateProjectDescription,
-    updateProjectRepositoryUrl,
+    archiveProjectAction: {
+      updateProjectArchived,
+      loading,
+    },
     create: { data },
   };
 }

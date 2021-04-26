@@ -14,6 +14,7 @@ type Props = {
   iconSize?: IconSize;
   onClick?: () => void;
   className?: string;
+  disabled?: boolean;
 };
 
 function NavigationButton({
@@ -23,10 +24,13 @@ function NavigationButton({
   onClick,
   className = '',
   iconSize = IconSize.REGULAR,
+  disabled = false,
 }: Props) {
   return (
     <div
-      className={cx(styles.navButton, className)}
+      className={cx(styles.navButton, className, {
+        [styles.disabled]: disabled,
+      })}
       title={title || label}
       onClick={onClick}
     >

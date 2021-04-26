@@ -62,16 +62,24 @@ describe('Step component', () => {
   });
 
   it('show right icons', () => {
+    // Arrange.
+    // Act.
     component.setProps({ completed: true });
-    expect(component.find(CheckIcon).isEmptyRender()).toBeFalsy();
+    const showsCheck = component.find(CheckIcon).isEmptyRender();
 
     component.setProps({ completed: false, disabled: true });
-    expect(component.find(NotInterestedIcon).isEmptyRender()).toBeFalsy();
+    const showsDisabled = component.find(NotInterestedIcon).isEmptyRender();
 
     component.setProps({ completed: false, disabled: false, active: true });
-    expect(component.find(CreateIcon).isEmptyRender()).toBeFalsy();
+    const showsActive = component.find(CreateIcon).isEmptyRender();
 
     component.setProps({ completed: false, disabled: false, active: false });
-    expect(component.find(ScheduleIcon).isEmptyRender()).toBeFalsy();
+    const showsPending = component.find(ScheduleIcon).isEmptyRender();
+
+    // Assert.
+    expect(showsCheck).toBeFalsy();
+    expect(showsDisabled).toBeFalsy();
+    expect(showsActive).toBeFalsy();
+    expect(showsPending).toBeFalsy();
   });
 });

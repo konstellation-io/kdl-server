@@ -8,7 +8,7 @@
   align-items: center;
   cursor: pointer;
   background-color: transparent;
-  border-left: $grid-unit/4 solid transparent;
+  border-left: 0.25 * $grid-unit solid transparent;
 
   transition: background-color ease 0.3s, border-left ease 0.3s, color ease 0.2s,
     opacity ease 0.3s;
@@ -23,24 +23,25 @@
     @include font-button;
     margin-left: $grid-unit/4;
     white-space: nowrap;
-    text-transform: capitalize;
   }
 
   &:hover {
-    background-color: palette(base, 400);
+    background-color: palette(base, 300);
     color: font-color(light);
   }
 }
 
 .active .navButton {
   color: font-color(highlight);
-  border-left: $grid-unit/4 solid palette(highlight);
+  border-left: 0.25 * $grid-unit solid palette(highlight);
 }
 
 .disabled {
-  display: block;
   pointer-events: none;
-  & .navButton {
+
+  .navButton,
+  .label,
+  .icon {
     color: palette(lowlight, 300);
     opacity: 0.5;
   }

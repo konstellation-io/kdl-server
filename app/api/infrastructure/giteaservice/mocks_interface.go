@@ -76,32 +76,33 @@ func (mr *MockGiteaClientMockRecorder) CreateRepo(name, ownerUsername interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRepo", reflect.TypeOf((*MockGiteaClient)(nil).CreateRepo), name, ownerUsername)
 }
 
-// CreateUser mocks base method.
-func (m *MockGiteaClient) CreateUser(email, username, password string) error {
+// FindAllUsers mocks base method.
+func (m *MockGiteaClient) FindAllUsers() ([]entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUser", email, username, password)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "FindAllUsers")
+	ret0, _ := ret[0].([]entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// CreateUser indicates an expected call of CreateUser.
-func (mr *MockGiteaClientMockRecorder) CreateUser(email, username, password interface{}) *gomock.Call {
+// FindAllUsers indicates an expected call of FindAllUsers.
+func (mr *MockGiteaClientMockRecorder) FindAllUsers() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockGiteaClient)(nil).CreateUser), email, username, password)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAllUsers", reflect.TypeOf((*MockGiteaClient)(nil).FindAllUsers))
 }
 
 // MirrorRepo mocks base method.
-func (m *MockGiteaClient) MirrorRepo(url, repoName, userName, userToken string) error {
+func (m *MockGiteaClient) MirrorRepo(url, repoName, userName, userToken, ownerUsername string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MirrorRepo", url, repoName, userName, userToken)
+	ret := m.ctrl.Call(m, "MirrorRepo", url, repoName, userName, userToken, ownerUsername)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // MirrorRepo indicates an expected call of MirrorRepo.
-func (mr *MockGiteaClientMockRecorder) MirrorRepo(url, repoName, userName, userToken interface{}) *gomock.Call {
+func (mr *MockGiteaClientMockRecorder) MirrorRepo(url, repoName, userName, userToken, ownerUsername interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MirrorRepo", reflect.TypeOf((*MockGiteaClient)(nil).MirrorRepo), url, repoName, userName, userToken)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MirrorRepo", reflect.TypeOf((*MockGiteaClient)(nil).MirrorRepo), url, repoName, userName, userToken, ownerUsername)
 }
 
 // RemoveCollaborator mocks base method.
@@ -130,4 +131,32 @@ func (m *MockGiteaClient) UpdateCollaboratorPermissions(repoName, username strin
 func (mr *MockGiteaClientMockRecorder) UpdateCollaboratorPermissions(repoName, username, accessLevel interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCollaboratorPermissions", reflect.TypeOf((*MockGiteaClient)(nil).UpdateCollaboratorPermissions), repoName, username, accessLevel)
+}
+
+// UpdateSSHKey mocks base method.
+func (m *MockGiteaClient) UpdateSSHKey(username, newPublicSSHKey string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSSHKey", username, newPublicSSHKey)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateSSHKey indicates an expected call of UpdateSSHKey.
+func (mr *MockGiteaClientMockRecorder) UpdateSSHKey(username, newPublicSSHKey interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSSHKey", reflect.TypeOf((*MockGiteaClient)(nil).UpdateSSHKey), username, newPublicSSHKey)
+}
+
+// UpdateUserPermissions mocks base method.
+func (m *MockGiteaClient) UpdateUserPermissions(username, email string, level entity.AccessLevel) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUserPermissions", username, email, level)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateUserPermissions indicates an expected call of UpdateUserPermissions.
+func (mr *MockGiteaClientMockRecorder) UpdateUserPermissions(username, email, level interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserPermissions", reflect.TypeOf((*MockGiteaClient)(nil).UpdateUserPermissions), username, email, level)
 }

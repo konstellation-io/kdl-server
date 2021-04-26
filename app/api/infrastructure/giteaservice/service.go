@@ -1,9 +1,10 @@
 package giteaservice
 
 import (
+	"errors"
+
 	"code.gitea.io/sdk/gitea"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
@@ -12,6 +13,10 @@ const (
 	// https://github.com/konstellation-io/science-toolkit/blob/master/helm/science-toolkit/templates/gitea/init-configmap.yaml
 	kdlOrganization = "kdl"
 	kdlSSHKeyName   = "kdl-ssh-key"
+)
+
+var (
+	ErrAccessLevelNotFound = errors.New("the access level is not recognized")
 )
 
 type giteaService struct {
@@ -27,25 +32,6 @@ func NewGiteaService(logger logging.Logger, url, adminUser, adminPassword string
 	}
 
 	return &giteaService{logger: logger, client: client}, nil
-}
-
-// CreateUser creates a new user in Gitea.
-func (g *giteaService) CreateUser(email, username, password string) error {
-	mustChangePassword := true
-	user, _, err := g.client.AdminCreateUser(gitea.CreateUserOption{
-		Email:              email,
-		Password:           password,
-		Username:           username,
-		MustChangePassword: &mustChangePassword,
-	})
-
-	if err != nil {
-		return err
-	}
-
-	g.logger.Infof("Created user \"%s\" in Gitea with id \"%d\"", user.UserName, user.ID)
-
-	return nil
 }
 
 // AddSSHKey adds a new public SSH key to a user.
@@ -65,11 +51,33 @@ func (g *giteaService) AddSSHKey(username, publicSSHKey string) error {
 	return nil
 }
 
+// UpdateSSHKey updates public SSH key on Gitea for a user.
+func (g *giteaService) UpdateSSHKey(username, publicSSHKey string) error {
+	userKey, err := g.getUserSSHKey(username)
+	if err != nil {
+		return err
+	}
+
+	if userKey != nil {
+		keyID := int(userKey.ID)
+
+		_, err = g.client.AdminDeleteUserPublicKey(username, keyID)
+		if err != nil {
+			return err
+		}
+
+		g.logger.Infof("Deleted public SSH key for user \"%s\" in Gitea with id \"%d\"", username, keyID)
+	}
+
+	return g.AddSSHKey(username, publicSSHKey)
+}
+
 // CreateRepo creates a repository in the KDL organization.
 func (g *giteaService) CreateRepo(name, ownerUsername string) error {
 	repo, _, err := g.client.AdminCreateRepo(kdlOrganization, gitea.CreateRepoOption{
 		Name:     name,
 		AutoInit: true,
+		Private:  true,
 	})
 
 	if err != nil {
@@ -82,7 +90,7 @@ func (g *giteaService) CreateRepo(name, ownerUsername string) error {
 }
 
 // MirrorRepo creates a mirror of an external repository in the KDL organization.
-func (g *giteaService) MirrorRepo(url, repoName, userName, userToken string) error {
+func (g *giteaService) MirrorRepo(url, repoName, userName, userToken, ownerUsername string) error {
 	repo, _, err := g.client.MigrateRepo(gitea.MigrateRepoOption{
 		RepoOwner:    kdlOrganization,
 		RepoName:     repoName,
@@ -90,6 +98,7 @@ func (g *giteaService) MirrorRepo(url, repoName, userName, userToken string) err
 		AuthUsername: userName,
 		AuthToken:    userToken,
 		Mirror:       true,
+		Private:      true,
 	})
 
 	if err != nil {
@@ -98,7 +107,7 @@ func (g *giteaService) MirrorRepo(url, repoName, userName, userToken string) err
 
 	g.logger.Infof("Mirrored repository from \"%s\" in organization \"%s\" in Gitea with id \"%d\"", url, kdlOrganization, repo.ID)
 
-	return nil
+	return g.AddCollaborator(repoName, ownerUsername, entity.AccessLevelAdmin)
 }
 
 // AddCollaborator adds a new collaborator to the given repository.
@@ -147,4 +156,92 @@ func (g *giteaService) UpdateCollaboratorPermissions(repoName, username string, 
 	}
 
 	return g.AddCollaborator(repoName, username, newAccessLevel)
+}
+
+// UpdateUserPermissions changes the permissions for the given user.
+func (g *giteaService) UpdateUserPermissions(username, email string, level entity.AccessLevel) error {
+	varTrue := true
+	varFalse := false
+
+	// gitea AdminEditUser call requires email in editUserOptions to work properly
+	editUserOptions := gitea.EditUserOption{
+		Admin: nil,
+		Email: email,
+	}
+
+	switch level {
+	case entity.AccessLevelAdmin:
+		editUserOptions.Admin = &varTrue
+	case entity.AccessLevelManager:
+		editUserOptions.Admin = &varFalse
+	case entity.AccessLevelViewer:
+		editUserOptions.Admin = &varFalse
+	default:
+		return ErrAccessLevelNotFound
+	}
+
+	_, err := g.client.AdminEditUser(username, editUserOptions)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// FindAllUsers returns all users from Gitea.
+func (g *giteaService) FindAllUsers() ([]entity.User, error) {
+	const pageSize = 40
+
+	var result []entity.User
+
+	page := 0
+	lastNumberOfUsers := 0
+
+	for moreResults := true; moreResults; moreResults = lastNumberOfUsers == pageSize {
+		g.logger.Debugf("Request users from Gitea: page number = %d, page size = %d", page, pageSize)
+
+		users, _, err := g.client.AdminListUsers(gitea.AdminListUsersOptions{
+			ListOptions: gitea.ListOptions{
+				Page:     page,
+				PageSize: pageSize,
+			},
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
+		for _, u := range users {
+			result = append(result, entity.User{
+				Username: u.UserName,
+				Email:    u.Email,
+			})
+		}
+
+		lastNumberOfUsers = len(users)
+
+		g.logger.Debugf("There are %d users in the page %d", lastNumberOfUsers, page)
+
+		page++
+	}
+
+	g.logger.Debugf("Downloaded a total of %d users from Gitea", len(result))
+
+	return result, nil
+}
+
+// getUserSSHKey gets the user SSH key.
+func (g *giteaService) getUserSSHKey(username string) (*gitea.PublicKey, error) {
+	keys, _, err := g.client.ListPublicKeys(username, gitea.ListPublicKeysOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, key := range keys {
+		if key.Title == kdlSSHKeyName {
+			return key, nil
+		}
+	}
+
+	return nil, nil
 }

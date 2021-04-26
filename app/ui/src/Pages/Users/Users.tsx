@@ -5,33 +5,29 @@ import {
   SpinnerCircular,
 } from 'kwc';
 import {
-  GET_USER_SETTINGS,
-  GetUserSettings,
-} from 'Graphql/client/queries/getUserSettings.graphql';
-import {
-  ModalInfo,
   defaultModalInfo,
   getModalInfo,
+  ModalInfo,
 } from './confirmationModals';
 import React, { useRef } from 'react';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import { GetUsers } from 'Graphql/queries/types/GetUsers';
 import UserFiltersAndActions from './components/UserFiltersAndActions/UserFiltersAndActions';
-import UserList from './components/UserList/UserList';
 import UserRow from './components/UserRow/UserRow';
-import { loader } from 'graphql.macro';
 import styles from './Users.module.scss';
 import useBoolState from 'Hooks/useBoolState';
-import { useQuery } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
 import useUser from 'Graphql/hooks/useUser';
+import UsersTable from './components/UserList/UsersTable';
 
-const GetUsersQuery = loader('Graphql/queries/getUsers.graphql');
+import GetUsersQuery from 'Graphql/queries/getUsers';
+import { userSettings } from 'Graphql/client/cache';
 
 function Users() {
   const { data, loading, error } = useQuery<GetUsers>(GetUsersQuery);
-  const { data: localData } = useQuery<GetUserSettings>(GET_USER_SETTINGS);
-  const { removeUsersById, updateUsersAccessLevel } = useUser();
+  const { selectedUserIds } = useReactiveVar(userSettings);
+  const { updateUsersAccessLevel } = useUser();
 
   const {
     value: modalVisible,
@@ -40,28 +36,12 @@ function Users() {
   } = useBoolState(false);
   const modalInfo = useRef<ModalInfo>(defaultModalInfo);
 
-  const selectedUsers = localData?.userSettings.selectedUserIds || [];
-
   function getUsersInfo(user?: [string]) {
-    const userIds = user || selectedUsers;
+    const userIds = user || selectedUserIds;
     const nUsers = userIds.length;
     const plural = nUsers > 1;
 
     return { userIds, nUsers, plural };
-  }
-
-  function onDeleteUsers(user?: [string]) {
-    const usersInfo = getUsersInfo(user);
-
-    showModal();
-    modalInfo.current = getModalInfo({
-      type: 'delete',
-      action: () => {
-        removeUsersById(usersInfo.userIds);
-        hideModal();
-      },
-      ...usersInfo,
-    });
   }
 
   function onUpdateAccessLevel(newAccessLevel: AccessLevel, user?: [string]) {
@@ -85,15 +65,8 @@ function Users() {
 
     return (
       <>
-        <UserFiltersAndActions
-          onDeleteUsers={onDeleteUsers}
-          onUpdateAccessLevel={onUpdateAccessLevel}
-        />
-        <UserList
-          users={data.users}
-          onDeleteUsers={onDeleteUsers}
-          onUpdateAccessLevel={onUpdateAccessLevel}
-        />
+        <UserFiltersAndActions onUpdateAccessLevel={onUpdateAccessLevel} />
+        <UsersTable users={data.users} />
       </>
     );
   }
@@ -108,6 +81,7 @@ function Users() {
           onAccept={modalInfo.current.action}
           onCancel={hideModal}
           actionButtonLabel={modalInfo.current.acceptLabel}
+          actionButtonCancel="Cancel"
           className={styles.modal}
           blocking
         >

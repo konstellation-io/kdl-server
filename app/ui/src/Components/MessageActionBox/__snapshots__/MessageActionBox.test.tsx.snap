@@ -31,24 +31,28 @@ exports[`MessageActionBox component Component match snapshot 1`] = `
         Some message
       </p>
     </div>
-    <T
-      Icon={
-        Object {
-          "$$typeof": Symbol(react.memo),
-          "compare": null,
-          "type": Object {
-            "$$typeof": Symbol(react.forward_ref),
-            "render": [Function],
-          },
+    <div
+      className="button"
+    >
+      <P
+        Icon={
+          Object {
+            "$$typeof": Symbol(react.memo),
+            "compare": null,
+            "type": Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "render": [Function],
+            },
+          }
         }
-      }
-      disabled={true}
-      height={30}
-      label="Some label"
-      onClick={[MockFunction]}
-      primary={true}
-      theme="default"
-    />
+        disabled={true}
+        height={30}
+        label="Some label"
+        onClick={[MockFunction]}
+        primary={true}
+        theme="default"
+      />
+    </div>
   </div>
 </div>
 `;

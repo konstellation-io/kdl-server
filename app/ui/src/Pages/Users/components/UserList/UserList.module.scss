@@ -4,6 +4,8 @@
 
 .container {
   overflow: auto;
+  height: 100%;
+  padding-bottom: 15 * $grid-unit;
 }
 
 .table {
@@ -32,8 +34,7 @@
   width: 100% !important;
   white-space: nowrap;
 
-  tbody tr td:nth-child(1),
-  tbody tr td:nth-child(7) {
+  tbody tr td:nth-child(1) {
     width: 37px;
   }
 
@@ -68,8 +69,7 @@
       border-bottom: solid 1px palette(base, 400);
     }
 
-    td:nth-child(2),
-    td:nth-child(7) {
+    td:nth-child(2) {
       @include font-small;
       color: font-color(regular);
       line-height: inherit;
@@ -77,6 +77,7 @@
       width: 115px;
       padding-left: 2 * $grid-unit;
     }
+
     td:nth-child(3) {
       @include font-code;
 
@@ -92,11 +93,6 @@
     }
     td:nth-child(6) {
       width: 165px;
-    }
-    td:nth-child(7) {
-      color: font-color(regular);
-      line-height: 0;
-      width: 1px;
     }
   }
 }
@@ -138,4 +134,8 @@
   svg {
     margin-bottom: -4px;
   }
+}
+
+.levelSelector > div > div > div:first-child {
+  min-height: 30px;
 }

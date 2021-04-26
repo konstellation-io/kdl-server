@@ -3,11 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import {
-  RepositoryType,
-  ProjectState,
-  AccessLevel,
-} from './../../types/globalTypes';
+import { RepositoryType, AccessLevel } from './../../types/globalTypes';
 
 // ====================================================
 // GraphQL query operation: GetProjects
@@ -53,7 +49,8 @@ export interface GetProjects_projects {
   creationDate: string;
   lastActivationDate: string;
   repository: GetProjects_projects_repository | null;
-  state: ProjectState;
+  needAccess: boolean;
+  archived: boolean;
   error: string | null;
   toolUrls: GetProjects_projects_toolUrls;
   members: GetProjects_projects_members[];

@@ -7,6 +7,7 @@ package user
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	gomock "github.com/golang/mock/gomock"
 	entity "github.com/konstellation-io/kdl-server/app/api/entity"
@@ -65,18 +66,18 @@ func (mr *MockRepositoryMockRecorder) EnsureIndexes() *gomock.Call {
 }
 
 // FindAll mocks base method.
-func (m *MockRepository) FindAll(ctx context.Context) ([]entity.User, error) {
+func (m *MockRepository) FindAll(ctx context.Context, includeDeleted bool) ([]entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindAll", ctx)
+	ret := m.ctrl.Call(m, "FindAll", ctx, includeDeleted)
 	ret0, _ := ret[0].([]entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FindAll indicates an expected call of FindAll.
-func (mr *MockRepositoryMockRecorder) FindAll(ctx interface{}) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) FindAll(ctx, includeDeleted interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockRepository)(nil).FindAll), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockRepository)(nil).FindAll), ctx, includeDeleted)
 }
 
 // FindByIDs mocks base method.
@@ -139,6 +140,62 @@ func (mr *MockRepositoryMockRecorder) GetByUsername(ctx, username interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByUsername", reflect.TypeOf((*MockRepository)(nil).GetByUsername), ctx, username)
 }
 
+// UpdateAccessLevel mocks base method.
+func (m *MockRepository) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateAccessLevel", ctx, userIDs, level)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateAccessLevel indicates an expected call of UpdateAccessLevel.
+func (mr *MockRepositoryMockRecorder) UpdateAccessLevel(ctx, userIDs, level interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccessLevel", reflect.TypeOf((*MockRepository)(nil).UpdateAccessLevel), ctx, userIDs, level)
+}
+
+// UpdateDeleted mocks base method.
+func (m *MockRepository) UpdateDeleted(ctx context.Context, userID string, deleted bool) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateDeleted", ctx, userID, deleted)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateDeleted indicates an expected call of UpdateDeleted.
+func (mr *MockRepositoryMockRecorder) UpdateDeleted(ctx, userID, deleted interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDeleted", reflect.TypeOf((*MockRepository)(nil).UpdateDeleted), ctx, userID, deleted)
+}
+
+// UpdateEmail mocks base method.
+func (m *MockRepository) UpdateEmail(ctx context.Context, userID, email string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateEmail", ctx, userID, email)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateEmail indicates an expected call of UpdateEmail.
+func (mr *MockRepositoryMockRecorder) UpdateEmail(ctx, userID, email interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEmail", reflect.TypeOf((*MockRepository)(nil).UpdateEmail), ctx, userID, email)
+}
+
+// UpdateSSHKey mocks base method.
+func (m *MockRepository) UpdateSSHKey(ctx context.Context, username string, SSHKey entity.SSHKey) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSSHKey", ctx, username, SSHKey)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateSSHKey indicates an expected call of UpdateSSHKey.
+func (mr *MockRepositoryMockRecorder) UpdateSSHKey(ctx, username, SSHKey interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSSHKey", reflect.TypeOf((*MockRepository)(nil).UpdateSSHKey), ctx, username, SSHKey)
+}
+
 // MockUseCase is a mock of UseCase interface.
 type MockUseCase struct {
 	ctrl     *gomock.Controller
@@ -178,18 +235,18 @@ func (mr *MockUseCaseMockRecorder) AreToolsRunning(username interface{}) *gomock
 }
 
 // Create mocks base method.
-func (m *MockUseCase) Create(ctx context.Context, email, username, password string, accessLevel entity.AccessLevel) (entity.User, error) {
+func (m *MockUseCase) Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, email, username, password, accessLevel)
+	ret := m.ctrl.Call(m, "Create", ctx, email, username, accessLevel)
 	ret0, _ := ret[0].(entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockUseCaseMockRecorder) Create(ctx, email, username, password, accessLevel interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) Create(ctx, email, username, accessLevel interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUseCase)(nil).Create), ctx, email, username, password, accessLevel)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUseCase)(nil).Create), ctx, email, username, accessLevel)
 }
 
 // FindAll mocks base method.
@@ -222,21 +279,6 @@ func (mr *MockUseCaseMockRecorder) FindByIDs(ctx, userIDs interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByIDs", reflect.TypeOf((*MockUseCase)(nil).FindByIDs), ctx, userIDs)
 }
 
-// GetByEmail mocks base method.
-func (m *MockUseCase) GetByEmail(ctx context.Context, email string) (entity.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByEmail", ctx, email)
-	ret0, _ := ret[0].(entity.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetByEmail indicates an expected call of GetByEmail.
-func (mr *MockUseCaseMockRecorder) GetByEmail(ctx, email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmail", reflect.TypeOf((*MockUseCase)(nil).GetByEmail), ctx, email)
-}
-
 // GetByID mocks base method.
 func (m *MockUseCase) GetByID(ctx context.Context, userID string) (entity.User, error) {
 	m.ctrl.T.Helper()
@@ -250,6 +292,62 @@ func (m *MockUseCase) GetByID(ctx context.Context, userID string) (entity.User, 
 func (mr *MockUseCaseMockRecorder) GetByID(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockUseCase)(nil).GetByID), ctx, userID)
+}
+
+// GetByUsername mocks base method.
+func (m *MockUseCase) GetByUsername(ctx context.Context, username string) (entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByUsername", ctx, username)
+	ret0, _ := ret[0].(entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByUsername indicates an expected call of GetByUsername.
+func (mr *MockUseCaseMockRecorder) GetByUsername(ctx, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByUsername", reflect.TypeOf((*MockUseCase)(nil).GetByUsername), ctx, username)
+}
+
+// RegenerateSSHKeys mocks base method.
+func (m *MockUseCase) RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RegenerateSSHKeys", ctx, user)
+	ret0, _ := ret[0].(entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RegenerateSSHKeys indicates an expected call of RegenerateSSHKeys.
+func (mr *MockUseCaseMockRecorder) RegenerateSSHKeys(ctx, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegenerateSSHKeys", reflect.TypeOf((*MockUseCase)(nil).RegenerateSSHKeys), ctx, user)
+}
+
+// RunSyncUsersCronJob mocks base method.
+func (m *MockUseCase) RunSyncUsersCronJob() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "RunSyncUsersCronJob")
+}
+
+// RunSyncUsersCronJob indicates an expected call of RunSyncUsersCronJob.
+func (mr *MockUseCaseMockRecorder) RunSyncUsersCronJob() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunSyncUsersCronJob", reflect.TypeOf((*MockUseCase)(nil).RunSyncUsersCronJob))
+}
+
+// ScheduleUsersSyncJob mocks base method.
+func (m *MockUseCase) ScheduleUsersSyncJob(interval time.Duration) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ScheduleUsersSyncJob", interval)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ScheduleUsersSyncJob indicates an expected call of ScheduleUsersSyncJob.
+func (mr *MockUseCaseMockRecorder) ScheduleUsersSyncJob(interval interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ScheduleUsersSyncJob", reflect.TypeOf((*MockUseCase)(nil).ScheduleUsersSyncJob), interval)
 }
 
 // StartTools mocks base method.
@@ -280,4 +378,19 @@ func (m *MockUseCase) StopTools(ctx context.Context, username string) (entity.Us
 func (mr *MockUseCaseMockRecorder) StopTools(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopTools", reflect.TypeOf((*MockUseCase)(nil).StopTools), ctx, username)
+}
+
+// UpdateAccessLevel mocks base method.
+func (m *MockUseCase) UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateAccessLevel", ctx, userIds, level)
+	ret0, _ := ret[0].([]entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateAccessLevel indicates an expected call of UpdateAccessLevel.
+func (mr *MockUseCaseMockRecorder) UpdateAccessLevel(ctx, userIds, level interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccessLevel", reflect.TypeOf((*MockUseCase)(nil).UpdateAccessLevel), ctx, userIds, level)
 }

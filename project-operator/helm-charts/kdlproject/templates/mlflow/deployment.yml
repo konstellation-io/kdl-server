@@ -1,0 +1,109 @@
+{{ if .Capabilities.APIVersions.Has "apps/v1" }}
+apiVersion: apps/v1
+{{ else if .Capabilities.APIVersions.Has "extensions/v1beta1" }}
+apiVersion: extensions/v1beta1
+{{ end }}
+kind: Deployment
+metadata:
+  name: {{ .Values.projectId }}-mlflow
+  labels:
+    app: {{ .Values.projectId }}-mlflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.projectId }}-mlflow
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.projectId }}-mlflow
+    spec:
+      initContainers:
+        - name: gitea-oauth2-setup
+          image: "terminus7/gitea-oauth2-setup:{{ .Values.giteaOauth2Setup.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          envFrom:
+            - secretRef:
+                name: gitea-admin-secrets
+            - secretRef:
+                name: {{ .Values.projectId }}-mlflow-oauth2-secrets
+            - configMapRef:
+                name: gitea-configmap
+      containers:
+        - name: mlflow
+          image: {{ .Values.mlflow.image.repository }}:{{ .Values.mlflow.image.tag }}
+          imagePullPolicy: {{ .Values.mlflow.image.pullPolicy }}
+          args:
+          - server
+          - --backend-store-uri
+          - sqlite:///mlflow.db
+          - --default-artifact-root
+          - s3://$ARTIFACTS_BUCKET
+          - --host
+          - 0.0.0.0
+          - --static-prefix
+          - /mlflow
+          command:
+          - mlflow
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.projectId }}-mlflow-config
+            - secretRef:
+                name: {{ .Values.projectId }}-mlflow-secret
+          volumeMounts:
+            - name: mlflow-tracking
+              mountPath: /mlflow/tracking
+          livenessProbe:
+            httpGet:
+              path: /mlflow
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 60
+        - name: oauth2-proxy
+          image: {{ .Values.oauth2Proxy.image.repository }}:{{ .Values.oauth2Proxy.image.tag }}
+          imagePullPolicy: {{ .Values.oauth2Proxy.image.pullPolicy }}
+          args:
+            - "--config=/etc/oauth2_proxy.cfg"
+            - "--email-domain=*"
+            - "--upstream=http://127.0.0.1:5000/"
+            - "--pass-user-headers=true"
+            - "--skip-provider-button=true"
+          env:
+            - name: OAUTH2_PROXY_HTTP_ADDRESS
+              value: "0.0.0.0:8080"
+            - name: OAUTH2_PROXY_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.projectId }}-mlflow-oauth2-credentials
+                  key: OAUTH2_CLIENT_ID
+            - name: OAUTH2_PROXY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.projectId }}-mlflow-oauth2-credentials
+                  key: OAUTH2_CLIENT_SECRET
+          volumeMounts:
+            - name: oauth2-config
+              mountPath: /etc/oauth2_proxy.cfg
+              subPath: oauth2_proxy.cfg
+          ports:
+            - name: http
+              containerPort: 4180
+              protocol: TCP
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.imagePullSecrets  }}
+      - name: {{ . }}
+      {{- end }}
+      {{- end }}
+      volumes:
+        - name: mlflow-tracking
+          persistentVolumeClaim:
+            claimName: {{ .Values.projectId }}-mlflow-claim
+        - name: oauth2-config
+          configMap:
+            name: {{ .Values.projectId }}-mlflow-oauth2-proxy

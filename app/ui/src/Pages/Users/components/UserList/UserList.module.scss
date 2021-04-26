@@ -5,6 +5,7 @@
 .container {
   overflow: auto;
   height: 100%;
+  padding-bottom: 15 * $grid-unit;
 }
 
 .table {

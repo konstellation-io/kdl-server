@@ -8,7 +8,11 @@
 }
 
 .settingButton {
-  background-color: palette(base, 500);
+  background-color: palette(base, 400);
+
+  &:hover {
+    background-color: palette(base, 300);
+  }
 }
 
 .logoutMessage {
@@ -23,12 +27,12 @@
   color: font-color(regular);
 
   cursor: default;
-  background-color: palette(base);
+  background-color: palette(base, 400);
 
   border-top: 2px solid palette(base, 900);
 
   &:hover {
-    background-color: palette(base);
+    background-color: palette(base, 400);
     color: font-color(regular);
   }
 }

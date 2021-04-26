@@ -22,7 +22,6 @@ $ go generate ./...
 go test ./...
 ```
 
-
 ## Linters
 
 `golangci-lint` is a fast Go linters runner. It runs linters in parallel, uses caching, supports yaml config, has

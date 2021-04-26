@@ -29,7 +29,7 @@ const bisectDate = bisector<D, Date>((d) => new Date(d.x)).left;
 
 const margin = { top: 10, right: 0, bottom: 0, left: 0 };
 const xyChartXScale: any = { type: 'time' };
-const gridLineProps = { stroke: '#313131' };
+const gridLineProps = { stroke: styles.colorGridLines };
 
 type Props = {
   data: D[];
@@ -49,7 +49,7 @@ function TimeSeriesChart({
   highlightLastValue,
   width,
   height,
-  color = '#f00',
+  color = 'red',
   formatXAxis = (v) => v,
   formatYAxis = (v) => v.toString(),
 }: Props) {

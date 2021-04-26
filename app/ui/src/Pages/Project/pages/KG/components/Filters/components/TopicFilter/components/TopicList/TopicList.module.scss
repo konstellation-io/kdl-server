@@ -2,6 +2,11 @@
 @import 'Styles/mixins';
 @import 'Styles/colors';
 
+:export {
+  colorPapersMax: palette(error, 600);
+  colorPapersMin: palette(feedback, 900);
+}
+
 .titlesContainer {
   display: flex;
   align-items: center;

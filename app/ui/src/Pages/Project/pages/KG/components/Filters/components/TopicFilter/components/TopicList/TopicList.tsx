@@ -5,7 +5,7 @@ import { Topic } from '../../../../Filters';
 import { scaleLinear } from '@visx/scale';
 import { extent } from 'd3-array';
 
-const COLOR_SCALE_COLORS = ['#0C3448', '#D02F3F'];
+const COLOR_SCALE_COLORS = [styles.colorPapersMin, styles.colorPapersMax];
 
 export interface TopicListProps {
   topics: Topic[];

@@ -4,7 +4,7 @@ import { select, Selection } from 'd3-selection';
 import { Coord, DComplete, getHash, groupData } from '../../../KGUtils';
 import BG from './BG/BG';
 import { scaleBand, scaleLinear } from '@visx/scale';
-import Resources, { RESOURCE_R } from './Resources';
+import Resources, { RESOURCE_R } from './Resources/Resources';
 import radialAxis, {
   OrientationH,
   OrientationV,

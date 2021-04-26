@@ -71,7 +71,6 @@ function NewProject() {
   const { enableUnloadPrompt, disableUnloadPrompt } = useUnloadPrompt();
   const data = useReactiveVar(newProject);
 
-  const { clearAll } = useNewProject('information');
   const type = data.repository.values.type;
 
   const stepsWithData: (

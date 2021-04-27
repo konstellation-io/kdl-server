@@ -89,7 +89,7 @@
     "@types/react-router-dom": "5.1.7",
     "@types/react-table": "7.0.28",
     "@types/react-tabs": "2.3.2",
-    "cypress": "^7.1.0",
+    "cypress": "7.1.0",
     "apollo": "^2.32.5",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "^1.15.6",

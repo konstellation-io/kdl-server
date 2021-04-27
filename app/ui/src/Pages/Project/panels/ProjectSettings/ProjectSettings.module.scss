@@ -16,4 +16,10 @@
   background-color: palette(lowlight, 900);
   flex-grow: 1;
   overflow: hidden;
+  display: flex;
+
+  & > div {
+    flex-grow: 1;
+    height: unset;
+  }
 }

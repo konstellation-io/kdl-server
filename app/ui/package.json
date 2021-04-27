@@ -44,7 +44,8 @@
     "test:cov:sonar": "react-scripts test --silent --env=jsdom --coverage --watchAll=false --testResultsProcessor jest-sonar-reporter",
     "eject": "react-scripts eject",
     "prettier:types": "prettier --write --single-quote \"src/Graphql/**/types/**/*.ts\"",
-    "gen:types": "apollo client:codegen types --globalTypesFile=src/Graphql/types/globalTypes.ts --target typescript --includes=./src/Graphql/\"{queries,mutations,fragments}\"/*.ts --localSchemaFile=../api/infrastructure/graph/schema.graphqls && yarn prettier:types"
+    "gen:types": "apollo client:codegen types --globalTypesFile=src/Graphql/types/globalTypes.ts --target typescript --includes=./src/Graphql/\"{queries,mutations,fragments}\"/*.ts --localSchemaFile=../api/infrastructure/graph/schema.graphqls && yarn prettier:types",
+    "cy": "yarn run cypress open"
   },
   "eslintConfig": {
     "extends": [
@@ -65,6 +66,7 @@
     ]
   },
   "devDependencies": {
+    "@bahmutov/add-typescript-to-cypress": "2.1.2",
     "@testing-library/jest-dom": "5.11.4",
     "@testing-library/react": "11.1.0",
     "@testing-library/user-event": "12.1.10",
@@ -87,6 +89,7 @@
     "@types/react-router-dom": "5.1.7",
     "@types/react-table": "7.0.28",
     "@types/react-tabs": "2.3.2",
+    "cypress": "7.1.0",
     "apollo": "^2.32.5",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "^1.15.6",

@@ -16,6 +16,7 @@ ENV SASS_PATH=src
 WORKDIR /app
 COPY ui/package.* ./
 COPY ui/yarn* ./
+RUN mkdir -p cypress/plugins
 RUN yarn install
 COPY ui/ .
 RUN yarn build

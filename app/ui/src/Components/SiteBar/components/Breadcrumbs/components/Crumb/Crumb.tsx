@@ -1,10 +1,9 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC } from 'react';
 import styles from './Crumb.module.scss';
-import AnimateHeight from 'react-animate-height';
-import { useClickOutside } from 'kwc';
 import cx from 'classnames';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import useBoolState from 'Hooks/useBoolState';
+import ExpandableMenu from 'Components/ExpandableMenu/ExpandableMenu';
 
 export interface BottomComponentProps {
   closeComponent: () => void;
@@ -16,24 +15,14 @@ export type CrumbProps = {
 };
 
 function Crumb({ crumbText, LeftIconComponent, BottomComponent }: CrumbProps) {
-  const crumbRef = useRef(null);
   const {
     value: opened,
     toggle: toggleComponent,
     deactivate: hideComponent,
   } = useBoolState(false);
-  const { addClickOutsideEvents, removeClickOutsideEvents } = useClickOutside({
-    componentRef: crumbRef,
-    action: hideComponent,
-  });
-
-  useEffect(() => {
-    if (crumbRef && opened) addClickOutsideEvents();
-    else removeClickOutsideEvents();
-  }, [opened, addClickOutsideEvents, removeClickOutsideEvents]);
 
   return (
-    <div className={styles.container} onClick={toggleComponent} ref={crumbRef}>
+    <div className={styles.container} onClick={toggleComponent}>
       <div className={styles.crumbContainer}>
         {LeftIconComponent}
         <span className={styles.crumbText}>{crumbText}</span>
@@ -43,13 +32,13 @@ function Crumb({ crumbText, LeftIconComponent, BottomComponent }: CrumbProps) {
           })}
         />
       </div>
-      <AnimateHeight
-        height={opened ? 'auto' : 0}
-        duration={300}
+      <ExpandableMenu
+        opened={opened}
+        close={hideComponent}
         className={styles.content}
       >
         <BottomComponent closeComponent={hideComponent} />
-      </AnimateHeight>
+      </ExpandableMenu>
     </div>
   );
 }

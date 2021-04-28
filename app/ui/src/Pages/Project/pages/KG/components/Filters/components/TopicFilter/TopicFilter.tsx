@@ -1,7 +1,6 @@
-import { BUTTON_ALIGN, Button, TextInput, useClickOutside } from 'kwc';
-import React, { useEffect, useRef, useState } from 'react';
+import { BUTTON_ALIGN, Button, TextInput } from 'kwc';
+import React from 'react';
 
-import AnimateHeight from 'react-animate-height';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SearchIcon from '@material-ui/icons/Search';
 import { Topic } from '../../Filters';
@@ -9,6 +8,8 @@ import TopicList from './components/TopicList/TopicList';
 import cx from 'classnames';
 import styles from './TopicFilter.module.scss';
 import useTopicFilter from './useTopicFilter';
+import ExpandableMenu from 'Components/ExpandableMenu/ExpandableMenu';
+import useBoolState from 'Hooks/useBoolState';
 
 interface Props {
   topics: Topic[];
@@ -16,13 +17,11 @@ interface Props {
 }
 
 function TopicFilter({ topics, onUpdate }: Props) {
-  const contentRef = useRef(null);
-  const [opened, setOpened] = useState(false);
-
-  const { addClickOutsideEvents, removeClickOutsideEvents } = useClickOutside({
-    componentRef: contentRef,
-    action: () => setOpened(false),
-  });
+  const {
+    value: opened,
+    toggle: toggleFilter,
+    deactivate: closeFilter,
+  } = useBoolState(false);
 
   const {
     resetTopics,
@@ -32,17 +31,6 @@ function TopicFilter({ topics, onUpdate }: Props) {
     clearAll,
     selectedTopics,
   } = useTopicFilter(topics, onUpdate);
-
-  useEffect(() => {
-    if (contentRef && opened) addClickOutsideEvents();
-    else removeClickOutsideEvents();
-    return () => removeClickOutsideEvents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contentRef, opened]);
-
-  function toggleFilter() {
-    setOpened(!opened);
-  }
 
   function getButtonLabel() {
     const selectedTopicsCount = topics.filter((t) =>
@@ -54,7 +42,7 @@ function TopicFilter({ topics, onUpdate }: Props) {
   }
 
   return (
-    <div className={styles.container} ref={contentRef}>
+    <div className={styles.container}>
       <Button
         className={cx(styles.button, { [styles.opened]: opened })}
         label={getButtonLabel()}
@@ -63,9 +51,9 @@ function TopicFilter({ topics, onUpdate }: Props) {
         align={BUTTON_ALIGN.LEFT}
         onClick={toggleFilter}
       />
-      <AnimateHeight
-        height={opened ? 'auto' : 0}
-        duration={300}
+      <ExpandableMenu
+        opened={opened}
+        close={closeFilter}
         className={styles.content}
       >
         <div className={styles.contentWrapper}>
@@ -87,7 +75,7 @@ function TopicFilter({ topics, onUpdate }: Props) {
           <Button label="Select all" onClick={resetTopics} />
           <Button label="Clear all" onClick={clearAll} />
         </div>
-      </AnimateHeight>
+      </ExpandableMenu>
     </div>
   );
 }

@@ -18,33 +18,14 @@ exports[`Crumb component should render without crashing 1`] = `
       className="rightIcon icon-regular"
     />
   </div>
-  <AnimateHeight
-    animateOpacity={false}
-    animationStateClasses={
-      Object {
-        "animating": "rah-animating",
-        "animatingDown": "rah-animating--down",
-        "animatingToHeightAuto": "rah-animating--to-height-auto",
-        "animatingToHeightSpecific": "rah-animating--to-height-specific",
-        "animatingToHeightZero": "rah-animating--to-height-zero",
-        "animatingUp": "rah-animating--up",
-        "static": "rah-static",
-        "staticHeightAuto": "rah-static--height-auto",
-        "staticHeightSpecific": "rah-static--height-specific",
-        "staticHeightZero": "rah-static--height-zero",
-      }
-    }
-    applyInlineTransitions={true}
+  <ExpandableMenu
     className="content"
-    delay={0}
-    duration={300}
-    easing="ease"
-    height={0}
-    style={Object {}}
+    close={[Function]}
+    opened={false}
   >
     <BottomComponent
       closeComponent={[Function]}
     />
-  </AnimateHeight>
+  </ExpandableMenu>
 </div>
 `;

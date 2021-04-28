@@ -7,6 +7,8 @@ import React from 'react';
 import styles from './TabDangerZone.module.scss';
 import useProject from 'Graphql/hooks/useProject';
 import { toast } from 'react-toastify';
+import useBoolState from 'Hooks/useBoolState';
+import { ModalContainer, ModalLayoutInfo } from 'kwc';
 
 type Props = {
   projectId: string;
@@ -16,6 +18,12 @@ function TabDangerZone({ projectId }: Props) {
   const {
     archiveProjectAction: { updateProjectArchived, loading },
   } = useProject({ onUpdateCompleted: handleUpdateCompleted });
+
+  const {
+    activate: showModal,
+    deactivate: closeModal,
+    value: isModalVisible,
+  } = useBoolState();
 
   function handleUpdateCompleted() {
     toast.info('The project has been archived successfully!');
@@ -35,13 +43,30 @@ function TabDangerZone({ projectId }: Props) {
           default, archived projects are hidden)."
           action={{
             label: 'Archive',
-            onClick: () => updateProjectArchived(projectId, true),
+            onClick: showModal,
             Icon: IconArchive,
             loading,
           }}
           theme={BOX_THEME.DEFAULT}
         />
       </div>
+      {isModalVisible && (
+        <ModalContainer
+          title="Archiving project"
+          onAccept={() => updateProjectArchived(projectId, true)}
+          onCancel={closeModal}
+          actionButtonLabel="Archive"
+          actionButtonCancel="Cancel"
+          warning
+          blocking
+        >
+          <ModalLayoutInfo>
+            You are going to archive this project. When a project is archived
+            you will not be able to make changes or use any resources associated
+            with this project. Are you sure you want archive it?
+          </ModalLayoutInfo>
+        </ModalContainer>
+      )}
     </div>
   );
 }

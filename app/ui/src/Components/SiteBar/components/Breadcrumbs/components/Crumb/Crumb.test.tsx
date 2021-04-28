@@ -2,7 +2,7 @@ import Crumb, { CrumbProps } from './Crumb';
 import React from 'react';
 import { shallow } from 'enzyme';
 import IconHome from '@material-ui/icons/Dashboard';
-import AnimateHeight from 'react-animate-height';
+import ExpandableMenu from 'Components/ExpandableMenu/ExpandableMenu';
 
 const BottomComponent = () => <div>bar</div>;
 const crumbProps: CrumbProps = {
@@ -22,34 +22,18 @@ describe('Crumb component', () => {
   });
 
   describe('behavior', () => {
-    it('should show the bottom component when click on crumb', () => {
+    it('should open the menu on click', () => {
       // Arrange.
       const container = component.find('.container');
-      const contentProps = component.find(AnimateHeight).props();
-      const heightBeforeClick = contentProps.height;
-
+      const wasComponentOpened = component.find(ExpandableMenu).props().opened;
       // Act.
+
       container.simulate('click');
+      const isComponentOpened = component.find(ExpandableMenu).props().opened;
 
       // Assert.
-      const contentPropsAfter = component.find(AnimateHeight).props();
-      const heightAfterClick = contentPropsAfter.height;
-      expect(heightBeforeClick).toBe(0);
-      expect(heightAfterClick).toBe('auto');
-    });
-
-    it('should hide the bottom component when double click on crumb', () => {
-      // Arrange.
-      const heightBeforeClick = component.find(AnimateHeight).props().height;
-
-      // Act.
-      component.find('.container').simulate('click');
-      component.find('.container').simulate('click');
-
-      // Assert.
-      const heightAfterClick = component.find(AnimateHeight).props().height;
-      expect(heightBeforeClick).toBe(0);
-      expect(heightAfterClick).toBe(0);
+      expect(wasComponentOpened).toBeFalsy();
+      expect(isComponentOpened).toBeTruthy();
     });
   });
 });

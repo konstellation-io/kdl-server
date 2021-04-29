@@ -17,9 +17,6 @@ spec:
     accessKey: minio
     secretKey: minio123
 
-  argocd:
-    enabled: false
-
   giteaOauth2Setup:
     image:
       repository: terminus7/gitea-oauth2-setup

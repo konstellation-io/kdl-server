@@ -13,9 +13,6 @@ minio:
   accessKey: minio
   secretKey: minio123
 
-argocd:
-  enabled: false
-
 giteaOauth2Setup:
   image:
     repository: terminus7/gitea-oauth2-setup
@@ -30,12 +27,10 @@ oauth2Proxy:
   cookieSecret: "p0aw4r65890a3vnl"
 
 mlflow:
-  name: mlflow
   image:
     repository: terminus7/mlflow
     tag: latest
     pullPolicy: IfNotPresent
-  host: mlflow
   volume:
     size: 1Gi
     storageClassName: standard

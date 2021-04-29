@@ -7,10 +7,6 @@ metadata:
 spec:
   clusterIP: None
   ports:
-    - name: oauth-proxy
-      port: 8080
-      targetPort: 8080
-      protocol: TCP
     - name: internal
       port: 5000
       targetPort: 5000

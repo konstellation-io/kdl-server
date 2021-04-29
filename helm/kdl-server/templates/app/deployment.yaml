@@ -75,7 +75,7 @@ spec:
             - name: DRONE_URL
               value: {{ include "protocol" . }}://drone.{{ .Values.domain }}
             - name: MLFLOW_URL
-              value: {{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/mlflow/
+              value: {{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/mlflow/PROJECT_ID/
             - name: KG_URL
               value: kdl-kg:{{ .Values.kdlKG.port }}
             - name: DRONE_INTERNAL_URL
@@ -112,6 +112,7 @@ spec:
             - "--config=/etc/oauth2_proxy.cfg"
             - "--email-domain=*"
             - "--upstream=http://127.0.0.1:8080/"
+            - "--upstream=http://127.0.0.1:9000/mlflow/"
             - "--pass-user-headers=true"
             - "--skip-provider-button=true"
             - "--skip-auth-route=/config.json"
@@ -139,6 +140,14 @@ spec:
             - name: http
               containerPort: 3000
               protocol: TCP
+        - name: mlflow-proxy
+          image: nginx:alpine
+          ports:
+            - containerPort: 9000
+          volumeMounts:
+            - name: mlflow-proxy-nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
       volumes:
         - name: oauth2-config
           configMap:
@@ -146,3 +155,6 @@ spec:
         - name: kdl-server-configmap
           configMap:
             name: kdl-server-configmap
+        - name: mlflow-proxy-nginx-config
+          configMap:
+            name: mlflow-proxy-nginx-config

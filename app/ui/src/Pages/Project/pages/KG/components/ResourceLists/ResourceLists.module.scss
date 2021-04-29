@@ -16,6 +16,12 @@
     background-color: palette(lowlight, 900);
     padding: $grid-unit 0 $grid-unit $grid-unit;
     overflow: hidden;
+    display: flex;
+
+    & > div {
+      height: unset;
+      flex-grow: 1;
+    }
   }
 
   .selectedTab {

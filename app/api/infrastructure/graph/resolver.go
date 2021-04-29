@@ -2,6 +2,7 @@ package graph
 
 import (
 	"context"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
@@ -21,11 +22,24 @@ type Resolver struct {
 	projects project.UseCase
 	users    user.UseCase
 	kg       kg.UseCase
+	logger   logging.Logger
 }
 
 // NewResolver is a constructor function.
-func NewResolver(cfg config.Config, projectInteractor project.UseCase, userInteractor user.UseCase, kgInteractor kg.UseCase) *Resolver {
-	return &Resolver{cfg: cfg, projects: projectInteractor, users: userInteractor, kg: kgInteractor}
+func NewResolver(
+	cfg config.Config,
+	projectInteractor project.UseCase,
+	userInteractor user.UseCase,
+	kgInteractor kg.UseCase,
+	logger logging.Logger,
+) *Resolver {
+	return &Resolver{
+		cfg:      cfg,
+		projects: projectInteractor,
+		users:    userInteractor,
+		kg:       kgInteractor,
+		logger:   logger,
+	}
 }
 
 func (r *Resolver) getLoggedUser(ctx context.Context) (entity.User, error) {

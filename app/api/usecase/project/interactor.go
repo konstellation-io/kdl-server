@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"regexp"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
@@ -21,7 +22,6 @@ const (
 
 var (
 	ErrCreateProjectValidation = errors.New("create project validation error")
-	ErrInvalidRepoURL          = errors.New("the repository URL is invalid")
 )
 
 // CreateProjectOption options when creating project.
@@ -106,6 +106,7 @@ type interactor struct {
 	giteaService giteaservice.GiteaClient
 	minioService minioservice.MinioService
 	droneService droneservice.DroneService
+	k8sClient    k8s.K8sClient
 }
 
 // NewInteractor is a constructor function.
@@ -115,6 +116,7 @@ func NewInteractor(logger logging.Logger,
 	giteaService giteaservice.GiteaClient,
 	minioService minioservice.MinioService,
 	droneService droneservice.DroneService,
+	k8sClient k8s.K8sClient,
 ) UseCase {
 	return &interactor{
 		logger:       logger,
@@ -123,6 +125,7 @@ func NewInteractor(logger logging.Logger,
 		giteaService: giteaService,
 		minioService: minioService,
 		droneService: droneService,
+		k8sClient:    k8sClient,
 	}
 }
 
@@ -130,6 +133,7 @@ func NewInteractor(logger logging.Logger,
 // Depending on the repository type:
 //  - For internal repositories creates a repository in Gitea.
 //  - For external repositories, mirrors the external repository in Gitea.
+//  - Create MLFlow instance
 //  - Create Minio bucket
 //  - Activate Drone.io repo
 func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
@@ -180,6 +184,12 @@ func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity
 			ExternalRepoURL: *opt.ExternalRepoURL,
 			RepoName:        repoName,
 		}
+	}
+
+	// Create MLFLow instance
+	err = i.k8sClient.CreateKDLProjectCR(ctx, opt.ProjectID)
+	if err != nil {
+		return entity.Project{}, err
 	}
 
 	// Create Minio bucket

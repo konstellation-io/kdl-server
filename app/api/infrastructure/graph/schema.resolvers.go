@@ -72,6 +72,10 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 
 	createdProject, err := r.projects.Create(ctx, opts)
 
+	if err != nil {
+		r.logger.Errorf("Error creating project: %s", err)
+	}
+
 	return &createdProject, err
 }
 
@@ -216,6 +220,7 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 	jupyterWithUsernameAndFolder := strings.Replace(jupyterWithUsername, "REPO_FOLDER", folderName, 2)
 	vscodeWithUsername := strings.Replace(r.cfg.VSCode.URL, "USERNAME", slugUserName, 1)
 	vscodeWithUsernameAndFolder := strings.Replace(vscodeWithUsername, "REPO_FOLDER", folderName, 1)
+	mlflowWithProject := strings.Replace(r.cfg.MLFlow.URL, "PROJECT_ID", obj.ID, 1)
 
 	return &entity.ToolUrls{
 		Gitea:   giteaWithFolder,
@@ -223,7 +228,7 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 		Jupyter: jupyterWithUsernameAndFolder,
 		VSCode:  vscodeWithUsernameAndFolder,
 		Drone:   r.cfg.Drone.URL,
-		MLFlow:  r.cfg.MLFlow.URL,
+		MLFlow:  mlflowWithProject,
 	}, nil
 }
 
@@ -333,7 +338,7 @@ func (r *userResolver) LastActivity(ctx context.Context, obj *entity.User) (*str
 func (r *userResolver) AreToolsActive(ctx context.Context, obj *entity.User) (bool, error) {
 	username := ctx.Value(middleware.LoggedUserNameKey).(string)
 
-	return r.users.AreToolsRunning(username)
+	return r.users.AreToolsRunning(ctx, username)
 }
 
 // Member returns generated.MemberResolver implementation.

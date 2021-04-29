@@ -9,9 +9,8 @@
   padding: 1.25 * $grid-unit 2 * $grid-unit;
   border: 1px solid transparent;
   border-left-width: 4px;
-  animation: border-left-color ease 0.4s;
 
-  transition: background-color ease 0.3s;
+  transition: background-color ease 0.3s, border-left-color ease 0.4s;
 
   &:not(:first-child) {
     margin-top: $grid-unit;

@@ -7,7 +7,8 @@
   background-color: palette(base, 400);
   border-radius: $grid-unit / 2;
   padding: 1.25 * $grid-unit 2 * $grid-unit;
-  border-left: solid 4px transparent;
+  border: 1px solid transparent;
+  border-left-width: 4px;
   animation: border-left-color ease 0.4s;
 
   transition: background-color ease 0.3s;

@@ -38,13 +38,6 @@ rules:
     - persistentvolumeclaims
   verbs:
     - "*"
-# ingresses
-- apiGroups:
-    - networking.k8s.io
-  resources:
-    - ingresses
-  verbs:
-    - "*"
 # configmaps
 - apiGroups:
     - ""

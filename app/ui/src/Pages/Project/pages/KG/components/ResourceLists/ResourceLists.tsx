@@ -75,7 +75,7 @@ function ResourceLists({
           <Tab>{`STARRED (${starredResources.length})`}</Tab>
         </TabList>
         <div className={styles.tabContainer}>
-          <TabPanel>
+          <TabPanel className={styles.tab}>
             <ResourcesList
               header={listHeader}
               resources={top25}
@@ -85,7 +85,7 @@ function ResourceLists({
               noItems={NO_ITEMS_MESSAGE}
             />
           </TabPanel>
-          <TabPanel>
+          <TabPanel className={styles.tab}>
             <ResourcesList
               resources={starredResources}
               onClick={onSelectResource}

@@ -16,4 +16,11 @@
   background-color: palette(lowlight, 900);
   flex-grow: 1;
   overflow: hidden;
+  display: flex;
+
+  .tab {
+    flex-grow: 1;
+    height: unset;
+  }
+
 }

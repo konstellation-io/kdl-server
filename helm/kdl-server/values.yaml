@@ -29,6 +29,17 @@ kdlKG:
   logPath: /var/log/app/kg.log
   logLevel: INFO
   
+projectOperator:
+ image:
+    repository: konstellation/project-operator
+    tag: latest
+    pullPolicy: IfNotPresent
+
+kubeRbacProxy:
+ image:
+    repository: gcr.io/kubebuilder/kube-rbac-proxy
+    tag: v0.8.0
+    pullPolicy: IfNotPresent
 
 oauth2Proxy:
   image:

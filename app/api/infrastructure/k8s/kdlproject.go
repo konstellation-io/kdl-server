@@ -3,23 +3,20 @@ package k8s
 import (
 	"context"
 	"fmt"
+
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"math/rand"
 )
 
-var letters = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
-
-// TODO move to kdlutil
-func randSeq(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
-}
-
 func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) error {
+	const oAuth2ProxyCookieSecretLen = 16
+
+	cookieSecret, err := kdlutil.GenerateRandomString(oAuth2ProxyCookieSecretLen)
+	if err != nil {
+		return err
+	}
+
 	resName := fmt.Sprintf("kdlproject-%s", projectID)
 
 	definition := &unstructured.Unstructured{
@@ -28,7 +25,7 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 			"kind":       "KDLProject",
 			"metadata": map[string]interface{}{
 				"name":      resName,
-				"namespace": k.cfg.Kubernetes.Namespace, // TODO review
+				"namespace": k.cfg.Kubernetes.Namespace,
 				"labels": map[string]interface{}{
 					"app": resName,
 				},
@@ -46,32 +43,26 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 					"accessKey": k.cfg.Minio.AccessKey,
 					"secretKey": k.cfg.Minio.SecretKey,
 				},
-				// TODO
-				//"argocd": map[string]string{
-				//	"enabled": k.cfg.Ar,
-				//},
-				//"giteaOauth2Setup": map[string]interface{}{
-				//	"image": map[string]string{
-				//		"repository": "terminus7/gitea-oauth2-setup",
-				//		"tag":        "latest",
-				//		"pullPolicy": "IfNotPresent",
-				//	},
-				//},
+				"giteaOauth2Setup": map[string]interface{}{
+					"image": map[string]string{
+						"repository": k.cfg.GiteaOAuth2Setup.Image.Repository,
+						"tag":        k.cfg.GiteaOAuth2Setup.Image.Tag,
+						"pullPolicy": k.cfg.GiteaOAuth2Setup.Image.PullPolicy,
+					},
+				},
 				"oauth2Proxy": map[string]interface{}{
-					// TODO
-					//"image": map[string]string{
-					//	"repository": "quay.io/oauth2-proxy/oauth2-proxy",
-					//	"tag":        "v7.0.1-amd64",
-					//	"pullPolicy": "IfNotPresent",
-					//},
-					"cookieSecret": randSeq(16),
+					"image": map[string]string{
+						"repository": k.cfg.OAuth2Proxy.Image.Repository,
+						"tag":        k.cfg.OAuth2Proxy.Image.Tag,
+						"pullPolicy": k.cfg.OAuth2Proxy.Image.PullPolicy,
+					},
+					"cookieSecret": cookieSecret,
 				},
 				"mlflow": map[string]interface{}{
 					"image": map[string]string{
-						// TODO change docker img
-						"repository": "terminus7/mlflow",
-						"tag":        "latest",
-						"pullPolicy": "IfNotPresent",
+						"repository": k.cfg.MLFlow.Image.Repository,
+						"tag":        k.cfg.MLFlow.Image.Tag,
+						"pullPolicy": k.cfg.MLFlow.Image.PullPolicy,
 					},
 					"s3": map[string]string{
 						"bucket": fmt.Sprintf("%s/mlflow-artifacts", projectID),
@@ -82,7 +73,7 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 	}
 
 	k.logger.Infof("Creating kdl project: %#v", definition.Object)
-	_, err := k.kdlprojectRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
+	_, err = k.kdlprojectRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
 
 	if err == nil {
 		k.logger.Infof("The kdl project \"%s\" was created correctly in k8s", resName)

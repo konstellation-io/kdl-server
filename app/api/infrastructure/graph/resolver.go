@@ -2,6 +2,7 @@ package graph
 
 import (
 	"context"
+
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"

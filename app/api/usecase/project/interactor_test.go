@@ -2,9 +2,10 @@ package project_test
 
 import (
 	"context"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"testing"
 	"time"
+
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"

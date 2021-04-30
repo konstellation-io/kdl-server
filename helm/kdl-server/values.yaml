@@ -48,6 +48,12 @@ droneAuthorizer:
     tag: latest
     pullPolicy: IfNotPresent
 
+mlflow:
+  image:
+    repository: terminus7/mlflow
+    tag: latest
+    pullPolicy: IfNotPresent
+
 mongodb:
   service:
     name: "mongodb"

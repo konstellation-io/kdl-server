@@ -133,7 +133,7 @@ func NewInteractor(logger logging.Logger,
 // Depending on the repository type:
 //  - For internal repositories creates a repository in Gitea.
 //  - For external repositories, mirrors the external repository in Gitea.
-//  - Create MLFlow instance
+//  - Create a k8s KDLProject containing a MLFLow instance
 //  - Create Minio bucket
 //  - Activate Drone.io repo
 func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
@@ -186,7 +186,7 @@ func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity
 		}
 	}
 
-	// Create MLFLow instance
+	// Create a k8s KDLProject containing a MLFLow instance
 	err = i.k8sClient.CreateKDLProjectCR(ctx, opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err

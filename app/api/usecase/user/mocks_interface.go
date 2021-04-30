@@ -220,18 +220,18 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // AreToolsRunning mocks base method.
-func (m *MockUseCase) AreToolsRunning(username string) (bool, error) {
+func (m *MockUseCase) AreToolsRunning(ctx context.Context, username string) (bool, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AreToolsRunning", username)
+	ret := m.ctrl.Call(m, "AreToolsRunning", ctx, username)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // AreToolsRunning indicates an expected call of AreToolsRunning.
-func (mr *MockUseCaseMockRecorder) AreToolsRunning(username interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) AreToolsRunning(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AreToolsRunning", reflect.TypeOf((*MockUseCase)(nil).AreToolsRunning), username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AreToolsRunning", reflect.TypeOf((*MockUseCase)(nil).AreToolsRunning), ctx, username)
 }
 
 // Create mocks base method.

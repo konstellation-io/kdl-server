@@ -34,18 +34,32 @@ func (m *MockK8sClient) EXPECT() *MockK8sClientMockRecorder {
 	return m.recorder
 }
 
-// CreateSecret mocks base method.
-func (m *MockK8sClient) CreateSecret(name string, values map[string]string) error {
+// CreateKDLProjectCR mocks base method.
+func (m *MockK8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateSecret", name, values)
+	ret := m.ctrl.Call(m, "CreateKDLProjectCR", ctx, projectID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateKDLProjectCR indicates an expected call of CreateKDLProjectCR.
+func (mr *MockK8sClientMockRecorder) CreateKDLProjectCR(ctx, projectID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKDLProjectCR", reflect.TypeOf((*MockK8sClient)(nil).CreateKDLProjectCR), ctx, projectID)
+}
+
+// CreateSecret mocks base method.
+func (m *MockK8sClient) CreateSecret(ctx context.Context, name string, values map[string]string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateSecret", ctx, name, values)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateSecret indicates an expected call of CreateSecret.
-func (mr *MockK8sClientMockRecorder) CreateSecret(name, values interface{}) *gomock.Call {
+func (mr *MockK8sClientMockRecorder) CreateSecret(ctx, name, values interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSecret", reflect.TypeOf((*MockK8sClient)(nil).CreateSecret), name, values)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSecret", reflect.TypeOf((*MockK8sClient)(nil).CreateSecret), ctx, name, values)
 }
 
 // CreateUserToolsCR mocks base method.
@@ -77,30 +91,30 @@ func (mr *MockK8sClientMockRecorder) DeleteUserToolsCR(ctx, username interface{}
 }
 
 // IsUserToolPODRunning mocks base method.
-func (m *MockK8sClient) IsUserToolPODRunning(username string) (bool, error) {
+func (m *MockK8sClient) IsUserToolPODRunning(ctx context.Context, username string) (bool, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsUserToolPODRunning", username)
+	ret := m.ctrl.Call(m, "IsUserToolPODRunning", ctx, username)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // IsUserToolPODRunning indicates an expected call of IsUserToolPODRunning.
-func (mr *MockK8sClientMockRecorder) IsUserToolPODRunning(username interface{}) *gomock.Call {
+func (mr *MockK8sClientMockRecorder) IsUserToolPODRunning(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUserToolPODRunning", reflect.TypeOf((*MockK8sClient)(nil).IsUserToolPODRunning), username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUserToolPODRunning", reflect.TypeOf((*MockK8sClient)(nil).IsUserToolPODRunning), ctx, username)
 }
 
 // UpdateSecret mocks base method.
-func (m *MockK8sClient) UpdateSecret(name string, values map[string]string) error {
+func (m *MockK8sClient) UpdateSecret(ctx context.Context, name string, values map[string]string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateSecret", name, values)
+	ret := m.ctrl.Call(m, "UpdateSecret", ctx, name, values)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateSecret indicates an expected call of UpdateSecret.
-func (mr *MockK8sClientMockRecorder) UpdateSecret(name, values interface{}) *gomock.Call {
+func (mr *MockK8sClientMockRecorder) UpdateSecret(ctx, name, values interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSecret", reflect.TypeOf((*MockK8sClient)(nil).UpdateSecret), name, values)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSecret", reflect.TypeOf((*MockK8sClient)(nil).UpdateSecret), ctx, name, values)
 }

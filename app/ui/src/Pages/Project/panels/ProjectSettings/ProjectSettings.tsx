@@ -37,16 +37,16 @@ function ProjectSettings({ project }: Props) {
         </TabList>
 
         <div className={styles.tabContent}>
-          <TabPanel>
+          <TabPanel className={styles.tab}>
             <TabInfo project={project} />
           </TabPanel>
-          <TabPanel>
+          <TabPanel className={styles.tab}>
             <TabGit project={project} />
           </TabPanel>
-          <TabPanel>
+          <TabPanel className={styles.tab}>
             <TabMembers projectId={project.id} />
           </TabPanel>
-          <TabPanel>
+          <TabPanel className={styles.tab}>
             <TabDangerZone projectId={project.id} />
           </TabPanel>
         </div>

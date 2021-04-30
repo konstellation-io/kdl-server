@@ -18,7 +18,7 @@
     overflow: hidden;
     display: flex;
 
-    & > div {
+    .tab {
       height: unset;
       flex-grow: 1;
     }

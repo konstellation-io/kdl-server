@@ -12,8 +12,10 @@ import { useReactiveVar } from '@apollo/client';
 import { newProject } from 'Graphql/client/cache';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 import cx from 'classnames';
+import { useHistory } from 'react-router-dom';
 
 function ProjectCreation() {
+  const history = useHistory();
   const [animationFinished, setAnimationFinished] = useState(false);
   const { clearAll } = useNewProject('information');
 
@@ -39,6 +41,11 @@ function ProjectCreation() {
   }, []);
 
   useEffect(() => {
+    // If the user reload the page he/she will be redirected to the home
+    if (!information.values.id) {
+      history.push(ROUTE.HOME);
+      return;
+    }
     const type = repository.values.type || RepositoryType.EXTERNAL;
 
     const inputRepository: RepositoryInput = {

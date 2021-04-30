@@ -9,13 +9,13 @@ export function getScoreLevel(score: number) {
   let selectedLevel: ScoreLevels;
 
   switch (true) {
-    case score >= 25 && score < 50:
+    case score >= 20 && score < 70:
       selectedLevel = ScoreLevels.MEDIUM;
       break;
-    case score >= 50 && score < 75:
+    case score >= 70 && score < 90:
       selectedLevel = ScoreLevels.HIGH;
       break;
-    case score >= 75:
+    case score >= 90:
       selectedLevel = ScoreLevels.VERY_HIGH;
       break;
     default:

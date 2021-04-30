@@ -150,6 +150,7 @@ function UsersTable({ users }: Props) {
       data,
       initialState: {
         selectedRowIds: initialStateSelectedRowIds,
+        sortBy: [{ id: 'email' }],
       },
     },
     useSortBy,

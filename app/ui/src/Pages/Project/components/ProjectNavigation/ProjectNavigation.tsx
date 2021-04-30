@@ -29,7 +29,7 @@ export const NavButtonLink: FC<any> = ({ children, ...props }) => {
   );
 };
 
-const SETTINGS_PANEL_OPTIONS = {
+export const SETTINGS_PANEL_OPTIONS = {
   id: PANEL_ID.SETTINGS,
   title: 'Settings',
   fixedWidth: true,

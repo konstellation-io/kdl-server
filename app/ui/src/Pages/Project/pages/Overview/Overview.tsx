@@ -10,11 +10,21 @@ import React from 'react';
 import { RepositoryType } from 'Graphql/types/globalTypes';
 import styles from './Overview.module.scss';
 import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
+import useSettingTabs from 'Graphql/client/hooks/useSettingTabs';
+import { SettingTabs } from 'Graphql/client/models/SettingTabs';
+import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
+import { SETTINGS_PANEL_OPTIONS } from '../../components/ProjectNavigation/ProjectNavigation';
 
 type Props = {
   openedProject: GetProjects_projects;
 };
 function Overview({ openedProject }: Props) {
+  const { openPanel: openSettings } = usePanel(
+    PanelType.PRIMARY,
+    SETTINGS_PANEL_OPTIONS
+  );
+  const { updateSettingTab } = useSettingTabs();
+
   const {
     descriptionScore,
     loading,
@@ -23,6 +33,15 @@ function Overview({ openedProject }: Props) {
 
   if (loading) return <SpinnerCircular />;
   if (error) return <ErrorMessage />;
+
+  function handleMembersClick() {
+    updateSettingTab(SettingTabs.MEMBERS);
+    openSettings();
+  }
+  function handleRepoClick() {
+    updateSettingTab(SettingTabs.REPOSITORY);
+    openSettings();
+  }
 
   return (
     <div className={styles.container}>
@@ -44,7 +63,7 @@ function Overview({ openedProject }: Props) {
           <DescriptionScore score={descriptionScore} />
         </div>
         <div className={styles.section}>
-          <div className={styles.repoType}>
+          <div className={styles.repoType} onClick={handleRepoClick}>
             <RepositoryTypeComponent
               squareLocation={
                 openedProject.repository?.type === RepositoryType.EXTERNAL
@@ -60,6 +79,7 @@ function Overview({ openedProject }: Props) {
           </div>
           <div
             className={styles.nMembers}
+            onClick={handleMembersClick}
           >{`${openedProject.members.length} members`}</div>
         </div>
       </div>

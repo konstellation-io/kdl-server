@@ -8,6 +8,7 @@ const me = {
   username: 'admin',
   areToolsActive: true,
   apiTokens: () => new MockList([4, 8]),
+  accessLevel: 'MANAGER',
 };
 
 module.exports = { me, meId };

@@ -16,6 +16,7 @@ import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTools';
 import { NewProject } from './models/NewProject';
 import { PanelInfo } from './models/Panel';
+import { SettingTabs } from './models/SettingTabs';
 
 type ToolName = keyof GetUserTools_project_toolUrls;
 
@@ -78,8 +79,7 @@ export const primaryPanel = makeVar<PanelInfo | null>(null);
 export const secondaryPanel = makeVar<PanelInfo | null>(null);
 export const currentTool = makeVar<ToolName | null>(null);
 export const openedTools = makeVar<ToolName[]>([]);
-
-export const kgScore = makeVar<[number, number]>([1, 0]);
+export const openedSettingTab = makeVar<SettingTabs>(SettingTabs.INFO);
 
 const cache = new InMemoryCache({
   typePolicies: {

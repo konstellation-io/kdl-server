@@ -6,6 +6,7 @@ export default gql`
       id
       email
       areToolsActive
+      accessLevel
       apiTokens {
         id
         name

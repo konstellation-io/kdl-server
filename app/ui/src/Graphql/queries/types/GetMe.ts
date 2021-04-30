@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { AccessLevel } from './../../types/globalTypes';
+
 // ====================================================
 // GraphQL query operation: GetMe
 // ====================================================
@@ -20,6 +22,7 @@ export interface GetMe_me {
   id: string;
   email: string;
   areToolsActive: boolean;
+  accessLevel: AccessLevel;
   apiTokens: GetMe_me_apiTokens[];
 }
 

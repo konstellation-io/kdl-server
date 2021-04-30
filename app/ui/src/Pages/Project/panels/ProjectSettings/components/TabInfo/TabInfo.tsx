@@ -8,12 +8,15 @@ import IconEdit from '@material-ui/icons/Edit';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
 import styles from './TabInfo.module.scss';
 import useProject from 'Graphql/hooks/useProject';
+import { toast } from 'react-toastify';
 
 type Props = {
   project: GetProjects_projects;
 };
 function TabInfo({ project }: Props) {
-  const { updateProjectName } = useProject();
+  const { updateProjectName } = useProject({
+    onUpdateCompleted: () => toast.info('The project name has been updated'),
+  });
   const [newName, setNewName] = useState(project.name);
   const { openPanel } = usePanel(PanelType.SECONDARY, {
     id: PANEL_ID.PROJECT_DESCRIPTION,

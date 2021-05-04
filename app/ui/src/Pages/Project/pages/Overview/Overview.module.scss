@@ -16,10 +16,21 @@
   }
   .section {
     margin-bottom: 3 * $grid-unit;
+
+    &.sectionClickable {
+      cursor: pointer;
+    }
   }
   .sectionTitle {
     @include font-caption;
     color: font-color(regular);
+  }
+  .sectionTitleWithIcon {
+    @include font-caption;
+    color: font-color(regular);
+
+    display: flex;
+    align-items: center;
   }
   .name {
     @include font-subheader;
@@ -41,11 +52,9 @@
 
   .repoType {
     @include font-caption;
-    color: font-color(regular);
-    cursor: pointer;
 
     display: flex;
-    margin-top: 5 * $grid-unit;
+    margin-top: 2 * $grid-unit;
 
     .repoTypeName {
       margin: 0 0 0 1.5 * $grid-unit;
@@ -53,7 +62,10 @@
   }
 
   .nMembers {
-    cursor: pointer;
-    margin: 2 * $grid-unit 0 0 3.5 * $grid-unit;
+    margin: 2 * $grid-unit 0 0 0;
+  }
+
+  .settingIcon {
+    margin-left: $grid-unit;
   }
 }

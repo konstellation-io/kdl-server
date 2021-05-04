@@ -14,6 +14,8 @@ import useSettingTabs from 'Graphql/client/hooks/useSettingTabs';
 import { SettingsTab } from 'Graphql/client/models/SettingsTab';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { SETTINGS_PANEL_OPTIONS } from '../../panelSettings';
+import IconSettings from '@material-ui/icons/Settings';
+import cx from 'classnames';
 
 type Props = {
   openedProject: GetProjects_projects;
@@ -62,8 +64,15 @@ function Overview({ openedProject }: Props) {
         <div className={styles.section}>
           <DescriptionScore score={descriptionScore} />
         </div>
-        <div className={styles.section}>
-          <div className={styles.repoType} onClick={handleRepoClick}>
+        <div
+          className={cx(styles.section, styles.sectionClickable)}
+          onClick={handleRepoClick}
+        >
+          <div className={styles.sectionTitleWithIcon}>
+            <span>REPOSITORY</span>
+            <IconSettings fontSize="small" className={styles.settingIcon} />
+          </div>
+          <div className={styles.repoType}>
             <RepositoryTypeComponent
               squareLocation={
                 openedProject.repository?.type === RepositoryType.EXTERNAL
@@ -77,9 +86,17 @@ function Overview({ openedProject }: Props) {
               className={styles.repoTypeName}
             >{`${openedProject.repository?.type} REPOSITORY`}</p>
           </div>
+        </div>
+        <div
+          className={cx(styles.section, styles.sectionClickable)}
+          onClick={handleMembersClick}
+        >
+          <div className={styles.sectionTitleWithIcon}>
+            <span>MEMBERS</span>
+            <IconSettings fontSize="small" className={styles.settingIcon} />
+          </div>
           <div
             className={styles.nMembers}
-            onClick={handleMembersClick}
           >{`${openedProject.members.length} members`}</div>
         </div>
       </div>

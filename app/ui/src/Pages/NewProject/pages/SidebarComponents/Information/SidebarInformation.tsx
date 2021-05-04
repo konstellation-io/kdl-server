@@ -1,8 +1,8 @@
 import React from 'react';
-import styles from './SidebarInformation.module.scss';
+import styles from '../SidebarComponents.module.scss';
 
 const SidebarInformation = () => (
-  <div className={styles.infoSidebar}>
+  <div className={styles.sidebar}>
     <span>
       In this page you should fill with accuracy the description field.
     </span>

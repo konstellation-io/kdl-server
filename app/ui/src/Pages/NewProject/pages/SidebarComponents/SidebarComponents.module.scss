@@ -2,7 +2,7 @@
 @import 'Styles/variables';
 @import 'Styles/mixins';
 
-.infoSidebar {
+.sidebar {
   @include font-body;
 
   display: flex;
@@ -11,6 +11,10 @@
 
   .line {
     margin-top: $grid-unit;
+  }
+
+  .repoList {
+    padding-left: 1.75 * $grid-unit;
   }
 
 }

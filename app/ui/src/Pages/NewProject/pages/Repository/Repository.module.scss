@@ -33,27 +33,3 @@
     margin-top: $grid-unit;
   }
 }
-
-
-.sidebarComponent {
-  @include font-small;
-  color: font-color(lowlight);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  width: 100%;
-  margin-top: 3 * $grid-unit;
-
-  .repoIcon {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 5 * $grid-unit;
-  }
-  .repoLabel {
-    @include font-subheader;
-    color: font-color(light);
-    width: 50%;
-  }
-}

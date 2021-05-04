@@ -1,8 +1,8 @@
 import React from 'react';
-import styles from './SidebarRepository.module.scss';
+import styles from '../SidebarComponents.module.scss';
 
 const SidebarRepository = () => (
-  <div className={styles.infoSidebar}>
+  <div className={styles.sidebar}>
     <span>In this page you can choose the type of repository you want.</span>
     <span className={styles.line}>We provide two types of repos:</span>
     <ol className={styles.repoList}>

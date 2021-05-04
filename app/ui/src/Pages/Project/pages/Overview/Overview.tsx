@@ -10,11 +10,23 @@ import React from 'react';
 import { RepositoryType } from 'Graphql/types/globalTypes';
 import styles from './Overview.module.scss';
 import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
+import useSettingTabs from 'Graphql/client/hooks/useSettingTabs';
+import { SettingsTab } from 'Graphql/client/models/SettingsTab';
+import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
+import { SETTINGS_PANEL_OPTIONS } from '../../panelSettings';
+import IconLaunch from '@material-ui/icons/Launch';
+import cx from 'classnames';
 
 type Props = {
   openedProject: GetProjects_projects;
 };
 function Overview({ openedProject }: Props) {
+  const { openPanel: openSettings } = usePanel(
+    PanelType.PRIMARY,
+    SETTINGS_PANEL_OPTIONS
+  );
+  const { updateSettingTab } = useSettingTabs();
+
   const {
     descriptionScore,
     loading,
@@ -23,6 +35,15 @@ function Overview({ openedProject }: Props) {
 
   if (loading) return <SpinnerCircular />;
   if (error) return <ErrorMessage />;
+
+  function handleMembersClick() {
+    updateSettingTab(SettingsTab.MEMBERS);
+    openSettings();
+  }
+  function handleRepoClick() {
+    updateSettingTab(SettingsTab.REPOSITORY);
+    openSettings();
+  }
 
   return (
     <div className={styles.container}>
@@ -43,7 +64,14 @@ function Overview({ openedProject }: Props) {
         <div className={styles.section}>
           <DescriptionScore score={descriptionScore} />
         </div>
-        <div className={styles.section}>
+        <div
+          className={cx(styles.section, styles.sectionClickable)}
+          onClick={handleRepoClick}
+        >
+          <div className={styles.sectionTitleWithIcon}>
+            <span>REPOSITORY</span>
+            <IconLaunch className={cx(styles.settingIcon, 'icon-small')} />
+          </div>
           <div className={styles.repoType}>
             <RepositoryTypeComponent
               squareLocation={
@@ -57,6 +85,15 @@ function Overview({ openedProject }: Props) {
             <p
               className={styles.repoTypeName}
             >{`${openedProject.repository?.type} REPOSITORY`}</p>
+          </div>
+        </div>
+        <div
+          className={cx(styles.section, styles.sectionClickable)}
+          onClick={handleMembersClick}
+        >
+          <div className={styles.sectionTitleWithIcon}>
+            <span>MEMBERS</span>
+            <IconLaunch className={cx(styles.settingIcon, 'icon-small')} />
           </div>
           <div
             className={styles.nMembers}

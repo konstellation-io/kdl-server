@@ -10,6 +10,10 @@
   position: relative;
 }
 
+.centeredSpinner {
+  @include center;
+}
+
 .vizArea {
   position: relative;
   width: 100%;

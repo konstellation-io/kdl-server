@@ -69,7 +69,12 @@ function KG({ openedProject }: ProjectRoute) {
     kgItems
   );
 
-  if (loading) return <SpinnerCircular />;
+  if (loading)
+    return (
+      <div className={styles.centeredSpinner}>
+        <SpinnerCircular />
+      </div>
+    );
   if (!data || error) return <ErrorMessage />;
 
   const filtersOrder = [...topTopics, topicOthers];

@@ -23,8 +23,13 @@ import UsersTable from './components/UserList/UsersTable';
 
 import GetUsersQuery from 'Graphql/queries/getUsers';
 import { userSettings } from 'Graphql/client/cache';
+import { GetMe } from 'Graphql/queries/types/GetMe';
+import GetMeQuery from 'Graphql/queries/getMe';
 
 function Users() {
+  const { data: dataMe, loading: loadingMe, error: errorMe } = useQuery<GetMe>(
+    GetMeQuery
+  );
   const { data, loading, error } = useQuery<GetUsers>(GetUsersQuery);
   const { selectedUserIds } = useReactiveVar(userSettings);
   const { updateUsersAccessLevel } = useUser();
@@ -60,12 +65,15 @@ function Users() {
   }
 
   function getContent() {
-    if (loading) return <SpinnerCircular />;
-    if (error || !data) return <ErrorMessage />;
+    if (loading || loadingMe) return <SpinnerCircular />;
+    if (error || errorMe || !data) return <ErrorMessage />;
 
     return (
       <>
-        <UserFiltersAndActions onUpdateAccessLevel={onUpdateAccessLevel} />
+        <UserFiltersAndActions
+          onUpdateAccessLevel={onUpdateAccessLevel}
+          canManageUsers={dataMe?.me.accessLevel === AccessLevel.ADMIN}
+        />
         <UsersTable users={data.users} />
       </>
     );

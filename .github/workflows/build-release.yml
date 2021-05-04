@@ -145,6 +145,7 @@ jobs:
       - docker-kdl-server
       - docker-drone-authorizer
       - docker-kdl-kg
+      - docker-project-operator
     steps:
       - name: Checkout
         uses: actions/checkout@v2

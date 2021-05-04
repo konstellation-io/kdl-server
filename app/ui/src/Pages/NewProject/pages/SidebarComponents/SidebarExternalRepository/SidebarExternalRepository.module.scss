@@ -1,0 +1,16 @@
+@import 'Styles/colors';
+@import 'Styles/variables';
+@import 'Styles/mixins';
+
+.infoSidebar {
+  @include font-body;
+
+  display: flex;
+  flex-direction: column;
+  margin-top: 3 * $grid-unit;
+
+  .line {
+    margin-top: $grid-unit;
+  }
+
+}

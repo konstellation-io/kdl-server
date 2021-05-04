@@ -63,6 +63,7 @@ export const repoTypeToStepName: {
 };
 
 function NewProject() {
+  const [isMounted, setIsMounted] = useState(false);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [isPromptEnabled, setIsPromptEnabled] = useState(false);
 
@@ -86,6 +87,8 @@ function NewProject() {
   // We want to execute this on on component mount and unmount
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => disableUnloadPrompt, []);
+
+  useEffect(() => setIsMounted(true), []);
 
   const {
     direction,
@@ -214,7 +217,7 @@ function NewProject() {
           when={isPromptEnabled}
           message="You are going to leave this page. You'll lose your changes, please confirm."
         />
-        <SidebarTop>{getSideContent()}</SidebarTop>
+        {isMounted && <SidebarTop>{getSideContent()}</SidebarTop>}
         <div className={styles.container}>
           <div className={styles.steps}>
             <div className={styles.stepper}>

@@ -11,8 +11,8 @@ const SidebarRepository = () => (
         outside the server.
       </li>
       <li>
-        <strong>Internal repo:</strong> will be deployed inside the actual
-        server.
+        <strong>Internal repo:</strong> use a version-control system that will
+        be deployed inside the current server.
       </li>
     </ol>
   </div>

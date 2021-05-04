@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 
@@ -34,6 +36,7 @@ type projectMocks struct {
 	giteaService *giteaservice.MockGiteaClient
 	minioService *minioservice.MockMinioService
 	droneService *droneservice.MockDroneService
+	k8sClient    *k8s.MockK8sClient
 }
 
 func newProjectSuite(t *testing.T) *projectSuite {
@@ -52,7 +55,9 @@ func newProjectSuite(t *testing.T) *projectSuite {
 
 	droneService := droneservice.NewMockDroneService(ctrl)
 
-	interactor := project.NewInteractor(logger, repo, clockMock, giteaService, minioService, droneService)
+	k8sClient := k8s.NewMockK8sClient(ctrl)
+
+	interactor := project.NewInteractor(logger, repo, clockMock, giteaService, minioService, droneService, k8sClient)
 
 	return &projectSuite{
 		ctrl:       ctrl,
@@ -64,6 +69,7 @@ func newProjectSuite(t *testing.T) *projectSuite {
 			giteaService: giteaService,
 			minioService: minioService,
 			droneService: droneService,
+			k8sClient:    k8sClient,
 		},
 	}
 }
@@ -107,6 +113,7 @@ func TestInteractor_CreateInternal(t *testing.T) {
 	}
 
 	s.mocks.giteaService.EXPECT().CreateRepo(someProjectID, ownerUsername).Return(nil)
+	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, someProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().CreateBucket(someProjectID).Return(nil)
 	s.mocks.droneService.EXPECT().ActivateRepository(someProjectID).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
@@ -176,6 +183,7 @@ func TestInteractor_CreateExternal(t *testing.T) {
 	s.mocks.giteaService.EXPECT().
 		MirrorRepo(externalRepoURL, someProjectID, externalRepoUsername, externalRepoToken, ownerUsername).
 		Return(nil)
+	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, someProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().CreateBucket(someProjectID).Return(nil)
 	s.mocks.droneService.EXPECT().ActivateRepository(someProjectID).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)

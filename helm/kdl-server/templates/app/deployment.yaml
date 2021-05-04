@@ -46,7 +46,7 @@ spec:
             - secretRef:
                 name: gitea-admin-secrets
       containers:
-        - name: kdl-server
+        - name: kdl-app
           image: {{ .Values.kdlServer.image.repository }}:{{ .Values.kdlServer.image.tag }}
           imagePullPolicy: {{ .Values.kdlServer.image.pullPolicy }}
           env:
@@ -54,10 +54,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-            - name: MINIO_URL
-              value: {{ include "protocol" . }}://minio.{{ .Values.domain }}
-            - name: MINIO_ENDPOINT
-              value: {{ .Release.Name }}-minio:9000
             - name: MINIO_SECRET_KEY
               valueFrom:
                 secretKeyRef:
@@ -68,16 +64,6 @@ spec:
                 secretKeyRef:
                   key: accesskey
                   name: {{ .Release.Name }}-minio
-            - name: JUPYTER_URL
-              value: {{ include "protocol" . }}://USERNAME-jupyter.{{ .Values.domain }}/lab/workspaces/REPO_FOLDER/tree/repos/REPO_FOLDER
-            - name: VSCODE_URL
-              value: {{ include "protocol" . }}://USERNAME-code.{{ .Values.domain }}/?folder=/home/coder/repos/REPO_FOLDER
-            - name: DRONE_URL
-              value: {{ include "protocol" . }}://drone.{{ .Values.domain }}
-            - name: MLFLOW_URL
-              value: {{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/mlflow/
-            - name: KG_URL
-              value: kdl-kg:{{ .Values.kdlKG.port }}
             - name: DRONE_INTERNAL_URL
               valueFrom:
                 configMapKeyRef:
@@ -105,13 +91,14 @@ spec:
               subPath: config.cfg
           ports:
             - containerPort: 3000
-        - name: kdl-server-proxy
+        - name: oauth2-proxy
           image: {{ .Values.oauth2Proxy.image.repository }}:{{ .Values.oauth2Proxy.image.tag }}
           imagePullPolicy: {{ .Values.oauth2Proxy.image.pullPolicy }}
           args:
             - "--config=/etc/oauth2_proxy.cfg"
             - "--email-domain=*"
             - "--upstream=http://127.0.0.1:8080/"
+            - "--upstream=http://127.0.0.1:9000/mlflow/"
             - "--pass-user-headers=true"
             - "--skip-provider-button=true"
             - "--skip-auth-route=/config.json"
@@ -139,6 +126,14 @@ spec:
             - name: http
               containerPort: 3000
               protocol: TCP
+        - name: mlflow-proxy
+          image: nginx:alpine
+          ports:
+            - containerPort: 9000
+          volumeMounts:
+            - name: mlflow-proxy-nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
       volumes:
         - name: oauth2-config
           configMap:
@@ -146,3 +141,6 @@ spec:
         - name: kdl-server-configmap
           configMap:
             name: kdl-server-configmap
+        - name: mlflow-proxy-nginx-config
+          configMap:
+            name: mlflow-proxy-nginx-config

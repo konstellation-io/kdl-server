@@ -116,7 +116,7 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
 	s.mocks.giteaService.EXPECT().AddSSHKey(username, sshKey.Public).Return(nil)
-	s.mocks.k8sClientMock.EXPECT().CreateSecret(secretName, secretValues)
+	s.mocks.k8sClientMock.EXPECT().CreateSecret(ctx, secretName, secretValues)
 
 	createdUser, err := s.interactor.Create(ctx, email, username, accessLevel)
 
@@ -172,9 +172,11 @@ func TestInteractor_AreToolsRunning(t *testing.T) {
 		expectedResponse = true
 	)
 
-	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(username).Return(expectedResponse, nil)
+	ctx := context.Background()
 
-	running, err := s.interactor.AreToolsRunning(username)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(expectedResponse, nil)
+
+	running, err := s.interactor.AreToolsRunning(ctx, username)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedResponse, running)
@@ -194,7 +196,7 @@ func TestInteractor_StopTools(t *testing.T) {
 	expectedUser := entity.User{Username: username}
 
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
-	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(username).Return(toolsRunning, nil)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 	s.mocks.k8sClientMock.EXPECT().DeleteUserToolsCR(ctx, username).Return(nil)
 
 	returnedUser, err := s.interactor.StopTools(ctx, username)
@@ -217,7 +219,7 @@ func TestInteractor_StopTools_Err(t *testing.T) {
 	emptyUser := entity.User{}
 
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(u, nil)
-	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(username).Return(toolsRunning, nil)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 
 	returnedUser, err := s.interactor.StopTools(ctx, username)
 
@@ -239,7 +241,7 @@ func TestInteractor_StartTools(t *testing.T) {
 	expectedUser := entity.User{Username: username}
 
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
-	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(username).Return(toolsRunning, nil)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username).Return(nil)
 
 	returnedUser, err := s.interactor.StartTools(ctx, username)
@@ -262,7 +264,7 @@ func TestInteractor_StartTools_Err(t *testing.T) {
 	emptyUser := entity.User{}
 
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(u, nil)
-	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(username).Return(toolsRunning, nil)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 
 	returnedUser, err := s.interactor.StartTools(ctx, username)
 
@@ -408,9 +410,9 @@ func TestInteractor_RegenerateSSHKeys(t *testing.T) {
 		CreationDate: now,
 	}
 
-	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(username).Return(false, nil)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(false, nil)
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
-	s.mocks.k8sClientMock.EXPECT().UpdateSecret(secretName, secretValues).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().UpdateSecret(ctx, secretName, secretValues).Return(nil)
 	s.mocks.giteaService.EXPECT().UpdateSSHKey(username, sshKey.Public).Return(nil)
 	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, sshKey).Return(nil)
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(targetUser, nil).AnyTimes()
@@ -452,7 +454,7 @@ func TestInteractor_RegenerateSSHKeys_UserToolsRunning(t *testing.T) {
 		CreationDate: now,
 	}
 
-	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(username).Return(true, nil)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(true, nil)
 	userData, err := s.interactor.RegenerateSSHKeys(ctx, targetUser)
 
 	require.Equal(t, userData, entity.User{})

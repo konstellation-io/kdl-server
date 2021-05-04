@@ -105,6 +105,39 @@ jobs:
             konstellation/kdl-kg:${{ steps.get_version.outputs.VERSION }}
             konstellation/kdl-kg:latest
 
+  docker-project-operator:
+    runs-on: ubuntu-latest    
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub Registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Get Version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          context: ./project-operator
+          file: ./project-operator/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            konstellation/project-operator:${{ steps.get_version.outputs.VERSION }}
+            konstellation/project-operator:latest
+
   helm:
     if: ${{ ! contains( github.event.ref, 'alpha' ) }}
     runs-on: ubuntu-latest
@@ -112,6 +145,7 @@ jobs:
       - docker-kdl-server
       - docker-drone-authorizer
       - docker-kdl-kg
+      - docker-project-operator
     steps:
       - name: Checkout
         uses: actions/checkout@v2

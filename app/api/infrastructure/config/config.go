@@ -57,7 +57,12 @@ type Config struct {
 		Token       string `envconfig:"DRONE_TOKEN"`
 	}
 	MLFlow struct {
-		URL string `envconfig:"MLFLOW_URL"`
+		URL   string `envconfig:"MLFLOW_URL"`
+		Image struct {
+			Repository string `envconfig:"MLFLOW_IMG_REPO"`
+			Tag        string `envconfig:"MLFLOW_IMG_TAG"`
+			PullPolicy string `envconfig:"MLFLOW_IMG_PULLPOLICY"`
+		}
 	}
 	KGservice struct {
 		URL string `envconfig:"KG_URL"`
@@ -67,6 +72,20 @@ type Config struct {
 			Interval time.Duration `yaml:"interval" envconfig:"CRONJOB_USERS_SYNC_INTERVAL"`
 		} `yaml:"usersSync"`
 	} `yaml:"scheduledJob"`
+	OAuth2Proxy struct {
+		Image struct {
+			Repository string `envconfig:"OAUTH2_PROXY_IMG_REPO"`
+			Tag        string `envconfig:"OAUTH2_PROXY_IMG_TAG"`
+			PullPolicy string `envconfig:"OAUTH2_PROXY_IMG_PULLPOLICY"`
+		}
+	}
+	GiteaOAuth2Setup struct {
+		Image struct {
+			Repository string `envconfig:"GITEA_OAUTH2_SETUP_IMG_REPO"`
+			Tag        string `envconfig:"GITEA_OAUTH2_SETUP_IMG_TAG"`
+			PullPolicy string `envconfig:"GITEA_OAUTH2_SETUP_IMG_PULLPOLICY"`
+		}
+	}
 }
 
 // NewConfig will read the config.yml file and override values with env vars.

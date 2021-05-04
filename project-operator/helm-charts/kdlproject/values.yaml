@@ -1,0 +1,38 @@
+# Default values for kdlproject.
+projectId: my-project
+
+domain: kdl.local
+
+tls:
+  enabled: false
+
+ingress:
+  type: nginx
+
+minio:
+  accessKey: minio
+  secretKey: minio123
+
+giteaOauth2Setup:
+  image:
+    repository: terminus7/gitea-oauth2-setup
+    tag: latest
+    pullPolicy: IfNotPresent
+
+oauth2Proxy:
+  image:
+    repository: quay.io/oauth2-proxy/oauth2-proxy
+    tag: v7.0.1-amd64
+    pullPolicy: IfNotPresent
+  cookieSecret: "p0aw4r65890a3vnl"
+
+mlflow:
+  image:
+    repository: terminus7/mlflow
+    tag: latest
+    pullPolicy: IfNotPresent
+  volume:
+    size: 1Gi
+    storageClassName: standard
+  s3:
+    bucket: mlflow-artifacts

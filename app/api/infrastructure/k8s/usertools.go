@@ -22,7 +22,7 @@ func (k *k8sClient) DeleteUserToolsCR(ctx context.Context, username string) erro
 
 	delPropagationFg := metav1.DeletePropagationForeground
 
-	err := k.codeClient.Namespace(k.cfg.Kubernetes.Namespace).Delete(resName, &metav1.DeleteOptions{
+	err := k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Delete(ctx, resName, metav1.DeleteOptions{
 		GracePeriodSeconds: &zero,
 		PropagationPolicy:  &delPropagationFg,
 	})
@@ -31,9 +31,9 @@ func (k *k8sClient) DeleteUserToolsCR(ctx context.Context, username string) erro
 		return err
 	}
 
-	result, err := k.codeClient.
+	result, err := k.userToolsRes.
 		Namespace(k.cfg.Kubernetes.Namespace).
-		Patch(resName, types.MergePatchType, []byte("{\"metadata\":{\"finalizers\":[]}}"), metav1.PatchOptions{})
+		Patch(ctx, resName, types.MergePatchType, []byte("{\"metadata\":{\"finalizers\":[]}}"), metav1.PatchOptions{})
 
 	if err != nil {
 		return err
@@ -49,14 +49,14 @@ func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username string) erro
 	slugUsername := k.getSlugUsername(username)
 	resName := fmt.Sprintf("usertools-%s", slugUsername)
 
-	err := k.checkOrCreateToolsSecrets(slugUsername)
+	err := k.checkOrCreateToolsSecrets(ctx, slugUsername)
 	if err != nil {
 		return err
 	}
 
 	k.logger.Info("UserTools secrets created")
 
-	err = k.createUserToolsDefinition(username, slugUsername, resName)
+	err = k.createUserToolsDefinition(ctx, username, slugUsername, resName)
 	if err != nil {
 		return err
 	}
@@ -65,12 +65,12 @@ func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username string) erro
 }
 
 // IsUserToolPODRunning checks if the there is a user tool POD running for the given username.
-func (k k8sClient) IsUserToolPODRunning(username string) (bool, error) {
+func (k k8sClient) IsUserToolPODRunning(ctx context.Context, username string) (bool, error) {
 	slugUsername := k.getSlugUsername(username)
 	resName := k.getUserToolsResName(slugUsername)
 	labelSelector := k.userToolsPODLabelSelector(resName)
 
-	list, err := k.clientset.CoreV1().Pods(k.cfg.Kubernetes.Namespace).List(metav1.ListOptions{
+	list, err := k.clientset.CoreV1().Pods(k.cfg.Kubernetes.Namespace).List(ctx, metav1.ListOptions{
 		LabelSelector: labelSelector,
 	})
 
@@ -100,20 +100,20 @@ func (k *k8sClient) userToolsPODLabelSelector(resName string) string {
 }
 
 // checkOrCreateToolsSecrets set ClientID and ClientSecret on Kubernetes secret objects.
-func (k *k8sClient) checkOrCreateToolsSecrets(slugUsername string) error {
-	err := k.createToolSecret(slugUsername, "codeserver", "code")
+func (k *k8sClient) checkOrCreateToolsSecrets(ctx context.Context, slugUsername string) error {
+	err := k.createToolSecret(ctx, slugUsername, "codeserver", "code")
 	if err != nil {
 		return err
 	}
 
-	return k.createToolSecret(slugUsername, "jupyter", "jupyter")
+	return k.createToolSecret(ctx, slugUsername, "jupyter", "jupyter")
 }
 
-func (k *k8sClient) createToolSecret(slugUsername, toolName, toolURLName string) error {
+func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName, toolURLName string) error {
 	secretName := fmt.Sprintf("%s-oauth2-secrets-%s", toolName, slugUsername)
 	credentialsSecretName := fmt.Sprintf("%s-oauth2-credentials-%s", toolName, slugUsername)
 
-	exist, err := k.isSecretPresent(secretName)
+	exist, err := k.isSecretPresent(ctx, secretName)
 	if err != nil {
 		return fmt.Errorf("check %s tool secret: %w", toolName, err)
 	}
@@ -135,7 +135,7 @@ func (k *k8sClient) createToolSecret(slugUsername, toolName, toolURLName string)
 	data["GITEA_REDIRECT_URIS"] = callbackURL
 	data["GITEA_APPLICATION_NAME"] = oAuthName
 
-	err = k.CreateSecret(secretName, data)
+	err = k.CreateSecret(ctx, secretName, data)
 	if err != nil {
 		return fmt.Errorf("creating %s tool secrets: %w", toolName, err)
 	}
@@ -144,11 +144,11 @@ func (k *k8sClient) createToolSecret(slugUsername, toolName, toolURLName string)
 }
 
 // createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
-func (k *k8sClient) createUserToolsDefinition(username, slugUsername, resName string) error {
+func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slugUsername, resName string) error {
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",
-			"apiVersion": apiVersion,
+			"apiVersion": userToolsAPIVersion,
 			"metadata": map[string]interface{}{
 				"name":      resName,
 				"namespace": k.cfg.Kubernetes.Namespace,
@@ -179,12 +179,12 @@ func (k *k8sClient) createUserToolsDefinition(username, slugUsername, resName st
 	}
 
 	k.logger.Infof("Creating users tools: %#v", definition.Object)
-	_, err := k.codeClient.Namespace(k.cfg.Kubernetes.Namespace).Create(definition, metav1.CreateOptions{})
+	_, err := k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
 
 	return err
 }
 
-func (k *k8sClient) createUserToolsWatcher(resName string) (watch.Interface, error) {
+func (k *k8sClient) createUserToolsWatcher(ctx context.Context, resName string) (watch.Interface, error) {
 	labelSelector := k.userToolsPODLabelSelector(resName)
 	k.logger.Debugf("Creating watcher for POD with label: %s", labelSelector)
 
@@ -194,11 +194,11 @@ func (k *k8sClient) createUserToolsWatcher(resName string) (watch.Interface, err
 		FieldSelector: "",
 	}
 
-	return k.clientset.CoreV1().Pods(k.cfg.Kubernetes.Namespace).Watch(opts)
+	return k.clientset.CoreV1().Pods(k.cfg.Kubernetes.Namespace).Watch(ctx, opts)
 }
 
 func (k *k8sClient) waitUserToolsDeleted(ctx context.Context, resName string) error {
-	watcher, err := k.createUserToolsWatcher(resName)
+	watcher, err := k.createUserToolsWatcher(ctx, resName)
 	if err != nil {
 		return err
 	}
@@ -222,7 +222,7 @@ func (k *k8sClient) waitUserToolsDeleted(ctx context.Context, resName string) er
 }
 
 func (k *k8sClient) waitUserToolsRunning(ctx context.Context, resName string) error {
-	watcher, err := k.createUserToolsWatcher(resName)
+	watcher, err := k.createUserToolsWatcher(ctx, resName)
 	if err != nil {
 		return err
 	}

@@ -32,7 +32,7 @@ type UseCase interface {
 	GetByUsername(ctx context.Context, username string) (entity.User, error)
 	StartTools(ctx context.Context, username string) (entity.User, error)
 	StopTools(ctx context.Context, username string) (entity.User, error)
-	AreToolsRunning(username string) (bool, error)
+	AreToolsRunning(ctx context.Context, username string) (bool, error)
 	FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error)
 	GetByID(ctx context.Context, userID string) (entity.User, error)
 	RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error)

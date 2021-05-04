@@ -14,6 +14,8 @@ const CHAR_WIDTH = 8;
 const RECT_PADDING = 10;
 const ORIENTATION_DY = 10;
 
+const LABELS_SEPARATION_TH = 1620;
+
 export enum OrientationH {
   LEFT,
   RIGHT,
@@ -75,8 +77,10 @@ function radialAxis(scale: ScaleLinear<number, number>) {
     let values = tickValues === null ? scaleTicks : tickValues;
     const [mx, mn] = scale.domain();
     const df = mx - mn;
+    const labelsMargin = window.innerWidth < LABELS_SEPARATION_TH ? 0.3 : 0.2;
     values = values.filter(
-      (v: number) => v > mn + df * 0.1 && v < mn + df * 0.8
+      (v: number) =>
+        v > mn + df * labelsMargin && v < mn + df * (1 - labelsMargin)
     );
     values = [mn, ...values, mx];
     borderValues = [...borderValues.slice(2, 4), mn, mx];

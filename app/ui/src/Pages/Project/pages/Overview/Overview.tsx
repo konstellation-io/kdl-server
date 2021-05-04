@@ -11,9 +11,9 @@ import { RepositoryType } from 'Graphql/types/globalTypes';
 import styles from './Overview.module.scss';
 import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
 import useSettingTabs from 'Graphql/client/hooks/useSettingTabs';
-import { SettingTabs } from 'Graphql/client/models/SettingTabs';
+import { SettingsTab } from 'Graphql/client/models/SettingsTab';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
-import { SETTINGS_PANEL_OPTIONS } from '../../components/ProjectNavigation/ProjectNavigation';
+import { SETTINGS_PANEL_OPTIONS } from '../../panelSettings';
 
 type Props = {
   openedProject: GetProjects_projects;
@@ -35,11 +35,11 @@ function Overview({ openedProject }: Props) {
   if (error) return <ErrorMessage />;
 
   function handleMembersClick() {
-    updateSettingTab(SettingTabs.MEMBERS);
+    updateSettingTab(SettingsTab.MEMBERS);
     openSettings();
   }
   function handleRepoClick() {
-    updateSettingTab(SettingTabs.REPOSITORY);
+    updateSettingTab(SettingsTab.REPOSITORY);
     openSettings();
   }
 

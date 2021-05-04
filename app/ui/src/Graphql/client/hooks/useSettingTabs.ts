@@ -1,8 +1,8 @@
 import { openedSettingTab } from '../cache';
-import { SettingTabs } from '../models/SettingTabs';
+import { SettingsTab } from '../models/SettingsTab';
 
 export default function useSettingTabs() {
-  function updateSettingTab(tab: SettingTabs) {
+  function updateSettingTab(tab: SettingsTab) {
     openedSettingTab(tab);
   }
 

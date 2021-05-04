@@ -1,4 +1,4 @@
-export enum SettingTabs {
+export enum SettingsTab {
   INFO,
   REPOSITORY,
   MEMBERS,

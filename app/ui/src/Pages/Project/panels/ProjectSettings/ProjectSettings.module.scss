@@ -19,9 +19,12 @@
   display: flex;
 
   .tab {
-    flex-grow: 1;
     height: unset;
     position: relative;
+  }
+
+  .selectedTab {
+    width: 100%;
   }
 
 }

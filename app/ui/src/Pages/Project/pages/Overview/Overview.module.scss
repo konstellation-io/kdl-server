@@ -19,6 +19,9 @@
 
     &.sectionClickable {
       cursor: pointer;
+      &:hover .settingIcon {
+        color: palette(highlight);
+      }
     }
   }
   .sectionTitle {
@@ -54,7 +57,7 @@
     @include font-caption;
 
     display: flex;
-    margin-top: 2 * $grid-unit;
+    margin-top: 1.5 * $grid-unit;
 
     .repoTypeName {
       margin: 0 0 0 1.5 * $grid-unit;
@@ -62,7 +65,7 @@
   }
 
   .nMembers {
-    margin: 2 * $grid-unit 0 0 0;
+    margin: 1.5 * $grid-unit 0 0 0;
   }
 
   .settingIcon {

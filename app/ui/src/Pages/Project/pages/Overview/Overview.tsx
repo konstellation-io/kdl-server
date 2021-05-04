@@ -14,7 +14,7 @@ import useSettingTabs from 'Graphql/client/hooks/useSettingTabs';
 import { SettingsTab } from 'Graphql/client/models/SettingsTab';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { SETTINGS_PANEL_OPTIONS } from '../../panelSettings';
-import IconSettings from '@material-ui/icons/Settings';
+import IconLaunch from '@material-ui/icons/Launch';
 import cx from 'classnames';
 
 type Props = {
@@ -70,7 +70,7 @@ function Overview({ openedProject }: Props) {
         >
           <div className={styles.sectionTitleWithIcon}>
             <span>REPOSITORY</span>
-            <IconSettings fontSize="small" className={styles.settingIcon} />
+            <IconLaunch className={cx(styles.settingIcon, 'icon-small')} />
           </div>
           <div className={styles.repoType}>
             <RepositoryTypeComponent
@@ -93,7 +93,7 @@ function Overview({ openedProject }: Props) {
         >
           <div className={styles.sectionTitleWithIcon}>
             <span>MEMBERS</span>
-            <IconSettings fontSize="small" className={styles.settingIcon} />
+            <IconLaunch className={cx(styles.settingIcon, 'icon-small')} />
           </div>
           <div
             className={styles.nMembers}

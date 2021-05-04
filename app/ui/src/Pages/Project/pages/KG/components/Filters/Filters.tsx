@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 
 import { KGFilters } from '../useKGFilters';
-import ScoreFilter from './components/ScoreFilter/ScoreFilter';
 import ShowOthersFilter from './components/ShowOthersFilter/ShowOthersFilter';
 import TopicFilter from './components/TopicFilter/TopicFilter';
 import styles from './Filters.module.scss';
@@ -11,8 +10,6 @@ export interface Topic {
   nResources: number;
   relevance: number;
 }
-
-const MAX_SCORE = 100;
 
 type Props = {
   topics: Topic[];
@@ -41,7 +38,6 @@ function Filters({ topics, filters, onFiltersChange }: Props) {
         onUpdate={handleShowOthersUpdate}
       />
       <TopicFilter topics={filterableTopics} onUpdate={handleTopicsUpdate} />
-      <ScoreFilter max={MAX_SCORE} />
     </div>
   );
 }

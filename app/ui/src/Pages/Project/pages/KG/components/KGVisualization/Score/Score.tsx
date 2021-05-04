@@ -4,23 +4,16 @@ import cx from 'classnames';
 import styles from './Score.module.scss';
 
 function getColorClass(value: number) {
-  let className = '';
-
   switch (true) {
-    case value < 0.75:
-      className = styles.notSoBad;
-      break;
-    case value < 0.5:
-      className = styles.notGood;
-      break;
-    case value < 0.25:
-      className = styles.bad;
-      break;
+    case value < 0.2:
+      return styles.bad;
+    case value < 0.7:
+      return styles.notGood;
+    case value < 0.9:
+      return styles.notSoBad;
     default:
-      className = styles.good;
+      return styles.good;
   }
-
-  return className;
 }
 
 type Props = {

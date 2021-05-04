@@ -15,6 +15,7 @@ import navButtonStyles from './components/NavigationButton/NavigationButton.modu
 import styles from './ProjectNavigation.module.scss';
 import { useReactiveVar } from '@apollo/client';
 import { primaryPanel } from 'Graphql/client/cache';
+import { SETTINGS_PANEL_OPTIONS } from '../../panelSettings';
 
 export const NavButtonLink: FC<any> = ({ children, ...props }) => {
   return (
@@ -29,11 +30,6 @@ export const NavButtonLink: FC<any> = ({ children, ...props }) => {
   );
 };
 
-const SETTINGS_PANEL_OPTIONS = {
-  id: PANEL_ID.SETTINGS,
-  title: 'Settings',
-  fixedWidth: true,
-};
 const KG_PANEL_OPTIONS = {
   id: PANEL_ID.KG_RESULTS,
   title: 'Knowledge Viewer',

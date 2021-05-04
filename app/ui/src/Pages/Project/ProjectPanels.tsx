@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   memberDetails,
   primaryPanel,
@@ -37,10 +37,6 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
   const { unselectMemberDetails } = useMemberDetails();
   const { unselectResourceDetails } = useResourceDetails();
 
-  // Stores last opened tab inside project settings panel. When you reopen
-  // this panel, last opened tab will remain opened.
-  const [settingsOpenedTab, setSettingsOpenedTab] = useState(0);
-
   // Opening a level 1 panel closes previous level 2 panels
   useEffect(() => {
     if (panel1Data) panel2Close();
@@ -58,13 +54,7 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
   }
 
   const panels: { [key in PANEL_ID]: JSX.Element | null } = {
-    [PANEL_ID.SETTINGS]: (
-      <ProjectSettings
-        project={openedProject}
-        settingsOpenedTab={settingsOpenedTab}
-        setSettingsOpenedTab={setSettingsOpenedTab}
-      />
-    ),
+    [PANEL_ID.SETTINGS]: <ProjectSettings project={openedProject} />,
     [PANEL_ID.PROJECT_DESCRIPTION]: (
       <UpdateProjectDescription project={openedProject} close={panel2Close} />
     ),

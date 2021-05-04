@@ -17,9 +17,10 @@ import syncUsersMutation from 'Graphql/mutations/syncUsers';
 
 type Props = {
   onUpdateAccessLevel: (newAccessLevel: AccessLevel) => void;
+  canManageUsers: boolean;
 };
 
-function UserFiltersAndActions({ onUpdateAccessLevel }: Props) {
+function UserFiltersAndActions({ onUpdateAccessLevel, canManageUsers }: Props) {
   const [syncDisabled, disableSyncAction] = useActionDisableDelay(3000);
   const [syncUsers, { loading }] = useMutation<SyncUsers>(syncUsersMutation, {
     onCompleted: () => {
@@ -51,12 +52,17 @@ function UserFiltersAndActions({ onUpdateAccessLevel }: Props) {
             label="Synchronize"
             onClick={onSync}
             loading={loading}
-            disabled={syncDisabled}
+            disabled={syncDisabled || !canManageUsers}
             border
           />
         </div>
         <div>
-          <Button label="Manage users" onClick={onManageUsers} border />
+          <Button
+            label="Manage users"
+            onClick={onManageUsers}
+            disabled={!canManageUsers}
+            border
+          />
         </div>
       </Right>
     </div>

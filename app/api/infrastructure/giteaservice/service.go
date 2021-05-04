@@ -159,25 +159,17 @@ func (g *giteaService) UpdateCollaboratorPermissions(repoName, username string, 
 }
 
 // UpdateUserPermissions changes the permissions for the given user.
-func (g *giteaService) UpdateUserPermissions(username, email string, level entity.AccessLevel) error {
-	varTrue := true
-	varFalse := false
+func (g *giteaService) UpdateUserPermissions(username string, level entity.AccessLevel) error {
+	isAdmin := false
+
+	if level == entity.AccessLevelAdmin {
+		isAdmin = true
+	}
 
 	// gitea AdminEditUser call requires email in editUserOptions to work properly
 	editUserOptions := gitea.EditUserOption{
-		Admin: nil,
-		Email: email,
-	}
-
-	switch level {
-	case entity.AccessLevelAdmin:
-		editUserOptions.Admin = &varTrue
-	case entity.AccessLevelManager:
-		editUserOptions.Admin = &varFalse
-	case entity.AccessLevelViewer:
-		editUserOptions.Admin = &varFalse
-	default:
-		return ErrAccessLevelNotFound
+		LoginName: username,
+		Admin:     &isAdmin,
 	}
 
 	_, err := g.client.AdminEditUser(username, editUserOptions)

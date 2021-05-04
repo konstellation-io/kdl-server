@@ -46,7 +46,7 @@ function calculateRectWidth(label: string) {
 
 function radialAxis(scale: ScaleLinear<number, number>) {
   let tickValues: number[] | null = null;
-  let tickArguments: [count?: number | undefined] = [3];
+  let tickArguments: [count?: number | undefined] = [1];
   let tickFormat: any = null;
   let sections: string[] = [];
   let borderValues: number[] = [0, 0, 0, 0];

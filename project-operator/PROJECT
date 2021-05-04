@@ -1,0 +1,16 @@
+domain: konstellation.io
+layout:
+- helm.sdk.operatorframework.io/v1
+plugins:
+  manifests.sdk.operatorframework.io/v2: {}
+  scorecard.sdk.operatorframework.io/v2: {}
+projectName: project-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: konstellation.io
+  group: project
+  kind: KDLProject
+  version: v1
+version: "3"

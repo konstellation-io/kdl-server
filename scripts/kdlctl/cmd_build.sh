@@ -46,6 +46,7 @@ build_docker_images() {
     build_server
     build_drone_authorizer
     build_kg
+    build_project_operator
   fi
 
   setup_env
@@ -74,6 +75,11 @@ build_drone_authorizer() {
 build_kg() {
   setup_env
   build_image kdl-kg kg
+}
+
+build_project_operator() {
+  setup_env
+  build_image project-operator project-operator
 }
 
 build_image() {

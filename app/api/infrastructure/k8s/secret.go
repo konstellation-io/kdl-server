@@ -1,18 +1,20 @@
 package k8s
 
 import (
+	"context"
+
 	coreV1 "k8s.io/api/core/v1"
 	k8sErrors "k8s.io/apimachinery/pkg/api/errors"
-	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // CreateSecret creates a new k8s secret.
-func (k *k8sClient) CreateSecret(name string, values map[string]string) error {
+func (k *k8sClient) CreateSecret(ctx context.Context, name string, values map[string]string) error {
 	k.logger.Infof("Creating secret \"%s\" in k8s...", name)
 
 	secret := k.newSecret(name, values)
 
-	createdSecret, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Create(secret)
+	createdSecret, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Create(ctx, secret, metav1.CreateOptions{})
 	if err != nil {
 		return err
 	}
@@ -23,12 +25,12 @@ func (k *k8sClient) CreateSecret(name string, values map[string]string) error {
 }
 
 // UpdateSecret updates a k8s secret.
-func (k *k8sClient) UpdateSecret(name string, values map[string]string) error {
+func (k *k8sClient) UpdateSecret(ctx context.Context, name string, values map[string]string) error {
 	k.logger.Infof("Updating secret \"%s\" in k8s...", name)
 
 	secret := k.newSecret(name, values)
 
-	_, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Update(secret)
+	_, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Update(ctx, secret, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
@@ -39,8 +41,8 @@ func (k *k8sClient) UpdateSecret(name string, values map[string]string) error {
 }
 
 // isSecretPresent checks if there is a secret with the given name.
-func (k *k8sClient) isSecretPresent(name string) (bool, error) {
-	_, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Get(name, metaV1.GetOptions{})
+func (k *k8sClient) isSecretPresent(ctx context.Context, name string) (bool, error) {
+	_, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Get(ctx, name, metav1.GetOptions{})
 	if err != nil && !k8sErrors.IsNotFound(err) {
 		return false, err
 	}
@@ -56,8 +58,8 @@ func (k *k8sClient) newSecret(name string, values map[string]string) *coreV1.Sec
 	}
 
 	return &coreV1.Secret{
-		TypeMeta: metaV1.TypeMeta{},
-		ObjectMeta: metaV1.ObjectMeta{
+		TypeMeta: metav1.TypeMeta{},
+		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 		},
 		Data: secretData,

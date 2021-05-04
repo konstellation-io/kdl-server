@@ -1,0 +1,24 @@
+# permissions for end users to edit kdlprojects.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kdlproject-editor-role
+rules:
+- apiGroups:
+  - project.konstellation.io
+  resources:
+  - kdlprojects
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - project.konstellation.io
+  resources:
+  - kdlprojects/status
+  verbs:
+  - get

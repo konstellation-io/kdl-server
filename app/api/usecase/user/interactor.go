@@ -107,7 +107,7 @@ func (i *interactor) Create(ctx context.Context, email, username string, accessL
 	i.logger.Infof("The user \"%s\" (%s) was created with ID \"%s\"", user.Username, user.Email, insertedID)
 
 	secretName, k8sKeys := i.newUserSSHKeySecret(user, keys.Public, keys.Private)
-	err = i.k8sClient.CreateSecret(secretName, k8sKeys)
+	err = i.k8sClient.CreateSecret(ctx, secretName, k8sKeys)
 
 	if err != nil {
 		return entity.User{}, err
@@ -135,7 +135,7 @@ func (i *interactor) StartTools(ctx context.Context, username string) (entity.Us
 		return entity.User{}, err
 	}
 
-	running, err := i.k8sClient.IsUserToolPODRunning(username)
+	running, err := i.k8sClient.IsUserToolPODRunning(ctx, username)
 
 	if err != nil {
 		return entity.User{}, err
@@ -162,7 +162,7 @@ func (i *interactor) StopTools(ctx context.Context, username string) (entity.Use
 		return entity.User{}, err
 	}
 
-	running, err := i.k8sClient.IsUserToolPODRunning(username)
+	running, err := i.k8sClient.IsUserToolPODRunning(ctx, username)
 
 	if err != nil {
 		return entity.User{}, err
@@ -183,8 +183,8 @@ func (i *interactor) StopTools(ctx context.Context, username string) (entity.Use
 }
 
 // AreToolsRunning checks if the user tools are running for the given username.
-func (i *interactor) AreToolsRunning(username string) (bool, error) {
-	return i.k8sClient.IsUserToolPODRunning(username)
+func (i *interactor) AreToolsRunning(ctx context.Context, username string) (bool, error) {
+	return i.k8sClient.IsUserToolPODRunning(ctx, username)
 }
 
 // FindByIDs retrieves the users for the given identifiers.
@@ -232,7 +232,7 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 	i.logger.Infof("Regenerating user SSH keys for user \"%s\" ", user.Username)
 
 	// Check if userTools are running
-	userToolsRunning, err := i.AreToolsRunning(user.Username)
+	userToolsRunning, err := i.AreToolsRunning(ctx, user.Username)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -250,7 +250,7 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 	// Check if k8s secret exists. If exists, update it. Otherwise, create it.
 	secretName, k8sKeys := i.newUserSSHKeySecret(user, keys.Public, keys.Private)
 
-	err = i.k8sClient.UpdateSecret(secretName, k8sKeys)
+	err = i.k8sClient.UpdateSecret(ctx, secretName, k8sKeys)
 	if err != nil {
 		return entity.User{}, err
 	}

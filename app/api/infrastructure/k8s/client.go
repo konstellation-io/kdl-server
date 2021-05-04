@@ -10,17 +10,23 @@ import (
 )
 
 const (
-	userToolsGroup    = "sci-toolkit.konstellation.io"
-	userToolsResource = "usertools"
-	userToolsVersion  = "v1alpha1"
-	apiVersion        = userToolsGroup + "/" + userToolsVersion
+	userToolsGroup      = "sci-toolkit.konstellation.io"
+	userToolsResource   = "usertools"
+	userToolsVersion    = "v1alpha1"
+	userToolsAPIVersion = userToolsGroup + "/" + userToolsVersion
+
+	kdlprojectGroup      = "project.konstellation.io"
+	kdlprojectResource   = "kdlprojects"
+	kdlprojectVersion    = "v1"
+	kdlprojectAPIVersion = kdlprojectGroup + "/" + kdlprojectVersion
 )
 
 type k8sClient struct {
-	logger     logging.Logger
-	cfg        config.Config
-	clientset  *kubernetes.Clientset
-	codeClient dynamic.NamespaceableResourceInterface
+	logger        logging.Logger
+	cfg           config.Config
+	clientset     *kubernetes.Clientset
+	userToolsRes  dynamic.NamespaceableResourceInterface
+	kdlprojectRes dynamic.NamespaceableResourceInterface
 }
 
 func NewK8sClient(logger logging.Logger, cfg config.Config) (K8sClient, error) {
@@ -39,17 +45,24 @@ func NewK8sClient(logger logging.Logger, cfg config.Config) (K8sClient, error) {
 		return nil, err
 	}
 
-	codeClient := dynamicClient.Resource(schema.GroupVersionResource{
+	userToolsRes := dynamicClient.Resource(schema.GroupVersionResource{
 		Group:    userToolsGroup,
 		Version:  userToolsVersion,
 		Resource: userToolsResource,
 	})
 
+	kdlprojectRes := dynamicClient.Resource(schema.GroupVersionResource{
+		Group:    kdlprojectGroup,
+		Version:  kdlprojectVersion,
+		Resource: kdlprojectResource,
+	})
+
 	c := &k8sClient{
-		logger:     logger,
-		clientset:  clientset,
-		cfg:        cfg,
-		codeClient: codeClient,
+		logger:        logger,
+		clientset:     clientset,
+		cfg:           cfg,
+		userToolsRes:  userToolsRes,
+		kdlprojectRes: kdlprojectRes,
 	}
 
 	return c, nil

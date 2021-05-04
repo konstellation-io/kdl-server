@@ -114,9 +114,10 @@ func main() {
 
 	resolvers := graph.NewResolver(
 		cfg,
-		project.NewInteractor(logger, projectRepo, realClock, giteaService, minioService, droneService),
+		project.NewInteractor(logger, projectRepo, realClock, giteaService, minioService, droneService, k8sClient),
 		userInteractor,
 		kg.NewInteractor(logger, kgService),
+		logger,
 	)
 
 	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, resolvers, userRepo)

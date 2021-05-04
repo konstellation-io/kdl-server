@@ -8,6 +8,7 @@ import styles from './SiteBar.module.scss';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import useProjectFilters from 'Graphql/client/hooks/useProjectFilters';
+import isElectron from 'is-electron';
 
 type FormData = {
   projectName: string;
@@ -35,8 +36,12 @@ function SiteBar() {
   return (
     <div className={styles.container}>
       <Left className={styles.left}>
-        <ArrowsNavigator onBackClick={goBack} onForwardClick={goForward} />
-        <Breadcrumbs />
+        <>
+          {isElectron() && (
+            <ArrowsNavigator onBackClick={goBack} onForwardClick={goForward} />
+          )}
+          <Breadcrumbs />
+        </>
       </Left>
       <Right className={styles.right}>
         <SettingsMenu />

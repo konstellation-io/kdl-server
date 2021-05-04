@@ -1,0 +1,6 @@
+# Use the 'create api' subcommand to add watches to this file.
+- group: project.konstellation.io
+  version: v1
+  kind: KDLProject
+  chart: helm-charts/kdlproject
+#+kubebuilder:scaffold:watch

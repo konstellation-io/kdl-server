@@ -49,11 +49,13 @@ def get_topics_from_probs(topic_probs, topic_names, threshold=0.5):
 
 
 def get_topics_table(Y_probs, topic_names, cutoff_paper=100):
-    """Computes topic relevance from a stack of papers (in rows) containing topic probabilities (in columns) for each paper.
+    """Computes topic relevance from a stack of papers (in rows) containing
+    topic probabilities (in columns) for each paper.
 
     Args:
-        Y_probs: (np array) with dim (n_papers, n_topics), where the papers are arranged by order of score (only top N papers
-            will be included in top topic computation, where N is defined by the cutoff_paper paramenter)
+        Y_probs: (np array) with dim (n_papers, n_topics), where the papers
+         are arranged by order of score (only top N papers will be included
+          in top topic computation, where N is defined by the cutoff_paper paramenter)
         topic_names: (list) topics in order in which they appear in the Y_probs columns
         cutoff_paper: (int) study topic relevance up to this rank
 

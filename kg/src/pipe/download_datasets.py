@@ -13,14 +13,13 @@ PWC_PAPERS_URL = "https://paperswithcode.com/media/about/papers-with-abstracts.j
 PWC_LINKS_URL = "https://paperswithcode.com/media/about/links-between-papers-and-code.json.gz"
 ARXIV_JSON = "gs://arxiv-dataset/metadata-v5/arxiv-metadata-oai.json"
 
-
-
 CHUNK_SIZE = 8192
 
 
 def download_file(origin: str, dest_path: str, chunk_size: int):
     """
-    Downloads a json file with .gz extension from origin URL, decompresses it and stores to the specified destination directory.
+    Downloads a json file with .gz extension from origin URL,
+    decompresses it and stores to the specified destination directory.
 
     Args:
     origin: (str) URL of the input file

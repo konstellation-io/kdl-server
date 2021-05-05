@@ -83,7 +83,6 @@ def create_topic_labels(number_of_tags: list[int], input_path: str):
 
         # Extract top tags
         task_counts = df_task_tags['task_tag'].value_counts()
-        top_tasks = task_counts.head(n_tags)
         min_papers = task_counts.iloc[n_tags]
 
         # Keep papers with those tags

@@ -1,7 +1,9 @@
+import pathlib
+
 import sklearn
 import torch
 from sklearn.model_selection import train_test_split
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 from transformers import AutoModelForMaskedLM, AutoTokenizer, PreTrainedTokenizer
 from transformers import DataCollatorForLanguageModeling
 from transformers import DistilBertModel
@@ -26,7 +28,7 @@ LEARNING_RATE = 1e-4
 RANDOM_SEED = 42
 
 
-class KGDataset(torch.utils.data.Dataset):
+class KGDataset(Dataset):
 
     def __init__(self, encodings: dict[str, list]):
         self.encodings = encodings
@@ -162,6 +164,9 @@ def run_accuracy_loop(model: DistilBertModel, dataset_loader: DataLoader,
 
 
 if __name__ == "__main__":
+    # Check or create model path
+    pathlib.Path(MODEL_PATH).mkdir(parents=True, exist_ok=True)
+
     # Reading dataset data
     texts = utils.get_inputs(DATASET_PATH)
 
@@ -181,8 +186,8 @@ if __name__ == "__main__":
                           max_length=tokenizer.model_max_length)
 
     # GPU benchmarking
-    train_encodings, time_tokenizer_train = tokenize(train_texts, tokenizer, tokenizer_args)
-    val_encodings, time_tokenizer_val = tokenize(val_texts, tokenizer, tokenizer_args)
+    train_encodings = tokenize(train_texts, tokenizer, tokenizer_args)
+    val_encodings = tokenize(val_texts, tokenizer, tokenizer_args)
 
     # Convert data to torch Dataset classes
     train_dataset = KGDataset(train_encodings)
@@ -226,12 +231,8 @@ if __name__ == "__main__":
     print(f"Train accuracy before training: {train_acc_before:.3f}")
 
     # Run training
-    train_loss, time_training = train_trainer(trainer=trainer)
-    val_loss, time_validation = evaluate_trainer(trainer=trainer, eval_dataset=val_dataset)
-
-    print(f"Tokenization time (train): {time_tokenizer_train:3f}")
-    print(f"Tokenization time (val): {time_tokenizer_val:3f}")
-    print(f"Training time: {time_training:.3f}")
+    train_loss = train_trainer(trainer=trainer)
+    val_loss = evaluate_trainer(trainer=trainer, eval_dataset=val_dataset)
 
     # Compute accuracy (train/val) after training
     val_acc_after, (_, _) = run_accuracy_loop(model, val_loader, data_collator)
@@ -239,3 +240,4 @@ if __name__ == "__main__":
 
     # Save and log the model
     model.save_pretrained(MODEL_PATH)
+    tokenizer.save_pretrained(MODEL_PATH)

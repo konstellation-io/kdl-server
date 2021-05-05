@@ -19,6 +19,7 @@ The pipeline consists of the following steps:
 check-inputs
 create-dataset
 train-transformer (freezed)
+create-topic-labels (freezed)
 train-topics (freezed)
 compute-vectors
 compute-topics
@@ -36,7 +37,7 @@ dvc commit
 ```
 This will commit in dvc the current version of output data.
 
-After that you can store in an external storage:
+After that you can store in an external storage (You have to ask the project admins permission to commit to this storage):
 ```
 dvc push -r s3
 ```

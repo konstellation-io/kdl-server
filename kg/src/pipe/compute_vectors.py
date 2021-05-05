@@ -4,10 +4,11 @@ import faiss
 import numpy as np
 import torch
 import transformers
-from pipe import utils
-from pipe.data_checks.vectors import check_vector_size
 from transformers import AutoModel, AutoTokenizer
 from transformers.tokenization_utils_base import BatchEncoding
+
+from pipe import utils
+from pipe.data_checks.vectors import check_vector_size
 
 # Paths
 ASSET_PATH = "assets/"

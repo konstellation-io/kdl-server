@@ -1,6 +1,6 @@
 import numpy as np
 
-import utils
+from pipe import utils
 
 TEST_DATASET_PATH = "tests/files/test_ds.pkl.gz"
 

@@ -1,8 +1,6 @@
 package giteaservice
 
 import (
-	"errors"
-
 	"code.gitea.io/sdk/gitea"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
@@ -13,10 +11,6 @@ const (
 	// https://github.com/konstellation-io/science-toolkit/blob/master/helm/science-toolkit/templates/gitea/init-configmap.yaml
 	kdlOrganization = "kdl"
 	kdlSSHKeyName   = "kdl-ssh-key"
-)
-
-var (
-	ErrAccessLevelNotFound = errors.New("the access level is not recognized")
 )
 
 type giteaService struct {
@@ -160,24 +154,17 @@ func (g *giteaService) UpdateCollaboratorPermissions(repoName, username string, 
 
 // UpdateUserPermissions changes the permissions for the given user.
 func (g *giteaService) UpdateUserPermissions(username, email string, level entity.AccessLevel) error {
-	varTrue := true
-	varFalse := false
+	isAdmin := false
 
-	// gitea AdminEditUser call requires email in editUserOptions to work properly
-	editUserOptions := gitea.EditUserOption{
-		Admin: nil,
-		Email: email,
+	if level == entity.AccessLevelAdmin {
+		isAdmin = true
 	}
 
-	switch level {
-	case entity.AccessLevelAdmin:
-		editUserOptions.Admin = &varTrue
-	case entity.AccessLevelManager:
-		editUserOptions.Admin = &varFalse
-	case entity.AccessLevelViewer:
-		editUserOptions.Admin = &varFalse
-	default:
-		return ErrAccessLevelNotFound
+	// gitea AdminEditUser call requires Email and LoginName in editUserOptions to work properly
+	editUserOptions := gitea.EditUserOption{
+		LoginName: username,
+		Email:     email,
+		Admin:     &isAdmin,
 	}
 
 	_, err := g.client.AdminEditUser(username, editUserOptions)

@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/konstellation-io/kdl-server/app/api/http/controller"
+
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/dataloader"
 
 	"github.com/konstellation-io/kdl-server/app/api/usecase/kg"
@@ -120,19 +122,28 @@ func main() {
 		logger,
 	)
 
-	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, resolvers, userRepo)
+	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, resolvers, userRepo, projectRepo)
 }
 
-func startHTTPServer(logger logging.Logger, port, staticFilesPath string, resolvers generated.ResolverRoot, userRepo user.Repository) {
+func startHTTPServer(
+	logger logging.Logger,
+	port, staticFilesPath string,
+	resolvers generated.ResolverRoot,
+	userRepo user.Repository,
+	projectRepo project.Repository,
+) {
 	const apiQueryPath = "/api/query"
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers}))
 	pg := playground.Handler("GraphQL playground", apiQueryPath)
 	fs := http.FileServer(http.Dir(staticFilesPath))
 
+	authController := controller.NewAuthController(logger, userRepo, projectRepo)
+
 	http.Handle("/", fs)
 	http.Handle("/api/playground", middleware.AuthMiddleware(pg))
 	http.Handle(apiQueryPath, middleware.AuthMiddleware(dataloader.Middleware(userRepo, srv)))
+	http.HandleFunc("/api/auth/project", authController.HandleProjectAuth)
 
 	logger.Infof("Server running at port %s", port)
 

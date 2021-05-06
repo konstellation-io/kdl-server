@@ -6,21 +6,16 @@ describe('Projects Page', () => {
   });
 
   it('should show projects page', () => {
-    // Arrange.
-    // Act.
     // Assert.
     cy.url().should('include', '/projects');
   });
 
   it('should show at least 4 projects in the page', () => {
-    // Arrange.
-    // Act.
     // Assert.
     cy.get('[data-testid="project"]').should('have.length.at.least', 4);
   });
 
   it('should show 8 projects when filtering by all', () => {
-    // Arrange.
     // Act.
     cy.get('[data-testid="filterProjects"]')
       .click()
@@ -32,7 +27,6 @@ describe('Projects Page', () => {
   });
 
   it('should show only archived projects when filtering by archived', () => {
-    // Arrange.
     // Act.
     cy.get('[data-testid="filterProjects"]')
       .click()
@@ -72,7 +66,6 @@ describe('Projects Page', () => {
   });
 
   it('should navigate to the user page when click on the user option in the menu', () => {
-    // Arrange.
     // Act.
     cy.get('[data-testid="server"]')
       .click()

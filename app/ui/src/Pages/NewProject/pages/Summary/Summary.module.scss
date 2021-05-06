@@ -4,10 +4,14 @@
 
 .container {
   height: 100%;
+  overflow: hidden;
 
   .section {
     @include font-title;
     color: font-color(lowlight);
+
+    overflow: auto;
+    height: 100%;
   }
 
   .title {
@@ -58,9 +62,9 @@
   }
   .descriptionContainer {
     @include font-body;
-    margin: 2.5 * $grid-unit 0;
-    background-color: palette(base, 600);
     color: font-color(lowlight);
+
+    background-color: palette(base, 600);
     padding: 3 * $grid-unit;
     white-space: pre-line;
   }

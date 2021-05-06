@@ -1,9 +1,5 @@
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import React, { useEffect, useMemo, useState } from 'react';
-import RepositoryTypeComponent, {
-  LOCATION,
-  SIZE,
-} from './pages/Repository/components/RepositoryTypeComponent/RepositoryTypeComponent';
 import useStepper, { ActionButton } from 'Hooks/useStepper/useStepper';
 
 import DefaultPage from 'Components/Layout/Page/DefaultPage/DefaultPage';
@@ -12,7 +8,6 @@ import ROUTE from 'Constants/routes';
 import Repository from './pages/Repository/Repository';
 import RepositoryDetails from './pages/RepositoryDetails/RepositoryDetails';
 import { RepositoryType } from 'Graphql/types/globalTypes';
-import SidebarTop from 'Components/Layout/Page/DefaultPage/SidebarTop';
 import Stepper from 'Components/Stepper/Stepper';
 import Summary from './pages/Summary/Summary';
 import cx from 'classnames';
@@ -21,6 +16,10 @@ import { useReactiveVar } from '@apollo/client';
 import { Prompt } from 'react-router-dom';
 import useUnloadPrompt from 'Hooks/useUnloadPrompt/useUnloadPrompt';
 import { newProject } from 'Graphql/client/cache';
+import SidebarTop from 'Components/Layout/Page/DefaultPage/SidebarTop';
+import SidebarInformation from './pages/SidebarComponents/Information/SidebarInformation';
+import SidebarRepository from './pages/SidebarComponents/Repository/SidebarRepository';
+import SidebarExternalRepository from './pages/SidebarComponents/SidebarExternalRepository/SidebarExternalRepository';
 
 enum Steps {
   INFORMATION,
@@ -64,6 +63,7 @@ export const repoTypeToStepName: {
 };
 
 function NewProject() {
+  const [isMounted, setIsMounted] = useState(false);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [isPromptEnabled, setIsPromptEnabled] = useState(false);
 
@@ -87,6 +87,8 @@ function NewProject() {
   // We want to execute this on on component mount and unmount
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => disableUnloadPrompt, []);
+
+  useEffect(() => setIsMounted(true), []);
 
   const {
     direction,
@@ -190,31 +192,18 @@ function NewProject() {
     return true;
   }
 
-  function getSidebarTopComponent() {
-    const locationByType =
-      type === RepositoryType.EXTERNAL ? LOCATION.OUT : LOCATION.IN;
-    const typeAsString =
-      type === RepositoryType.EXTERNAL
-        ? 'External Repository'
-        : 'Internal Repository';
-    return (
-      <div className={styles.sidebarComponent}>
-        <div className={styles.repoIcon}>
-          <RepositoryTypeComponent
-            squareLocation={locationByType}
-            size={SIZE.SMALL}
-            shouldAnimate={false}
-          />
-          <span className={styles.repoLabel}>{typeAsString}</span>
-        </div>
-        <p>
-          You have selected a repository type.{' '}
-          <strong>External repositories</strong> use a version-control system
-          located outside the server. <strong>Internal repositories</strong>{' '}
-          will be deployed inside the actual Server.
-        </p>
-      </div>
-    );
+  function getSideContent() {
+    const step = stepsWithData[actStep];
+    switch (step) {
+      case StepNames.INFORMATION:
+        return <SidebarInformation />;
+      case StepNames.REPOSITORY:
+        return <SidebarRepository />;
+      case StepNames.EXTERNAL:
+        return <SidebarExternalRepository />;
+      default:
+        return <></>;
+    }
   }
 
   return (
@@ -228,7 +217,7 @@ function NewProject() {
           when={isPromptEnabled}
           message="You are going to leave this page. You'll lose your changes, please confirm."
         />
-        {type && <SidebarTop>{getSidebarTopComponent()}</SidebarTop>}
+        {isMounted && <SidebarTop>{getSideContent()}</SidebarTop>}
         <div className={styles.container}>
           <div className={styles.steps}>
             <div className={styles.stepper}>

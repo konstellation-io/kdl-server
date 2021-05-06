@@ -5,6 +5,7 @@ exports[`When data is ready should render without crashing 1`] = `
   <div>
     <div
       class="container"
+      data-testid="filterProjects"
     >
       <div
         class="formSelect _2rBeV _1z7Bn"

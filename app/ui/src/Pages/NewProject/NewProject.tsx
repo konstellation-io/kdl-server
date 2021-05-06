@@ -20,6 +20,8 @@ import SidebarTop from 'Components/Layout/Page/DefaultPage/SidebarTop';
 import SidebarInformation from './pages/SidebarComponents/Information/SidebarInformation';
 import SidebarRepository from './pages/SidebarComponents/Repository/SidebarRepository';
 import SidebarExternalRepository from './pages/SidebarComponents/SidebarExternalRepository/SidebarExternalRepository';
+import { useHistory } from 'react-router-dom';
+import useNewProject from 'Graphql/client/hooks/useNewProject';
 
 enum Steps {
   INFORMATION,
@@ -63,6 +65,8 @@ export const repoTypeToStepName: {
 };
 
 function NewProject() {
+  const history = useHistory();
+  const { clearAll } = useNewProject('information');
   const [isMounted, setIsMounted] = useState(false);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [isPromptEnabled, setIsPromptEnabled] = useState(false);
@@ -89,6 +93,13 @@ function NewProject() {
   useEffect(() => disableUnloadPrompt, []);
 
   useEffect(() => setIsMounted(true), []);
+
+  useEffect(() => {
+    const routeListener = history.listen((newLocation) => {
+      if (newLocation.pathname !== ROUTE.PROJECT_CREATION) clearAll();
+    });
+    return () => routeListener();
+  }, []);
 
   const {
     direction,

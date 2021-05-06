@@ -1,8 +1,9 @@
 const casual = require('casual');
 const { buildRandomMembers } = require('./membersMock');
 const buildRepository = require('./repositoryMock');
+const activeProjectsCount = 4;
 
-function buildProject() {
+function buildProject(_, index) {
   return {
     id: casual.uuid,
     name: casual.name,
@@ -12,9 +13,9 @@ function buildProject() {
     creationDate: () => new Date().toISOString(),
     lastActivationDate: () => new Date().toISOString(),
     error: casual.random_element([null, casual.error]),
-    needAccess: casual.boolean,
+    needAccess: index < activeProjectsCount ? false : casual.boolean,
     members: buildRandomMembers(casual.integer(1, 5)),
-    archived: casual.boolean,
+    archived: index < activeProjectsCount ? false : casual.boolean,
     toolUrls: () => ({
       gitea: 'https://gitea.io/en-us/',
       minio: 'https://min.io/',

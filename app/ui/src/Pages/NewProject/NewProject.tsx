@@ -99,6 +99,8 @@ function NewProject() {
       if (newLocation.pathname !== ROUTE.PROJECT_CREATION) clearAll();
     });
     return () => routeListener();
+    // We want to execute this on on component mount and unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const {

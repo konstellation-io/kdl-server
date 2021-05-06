@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`When data is ready should render without crashing 1`] = `
+<body>
+  <div>
+    <div
+      class="container"
+    >
+      <div
+        class="formSelect _2rBeV _1z7Bn"
+      >
+        
+        <div
+          class="_Z0bIQ"
+        >
+          <div
+            class="_3Loey"
+            style="height: 67px;"
+          >
+            Active (1)
+          </div>
+          <div
+            class="_3bqns"
+            style="max-height: 0;"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;

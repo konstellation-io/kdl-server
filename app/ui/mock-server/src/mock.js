@@ -1,19 +1,19 @@
-const { MockList } = require('apollo-server');
-
 const relevances = require('./mocks/topic_relevance.json');
 const casual = require('casual');
 const buildProject = require('./mocks/projectMock');
+const buildUser = require('./mocks/usersMock');
 const kgData = require('./mocks/kgMock');
 const { buildMember, meAsMember } = require('./mocks/membersMock');
 const { meId, me } = require('./mocks/meMock');
 
 const projects = Array(8).fill(0).map(buildProject);
+const users = Array(casual.integer(20, 30)).fill(0).map(buildUser);
 
 module.exports = {
   Query: () => ({
     me: () => me,
     projects: () => projects,
-    users: () => new MockList([20, 30]),
+    users: () => users,
     project: (_, { id }) => projects.find((project) => project.id === id),
     qualityProjectDesc: () => ({
       quality: Math.round((Math.random() * 1000) % 100),
@@ -73,11 +73,14 @@ module.exports = {
       starred,
     }),
     addApiToken: this.ApiToken,
-    updateAccessLevel: (_, { input: { userIds, accessLevel } }) =>
-      userIds.map((userId) => ({
-        id: userId,
-        accessLevel,
-      })),
+    updateAccessLevel: (_, { input: { userIds, accessLevel } }) => {
+      console.log(userIds);
+      for (const id of userIds) {
+        const user = users.find((user) => user.id === id);
+        user.accessLevel = accessLevel;
+      }
+      return users;
+    },
     removeUsers: (_, { input: { userIds } }) =>
       userIds.map((userId) => ({
         id: userId,

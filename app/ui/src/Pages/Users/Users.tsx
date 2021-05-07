@@ -84,28 +84,30 @@ function Users() {
       <h1 className={styles.sectionTitle}>Users</h1>
       {getContent()}
       {modalVisible && (
-        <ModalContainer
-          title={modalInfo.current.title}
-          onAccept={modalInfo.current.action}
-          onCancel={hideModal}
-          actionButtonLabel={modalInfo.current.acceptLabel}
-          actionButtonCancel="Cancel"
-          className={styles.modal}
-          blocking
-        >
-          <ModalLayoutConfirmList message={modalInfo.current.message}>
-            {modalInfo.current.userIds.map((userId) => {
-              const user = data?.users.find((u) => u.id === userId);
-              return (
-                <UserRow
-                  key={user?.email}
-                  email={user?.email}
-                  accessLevel={user?.accessLevel}
-                />
-              );
-            })}
-          </ModalLayoutConfirmList>
-        </ModalContainer>
+        <div data-testid="usersModal">
+          <ModalContainer
+            title={modalInfo.current.title}
+            onAccept={modalInfo.current.action}
+            onCancel={hideModal}
+            actionButtonLabel={modalInfo.current.acceptLabel}
+            actionButtonCancel="Cancel"
+            className={styles.modal}
+            blocking
+          >
+            <ModalLayoutConfirmList message={modalInfo.current.message}>
+              {modalInfo.current.userIds.map((userId) => {
+                const user = data?.users.find((u) => u.id === userId);
+                return (
+                  <UserRow
+                    key={user?.email}
+                    email={user?.email}
+                    accessLevel={user?.accessLevel}
+                  />
+                );
+              })}
+            </ModalLayoutConfirmList>
+          </ModalContainer>
+        </div>
       )}
     </div>
   );

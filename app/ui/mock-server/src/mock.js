@@ -74,7 +74,6 @@ module.exports = {
     }),
     addApiToken: this.ApiToken,
     updateAccessLevel: (_, { input: { userIds, accessLevel } }) => {
-      console.log(userIds);
       for (const id of userIds) {
         const user = users.find((user) => user.id === id);
         user.accessLevel = accessLevel;

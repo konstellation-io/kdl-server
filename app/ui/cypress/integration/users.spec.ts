@@ -9,23 +9,21 @@ describe('Users Page', () => {
   });
 
   it('should reflect the new role in the table when change role of a single user', () => {
+    // Arrange.
+    const newRole = 'Viewer';
+
     // Act.
     cy.get('[data-testid="userRoleSelect"]')
       .first()
       .click()
-      .find('div > div > div > div')
-      .last()
-      .click()
-      .invoke('text')
-      .as('newRole');
+      .contains(newRole)
+      .click();
 
     // Assert.
-    cy.get('@newRole').then((newRole) => {
-      cy.get('[data-testid="userRoleSelect"]')
-        .first()
-        .invoke('text')
-        .should('equal', newRole);
-    });
+    cy.get('[data-testid="userRoleSelect"]')
+      .first()
+      .invoke('text')
+      .should('equal', newRole);
   });
 
   describe('bulk actions', () => {

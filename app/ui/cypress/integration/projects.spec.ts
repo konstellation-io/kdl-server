@@ -69,9 +69,8 @@ describe('Projects Page', () => {
     // Act.
     cy.get('[data-testid="server"]')
       .click()
-      .within(() => {
-        cy.get('[data-testid="users"]').click();
-      });
+      .find('[data-testid="users"]')
+      .click();
 
     // Assert
     cy.url().should('include', '/users');

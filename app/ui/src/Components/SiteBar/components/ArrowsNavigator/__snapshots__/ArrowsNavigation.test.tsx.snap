@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ProjectsBar component Component match snapshot 1`] = `
+<div
+  className="container"
+>
+  <P
+    Icon={
+      Object {
+        "$$typeof": Symbol(react.memo),
+        "compare": null,
+        "type": Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "render": [Function],
+        },
+      }
+    }
+    label=""
+    onClick={[MockFunction]}
+  />
+  <P
+    Icon={
+      Object {
+        "$$typeof": Symbol(react.memo),
+        "compare": null,
+        "type": Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "render": [Function],
+        },
+      }
+    }
+    label=""
+    onClick={[MockFunction]}
+  />
+</div>
+`;

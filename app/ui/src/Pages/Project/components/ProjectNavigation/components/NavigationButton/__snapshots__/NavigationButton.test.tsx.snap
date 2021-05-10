@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NavigationButton component Component match snapshot 1`] = `
+<div
+  className="navButton someClass"
+  onClick={[MockFunction]}
+  title="some title"
+>
+  <Memo(ForwardRef(CloseIcon))
+    className="icon-small icon"
+  />
+  <span
+    className="label"
+  >
+    some label
+  </span>
+</div>
+`;

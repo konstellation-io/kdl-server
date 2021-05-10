@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AddProject component Component match snapshot 1`] = `
+<div
+  className="addProjectContainer"
+  data-testid="add-project"
+>
+  <Link
+    to="/new-project"
+  >
+    <div
+      className="addProjectBg"
+    >
+      <div
+        className="addProjectBgUpper"
+      />
+      <div
+        className="addProjectBgLower"
+      />
+    </div>
+  </Link>
+  <div
+    className="addProjectLabel"
+  >
+    <Memo(ForwardRef(AddIcon))
+      className="icon-regular"
+    />
+    <p>
+      ADD PROJECT
+    </p>
+  </div>
+</div>
+`;

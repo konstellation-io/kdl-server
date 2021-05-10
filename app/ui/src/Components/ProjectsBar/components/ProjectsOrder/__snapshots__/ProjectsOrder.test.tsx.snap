@@ -6,8 +6,13 @@ exports[`When data is ready should render without crashing 1`] = `
     <div
       class="container"
     >
+      <p
+        class="label"
+      >
+        SORT BY
+      </p>
       <div
-        class="formSelect _2rBeV _1z7Bn"
+        class="_2rBeV _1z7Bn"
       >
         
         <div
@@ -15,9 +20,9 @@ exports[`When data is ready should render without crashing 1`] = `
         >
           <div
             class="_3Loey"
-            style="height: 67px;"
+            style="height: 40px;"
           >
-            Active (2)
+            Creation date
           </div>
           <div
             class="_3bqns"

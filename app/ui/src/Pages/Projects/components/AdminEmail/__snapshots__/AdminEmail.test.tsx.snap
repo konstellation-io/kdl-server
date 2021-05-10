@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AdminEmail component Component match snapshot 1`] = `
+<div
+  className="adminEmail"
+>
+  <span>
+    email@kosntellation.io
+  </span>
+  <div
+    className="actions"
+  >
+    <CopyToClipboard>
+      email@kosntellation.io
+    </CopyToClipboard>
+    <P
+      Icon={
+        Object {
+          "$$typeof": Symbol(react.memo),
+          "compare": null,
+          "type": Object {
+            "$$typeof": Symbol(react.forward_ref),
+            "render": [Function],
+          },
+        }
+      }
+      label=""
+      onClick={[Function]}
+    />
+  </div>
+</div>
+`;

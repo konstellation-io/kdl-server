@@ -6,7 +6,7 @@ import React from 'react';
 import styles from './Project.module.scss';
 
 const AddProject = () => (
-  <div className={styles.addProjectContainer}>
+  <div className={styles.addProjectContainer} data-testid="add-project">
     <Link to={ROUTE.NEW_PROJECT}>
       <div className={styles.addProjectBg}>
         <div className={styles.addProjectBgUpper} />

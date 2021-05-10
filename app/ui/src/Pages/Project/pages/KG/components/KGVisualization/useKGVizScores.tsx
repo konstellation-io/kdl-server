@@ -55,8 +55,15 @@ function useKGVizScores(data: D[]) {
     //   if mouse is at min score, min score will not me affected by the zoom
     //   if mouse is at 25% from min score, a 25% of zoom will be applied to min score
     //     and a 75% to max score
-    const scoreFactorMin = 1 - pivotPosition;
-    const scoreFactorMax = pivotPosition;
+    let scoreFactorMin = 1 - pivotPosition;
+    let scoreFactorMax = pivotPosition;
+
+    // Zooming while on edge will apply an inverted zoom to the closest value
+    if (pivotPosition === 0) {
+      scoreFactorMax = -0.1;
+    } else if (pivotPosition === 1) {
+      scoreFactorMin = -0.1;
+    }
 
     const [maxScore, minScore] = borderScores;
     const [max, min] = scores;
@@ -79,30 +86,14 @@ function useKGVizScores(data: D[]) {
     const minMultiplier = totalMultiplier * scoreFactorMin;
     const maxMultiplier = totalMultiplier * scoreFactorMax;
 
-    let newMin = min;
-    let newMax = max;
-    if (pivotPosition === 0) {
-      // If mouse is at inner circle, move max score to one of the sides
-      newMax = Math.max(
-        newMin + 0.0001,
-        Math.min(maxScore, max + max * totalMultiplier)
-      );
-    } else if (pivotPosition === 1) {
-      // If mouse is outside the radar, move min score to one of the sides
-      newMin = Math.min(
-        max,
-        Math.max(minScore + 0.001, min - min * totalMultiplier)
-      );
-    } else {
-      newMin = Math.min(
-        max,
-        Math.max(minScore + 0.001, min + min * minMultiplier)
-      );
-      newMax = Math.max(
-        newMin + 0.0001,
-        Math.min(maxScore, max - max * maxMultiplier)
-      );
-    }
+    const newMin = Math.min(
+      max,
+      Math.max(minScore + 0.0001, min + min * minMultiplier)
+    );
+    const newMax = Math.max(
+      newMin + 0.0001,
+      Math.min(maxScore, max - max * maxMultiplier)
+    );
 
     setScore([newMax, newMin]);
   }
@@ -116,7 +107,7 @@ function useKGVizScores(data: D[]) {
     const [limitMax] = borderScores;
 
     newMax = Math.min(limitMax, newMax);
-    const newMin = newMax - scoresDistance;
+    const newMin = Math.max(0, newMax - scoresDistance);
 
     setScore([newMax, newMin]);
   }

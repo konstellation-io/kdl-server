@@ -34,7 +34,7 @@ function TableColCheck({
   className = '',
 }: any) {
   return (
-    <div className={styles.check}>
+    <div className={styles.check} data-testid="checkUser">
       <Check
         onChange={() => onChange && onChange({ target: { checked: !checked } })}
         checked={checked || false}
@@ -99,7 +99,7 @@ function UsersTable({ users }: Props) {
         accessor: 'accessLevel',
         Cell: ({ value, row }) => {
           return (
-            <div className={styles.levelSelector}>
+            <div className={styles.levelSelector} data-testid="userRoleSelect">
               <Select
                 options={Object.keys(AccessLevel)}
                 formSelectedOption={value}

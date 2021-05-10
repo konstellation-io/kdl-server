@@ -92,7 +92,7 @@ function UserActions({ onUpdateUsers }: Props) {
         handleCheckClick={handleCheckClick}
       />
       <span className={styles.nSelections}>{nSelectionsText}</span>
-      <div className={styles.formActions}>
+      <div className={styles.formActions} data-testid="bulkSelect">
         <Select
           label="Actions"
           options={types}

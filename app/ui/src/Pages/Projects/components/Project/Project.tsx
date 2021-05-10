@@ -26,6 +26,7 @@ function Project({ project, showAdmins }: Props) {
   const disabled = project.needAccess || project.archived;
   const Component = (
     <div
+      data-testid="project"
       className={cx(styles.container, {
         [styles.archived]: project.archived,
       })}
@@ -61,7 +62,9 @@ function UpperBg({ project, showAdmins }: Props) {
         <div className={styles.bgBand} />
       </div>
       <div className={styles.content}>
-        <p className={styles.name}>{project.name}</p>
+        <p className={styles.name} data-testid="projectName">
+          {project.name}
+        </p>
         {project.needAccess && (
           <div className={styles.contactInfo} onClick={onContactAdmins}>
             Need access?
@@ -95,7 +98,11 @@ const Band: FC<BaseProps> = ({ project }) => (
   <div className={styles.band}>
     <div className={styles.label}>{capitalize(project.repository?.type)}</div>
     <div className={styles.otherLabels}>
-      {project.archived && <div className={styles.labelArchived}>Archived</div>}
+      {project.archived && (
+        <div className={styles.labelArchived} data-testid="projectArchived">
+          Archived
+        </div>
+      )}
       {project.needAccess && (
         <div className={styles.labelNoAccess}>No Access</div>
       )}

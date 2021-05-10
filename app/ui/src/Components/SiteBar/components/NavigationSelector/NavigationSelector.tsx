@@ -16,12 +16,13 @@ const NavigationSelector: FC<Props & BottomComponentProps> = ({
 }) => (
   <div className={styles.container}>
     <ul>
-      {options.map(({ to, Icon, label, disabled }) => (
+      {options.map(({ to, Icon, label, disabled, id }) => (
         <li
           key={label}
           className={cx({
             [styles.disabled]: disabled,
           })}
+          data-testid={id}
         >
           <NavLink
             to={to}

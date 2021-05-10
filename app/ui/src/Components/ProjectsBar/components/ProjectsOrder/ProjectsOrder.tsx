@@ -26,7 +26,7 @@ function ProjectsOrder() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="sortProjects">
       <p className={styles.label}>SORT BY</p>
       <Select
         onChange={(newOrder: ProjectOrder) =>

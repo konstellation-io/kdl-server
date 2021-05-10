@@ -219,7 +219,11 @@ function UsersTable({ users }: Props) {
 
   return (
     <div className={styles.container}>
-      <table {...getTableProps()} className={styles.table}>
+      <table
+        {...getTableProps()}
+        className={styles.table}
+        data-testid="usersTable"
+      >
         <thead>
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>

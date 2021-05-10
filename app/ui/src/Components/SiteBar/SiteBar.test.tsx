@@ -18,7 +18,6 @@ describe('SiteBar component', () => {
   });
 
   it('should show navigation buttons when running on electron', function () {
-    // Arrange.
     // Act.
     isElectron.mockReturnValue(true);
     component = shallow(<SiteBar />);

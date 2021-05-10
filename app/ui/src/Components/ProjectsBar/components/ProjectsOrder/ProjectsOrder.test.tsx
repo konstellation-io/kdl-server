@@ -46,7 +46,6 @@ describe('When data is ready', () => {
   });
 
   it('should allow the selection of other options', function () {
-    // Arrange.
     // Act.
     fireEvent.click(screen.getByText('Creation date', { exact: false }));
     fireEvent.click(screen.getByText('From A to Z', { exact: false }));

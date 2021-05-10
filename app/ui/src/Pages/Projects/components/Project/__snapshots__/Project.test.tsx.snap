@@ -58,12 +58,12 @@ exports[`Project component Component match snapshot 1`] = `
           "needAccess": true,
           "repository": null,
           "toolUrls": Object {
-            "drone": "drone",
-            "gitea": "drone",
-            "jupyter": "gitea",
-            "minio": "jupyter",
-            "mlflow": "minio",
-            "vscode": "mlflow",
+            "drone": "https://drone",
+            "filebrowser": "https://filebrowser",
+            "gitea": "https://gitea",
+            "jupyter": "https://jupyter",
+            "mlflow": "https://mlflow",
+            "vscode": "https://vscode",
           },
         }
       }
@@ -110,12 +110,12 @@ exports[`Project component Component match snapshot 1`] = `
                 "needAccess": true,
                 "repository": null,
                 "toolUrls": Object {
-                  "drone": "drone",
-                  "gitea": "drone",
-                  "jupyter": "gitea",
-                  "minio": "jupyter",
-                  "mlflow": "minio",
-                  "vscode": "mlflow",
+                  "drone": "https://drone",
+                  "filebrowser": "https://filebrowser",
+                  "gitea": "https://gitea",
+                  "jupyter": "https://jupyter",
+                  "mlflow": "https://mlflow",
+                  "vscode": "https://vscode",
                 },
               }
             }
@@ -136,6 +136,7 @@ exports[`Project component Component match snapshot 1`] = `
               >
                 <p
                   className="name"
+                  data-testid="projectName"
                 >
                   projectName3
                 </p>
@@ -183,12 +184,12 @@ exports[`Project component Component match snapshot 1`] = `
                 "needAccess": true,
                 "repository": null,
                 "toolUrls": Object {
-                  "drone": "drone",
-                  "gitea": "drone",
-                  "jupyter": "gitea",
-                  "minio": "jupyter",
-                  "mlflow": "minio",
-                  "vscode": "mlflow",
+                  "drone": "https://drone",
+                  "filebrowser": "https://filebrowser",
+                  "gitea": "https://gitea",
+                  "jupyter": "https://jupyter",
+                  "mlflow": "https://mlflow",
+                  "vscode": "https://vscode",
                 },
               }
             }
@@ -263,12 +264,12 @@ exports[`Project component Component match snapshot 1`] = `
                 "needAccess": true,
                 "repository": null,
                 "toolUrls": Object {
-                  "drone": "drone",
-                  "gitea": "drone",
-                  "jupyter": "gitea",
-                  "minio": "jupyter",
-                  "mlflow": "minio",
-                  "vscode": "mlflow",
+                  "drone": "https://drone",
+                  "filebrowser": "https://filebrowser",
+                  "gitea": "https://gitea",
+                  "jupyter": "https://jupyter",
+                  "mlflow": "https://mlflow",
+                  "vscode": "https://vscode",
                 },
               }
             }
@@ -324,12 +325,12 @@ exports[`Project component Component match snapshot 1`] = `
                 "needAccess": true,
                 "repository": null,
                 "toolUrls": Object {
-                  "drone": "drone",
-                  "gitea": "drone",
-                  "jupyter": "gitea",
-                  "minio": "jupyter",
-                  "mlflow": "minio",
-                  "vscode": "mlflow",
+                  "drone": "https://drone",
+                  "filebrowser": "https://filebrowser",
+                  "gitea": "https://gitea",
+                  "jupyter": "https://jupyter",
+                  "mlflow": "https://mlflow",
+                  "vscode": "https://vscode",
                 },
               }
             }

@@ -32,7 +32,6 @@ afterEach(cleanup);
 
 describe('When component is loading', () => {
   it('should render without crashing', () => {
-    // Arrange.
     // Act.
     mockClient.setRequestHandler(GetMeQuery, loadingHandler);
     apolloRender(Component, mockClient);
@@ -62,7 +61,6 @@ describe('When data is ready', () => {
     });
 
     it('should not perform any action when clicking on the separator', () => {
-      // Arrange.
       // Act.
       fireEvent.click(screen.getByText('USER SETTINGS', { exact: false }));
 
@@ -73,7 +71,6 @@ describe('When data is ready', () => {
     });
 
     it('should redirect to ssh key page when clicking on this section', () => {
-      // Arrange.
       // Act.
       fireEvent.click(screen.getByText('SSH KEY', { exact: false }));
 

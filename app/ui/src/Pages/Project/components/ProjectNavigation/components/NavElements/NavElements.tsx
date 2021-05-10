@@ -88,7 +88,7 @@ function NavElements({ isOpened }: Props) {
               warning
             >
               <NavigationButton
-                label="Stop tools"
+                label={areToolsActive ? 'Stop tools' : 'Run tools'}
                 Icon={renderToggleToolsIcon()}
               />
             </ConfirmAction>

@@ -11,6 +11,7 @@ exports[`When data is ready should render without crashing 1`] = `
       >
         <div
           class="container"
+          data-testid="filterProjects"
         >
           <div
             class="formSelect _2rBeV _1z7Bn"
@@ -34,6 +35,7 @@ exports[`When data is ready should render without crashing 1`] = `
         </div>
         <div
           class="container"
+          data-testid="sortProjects"
         >
           <p
             class="label"
@@ -116,6 +118,7 @@ exports[`When data is ready should render without crashing 1`] = `
             >
               <p
                 class="name"
+                data-testid="projectName"
               >
                 projectName1
               </p>
@@ -215,6 +218,7 @@ exports[`When data is ready should render without crashing 1`] = `
             >
               <p
                 class="name"
+                data-testid="projectName"
               >
                 projectName2
               </p>

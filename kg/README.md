@@ -50,7 +50,8 @@ bash scripts/generate_proto.sh
 You have to install [dvc](https://dvc.org/doc/install) or be inside the project virtualenv
 
 After that you have to run the following command:
-```
+
+```bash
 dvc pull
 ```
 

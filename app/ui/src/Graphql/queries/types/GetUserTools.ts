@@ -10,7 +10,7 @@
 export interface GetUserTools_project_toolUrls {
   __typename: 'ToolUrls';
   gitea: string;
-  minio: string;
+  filebrowser: string;
   jupyter: string;
   vscode: string;
   drone: string;

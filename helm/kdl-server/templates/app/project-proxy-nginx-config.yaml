@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mlflow-proxy-nginx-config
+  name: project-proxy-nginx-config
 data:
   nginx.conf: |
     user  nginx;
@@ -37,6 +37,12 @@ data:
             auth_request /auth;
             auth_request_set $auth_status $upstream_status;
             proxy_pass http://$1-mlflow.kdl.svc.cluster.local:5000/$2$is_args$args;
+        }
+
+        location ~ ^/filebrowser/([^/]+)/(.*)$ {
+            auth_request /auth;
+            auth_request_set $auth_status $upstream_status;
+            proxy_pass http://$1-filebrowser.kdl.svc.cluster.local:9696/$2$is_args$args;
         }
       }
     }

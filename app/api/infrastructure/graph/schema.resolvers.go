@@ -211,24 +211,20 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 		return &entity.ToolUrls{}, err
 	}
 
-	minioWithFolder, err := kdlutil.JoinToURL(r.cfg.Minio.URL, folderName)
-	if err != nil {
-		return &entity.ToolUrls{}, err
-	}
-
 	jupyterWithUsername := strings.Replace(r.cfg.Jupyter.URL, "USERNAME", slugUserName, 1)
 	jupyterWithUsernameAndFolder := strings.Replace(jupyterWithUsername, "REPO_FOLDER", folderName, 2)
 	vscodeWithUsername := strings.Replace(r.cfg.VSCode.URL, "USERNAME", slugUserName, 1)
 	vscodeWithUsernameAndFolder := strings.Replace(vscodeWithUsername, "REPO_FOLDER", folderName, 1)
 	mlflowWithProject := strings.Replace(r.cfg.MLFlow.URL, "PROJECT_ID", obj.ID, 1)
+	filebrowserWithProject := strings.Replace(r.cfg.Filebrowser.URL, "PROJECT_ID", obj.ID, 1)
 
 	return &entity.ToolUrls{
-		Gitea:   giteaWithFolder,
-		Minio:   minioWithFolder,
-		Jupyter: jupyterWithUsernameAndFolder,
-		VSCode:  vscodeWithUsernameAndFolder,
-		Drone:   r.cfg.Drone.URL,
-		MLFlow:  mlflowWithProject,
+		Gitea:       giteaWithFolder,
+		Filebrowser: filebrowserWithProject,
+		Jupyter:     jupyterWithUsernameAndFolder,
+		VSCode:      vscodeWithUsernameAndFolder,
+		Drone:       r.cfg.Drone.URL,
+		MLFlow:      mlflowWithProject,
 	}, nil
 }
 

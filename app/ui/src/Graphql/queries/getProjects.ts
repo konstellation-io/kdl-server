@@ -23,7 +23,7 @@ export default gql`
         drone
         gitea
         jupyter
-        minio
+        filebrowser
         mlflow
         vscode
       }

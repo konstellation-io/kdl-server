@@ -34,7 +34,7 @@ func (a *AuthController) HandleProjectAuth(res http.ResponseWriter, req *http.Re
 		return
 	}
 
-	projectIDRegExp := regexp.MustCompile("^/mlflow/([^/]+)")
+	projectIDRegExp := regexp.MustCompile("^/[^/]+/([^/]+)")
 	matches := projectIDRegExp.FindAllStringSubmatch(originalURI, 1)
 
 	if !projectIDRegExp.MatchString(originalURI) {

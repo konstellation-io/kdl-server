@@ -6,7 +6,7 @@ export default gql`
       id
       toolUrls {
         gitea
-        minio
+        filebrowser
         jupyter
         vscode
         drone

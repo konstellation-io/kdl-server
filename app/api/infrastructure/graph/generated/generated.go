@@ -151,12 +151,12 @@ type ComplexityRoot struct {
 	}
 
 	ToolUrls struct {
-		Drone   func(childComplexity int) int
-		Gitea   func(childComplexity int) int
-		Jupyter func(childComplexity int) int
-		MLFlow  func(childComplexity int) int
-		Minio   func(childComplexity int) int
-		VSCode  func(childComplexity int) int
+		Drone       func(childComplexity int) int
+		Filebrowser func(childComplexity int) int
+		Gitea       func(childComplexity int) int
+		Jupyter     func(childComplexity int) int
+		MLFlow      func(childComplexity int) int
+		VSCode      func(childComplexity int) int
 	}
 
 	Topic struct {
@@ -773,6 +773,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ToolUrls.Drone(childComplexity), true
 
+	case "ToolUrls.filebrowser":
+		if e.complexity.ToolUrls.Filebrowser == nil {
+			break
+		}
+
+		return e.complexity.ToolUrls.Filebrowser(childComplexity), true
+
 	case "ToolUrls.gitea":
 		if e.complexity.ToolUrls.Gitea == nil {
 			break
@@ -793,13 +800,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ToolUrls.MLFlow(childComplexity), true
-
-	case "ToolUrls.minio":
-		if e.complexity.ToolUrls.Minio == nil {
-			break
-		}
-
-		return e.complexity.ToolUrls.Minio(childComplexity), true
 
 	case "ToolUrls.vscode":
 		if e.complexity.ToolUrls.VSCode == nil {
@@ -1041,7 +1041,7 @@ type Member {
 
 type ToolUrls {
   gitea: String!
-  minio: String!
+  filebrowser: String!
   jupyter: String!
   vscode: String!
   drone: String!
@@ -3900,7 +3900,7 @@ func (ec *executionContext) _ToolUrls_gitea(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ToolUrls_minio(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
+func (ec *executionContext) _ToolUrls_filebrowser(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3918,7 +3918,7 @@ func (ec *executionContext) _ToolUrls_minio(ctx context.Context, field graphql.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Minio, nil
+		return obj.Filebrowser, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6739,8 +6739,8 @@ func (ec *executionContext) _ToolUrls(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "minio":
-			out.Values[i] = ec._ToolUrls_minio(ctx, field, obj)
+		case "filebrowser":
+			out.Values[i] = ec._ToolUrls_filebrowser(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

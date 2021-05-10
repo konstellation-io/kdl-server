@@ -90,7 +90,7 @@ type Member {
 
 type ToolUrls {
   gitea: String!
-  minio: String!
+  filebrowser: String!
   jupyter: String!
   vscode: String!
   drone: String!

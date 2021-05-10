@@ -51,30 +51,30 @@ describe('Users Page', () => {
       cy.get('[data-testid="userRoleSelect"]')
         .then((selectElements) => selectElements.slice(0, usersToChange))
         .as('users');
+
+      cy.get('.modal').as('usersModal');
     });
 
     it('should show modal when you try to change multiple users role at once', () => {
       // Assert.
-      cy.get('[data-testid="usersModal"]').should('exist');
+      cy.get('@usersModal').should('exist');
     });
 
     it('should close the modal when you click on cancel button', () => {
       // Act.
-      cy.get('[data-testid="usersModal"]').contains('Cancel').click();
+      cy.get('@usersModal').contains('Cancel').click();
 
       // Assert.
-      cy.get('[data-testid="usersModal"]').should('not.exist');
+      cy.get('@usersModal').should('not.exist');
     });
 
     it('should reflect the new role in the table when change the role of multiple users', () => {
       // Act.
-      cy.get('[data-testid="usersModal"]')
-        .contains(`Update ${usersToChange} users`)
-        .click();
+      cy.get('@usersModal').contains(`Update ${usersToChange} users`).click();
 
       // Assert.
-      cy.get('@users').each((user) => {
-        cy.wrap(user).invoke('text').should('equal', newBulkRole);
+      cy.get('@users').each((userRole) => {
+        cy.wrap(userRole).invoke('text').should('equal', newBulkRole);
       });
     });
   });

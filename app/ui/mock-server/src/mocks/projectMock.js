@@ -18,7 +18,7 @@ function buildProject(_, index) {
     archived: index < activeProjectsCount ? false : casual.boolean,
     toolUrls: () => ({
       gitea: 'https://gitea.io/en-us/',
-      minio: 'https://min.io/',
+      filebrowser: 'https://filebrowser.org/',
       jupyter: 'https://jupyter.org/',
       vscode: 'https://code.visualstudio.com/',
       drone: 'https://www.drone.io/',

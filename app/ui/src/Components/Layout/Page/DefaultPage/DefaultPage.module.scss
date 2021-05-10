@@ -9,8 +9,9 @@ $sidebar-width: 40 * $grid-unit;
   position: relative;
   display: flex;
   width: 100%;
-  height: 100%;
   background-color: palette(base, 700);
+  flex-grow: 1;
+  overflow: hidden;
 }
 
 .actions div {
@@ -27,7 +28,8 @@ $sidebar-width: 40 * $grid-unit;
   display: flex;
   flex-direction: column;
   background-color: palette(base, 500);
-  padding: 10 * $grid-unit 5 * $grid-unit 0 3 * $grid-unit;
+  padding: 10 * $grid-unit 5 * $grid-unit 2 * $grid-unit 3 * $grid-unit;
+  overflow: auto;
 
   h1 {
     text-align: left;
@@ -45,7 +47,6 @@ $sidebar-width: 40 * $grid-unit;
 .content {
   display: flex;
   flex-direction: column;
-  height: 100%;
   width: 100%;
   max-width: 1440px - $sidebar-width;
   background-color: palette(base, 800);

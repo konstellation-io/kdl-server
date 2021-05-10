@@ -7,8 +7,8 @@ import GiteaIcon from 'Components/Icons/GiteaIcon/GiteaIcon';
 import IconHome from '@material-ui/icons/Dashboard';
 import IconKG from '@material-ui/icons/EmojiObjects';
 import JupyterIcon from 'Components/Icons/JupyterIcon/JupyterIcon';
-import MinioIcon from 'Components/Icons/MinioIcon/MinioIcon';
 import MlFlowIcon from 'Components/Icons/MlFlowIcon/MlFlowIcon';
+import FolderIcon from '@material-ui/icons/Folder'
 import { OverridableComponent } from '@material-ui/core/OverridableComponent';
 import { SvgIconTypeMap } from '@material-ui/core';
 import VSIcon from 'Components/Icons/VSIcon/VSIcon';
@@ -52,10 +52,10 @@ export const projectToolsRoutesConfig: RouteConfiguration[] = [
     Icon: DroneIcon,
   },
   {
-    id: 'minio',
-    route: ROUTE.PROJECT_TOOL_MINIO,
-    label: 'Minio',
-    Icon: MinioIcon,
+    id: 'filebrowser',
+    route: ROUTE.PROJECT_TOOL_FILEBROWSER,
+    label: 'Filebrowser',
+    Icon: FolderIcon,
   },
   {
     id: 'mlflow',

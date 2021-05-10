@@ -1,12 +1,12 @@
 import { member1, member2 } from './member';
 
 const toolUrls = {
-  drone: 'drone',
-  gitea: 'drone',
-  jupyter: 'gitea',
-  minio: 'jupyter',
-  mlflow: 'minio',
-  vscode: 'mlflow',
+  drone: 'http://drone',
+  gitea: 'http://gitea',
+  jupyter: 'http://jupyter',
+  filebrowser: 'http://filebrowser',
+  mlflow: 'http://mlflow',
+  vscode: 'http://vscode',
 };
 
 export const project1 = {

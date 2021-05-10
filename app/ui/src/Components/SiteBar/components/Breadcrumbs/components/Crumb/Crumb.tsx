@@ -9,12 +9,18 @@ export interface BottomComponentProps {
   closeComponent: () => void;
 }
 export type CrumbProps = {
+  dataTestId?: string;
   crumbText: string;
   LeftIconComponent: React.ReactElement;
   BottomComponent: FC<BottomComponentProps>;
 };
 
-function Crumb({ crumbText, LeftIconComponent, BottomComponent }: CrumbProps) {
+function Crumb({
+  crumbText,
+  LeftIconComponent,
+  BottomComponent,
+  dataTestId,
+}: CrumbProps) {
   const {
     value: opened,
     toggle: toggleComponent,
@@ -22,7 +28,11 @@ function Crumb({ crumbText, LeftIconComponent, BottomComponent }: CrumbProps) {
   } = useBoolState(false);
 
   return (
-    <div className={styles.container} onClick={toggleComponent}>
+    <div
+      className={styles.container}
+      onClick={toggleComponent}
+      data-testid={dataTestId}
+    >
       <div className={styles.crumbContainer}>
         {LeftIconComponent}
         <span className={styles.crumbText}>{crumbText}</span>

@@ -23,3 +23,13 @@ type Project struct {
 func NewProject(id, name, description string) Project {
 	return Project{ID: id, Name: name, Description: description, StarredKGItems: []string{}}
 }
+
+func (p Project) HasMember(userID string) bool {
+	for _, member := range p.Members {
+		if member.UserID == userID {
+			return true
+		}
+	}
+
+	return false
+}

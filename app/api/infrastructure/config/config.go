@@ -34,10 +34,12 @@ type Config struct {
 		Namespace string `envconfig:"POD_NAMESPACE"`
 	} `yaml:"kubernetes"`
 	Minio struct {
-		URL       string `envconfig:"MINIO_URL"`
 		Endpoint  string `envconfig:"MINIO_ENDPOINT"`
 		AccessKey string `envconfig:"MINIO_ACCESS_KEY"`
 		SecretKey string `envconfig:"MINIO_SECRET_KEY"`
+	}
+	Filebrowser struct {
+		URL string `envconfig:"FILEBROWSER_URL"`
 	}
 	Jupyter struct {
 		URL string `envconfig:"JUPYTER_URL"`

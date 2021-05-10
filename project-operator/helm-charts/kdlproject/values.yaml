@@ -36,3 +36,9 @@ mlflow:
     storageClassName: standard
   s3:
     bucket: mlflow-artifacts
+
+filebrowser:
+  image:
+    repository: filebrowser/filebrowser
+    tag: v2
+    pullPolicy: IfNotPresent

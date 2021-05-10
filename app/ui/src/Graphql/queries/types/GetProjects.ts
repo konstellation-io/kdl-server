@@ -21,7 +21,7 @@ export interface GetProjects_projects_toolUrls {
   drone: string;
   gitea: string;
   jupyter: string;
-  minio: string;
+  filebrowser: string;
   mlflow: string;
   vscode: string;
 }

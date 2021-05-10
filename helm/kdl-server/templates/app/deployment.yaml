@@ -99,6 +99,7 @@ spec:
             - "--email-domain=*"
             - "--upstream=http://127.0.0.1:8080/"
             - "--upstream=http://127.0.0.1:9000/mlflow/"
+            - "--upstream=http://127.0.0.1:9000/filebrowser/"
             - "--pass-user-headers=true"
             - "--skip-provider-button=true"
             - "--skip-auth-route=/config.json"
@@ -126,12 +127,12 @@ spec:
             - name: http
               containerPort: 3000
               protocol: TCP
-        - name: mlflow-proxy
+        - name: project-proxy
           image: nginx:alpine
           ports:
             - containerPort: 9000
           volumeMounts:
-            - name: mlflow-proxy-nginx-config
+            - name: project-proxy-nginx-config
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
       volumes:
@@ -141,6 +142,6 @@ spec:
         - name: kdl-server-configmap
           configMap:
             name: kdl-server-configmap
-        - name: mlflow-proxy-nginx-config
+        - name: project-proxy-nginx-config
           configMap:
-            name: mlflow-proxy-nginx-config
+            name: project-proxy-nginx-config

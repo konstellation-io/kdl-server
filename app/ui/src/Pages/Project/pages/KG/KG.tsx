@@ -59,7 +59,7 @@ function KG({ openedProject }: ProjectRoute) {
     const _topics: Topic[] = topTopics.map((topic) => ({
       name: topic.name,
       relevance: Math.round(topic.relevance * 100) / 100,
-      nResources: _sections[topic.name].length,
+      nResources: _sections[topic.name]?.length || 0,
     }));
     return [_sections, _topics];
   }, [kgItems, topTopics]);

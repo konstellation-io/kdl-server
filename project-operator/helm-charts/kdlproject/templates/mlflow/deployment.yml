@@ -27,11 +27,17 @@ spec:
           - --backend-store-uri
           - sqlite:///mlflow.db
           - --default-artifact-root
-          - s3://$ARTIFACTS_BUCKET
+          - s3://$(ARTIFACTS_BUCKET)
           - --host
           - 0.0.0.0
           command:
           - mlflow
+          env:
+            - name: MLFLOW_S3_ENDPOINT_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: mlflow-server-config
+                  key: MLFLOW_S3_ENDPOINT_URL
           envFrom:
             - configMapRef:
                 name: {{ .Values.projectId }}-mlflow-config

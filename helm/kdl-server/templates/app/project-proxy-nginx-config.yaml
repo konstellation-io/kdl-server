@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mlflow-proxy-nginx-config
+  name: project-proxy-nginx-config
 data:
   nginx.conf: |
     user  nginx;
@@ -25,8 +25,24 @@ data:
         listen 9000;
         resolver kube-dns.kube-system.svc.cluster.local valid=5s;
 
+        location = /auth {
+            internal;
+            proxy_pass              http://127.0.0.1:8080/api/auth/project;
+            proxy_pass_request_body off;
+            proxy_set_header        Content-Length "";
+            proxy_set_header        X-Original-URI $request_uri;
+        }
+
         location ~ ^/mlflow/([^/]+)/(.*)$ {
+            auth_request /auth;
+            auth_request_set $auth_status $upstream_status;
             proxy_pass http://$1-mlflow.kdl.svc.cluster.local:5000/$2$is_args$args;
+        }
+
+        location ~ ^/filebrowser/([^/]+)/(.*)$ {
+            auth_request /auth;
+            auth_request_set $auth_status $upstream_status;
+            proxy_pass http://$1-filebrowser.kdl.svc.cluster.local:9696/$2$is_args$args;
         }
       }
     }

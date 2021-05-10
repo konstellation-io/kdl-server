@@ -61,6 +61,7 @@ function useBreadcrumbs() {
 
   // Add server crumb
   crumbs.push({
+    dataTestId: 'server',
     crumbText: CONFIG.SERVER_NAME,
     LeftIconComponent: <ServerIcon className="icon-regular" />,
     BottomComponent: (props: BottomComponentProps) => (

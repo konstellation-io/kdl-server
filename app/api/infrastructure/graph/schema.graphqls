@@ -21,6 +21,7 @@ type Mutation {
   setKGStarred(input: SetKGStarredInput!): SetKGStarredRes!
   setActiveUserTools(input: SetActiveUserToolsInput!): User!
   syncUsers: SyncUsersResponse!
+  logout: Boolean!
 }
 
 type QualityProjectDesc {

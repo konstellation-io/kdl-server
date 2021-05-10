@@ -10,15 +10,21 @@ import React, { memo } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { GetMe } from 'Graphql/queries/types/GetMe';
+import { Logout } from 'Graphql/mutations/types/Logout';
 import KeyIcon from '@material-ui/icons/VpnKey';
+import LogoutIcon from '@material-ui/icons/ExitToApp';
 import styles from './SettingsMenu.module.scss';
-import { useQuery } from '@apollo/client';
 
+import { useQuery, useMutation } from '@apollo/client';
 import GetMeQuery from 'Graphql/queries/getMe';
+import logoutMutation from 'Graphql/mutations/logout';
 
 function SettingsMenu() {
   const history = useHistory();
   const { data } = useQuery<GetMe>(GetMeQuery);
+  const [doLogout] = useMutation<Logout>(logoutMutation, {
+    onCompleted: () => history.push(ROUTE.HOME),
+  });
 
   function goToUserSSHKeys() {
     history.push(ROUTE.USER_SSH_KEY);
@@ -35,20 +41,29 @@ function SettingsMenu() {
     );
   }
 
-  function SSHKeyButton() {
-    return (
-      <Button
-        label="SSH key"
-        key="SSH key"
-        onClick={goToUserSSHKeys}
-        Icon={KeyIcon}
-        className={styles.settingButton}
-        align={BUTTON_ALIGN.LEFT}
-      />
-    );
-  }
+  const LogoutButton = () => (
+    <Button
+      label="Sign out"
+      key="Sign out"
+      onClick={() => doLogout()}
+      Icon={LogoutIcon}
+      className={styles.settingButton}
+      align={BUTTON_ALIGN.LEFT}
+    />
+  );
+  const SSHKeyButton = () => (
+    <Button
+      label="SSH key"
+      key="SSH key"
+      onClick={goToUserSSHKeys}
+      Icon={KeyIcon}
+      className={styles.settingButton}
+      align={BUTTON_ALIGN.LEFT}
+    />
+  );
 
   const optionToButton = {
+    'sign out': LogoutButton,
     'user settings': UserSettingsSeparator,
     'ssh key': SSHKeyButton,
   };

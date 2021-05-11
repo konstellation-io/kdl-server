@@ -39,7 +39,7 @@
       background-color: palette(lowlight, 900);
       transition: background-color ease 0.4s;
 
-      &:not(first-child) {
+      &:not(:first-child) {
         margin-left: $grid-unit / 4;
       }
 

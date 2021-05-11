@@ -45,9 +45,9 @@ function Information({ showErrors }: Props) {
   if (loading) return <SpinnerCircular />;
   if (!data || error) return <ErrorMessage />;
 
-  function handleNameChange(name: string) {
-    const generatedId = generateSlug(name);
-    updateValue('name', name);
+  function handleNameChange(newName: string) {
+    const generatedId = generateSlug(newName);
+    updateValue('name', newName);
     updateValue('id', generatedId);
     clearError('name');
     clearError('id');
@@ -55,7 +55,7 @@ function Information({ showErrors }: Props) {
 
   function validateName() {
     if (data) {
-      const projectsNames = data.projects.map(({ name }) => name);
+      const projectsNames = data.projects.map((p) => p.name);
       const isValidName = validateProjectName(name, projectsNames);
       updateError('name', getErrorMsg(isValidName));
     }
@@ -63,7 +63,7 @@ function Information({ showErrors }: Props) {
 
   function validateId() {
     if (data) {
-      const projectsIds = data.projects.map(({ id }) => id);
+      const projectsIds = data.projects.map((p) => p.id);
       const isValidId = validateProjectId(id, projectsIds);
       updateError('id', getErrorMsg(isValidId));
     }

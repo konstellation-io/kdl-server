@@ -13,14 +13,13 @@ import Summary from './pages/Summary/Summary';
 import cx from 'classnames';
 import styles from './NewProject.module.scss';
 import { useReactiveVar } from '@apollo/client';
-import { Prompt } from 'react-router-dom';
+import { Prompt, useHistory } from 'react-router-dom';
 import useUnloadPrompt from 'Hooks/useUnloadPrompt/useUnloadPrompt';
 import { newProject } from 'Graphql/client/cache';
 import SidebarTop from 'Components/Layout/Page/DefaultPage/SidebarTop';
 import SidebarInformation from './pages/SidebarComponents/Information/SidebarInformation';
 import SidebarRepository from './pages/SidebarComponents/Repository/SidebarRepository';
 import SidebarExternalRepository from './pages/SidebarComponents/SidebarExternalRepository/SidebarExternalRepository';
-import { useHistory } from 'react-router-dom';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 
 enum Steps {

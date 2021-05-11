@@ -71,12 +71,10 @@ function TabMembers({ projectId }: Props) {
   );
 
   const canManageMembers = useMemo(() => {
-    if (dataMe?.me && dataMembers?.project) {
-      const meAsMember = dataMembers.project.members.find(
-        ({ user }) => user.email === dataMe.me.email
-      );
-      return meAsMember?.accessLevel === AccessLevel.ADMIN;
-    }
+    const meAsMember = dataMembers?.project.members.find(
+      ({ user }) => user.email === dataMe?.me.email
+    );
+    return meAsMember?.accessLevel === AccessLevel.ADMIN;
   }, [dataMe, dataMembers]);
 
   // Update opened member details as data is updated

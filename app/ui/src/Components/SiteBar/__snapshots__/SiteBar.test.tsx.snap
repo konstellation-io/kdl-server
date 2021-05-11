@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SiteBar component Component match snapshot 1`] = `
+<div
+  className="container"
+>
+  <nt
+    className="left"
+  >
+    <Breadcrumbs />
+  </nt>
+  <rt
+    className="right"
+  >
+    <Memo(SettingsMenu) />
+  </rt>
+</div>
+`;

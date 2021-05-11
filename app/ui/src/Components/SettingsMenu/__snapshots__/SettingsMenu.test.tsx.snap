@@ -3,22 +3,19 @@
 exports[`When data is ready should render without crashing 1`] = `
 <body>
   <div>
-    <div
-      class="container"
-      data-testid="filterProjects"
-    >
+    <div>
       <div
-        class="formSelect _2rBeV _1z7Bn"
+        class="settings _2rBeV _1z7Bn"
       >
         
         <div
           class="_Z0bIQ"
         >
           <div
-            class="_3Loey"
-            style="height: 67px;"
+            class="_3Loey _BNV4_"
+            style="height: 40px;"
           >
-            Active (2)
+            admin@konstellation.io
           </div>
           <div
             class="_3bqns"

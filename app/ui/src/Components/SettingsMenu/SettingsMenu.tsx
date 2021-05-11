@@ -4,6 +4,7 @@ import {
   CustomOptionProps,
   Select,
   SelectTheme,
+  SpinnerCircular,
 } from 'kwc';
 import ROUTE from 'Constants/routes';
 import React, { memo } from 'react';
@@ -18,7 +19,9 @@ import GetMeQuery from 'Graphql/queries/getMe';
 
 function SettingsMenu() {
   const history = useHistory();
-  const { data } = useQuery<GetMe>(GetMeQuery);
+  const { data, loading } = useQuery<GetMe>(GetMeQuery);
+
+  if (loading) return <SpinnerCircular />;
 
   function goToUserSSHKeys() {
     history.push(ROUTE.USER_SSH_KEY);

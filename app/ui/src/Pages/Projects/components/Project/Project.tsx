@@ -30,6 +30,7 @@ function Project({ project, showAdmins }: Props) {
       className={cx(styles.container, {
         [styles.archived]: project.archived,
       })}
+      data-testid="project"
     >
       <UpperBg project={project} showAdmins={showAdmins} />
       <LowerBg project={project} />
@@ -66,7 +67,11 @@ function UpperBg({ project, showAdmins }: Props) {
           {project.name}
         </p>
         {project.needAccess && (
-          <div className={styles.contactInfo} onClick={onContactAdmins}>
+          <div
+            className={styles.contactInfo}
+            onClick={onContactAdmins}
+            data-testid="showAdminsButton"
+          >
             Need access?
           </div>
         )}

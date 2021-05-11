@@ -1,0 +1,338 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`When data is ready should render without crashing 1`] = `
+<body>
+  <div>
+    <div
+      class="container"
+    >
+      <div
+        class="_pcC7V left"
+      >
+        <div
+          class="container"
+          data-testid="filterProjects"
+        >
+          <div
+            class="formSelect _2rBeV _1z7Bn"
+          >
+            
+            <div
+              class="_Z0bIQ"
+            >
+              <div
+                class="_3Loey"
+                style="height: 67px;"
+              >
+                Active (2)
+              </div>
+              <div
+                class="_3bqns"
+                style="max-height: 0;"
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          class="container"
+          data-testid="sortProjects"
+        >
+          <p
+            class="label"
+          >
+            SORT BY
+          </p>
+          <div
+            class="_2rBeV _1z7Bn"
+          >
+            
+            <div
+              class="_Z0bIQ"
+            >
+              <div
+                class="_3Loey"
+                style="height: 40px;"
+              >
+                Creation date
+              </div>
+              <div
+                class="_3bqns"
+                style="max-height: 0;"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="_2u-ZX"
+      >
+        <a
+          data-testid="buttonLink"
+          href="/new-project"
+        >
+          <div
+            class="addProjectButton _1lqJX _3kQFd _zeH0N undefined"
+            style="height: 40px; line-height: 40px;"
+            tabindex="-1"
+            title=""
+          >
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root icon-small"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+              />
+            </svg>
+            <span>
+              Add project
+            </span>
+          </div>
+        </a>
+      </div>
+    </div>
+    <div
+      class="container"
+    >
+      <a
+        href="/projects/projectId1"
+      >
+        <div
+          class="container"
+          data-testid="project"
+        >
+          <div
+            class="sup"
+          >
+            <div
+              class="bg"
+            >
+              <div
+                class="bgBand"
+              />
+            </div>
+            <div
+              class="content"
+            >
+              <p
+                class="name"
+                data-testid="projectName"
+              >
+                projectName1
+              </p>
+            </div>
+          </div>
+          <div
+            class="inf"
+          >
+            <div
+              class="bg"
+            >
+              <div
+                class="bgBand"
+              />
+            </div>
+            <div
+              class="content"
+            >
+              <p
+                class="description"
+                title="projectDescription1"
+              >
+                projectDescription1
+              </p>
+              <div
+                class="creationDate"
+              >
+                <p
+                  class="creationDateLabel"
+                >
+                  CREATED:
+                </p>
+                <p
+                  class="date"
+                >
+                  Feb 2, 2020 12:00 AM
+                </p>
+              </div>
+            </div>
+          </div>
+          <div
+            class="band"
+          >
+            <div
+              class="label"
+            />
+            <div
+              class="otherLabels"
+            />
+          </div>
+          <div
+            class="square"
+          >
+            <div
+              class="repoType"
+            >
+              <div
+                class="square in medium notAnimate"
+                style="height: 38px; width: 38px;"
+              >
+                <div
+                  class="s4"
+                />
+                <div
+                  class="s3"
+                />
+                <div
+                  class="s2"
+                />
+                <div
+                  class="s1"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+      <a
+        href="/projects/projectId2"
+      >
+        <div
+          class="container"
+          data-testid="project"
+        >
+          <div
+            class="sup"
+          >
+            <div
+              class="bg"
+            >
+              <div
+                class="bgBand"
+              />
+            </div>
+            <div
+              class="content"
+            >
+              <p
+                class="name"
+                data-testid="projectName"
+              >
+                projectName2
+              </p>
+            </div>
+          </div>
+          <div
+            class="inf"
+          >
+            <div
+              class="bg"
+            >
+              <div
+                class="bgBand"
+              />
+            </div>
+            <div
+              class="content"
+            >
+              <p
+                class="description"
+                title="projectDescription2"
+              >
+                projectDescription2
+              </p>
+              <div
+                class="creationDate"
+              >
+                <p
+                  class="creationDateLabel"
+                >
+                  CREATED:
+                </p>
+                <p
+                  class="date"
+                >
+                  Mar 3, 2020 12:00 AM
+                </p>
+              </div>
+            </div>
+          </div>
+          <div
+            class="band"
+          >
+            <div
+              class="label"
+            />
+            <div
+              class="otherLabels"
+            />
+          </div>
+          <div
+            class="square"
+          >
+            <div
+              class="repoType"
+            >
+              <div
+                class="square in medium notAnimate"
+                style="height: 38px; width: 38px;"
+              >
+                <div
+                  class="s4"
+                />
+                <div
+                  class="s3"
+                />
+                <div
+                  class="s2"
+                />
+                <div
+                  class="s1"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+      <div
+        class="addProjectContainer"
+        data-testid="add-project"
+      >
+        <a
+          href="/new-project"
+        >
+          <div
+            class="addProjectBg"
+          >
+            <div
+              class="addProjectBgUpper"
+            />
+            <div
+              class="addProjectBgLower"
+            />
+          </div>
+        </a>
+        <div
+          class="addProjectLabel"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root icon-regular"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+            />
+          </svg>
+          <p>
+            ADD PROJECT
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;

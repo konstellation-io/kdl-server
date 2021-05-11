@@ -1,0 +1,380 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Project component Component match snapshot 1`] = `
+<StaticRouter>
+  <Router
+    history={
+      Object {
+        "action": "POP",
+        "block": [Function],
+        "createHref": [Function],
+        "go": [Function],
+        "goBack": [Function],
+        "goForward": [Function],
+        "listen": [Function],
+        "location": Object {
+          "hash": "",
+          "pathname": "/",
+          "search": "",
+          "state": undefined,
+        },
+        "push": [Function],
+        "replace": [Function],
+      }
+    }
+    staticContext={Object {}}
+  >
+    <Project
+      project={
+        Object {
+          "archived": false,
+          "creationDate": "2020-02-02",
+          "description": "projectDescription3",
+          "error": null,
+          "favorite": false,
+          "id": "projectId3",
+          "lastActivationDate": "2020-02-02",
+          "members": Array [
+            Object {
+              "accessLevel": "VIEWER",
+              "addedDate": "2020-02-02",
+              "user": Object {
+                "email": "userEmail1",
+                "id": "userId1",
+                "lastActivity": "2020-02-02",
+              },
+            },
+            Object {
+              "accessLevel": "MANAGER",
+              "addedDate": "2020-02-03",
+              "user": Object {
+                "email": "userEmail2",
+                "id": "userId2",
+                "lastActivity": "2020-02-03",
+              },
+            },
+          ],
+          "name": "projectName3",
+          "needAccess": true,
+          "repository": null,
+          "toolUrls": Object {
+            "drone": "https://drone",
+            "filebrowser": "https://filebrowser",
+            "gitea": "https://gitea",
+            "jupyter": "https://jupyter",
+            "mlflow": "https://mlflow",
+            "vscode": "https://vscode",
+          },
+        }
+      }
+      showAdmins={[MockFunction]}
+    >
+      <div
+        className="disabled"
+      >
+        <div
+          className="container"
+          data-testid="project"
+        >
+          <UpperBg
+            project={
+              Object {
+                "archived": false,
+                "creationDate": "2020-02-02",
+                "description": "projectDescription3",
+                "error": null,
+                "favorite": false,
+                "id": "projectId3",
+                "lastActivationDate": "2020-02-02",
+                "members": Array [
+                  Object {
+                    "accessLevel": "VIEWER",
+                    "addedDate": "2020-02-02",
+                    "user": Object {
+                      "email": "userEmail1",
+                      "id": "userId1",
+                      "lastActivity": "2020-02-02",
+                    },
+                  },
+                  Object {
+                    "accessLevel": "MANAGER",
+                    "addedDate": "2020-02-03",
+                    "user": Object {
+                      "email": "userEmail2",
+                      "id": "userId2",
+                      "lastActivity": "2020-02-03",
+                    },
+                  },
+                ],
+                "name": "projectName3",
+                "needAccess": true,
+                "repository": null,
+                "toolUrls": Object {
+                  "drone": "https://drone",
+                  "filebrowser": "https://filebrowser",
+                  "gitea": "https://gitea",
+                  "jupyter": "https://jupyter",
+                  "mlflow": "https://mlflow",
+                  "vscode": "https://vscode",
+                },
+              }
+            }
+            showAdmins={[MockFunction]}
+          >
+            <div
+              className="sup"
+            >
+              <div
+                className="bg"
+              >
+                <div
+                  className="bgBand"
+                />
+              </div>
+              <div
+                className="content"
+              >
+                <p
+                  className="name"
+                  data-testid="projectName"
+                >
+                  projectName3
+                </p>
+                <div
+                  className="contactInfo"
+                  data-testid="showAdminsButton"
+                  onClick={[Function]}
+                >
+                  Need access?
+                </div>
+              </div>
+            </div>
+          </UpperBg>
+          <LowerBg
+            project={
+              Object {
+                "archived": false,
+                "creationDate": "2020-02-02",
+                "description": "projectDescription3",
+                "error": null,
+                "favorite": false,
+                "id": "projectId3",
+                "lastActivationDate": "2020-02-02",
+                "members": Array [
+                  Object {
+                    "accessLevel": "VIEWER",
+                    "addedDate": "2020-02-02",
+                    "user": Object {
+                      "email": "userEmail1",
+                      "id": "userId1",
+                      "lastActivity": "2020-02-02",
+                    },
+                  },
+                  Object {
+                    "accessLevel": "MANAGER",
+                    "addedDate": "2020-02-03",
+                    "user": Object {
+                      "email": "userEmail2",
+                      "id": "userId2",
+                      "lastActivity": "2020-02-03",
+                    },
+                  },
+                ],
+                "name": "projectName3",
+                "needAccess": true,
+                "repository": null,
+                "toolUrls": Object {
+                  "drone": "https://drone",
+                  "filebrowser": "https://filebrowser",
+                  "gitea": "https://gitea",
+                  "jupyter": "https://jupyter",
+                  "mlflow": "https://mlflow",
+                  "vscode": "https://vscode",
+                },
+              }
+            }
+          >
+            <div
+              className="inf"
+            >
+              <div
+                className="bg"
+              >
+                <div
+                  className="bgBand"
+                />
+              </div>
+              <div
+                className="content"
+              >
+                <p
+                  className="description"
+                  title="projectDescription3"
+                >
+                  projectDescription3
+                </p>
+                <div
+                  className="creationDate"
+                >
+                  <p
+                    className="creationDateLabel"
+                  >
+                    CREATED:
+                  </p>
+                  <p
+                    className="date"
+                  >
+                    Feb 2, 2020 12:00 AM
+                  </p>
+                </div>
+              </div>
+            </div>
+          </LowerBg>
+          <Band
+            project={
+              Object {
+                "archived": false,
+                "creationDate": "2020-02-02",
+                "description": "projectDescription3",
+                "error": null,
+                "favorite": false,
+                "id": "projectId3",
+                "lastActivationDate": "2020-02-02",
+                "members": Array [
+                  Object {
+                    "accessLevel": "VIEWER",
+                    "addedDate": "2020-02-02",
+                    "user": Object {
+                      "email": "userEmail1",
+                      "id": "userId1",
+                      "lastActivity": "2020-02-02",
+                    },
+                  },
+                  Object {
+                    "accessLevel": "MANAGER",
+                    "addedDate": "2020-02-03",
+                    "user": Object {
+                      "email": "userEmail2",
+                      "id": "userId2",
+                      "lastActivity": "2020-02-03",
+                    },
+                  },
+                ],
+                "name": "projectName3",
+                "needAccess": true,
+                "repository": null,
+                "toolUrls": Object {
+                  "drone": "https://drone",
+                  "filebrowser": "https://filebrowser",
+                  "gitea": "https://gitea",
+                  "jupyter": "https://jupyter",
+                  "mlflow": "https://mlflow",
+                  "vscode": "https://vscode",
+                },
+              }
+            }
+          >
+            <div
+              className="band"
+            >
+              <div
+                className="label"
+              />
+              <div
+                className="otherLabels"
+              >
+                <div
+                  className="labelNoAccess"
+                >
+                  No Access
+                </div>
+              </div>
+            </div>
+          </Band>
+          <Square
+            project={
+              Object {
+                "archived": false,
+                "creationDate": "2020-02-02",
+                "description": "projectDescription3",
+                "error": null,
+                "favorite": false,
+                "id": "projectId3",
+                "lastActivationDate": "2020-02-02",
+                "members": Array [
+                  Object {
+                    "accessLevel": "VIEWER",
+                    "addedDate": "2020-02-02",
+                    "user": Object {
+                      "email": "userEmail1",
+                      "id": "userId1",
+                      "lastActivity": "2020-02-02",
+                    },
+                  },
+                  Object {
+                    "accessLevel": "MANAGER",
+                    "addedDate": "2020-02-03",
+                    "user": Object {
+                      "email": "userEmail2",
+                      "id": "userId2",
+                      "lastActivity": "2020-02-03",
+                    },
+                  },
+                ],
+                "name": "projectName3",
+                "needAccess": true,
+                "repository": null,
+                "toolUrls": Object {
+                  "drone": "https://drone",
+                  "filebrowser": "https://filebrowser",
+                  "gitea": "https://gitea",
+                  "jupyter": "https://jupyter",
+                  "mlflow": "https://mlflow",
+                  "vscode": "https://vscode",
+                },
+              }
+            }
+          >
+            <div
+              className="square"
+            >
+              <div
+                className="repoType"
+              >
+                <Memo(RepositoryTypeComponent)
+                  customSize={38}
+                  shouldAnimate={false}
+                  squareLocation="in"
+                >
+                  <div
+                    className="square in medium notAnimate"
+                    style={
+                      Object {
+                        "height": 38,
+                        "width": 38,
+                      }
+                    }
+                  >
+                    <div
+                      className="s4"
+                    />
+                    <div
+                      className="s3"
+                    />
+                    <div
+                      className="s2"
+                    />
+                    <div
+                      className="s1"
+                    />
+                  </div>
+                </Memo(RepositoryTypeComponent)>
+              </div>
+            </div>
+          </Square>
+        </div>
+      </div>
+    </Project>
+  </Router>
+</StaticRouter>
+`;

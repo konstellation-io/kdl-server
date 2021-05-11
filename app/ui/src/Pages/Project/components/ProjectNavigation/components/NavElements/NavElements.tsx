@@ -29,8 +29,10 @@ function NavElements({ isOpened }: Props) {
     projectToolsRoutes,
   } = useProjectNavigation(projectId);
   const { updateProjectActiveTools, projectActiveTools } = useTool();
-  const { data } = useQuery<GetMe>(GetMeQuery);
+  const { data, loading } = useQuery<GetMe>(GetMeQuery);
   const areToolsActive = data?.me.areToolsActive;
+
+  if (loading) return null;
 
   function toggleTools() {
     updateProjectActiveTools(!areToolsActive);
@@ -75,6 +77,7 @@ function NavElements({ isOpened }: Props) {
             className={cx(styles.toggleToolsWrapper, {
               [styles.disabled]: projectActiveTools.loading,
             })}
+            data-testid="confirmationModal"
           >
             <ConfirmAction
               title="STOP YOUR TOOLS"

@@ -111,13 +111,13 @@
       "src/**/*.tsx",
       "src/**/*.ts",
       "!src/index.tsx",
-      "!Graphql/client/queries/*.ts",
-      "!Graphql/mutations/**/*.ts",
-      "!Graphql/queries/**/*.ts",
-      "!Graphql/types/**/*.ts",
+      "!Graphql",
+      "Graphql/hooks/**/*.ts",
       "!types/**/*.ts",
       "!browserHistory.ts",
-      "!react-app-env.d.ts"
+      "!fetchConfig.ts",
+      "!react-app-env.d.ts",
+      "!src/Pages/Project/pages/KG/components/KGVisualization"
     ],
     "coverageReporters": [
       "text"

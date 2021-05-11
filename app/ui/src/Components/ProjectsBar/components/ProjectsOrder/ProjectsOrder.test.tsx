@@ -1,8 +1,11 @@
 import React from 'react';
-import ProjectsFilter from './ProjectsFilter';
-import GetProjectsQuery from 'Graphql/queries/getProjects';
+import ProjectsOrder from './ProjectsOrder';
 import { createMockClient } from 'mock-apollo-client';
 import { screen, fireEvent, cleanup } from '@testing-library/react';
+import GetProjectsQuery from 'Graphql/queries/getProjects';
+
+import data from 'Mocks/GetProjectsQuery';
+
 import {
   apolloRender,
   loadingHandler,
@@ -11,9 +14,8 @@ import {
   getSnapshot,
   ERROR_MESSAGE,
 } from 'testUtils';
-import data from 'Mocks/GetProjectsQuery';
 
-const Component = <ProjectsFilter />;
+const Component = <ProjectsOrder />;
 
 let mockClient;
 beforeEach(() => {
@@ -39,20 +41,21 @@ describe('When data is ready', () => {
   });
 
   it('should render without crashing', () => {
-    expect(screen.getByText('Active', { exact: false })).toBeInTheDocument();
+    expect(screen.getByText('Creation date')).toBeInTheDocument();
     expect(getSnapshot()).toMatchSnapshot();
   });
 
   it('should allow the selection of other options', function () {
-    // Arrange.
     // Act.
-    fireEvent.click(screen.getByText('active', { exact: false }));
-    fireEvent.click(screen.getByText('all', { exact: false }));
+    fireEvent.click(screen.getByText('Creation date', { exact: false }));
+    fireEvent.click(screen.getByText('From A to Z', { exact: false }));
 
     // Assert.
-    expect(screen.getByText('all', { exact: false })).toBeInTheDocument();
     expect(
-      screen.queryByText('active', { exact: false })
+      screen.getByText('From A to Z', { exact: false })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('Creation date', { exact: false })
     ).not.toBeInTheDocument();
   });
 });

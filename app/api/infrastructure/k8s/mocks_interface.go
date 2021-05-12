@@ -9,6 +9,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	entity "github.com/konstellation-io/kdl-server/app/api/entity"
 )
 
 // MockK8sClient is a mock of K8sClient interface.
@@ -62,6 +63,20 @@ func (mr *MockK8sClientMockRecorder) CreateSecret(ctx, name, values interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSecret", reflect.TypeOf((*MockK8sClient)(nil).CreateSecret), ctx, name, values)
 }
 
+// CreateUserSSHKeySecret mocks base method.
+func (m *MockK8sClient) CreateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUserSSHKeySecret", ctx, user, public, private)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateUserSSHKeySecret indicates an expected call of CreateUserSSHKeySecret.
+func (mr *MockK8sClientMockRecorder) CreateUserSSHKeySecret(ctx, user, public, private interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserSSHKeySecret", reflect.TypeOf((*MockK8sClient)(nil).CreateUserSSHKeySecret), ctx, user, public, private)
+}
+
 // CreateUserToolsCR mocks base method.
 func (m *MockK8sClient) CreateUserToolsCR(ctx context.Context, username string) error {
 	m.ctrl.T.Helper()
@@ -88,6 +103,36 @@ func (m *MockK8sClient) DeleteUserToolsCR(ctx context.Context, username string) 
 func (mr *MockK8sClientMockRecorder) DeleteUserToolsCR(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserToolsCR", reflect.TypeOf((*MockK8sClient)(nil).DeleteUserToolsCR), ctx, username)
+}
+
+// GetSecret mocks base method.
+func (m *MockK8sClient) GetSecret(ctx context.Context, name string) (map[string][]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSecret", ctx, name)
+	ret0, _ := ret[0].(map[string][]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSecret indicates an expected call of GetSecret.
+func (mr *MockK8sClientMockRecorder) GetSecret(ctx, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecret", reflect.TypeOf((*MockK8sClient)(nil).GetSecret), ctx, name)
+}
+
+// GetUserSSHKeySecret mocks base method.
+func (m *MockK8sClient) GetUserSSHKeySecret(ctx context.Context, usernameSlug string) ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserSSHKeySecret", ctx, usernameSlug)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserSSHKeySecret indicates an expected call of GetUserSSHKeySecret.
+func (mr *MockK8sClientMockRecorder) GetUserSSHKeySecret(ctx, usernameSlug interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserSSHKeySecret", reflect.TypeOf((*MockK8sClient)(nil).GetUserSSHKeySecret), ctx, usernameSlug)
 }
 
 // IsUserToolPODRunning mocks base method.
@@ -117,4 +162,18 @@ func (m *MockK8sClient) UpdateSecret(ctx context.Context, name string, values ma
 func (mr *MockK8sClientMockRecorder) UpdateSecret(ctx, name, values interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSecret", reflect.TypeOf((*MockK8sClient)(nil).UpdateSecret), ctx, name, values)
+}
+
+// UpdateUserSSHKeySecret mocks base method.
+func (m *MockK8sClient) UpdateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUserSSHKeySecret", ctx, user, public, private)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateUserSSHKeySecret indicates an expected call of UpdateUserSSHKeySecret.
+func (mr *MockK8sClientMockRecorder) UpdateUserSSHKeySecret(ctx, user, public, private interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserSSHKeySecret", reflect.TypeOf((*MockK8sClient)(nil).UpdateUserSSHKeySecret), ctx, user, public, private)
 }

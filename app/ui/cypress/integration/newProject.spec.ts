@@ -5,15 +5,14 @@ import { generateSlug } from '../../src/Utils/string';
 
 const PROJECT_WITH_ERROR = 'project with error';
 
-beforeEach(() => {
-  // Stub response
-  cy.intercept('/api/query', (req) => {
-    const { operationName } = req.body;
-    if (operationName === 'GetProjects') req.reply({ data: GetProjectsQuery });
-  });
-});
-describe('Projects Page', () => {
+describe('New Project Page', () => {
   beforeEach(() => {
+    // Stub response
+    cy.intercept('/api/query', (req) => {
+      const { operationName } = req.body;
+      if (operationName === 'GetProjects')
+        req.reply({ data: GetProjectsQuery });
+    });
     cy.visit('http://localhost:3001/#/new-project');
   });
 
@@ -112,18 +111,21 @@ const createProject = (name: string, id: string) => {
   // Stub responses
   cy.intercept('/api/query', (req) => {
     const { operationName, variables } = req.body;
+    const projects = GetProjectsQuery.projects;
+    const newProject = { ...project1, id, name };
 
     if (operationName === 'GetProjects') {
-      const projects = GetProjectsQuery.projects;
-      const newProject = { ...project1, id, name };
       req.reply({ data: { projects: [...projects, newProject] } });
     }
 
-    if (
-      operationName === 'CreateProject' &&
-      variables.input.name === PROJECT_WITH_ERROR
-    ) {
-      req.reply({ forceNetworkError: true });
+    if (operationName === 'CreateProject') {
+      if (variables.input.name === PROJECT_WITH_ERROR) {
+        req.reply({ forceNetworkError: true });
+      } else {
+        req.reply({
+          data: { createProject: newProject },
+        });
+      }
     }
   });
 

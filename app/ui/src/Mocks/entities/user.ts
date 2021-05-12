@@ -1,5 +1,4 @@
 import { apiToken1 } from './apiToken';
-import { AccessLevel } from 'Graphql/types/globalTypes';
 
 export const userMe = {
   id: 'userMe',

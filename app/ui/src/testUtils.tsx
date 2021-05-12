@@ -17,6 +17,7 @@ export async function apolloRender(
   await wait();
 }
 
+// @ts-ignore
 const HookWrapper = ({ hook }: any) => <div hook={hook()} />;
 
 export async function apolloHookRender(
@@ -31,6 +32,7 @@ export async function apolloHookRender(
 
   await wait();
 
+  // @ts-ignore
   return wrapper.find('div').props().hook;
 }
 

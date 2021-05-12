@@ -16,12 +16,13 @@ export type ActionButtonProps = {
   label: string;
   onClick?: (e?: MouseEvent<HTMLDivElement> | undefined) => void;
   to?: string;
+  dataTestId?: string;
   primary?: boolean;
   disabled?: boolean;
 };
 
 export const ActionButton = (props: ActionButtonProps) => (
-  <div className={styles.actionButton}>
+  <div className={styles.actionButton} data-testid={props.dataTestId}>
     <Button {...props} />
   </div>
 );

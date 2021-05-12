@@ -12,6 +12,7 @@ type Props = {
   isSelected: boolean;
   onSelect: (e?: MouseEvent<HTMLDivElement> | undefined) => void;
   Repository: JSX.Element;
+  dataTestId?: string;
 };
 
 function RepositoryOption({
@@ -20,10 +21,12 @@ function RepositoryOption({
   isSelected,
   onSelect,
   Repository,
+  dataTestId,
 }: Props) {
   return (
     <div className={styles.container}>
       <div
+        data-testid={dataTestId}
         className={cx(
           styles.repoContainer,
           repositoryStyles.hoverContainer,

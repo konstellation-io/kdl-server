@@ -70,7 +70,7 @@ function Information({ showErrors }: Props) {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="informationInputs">
       <TextInput
         label="project name"
         onChange={handleNameChange}

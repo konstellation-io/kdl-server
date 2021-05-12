@@ -5,7 +5,7 @@ export const userMe = {
   id: 'userMe',
   email: 'admin@konstellation.io',
   areToolsActive: true,
-  accessLevel: AccessLevel.ADMIN,
+  accessLevel: 'ADMIN',
   apiTokens: [apiToken1],
 };
 

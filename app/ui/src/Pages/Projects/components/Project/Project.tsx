@@ -30,7 +30,6 @@ function Project({ project, showAdmins }: Props) {
       className={cx(styles.container, {
         [styles.archived]: project.archived,
       })}
-      data-testid="project"
     >
       <UpperBg project={project} showAdmins={showAdmins} />
       <LowerBg project={project} />

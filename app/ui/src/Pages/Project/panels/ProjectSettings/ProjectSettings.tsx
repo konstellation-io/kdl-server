@@ -24,7 +24,7 @@ function ProjectSettings({ project }: Props) {
   if (!project.repository) return <ErrorMessage />;
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="settingsPanel">
       <div className={styles.info}>
         <ProjectInfo project={project} />
       </div>

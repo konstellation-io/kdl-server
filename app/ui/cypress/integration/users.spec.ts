@@ -1,4 +1,4 @@
-describe('Users Page', () => {
+describe('Users Behavior', () => {
   beforeEach(() => {
     cy.visit('http://localhost:3001/#/users');
   });

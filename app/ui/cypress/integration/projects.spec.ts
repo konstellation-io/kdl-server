@@ -1,6 +1,6 @@
 const { _ } = Cypress;
 
-describe('Projects Page', () => {
+describe('Home Behavior', () => {
   beforeEach(() => {
     cy.visit('http://localhost:3001');
   });

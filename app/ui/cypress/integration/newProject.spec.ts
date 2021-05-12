@@ -5,7 +5,7 @@ import { generateSlug } from '../../src/Utils/string';
 
 const PROJECT_WITH_ERROR = 'project with error';
 
-describe('New Project Page', () => {
+describe('New Project Behavior', () => {
   beforeEach(() => {
     // Stub response
     cy.intercept('/api/query', (req) => {

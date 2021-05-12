@@ -17,10 +17,10 @@ describe('Projects Page', () => {
     cy.visit('http://localhost:3001/#/new-project');
   });
 
-  // it('should show new project page', () => {
-  //   // Assert.
-  //   cy.url().should('include', '/new-project');
-  // });
+  it('should show new project page', () => {
+    // Assert.
+    cy.url().should('include', '/new-project');
+  });
 
   describe('Project successfully created', () => {
     const projectName = `my new project`;

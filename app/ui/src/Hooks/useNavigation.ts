@@ -13,7 +13,9 @@ type UseNavigationParams = {
 };
 function useNavigation({
   initialStep = 0,
-  beforeGoToStep = () => {},
+  beforeGoToStep = () => {
+    // This is intentional
+  },
   loop = true,
   maxSteps,
 }: UseNavigationParams) {

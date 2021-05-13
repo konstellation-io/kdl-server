@@ -36,7 +36,7 @@ type Props = {
   projectId: string;
   close: () => void;
 };
-function MemberDetail({ member, projectId, close }: Props) {
+function MemberDetails({ member, projectId, close }: Props) {
   const { data: dataMe } = useQuery<GetMe>(GetMeQuery);
   const { data: dataMembers } = useQuery<
     GetProjectMembers,
@@ -173,4 +173,4 @@ function MemberDetail({ member, projectId, close }: Props) {
   );
 }
 
-export default MemberDetail;
+export default MemberDetails;

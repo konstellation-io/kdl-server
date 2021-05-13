@@ -8,7 +8,7 @@ import IconHome from '@material-ui/icons/Dashboard';
 import IconKG from '@material-ui/icons/EmojiObjects';
 import JupyterIcon from 'Components/Icons/JupyterIcon/JupyterIcon';
 import MlFlowIcon from 'Components/Icons/MlFlowIcon/MlFlowIcon';
-import FolderIcon from '@material-ui/icons/Folder'
+import FolderIcon from '@material-ui/icons/Folder';
 import { OverridableComponent } from '@material-ui/core/OverridableComponent';
 import { SvgIconTypeMap } from '@material-ui/core';
 import VSIcon from 'Components/Icons/VSIcon/VSIcon';
@@ -80,25 +80,22 @@ export const userToolsRoutesConfig: RouteConfiguration[] = [
   },
 ];
 
-export interface EnhancedRouteConfiguration extends RouteConfiguration {
-  to: string;
-}
-
 export interface RoutesConfiguration {
-  allRoutes: EnhancedRouteConfiguration[];
-  mainRoutes: EnhancedRouteConfiguration[];
-  userToolsRoutes: EnhancedRouteConfiguration[];
-  projectToolsRoutes: EnhancedRouteConfiguration[];
+  allRoutes: RouteConfiguration[];
+  mainRoutes: RouteConfiguration[];
+  userToolsRoutes: RouteConfiguration[];
+  projectToolsRoutes: RouteConfiguration[];
 }
 
 function useProjectNavigation(projectId: string): RoutesConfiguration {
   const { data } = useQuery<GetMe>(GetMeQuery);
 
   const buildRoutes = useCallback(
-    (route: RouteConfiguration) => ({
-      ...route,
-      to: buildRoute(route.route, projectId),
-    }),
+    (route: RouteConfiguration) =>
+      ({
+        ...route,
+        route: buildRoute(route.route, projectId),
+      } as RouteConfiguration),
     [projectId]
   );
 

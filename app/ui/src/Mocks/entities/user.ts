@@ -1,10 +1,11 @@
 import { apiToken1 } from './apiToken';
+import { AccessLevel } from '../../Graphql/types/globalTypes';
 
 export const userMe = {
   id: 'userMe',
   email: 'admin@konstellation.io',
   areToolsActive: true,
-  accessLevel: 'ADMIN',
+  accessLevel: AccessLevel.ADMIN,
   apiTokens: [apiToken1],
 };
 

@@ -18,7 +18,7 @@ exports[`Crumb component should render without crashing 1`] = `
       className="rightIcon icon-regular"
     />
   </div>
-  <ExpandableMenu
+  <N
     className="content"
     close={[Function]}
     opened={false}
@@ -26,6 +26,6 @@ exports[`Crumb component should render without crashing 1`] = `
     <BottomComponent
       closeComponent={[Function]}
     />
-  </ExpandableMenu>
+  </N>
 </div>
 `;

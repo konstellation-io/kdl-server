@@ -12,7 +12,9 @@ type Props = {
 };
 const ProjectSelector: FC<Props & BottomComponentProps> = ({
   options,
-  closeComponent = () => {},
+  closeComponent = () => {
+    // This is intentional
+  },
 }) => (
   <div className={styles.container}>
     <ul>

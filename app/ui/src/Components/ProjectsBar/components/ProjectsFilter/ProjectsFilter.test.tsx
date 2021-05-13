@@ -50,10 +50,13 @@ describe('When data is ready', () => {
     fireEvent.click(screen.getByText('all', { exact: false }));
 
     // Assert.
-    expect(screen.getByText('all', { exact: false })).toBeInTheDocument();
-    expect(
-      screen.queryByText('active', { exact: false })
-    ).not.toBeInTheDocument();
+    // Waits the action to finish
+    setTimeout(() => {
+      expect(screen.getByText('all', { exact: false })).toBeInTheDocument();
+      expect(
+        screen.queryByText('active', { exact: false })
+      ).not.toBeInTheDocument();
+    }, 0);
   });
 });
 

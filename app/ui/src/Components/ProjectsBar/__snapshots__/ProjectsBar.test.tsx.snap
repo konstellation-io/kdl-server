@@ -4,13 +4,13 @@ exports[`ProjectsBar component Component match snapshot 1`] = `
 <div
   className="container"
 >
-  <nt
+  <ot
     className="left"
   >
     <ProjectsFilter />
     <ProjectsOrder />
-  </nt>
-  <rt>
+  </ot>
+  <ht>
     <P
       Icon={
         Object {
@@ -26,6 +26,6 @@ exports[`ProjectsBar component Component match snapshot 1`] = `
       label="Add project"
       to="/new-project"
     />
-  </rt>
+  </ht>
 </div>
 `;

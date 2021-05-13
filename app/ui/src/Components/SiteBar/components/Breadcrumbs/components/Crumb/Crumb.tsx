@@ -3,7 +3,7 @@ import styles from './Crumb.module.scss';
 import cx from 'classnames';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import useBoolState from 'Hooks/useBoolState';
-import ExpandableMenu from 'Components/ExpandableMenu/ExpandableMenu';
+import { ExpandableMenu } from 'kwc';
 
 export interface BottomComponentProps {
   closeComponent: () => void;

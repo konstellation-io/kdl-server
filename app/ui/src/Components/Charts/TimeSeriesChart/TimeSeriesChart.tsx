@@ -5,7 +5,7 @@ import {
   XYChart,
 } from '@visx/xychart';
 import { Bar, Line } from '@visx/shape';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { bisector, extent } from 'd3-array';
 import { scaleLinear, scaleTime } from '@visx/scale';
@@ -16,7 +16,6 @@ import TooltipContent from './TooltipContent';
 import cx from 'classnames';
 import { localPoint } from '@visx/event';
 import styles from './TimeSeriesChart.module.scss';
-import { useEffect } from 'react';
 
 export type D = {
   x: Date;

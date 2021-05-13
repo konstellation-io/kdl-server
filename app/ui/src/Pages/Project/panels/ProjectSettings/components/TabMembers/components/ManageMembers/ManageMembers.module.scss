@@ -19,16 +19,6 @@
     margin-left: $grid-unit;
     min-width: 28 * $grid-unit;
 
-    & > div {
-      & > div:last-child > div:hover {
-        box-shadow: unset;
-        background-color: palette(lowlight);
-      }
-      & > div:first-child {
-        min-height: 30px;
-      }
-    }
-
     .separator {
       @include font-caption;
       color: font-color(regular);
@@ -37,15 +27,23 @@
       background-color: palette(base);
 
       border-top: 2px solid palette(base, 900);
-
-      &:hover {
-        background-color: palette(base);
-        color: font-color(regular);
-      }
     }
 
-    .manageMemberButton:hover {
-      background-color: palette(lowlight);
+    .removeMemberOption {
+      @include font-small;
+      color: font-color(lowlight);
+
+      display: flex;
+      align-items: center;
+      height: 5 * $grid-unit;
+
+      .removeIcon {
+        width: 5 * $grid-unit;
+      }
+
+      &:hover {
+        color: font-color(dark);
+      }
     }
   }
 }

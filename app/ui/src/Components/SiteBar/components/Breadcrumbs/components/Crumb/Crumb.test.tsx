@@ -2,7 +2,7 @@ import Crumb, { CrumbProps } from './Crumb';
 import React from 'react';
 import { shallow } from 'enzyme';
 import IconHome from '@material-ui/icons/Dashboard';
-import ExpandableMenu from 'Components/ExpandableMenu/ExpandableMenu';
+import { ExpandableMenu } from 'kwc';
 
 const BottomComponent = () => <div>bar</div>;
 const crumbProps: CrumbProps = {

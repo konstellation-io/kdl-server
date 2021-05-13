@@ -51,12 +51,15 @@ describe('When data is ready', () => {
     fireEvent.click(screen.getByText('From A to Z', { exact: false }));
 
     // Assert.
-    expect(
-      screen.getByText('From A to Z', { exact: false })
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByText('Creation date', { exact: false })
-    ).not.toBeInTheDocument();
+    // Waits the action to finish
+    setTimeout(() => {
+      expect(
+        screen.getByText('From A to Z', { exact: false })
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText('Creation date', { exact: false })
+      ).not.toBeInTheDocument();
+    }, 0);
   });
 });
 

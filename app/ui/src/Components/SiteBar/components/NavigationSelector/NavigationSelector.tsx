@@ -1,13 +1,13 @@
 import React, { FC } from 'react';
 import styles from './NavigationSelector.module.scss';
 import { NavLink } from 'react-router-dom';
-import { EnhancedRouteConfiguration } from 'Hooks/useProjectNavigation';
+import { RouteConfiguration } from 'Hooks/useProjectNavigation';
 import { BottomComponentProps } from '../Breadcrumbs/components/Crumb/Crumb';
 import cx from 'classnames';
 import NavListItem from './components/NavListItem/NavListItem';
 
 type Props = {
-  options: EnhancedRouteConfiguration[];
+  options: RouteConfiguration[];
 };
 
 const NavigationSelector: FC<Props & BottomComponentProps> = ({
@@ -16,7 +16,7 @@ const NavigationSelector: FC<Props & BottomComponentProps> = ({
 }) => (
   <div className={styles.container}>
     <ul>
-      {options.map(({ to, Icon, label, disabled, id }) => (
+      {options.map(({ route, Icon, label, disabled, id }) => (
         <li
           key={label}
           className={cx({
@@ -25,7 +25,7 @@ const NavigationSelector: FC<Props & BottomComponentProps> = ({
           data-testid={id}
         >
           <NavLink
-            to={to}
+            to={route}
             activeClassName={styles.selectedSection}
             className={styles.section}
             onClick={closeComponent}

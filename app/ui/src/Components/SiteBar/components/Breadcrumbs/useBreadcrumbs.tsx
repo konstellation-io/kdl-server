@@ -1,7 +1,7 @@
 import { BottomComponentProps, CrumbProps } from './components/Crumb/Crumb';
 import { useLocation, useRouteMatch } from 'react-router-dom';
 import useProjectNavigation, {
-  EnhancedRouteConfiguration,
+  RouteConfiguration,
   RoutesConfiguration,
 } from 'Hooks/useProjectNavigation';
 import { useQuery, useReactiveVar } from '@apollo/client';
@@ -19,32 +19,34 @@ import ServerIcon from 'Components/Icons/ServerIcon/ServerIcon';
 import { openedProject } from 'Graphql/client/cache';
 
 import GetProjectsQuery from 'Graphql/queries/getProjects';
+import GetMeQuery from 'Graphql/queries/getMe';
+import { GetMe } from 'Graphql/queries/types/GetMe';
+import { AccessLevel } from 'Graphql/types/globalTypes';
 
-const serverSections: EnhancedRouteConfiguration[] = [
-  {
-    id: 'projects',
-    label: 'Projects',
-    Icon: ArrowForwardIcon,
-    route: ROUTE.PROJECTS,
-    to: ROUTE.PROJECTS,
-  },
-  {
-    id: 'users',
-    label: 'Users',
-    Icon: PersonIcon,
-    route: ROUTE.USERS,
-    to: ROUTE.USERS,
-  },
-];
+const SECTION_PROJECTS: RouteConfiguration = {
+  id: 'projects',
+  label: 'Projects',
+  Icon: ArrowForwardIcon,
+  route: ROUTE.PROJECTS,
+};
+const SECTION_USERS: RouteConfiguration = {
+  id: 'users',
+  label: 'Users',
+  Icon: PersonIcon,
+  route: ROUTE.USERS,
+};
 
 function useBreadcrumbs() {
   const crumbs: CrumbProps[] = [];
   const routeMatch = useRouteMatch(ROUTE.PROJECT);
   const location = useLocation();
 
-  const { data: projectsData, loading, error } = useQuery<GetProjects>(
-    GetProjectsQuery
-  );
+  const {
+    data: projectsData,
+    loading,
+    error,
+  } = useQuery<GetProjects>(GetProjectsQuery);
+  const { data: dataMe } = useQuery<GetMe>(GetMeQuery);
 
   const project = useReactiveVar(openedProject);
 
@@ -52,8 +54,15 @@ function useBreadcrumbs() {
     project?.id || ''
   );
 
-  if (loading || !projectsData) return { loading, crumbs };
+  if (loading || !projectsData || !dataMe) return { loading, crumbs };
   if (error) throw Error('cannot retrieve data at useBreadcrumbs');
+
+  const serverSections = [SECTION_PROJECTS];
+
+  // Admin users can access Users section
+  if (dataMe.me.accessLevel === AccessLevel.ADMIN) {
+    serverSections.push(SECTION_USERS);
+  }
 
   const activeProjects = projectsData.projects.filter(
     (p) => !p.archived && !p.needAccess

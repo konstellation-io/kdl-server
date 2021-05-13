@@ -12,7 +12,7 @@ declare namespace Cypress {
   interface Chainable {
     /**
      * Custom command to intercept GraphQl queries from the KDL.
-     * @example cy.kstInterceptor('GetMe', {name: marco, second})
+     * @example cy.kstInterceptor('GetMe', {name: 'Jon Doe'})
      */
     kstInterceptor(
       operation: string,

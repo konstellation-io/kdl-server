@@ -13,14 +13,19 @@ exports[`When data is ready should render without crashing 1`] = `
         >
           <div
             class="_3Loey _BNV4_"
-            style="height: 40px;"
+            style="height: 40px; min-height: 40px;"
           >
             admin@konstellation.io
           </div>
           <div
-            class="_3bqns"
-            style="max-height: 0;"
-          />
+            aria-hidden="true"
+            class="rah-static rah-static--height-zero _3bqns"
+            style="height: 0px; overflow: hidden;"
+          >
+            <div
+              style="display: none;"
+            />
+          </div>
         </div>
       </div>
     </div>

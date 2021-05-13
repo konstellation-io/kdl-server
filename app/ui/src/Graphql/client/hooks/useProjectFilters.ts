@@ -65,10 +65,12 @@ function useProjectFilters() {
       .filter((project) => project.name.includes(filters.name))
       .filter((project) => filterBySelection(project, filters.selection));
 
-    projectFilters({
-      ...filters,
-      nFiltered: filteredProjects.length,
-    });
+    if (filteredProjects.length !== projectFilters().nFiltered) {
+      projectFilters({
+        ...filters,
+        nFiltered: filteredProjects.length,
+      });
+    }
 
     return filteredProjects;
   }

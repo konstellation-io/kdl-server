@@ -67,13 +67,6 @@
       .button {
         margin-left: $grid-unit;
       }
-
-      .accessLevelSelector {
-        & > div > div:first-child {
-          min-height: 30px;
-          border: unset;
-        }
-      }
     }
   }
 }

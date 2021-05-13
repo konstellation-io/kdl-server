@@ -4,7 +4,7 @@ exports[`ActionsBar component Component match snapshot 1`] = `
 <div
   className="container some-class"
 >
-  <ft
+  <mt
     className="actions"
   >
     <div
@@ -17,6 +17,6 @@ exports[`ActionsBar component Component match snapshot 1`] = `
     >
       Child 2
     </div>
-  </ft>
+  </mt>
 </div>
 `;

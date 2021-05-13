@@ -18,9 +18,9 @@ import { GetProjectMembers_project_members } from 'Graphql/queries/types/GetProj
 import MemberItem from './components/MemberItem/MemberItem';
 import DeleteIcon from '@material-ui/icons/Delete';
 import useBoolState from 'Hooks/useBoolState';
-import capitalize from 'lodash.capitalize';
+import cx from 'classnames';
 
-const accessLevelSeparator = () => (
+const AccessLevelSeparator = () => (
   <Button
     key="separator"
     label="CHANGE MEMBERS LEVEL TO"
@@ -29,6 +29,23 @@ const accessLevelSeparator = () => (
     disabled
   />
 );
+
+const RemoveMembersButton = () => (
+  <div className={styles.removeMemberOption}>
+    <DeleteIcon className={cx('icon-regular', styles.removeIcon)} />
+    <span>Remove members</span>
+  </div>
+);
+
+enum Actions {
+  REMOVE_MEMBERS = 'REMOVE_MEMBERS',
+  ACCESS_LEVEL_SEPARATOR = 'ACCESS_LEVEL_SEPARATOR',
+  VIEWER = 'Viewer',
+  MANAGER = 'Manager',
+  ADMIN = 'Admin',
+}
+
+const actions = Object.values(Actions);
 
 type Props = {
   projectId: string;
@@ -83,34 +100,22 @@ function ManageMembers({
     showModal();
   }
 
-  const removeMembersButton = () => (
-    <Button
-      key="remove"
-      label="Remove members"
-      onClick={showRemoveModal}
-      className={styles.manageMemberButton}
-      Icon={DeleteIcon}
-      align={BUTTON_ALIGN.LEFT}
-    />
-  );
-
-  const AccessLevelButton = (accessLevel: AccessLevel) => (
-    <Button
-      key={accessLevel}
-      label={capitalize(accessLevel)}
-      onClick={() => showAccessLevelModal(accessLevel)}
-      className={styles.manageMemberButton}
-      align={BUTTON_ALIGN.LEFT}
-    />
-  );
-
-  const optionToButton = {
-    'remove members': removeMembersButton,
-    'access levels': accessLevelSeparator,
-    admin: () => AccessLevelButton(AccessLevel.ADMIN),
-    manager: () => AccessLevelButton(AccessLevel.MANAGER),
-    viewer: () => AccessLevelButton(AccessLevel.VIEWER),
-  };
+  function onAction(action: Actions) {
+    switch (action) {
+      case Actions.VIEWER:
+        showAccessLevelModal(AccessLevel.VIEWER);
+        break;
+      case Actions.MANAGER:
+        showAccessLevelModal(AccessLevel.MANAGER);
+        break;
+      case Actions.ADMIN:
+        showAccessLevelModal(AccessLevel.ADMIN);
+        break;
+      case Actions.REMOVE_MEMBERS:
+        showRemoveModal();
+        break;
+    }
+  }
 
   const selectionText =
     nMembers === 1 ? `${nMembers} User selected` : `${nMembers} Users selected`;
@@ -121,9 +126,13 @@ function ManageMembers({
       <Select
         placeholder={selectionText}
         className={styles.accessLevelSelector}
-        options={Object.keys(optionToButton)}
-        CustomOptions={optionToButton}
-        disabledOptions={[Object.keys(optionToButton)[1]]}
+        options={actions}
+        CustomOptions={{
+          [Actions.ACCESS_LEVEL_SEPARATOR]: AccessLevelSeparator,
+          [Actions.REMOVE_MEMBERS]: RemoveMembersButton,
+        }}
+        onChange={onAction}
+        disabledOptions={[Object.keys(Actions)[1]]}
         showSelectAllOption={false}
         shouldSort={false}
         height={30}

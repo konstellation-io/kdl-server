@@ -36,6 +36,7 @@ function Repository(params: any) {
           Repository={<RepositoryTypeComponent squareLocation={LOCATION.OUT} />}
         />
         <RepositoryOption
+          dataTestId={RepositoryType.INTERNAL}
           title="Internal Repository"
           subtitle="A new repository will be installed in the server. The version-control system used will be Gitea. Administrator right access will be granted to your repository account."
           actionLabel="USE INTERNAL"

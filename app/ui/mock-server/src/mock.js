@@ -85,7 +85,7 @@ module.exports = {
         id: userId,
       })),
     createProject: (_, { input }) => {
-      const hasError = casual.boolean;
+      const hasError = false;
       if (hasError) throw new Error(casual.words(100));
 
       const casualProject = buildProject();

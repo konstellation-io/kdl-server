@@ -46,7 +46,7 @@ function Overview({ openedProject }: Props) {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="overview">
       <h1>Overview</h1>
       <div className={styles.projectData}>
         <div className={styles.section}>

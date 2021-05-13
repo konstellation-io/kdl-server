@@ -86,14 +86,17 @@ function ProjectCreation() {
     const project = buildRoute(ROUTE.PROJECT, information.values.id);
     return (
       <div className={styles.actionButtons}>
-        <div className={styles.actionButton}>
+        <div
+          className={styles.actionButton}
+          data-testid="goToProjectsListButton"
+        >
           <Button
             label="Go to projects list"
             className={styles.button}
             to={ROUTE.HOME}
           />
         </div>
-        <div className={styles.actionButton}>
+        <div className={styles.actionButton} data-testid="goToProjectButton">
           <Button
             label="Go to project"
             to={project}
@@ -114,7 +117,7 @@ function ProjectCreation() {
             onClick={clearAll}
           />
         </div>
-        <div className={styles.actionButton}>
+        <div className={styles.actionButton} data-testid="tryAgainButton">
           <Button
             label="Try again"
             to={ROUTE.NEW_PROJECT}
@@ -133,7 +136,7 @@ function ProjectCreation() {
           <StatusCircle {...getCircleProps()} />
         </div>
         {error && (
-          <p className={styles.errorTitle}>
+          <p className={styles.errorTitle} data-testid="errorMessage">
             There was an error creating your project
           </p>
         )}

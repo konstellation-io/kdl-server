@@ -152,6 +152,7 @@ function NewProject() {
         return [
           <ActionButton key="cancel" label="Cancel" to={ROUTE.HOME} />,
           <ActionButton
+            dataTestId="nextButton"
             key="next"
             label="Next"
             primary
@@ -162,6 +163,7 @@ function NewProject() {
         return [
           <ActionButton key="key" label="Back" onClick={prevStep} />,
           <ActionButton
+            dataTestId="createProjectButton"
             key="create"
             label="Create"
             to={ROUTE.PROJECT_CREATION}
@@ -172,6 +174,7 @@ function NewProject() {
         return [
           <ActionButton key="back" label="Back" onClick={prevStep} />,
           <ActionButton
+            dataTestId="nextButton"
             key="next"
             label="Next"
             primary

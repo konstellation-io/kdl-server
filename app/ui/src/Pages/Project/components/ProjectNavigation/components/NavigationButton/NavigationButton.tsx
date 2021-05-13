@@ -24,7 +24,7 @@ function NavigationButton({
   Icon,
   onClick,
   className = '',
-  dataTestId = '',
+  dataTestId = undefined,
   iconSize = IconSize.REGULAR,
   disabled = false,
 }: Props) {

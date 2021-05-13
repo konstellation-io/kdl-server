@@ -33,6 +33,7 @@ exports[`NavButtonLink component Component match snapshot 1`] = `
 exports[`ProjectNavigation component Component match snapshot 1`] = `
 <div
   className="container opened"
+  data-testid="navigationBar"
 >
   <div
     className="top"
@@ -46,6 +47,7 @@ exports[`ProjectNavigation component Component match snapshot 1`] = `
   >
     <NavigationButton
       Icon={[Function]}
+      dataTestId="toggleKnowledgeViewer"
       disabled={false}
       label="Knowledge Viewer"
       onClick={[Function]}
@@ -61,6 +63,7 @@ exports[`ProjectNavigation component Component match snapshot 1`] = `
           },
         }
       }
+      dataTestId="toggleSettings"
       label="Settings"
       onClick={[Function]}
     />
@@ -76,6 +79,7 @@ exports[`ProjectNavigation component Component match snapshot 1`] = `
         }
       }
       className=""
+      dataTestId="toggleBar"
       label="Collapse"
       onClick={[Function]}
       title="Collapse"

@@ -254,6 +254,7 @@ exports[`When data is ready should render without crashing 1`] = `
           <div>
             <div
               class="navButton"
+              data-testid="stopTools"
               title="Stop tools"
             >
               <svg

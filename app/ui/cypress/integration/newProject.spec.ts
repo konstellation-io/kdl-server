@@ -23,18 +23,18 @@ describe('New Project Behavior', () => {
 
     it('should show the project in the main page when the project is created', () => {
       // Act.
-      cy.get('[data-testid="goToProjectsListButton"]').click();
+      cy.getByTestId('goToProjectsListButton').click();
 
       // Assert.
-      cy.get('[data-testid="project"]').contains(projectName).should('exist');
+      cy.getByTestId('project').contains(projectName).should('exist');
     });
 
     it('should navigate to the overview page of the new project ', () => {
       // Act.
-      cy.get('[data-testid="goToProjectButton"]').click();
+      cy.getByTestId('goToProjectButton').click();
 
       // Assert.
-      cy.get('[data-testid="overview"]')
+      cy.getByTestId('overview')
         .should('contain', projectName)
         .and('contain', projectId);
       cy.url().should('contain', '/overview');
@@ -48,15 +48,15 @@ describe('New Project Behavior', () => {
 
     it('should show an error message when the project creation service respond with an error', () => {
       // Assert.
-      cy.get('[data-testid="errorMessage"]').should('exist');
+      cy.getByTestId('errorMessage').should('exist');
     });
 
     it('should maintain the fields when retry to create a project that fails', () => {
       // Act.
-      cy.get('[data-testid="tryAgainButton"]').click();
+      cy.getByTestId('tryAgainButton').click();
 
       // Assert.
-      cy.get('[data-testid="informationInputs"]')
+      cy.getByTestId('informationInputs')
         .find('input')
         .eq(0)
         .should('have.value', projectName);
@@ -68,24 +68,24 @@ const createProject = (name: string, id: string, customResponse?: Object) => {
   // Arrange.
 
   // Type the name of the project
-  cy.get('[data-testid="informationInputs"]').find('input').eq(0).type(name);
+  cy.getByTestId('informationInputs').find('input').eq(0).type(name);
 
   // Type the description of the project
-  cy.get('[data-testid="informationInputs"]')
+  cy.getByTestId('informationInputs')
     .find('textarea')
     .type('My super detailed description');
 
   // Go to the next step
-  cy.get('[data-testid="nextButton"]').click();
+  cy.getByTestId('nextButton').click();
 
   // Select the repo type
-  cy.get(`[data-testid="${RepositoryType.INTERNAL}"]`).click();
+  cy.getByTestId(RepositoryType.INTERNAL).click();
 
   // Go to the next step
-  cy.get('[data-testid="nextButton"]').click();
+  cy.getByTestId('nextButton').click();
 
   // Go to the next step
-  cy.get('[data-testid="nextButton"]').click();
+  cy.getByTestId('nextButton').click();
 
   // Stub responses
   const projects = GetProjectsQuery.projects;
@@ -105,5 +105,5 @@ const createProject = (name: string, id: string, customResponse?: Object) => {
   cy.wait(1000);
 
   // Create the project
-  cy.get('[data-testid="createProjectButton"]').click();
+  cy.getByTestId('createProjectButton').click();
 };

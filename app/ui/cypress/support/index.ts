@@ -5,6 +5,16 @@ Cypress.Commands.add('kstInterceptor', (operation, responseObject) => {
   });
 });
 
+Cypress.Commands.add('getByTestId', (dataTestId) =>
+  cy.get(`[data-testid="${dataTestId}"]`)
+);
+
+Cypress.Commands.add(
+  'findByTestId',
+  { prevSubject: true },
+  (subject, dataTestId) => subject.find(`[data-testid="${dataTestId}"]`)
+);
+
 // load type definitions that come with Cypress module
 /// <reference types="cypress" />
 
@@ -18,5 +28,17 @@ declare namespace Cypress {
       operation: string,
       responseObject: Object
     ): Chainable<Element>;
+
+    /**
+     * Custom command to get element by data-testid
+     * @example cy.getByTestId('my-data-testid')
+     */
+    getByTestId(dataTestId: string): Chainable<JQuery<HTMLElement>>;
+
+    /**
+     * Custom command to find an element by data-testid
+     * @example cy.findByTestId('my-data-testid')
+     */
+    findByTestId(dataTestId: string): Chainable<JQuery<HTMLElement>>;
   }
 }

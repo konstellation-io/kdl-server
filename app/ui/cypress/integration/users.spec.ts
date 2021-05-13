@@ -13,14 +13,10 @@ describe('Users Behavior', () => {
     const newRole = 'Viewer';
 
     // Act.
-    cy.get('[data-testid="userRoleSelect"]')
-      .first()
-      .click()
-      .contains(newRole)
-      .click();
+    cy.getByTestId('userRoleSelect').first().click().contains(newRole).click();
 
     // Assert.
-    cy.get('[data-testid="userRoleSelect"]')
+    cy.getByTestId('userRoleSelect')
       .first()
       .invoke('text')
       .should('equal', newRole);
@@ -34,21 +30,18 @@ describe('Users Behavior', () => {
       // Arrange.
 
       // Check first n (where n = 3) users
-      cy.get('[data-testid="usersTable"]')
+      cy.getByTestId('usersTable')
         .find('tbody')
-        .find('[data-testid="checkUser"]')
+        .findByTestId('checkUser')
         .each((checkEl, index) => {
           if (index < usersToChange) cy.wrap(checkEl).click();
         });
 
       // Select new role for these three users
-      cy.get('[data-testid="bulkSelect"]')
-        .click()
-        .contains(newBulkRole)
-        .click();
+      cy.getByTestId('bulkSelect').click().contains(newBulkRole).click();
 
       // Yield first three users role select
-      cy.get('[data-testid="userRoleSelect"]')
+      cy.getByTestId('userRoleSelect')
         .then((selectElements) => selectElements.slice(0, usersToChange))
         .as('users');
 

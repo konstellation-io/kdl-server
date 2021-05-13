@@ -4,15 +4,15 @@ exports[`SiteBar component Component match snapshot 1`] = `
 <div
   className="container"
 >
-  <nt
+  <ot
     className="left"
   >
     <Breadcrumbs />
-  </nt>
-  <rt
+  </ot>
+  <ht
     className="right"
   >
     <Memo(SettingsMenu) />
-  </rt>
+  </ht>
 </div>
 `;

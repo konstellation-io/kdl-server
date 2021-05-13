@@ -1,4 +1,4 @@
-import { BUTTON_ALIGN, Button, TextInput } from 'kwc';
+import { BUTTON_ALIGN, Button, TextInput, ExpandableMenu } from 'kwc';
 import React from 'react';
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -8,7 +8,6 @@ import TopicList from './components/TopicList/TopicList';
 import cx from 'classnames';
 import styles from './TopicFilter.module.scss';
 import useTopicFilter from './useTopicFilter';
-import ExpandableMenu from 'Components/ExpandableMenu/ExpandableMenu';
 import useBoolState from 'Hooks/useBoolState';
 
 interface Props {

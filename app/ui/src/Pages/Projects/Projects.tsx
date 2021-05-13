@@ -24,10 +24,8 @@ export type ProjectAdmins = {
 };
 
 function Projects() {
-  const [
-    showProjectAdmins,
-    setShowProjectAdmins,
-  ] = useState<ProjectAdmins | null>(null);
+  const [showProjectAdmins, setShowProjectAdmins] =
+    useState<ProjectAdmins | null>(null);
 
   const { data, error, loading } = useQuery<GetProjects>(GetProjectsQuery);
   const filters = useReactiveVar(projectFilters);

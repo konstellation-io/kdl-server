@@ -16,14 +16,19 @@ exports[`When data is ready should render without crashing 1`] = `
         >
           <div
             class="_3Loey"
-            style="height: 67px;"
+            style="height: 67px; min-height: 67px;"
           >
             Active (2)
           </div>
           <div
-            class="_3bqns"
-            style="max-height: 0;"
-          />
+            aria-hidden="true"
+            class="rah-static rah-static--height-zero _3bqns"
+            style="height: 0px; overflow: hidden;"
+          >
+            <div
+              style="display: none;"
+            />
+          </div>
         </div>
       </div>
     </div>

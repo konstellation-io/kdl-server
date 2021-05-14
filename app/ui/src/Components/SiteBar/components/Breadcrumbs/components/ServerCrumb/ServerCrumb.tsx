@@ -41,10 +41,11 @@ function ServerCrumb() {
       dataTestId="server"
       crumbText={CONFIG.SERVER_NAME}
       LeftIconComponent={<ServerIcon className="icon-regular" />}
-      BottomComponent={(props: BottomComponentProps) => (
+    >
+      {(props: BottomComponentProps) => (
         <NavigationSelector options={serverSections} {...props} />
       )}
-    />
+    </Crumb>
   );
 }
 

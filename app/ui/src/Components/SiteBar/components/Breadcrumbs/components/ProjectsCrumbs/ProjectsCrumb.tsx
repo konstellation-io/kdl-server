@@ -24,10 +24,11 @@ function ProjectsCrumb() {
       LeftIconComponent={
         <ProjectIcon className="icon-regular" archived={project.archived} />
       }
-      BottomComponent={(props: BottomComponentProps) => (
+    >
+      {(props: BottomComponentProps) => (
         <ProjectSelector options={activeProjects} {...props} />
       )}
-    />
+    </Crumb>
   );
 }
 

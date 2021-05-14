@@ -22,10 +22,11 @@ function ProjectCrumb() {
     <Crumb
       crumbText={label}
       LeftIconComponent={<Icon className="icon-small" />}
-      BottomComponent={(props: BottomComponentProps) => (
+    >
+      {(props: BottomComponentProps) => (
         <NavigationSelector options={allRoutes} {...props} />
       )}
-    />
+    </Crumb>
   );
 }
 

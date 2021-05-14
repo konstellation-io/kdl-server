@@ -69,6 +69,7 @@ function KGResults() {
   return (
     <div className={styles.container}>
       <ResourcesList
+        dataTestId="knowledgeViewerList"
         onClick={openDetails}
         resources={resources}
         noItems={{

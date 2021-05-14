@@ -85,6 +85,7 @@ function NavElements({ isOpened }: Props) {
               warning
             >
               <NavigationButton
+                dataTestId={areToolsActive ? 'stopTools' : 'runTools'}
                 label={areToolsActive ? 'Stop tools' : 'Run tools'}
                 Icon={renderToggleToolsIcon()}
               />

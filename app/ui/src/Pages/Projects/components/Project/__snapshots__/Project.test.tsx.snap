@@ -27,6 +27,7 @@ exports[`Project component Component match snapshot 1`] = `
     <Project
       project={
         Object {
+          "__typename": "Project",
           "archived": false,
           "creationDate": "2020-02-02",
           "description": "projectDescription3",
@@ -79,6 +80,7 @@ exports[`Project component Component match snapshot 1`] = `
           <UpperBg
             project={
               Object {
+                "__typename": "Project",
                 "archived": false,
                 "creationDate": "2020-02-02",
                 "description": "projectDescription3",
@@ -153,6 +155,7 @@ exports[`Project component Component match snapshot 1`] = `
           <LowerBg
             project={
               Object {
+                "__typename": "Project",
                 "archived": false,
                 "creationDate": "2020-02-02",
                 "description": "projectDescription3",
@@ -233,6 +236,7 @@ exports[`Project component Component match snapshot 1`] = `
           <Band
             project={
               Object {
+                "__typename": "Project",
                 "archived": false,
                 "creationDate": "2020-02-02",
                 "description": "projectDescription3",
@@ -294,6 +298,7 @@ exports[`Project component Component match snapshot 1`] = `
           <Square
             project={
               Object {
+                "__typename": "Project",
                 "archived": false,
                 "creationDate": "2020-02-02",
                 "description": "projectDescription3",

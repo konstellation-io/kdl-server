@@ -174,7 +174,9 @@ exports[`When data is ready should render without crashing 1`] = `
           >
             <div
               class="label"
-            />
+            >
+              External
+            </div>
             <div
               class="otherLabels"
             />
@@ -186,7 +188,7 @@ exports[`When data is ready should render without crashing 1`] = `
               class="repoType"
             >
               <div
-                class="square in medium notAnimate"
+                class="square out medium notAnimate"
                 style="height: 38px; width: 38px;"
               >
                 <div

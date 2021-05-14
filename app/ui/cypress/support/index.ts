@@ -15,6 +15,12 @@ Cypress.Commands.add(
   (subject, dataTestId) => subject.find(`[data-testid="${dataTestId}"]`)
 );
 
+Cypress.Commands.add('openSettings', () => {
+  cy.visit('http://localhost:3001');
+  cy.getByTestId('project').first().parent().click();
+  cy.getByTestId('toggleSettings').click();
+});
+
 // load type definitions that come with Cypress module
 /// <reference types="cypress" />
 
@@ -40,5 +46,11 @@ declare namespace Cypress {
      * @example cy.findByTestId('my-data-testid')
      */
     findByTestId(dataTestId: string): Chainable<JQuery<HTMLElement>>;
+
+    /**
+     * Custom command to open the settings
+     * @example cy.openSettings()
+     */
+    openSettings(): null;
   }
 }

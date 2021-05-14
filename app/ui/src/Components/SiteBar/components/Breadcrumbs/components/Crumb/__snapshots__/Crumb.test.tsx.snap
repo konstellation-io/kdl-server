@@ -23,9 +23,9 @@ exports[`Crumb component should render without crashing 1`] = `
     close={[Function]}
     opened={false}
   >
-    <BottomComponent
-      closeComponent={[Function]}
-    />
+    <div>
+      bar
+    </div>
   </N>
 </div>
 `;

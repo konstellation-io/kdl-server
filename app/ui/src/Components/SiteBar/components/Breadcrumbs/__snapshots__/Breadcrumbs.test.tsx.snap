@@ -4,15 +4,8 @@ exports[`Breadcrumbs component should render without crashing 1`] = `
 <div
   className="container"
 >
-  <Crumb
-    BottomComponent={
-      <div>
-        bar
-      </div>
-    }
-    LeftIconComponent={<svg />}
-    crumbText="foo"
-    key="0"
-  />
+  <ServerCrumb />
+  <ProjectsCrumb />
+  <ProjectCrumb />
 </div>
 `;

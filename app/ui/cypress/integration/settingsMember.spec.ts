@@ -17,23 +17,25 @@ describe('Settings Members Behavior', () => {
     cy.kstInterceptor('GetProjects', { data: { projects: [project1] } });
   });
 
-  it('should hide add member bar when the user is not an admin', () => {
-    // Arrange.
-    const { me, project } = buildMockedData(AccessLevel.VIEWER);
-    cy.kstInterceptor('GetMe', { data: { me } });
-    cy.kstInterceptor('GetProjectMembers', { data: { project } });
+  describe('Not admin member behavior', () => {
+    it('should hide add member bar when the user is not an admin', () => {
+      // Arrange.
+      const { me, project } = buildMockedData(AccessLevel.VIEWER);
+      cy.kstInterceptor('GetMe', { data: { me } });
+      cy.kstInterceptor('GetProjectMembers', { data: { project } });
 
-    cy.openSettings();
+      cy.openSettings();
 
-    // Act.
-    cy.getByTestId('members').click();
+      // Act.
+      cy.getByTestId('members').click();
 
-    // Assert.
-    cy.getByTestId('member').should('be.visible');
-    cy.getByTestId('addMembers').should('not.exist');
+      // Assert.
+      cy.getByTestId('member').should('be.visible');
+      cy.getByTestId('addMembers').should('not.exist');
+    });
   });
 
-  describe('Admin user behavior', () => {
+  describe('Admin member behavior', () => {
     beforeEach(() => {
       // Arrange.
       const { me, project } = buildMockedData(AccessLevel.ADMIN);

@@ -65,6 +65,7 @@ function Overview({ openedProject }: Props) {
           <DescriptionScore score={descriptionScore} />
         </div>
         <div
+          data-testid="repositorySection"
           className={cx(styles.section, styles.sectionClickable)}
           onClick={handleRepoClick}
         >
@@ -88,6 +89,7 @@ function Overview({ openedProject }: Props) {
           </div>
         </div>
         <div
+          data-testid="membersSection"
           className={cx(styles.section, styles.sectionClickable)}
           onClick={handleMembersClick}
         >

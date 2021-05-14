@@ -1,81 +1,40 @@
-const { _ } = Cypress;
-
 describe('Project Overview Behavior', () => {
   beforeEach(() => {
     cy.visit('http://localhost:3001');
   });
 
   it('should show the name of the project in the overview page', () => {
+    // Arrange.
+    cy.getByTestId('projectName').first().invoke('text').as('projectName');
+
     // Act.
-    cy.get('[data-testid="projectName"]')
-      .first()
-      .invoke('text')
-      .as('projectName')
-      .click();
+    cy.getByTestId('project').first().parent().click();
 
     // Assert.
-    cy.get('[data-testid="project"]').should('have.length.at.least', 4);
-  });
-
-  it('should show 8 projects when filtering by all', () => {
-    // Act.
-    cy.get('[data-testid="filterProjects"]')
-      .click()
-      .contains('all', { matchCase: false })
-      .click();
-
-    // Assert.
-    cy.get('[data-testid="project"]').should('have.length.at.least', 8);
-  });
-
-  it('should show only archived projects when filtering by archived', () => {
-    // Act.
-    cy.get('[data-testid="filterProjects"]')
-      .click()
-      .contains('archived', { matchCase: false })
-      .click();
-
-    cy.get('[data-testid="project"]').its('length').as('projectsCount');
-    cy.get('[data-testid="projectArchived"]')
-      .its('length')
-      .as('archivedProjectsCount');
-
-    // Assert.
-    cy.get('@projectsCount').then((projectsCount) =>
-      cy.get('@archivedProjectsCount').should('eq', projectsCount)
+    cy.get('@projectName').then((projectName) =>
+      cy.getByTestId('overview').should('contain', projectName)
     );
   });
 
-  it('should show the projects ordered from A to Z', () => {
+  it('should show the settings panel with the git tab selected when click on repository container', () => {
     // Arrange.
-    const mapNames = (el: JQuery<HTMLElement>) => _.map(el, 'textContent');
-    cy.get('[data-testid="projectName"]').then(mapNames).as('unorderedNames');
+    cy.getByTestId('project').first().parent().click();
 
     // Act.
-    cy.get('[data-testid="sortProjects"] > div')
-      .click()
-      .contains('from a to z', { matchCase: false })
-      .click();
+    cy.getByTestId('repositorySection').click();
 
-    // Assert
-    cy.get('[data-testid="projectName"]')
-      .then(mapNames)
-      .then((orderedNames) => {
-        cy.get('@unorderedNames').then((unorderedNames) => {
-          expect(orderedNames).to.be.deep.equal(_.sortBy(unorderedNames));
-        });
-      });
+    // Assert.
+    cy.getByTestId('tabGit').should('exist');
   });
 
-  it('should navigate to the user page when click on the user option in the menu', () => {
-    // Act.
-    cy.get('[data-testid="server"]')
-      .click()
-      .find('[data-testid="users"]')
-      .click();
+  it('should show the settings panel with the members tab selected when click on members container', () => {
+    // Arrange.
+    cy.getByTestId('project').first().parent().click();
 
-    // Assert
-    cy.url().should('include', '/users');
-    cy.get('[data-testid="usersTable"]').should('exist');
+    // Act.
+    cy.getByTestId('membersSection').click();
+
+    // Assert.
+    cy.getByTestId('tabMembers').should('exist');
   });
 });

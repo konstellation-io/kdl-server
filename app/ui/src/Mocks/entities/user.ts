@@ -13,10 +13,16 @@ export const user1 = {
   id: 'userId1',
   email: 'userEmail1',
   lastActivity: '2020-02-02',
+  username: 'username1',
+  creationDate: '2020-02-02',
+  __typename: 'User',
 };
 
 export const user2 = {
   id: 'userId2',
   email: 'userEmail2',
   lastActivity: '2020-02-03',
+  username: 'username2',
+  creationDate: '2020-02-03',
+  __typename: 'User',
 };

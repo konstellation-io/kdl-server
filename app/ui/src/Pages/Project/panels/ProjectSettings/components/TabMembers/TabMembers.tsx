@@ -70,6 +70,7 @@ function TabMembers({ projectId }: Props) {
     [updateMemberDetails, openPanel]
   );
 
+  console.log(dataMembers, dataMe);
   const canManageMembers = useMemo(() => {
     const meAsMember = dataMembers?.project.members.find(
       ({ user }) => user.email === dataMe?.me.email

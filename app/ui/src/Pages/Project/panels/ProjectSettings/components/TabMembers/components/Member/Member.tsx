@@ -40,6 +40,7 @@ function Member({
 }: Props) {
   return (
     <div
+      data-testid="member"
       className={cx(styles.container, {
         [styles.saveCheckSpace]: canManageMembers && !canBeSelected,
       })}

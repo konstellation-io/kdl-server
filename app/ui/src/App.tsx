@@ -104,6 +104,7 @@ function App() {
         <Routes />
       </ApolloProvider>
       <ToastContainer
+        role="toastMessage"
         position="bottom-center"
         autoClose={2000}
         hideProgressBar

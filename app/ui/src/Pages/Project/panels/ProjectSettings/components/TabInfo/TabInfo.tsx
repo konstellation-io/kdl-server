@@ -26,7 +26,7 @@ function TabInfo({ project }: Props) {
   });
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="tabInfo">
       <TextInput
         label="project name"
         formValue={newName}
@@ -40,7 +40,7 @@ function TabInfo({ project }: Props) {
       </div>
       <div className={styles.description}>
         <p className={styles.title}>ABSTRACT</p>
-        <div className={styles.button}>
+        <div className={styles.button} data-testid="editAbstract">
           <Button label="" Icon={IconEdit} onClick={openPanel} />
         </div>
         <div className={styles.content}>{project.description}</div>

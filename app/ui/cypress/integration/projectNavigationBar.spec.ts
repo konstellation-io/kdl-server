@@ -6,7 +6,7 @@ describe('Project Navigation Bar Behavior', () => {
 
   it('should show the overview project page', () => {
     // Assert.
-    cy.url().should('include', '/projects/').and('include', 'overview');
+    cy.url().should('include', '/overview');
   });
 
   it('should show the setting panel when click on settings option', () => {

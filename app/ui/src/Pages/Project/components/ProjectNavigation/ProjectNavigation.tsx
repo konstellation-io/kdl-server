@@ -77,23 +77,29 @@ function ProjectNavigation() {
   }
 
   return (
-    <div className={cx(styles.container, { [styles.opened]: opened })}>
+    <div
+      className={cx(styles.container, { [styles.opened]: opened })}
+      data-testid="navigationBar"
+    >
       <div className={styles.top}>
         <NavElements isOpened={opened} />
       </div>
       <div className={styles.bottom}>
         <NavigationButton
+          dataTestId="toggleKnowledgeViewer"
           onClick={toggleKGPanel}
           label="Knowledge Viewer"
           Icon={IconKGViewer}
           disabled={!!atKGRoute}
         />
         <NavigationButton
+          dataTestId="toggleSettings"
           onClick={toggleSettingsPanel}
           label="Settings"
           Icon={IconSettings}
         />
         <NavigationButton
+          dataTestId="toggleBar"
           label="Collapse"
           title={opened ? 'Collapse' : 'Expand'}
           Icon={IconCollapse}

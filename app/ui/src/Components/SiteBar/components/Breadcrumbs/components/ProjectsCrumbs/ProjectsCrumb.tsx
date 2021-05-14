@@ -12,7 +12,7 @@ function ProjectsCrumb() {
   const project = useReactiveVar(openedProject);
 
   if (loading || !project || !data) return null;
-  if (error) throw Error('cannot retrieve data at useBreadcrumbs');
+  if (error) throw Error('cannot retrieve data at ProjectsCrumb');
 
   const activeProjects = data.projects.filter(
     (p) => !p.archived && !p.needAccess

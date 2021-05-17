@@ -61,7 +61,10 @@ function Member({
         </div>
         <div className={styles.rightWrapper}>
           {canManageMembers ? (
-            <div onClick={(e) => e.stopPropagation()}>
+            <div
+              onClick={(e) => e.stopPropagation()}
+              data-testid="roleSelector"
+            >
               <Select
                 className={styles.accessLevelSelector}
                 options={Object.keys(AccessLevel)}

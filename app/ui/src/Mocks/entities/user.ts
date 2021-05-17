@@ -26,3 +26,12 @@ export const user2 = {
   creationDate: '2020-02-03',
   __typename: 'User',
 };
+
+export const newUser = {
+  id: 'userId3',
+  email: 'userEmail3',
+  lastActivity: '2020-02-04',
+  username: 'username3',
+  creationDate: '2020-02-04',
+  __typename: 'User',
+};

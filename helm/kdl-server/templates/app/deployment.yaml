@@ -57,6 +57,10 @@ spec:
                   - "-c"
                   - "mkdir /app/.ssh && ssh-keyscan -H gitea >> /app/.ssh/known_hosts"
           env:
+            - name: KDL_ADMIN_USERNAME
+              value: "{{ index .Values "science-toolkit" "gitea" "admin" "username" }}"
+            - name: KDL_ADMIN_EMAIL
+              value: "{{ index .Values "science-toolkit" "gitea" "admin" "email" }}"
             - name: SSH_KNOWN_HOSTS
               value: /app/.ssh/known_hosts
             - name: POD_NAMESPACE

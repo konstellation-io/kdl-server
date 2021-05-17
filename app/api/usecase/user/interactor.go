@@ -266,3 +266,29 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 
 	return i.repo.GetByUsername(ctx, user.Username)
 }
+
+// CreateAdminUser creates the KDL admin user if not exists.
+func (i *interactor) CreateAdminUser(username, email string) error {
+	ctx := context.Background()
+
+	_, err := i.repo.GetByUsername(ctx, username)
+	if err == nil {
+		i.logger.Debugf("The admin user \"%s\" already exists", username)
+		return nil
+	}
+
+	if !errors.Is(err, entity.ErrUserNotFound) {
+		return err
+	}
+
+	i.logger.Debugf("Creating the admin user \"%s\"...", username)
+
+	user, err := i.Create(ctx, email, username, entity.AccessLevelAdmin)
+	if err != nil {
+		return err
+	}
+
+	i.logger.Debugf("Admin user \"%s\" (%s) created correctly with id \"%s\"", user.Username, user.Email, user.ID)
+
+	return nil
+}

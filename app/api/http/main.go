@@ -3,55 +3,35 @@ package main
 import (
 	"net/http"
 	"os"
-	"strings"
-
-	"github.com/konstellation-io/kdl-server/app/api/http/controller"
-
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/dataloader"
-
-	"github.com/konstellation-io/kdl-server/app/api/usecase/kg"
-
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/kgservice"
-
-	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 
+	"github.com/konstellation-io/kdl-server/app/api/http/controller"
+	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/dataloader"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/kgservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/repository"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/templates"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/kg"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
-	"github.com/konstellation-io/kre/libs/simplelogger"
 )
 
 func main() {
 	cfg := config.NewConfig()
-
-	var level simplelogger.LogLevel
-
-	switch strings.ToLower(cfg.LogLevel) {
-	case "debug":
-		level = simplelogger.LevelDebug
-	case "info":
-		level = simplelogger.LevelInfo
-	case "warn":
-		level = simplelogger.LevelWarn
-	case "error":
-		level = simplelogger.LevelError
-	}
-
-	logger := simplelogger.New(level)
+	logger := logging.NewLogger(cfg.LogLevel)
 	realClock := clock.NewRealClock()
 	sshHelper := sshhelper.NewGenerator(logger)
 
@@ -98,6 +78,8 @@ func main() {
 	projectRepo := repository.NewProjectMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 	userRepo := repository.NewUserMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 
+	tmpl := templates.NewTemplating(cfg, logger, k8sClient)
+
 	err = userRepo.EnsureIndexes()
 	if err != nil {
 		logger.Errorf("Error creating indexes for users: %s", err)
@@ -114,9 +96,22 @@ func main() {
 		return
 	}
 
+	projectDeps := &project.InteractorDeps{
+		Logger:       logger,
+		Repo:         projectRepo,
+		Clock:        realClock,
+		GiteaService: giteaService,
+		MinioService: minioService,
+		DroneService: droneService,
+		K8sClient:    k8sClient,
+		Tmpl:         tmpl,
+	}
+
+	projectInteractor := project.NewInteractor(projectDeps)
+
 	resolvers := graph.NewResolver(
 		cfg,
-		project.NewInteractor(logger, projectRepo, realClock, giteaService, minioService, droneService, k8sClient),
+		projectInteractor,
 		userInteractor,
 		kg.NewInteractor(logger, kgService),
 		logger,

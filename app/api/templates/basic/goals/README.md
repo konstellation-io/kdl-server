@@ -1,0 +1,1 @@
+In this section, the technical and business goals of the project are documented.

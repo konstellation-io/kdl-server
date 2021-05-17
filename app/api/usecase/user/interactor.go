@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
@@ -106,9 +105,7 @@ func (i *interactor) Create(ctx context.Context, email, username string, accessL
 
 	i.logger.Infof("The user \"%s\" (%s) was created with ID \"%s\"", user.Username, user.Email, insertedID)
 
-	secretName, k8sKeys := i.newUserSSHKeySecret(user, keys.Public, keys.Private)
-	err = i.k8sClient.CreateSecret(ctx, secretName, k8sKeys)
-
+	err = i.k8sClient.CreateUserSSHKeySecret(ctx, user, keys.Public, keys.Private)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -247,10 +244,8 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 		return entity.User{}, err
 	}
 
-	// Check if k8s secret exists. If exists, update it. Otherwise, create it.
-	secretName, k8sKeys := i.newUserSSHKeySecret(user, keys.Public, keys.Private)
-
-	err = i.k8sClient.UpdateSecret(ctx, secretName, k8sKeys)
+	// Update the user SSH keys secret in k8s.
+	err = i.k8sClient.UpdateUserSSHKeySecret(ctx, user, keys.Public, keys.Private)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -270,15 +265,4 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 	i.logger.Infof("The SSH keys for user \"%s\" has been successfully regenerated", user.Username)
 
 	return i.repo.GetByUsername(ctx, user.Username)
-}
-
-// newUserSSHKeySecret returns the name and the k8s secret for public and private SSH keys.
-func (i *interactor) newUserSSHKeySecret(user entity.User, public, private string) (secretName string, k8sKeys map[string]string) {
-	secretName = fmt.Sprintf("%s-ssh-keys", user.UsernameSlug())
-	k8sKeys = map[string]string{
-		"KDL_USER_PUBLIC_SSH_KEY":  public,
-		"KDL_USER_PRIVATE_SSH_KEY": private,
-	}
-
-	return secretName, k8sKeys
 }

@@ -7,6 +7,7 @@ import (
 	"regexp"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/templates"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
@@ -108,25 +109,32 @@ type interactor struct {
 	minioService minioservice.MinioService
 	droneService droneservice.DroneService
 	k8sClient    k8s.K8sClient
+	tmpl         templates.Templating
+}
+
+// InteractorDeps encapsulates all project interactor dependencies.
+type InteractorDeps struct {
+	Logger       logging.Logger
+	Repo         Repository
+	Clock        clock.Clock
+	GiteaService giteaservice.GiteaClient
+	MinioService minioservice.MinioService
+	DroneService droneservice.DroneService
+	K8sClient    k8s.K8sClient
+	Tmpl         templates.Templating
 }
 
 // NewInteractor is a constructor function.
-func NewInteractor(logger logging.Logger,
-	repo Repository,
-	c clock.Clock,
-	giteaService giteaservice.GiteaClient,
-	minioService minioservice.MinioService,
-	droneService droneservice.DroneService,
-	k8sClient k8s.K8sClient,
-) UseCase {
+func NewInteractor(deps *InteractorDeps) UseCase {
 	return &interactor{
-		logger:       logger,
-		repo:         repo,
-		clock:        c,
-		giteaService: giteaService,
-		minioService: minioService,
-		droneService: droneService,
-		k8sClient:    k8sClient,
+		logger:       deps.Logger,
+		repo:         deps.Repo,
+		clock:        deps.Clock,
+		giteaService: deps.GiteaService,
+		minioService: deps.MinioService,
+		droneService: deps.DroneService,
+		k8sClient:    deps.K8sClient,
+		tmpl:         deps.Tmpl,
 	}
 }
 
@@ -137,7 +145,7 @@ func NewInteractor(logger logging.Logger,
 //  - Create a k8s KDLProject containing a MLFLow instance
 //  - Create Minio bucket
 //  - Activate Drone.io repo
-func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
+func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
 	// Validate the creation input
 	err := opt.Validate()
 	if err != nil {
@@ -168,6 +176,11 @@ func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity
 		project.Repository = entity.Repository{
 			Type:     entity.RepositoryTypeInternal,
 			RepoName: repoName,
+		}
+
+		err = i.tmpl.GenerateInitialProjectContent(ctx, project, opt.Owner)
+		if err != nil {
+			return entity.Project{}, err
 		}
 
 	case entity.RepositoryTypeExternal:
@@ -217,19 +230,19 @@ func (i interactor) Create(ctx context.Context, opt CreateProjectOption) (entity
 }
 
 // FindAll returns all the projects.
-func (i interactor) FindAll(ctx context.Context) ([]entity.Project, error) {
+func (i *interactor) FindAll(ctx context.Context) ([]entity.Project, error) {
 	i.logger.Info("Finding all projects")
 	return i.repo.FindAll(ctx)
 }
 
 // GetByID returns the project with the desired identifier.
-func (i interactor) GetByID(ctx context.Context, id string) (entity.Project, error) {
+func (i *interactor) GetByID(ctx context.Context, id string) (entity.Project, error) {
 	i.logger.Infof("Getting project with id \"%s\"", id)
 	return i.repo.Get(ctx, id)
 }
 
 // Update changes the desired information about a project.
-func (i interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
+func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
 	if !kdlutil.IsNilOrEmpty(opt.Name) {
 		err := i.repo.UpdateName(ctx, opt.ProjectID, *opt.Name)
 		if err != nil {
@@ -255,7 +268,7 @@ func (i interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity
 }
 
 // UpdateStarred set/unsets kgItem from starred list.
-func (i interactor) UpdateStarred(ctx context.Context, opt UpdateStarredOption) (bool, error) {
+func (i *interactor) UpdateStarred(ctx context.Context, opt UpdateStarredOption) (bool, error) {
 	if opt.Starred {
 		err := i.repo.SetStarredKGItem(ctx, opt.ProjectID, opt.KGItemID)
 		return true, err

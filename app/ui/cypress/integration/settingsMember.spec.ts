@@ -38,29 +38,18 @@ describe('Settings Members Behavior', () => {
 
   describe('Admin member behavior', () => {
     const newRole = 'Viewer';
+    const { me, project } = buildMockedData(AccessLevel.ADMIN);
 
     beforeEach(() => {
       // Arrange.
-      const { me, project } = buildMockedData(AccessLevel.ADMIN);
       const updatedMember = { ...project.members[1], accessLevel: newRole };
       const updateMembers = {
         ...project,
         members: [project.members[0], updatedMember],
       };
-      const addMembers = {
-        ...project,
-        members: [...project.members, newMember],
-      };
-      const removeMembers = {
-        ...project,
-        members: [project.members[0]],
-      };
-
       cy.kstInterceptor('GetMe', { data: { me } });
       cy.kstInterceptor('GetProjectMembers', { data: { project } });
       cy.kstInterceptor('UpdateMembers', { data: { updateMembers } });
-      cy.kstInterceptor('AddMembers', { data: { addMembers } });
-      cy.kstInterceptor('RemoveMembers', { data: { removeMembers } });
 
       cy.openSettings();
       cy.getByTestId('members').click();
@@ -88,18 +77,6 @@ describe('Settings Members Behavior', () => {
       cy.get('@roleSelector').invoke('text').should('equal', newRole);
     });
 
-    it('should update the member table when the admin add a new member', () => {
-      // Arrange.
-      cy.getByTestId('addMembers').find('input').type('a');
-      cy.getByTestId('addMembers').find('ul > li').first().click();
-
-      // Act.
-      cy.getByTestId('addMembers').contains('Add').click();
-
-      // Assert.
-      cy.getByTestId('tabMembers').should('contain', newUser.email);
-    });
-
     it('should update the member table when the admin change one member role using the checkbox', () => {
       // Arrange.
       cy.get('@secondMember').find('div').first().click();
@@ -115,8 +92,30 @@ describe('Settings Members Behavior', () => {
         .should('equal', newRole);
     });
 
+    it('should update the member table when the admin add a new member', () => {
+      // Arrange.
+      const addMembers = {
+        ...project,
+        members: [...project.members, newMember],
+      };
+      cy.kstInterceptor('AddMembers', { data: { addMembers } });
+      cy.getByTestId('addMembers').find('input').type('a');
+      cy.getByTestId('addMembers').find('ul > li').first().click();
+
+      // Act.
+      cy.getByTestId('addMembers').contains('Add').click();
+
+      // Assert.
+      cy.getByTestId('tabMembers').should('contain', newUser.email);
+    });
+
     it('should update the member table when the admin remove one member', () => {
       // Arrange.
+      const removeMembers = {
+        ...project,
+        members: [project.members[0]],
+      };
+      cy.kstInterceptor('RemoveMembers', { data: { removeMembers } });
       cy.get('@secondMember').find('div').first().click();
       cy.getByTestId('manageMembersActions')
         .click()

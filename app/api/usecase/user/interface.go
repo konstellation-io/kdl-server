@@ -27,6 +27,7 @@ type Repository interface {
 // UseCase interface to manage all operations related with users.
 type UseCase interface {
 	Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error)
+	CreateAdminUser(username, email string) error
 	UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error)
 	FindAll(ctx context.Context) ([]entity.User, error)
 	GetByUsername(ctx context.Context, username string) (entity.User, error)

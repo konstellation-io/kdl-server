@@ -87,6 +87,15 @@ func main() {
 
 	userInteractor := user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaService, k8sClient)
 
+	err = userInteractor.CreateAdminUser(cfg.Admin.Username, cfg.Admin.Email)
+	if err != nil {
+		logger.Errorf("Unexpected error creating admin user: %s", err)
+
+		defer os.Exit(1)
+
+		return
+	}
+
 	err = userInteractor.ScheduleUsersSyncJob(cfg.ScheduledJob.UsersSync.Interval)
 	if err != nil {
 		logger.Errorf("Unexpected error creating scheduled job for users synchronization: %s", err)

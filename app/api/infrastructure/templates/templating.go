@@ -80,6 +80,7 @@ func (t *templating) GenerateInitialProjectContent(ctx context.Context, project 
 		ProjectName string
 		MinioURL    string
 		MLFlowURL   string
+		SharedPVC   string
 	}
 
 	data := TemplateData{
@@ -87,6 +88,7 @@ func (t *templating) GenerateInitialProjectContent(ctx context.Context, project 
 		ProjectName: project.Name,
 		MinioURL:    fmt.Sprintf("http://%s", t.cfg.Minio.Endpoint),
 		MLFlowURL:   fmt.Sprintf("http://%s-mlflow:5000", project.ID),
+		SharedPVC:   t.cfg.SharedVolume.Name,
 	}
 
 	err = kdlutil.GenerateTemplate(tmplFolder, tmplSuffix, data, tmpDir)

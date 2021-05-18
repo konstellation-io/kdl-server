@@ -33,6 +33,9 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 			"spec": map[string]interface{}{
 				"projectId": projectID,
 				"domain":    k.cfg.BaseDomainName,
+				"sharedVolume": map[string]interface{}{
+					"name": k.cfg.SharedVolume.Name,
+				},
 				"tls": map[string]interface{}{
 					"enabled": k.cfg.TLS,
 				},

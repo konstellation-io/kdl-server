@@ -1,6 +1,7 @@
 package minioservice
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -33,14 +34,14 @@ func NewMinioService(logger logging.Logger, url, accessKey, secretKey string) (M
 }
 
 // CreateBucket creates a new bucket in Minio.
-func (m *minioService) CreateBucket(bucketName string) error {
+func (m *minioService) CreateBucket(ctx context.Context, bucketName string) error {
 	exists, err := m.client.BucketExists(context.Background(), bucketName)
 	if err != nil {
 		return err
 	}
 
 	if !exists {
-		err = m.client.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
+		err = m.client.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{})
 		if err != nil {
 			return err
 		}
@@ -51,4 +52,23 @@ func (m *minioService) CreateBucket(bucketName string) error {
 	}
 
 	return fmt.Errorf("%w: bucket name \"%s\"", ErrBucketAlreadyExists, bucketName)
+}
+
+func (m *minioService) CreateProjectDirs(ctx context.Context, bucketName string) error {
+	folders := []string{
+		"data/raw/",
+		"data/processed/",
+		"mlflow-artifacts/",
+		"krt/",
+	}
+
+	for _, f := range folders {
+		// Creating an empty file with a ending slash in the name, is the only way to create empty dirs in Minio
+		_, err := m.client.PutObject(ctx, bucketName, f, bytes.NewReader([]byte{}), 0, minio.PutObjectOptions{})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

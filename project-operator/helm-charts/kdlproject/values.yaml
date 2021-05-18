@@ -3,6 +3,9 @@ projectId: my-project
 
 domain: kdl.local
 
+sharedVolume:
+  name: received-data
+
 tls:
   enabled: false
 

@@ -24,6 +24,9 @@ type Config struct {
 		Size      string `envconfig:"TOOLKIT_VSCODE_STORAGE_SIZE"`
 		ClassName string `envconfig:"TOOLKIT_VSCODE_STORAGE_CLASSNAME"`
 	}
+	SharedVolume struct {
+		Name string `envconfig:"TOOLKIT_SHARED_VOLUME"`
+	}
 	MongoDB struct {
 		URI    string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
 		DBName string `yaml:"dbName"`
@@ -52,9 +55,6 @@ type Config struct {
 		URL     string `envconfig:"VSCODE_URL"`
 		Ingress struct {
 			Type string `envconfig:"TOOLKIT_INGRESS_TYPE"`
-		}
-		SharedVolume struct {
-			Name string `envconfig:"TOOLKIT_SHARED_VOLUME"`
 		}
 	}
 	Drone struct {

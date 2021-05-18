@@ -59,4 +59,4 @@ steps:
 volumes:
   - name: shared-storage
     claim:
-      name: received-data-claim
+      name: {{ .SharedPVC }}

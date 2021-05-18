@@ -168,7 +168,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 					"className": k.cfg.Storage.ClassName,
 				},
 				"sharedVolume": map[string]string{
-					"name": k.cfg.VSCode.SharedVolume.Name,
+					"name": k.cfg.SharedVolume.Name,
 				},
 				"tls": k.cfg.TLS,
 				"kdl": map[string]interface{}{

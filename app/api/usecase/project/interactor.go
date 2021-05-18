@@ -144,6 +144,7 @@ func NewInteractor(deps *InteractorDeps) UseCase {
 //  - For external repositories, mirrors the external repository in Gitea.
 //  - Create a k8s KDLProject containing a MLFLow instance
 //  - Create Minio bucket
+//  - Create Minio folders
 //  - Activate Drone.io repo
 func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
 	// Validate the creation input
@@ -207,7 +208,13 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 	}
 
 	// Create Minio bucket
-	err = i.minioService.CreateBucket(opt.ProjectID)
+	err = i.minioService.CreateBucket(ctx, opt.ProjectID)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	// Create Minio folders
+	err = i.minioService.CreateProjectDirs(ctx, opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err
 	}

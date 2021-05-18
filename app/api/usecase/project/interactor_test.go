@@ -131,7 +131,8 @@ func TestInteractor_CreateInternal(t *testing.T) {
 
 	s.mocks.giteaService.EXPECT().CreateRepo(someProjectID, ownerUsername).Return(nil)
 	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, someProjectID).Return(nil)
-	s.mocks.minioService.EXPECT().CreateBucket(someProjectID).Return(nil)
+	s.mocks.minioService.EXPECT().CreateBucket(ctx, someProjectID).Return(nil)
+	s.mocks.minioService.EXPECT().CreateProjectDirs(ctx, someProjectID).Return(nil)
 	s.mocks.droneService.EXPECT().ActivateRepository(someProjectID).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(someProjectID, nil)
@@ -202,7 +203,8 @@ func TestInteractor_CreateExternal(t *testing.T) {
 		MirrorRepo(externalRepoURL, someProjectID, externalRepoUsername, externalRepoToken, ownerUsername).
 		Return(nil)
 	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, someProjectID).Return(nil)
-	s.mocks.minioService.EXPECT().CreateBucket(someProjectID).Return(nil)
+	s.mocks.minioService.EXPECT().CreateBucket(ctx, someProjectID).Return(nil)
+	s.mocks.minioService.EXPECT().CreateProjectDirs(ctx, someProjectID).Return(nil)
 	s.mocks.droneService.EXPECT().ActivateRepository(someProjectID).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(someProjectID, nil)

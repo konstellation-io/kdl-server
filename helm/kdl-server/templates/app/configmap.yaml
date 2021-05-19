@@ -28,3 +28,5 @@ data:
   MLFLOW_IMG_REPO: "{{ .Values.mlflow.image.repository }}"
   MLFLOW_IMG_TAG: "{{ .Values.mlflow.image.tag }}"
   MLFLOW_IMG_PULLPOLICY: "{{ .Values.mlflow.image.pullPolicy }}"
+  MLFLOW_STORAGE_CLASS_NAME: "{{ .Values.mlflow.volume.storageClassName}}"
+  MLFLOW_STORAGE_SIZE: "{{ .Values.mlflow.volume.size}}"

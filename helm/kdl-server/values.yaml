@@ -9,6 +9,10 @@ ingress:
 science-toolkit:
   kdl:
     enabled: true
+  vscode:
+    storage:
+      size: 10Gi
+      storageClassName: standard
 
 kdlServer:
   image:

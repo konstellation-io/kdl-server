@@ -64,6 +64,9 @@ mlflow:
     repository: terminus7/mlflow
     tag: latest
     pullPolicy: IfNotPresent
+  volume:
+    storageClassName: standard
+    size: 1Gi
 
 mongodb:
   service:

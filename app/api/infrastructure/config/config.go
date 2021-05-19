@@ -69,6 +69,10 @@ type Config struct {
 			Tag        string `envconfig:"MLFLOW_IMG_TAG"`
 			PullPolicy string `envconfig:"MLFLOW_IMG_PULLPOLICY"`
 		}
+		Volume struct {
+			StorageClassName string `envconfig:"MLFLOW_STORAGE_CLASS_NAME"`
+			Size             string `envconfig:"MLFLOW_STORAGE_SIZE"`
+		}
 	}
 	KGservice struct {
 		URL string `envconfig:"KG_URL"`

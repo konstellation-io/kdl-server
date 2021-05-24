@@ -46,10 +46,8 @@ type Props = {
 } & WrapperProps;
 function KGVisualization({ width, height, data }: Props) {
   const [left, setLeft] = useState(0);
-  const [
-    openedPaper,
-    setOpenedPaper,
-  ] = useState<GetKnowledgeGraph_knowledgeGraph_items | null>(null);
+  const [openedPaper, setOpenedPaper] =
+    useState<GetKnowledgeGraph_knowledgeGraph_items | null>(null);
   const [hoveredPaper, setHoveredPaper] = useState<D | null>(null);
 
   const vizData: D[] = useMemo(() => data.map(buildD), [data]);
@@ -110,6 +108,7 @@ function KGVisualization({ width, height, data }: Props) {
     viz.current && viz.current.resources.unhighlightResource();
   }
 
+  // Obtains mouse position with respect to the center and the radius.
   function getMouseR(e: WheelEvent | MouseEvent) {
     let mouseR = 0;
     if (svgRef.current !== null) {

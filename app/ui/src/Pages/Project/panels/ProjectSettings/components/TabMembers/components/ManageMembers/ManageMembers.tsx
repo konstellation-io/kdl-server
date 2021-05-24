@@ -31,7 +31,7 @@ const AccessLevelSeparator = () => (
 );
 
 const RemoveMembersButton = () => (
-  <div className={styles.removeMemberOption}>
+  <div className={styles.removeMemberOption} data-testid="removeMembers">
     <DeleteIcon className={cx('icon-regular', styles.removeIcon)} />
     <span>Remove members</span>
   </div>
@@ -121,7 +121,7 @@ function ManageMembers({
     nMembers === 1 ? `${nMembers} User selected` : `${nMembers} Users selected`;
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="manageMembersActions">
       <span className={styles.actionsLabel}>ACTIONS</span>
       <Select
         placeholder={selectionText}

@@ -15,6 +15,7 @@ const MIN_RESOURCE_R = 1;
 const MAX_RESOURCE_OPACITY = 1;
 const MIN_RESOURCE_OPACITY = 0.3;
 const OUTSIDE_MAX_RESOURCE_R = 3;
+const LOWLIGHT_RESOURCE_OPACITY = 0.3;
 
 const MOUSE_HOVER_ACTIVATION_RADIUS = 50;
 
@@ -178,6 +179,14 @@ class Resources {
   };
 
   getResourceOpacity = (d: DComplete) => {
+    const { hoveredResource, highlightedResource } = this;
+
+    const shouldLowlight = hoveredResource || highlightedResource;
+    // Uncomment for section hover highlight implementation and remove previous line
+    // const shouldLowlight =
+    //   this.activeSection !== null && d.category !== this.activeSection;
+
+    if (shouldLowlight) return LOWLIGHT_RESOURCE_OPACITY;
     if (d.outsideMin) return 1;
 
     const opacityMaxIncrement = MAX_RESOURCE_OPACITY - MIN_RESOURCE_OPACITY;

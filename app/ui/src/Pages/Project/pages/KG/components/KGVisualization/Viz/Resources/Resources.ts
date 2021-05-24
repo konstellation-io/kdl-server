@@ -82,15 +82,8 @@ class Resources {
   };
 
   initialize = (sectionScale: ScaleBand<string>) => {
-    const {
-      canvas,
-      onMouseMove,
-      onMouseDown,
-      onMouseUp,
-      qt,
-      data,
-      draw,
-    } = this;
+    const { canvas, onMouseMove, onMouseDown, onMouseUp, qt, data, draw } =
+      this;
     this.sectionScale = sectionScale;
 
     qt.addAll(data);
@@ -261,9 +254,9 @@ class Resources {
     const {
       qt,
       draw,
-      sectionScale,
       getMouseAngle,
       getTextOrientations,
+      getActiveSection,
       props: {
         onHoverResource,
         center,
@@ -277,14 +270,12 @@ class Resources {
 
     const hovered = qt.find(dx, dy, 50);
 
-    const { angle, realAngle } = getMouseAngle(dx, dy);
-    const [orientationV, orientationH] = getTextOrientations(realAngle);
+    const angle = getMouseAngle(dx, dy);
+    const [orientationV, orientationH] = getTextOrientations(angle);
 
-    const sliceSize = this.sectionScale.step();
-    const sectionIndex = Math.floor(angle / sliceSize);
-    const activeSection = sectionScale.domain()[sectionIndex];
+    const { mouseActiveSection } = getActiveSection(angle);
 
-    updateActiveSection(activeSection);
+    updateActiveSection(mouseActiveSection);
     updateAxisOrientation(orientationV, orientationH);
 
     this.hideTooltipLink = false;
@@ -292,6 +283,35 @@ class Resources {
     this.hoveredResource = hovered || null;
     onHoverResource(this.hoveredResource);
     draw();
+  };
+
+  getActiveSection = (angle: number) => {
+    const { sectionScale, isMouseOnSecondSectionHalf } = this;
+
+    let correctedAngle = angle;
+    const sliceSize = sectionScale.step();
+    const secondHalf = isMouseOnSecondSectionHalf(angle);
+
+    // If angle is within the second half of a section, we shift the angle to be in the next section
+    if (secondHalf) correctedAngle += sliceSize;
+    correctedAngle %= 360;
+
+    const sectionIndex = Math.floor(angle / sliceSize);
+    const mouseSectionIndex = Math.floor(correctedAngle / sliceSize);
+
+    return {
+      activeSection: sectionScale.domain()[sectionIndex],
+      mouseActiveSection: sectionScale.domain()[mouseSectionIndex],
+    };
+  };
+
+  isMouseOnSecondSectionHalf = (angle: number) => {
+    const { sectionScale } = this;
+
+    const sliceSize = sectionScale.step();
+    const sectionAngle = angle % sliceSize;
+
+    return sectionAngle > sliceSize / 2;
   };
 
   getMouseAngle = (dx: number, dy: number) => {
@@ -305,34 +325,33 @@ class Resources {
     if (dx > 0 && dy < 0) angle += 0;
     angle += 90;
 
-    const realAngle = angle;
-
-    const sliceSize = this.sectionScale.step();
-
-    // Adjust the angle so a section cannot be located between the upper and lower side of the chart
-    // We do not want this as we do not want the axis labels to flip when mouse goes through the middle
-    // of the chart inside a given section.
-    const rem = angle % sliceSize;
-    const secondHalf = rem > sliceSize / 2;
-
-    if (secondHalf) angle += sliceSize;
-
-    if (angle > 360) angle = 0;
-
-    return { angle, realAngle };
+    return angle;
   };
 
   getTextOrientations = (angle: number) => {
-    const sliceSize = this.sectionScale.step();
+    const { getActiveSection, sectionScale, isMouseOnSecondSectionHalf } = this;
 
-    const rem = angle % sliceSize;
-    const secondHalf = rem > sliceSize / 2;
+    const sliceSize = sectionScale.step();
 
-    let bottom = angle > 90 && angle < 270;
+    const { activeSection } = getActiveSection(angle);
+    const secondHalf = isMouseOnSecondSectionHalf(angle);
+
+    const bottomThreshold = [90, 270];
+    const sectionAngle0 = (sectionScale(activeSection || '') || 0) + 90;
+    const sectionAngle1 = sectionAngle0 + sliceSize;
+    const sectionBisector = sectionAngle0 + (sectionAngle1 - sectionAngle0) / 2;
+
+    // Make a correction to the bottom threshold so it can only be outside of a section or
+    // exactly in the middle of it. With this, we fix the section between sides problem
+    if (sectionAngle0 < 90 && 90 < sectionAngle1) {
+      bottomThreshold[0] = sectionBisector;
+    }
+    if (sectionAngle0 < 270 && 270 < sectionAngle1) {
+      bottomThreshold[1] = sectionBisector;
+    }
+
+    let bottom = angle > bottomThreshold[0] && angle < bottomThreshold[1];
     let right = angle > 0 && angle < 180;
-
-    if (bottom && secondHalf && angle + sliceSize / 2 > 270) bottom = false;
-    if (bottom && !secondHalf && angle - sliceSize / 2 < 90) bottom = false;
 
     return getOrientations(right, bottom, secondHalf);
   };

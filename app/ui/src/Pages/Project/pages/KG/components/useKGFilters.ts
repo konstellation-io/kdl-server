@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { KGItem } from '../KG';
+import { KGItem, topicOthers } from '../KG';
 import { TopicSections } from '../KGUtils';
 
 export interface KGFilters {
@@ -28,11 +28,16 @@ function useKGFilters(sections: TopicSections, resources: KGItem[]) {
     return selectedTopics;
   }, [filters.topics, filters.showOthers]);
 
-  const filteredResources = useMemo<KGItem[]>(() => {
-    return resources.filter(({ topic }) =>
-      filteredSections.includes(topic?.name || '')
-    );
-  }, [filteredSections, resources]);
+  const filteredResources = useMemo<KGItem[]>(
+    () =>
+      resources.map((resource) => ({
+        ...resource,
+        topic: filteredSections.includes(resource.topic?.name || '')
+          ? resource.topic
+          : topicOthers,
+      })),
+    [filteredSections, resources]
+  );
 
   return {
     filters,

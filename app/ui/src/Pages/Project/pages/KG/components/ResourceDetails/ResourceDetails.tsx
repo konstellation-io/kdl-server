@@ -24,6 +24,7 @@ import { useParams } from 'react-router';
 import useBoolState from 'Hooks/useBoolState';
 
 import SetStarredKGItemMutation from 'Graphql/mutations/setStarredKGItem';
+import { categoryToLabel } from '../../KGUtils';
 
 function formatAbstract(abstract: string, completed: boolean) {
   return completed ? abstract : `${abstract.slice(0, 350)}...`;
@@ -107,7 +108,9 @@ function ResourceDetails({ resource, onClose }: Props) {
                 {resource.authors.join(', ')}
               </div>
             </div>
-            <div className={styles.type}>{resource.category}</div>
+            <div className={styles.type}>
+              {categoryToLabel[resource.category]}
+            </div>
             <div className={styles.urlRow}>
               <div className={styles.linkIcon}>
                 <IconLink className="icon-small" />

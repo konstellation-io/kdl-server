@@ -8,6 +8,7 @@ import cx from 'classnames';
 import { formatDate } from 'Utils/format';
 import styles from './KGItem.module.scss';
 import { GetKnowledgeGraph_knowledgeGraph_items_topics } from 'Graphql/queries/types/GetKnowledgeGraph';
+import { categoryToLabel } from '../../../../KGUtils';
 
 type Props = {
   resource: KGItemType;
@@ -63,7 +64,9 @@ function KGItem({ resource, onClick, onLeave, onEnter }: Props) {
         )}
         {resource.title}
       </div>
-      <div className={styles.rCategory}>{resource.category}</div>
+      <div className={styles.rCategory}>
+        {categoryToLabel[resource.category]}
+      </div>
     </div>
   );
 }

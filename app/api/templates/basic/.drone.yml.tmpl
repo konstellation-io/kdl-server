@@ -16,21 +16,22 @@ get:
 
 kind: pipeline
 type: kubernetes
-name: application-examples
+name: example-pipeline
 
 trigger:
   ref:
-  - refs/tags/run-examples-*
+  - refs/tags/run-example-*
 
 environment:
   PYTHONPATH: /drone/src/lab
+  PATH_CONFIG: /drone/src/lab/processes/config.ini
   MINIO_DATA_FOLDER: /shared-storage/{{ .ProjectID }}/data
   MLFLOW_URL: {{ .MLFlowURL }}
   MLFLOW_S3_ENDPOINT_URL: {{ .MinioURL }}
-  MLFLOW_EXPERIMENT: {{ .ProjectID }}
+  USER: ${DRONE_COMMIT_AUTHOR}
 
 steps:
-  - name: sklearn-example
+  - name: prepare-data
     image: terminus7/sci-toolkit-runner:1.1.2
     environment:
       AWS_ACCESS_KEY_ID:
@@ -38,12 +39,12 @@ steps:
       AWS_SECRET_ACCESS_KEY:
         from_secret: minio-secret
     commands:
-      - python3 lab/processes/sklearn_example/main.py
+      - python3 lab/processes/prepare_data/main.py
     volumes:
         - name: shared-storage
           path: /shared-storage
 
-  - name: pytorch-example
+  - name: train-standard-classifiers
     image: terminus7/sci-toolkit-runner:1.1.2
     environment:
       AWS_ACCESS_KEY_ID:
@@ -51,7 +52,20 @@ steps:
       AWS_SECRET_ACCESS_KEY:
         from_secret: minio-secret
     commands:
-      - python3 lab/processes/pytorch_example/main.py
+      - python3 lab/processes/train_standard_classifiers/main.py
+    volumes:
+        - name: shared-storage
+          path: /shared-storage
+
+  - name: train-pytorch-neural-net
+    image: terminus7/sci-toolkit-runner:1.1.2
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: minio-key-id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: minio-secret
+    commands:
+      - python3 lab/processes/train_dnn_pytorch/main.py
     volumes:
         - name: shared-storage
           path: /shared-storage

@@ -11,80 +11,113 @@ The project repository has the following directory structure:
 │   │
 │   ├── docs      <- High-level reports, executive summaries at each milestone (typically .md)
 │   │
-│   ├── lib       <- Importable functions shared between analysis notebooks and processes scripts
+│   ├── lib       <- Importable functions used by analysis notebooks and processes scripts
 │   │                (including unit tests)
 │   │
-│   └── processes           <- Source code for reproducible workflow steps. For example:
-│       ├── process_data
+│   └── processes           <- Source code for reproducible workflow steps.
+│       ├── prepare_data
 │       │   ├── main.py
-│       │   ├── process_data.py
-|       │   └── test_process_data.py
-|       ├── train_model
+│       │   └── cancer_data.py
+|       ├── train_dnn_pytorch
 │       │   ├── main.py
-│       │   ├── train_model.py
-|       │   └── test_train_model.py
-│       └── ...
-│
-├── goals         <- Acceptance criteria (TBD)
+│       │   └── densenet.py
+│       └── train_standard_classifiers
+│           └── main.py
+|
+├── goals         <- Acceptance criteria (typically as automated tests describing desired behaviour)
 │
 ├── runtimes      <- Code for generating deployment runtimes (.krt)
 │
-├── .drone.yml
-├── .flake8
+├── .drone.yml    <- Instructions for Drone runners
+├── .flake8       <- Configuration for style guide enforcement
 ├── .gitignore
 |
 └── README.md
 ```
 
+The `processes` subdirectory contains as its subdirectories the various separate processes (`prepare_data`, etc.),
+which can be tought of as nodes of the analysis graph.
+Each of these processes has a clearly identifiable main script,
+and another file containing importable functions and classes specific to that step.
 
-## Example project pipelines
+The process names from the template are not likely to generalize to other projects, so here is another example for clarity:
+
+```
+└── processes
+    ├── prepare_data
+    │   ├── main.py
+    │   ├── (image_data).py
+    │   └── (image_data)_test.py
+    ├── train_model
+    │   ├── main.py
+    │   ├── (convnet).py
+    │   └── (convnet)_test.py
+    └── ...
+```
+
+In the examples shown, all processes files are Python `.py` files.
+However, the idea of modularizing the analysis into separate processes facilitates changing any of those processes to a different language as may be required, for example R or Julia.
+
+## Example project pipeline
 
 KDL contains various components that need to be correctly orchestrated and connected.
-To illustrate their intended usage, we provide two example machine learning pipelines already implemented in KDL.
-The first example pipeline is a simple classification problem with standard ML models from scikit-learn.
-The second example pipeline is an image classification problem addressed with convolutional networks implemented in PyTorch.
+To illustrate their intended usage, we provide an example machine learning pipeline already implemented in KDL.
 
-### Scikit-learn example: Wine classification
+The example pipeline is a simple classification problem based on the [Breast Cancer Wisconsin Dataset](https://scikit-learn.org/stable/datasets/toy_dataset.html#breast-cancer-dataset).
+The dataset contains 30 numeric features and the binary target class (benign/malignant).
 
-The first example pipeline is a simple classification task.
-Based on the [Wine Recognition Dataset](https://scikit-learn.org/stable/datasets/toy_dataset.html#wine-dataset), the aim is to classify three different types of wines based on their physicochemical characteristics (alcohol content, malic acid, etc.).
+The code illustrating the implementation of a machine learning pipeline in KDL is composed of three parts:
 
-The code for wine classification is in [lab/processes/sklearn_example/main.py](lab/processes/sklearn_example/main.py).
+- Data preparation
+- Traditional ML models (in scikit-learn)
+- Neural network models (in PyTorch)
 
-The execution of the wine classification pipeline on Drone agents is specified in [.drone.yml](.drone.yml) (for simplicity, we are omitting various additional components, such as the environment variables and the AWS secrets):
+More information on each of these steps:
+
+- **Data preparation**
+  (code in [lab/processes/prepare_data/main.py](lab/processes/prepare_data/main.py)):
+  the dataset is loaded from sklearn datasets and normalized;
+  the transformed data are split into train, validation and test sets;
+  and the processed data are stored on the shared volume.
+- **Traditional ML models (in scikit-learn)**
+  (code in [lab/processes/train_standard_classifiers/main.py](lab/processes/train_standard_classifiers/main.py)):
+  the processed datasets are loaded from the shared volume as arrays;
+  the script iterates through a number of classification algorithms,
+  including logistic regression, naïve Bayes, random forest, gradient boosting, etc.;
+  validation accuracy is computed and logged to MLflow.
+- **Neural network models (in PyTorch)**
+  (code in [lab/processes/train_dnn_pytorch/main.py](lab/processes/train_dnn_pytorch/main.py)):
+  the processed datasets are loaded from the shared volume as torch DataLoaders;
+  the script initiates a densely connected neural network for binary classification
+  and launches its training and validation;
+  the training history (accuracy and loss per epoch on both training and validation data) are stored as an artifact in MLflow (`training_history.csv` and visualized in `.png`).
+  The model with the highest validation accuracy is saved as a .joblib file in MLflow artifacts, and is used to produce an assessment of model performance on the validation dataset (e.g. saving the loss and accuracy metrics, and the confusion matrix of the validation set, `confusion_matrix.png`, all logged to MLflow).
+
+The execution of the example classification pipeline on Drone agents is specified in [.drone.yml](.drone.yml) (for simplicity, we are omitting various additional components here, such as the environment variables and the AWS secrets):
 
 ```yaml
+---
 kind: pipeline
 type: kubernetes
-name: application-examples
+name: example-pipeline
 
 trigger:
   ref:
-  - refs/tags/run-examples-*
-
-steps:
-  - name: sklearn-example
-    image: terminus7/sci-toolkit-runner:1.1.2
-    commands:
-      - python3 lab/processes/sklearn_example/main.py
+    - refs/tags/run-example-*
 ```
 
-To trigger the execution of this pipeline on Drone runners, push a tag containing the name matching the trigger (e.g. in this case, `run-examples-v1`) to the remote repository.
-For more information, see the section Launching experiment runs (Drone) below.
+To **launch the execution** of this pipeline on Drone runners, push a tag containing the name matching the defined trigger to the remote repository.
+In this case, the tag pattern is `run-example-*`,
+therefore to launch the execution run the following commands in the Terminal:
+`git tag run-example-v0 && git push origin run-example-v0`.
+For more information and examples, see the section Launching experiment runs (Drone) below.
 
-The results of executions are stored in MLflow:
-in the simplified example of wine classification, we are only tracking one parameter (name of the classifier), and one metric (the obtained validation accuracy).
-In a real-world project, you are likely to be tracking many parameters and metrics of interest.
-The connection to MLflow to log these parameters and metrics is established via the code in the [main.py](lab/processes/sklearn_example/main.py) and with the environment variables in [.drone.yml](.drone.yml). For more information, see the section "Logging experiment results (MLflow)" below.
+The **results of executions** are stored in MLflow.
+In the example of training traditional ML models, we are only tracking one parameter (the name of the classifier)and one metric (the obtained validation accuracy). In the PyTorch neural network training example, we are tracking the same metric (validation accuracy) for comparisons, but a different set of hyperparameters, such as learning rate, batch size, number of epochs etc.
+In a real-world project, you are likely to be tracking many more parameters and metrics of interest.
+The connection to MLflow to log these parameters and metrics is established via the code in the [main.py](lab/processes/train_standard_classifiers/main.py) and with the environment variables in [.drone.yml](.drone.yml).
+For more information on MLflow tracking, see the section "Logging experiment results (MLflow)" below.
 To see the tracked experiments, visit the MLflow tool UI.
-
-
-### PyTorch example: digit classification
-
-The second example pipeline is based on an image classification problem, with the aim of classifying digits from the [Optical Recognition of Handwritten Digits](https://scikit-learn.org/stable/datasets/toy_dataset.html#digits-dataset) dataset. This is _not_ the standard MNIST dataset (over 20,000 images of 28x28 pixels), it is a considerably smaller dataset (1797 images of 8x8 pixels), with the advantage that it does not require downloading from the internet as it is already distributed with the scikit-learn library in the `sklearn.datasets` package.
-
-In this example pipeline, defined in [lab/processes/pytorch_example/main.py](lab/processes/pytorch_example/main.py), the dataset images are split into train, validation and test sets, and are classified as digits 0-9 with a simple convolutional neural network. The training history (accuracy and loss per epoch on both training and validation data) is stored as an artifact in MLflow (`training_history.csv` and visualized in `.png`). The model with the highest validation accuracy is saved as a .joblib file in MLflow artifacts, and is used to produce an assessment of model performance on the validation dataset (e.g. saving the loss and accuracy metrics, and the confusion matrix of the validation set, `confusion_matrix.png`, all logged to MLflow).
-
 
 ## Importing library functions
 
@@ -121,7 +154,6 @@ from lib.viz import plot_confusion_matrix
 To see a working example, refer to the existing `application-examples` pipeline defined in .drone.yml
 (the PyTorch example pipeline uses library imports in `processes/pytorch_example/main.py`).
 
-
 ## Launching experiment runs (Drone)
 
 To enable full tracability and reproducibility, all executions that generate results or artifacts
@@ -137,12 +169,12 @@ An example is shown below:
 ```yaml
 trigger:
   ref:
-  - refs/tags/process-data-*
+    - refs/tags/process-data-*
 ```
 
 With this trigger in place, the pipeline will be executed on Drone agents whenever a tag matching the pattern specified in the trigger is pushed to the remote repository, for example:
 
-```
+```bash
 git tag process-data-v0
 git push origin process-data-v0
 ```
@@ -158,12 +190,11 @@ The environment variables for connecting to MLflow server are provided in .drone
 
 ```yaml
 environment:
-  MLFLOW_URL: http://mlflow-server:5000
-  MLFLOW_S3_ENDPOINT_URL: http://kdl-server-minio:9000
-  MLFLOW_EXPERIMENT: {{ .ProjectID }}
+  MLFLOW_URL: {{ .MLFlowURL }}
+  MLFLOW_S3_ENDPOINT_URL: {{ .MinioURL }}
 ```
 
-The usage of MLflow for experiment tracking is illustrated by the scikit-learn example pipeline in [lab/processes/sklearn_example/main.py](lab/processes/sklearn_example/main.py).
+The usage of MLflow for experiment tracking is illustrated by the scikit-learn example pipeline in [lab/processes/train_standard_classifiers/main.py](lab/processes/train_standard_classifiers/main.py).
 
 ```python
 import mlflow
@@ -171,7 +202,7 @@ import mlflow
 mlflow.set_tracking_uri(MLFLOW_URL)
 mlflow.set_experiment(MLFLOW_EXPERIMENT)
 
-with mlflow.start_run(run_name=MLFLOW_RUN_NAME):
+with mlflow.start_run(run_name=MLFLOW_RUN_NAME, tags=MLFLOW_TAGS):
 
     # (... experiment code ...)
 
@@ -187,11 +218,11 @@ Whenever one script execution trains various models (e.g. in hyperparameter sear
 ```python
 import mlflow
 
-with mlflow.start_run(run_name=MLFLOW_RUN_NAME):
+with mlflow.start_run(run_name=MLFLOW_RUN_NAME, tags=MLFLOW_TAGS):
 
     # (... experiment setup code shared between subruns ... )
 
-    with mlflow.start_run(run_name=SUBRUN_NAME, nested=True):
+    with mlflow.start_run(run_name=SUBRUN_NAME, nested=True, tags=MLFLOW_TAGS):
 
         # (... model training code ...)
 
@@ -199,6 +230,6 @@ with mlflow.start_run(run_name=MLFLOW_RUN_NAME):
         mlflow.log_param("validation_accuracy", val_acc)
 ```
 
-To compare the executions and visualise the effect of logged parameters on the logged metrics,
+To compare the executions and vizualise the effect of logged parameters on the logged metrics,
 you can select the runs you wish to compare in the MLflow UI, select "Compare" and add the desired parameters and metrics to the visualizations provided through the UI.
 Alternatively, the results can also be queried with the MLflow API. For more information on the latter, see [MLflow documentation on querying runs](https://www.mlflow.org/docs/latest/tracking.html#querying-runs-programmatically).

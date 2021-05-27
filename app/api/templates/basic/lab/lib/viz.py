@@ -9,6 +9,7 @@ from typing import Union
 
 from matplotlib import pyplot as plt
 from matplotlib.colors import Colormap
+from matplotlib.ticker import MaxNLocator
 import numpy as np
 import pandas as pd
 
@@ -29,6 +30,7 @@ def plot_training_history(
             - 'loss':  training loss,
             - 'val_acc': validation accuracy,
             - 'val_loss': validation loss
+            - 'epoch': epoch number
         show: (bool) show plot if True
         title: (str) Title of the plot
         savepath: (str or Path, or None) file path to save resulting plot. If None, omit saving
@@ -37,6 +39,7 @@ def plot_training_history(
     Returns:
         (None or tuple of (fig, axes))
     """
+    epochs = history['epoch']
     loss = history['loss']
     val_loss = history['val_loss']
 
@@ -46,16 +49,16 @@ def plot_training_history(
     assert len(acc) == len(val_acc) == len(loss) == len(
         val_loss), "All metrics should have the same number of measurements (one for each epoch)."
 
-    epochs = [int(n) for n in range(len(acc))]
-
     fig, ax = plt.subplots(1, 1)
 
     ax.plot(epochs, acc, c='r', lw=1, label='Train accuracy')
     ax.plot(epochs, val_acc, c='r', lw=2, label='Validation accuracy')
+    ax.hlines(y=1, xmin=ax.get_xlim()[0], xmax=ax.get_xlim()[1], color="k", lw=1, ls="--", alpha=0.3)
     ax.set_xlabel('Epoch')
-    plt.xticks(epochs)
 
-    ax.set_ylim(0.5, 1.01)
+    xticks = MaxNLocator(nbins=11, steps=[1, 2, 5, 10])
+    ax.xaxis.set_major_locator(xticks)
+
     ax.set_ylabel('Accuracy', color='r')
     ax.tick_params(axis='y', labelcolor='r')
 
@@ -66,8 +69,17 @@ def plot_training_history(
     ax2.set_ylabel('Loss', color='b')
     ax2.tick_params(axis='y', labelcolor='b')
 
-    ax.legend(loc=6)
-    ax2.legend(loc=5)
+    # Make space for legend above
+    ax.set_ylim(min(0.5, ax.get_ylim()[0]), 1.1*ax.get_ylim()[1])
+    ax2.set_ylim(ax2.get_ylim()[0], 1.2*ax2.get_ylim()[1])
+
+    # Hide ticks on accuracy axis above 1.0
+    yticks = ax.yaxis.get_major_ticks()
+    yticks[-1].set_visible(False)
+    yticks[-2].set_visible(False)
+
+    ax.legend(loc=2, frameon=False)
+    ax2.legend(loc=1, frameon=False)
     plt.title(title)
 
     if savepath:

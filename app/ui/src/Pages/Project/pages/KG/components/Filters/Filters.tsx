@@ -4,6 +4,7 @@ import { KGFilters } from '../useKGFilters';
 import ShowOthersFilter from './components/ShowOthersFilter/ShowOthersFilter';
 import TopicFilter from './components/TopicFilter/TopicFilter';
 import styles from './Filters.module.scss';
+import { Button } from 'kwc';
 
 export interface Topic {
   name: string;
@@ -15,8 +16,9 @@ type Props = {
   topics: Topic[];
   filters: KGFilters;
   onFiltersChange: (kgFilters: KGFilters) => void;
+  restoreScores: () => void;
 };
-function Filters({ topics, filters, onFiltersChange }: Props) {
+function Filters({ topics, filters, onFiltersChange, restoreScores }: Props) {
   const handleTopicsUpdate = useCallback(
     (value: string[]) => onFiltersChange({ topics: value }),
     [onFiltersChange]
@@ -33,6 +35,7 @@ function Filters({ topics, filters, onFiltersChange }: Props) {
 
   return (
     <div className={styles.container}>
+      <Button label="Restore zoom" onClick={restoreScores} />
       <ShowOthersFilter
         showOthers={filters?.showOthers ?? false}
         onUpdate={handleShowOthersUpdate}

@@ -2,13 +2,20 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { KGItem, topicOthers } from '../KG';
 import { TopicSections } from '../KGUtils';
+import useKgScores from 'Graphql/hooks/useKgScores';
 
 export interface KGFilters {
   topics?: string[];
   showOthers?: boolean;
 }
 
-function useKGFilters(sections: TopicSections, resources: KGItem[]) {
+function useKGFilters(
+  sections: TopicSections,
+  resources: KGItem[],
+  scoreDomain: [number, number]
+) {
+  const { updateScores } = useKgScores();
+
   const [filters, setFilters] = useState<KGFilters>({
     topics: Object.keys(sections),
     showOthers: true,
@@ -39,10 +46,15 @@ function useKGFilters(sections: TopicSections, resources: KGItem[]) {
     [filteredSections, resources]
   );
 
+  function restoreScores() {
+    updateScores(scoreDomain);
+  }
+
   return {
     filters,
     handleFiltersChange,
     filteredResources,
+    restoreScores,
   };
 }
 

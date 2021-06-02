@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import { select } from 'd3-selection';
 import { D } from './Viz/KGViz';
+import { useReactiveVar } from '@apollo/client';
+import { kgScores } from '../../../../../../Graphql/client/cache';
+import useKgScores from '../../../../../../Graphql/hooks/useKgScores';
 
 const ZOOM_STEP_SIZE = 100; // The lower the size the higher the number of steps are
 const ZOOM_STEP_DIV = 8; // 100 / 8 = 12.5% -> amount of zoom that applies each step
 
 function useKGVizScores(data: D[]) {
-  const [scores, setScore] = useState<[number, number]>([1, 0]);
+  const scores = useReactiveVar(kgScores);
+  const { updateScores } = useKgScores();
   const [borderScores, setBorderScores] = useState<[number, number]>([1, 0]);
 
   const [animating, setAnimating] = useState(true);
@@ -27,7 +31,7 @@ function useKGVizScores(data: D[]) {
         .duration(1000)
         .delay(500)
         .attrTween('fill', () => (t) => {
-          setScore([1 - difMax * t, difMin * t]);
+          updateScores([1 - difMax * t, difMin * t]);
           return t;
         })
         .on('end', () => setAnimating(false));
@@ -43,7 +47,7 @@ function useKGVizScores(data: D[]) {
     const min = Math.min(...allScores);
     const max = Math.max(...allScores);
     if (!animating) {
-      setScore([max, min]);
+      updateScores([max, min]);
     }
     setBorderScores([max + 0.01, 0]);
     // We want to reset scores only when data updates
@@ -95,7 +99,7 @@ function useKGVizScores(data: D[]) {
       Math.min(maxScore, max - max * maxMultiplier)
     );
 
-    setScore([newMax, newMin]);
+    updateScores([newMax, newMin]);
   }
 
   function dragScore(dragAmount: number, pivotScores: [number, number]) {
@@ -109,7 +113,7 @@ function useKGVizScores(data: D[]) {
     newMax = Math.min(limitMax, newMax);
     const newMin = Math.max(0, newMax - scoresDistance);
 
-    setScore([newMax, newMin]);
+    updateScores([newMax, newMin]);
   }
 
   return { scores, zoomScore, dragScore };

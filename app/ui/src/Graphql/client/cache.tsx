@@ -65,16 +65,15 @@ const initialStateUserSettings: UserSettings = {
   },
 };
 
+export const kgScores = makeVar<[number, number]>([1, 0]);
 export const projectFilters = makeVar(initialProjectFilters);
 export const newProject = makeVar(initialNewProject);
 export const openedProject = makeVar<GetProjects_projects | null>(null);
 export const userSettings = makeVar<UserSettings>(initialStateUserSettings);
-export const memberDetails = makeVar<GetProjectMembers_project_members | null>(
-  null
-);
-export const resourceDetails = makeVar<GetKnowledgeGraph_knowledgeGraph_items | null>(
-  null
-);
+export const memberDetails =
+  makeVar<GetProjectMembers_project_members | null>(null);
+export const resourceDetails =
+  makeVar<GetKnowledgeGraph_knowledgeGraph_items | null>(null);
 export const primaryPanel = makeVar<PanelInfo | null>(null);
 export const secondaryPanel = makeVar<PanelInfo | null>(null);
 export const currentTool = makeVar<ToolName | null>(null);

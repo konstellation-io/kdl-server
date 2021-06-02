@@ -10,18 +10,17 @@ import React, { useMemo } from 'react';
 
 import { ProjectRoute } from '../../ProjectPanels';
 import { ErrorMessage, SpinnerCircular } from 'kwc';
-import { getSectionsAndNames, TopicSections } from './KGUtils';
+import {
+  getSectionsAndNames,
+  topicOthers,
+  TopicSections,
+  getKGItemsAndScores,
+} from './KGUtils';
 import styles from './KG.module.scss';
 import useKGFilters from './components/useKGFilters';
 import { useQuery } from '@apollo/client';
 
 import GetKnowledgeGraphQuery from 'Graphql/queries/getKnowledgeGraph';
-
-export const topicOthers: GetKnowledgeGraph_knowledgeGraph_items_topics = {
-  name: 'Others',
-  relevance: 0,
-  __typename: 'Topic',
-};
 
 export interface KGItem extends GetKnowledgeGraph_knowledgeGraph_items {
   topic?: GetKnowledgeGraph_knowledgeGraph_items_topics;
@@ -40,19 +39,10 @@ function KG({ openedProject }: ProjectRoute) {
     [data]
   );
 
-  const kgItems: KGItem[] = useMemo(() => {
-    const topTopicsName = topTopics.map((t) => t.name);
-    return (
-      data?.knowledgeGraph.items.map((r) => {
-        const mainTopic = r.topics[0];
-        const isInTop = topTopicsName.includes(mainTopic?.name);
-        return {
-          ...r,
-          topic: isInTop ? mainTopic : topicOthers,
-        };
-      }) || []
-    );
-  }, [data, topTopics]);
+  const [kgItems, scoreDomain] = useMemo(
+    () => getKGItemsAndScores(data?.knowledgeGraph.items, topTopics),
+    [data, topTopics]
+  );
 
   const [sections, topics]: [TopicSections, Topic[]] = useMemo(() => {
     const _sections = getSectionsAndNames(kgItems);
@@ -64,10 +54,8 @@ function KG({ openedProject }: ProjectRoute) {
     return [_sections, _topics];
   }, [kgItems, topTopics]);
 
-  const { handleFiltersChange, filteredResources, filters } = useKGFilters(
-    sections,
-    kgItems
-  );
+  const { handleFiltersChange, filteredResources, filters, restoreScores } =
+    useKGFilters(sections, kgItems, scoreDomain);
 
   if (loading)
     return (
@@ -96,6 +84,7 @@ function KG({ openedProject }: ProjectRoute) {
             topics={topics}
             filters={filters}
             onFiltersChange={handleFiltersChange}
+            restoreScores={restoreScores}
           />
         </div>
         <KGVisualizationWrapper data={filteredResources} />

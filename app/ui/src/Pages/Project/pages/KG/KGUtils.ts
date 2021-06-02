@@ -8,6 +8,11 @@ import {
 import { KGItem } from './KG';
 import { orderBy } from 'lodash';
 import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
+import {
+  GetKnowledgeGraph_knowledgeGraph_items,
+  GetKnowledgeGraph_knowledgeGraph_items_topics,
+  GetKnowledgeGraph_knowledgeGraph_topics,
+} from 'Graphql/queries/types/GetKnowledgeGraph';
 
 export interface TopicSections {
   [key: string]: string[];
@@ -108,4 +113,39 @@ export function getSectionsAndNames(newData: KGItem[]) {
   });
 
   return result;
+}
+
+export const topicOthers: GetKnowledgeGraph_knowledgeGraph_items_topics = {
+  name: 'Others',
+  relevance: 0,
+  __typename: 'Topic',
+};
+
+/**
+ * Build kg items and get scores domain.
+ * To build the items, creates a `topic` field with the topic that will represent the item.
+ */
+export function getKGItemsAndScores(
+  kgDataItems: GetKnowledgeGraph_knowledgeGraph_items[] | undefined,
+  shownTopics: GetKnowledgeGraph_knowledgeGraph_topics[]
+): [KGItem[], [number, number]] {
+  const shownTopicNames = shownTopics.map((t) => t.name);
+  let scoresEdges: [number, number] = [0, 1];
+  const items: KGItem[] = [];
+
+  kgDataItems?.forEach((r) => {
+    scoresEdges = [
+      Math.max(scoresEdges[0], r.score),
+      Math.min(scoresEdges[1], r.score),
+    ];
+
+    const mainTopic = r.topics[0];
+    const isTopicIncluded = shownTopicNames.includes(mainTopic?.name);
+    items.push({
+      ...r,
+      topic: isTopicIncluded ? mainTopic : topicOthers,
+    });
+  });
+
+  return [items, scoresEdges];
 }

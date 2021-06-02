@@ -233,7 +233,9 @@ function KGVisualization({ width, height, data }: Props) {
             starredResources={starredResources}
             scores={scores}
             onResourceClick={openResourceDetails}
-            hoverResource={viz.current && viz.current.resources.hoverResource}
+            hoverResource={
+              viz.current && viz.current.resources.highlightAndHoverResource
+            }
           />
         </div>
         <div

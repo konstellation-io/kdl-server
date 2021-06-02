@@ -70,6 +70,7 @@ class Resources {
   context: CanvasRenderingContext2D;
 
   isMouseMoving: boolean = false;
+  lowLightOtherResources: boolean = false;
   hoveredResource: DComplete | null = null;
   highlightedResource: string | null = null;
   hideTooltipLink: boolean = false;
@@ -135,6 +136,14 @@ class Resources {
     this.draw();
   };
 
+  highlightAndHoverResource = (
+    resourceName: string | null,
+    skipTooltipLink?: boolean
+  ) => {
+    this.lowLightOtherResources = resourceName !== null;
+    this.hoverResource(resourceName, skipTooltipLink);
+  };
+
   draw = () => {
     const {
       clearCanvas,
@@ -179,9 +188,11 @@ class Resources {
   };
 
   getResourceOpacity = (d: DComplete) => {
-    const { hoveredResource, highlightedResource } = this;
+    const { hoveredResource, highlightedResource, lowLightOtherResources } =
+      this;
 
-    const shouldLowlight = hoveredResource || highlightedResource;
+    const shouldLowlight =
+      lowLightOtherResources && (hoveredResource || highlightedResource);
     // Uncomment for section hover highlight implementation and remove previous line
     // const shouldLowlight =
     //   this.activeSection !== null && d.category !== this.activeSection;

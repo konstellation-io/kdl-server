@@ -29,10 +29,18 @@
   cursor: default;
   background-color: palette(base, 400);
 
-  border-top: 2px solid palette(base, 900);
 
   &:hover {
     background-color: palette(base, 400);
     color: font-color(regular);
   }
+}
+
+.releaseVersion {
+  @extend .separator;
+
+  @include font-small;
+
+  max-height: 4 * $grid-unit;
+  border-top: 2px solid palette(base, 500);
 }

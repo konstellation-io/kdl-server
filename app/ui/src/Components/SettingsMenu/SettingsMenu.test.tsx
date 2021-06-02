@@ -11,7 +11,6 @@ import {
   dataHandler,
   getSnapshot,
   loadingHandler,
-  wait,
 } from 'testUtils';
 import ROUTE from 'Constants/routes';
 

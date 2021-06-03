@@ -120,7 +120,8 @@
       "!src/Pages/Project/pages/KG/components/KGVisualization"
     ],
     "coverageReporters": [
-      "text"
+      "text",
+      "lcov"
     ]
   },
   "lint-staged": {

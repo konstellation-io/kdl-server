@@ -3,7 +3,7 @@ import {
   SetStarredKGItemVariables,
 } from 'Graphql/mutations/types/SetStarredKGItem';
 
-import { Button } from 'kwc';
+import { Button, URL } from 'kwc';
 import {
   GetKnowledgeGraph_knowledgeGraph_items,
   GetKnowledgeGraph_knowledgeGraph_items_topics,
@@ -15,7 +15,6 @@ import IconLink from '@material-ui/icons/Link';
 import React from 'react';
 import { RouteProjectParams } from 'Constants/routes';
 import Score from '../KGVisualization/Score/Score';
-import URL from 'Components/URL/URL';
 import cx from 'classnames';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 import styles from './ResourceDetails.module.scss';
@@ -35,10 +34,8 @@ type Props = {
   onClose: () => void;
 };
 function ResourceDetails({ resource, onClose }: Props) {
-  const {
-    value: showCompleteAbstract,
-    toggle: toggleShowAbstractText,
-  } = useBoolState();
+  const { value: showCompleteAbstract, toggle: toggleShowAbstractText } =
+    useBoolState();
   const { projectId } = useParams<RouteProjectParams>();
 
   const [setStarredKGItem] = useMutation<

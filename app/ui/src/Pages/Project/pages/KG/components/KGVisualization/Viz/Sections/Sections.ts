@@ -14,16 +14,13 @@ class Sections {
     x: 0,
     y: 0,
     angle: 0,
+    distanceToCenter: 0,
   });
   sectionsWrapper: Selection<SVGGElement, unknown, null, undefined> = select(
     {} as SVGGElement
   );
-  sectionLabelsWrapper: Selection<
-    SVGGElement,
-    unknown,
-    null,
-    undefined
-  > = select({} as SVGGElement);
+  sectionLabelsWrapper: Selection<SVGGElement, unknown, null, undefined> =
+    select({} as SVGGElement);
 
   constructor(coord: (data: CoordData, options?: CoordOptions) => CoordOut) {
     this.coord = coord;

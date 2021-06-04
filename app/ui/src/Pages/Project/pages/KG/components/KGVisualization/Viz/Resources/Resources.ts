@@ -10,6 +10,12 @@ import { px } from 'Utils/d3';
 import COLORS from './Resources.module.scss';
 
 export const RESOURCE_R = 4;
+const MAX_RESOURCE_R = 5.4;
+const MIN_RESOURCE_R = 1;
+const MAX_RESOURCE_OPACITY = 1;
+const MIN_RESOURCE_OPACITY = 0.35;
+const OUTSIDE_MAX_RESOURCE_R = 3;
+const OUTSIDE_MIN_RESOURCE_R = 2;
 
 const MOUSE_HOVER_ACTIVATION_RADIUS = 50;
 
@@ -67,6 +73,8 @@ class Resources {
   hoveredResource: DComplete | null = null;
   highlightedResource: string | null = null;
   hideTooltipLink: boolean = false;
+
+  activeSection: string | null = null;
 
   constructor(props: Props) {
     this.props = props;
@@ -163,15 +171,35 @@ class Resources {
     if (hoveredResource && !hideTooltipLink) drawTooltipLink(hoveredResource);
   };
 
+  getResourceR = (d: DComplete) => {
+    if (d.outsideMax) return OUTSIDE_MAX_RESOURCE_R;
+    if (d.outsideMin) return OUTSIDE_MIN_RESOURCE_R;
+
+    const radiusMaxIncrement = MAX_RESOURCE_R - MIN_RESOURCE_R;
+    return MIN_RESOURCE_R + (1 - d.distanceToCenter) * radiusMaxIncrement;
+  };
+
+  getResourceOpacity = (d: DComplete) => {
+    if (d.outsideMin) return 1;
+
+    const opacityMaxIncrement = MAX_RESOURCE_OPACITY - MIN_RESOURCE_OPACITY;
+    return (
+      MIN_RESOURCE_OPACITY + (1 - d.distanceToCenter) * opacityMaxIncrement
+    );
+  };
+
   drawCircle = (d: DComplete) => {
     const {
       context,
+      getResourceR,
+      getResourceOpacity,
       props: { center },
     } = this;
 
-    const r = d.outsideMax ? RESOURCE_R * 0.7 : RESOURCE_R;
+    const r = getResourceR(d);
 
     context.fillStyle = d.starred ? COLORS.starred : COLORS.default;
+    context.globalAlpha = getResourceOpacity(d);
 
     context.beginPath();
     context.moveTo(center.x + d.x, center.y + d.y);
@@ -193,6 +221,7 @@ class Resources {
     context.globalCompositeOperation = 'source-over';
     context.shadowBlur = 10;
     context.shadowColor = fillStyle;
+    context.globalAlpha = 1;
 
     context.beginPath();
     context.setLineDash([]);
@@ -225,6 +254,7 @@ class Resources {
       props: { center },
     } = this;
 
+    context.globalAlpha = 1;
     context.beginPath();
     context.setLineDash([4, 4]);
     context.moveTo(center.x + d.x, center.y + d.y);
@@ -273,7 +303,8 @@ class Resources {
     const angle = getMouseAngle(dx, dy);
     const [orientationV, orientationH] = getTextOrientations(angle);
 
-    const { mouseActiveSection } = getActiveSection(angle);
+    const { activeSection, mouseActiveSection } = getActiveSection(angle);
+    this.activeSection = hovered ? activeSection : null;
 
     updateActiveSection(mouseActiveSection);
     updateAxisOrientation(orientationV, orientationH);

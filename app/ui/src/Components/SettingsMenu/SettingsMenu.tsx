@@ -14,8 +14,17 @@ import { GetMe } from 'Graphql/queries/types/GetMe';
 import KeyIcon from '@material-ui/icons/VpnKey';
 import styles from './SettingsMenu.module.scss';
 import { useQuery } from '@apollo/client';
+import { CONFIG } from 'index';
 
 import GetMeQuery from 'Graphql/queries/getMe';
+
+const UserSettingsSeparator = ({ label }: CustomOptionProps) => (
+  <div className={styles.separator}>{label.toUpperCase()}</div>
+);
+
+const ReleaseVersion = ({ label }: CustomOptionProps) => (
+  <div className={styles.releaseVersion}>{label}</div>
+);
 
 function SettingsMenu() {
   const history = useHistory();
@@ -25,17 +34,6 @@ function SettingsMenu() {
 
   function goToUserSSHKeys() {
     history.push(ROUTE.USER_SSH_KEY);
-  }
-
-  function UserSettingsSeparator({ label }: CustomOptionProps) {
-    return (
-      <Button
-        label={label.toUpperCase()}
-        key="separator"
-        className={styles.separator}
-        align={BUTTON_ALIGN.LEFT}
-      />
-    );
   }
 
   function SSHKeyButton() {
@@ -54,6 +52,7 @@ function SettingsMenu() {
   const optionToButton = {
     'user settings': UserSettingsSeparator,
     'ssh key': SSHKeyButton,
+    [CONFIG.RELEASE_VERSION]: ReleaseVersion,
   };
 
   return (

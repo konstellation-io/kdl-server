@@ -17,7 +17,8 @@ data:
     {
       "SERVER_NAME": "{{ .Values.serverName }}",
       "SERVER_URL": "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}",
-      "GITEA_URL": "{{ include "protocol" . }}://gitea.{{ .Values.domain }}"
+      "GITEA_URL": "{{ include "protocol" . }}://gitea.{{ .Values.domain }}",
+      "RELEASE_VERSION": "{{ .Chart.AppVersion }}"
     }
   OAUTH2_PROXY_IMG_REPO: "{{ .Values.oauth2Proxy.image.repository }}"
   OAUTH2_PROXY_IMG_TAG: "{{ .Values.oauth2Proxy.image.tag }}"

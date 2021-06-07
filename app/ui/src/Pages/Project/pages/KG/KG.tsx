@@ -17,7 +17,7 @@ import { useQuery } from '@apollo/client';
 
 import GetKnowledgeGraphQuery from 'Graphql/queries/getKnowledgeGraph';
 
-const topicOthers: GetKnowledgeGraph_knowledgeGraph_items_topics = {
+export const topicOthers: GetKnowledgeGraph_knowledgeGraph_items_topics = {
   name: 'Others',
   relevance: 0,
   __typename: 'Topic',

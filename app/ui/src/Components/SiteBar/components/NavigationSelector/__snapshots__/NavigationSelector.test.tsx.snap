@@ -14,7 +14,6 @@ exports[`SectionSelector component should render without crashing 1`] = `
         className="section"
         exact={true}
         onClick={[MockFunction]}
-        to="bar"
       >
         <NavListItem
           Icon={

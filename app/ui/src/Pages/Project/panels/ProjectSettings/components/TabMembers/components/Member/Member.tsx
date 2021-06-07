@@ -40,6 +40,7 @@ function Member({
 }: Props) {
   return (
     <div
+      data-testid="member"
       className={cx(styles.container, {
         [styles.saveCheckSpace]: canManageMembers && !canBeSelected,
       })}
@@ -60,7 +61,10 @@ function Member({
         </div>
         <div className={styles.rightWrapper}>
           {canManageMembers ? (
-            <div onClick={(e) => e.stopPropagation()}>
+            <div
+              onClick={(e) => e.stopPropagation()}
+              data-testid="roleSelector"
+            >
               <Select
                 className={styles.accessLevelSelector}
                 options={Object.keys(AccessLevel)}

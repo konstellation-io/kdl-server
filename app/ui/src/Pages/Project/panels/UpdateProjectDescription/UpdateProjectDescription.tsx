@@ -58,7 +58,7 @@ function UpdateProjectDescription({ project, close }: Props) {
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} data-testid="updateDescription">
       <div className={styles.container}>
         <div className={styles.descriptionLabel}>
           Write a detailed description for your project. This description is

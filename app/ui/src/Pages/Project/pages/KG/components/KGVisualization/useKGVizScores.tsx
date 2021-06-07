@@ -7,7 +7,6 @@ const ZOOM_STEP_DIV = 8; // 100 / 8 = 12.5% -> amount of zoom that applies each 
 
 function useKGVizScores(data: D[]) {
   const [scores, setScore] = useState<[number, number]>([1, 0]);
-  // TODO: refactor using useMemo
   const [borderScores, setBorderScores] = useState<[number, number]>([1, 0]);
 
   const [animating, setAnimating] = useState(true);

@@ -15,6 +15,7 @@ type Props = {
   onClick?: () => void;
   className?: string;
   disabled?: boolean;
+  dataTestId?: string;
 };
 
 function NavigationButton({
@@ -23,6 +24,7 @@ function NavigationButton({
   Icon,
   onClick,
   className = '',
+  dataTestId = undefined,
   iconSize = IconSize.REGULAR,
   disabled = false,
 }: Props) {
@@ -33,6 +35,7 @@ function NavigationButton({
       })}
       title={title || label}
       onClick={onClick}
+      data-testid={dataTestId}
     >
       <Icon className={cx(iconSize, styles.icon)} />
       <span className={styles.label}>{label}</span>

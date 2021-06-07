@@ -33,6 +33,9 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 			"spec": map[string]interface{}{
 				"projectId": projectID,
 				"domain":    k.cfg.BaseDomainName,
+				"sharedVolume": map[string]interface{}{
+					"name": k.cfg.SharedVolume.Name,
+				},
 				"tls": map[string]interface{}{
 					"enabled": k.cfg.TLS,
 				},
@@ -64,6 +67,11 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 						"tag":        k.cfg.MLFlow.Image.Tag,
 						"pullPolicy": k.cfg.MLFlow.Image.PullPolicy,
 					},
+					"volume": map[string]interface{}{
+						"storageClassName": k.cfg.MLFlow.Volume.StorageClassName,
+						"size":             k.cfg.MLFlow.Volume.Size,
+					},
+
 					"s3": map[string]string{
 						"bucket": fmt.Sprintf("%s/mlflow-artifacts", projectID),
 					},

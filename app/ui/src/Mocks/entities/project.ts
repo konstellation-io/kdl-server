@@ -1,4 +1,5 @@
 import { member1, member2 } from './member';
+import { RepositoryType } from '../../Graphql/types/globalTypes';
 
 const toolUrls = {
   drone: 'https://drone',
@@ -16,12 +17,17 @@ export const project1 = {
   favorite: false,
   creationDate: '2020-02-02',
   lastActivationDate: '2020-02-02',
-  repository: null,
+  repository: {
+    type: RepositoryType.EXTERNAL,
+    url: 'https://my-super-url.com',
+    error: false,
+  },
   needAccess: false,
   archived: false,
   error: null,
   toolUrls,
   members: [member1, member2],
+  __typename: 'Project',
 };
 
 export const project2 = {
@@ -37,6 +43,7 @@ export const project2 = {
   error: null,
   toolUrls,
   members: [member1, member2],
+  __typename: 'Project',
 };
 
 export const projectNoAccess = {
@@ -52,6 +59,7 @@ export const projectNoAccess = {
   error: null,
   toolUrls,
   members: [member1, member2],
+  __typename: 'Project',
 };
 
 export const projectArchived = {
@@ -67,4 +75,5 @@ export const projectArchived = {
   error: null,
   toolUrls,
   members: [member1, member2],
+  __typename: 'Project',
 };

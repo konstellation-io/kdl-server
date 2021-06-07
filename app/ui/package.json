@@ -17,7 +17,7 @@
     "d3-zoom": "2.0.0",
     "graphql": "15.5.0",
     "is-electron": "2.2.0",
-    "kwc": "1.14.2",
+    "kwc": "1.15.0",
     "lodash.capitalize": "4.2.1",
     "moment-timezone": "0.5.33",
     "node-sass": "6.0.0",

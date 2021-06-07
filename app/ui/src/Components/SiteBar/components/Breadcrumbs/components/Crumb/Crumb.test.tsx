@@ -4,11 +4,10 @@ import { shallow } from 'enzyme';
 import IconHome from '@material-ui/icons/Dashboard';
 import { ExpandableMenu } from 'kwc';
 
-const BottomComponent = () => <div>bar</div>;
 const crumbProps: CrumbProps = {
   crumbText: 'foo',
-  BottomComponent,
   LeftIconComponent: <IconHome />,
+  children: () => <div>bar</div>,
 };
 
 let component;

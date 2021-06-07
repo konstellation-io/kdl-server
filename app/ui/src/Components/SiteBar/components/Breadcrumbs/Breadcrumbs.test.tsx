@@ -2,14 +2,8 @@ import Breadcrumbs from './Breadcrumbs';
 import React from 'react';
 import { shallow } from 'enzyme';
 
-jest.mock('./useBreadcrumbs.tsx', () => () => ({
-  crumbs: [
-    {
-      crumbText: 'foo',
-      BottomComponent: <div>bar</div>,
-      LeftIconComponent: <svg />,
-    },
-  ],
+jest.mock('react-router-dom', () => ({
+  useRouteMatch: () => true,
 }));
 
 describe('Breadcrumbs component', () => {

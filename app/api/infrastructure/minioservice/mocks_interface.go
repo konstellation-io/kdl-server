@@ -5,6 +5,7 @@
 package minioservice
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -34,15 +35,29 @@ func (m *MockMinioService) EXPECT() *MockMinioServiceMockRecorder {
 }
 
 // CreateBucket mocks base method.
-func (m *MockMinioService) CreateBucket(bucketName string) error {
+func (m *MockMinioService) CreateBucket(ctx context.Context, bucketName string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateBucket", bucketName)
+	ret := m.ctrl.Call(m, "CreateBucket", ctx, bucketName)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateBucket indicates an expected call of CreateBucket.
-func (mr *MockMinioServiceMockRecorder) CreateBucket(bucketName interface{}) *gomock.Call {
+func (mr *MockMinioServiceMockRecorder) CreateBucket(ctx, bucketName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateBucket", reflect.TypeOf((*MockMinioService)(nil).CreateBucket), bucketName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateBucket", reflect.TypeOf((*MockMinioService)(nil).CreateBucket), ctx, bucketName)
+}
+
+// CreateProjectDirs mocks base method.
+func (m *MockMinioService) CreateProjectDirs(ctx context.Context, bucketName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateProjectDirs", ctx, bucketName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateProjectDirs indicates an expected call of CreateProjectDirs.
+func (mr *MockMinioServiceMockRecorder) CreateProjectDirs(ctx, bucketName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProjectDirs", reflect.TypeOf((*MockMinioService)(nil).CreateProjectDirs), ctx, bucketName)
 }

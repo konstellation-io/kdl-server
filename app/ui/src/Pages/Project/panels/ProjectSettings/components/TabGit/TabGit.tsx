@@ -39,7 +39,7 @@ function TabGit({ project }: Props) {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="tabGit">
       {isAdmin && isExternal && (
         <div className={styles.edit}>
           <Button label="" Icon={IconEdit} onClick={openExternalRepoSettings} />

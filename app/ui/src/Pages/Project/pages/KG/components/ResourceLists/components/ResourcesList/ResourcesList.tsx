@@ -13,6 +13,7 @@ type Props = {
   resources: KGItemType[];
   header?: JSX.Element | null;
   noItems: NoItemsProps;
+  dataTestId?: string;
 };
 function ResourcesList({
   header = null,
@@ -21,6 +22,7 @@ function ResourcesList({
   onEnter,
   onLeave,
   noItems,
+  dataTestId = '',
 }: Props) {
   const [filterText, setFilterText] = useState('');
 
@@ -55,7 +57,9 @@ function ResourcesList({
           hideBottomText
         />
       </div>
-      <div className={styles.listWrapper}>{renderListContent()}</div>
+      <div className={styles.listWrapper} data-testid={dataTestId}>
+        {renderListContent()}
+      </div>
     </div>
   );
 }

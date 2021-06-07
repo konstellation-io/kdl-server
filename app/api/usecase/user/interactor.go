@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
@@ -106,9 +105,7 @@ func (i *interactor) Create(ctx context.Context, email, username string, accessL
 
 	i.logger.Infof("The user \"%s\" (%s) was created with ID \"%s\"", user.Username, user.Email, insertedID)
 
-	secretName, k8sKeys := i.newUserSSHKeySecret(user, keys.Public, keys.Private)
-	err = i.k8sClient.CreateSecret(ctx, secretName, k8sKeys)
-
+	err = i.k8sClient.CreateUserSSHKeySecret(ctx, user, keys.Public, keys.Private)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -247,10 +244,8 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 		return entity.User{}, err
 	}
 
-	// Check if k8s secret exists. If exists, update it. Otherwise, create it.
-	secretName, k8sKeys := i.newUserSSHKeySecret(user, keys.Public, keys.Private)
-
-	err = i.k8sClient.UpdateSecret(ctx, secretName, k8sKeys)
+	// Update the user SSH keys secret in k8s.
+	err = i.k8sClient.UpdateUserSSHKeySecret(ctx, user, keys.Public, keys.Private)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -272,13 +267,28 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 	return i.repo.GetByUsername(ctx, user.Username)
 }
 
-// newUserSSHKeySecret returns the name and the k8s secret for public and private SSH keys.
-func (i *interactor) newUserSSHKeySecret(user entity.User, public, private string) (secretName string, k8sKeys map[string]string) {
-	secretName = fmt.Sprintf("%s-ssh-keys", user.UsernameSlug())
-	k8sKeys = map[string]string{
-		"KDL_USER_PUBLIC_SSH_KEY":  public,
-		"KDL_USER_PRIVATE_SSH_KEY": private,
+// CreateAdminUser creates the KDL admin user if not exists.
+func (i *interactor) CreateAdminUser(username, email string) error {
+	ctx := context.Background()
+
+	_, err := i.repo.GetByUsername(ctx, username)
+	if err == nil {
+		i.logger.Debugf("The admin user \"%s\" already exists", username)
+		return nil
 	}
 
-	return secretName, k8sKeys
+	if !errors.Is(err, entity.ErrUserNotFound) {
+		return err
+	}
+
+	i.logger.Debugf("Creating the admin user \"%s\"...", username)
+
+	user, err := i.Create(ctx, email, username, entity.AccessLevelAdmin)
+	if err != nil {
+		return err
+	}
+
+	i.logger.Debugf("Admin user \"%s\" (%s) created correctly with id \"%s\"", user.Username, user.Email, user.ID)
+
+	return nil
 }

@@ -40,6 +40,16 @@ func (k *k8sClient) UpdateSecret(ctx context.Context, name string, values map[st
 	return nil
 }
 
+// GetSecret returns the secret data.
+func (k *k8sClient) GetSecret(ctx context.Context, name string) (map[string][]byte, error) {
+	s, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Get(ctx, name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return s.Data, nil
+}
+
 // isSecretPresent checks if there is a secret with the given name.
 func (k *k8sClient) isSecretPresent(ctx context.Context, name string) (bool, error) {
 	_, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Get(ctx, name, metav1.GetOptions{})

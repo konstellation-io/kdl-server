@@ -58,6 +58,7 @@ export type CoordOut = {
   y: number;
   angle: number;
   hash?: number;
+  distanceToCenter: number;
 };
 
 export function getVizDimensions(width: number, height: number) {
@@ -120,8 +121,8 @@ class KGViz {
     this.outerR = outerR;
 
     this.rScale = scaleLinear({
-      range: [INNER_R, this.outerR - RESOURCE_R],
-      domain: props.scores,
+      range: [INNER_R, this.outerR - RESOURCE_R], // [100px, 800px]
+      domain: props.scores, // [0.96, 0.23]     s = 0.8
     });
     this.sectionScale = scaleBand({
       range: [-90, 270],
@@ -224,6 +225,13 @@ class KGViz {
     let angle = sectionScale(category) || 0;
     let hash = 0;
 
+    const [maxScore, minScore] = rScale.domain();
+    const diffScore = maxScore - minScore;
+    const distanceToCenter = Math.max(
+      0,
+      Math.min(1, (maxScore - score) / diffScore)
+    );
+
     if (options?.jittered && !options?.bisector) {
       hash = Math.abs((getHash(name || '') % 10000) / 10000);
 
@@ -237,7 +245,7 @@ class KGViz {
     const dx = Math.cos((angle * Math.PI) / 180) * distance;
     const dy = Math.sin((angle * Math.PI) / 180) * distance;
 
-    return { x: dx, y: dy, angle, hash };
+    return { x: dx, y: dy, angle, hash, distanceToCenter };
   };
 
   getResourceCoords = (resourceId: string) => {

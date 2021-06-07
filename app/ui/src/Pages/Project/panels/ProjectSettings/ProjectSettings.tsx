@@ -24,7 +24,7 @@ function ProjectSettings({ project }: Props) {
   if (!project.repository) return <ErrorMessage />;
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="settingsPanel">
       <div className={styles.info}>
         <ProjectInfo project={project} />
       </div>
@@ -32,7 +32,7 @@ function ProjectSettings({ project }: Props) {
         <TabList>
           <Tab>INFO</Tab>
           <Tab>GIT</Tab>
-          <Tab>MEMBERS</Tab>
+          <Tab data-testid="members">MEMBERS</Tab>
           <Tab className={cx('react-tabs__tab', 'danger-tab')}>DANGER ZONE</Tab>
         </TabList>
 

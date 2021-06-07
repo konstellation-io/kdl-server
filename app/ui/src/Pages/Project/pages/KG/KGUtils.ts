@@ -7,6 +7,7 @@ import {
 
 import { KGItem } from './KG';
 import { orderBy } from 'lodash';
+import { KnowledgeGraphItemCat } from 'Graphql/types/globalTypes';
 
 export interface TopicSections {
   [key: string]: string[];
@@ -22,7 +23,15 @@ export interface DComplete extends D {
   y: number;
   outsideMin: boolean;
   outsideMax: boolean;
+  distanceToCenter: number; // 0-1
 }
+
+export const categoryToLabel: {
+  [key in keyof typeof KnowledgeGraphItemCat]: string;
+} = {
+  [KnowledgeGraphItemCat.Code]: 'Paper with Code',
+  [KnowledgeGraphItemCat.Paper]: 'Paper',
+};
 
 export function getHash(text: string) {
   let hash = 0;
@@ -67,7 +76,7 @@ export function groupData(
     const outsideMin = d.score < minScore;
     const outsideMax = d.score > maxScore;
 
-    const { x, y } = coord(
+    const { x, y, distanceToCenter } = coord(
       {
         ...d,
         score: Math.max(minScore, Math.min(maxScore, d.score)),
@@ -79,6 +88,7 @@ export function groupData(
       ...d,
       x,
       y,
+      distanceToCenter,
       outsideMin,
       outsideMax,
     };

@@ -16,6 +16,7 @@ const MAX_RESOURCE_OPACITY = 1;
 const MIN_RESOURCE_OPACITY = 0.35;
 const OUTSIDE_MAX_RESOURCE_R = 3;
 const OUTSIDE_MIN_RESOURCE_R = 2;
+const LOWLIGHT_RESOURCE_OPACITY = 0.3;
 
 const MOUSE_HOVER_ACTIVATION_RADIUS = 50;
 
@@ -70,6 +71,7 @@ class Resources {
   context: CanvasRenderingContext2D;
 
   isMouseMoving: boolean = false;
+  lowLightOtherResources: boolean = false;
   hoveredResource: DComplete | null = null;
   highlightedResource: string | null = null;
   hideTooltipLink: boolean = false;
@@ -135,6 +137,14 @@ class Resources {
     this.draw();
   };
 
+  highlightAndHoverResource = (
+    resourceName: string | null,
+    skipTooltipLink?: boolean
+  ) => {
+    this.lowLightOtherResources = resourceName !== null;
+    this.hoverResource(resourceName, skipTooltipLink);
+  };
+
   draw = () => {
     const {
       clearCanvas,
@@ -180,6 +190,13 @@ class Resources {
   };
 
   getResourceOpacity = (d: DComplete) => {
+    const { hoveredResource, highlightedResource, lowLightOtherResources } =
+      this;
+
+    const shouldLowlight =
+      lowLightOtherResources && (hoveredResource || highlightedResource);
+
+    if (shouldLowlight) return LOWLIGHT_RESOURCE_OPACITY;
     if (d.outsideMin) return 1;
 
     const opacityMaxIncrement = MAX_RESOURCE_OPACITY - MIN_RESOURCE_OPACITY;

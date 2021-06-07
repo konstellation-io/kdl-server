@@ -19,21 +19,11 @@ import { CONFIG } from 'index';
 import GetMeQuery from 'Graphql/queries/getMe';
 
 const UserSettingsSeparator = ({ label }: CustomOptionProps) => (
-  <Button
-    label={label.toUpperCase()}
-    key="separator"
-    className={styles.separator}
-    align={BUTTON_ALIGN.LEFT}
-  />
+  <div className={styles.separator}>{label.toUpperCase()}</div>
 );
 
 const ReleaseVersion = ({ label }: CustomOptionProps) => (
-  <Button
-    label={label}
-    key="releaseVersion"
-    className={styles.releaseVersion}
-    align={BUTTON_ALIGN.RIGHT}
-  />
+  <div className={styles.releaseVersion}>{label}</div>
 );
 
 function SettingsMenu() {

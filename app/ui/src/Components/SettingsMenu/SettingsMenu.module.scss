@@ -28,7 +28,9 @@
 
   cursor: default;
   background-color: palette(base, 400);
-
+  height: 5 * $grid-unit;
+  line-height: 5 * $grid-unit;
+  padding-left: 3 * $grid-unit;
 
   &:hover {
     background-color: palette(base, 400);
@@ -40,7 +42,10 @@
   @extend .separator;
 
   @include font-small;
+  text-align: right;
 
-  max-height: 4 * $grid-unit;
+  padding-right: 2 * $grid-unit;
+  height: 4 * $grid-unit;
+  line-height: 4 * $grid-unit;
   border-top: 2px solid palette(base, 500);
 }

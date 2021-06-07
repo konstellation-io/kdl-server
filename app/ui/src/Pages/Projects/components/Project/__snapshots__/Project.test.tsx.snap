@@ -27,6 +27,7 @@ exports[`Project component Component match snapshot 1`] = `
     <Project
       project={
         Object {
+          "__typename": "Project",
           "archived": false,
           "creationDate": "2020-02-02",
           "description": "projectDescription3",
@@ -36,21 +37,29 @@ exports[`Project component Component match snapshot 1`] = `
           "lastActivationDate": "2020-02-02",
           "members": Array [
             Object {
-              "accessLevel": "VIEWER",
+              "__typename": "Member",
+              "accessLevel": "ADMIN",
               "addedDate": "2020-02-02",
               "user": Object {
+                "__typename": "User",
+                "creationDate": "2020-02-02",
                 "email": "userEmail1",
                 "id": "userId1",
                 "lastActivity": "2020-02-02",
+                "username": "username1",
               },
             },
             Object {
+              "__typename": "Member",
               "accessLevel": "MANAGER",
               "addedDate": "2020-02-03",
               "user": Object {
+                "__typename": "User",
+                "creationDate": "2020-02-03",
                 "email": "userEmail2",
                 "id": "userId2",
                 "lastActivity": "2020-02-03",
+                "username": "username2",
               },
             },
           ],
@@ -79,6 +88,7 @@ exports[`Project component Component match snapshot 1`] = `
           <UpperBg
             project={
               Object {
+                "__typename": "Project",
                 "archived": false,
                 "creationDate": "2020-02-02",
                 "description": "projectDescription3",
@@ -88,21 +98,29 @@ exports[`Project component Component match snapshot 1`] = `
                 "lastActivationDate": "2020-02-02",
                 "members": Array [
                   Object {
-                    "accessLevel": "VIEWER",
+                    "__typename": "Member",
+                    "accessLevel": "ADMIN",
                     "addedDate": "2020-02-02",
                     "user": Object {
+                      "__typename": "User",
+                      "creationDate": "2020-02-02",
                       "email": "userEmail1",
                       "id": "userId1",
                       "lastActivity": "2020-02-02",
+                      "username": "username1",
                     },
                   },
                   Object {
+                    "__typename": "Member",
                     "accessLevel": "MANAGER",
                     "addedDate": "2020-02-03",
                     "user": Object {
+                      "__typename": "User",
+                      "creationDate": "2020-02-03",
                       "email": "userEmail2",
                       "id": "userId2",
                       "lastActivity": "2020-02-03",
+                      "username": "username2",
                     },
                   },
                 ],
@@ -153,6 +171,7 @@ exports[`Project component Component match snapshot 1`] = `
           <LowerBg
             project={
               Object {
+                "__typename": "Project",
                 "archived": false,
                 "creationDate": "2020-02-02",
                 "description": "projectDescription3",
@@ -162,21 +181,29 @@ exports[`Project component Component match snapshot 1`] = `
                 "lastActivationDate": "2020-02-02",
                 "members": Array [
                   Object {
-                    "accessLevel": "VIEWER",
+                    "__typename": "Member",
+                    "accessLevel": "ADMIN",
                     "addedDate": "2020-02-02",
                     "user": Object {
+                      "__typename": "User",
+                      "creationDate": "2020-02-02",
                       "email": "userEmail1",
                       "id": "userId1",
                       "lastActivity": "2020-02-02",
+                      "username": "username1",
                     },
                   },
                   Object {
+                    "__typename": "Member",
                     "accessLevel": "MANAGER",
                     "addedDate": "2020-02-03",
                     "user": Object {
+                      "__typename": "User",
+                      "creationDate": "2020-02-03",
                       "email": "userEmail2",
                       "id": "userId2",
                       "lastActivity": "2020-02-03",
+                      "username": "username2",
                     },
                   },
                 ],
@@ -233,6 +260,7 @@ exports[`Project component Component match snapshot 1`] = `
           <Band
             project={
               Object {
+                "__typename": "Project",
                 "archived": false,
                 "creationDate": "2020-02-02",
                 "description": "projectDescription3",
@@ -242,21 +270,29 @@ exports[`Project component Component match snapshot 1`] = `
                 "lastActivationDate": "2020-02-02",
                 "members": Array [
                   Object {
-                    "accessLevel": "VIEWER",
+                    "__typename": "Member",
+                    "accessLevel": "ADMIN",
                     "addedDate": "2020-02-02",
                     "user": Object {
+                      "__typename": "User",
+                      "creationDate": "2020-02-02",
                       "email": "userEmail1",
                       "id": "userId1",
                       "lastActivity": "2020-02-02",
+                      "username": "username1",
                     },
                   },
                   Object {
+                    "__typename": "Member",
                     "accessLevel": "MANAGER",
                     "addedDate": "2020-02-03",
                     "user": Object {
+                      "__typename": "User",
+                      "creationDate": "2020-02-03",
                       "email": "userEmail2",
                       "id": "userId2",
                       "lastActivity": "2020-02-03",
+                      "username": "username2",
                     },
                   },
                 ],
@@ -294,6 +330,7 @@ exports[`Project component Component match snapshot 1`] = `
           <Square
             project={
               Object {
+                "__typename": "Project",
                 "archived": false,
                 "creationDate": "2020-02-02",
                 "description": "projectDescription3",
@@ -303,21 +340,29 @@ exports[`Project component Component match snapshot 1`] = `
                 "lastActivationDate": "2020-02-02",
                 "members": Array [
                   Object {
-                    "accessLevel": "VIEWER",
+                    "__typename": "Member",
+                    "accessLevel": "ADMIN",
                     "addedDate": "2020-02-02",
                     "user": Object {
+                      "__typename": "User",
+                      "creationDate": "2020-02-02",
                       "email": "userEmail1",
                       "id": "userId1",
                       "lastActivity": "2020-02-02",
+                      "username": "username1",
                     },
                   },
                   Object {
+                    "__typename": "Member",
                     "accessLevel": "MANAGER",
                     "addedDate": "2020-02-03",
                     "user": Object {
+                      "__typename": "User",
+                      "creationDate": "2020-02-03",
                       "email": "userEmail2",
                       "id": "userId2",
                       "lastActivity": "2020-02-03",
+                      "username": "username2",
                     },
                   },
                 ],

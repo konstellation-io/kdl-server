@@ -36,7 +36,7 @@ function AddMembers({ projectId, users, members }: Props) {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="addMembers">
       <SearchSelect
         options={options}
         theme={SearchSelectTheme.LIGHT}

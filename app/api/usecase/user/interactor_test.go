@@ -75,13 +75,7 @@ func TestInteractor_Create(t *testing.T) {
 		accessLevel   = entity.AccessLevelAdmin
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"
-		secretName    = "john-doe-ssh-keys" //nolint:gosec // it is a unit test
 	)
-
-	secretValues := map[string]string{
-		"KDL_USER_PUBLIC_SSH_KEY":  publicSSHKey,
-		"KDL_USER_PRIVATE_SSH_KEY": privateSSHKey,
-	}
 
 	ctx := context.Background()
 	now := time.Now().UTC()
@@ -116,7 +110,7 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
 	s.mocks.giteaService.EXPECT().AddSSHKey(username, sshKey.Public).Return(nil)
-	s.mocks.k8sClientMock.EXPECT().CreateSecret(ctx, secretName, secretValues)
+	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 
 	createdUser, err := s.interactor.Create(ctx, email, username, accessLevel)
 
@@ -384,13 +378,7 @@ func TestInteractor_RegenerateSSHKeys(t *testing.T) {
 		accessLevel   = entity.AccessLevelAdmin
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"
-		secretName    = "john-doe-ssh-keys" //nolint:gosec // it is a unit test
 	)
-
-	secretValues := map[string]string{
-		"KDL_USER_PUBLIC_SSH_KEY":  publicSSHKey,
-		"KDL_USER_PRIVATE_SSH_KEY": privateSSHKey,
-	}
 
 	ctx := context.Background()
 	now := time.Now().UTC()
@@ -412,7 +400,7 @@ func TestInteractor_RegenerateSSHKeys(t *testing.T) {
 
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(false, nil)
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
-	s.mocks.k8sClientMock.EXPECT().UpdateSecret(ctx, secretName, secretValues).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().UpdateUserSSHKeySecret(ctx, targetUser, publicSSHKey, privateSSHKey)
 	s.mocks.giteaService.EXPECT().UpdateSSHKey(username, sshKey.Public).Return(nil)
 	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, sshKey).Return(nil)
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(targetUser, nil).AnyTimes()

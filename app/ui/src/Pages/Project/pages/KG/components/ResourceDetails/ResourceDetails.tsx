@@ -3,7 +3,7 @@ import {
   SetStarredKGItemVariables,
 } from 'Graphql/mutations/types/SetStarredKGItem';
 
-import { Button } from 'kwc';
+import { Button, URL } from 'kwc';
 import {
   GetKnowledgeGraph_knowledgeGraph_items,
   GetKnowledgeGraph_knowledgeGraph_items_topics,
@@ -15,7 +15,6 @@ import IconLink from '@material-ui/icons/Link';
 import React from 'react';
 import { RouteProjectParams } from 'Constants/routes';
 import Score from '../KGVisualization/Score/Score';
-import URL from 'Components/URL/URL';
 import cx from 'classnames';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 import styles from './ResourceDetails.module.scss';
@@ -24,6 +23,7 @@ import { useParams } from 'react-router';
 import useBoolState from 'Hooks/useBoolState';
 
 import SetStarredKGItemMutation from 'Graphql/mutations/setStarredKGItem';
+import { categoryToLabel } from '../../KGUtils';
 
 function formatAbstract(abstract: string, completed: boolean) {
   return completed ? abstract : `${abstract.slice(0, 350)}...`;
@@ -34,10 +34,8 @@ type Props = {
   onClose: () => void;
 };
 function ResourceDetails({ resource, onClose }: Props) {
-  const {
-    value: showCompleteAbstract,
-    toggle: toggleShowAbstractText,
-  } = useBoolState();
+  const { value: showCompleteAbstract, toggle: toggleShowAbstractText } =
+    useBoolState();
   const { projectId } = useParams<RouteProjectParams>();
 
   const [setStarredKGItem] = useMutation<
@@ -107,7 +105,9 @@ function ResourceDetails({ resource, onClose }: Props) {
                 {resource.authors.join(', ')}
               </div>
             </div>
-            <div className={styles.type}>{resource.category}</div>
+            <div className={styles.type}>
+              {categoryToLabel[resource.category]}
+            </div>
             <div className={styles.urlRow}>
               <div className={styles.linkIcon}>
                 <IconLink className="icon-small" />

@@ -10398,10 +10398,10 @@ klona@^2.0.4:
   resolved "https://registry.yarnpkg.com/klona/-/klona-2.0.4.tgz#7bb1e3affb0cb8624547ef7e8f6708ea2e39dfc0"
   integrity sha512-ZRbnvdg/NxqzC7L9Uyqzf4psi1OM4Cuc+sJAkQPjO6XkQIJTNbfK2Rsmbw8fx1p2mkZdp2FZYo2+LwXYY/uwIA==
 
-kwc@1.14.2:
-  version "1.14.2"
-  resolved "https://registry.yarnpkg.com/kwc/-/kwc-1.14.2.tgz#f672db58a966cb085648faa1a496c2ecb54b3900"
-  integrity sha512-wt41SYvR0ePyo0VlbCweApiqjcxcxNEKtTlbWVSg52/AAX6LefYmLga1d0mHAyarDihmgYwC6wC9xOeeUxsMHw==
+kwc@1.15.0:
+  version "1.15.0"
+  resolved "https://registry.yarnpkg.com/kwc/-/kwc-1.15.0.tgz#a05ab109a8cf0a86496a52c1a1916615555aacb3"
+  integrity sha512-g6vgHDY9kownkh8mOQGc/rPBcnYvRyMylkrO8XxYryzxlB1Vu66uToXlw89bfddADlh6pk10UOMDzHG2aMoAbA==
   dependencies:
     "@material-ui/core" "^4.11.0"
     "@material-ui/icons" "^4.9.1"

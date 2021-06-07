@@ -7,6 +7,7 @@ require (
 	github.com/99designs/gqlgen v0.13.0
 	github.com/drone/drone-go v1.5.0
 	github.com/go-co-op/gocron v1.1.0
+	github.com/go-git/go-git/v5 v5.3.0
 	github.com/golang/mock v1.5.0
 	github.com/golang/protobuf v1.4.1
 	github.com/gosimple/slug v1.9.0
@@ -17,7 +18,7 @@ require (
 	github.com/vektah/dataloaden v0.3.0 // indirect
 	github.com/vektah/gqlparser/v2 v2.1.0
 	go.mongodb.org/mongo-driver v1.4.5
-	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	google.golang.org/grpc v1.32.0
 	google.golang.org/protobuf v1.25.0

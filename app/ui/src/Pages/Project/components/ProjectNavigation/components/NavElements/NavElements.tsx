@@ -23,11 +23,8 @@ type Props = {
 
 function NavElements({ isOpened }: Props) {
   const { projectId } = useParams<RouteProjectParams>();
-  const {
-    mainRoutes,
-    userToolsRoutes,
-    projectToolsRoutes,
-  } = useProjectNavigation(projectId);
+  const { mainRoutes, userToolsRoutes, projectToolsRoutes } =
+    useProjectNavigation(projectId);
   const { updateProjectActiveTools, projectActiveTools } = useTool();
   const { data, loading } = useQuery<GetMe>(GetMeQuery);
   const areToolsActive = data?.me.areToolsActive;
@@ -48,14 +45,14 @@ function NavElements({ isOpened }: Props) {
 
   return (
     <>
-      {mainRoutes.map(({ Icon, label, to }) => (
-        <NavButtonLink to={to} key={label}>
+      {mainRoutes.map(({ Icon, label, route }) => (
+        <NavButtonLink to={route} key={label}>
           <NavigationButton label={label} Icon={Icon} />
         </NavButtonLink>
       ))}
       <div className={styles.projectTools}>
-        {projectToolsRoutes.map(({ Icon, label, to }) => (
-          <NavButtonLink to={to} key={label}>
+        {projectToolsRoutes.map(({ Icon, label, route }) => (
+          <NavButtonLink to={route} key={label}>
             <NavigationButton label={label} Icon={Icon} />
           </NavButtonLink>
         ))}
@@ -68,8 +65,8 @@ function NavElements({ isOpened }: Props) {
           <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
             <div className={styles.userToolLabel}>USER TOOLS</div>
           </AnimateHeight>
-          {userToolsRoutes.map(({ Icon, label, to, disabled }) => (
-            <NavButtonLink to={to} key={label} disabled={disabled}>
+          {userToolsRoutes.map(({ Icon, label, route, disabled }) => (
+            <NavButtonLink to={route} key={label} disabled={disabled}>
               <NavigationButton label={label} Icon={Icon} />
             </NavButtonLink>
           ))}
@@ -88,6 +85,7 @@ function NavElements({ isOpened }: Props) {
               warning
             >
               <NavigationButton
+                dataTestId={areToolsActive ? 'stopTools' : 'runTools'}
                 label={areToolsActive ? 'Stop tools' : 'Run tools'}
                 Icon={renderToggleToolsIcon()}
               />

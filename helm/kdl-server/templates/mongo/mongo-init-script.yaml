@@ -27,10 +27,3 @@ data:
     } catch (e) {
         print("User {{ .Values.mongodb.auth.adminUser }} admin for 'kdl' database already exists")
     }
-    db.users.insertOne(
-       { 
-        "username" : "{{ index .Values "science-toolkit" "gitea" "admin" "username" }}",
-        "email" : "{{ index .Values "science-toolkit" "gitea" "admin" "email" }}",
-        "access_level" : "ADMIN"
-       }
-    )

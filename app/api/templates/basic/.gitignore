@@ -1,0 +1,12 @@
+.ipynb_checkpoints
+__pycache__
+.idea/
+.vscode/
+*.bundle
+*.npy
+*.csv
+*.kvmodel
+*.json
+*.tgz
+*.joblib
+*.pt

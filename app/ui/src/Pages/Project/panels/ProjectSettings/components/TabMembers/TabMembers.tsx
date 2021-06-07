@@ -109,7 +109,7 @@ function TabMembers({ projectId }: Props) {
     !!selectedMembers.find(({ user }) => user.id === member.user.id);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="tabMembers">
       {canManageMembers && (
         <>
           <AddMembers

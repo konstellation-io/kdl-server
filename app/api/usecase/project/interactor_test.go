@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/templates"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
@@ -13,6 +13,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
@@ -37,6 +38,7 @@ type projectMocks struct {
 	minioService *minioservice.MockMinioService
 	droneService *droneservice.MockDroneService
 	k8sClient    *k8s.MockK8sClient
+	templating   *templates.MockTemplating
 }
 
 func newProjectSuite(t *testing.T) *projectSuite {
@@ -57,7 +59,19 @@ func newProjectSuite(t *testing.T) *projectSuite {
 
 	k8sClient := k8s.NewMockK8sClient(ctrl)
 
-	interactor := project.NewInteractor(logger, repo, clockMock, giteaService, minioService, droneService, k8sClient)
+	templating := templates.NewMockTemplating(ctrl)
+
+	deps := &project.InteractorDeps{
+		Logger:       logger,
+		Repo:         repo,
+		Clock:        clockMock,
+		GiteaService: giteaService,
+		MinioService: minioService,
+		DroneService: droneService,
+		K8sClient:    k8sClient,
+		Tmpl:         templating,
+	}
+	interactor := project.NewInteractor(deps)
 
 	return &projectSuite{
 		ctrl:       ctrl,
@@ -70,6 +84,7 @@ func newProjectSuite(t *testing.T) *projectSuite {
 			minioService: minioService,
 			droneService: droneService,
 			k8sClient:    k8sClient,
+			templating:   templating,
 		},
 	}
 }
@@ -112,13 +127,17 @@ func TestInteractor_CreateInternal(t *testing.T) {
 		},
 	}
 
+	owner := entity.User{ID: ownerUserID, Username: ownerUsername}
+
 	s.mocks.giteaService.EXPECT().CreateRepo(someProjectID, ownerUsername).Return(nil)
 	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, someProjectID).Return(nil)
-	s.mocks.minioService.EXPECT().CreateBucket(someProjectID).Return(nil)
+	s.mocks.minioService.EXPECT().CreateBucket(ctx, someProjectID).Return(nil)
+	s.mocks.minioService.EXPECT().CreateProjectDirs(ctx, someProjectID).Return(nil)
 	s.mocks.droneService.EXPECT().ActivateRepository(someProjectID).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(someProjectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, someProjectID).Return(expectedProject, nil)
+	s.mocks.templating.EXPECT().GenerateInitialProjectContent(ctx, createProject, owner)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
 		ProjectID:            someProjectID,
@@ -128,7 +147,7 @@ func TestInteractor_CreateInternal(t *testing.T) {
 		ExternalRepoURL:      nil,
 		ExternalRepoUsername: nil,
 		ExternalRepoToken:    nil,
-		Owner:                entity.User{ID: ownerUserID, Username: ownerUsername},
+		Owner:                owner,
 	})
 
 	require.NoError(t, err)
@@ -184,7 +203,8 @@ func TestInteractor_CreateExternal(t *testing.T) {
 		MirrorRepo(externalRepoURL, someProjectID, externalRepoUsername, externalRepoToken, ownerUsername).
 		Return(nil)
 	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, someProjectID).Return(nil)
-	s.mocks.minioService.EXPECT().CreateBucket(someProjectID).Return(nil)
+	s.mocks.minioService.EXPECT().CreateBucket(ctx, someProjectID).Return(nil)
+	s.mocks.minioService.EXPECT().CreateProjectDirs(ctx, someProjectID).Return(nil)
 	s.mocks.droneService.EXPECT().ActivateRepository(someProjectID).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(someProjectID, nil)

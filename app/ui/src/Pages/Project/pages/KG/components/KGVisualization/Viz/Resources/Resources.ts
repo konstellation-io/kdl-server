@@ -10,11 +10,12 @@ import { px } from 'Utils/d3';
 import COLORS from './Resources.module.scss';
 
 export const RESOURCE_R = 4;
-const MAX_RESOURCE_R = 6;
+const MAX_RESOURCE_R = 5.4;
 const MIN_RESOURCE_R = 1;
 const MAX_RESOURCE_OPACITY = 1;
-const MIN_RESOURCE_OPACITY = 0.3;
+const MIN_RESOURCE_OPACITY = 0.35;
 const OUTSIDE_MAX_RESOURCE_R = 3;
+const OUTSIDE_MIN_RESOURCE_R = 2;
 const LOWLIGHT_RESOURCE_OPACITY = 0.3;
 
 const MOUSE_HOVER_ACTIVATION_RADIUS = 50;
@@ -182,6 +183,7 @@ class Resources {
 
   getResourceR = (d: DComplete) => {
     if (d.outsideMax) return OUTSIDE_MAX_RESOURCE_R;
+    if (d.outsideMin) return OUTSIDE_MIN_RESOURCE_R;
 
     const radiusMaxIncrement = MAX_RESOURCE_R - MIN_RESOURCE_R;
     return MIN_RESOURCE_R + (1 - d.distanceToCenter) * radiusMaxIncrement;
@@ -193,9 +195,6 @@ class Resources {
 
     const shouldLowlight =
       lowLightOtherResources && (hoveredResource || highlightedResource);
-    // Uncomment for section hover highlight implementation and remove previous line
-    // const shouldLowlight =
-    //   this.activeSection !== null && d.category !== this.activeSection;
 
     if (shouldLowlight) return LOWLIGHT_RESOURCE_OPACITY;
     if (d.outsideMin) return 1;

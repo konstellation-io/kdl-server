@@ -56,4 +56,4 @@ spec:
             defaultMode: 0777
         - name: received-data
           persistentVolumeClaim:
-            claimName: received-data-claim
+            claimName: {{ .Values.sharedVolume.name }}-claim

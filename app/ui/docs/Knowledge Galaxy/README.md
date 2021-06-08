@@ -17,7 +17,7 @@ The core of the module, includes the radar chart itself, and the tooltip located
 
 ![Knowledge Galaxy visualization](../img/kg_viz.png "Knowledge Galaxy Visualization")
 
-More information about the visualization [here](./Visualization.md).
+More information about the visualization [here](./Visualization.md) and [here](./KGViz.md).
 
 ### Panels
 
@@ -84,7 +84,3 @@ assign the most relevant topic to that resource.
 In case the resource has no topics or its most relevant topic is not included
 in the top 9 topics, we assign to that resource the topic 'Others' instead 
 (with 0 relevance).
-
-## Mixed mode rendering layers
-
-![Knowledge Galaxy mixed mode rendering layers](../img/kg_layers.jpg "Knowledge Galaxy layers")

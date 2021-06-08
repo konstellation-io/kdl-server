@@ -61,9 +61,13 @@ There are three different scenarios we can find:
 3. **resources with more score than the maximum**: `outsideMax` flag will be set to true and radius will be the minimum
    one with some negative offset. Note that these resources will be displayed at a smaller scale than the rest.
 
-## Interaction between childrens
+## Interaction between children
 
 `KGViz` is composed by 4 children elements: `BG`, `Sections`, `Resources` and `radialAxis`. This component is the base
 one and, as you can see in the image, propagates the lifecycle stages to the remaining elements.
 
 ![Knowledge Galaxy components](../img/kg_components.png "Knowledge Galaxy components")
+
+## Radial axis
+
+You can see information about this component [here](./radialAxisLogic.md).

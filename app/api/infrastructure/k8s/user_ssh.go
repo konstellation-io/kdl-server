@@ -51,3 +51,15 @@ func (k *k8sClient) GetUserSSHKeySecret(ctx context.Context, usernameSlug string
 
 	return privateSSHKey, nil
 }
+
+// GetUserSSHKeyPublic returns public SSH key for the given user.
+func (k *k8sClient) GetUserSSHKeyPublic(ctx context.Context, usernameSlug string) ([]byte, error) {
+	sshKeysSecret, err := k.GetSecret(ctx, k.getUserSSHSecretName(usernameSlug))
+	if err != nil {
+		return nil, err
+	}
+
+	publicSSHKey := sshKeysSecret[KdlUserPublicSSHKey]
+
+	return publicSSHKey, nil
+}

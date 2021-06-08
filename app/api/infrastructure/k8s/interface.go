@@ -20,4 +20,5 @@ type K8sClient interface {
 	CreateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error
 	UpdateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error
 	GetUserSSHKeySecret(ctx context.Context, usernameSlug string) ([]byte, error)
+	GetUserSSHKeyPublic(ctx context.Context, usernameSlug string) ([]byte, error)
 }

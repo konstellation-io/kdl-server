@@ -120,6 +120,21 @@ func (mr *MockK8sClientMockRecorder) GetSecret(ctx, name interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecret", reflect.TypeOf((*MockK8sClient)(nil).GetSecret), ctx, name)
 }
 
+// GetUserSSHKeyPublic mocks base method.
+func (m *MockK8sClient) GetUserSSHKeyPublic(ctx context.Context, usernameSlug string) ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserSSHKeyPublic", ctx, usernameSlug)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserSSHKeyPublic indicates an expected call of GetUserSSHKeyPublic.
+func (mr *MockK8sClientMockRecorder) GetUserSSHKeyPublic(ctx, usernameSlug interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserSSHKeyPublic", reflect.TypeOf((*MockK8sClient)(nil).GetUserSSHKeyPublic), ctx, usernameSlug)
+}
+
 // GetUserSSHKeySecret mocks base method.
 func (m *MockK8sClient) GetUserSSHKeySecret(ctx context.Context, usernameSlug string) ([]byte, error) {
 	m.ctrl.T.Helper()

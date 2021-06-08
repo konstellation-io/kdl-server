@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { KGItem, topicOthers } from '../KG';
-import { TopicSections } from '../KGUtils';
+import { KGItem } from '../KG';
+import { TopicSections, topicOthers } from '../KGUtils';
 import useKgScores from 'Graphql/hooks/useKgScores';
 
 export interface KGFilters {

@@ -153,6 +153,7 @@ func (i *interactor) syncDelUsers(ctx context.Context, users []entity.User, wg *
 	}
 }
 
+// syncRestoreUsers restores the SSH key in Gitea and updates the user deleted flag in the DB.
 func (i *interactor) syncRestoreUsers(ctx context.Context, users []entity.User, wg *sync.WaitGroup) {
 	for _, u := range users {
 		wg.Add(1)
@@ -160,7 +161,20 @@ func (i *interactor) syncRestoreUsers(ctx context.Context, users []entity.User, 
 		go func(userToRestore entity.User) {
 			defer wg.Done()
 
-			err := i.repo.UpdateDeleted(ctx, userToRestore.Username, false)
+			// Get the user SSH public key from k8s secret
+			publicKey, err := i.k8sClient.GetUserSSHKeyPublic(ctx, userToRestore.UsernameSlug())
+			if err != nil {
+				i.logger.Errorf("Error getting the public SSH key for user \"%s\": %s", userToRestore.Username, err)
+			}
+
+			// Upload the SSH public key to Gitea
+			err = i.giteaService.AddSSHKey(userToRestore.Username, string(publicKey))
+			if err != nil {
+				i.logger.Errorf("Error restoring SSH key for user \"%s\": %s", userToRestore.Username, err)
+			}
+
+			// Update deleted user field
+			err = i.repo.UpdateDeleted(ctx, userToRestore.Username, false)
 			if err != nil {
 				i.logger.Errorf("Error restoring user \"%s\": %s", userToRestore.Username, err)
 			}

@@ -6,9 +6,8 @@ import {
   GetKnowledgeGraphVariables,
 } from 'Graphql/queries/types/GetKnowledgeGraph';
 import KGVisualizationWrapper from './components/KGVisualization/KGVisualizationWrapper';
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 
-import { ProjectRoute } from '../../ProjectPanels';
 import { ErrorMessage, SpinnerCircular } from 'kwc';
 import {
   getSectionsAndNames,
@@ -18,24 +17,48 @@ import {
 } from './KGUtils';
 import styles from './KG.module.scss';
 import useKGFilters from './components/useKGFilters';
-import { useQuery } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
 
 import GetKnowledgeGraphQuery from 'Graphql/queries/getKnowledgeGraph';
+import { useParams } from 'react-router';
+import { RouteProjectParams } from 'Constants/routes';
+import { openedProject } from 'Graphql/client/cache';
+import KGRefreshing from './components/KGRefreshing/KGRefreshing';
+import { isEmpty } from 'lodash';
 
 export interface KGItem extends GetKnowledgeGraph_knowledgeGraph_items {
   topic?: GetKnowledgeGraph_knowledgeGraph_items_topics;
 }
 
-function KG({ openedProject }: ProjectRoute) {
-  const { data, error, loading } = useQuery<
+const KGSpinner = () => (
+  <div className={styles.centeredSpinner}>
+    <SpinnerCircular />
+  </div>
+);
+
+function KG() {
+  const { projectId } = useParams<RouteProjectParams>();
+  const openedProjectData = useReactiveVar(openedProject);
+
+  const { data, error, loading, refetch } = useQuery<
     GetKnowledgeGraph,
     GetKnowledgeGraphVariables
   >(GetKnowledgeGraphQuery, {
-    variables: { projectId: openedProject.id },
+    variables: { projectId },
+    // We do not want to fully cache this query as it data depends on project description, not project id
+    fetchPolicy: 'cache-and-network',
+    // This will update loading and data states when refetching
+    notifyOnNetworkStatusChange: true,
   });
 
+  useEffect(() => {
+    refetch();
+    // We do not care about the refetch function as it cannot change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openedProjectData?.description]);
+
   const topTopics = useMemo(
-    () => data?.knowledgeGraph.topics.slice(0, 9) || [],
+    () => data?.knowledgeGraph?.topics.slice(0, 9) || [],
     [data]
   );
 
@@ -57,12 +80,7 @@ function KG({ openedProject }: ProjectRoute) {
   const { handleFiltersChange, filteredResources, filters, restoreScores } =
     useKGFilters(sections, kgItems, scoreDomain);
 
-  if (loading)
-    return (
-      <div className={styles.centeredSpinner}>
-        <SpinnerCircular />
-      </div>
-    );
+  if (loading && isEmpty(data)) return <KGSpinner />;
   if (!data || error) return <ErrorMessage />;
 
   const filtersOrder = [...topTopics, topicOthers];
@@ -77,6 +95,7 @@ function KG({ openedProject }: ProjectRoute) {
 
   return (
     <div className={styles.container}>
+      {loading && <KGRefreshing />}
       <div className={styles.vizArea}>
         <div className={styles.kgTopBar}>
           <div className={styles.safeArea} />

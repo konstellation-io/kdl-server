@@ -12,6 +12,7 @@
 
 .centeredSpinner {
   @include center;
+  z-index: 1;
 }
 
 .vizArea {
@@ -35,7 +36,6 @@
     .safeArea {
       height: $grid-unit;
       width: 24vw;
-      max-width: 335px;
       max-width: 460px;
     }
 

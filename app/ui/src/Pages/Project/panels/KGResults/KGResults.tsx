@@ -27,6 +27,7 @@ function KGResults() {
     GetKnowledgeGraphVariables
   >(GetKnowledgeGraphQuery, {
     variables: { projectId: openedProjectData?.id || '' },
+    fetchPolicy: 'cache-and-network',
   });
 
   const { openPanel } = usePanel(PanelType.SECONDARY, {

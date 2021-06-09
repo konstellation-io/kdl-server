@@ -22,4 +22,9 @@ const kgData = data.map((d, idx) => ({
   url: 'https://paperswithcode.com/paper/probabilistic-two-stage-detection',
 }));
 
-module.exports = kgData;
+const kgDataLowScores = kgData.map((d) => ({
+  ...d,
+  score: d.score / (Math.random() * 4 + 9),
+}));
+
+module.exports = { kgData, kgDataLowScores };

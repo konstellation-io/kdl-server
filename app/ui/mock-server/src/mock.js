@@ -2,12 +2,17 @@ const relevances = require('./mocks/topic_relevance.json');
 const casual = require('casual');
 const buildProject = require('./mocks/projectMock');
 const buildUser = require('./mocks/usersMock');
-const kgData = require('./mocks/kgMock');
+const { kgData, kgDataLowScores } = require('./mocks/kgMock');
 const { buildMember, meAsMember } = require('./mocks/membersMock');
 const { meId, me } = require('./mocks/meMock');
 
 const projects = Array(8).fill(0).map(buildProject);
 const users = Array(casual.integer(20, 30)).fill(0).map(buildUser);
+let kfidx = 0;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 module.exports = {
   Query: () => ({
@@ -18,14 +23,19 @@ module.exports = {
     qualityProjectDesc: () => ({
       quality: Math.round((Math.random() * 1000) % 100),
     }),
-    knowledgeGraph: () => ({
-      items: () => kgData,
-      topics: () => relevances,
-    }),
+    knowledgeGraph: async () => {
+      await sleep(2000);
+      kfidx += 1;
+
+      return {
+        items: () => (kfidx % 2 ? kgData : kgDataLowScores),
+        topics: () => relevances,
+      };
+    },
   }),
   Mutation: () => ({
     updateProject: (_, { input: { id, name, description, archived } }) => {
-      const project = projects.find((project) => project.id === id);
+      const project = projects.find((p) => p.id === id);
       if (name) project.name = name;
       if (description) project.description = description;
       if (archived !== undefined) project.archived = archived;

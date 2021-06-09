@@ -1,0 +1,7 @@
+@import 'Styles/variables';
+
+.container {
+  position: absolute;
+  bottom: 7 * $grid-unit;
+  left: 8 * $grid-unit;
+}

@@ -45,11 +45,7 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
         component={() => <Overview openedProject={openedProject} />}
       />
       <Route path={ROUTE.PROJECT_TOOL} component={ProjectToolsRoutes} />
-      <Route
-        exact
-        path={ROUTE.PROJECT_KG}
-        component={() => <KG openedProject={openedProject} />}
-      />
+      <Route exact path={ROUTE.PROJECT_KG} component={KG} />
     </Switch>
   );
 }

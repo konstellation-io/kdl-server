@@ -3,10 +3,12 @@ __pycache__
 .idea/
 .vscode/
 *.bundle
-*.npy
 *.csv
-*.kvmodel
-*.json
-*.tgz
 *.joblib
+*.json
+*.kvmodel
+*.npy
 *.pt
+*.png
+*.tgz
+

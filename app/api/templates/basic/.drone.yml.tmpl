@@ -20,7 +20,7 @@ name: example-pipeline
 
 trigger:
   ref:
-  - refs/tags/run-example-*
+    - refs/tags/run-example-*
 
 environment:
   PYTHONPATH: /drone/src/lab
@@ -41,8 +41,8 @@ steps:
     commands:
       - python3 lab/processes/prepare_data/main.py
     volumes:
-        - name: shared-storage
-          path: /shared-storage
+      - name: shared-storage
+        path: /shared-storage
 
   - name: train-standard-classifiers
     image: terminus7/sci-toolkit-runner:1.1.2
@@ -54,8 +54,8 @@ steps:
     commands:
       - python3 lab/processes/train_standard_classifiers/main.py
     volumes:
-        - name: shared-storage
-          path: /shared-storage
+      - name: shared-storage
+        path: /shared-storage
 
   - name: train-pytorch-neural-net
     image: terminus7/sci-toolkit-runner:1.1.2
@@ -67,8 +67,8 @@ steps:
     commands:
       - python3 lab/processes/train_dnn_pytorch/main.py
     volumes:
-        - name: shared-storage
-          path: /shared-storage
+      - name: shared-storage
+        path: /shared-storage
 
 volumes:
   - name: shared-storage

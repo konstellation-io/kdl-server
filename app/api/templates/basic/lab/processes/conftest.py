@@ -2,8 +2,9 @@
 Configuration for pytest unit tests
 """
 
-import pytest
 import shutil
+
+import pytest
 
 from processes.prepare_data.cancer_data import prepare_cancer_data
 

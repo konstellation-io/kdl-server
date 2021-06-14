@@ -4,14 +4,11 @@ A densely connected neural network for binary classification and its usage on th
 
 from configparser import ConfigParser
 from pathlib import Path
-from types import ModuleType
-from typing import Union
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from mock import MagicMock
 from sklearn.metrics import confusion_matrix
 
 from lib.pytorch import train_and_validate, val_loop
@@ -39,7 +36,15 @@ class DenseNN(nn.Module):
         self.output_layer = nn.Linear(100, 1)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        A forward pass through the network.
 
+        Arguments:
+            x {torch.Tensor} -- Input tensor
+
+        Returns:
+            torch.Tensor -- Output tensor
+        """
         x = self.dense1(x)
         x = self.bn1(x)
         x = F.relu(x)
@@ -59,7 +64,7 @@ class DenseNN(nn.Module):
 
 
 def train_densenet(
-    mlflow: Union[ModuleType, MagicMock], config: ConfigParser, mlflow_url: str, mlflow_tags: dict
+        mlflow, config: ConfigParser, mlflow_url: str, mlflow_tags: dict
 ) -> None:
     """
     The main function of the example Pytorch model training script
@@ -82,10 +87,10 @@ def train_densenet(
     filepath_conf_matrix = dir_artifacts / config["filenames"]["fname_conf_mat"]
     filepath_model = dir_artifacts / config["filenames"]["fname_model"]
     filepath_training_history = (
-        dir_artifacts / config["filenames"]["fname_training_history"]
+            dir_artifacts / config["filenames"]["fname_training_history"]
     )
     filepath_training_history_csv = (
-        dir_artifacts / config["filenames"]["fname_training_history_csv"]
+            dir_artifacts / config["filenames"]["fname_training_history_csv"]
     )
 
     # Prepare before run

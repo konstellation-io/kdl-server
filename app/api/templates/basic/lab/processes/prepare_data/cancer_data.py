@@ -82,7 +82,7 @@ def prepare_cancer_data(dir_output: str) -> None:
 
 
 def load_data_splits(
-    dir_processed: Union[str, Path], as_type: str
+        dir_processed: Union[str, Path], as_type: str
 ) -> Tuple[Union[np.ndarray, torch.Tensor]]:
     """
     Loads train/val/test files for X and y (named 'X_train.npy', 'y_train.npy', etc.)
@@ -108,6 +108,7 @@ def load_data_splits(
         return X_train, X_val, X_test, y_train, y_val, y_test
 
     elif as_type == "tensor":
+        # pylint: disable=not-callable
         X_train = torch.tensor(X_train).float()
         y_train = torch.tensor(y_train).float()
         X_val = torch.tensor(X_val).float()
@@ -124,7 +125,7 @@ def load_data_splits(
 
 
 def load_data_splits_as_dataloader(
-    dir_processed: str, batch_size: int, n_workers: int
+        dir_processed: str, batch_size: int, n_workers: int
 ) -> Tuple[DataLoader]:
     """
     Loads data tensors saved in processed data directory and returns as dataloaders.

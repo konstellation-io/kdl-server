@@ -1,3 +1,7 @@
+"""
+Reusable functions for pytorch training, validation and data loading
+"""
+
 from pathlib import Path
 from typing import Union
 
@@ -9,7 +13,9 @@ from torch.utils.data import DataLoader, TensorDataset
 from lib.utils import flatten_list
 
 
-def create_dataloader(X: torch.Tensor, y: torch.Tensor, dataloader_args: dict) -> DataLoader:
+def create_dataloader(
+    X: torch.Tensor, y: torch.Tensor, dataloader_args: dict
+) -> DataLoader:
     """
     Converts input torch tensors X and y into a DataLoader object.
 
@@ -30,9 +36,9 @@ def create_dataloader(X: torch.Tensor, y: torch.Tensor, dataloader_args: dict) -
 def train_loop(
     dataloader: DataLoader,
     model: nn.Module,
-    loss_fn: nn.modules.loss._Loss,
-    optimizer: torch.optim.Optimizer
-        ) -> tuple:
+    loss_fn: nn.BCELoss,
+    optimizer: torch.optim.Optimizer,
+) -> tuple:
     """
     Training loop through the dataset for a single epoch of training.
     Side effect: modifies input objects (model, loss_fn and optimizer) without returning.
@@ -40,7 +46,7 @@ def train_loop(
     Args:
         dataloader: (Dataloader) a torch DataLoader containing training samples (X) and labels (y)
         model: (nn.Module) a torch neural network object to train
-        loss_fn: (torch.nn.modules.loss._Loss) a torch loss function object
+        loss_fn: (torch.nn.BCELoss) a torch loss function object
         optimizer: (torch.optim.Optimizer) torch optimizer object, e.g. Adam or SGD
 
     Returns:
@@ -51,7 +57,7 @@ def train_loop(
     size = len(dataloader.dataset)
     model.train()
 
-    train_loss, correct = 0, 0
+    train_loss, correct = 0.0, 0.0
 
     for X, y in dataloader:
         y = y.unsqueeze(1)
@@ -75,14 +81,16 @@ def train_loop(
     return train_loss, correct
 
 
-def val_loop(dataloader: DataLoader, model: nn.Module, loss_fn: nn.modules.loss._Loss) -> tuple:
+def val_loop(
+    dataloader: DataLoader, model: nn.Module, loss_fn: nn.BCELoss
+) -> tuple:
     """
     Validation loop through the dataset.
 
     Args:
         dataloader: (Dataloader) a torch DataLoader containing validation samples (X) and labels (y)
         model: (nn.Module) a torch neural network object to validate
-        loss_fn: (torch.nn.modules.loss._Loss) a torch loss function object to compute validation loss
+        loss_fn: (torch.nn.BCELoss) a torch loss function object to compute validation loss
 
     Returns:
         (tuple):
@@ -95,7 +103,7 @@ def val_loop(dataloader: DataLoader, model: nn.Module, loss_fn: nn.modules.loss.
 
     y_true = []
     y_pred = []
-    val_loss, correct = 0, 0
+    val_loss, correct = 0.0, 0.0
 
     with torch.no_grad():
         for X, y in dataloader:
@@ -120,20 +128,20 @@ def val_loop(dataloader: DataLoader, model: nn.Module, loss_fn: nn.modules.loss.
 
 def train_and_validate(
     model: nn.Module,
-    loss_fn: nn.modules.loss._Loss,
+    loss_fn: nn.BCELoss,
     optimizer: torch.optim.Optimizer,
     train_loader: DataLoader,
     val_loader: DataLoader,
     epochs: int,
-    filepath_model: Union[str, Path]
-        ) -> tuple:
+    filepath_model: Union[str, Path],
+) -> tuple:
     """
     Runs model training and validation using the dataloaders provided for the number of epochs specified,
     saving the best version of the model to specified location.
 
     Args:
         model: (torch.nn.Module) torch model object to train and validate
-        loss_fn: (torch.nn.modules.loss._Loss) torch loss function object to use in training and validation
+        loss_fn: (torch.nn.BCELoss) torch loss function object to use in training and validation
         optimizer: (torch.optim.Optimizer) torch optimizer object to use in training
         train_loader: (DataLoader) the dataloader containing training data
         val_loader: (DataLoader) the dataloader containing validation data
@@ -147,22 +155,40 @@ def train_and_validate(
             (tuple[list]): (y_true, y_pred): lists containing true labels and the labels as predicted by
                 the model for the validation set in last iteration
     """
-    df_history = pd.DataFrame([], columns=['epoch', 'loss', 'val_loss', 'acc', 'val_acc'])
+    df_history = pd.DataFrame(
+        [], columns=["epoch", "loss", "val_loss", "acc", "val_acc"]
+    )
 
     best_acc = 0
 
     # Loop through epochs
-    for epoch in range(1, epochs+1):
+    for epoch in range(1, epochs + 1):
         print(f"Epoch {epoch}\n-------------------------------")
 
-        train_loss, train_acc = train_loop(dataloader=train_loader, model=model, loss_fn=loss_fn, optimizer=optimizer)
-        print(f"Training set: Accuracy: {(100*train_acc):>0.1f}%, Avg loss: {train_loss:>7f}")
+        train_loss, train_acc = train_loop(
+            dataloader=train_loader, model=model, loss_fn=loss_fn, optimizer=optimizer
+        )
+        print(
+            f"Training set: Accuracy: {(100*train_acc):>0.1f}%, Avg loss: {train_loss:>7f}"
+        )
 
-        val_loss, val_acc, (y_true, y_pred) = val_loop(dataloader=val_loader, model=model, loss_fn=loss_fn)
-        print(f"Validation set: Accuracy: {(100*val_acc):>0.1f}%, Avg loss: {val_loss:>7f} \n")
+        val_loss, val_acc, (y_true, y_pred) = val_loop(
+            dataloader=val_loader, model=model, loss_fn=loss_fn
+        )
+        print(
+            f"Validation set: Accuracy: {(100*val_acc):>0.1f}%, Avg loss: {val_loss:>7f} \n"
+        )
 
         df_history = df_history.append(
-            dict(epoch=epoch, loss=train_loss, val_loss=val_loss, acc=train_acc, val_acc=val_acc), ignore_index=True)
+            dict(
+                epoch=epoch,
+                loss=train_loss,
+                val_loss=val_loss,
+                acc=train_acc,
+                val_acc=val_acc,
+            ),
+            ignore_index=True,
+        )
 
         if val_acc > best_acc:
             torch.save(model.state_dict(), filepath_model)

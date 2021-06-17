@@ -34,6 +34,7 @@ function Tool({ name, isHidden, src }: Props) {
         frameBorder="0"
         className={styles.iframeContainer}
         onLoad={handleFinishLoad}
+        allow="clipboard-read; clipboard-write"
       />
     </div>
   );

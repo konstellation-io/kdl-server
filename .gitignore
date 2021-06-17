@@ -1,6 +1,5 @@
 .idea
 .run/*.xml
-.vscode
 .certs
 
 node_modules

@@ -270,10 +270,10 @@ To run the automated tests, you have two options: via command line or via the Vs
 ### Running tests from command line
 You can use the command `pytest` directly from the terminal line as follows:
    ```
-   PYTHONPATH=lab pytest -v                              # Run all tests (verbose)
-   PYTHONPATH=lab pytest -v lab/processes/prepare_data   # Run only tests in prepare_data
-   PYTHONPATH=lab pytest -v -m unittest                  # Run only unit tests
-   PYTHONPATH=lab pytest -v -m integration               # Run only integration tests
+   pytest -v                              # Run all tests (verbose)
+   pytest -v lab/processes/prepare_data   # Run only tests in prepare_data
+   pytest -v -m unittest                  # Run only unit tests
+   pytest -v -m integration               # Run only integration tests
    ```
 
 You may add other optional pytest arguments as needed

@@ -15,11 +15,11 @@ from matplotlib.ticker import MaxNLocator
 
 
 def plot_training_history(
-        history: pd.DataFrame,
-        show: bool = True,
-        title: str = "",
-        savepath: Union[None, str, Path] = None,
-        accuracy_metric: str = "acc",
+    history: pd.DataFrame,
+    show: bool = True,
+    title: str = "",
+    savepath: Union[None, str, Path] = None,
+    accuracy_metric: str = "acc",
 ) -> None:
     """
     Plots training history (validation and loss) for a model, given a table of metrics per epoch.
@@ -47,7 +47,7 @@ def plot_training_history(
     val_acc = history[f"val_{accuracy_metric}"]
 
     assert (
-            len(acc) == len(val_acc) == len(loss) == len(val_loss)
+        len(acc) == len(val_acc) == len(loss) == len(val_loss)
     ), "All metrics should have the same number of measurements (one for each epoch)."
 
     _, ax = plt.subplots(1, 1)
@@ -101,13 +101,13 @@ def plot_training_history(
 
 
 def plot_confusion_matrix(
-        cm: np.ndarray,
-        normalize: bool = True,
-        title: str = "Confusion matrix",
-        cmap: Colormap = plt.cm.Blues,  # pylint: disable=no-member
-        show: bool = True,
-        class_names: Union[None, list] = None,
-        savepath: Union[None, str, Path] = None,
+    cm: np.ndarray,
+    normalize: bool = True,
+    title: str = "Confusion matrix",
+    cmap: Colormap = plt.cm.Blues,  # pylint: disable=no-member
+    show: bool = True,
+    class_names: Union[None, list] = None,
+    savepath: Union[None, str, Path] = None,
 ) -> None:
     """
     Prints and plots the confusion matrix.

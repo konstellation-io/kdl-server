@@ -6,6 +6,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import Union
 
+import joblib
 import numpy as np
 from mock import MagicMock
 from sklearn.ensemble import (AdaBoostClassifier, GradientBoostingClassifier,
@@ -96,7 +97,7 @@ def train_classifiers(
                     title="Confusion matrix (validation set)",
                     savepath=filepath_conf_matrix,
                 )
-
+                joblib.dump(model, Path(dir_artifacts) / "model.joblib")
                 mlflow.log_artifacts(dir_artifacts)
                 mlflow.log_params({"classifier": model_name})
                 mlflow.log_metrics({"val_acc": val_accuracy})

@@ -5,6 +5,7 @@ Functions for preparing the breast cancer dataset for training and validating ML
 from pathlib import Path
 from typing import Tuple, Union
 
+import joblib
 import numpy as np
 import pandas as pd
 import torch
@@ -80,9 +81,12 @@ def prepare_cancer_data(dir_output: str) -> None:
     np.save(str(Path(dir_output) / "X_test.npy"), X_test.to_numpy())
     np.save(str(Path(dir_output) / "y_test.npy"), y_test.to_numpy())
 
+    # Save scaler
+    joblib.dump(scaler, str(Path(dir_output) / "scaler.joblib"))
+
 
 def load_data_splits(
-        dir_processed: Union[str, Path], as_type: str
+    dir_processed: Union[str, Path], as_type: str
 ) -> Tuple[Union[np.ndarray, torch.Tensor]]:
     """
     Loads train/val/test files for X and y (named 'X_train.npy', 'y_train.npy', etc.)
@@ -125,7 +129,7 @@ def load_data_splits(
 
 
 def load_data_splits_as_dataloader(
-        dir_processed: str, batch_size: int, n_workers: int
+    dir_processed: str, batch_size: int, n_workers: int
 ) -> Tuple[DataLoader]:
     """
     Loads data tensors saved in processed data directory and returns as dataloaders.

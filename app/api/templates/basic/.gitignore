@@ -1,14 +1,13 @@
 .ipynb_checkpoints
 __pycache__
 .idea/
-.vscode/
 *.bundle
 *.csv
 *.joblib
-*.json
 *.kvmodel
 *.npy
 *.pt
 *.png
 *.tgz
-
+.mypy_cache
+.ropeproject

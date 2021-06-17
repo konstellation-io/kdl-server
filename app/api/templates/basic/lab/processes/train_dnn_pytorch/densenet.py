@@ -64,7 +64,7 @@ class DenseNN(nn.Module):
 
 
 def train_densenet(
-        mlflow, config: ConfigParser, mlflow_url: str, mlflow_tags: dict
+    mlflow, config: ConfigParser, mlflow_url: str, mlflow_tags: dict
 ) -> None:
     """
     The main function of the example Pytorch model training script
@@ -87,10 +87,10 @@ def train_densenet(
     filepath_conf_matrix = dir_artifacts / config["filenames"]["fname_conf_mat"]
     filepath_model = dir_artifacts / config["filenames"]["fname_model"]
     filepath_training_history = (
-            dir_artifacts / config["filenames"]["fname_training_history"]
+        dir_artifacts / config["filenames"]["fname_training_history"]
     )
     filepath_training_history_csv = (
-            dir_artifacts / config["filenames"]["fname_training_history_csv"]
+        dir_artifacts / config["filenames"]["fname_training_history_csv"]
     )
 
     # Prepare before run

@@ -14,7 +14,7 @@ from lib.utils import flatten_list
 
 
 def create_dataloader(
-        X: torch.Tensor, y: torch.Tensor, dataloader_args: dict
+    X: torch.Tensor, y: torch.Tensor, dataloader_args: dict
 ) -> DataLoader:
     """
     Converts input torch tensors X and y into a DataLoader object.
@@ -34,10 +34,10 @@ def create_dataloader(
 
 
 def train_loop(
-        dataloader: DataLoader,
-        model: nn.Module,
-        loss_fn: nn.BCELoss,
-        optimizer: torch.optim.Optimizer,
+    dataloader: DataLoader,
+    model: nn.Module,
+    loss_fn: nn.BCELoss,
+    optimizer: torch.optim.Optimizer,
 ) -> tuple:
     """
     Training loop through the dataset for a single epoch of training.
@@ -82,7 +82,7 @@ def train_loop(
 
 
 def val_loop(
-        dataloader: DataLoader, model: nn.Module, loss_fn: nn.BCELoss
+    dataloader: DataLoader, model: nn.Module, loss_fn: nn.BCELoss
 ) -> tuple:
     """
     Validation loop through the dataset.
@@ -127,13 +127,13 @@ def val_loop(
 
 
 def train_and_validate(
-        model: nn.Module,
-        loss_fn: nn.BCELoss,
-        optimizer: torch.optim.Optimizer,
-        train_loader: DataLoader,
-        val_loader: DataLoader,
-        epochs: int,
-        filepath_model: Union[str, Path],
+    model: nn.Module,
+    loss_fn: nn.BCELoss,
+    optimizer: torch.optim.Optimizer,
+    train_loader: DataLoader,
+    val_loader: DataLoader,
+    epochs: int,
+    filepath_model: Union[str, Path],
 ) -> tuple:
     """
     Runs model training and validation using the dataloaders provided for the number of epochs specified,

@@ -33,3 +33,19 @@ stages:
     outs:
     - assets/topics.pkl.gz
     frozen: true
+  train-topics:
+    cmd: python src/pipe/train_topics.py
+    deps:
+    - assets/dataset.pkl.gz
+    - src/pipe/train_topics.py
+    outs:
+    - inputs/topics_model
+    frozen: true
+  train-transformer:
+    cmd: python src/pipe/train_transformer.py
+    deps:
+    - assets/dataset.pkl.gz
+    - src/pipe/train_transformer.py
+    outs:
+    - assets/model
+    frozen: true

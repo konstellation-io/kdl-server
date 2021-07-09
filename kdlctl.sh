@@ -34,7 +34,8 @@ MONGO_PASS=123456
 . ./.kdlctl.conf
 . ./scripts/kdlctl/common_functions.sh
 . ./scripts/kdlctl/cmd_help.sh
-. ./scripts/kdlctl/cmd_minikube.sh
+. ./scripts/kdlctl/cmd_microk8s.sh
+# . ./scripts/kdlctl/cmd_minikube.sh
 . ./scripts/kdlctl/cmd_dev.sh
 . ./scripts/kdlctl/cmd_build.sh
 . ./scripts/kdlctl/cmd_deploy.sh
@@ -77,7 +78,8 @@ COMMAND_ARGS=$(echo "$*" | sed -e 's/ +-v//g')
 # Check which command is requested
 case $COMMAND in
   start)
-    minikube_start
+    # minikube_start
+    microk8s_start
     echo_done "Start done"
     exit 0
   ;;

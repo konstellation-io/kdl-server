@@ -5,37 +5,39 @@
 
 cmd_dev() {
   # NOTE: Use this loop to capture multiple unsorted args
-  while test $# -gt 0; do
-    case "$1" in
-      # WARNING: Doing a hard reset before deploying
-      --hard|--dracarys)
-        MINIKUBE_RESET=1
-        shift
-      ;;
+  # while test $# -gt 0; do
+  #   case "$1" in
+  #     # WARNING: Doing a hard reset before deploying
+  #     --hard|--dracarys)
+  #       MINIKUBE_RESET=1
+  #       shift
+  #     ;;
 
-      --skip-build)
-        SKIP_BUILD=1
-        shift
-      ;;
+  #     --skip-build)
+  #       SKIP_BUILD=1
+  #       shift
+  #     ;;
 
-      *)
-        shift
-      ;;
-    esac
-  done
+  #     *)
+  #       shift
+  #     ;;
+  #   esac
+  # done
 
-  if [ "$MINIKUBE_RESET" = "1" ]; then
-    minikube_hard_reset
-  fi
+  # if [ "$MINIKUBE_RESET" = "1" ]; then
+  #   minikube_hard_reset
+  # fi
 
-  minikube_start
-  minikube_clean
-  if [ "$SKIP_BUILD" = "0" ]; then
-    cmd_build "$@"
-  else
-    sleep 10
-  fi
-  IP=$(minikube -p $MINIKUBE_PROFILE ip)
+  # minikube_start
+  # minikube_clean
+  microk8s_start
+  # if [ "$SKIP_BUILD" = "0" ]; then
+  #   cmd_build "$@"
+  # else
+  #   sleep 10
+  # fi
+  # IP=$(minikube -p $MINIKUBE_PROFILE ip)
+  IP=$(hostname -I | cut -d' ' -f1)
   export DOMAIN=kdl.$IP.nip.io
   deploy
 }

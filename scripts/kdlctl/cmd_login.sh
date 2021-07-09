@@ -1,7 +1,8 @@
 #!/bin/sh
 
 cmd_login() {
-  minikube_start
+  # minikube_start
+  # microk8s_start
   local_login
 }
 
@@ -13,7 +14,7 @@ show_login_help() {
 }
 
 local_login() {
-  LINK=https://kdlapp.kdl.$(minikube -p kdl-local ip).nip.io
+  LINK=https://kdlapp.kdl.$(hostname -I | cut -d' ' -f1).nip.io
 
   if [ "$OS" = "Darwin" ]; then
     open "$LINK"

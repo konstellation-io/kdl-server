@@ -14,7 +14,7 @@ cmd_restart() {
 
     if [ "$TYPE" = "minikube" ]; then
       minikube_stop
-      minikube_start
+      # minikube_start
     fi
 
 }

@@ -18,7 +18,7 @@ There are two ways of working with KDL:
 
 ### Option 2 prerequisites
 The following software must be installed on your machine:
-- [minikube](https://minikube.sigs.k8s.io/docs/start/)
+- [microk8s](https://microk8s.io/docs)
 - [envsubt](https://command-not-found.com/envsubst)
 - [docker](https://www.docker.com/get-started)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)

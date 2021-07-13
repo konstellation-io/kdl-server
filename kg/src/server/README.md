@@ -25,7 +25,7 @@ KG_LOG_LEVEL="INFO" # Log level defaults to info
 pipenv run python src/server/app.py
 ```
 
-to run in minikube create dev environment:
+to run in microk8s create dev environment:
 ```
 kdlctl.sh dev
 ```

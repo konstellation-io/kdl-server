@@ -54,16 +54,7 @@ prepare_helm() {
     run helm init --upgrade --wait
   fi
 
-  if [ "$MINIKUBE_RESET" = "1" ]; then
-    clean_helm_deps
-  fi
-
   HELM_READY=1
-}
-
-clean_helm_deps() {
-  rm -rf helm/kdl-server/charts/*
-  helm dep update helm/kdl-server
 }
 
 get_kubectl_dry_run() {

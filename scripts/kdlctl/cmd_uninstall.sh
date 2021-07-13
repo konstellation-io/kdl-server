@@ -10,9 +10,6 @@ cmd_uninstall() {
       echo_info "Deleting \"$RELEASE_NAME\" helm release..."
       helm delete "$RELEASE_NAME" -n $NAMESPACE
 
-#      echo_info "Deleting all generated data in the hostpath-provisioner..."
-#      minikube -p "$MINIKUBE_PROFILE" ssh -- sudo rm -rf /tmp/hostpath-provisioner/\*
-
       echo_info "Deleting \"$NAMESPACE\" k8s namespace..."
       kubectl delete ns $NAMESPACE --force --grace-period 0
 

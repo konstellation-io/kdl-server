@@ -34,10 +34,11 @@ microk8s_start() {
   # esac
   # MICROK8S_CHECK=1
 
-  microk8s.start
-  microk8s.enable dns storage gpu ingress
-  microk8s.config > ${HOME}/.kube/config-microk8s
   export KUBECONFIG=${HOME}/.kube/config-microk8s
+
+  microk8s.start
+  microk8s.enable dns storage gpu ingress registry
+  microk8s.config > ${KUBECONFIG}
 }
 
 # get_admin_api_pod() {
@@ -48,11 +49,13 @@ microk8s_start() {
 #   kubectl -n ${NAMESPACE} get pod -l app=${NAMESPACE}-mongo -o custom-columns=":metadata.name" --no-headers
 # }
 
-# minikube_stop() {
+minikube_stop() {
+  echo "TODO Remove minikube_stop"
 #   minikube -p "$MINIKUBE_PROFILE" stop
-# }
+}
 
-# minikube_clean() {
+minikube_clean() {
+  echo "TODO Remove minikube_clean"
 #   eval "$(minikube docker-env -p "$MINIKUBE_PROFILE")"
 #   KEEP_THRESHOLD_HOURS="12"
 #   # Clean unused containers and images inside minikube
@@ -62,7 +65,7 @@ microk8s_start() {
 #     /bin/sh -c "docker system prune --filter \"until=${KEEP_THRESHOLD_HOURS}h\" -f"
 
 #   unset DOCKER_TLS_VERIFY DOCKER_HOST DOCKER_CERT_PATH MINIKUBE_ACTIVE_DOCKERD
-# }
+}
 
 dracarys_header() {
   echo "          ____ __"

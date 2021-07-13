@@ -15,7 +15,7 @@ show_deploy_help() {
   echo "$(help_global_header "deploy")
 
     options:
-      --build  re-build all docker images before deploying on minikube.
+      --build  re-build all docker images before deploying on microk8s.
       --clean  sends a prune command to remove old docker images and containers.
 
     $(help_global_options)
@@ -103,6 +103,7 @@ deploy_helm_chart() {
     --install "${RELEASE_NAME}" \
     --namespace "${NAMESPACE}" \
     --set domain=$DOMAIN \
+    --set docker.registry="localhost:32000/" \
     --set mongodb.persistentVolume.storageClass=$STORAGE_CLASS_NAME \
     --set mlflow.volume.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.kdl.local="true" \

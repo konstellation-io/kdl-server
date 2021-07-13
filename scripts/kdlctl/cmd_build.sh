@@ -53,13 +53,14 @@ build_docker_images() {
 }
 
 setup_env() {
-  if [ "$SETUP_ENV" = 1 ]; then
-    return
-  fi
-
-  # Setup environment to build images inside minikube
-  eval "$(minikube docker-env -p "$MINIKUBE_PROFILE")"
-  SETUP_ENV=1
+  echo "TODO remove setup_env"
+#  if [ "$SETUP_ENV" = 1 ]; then
+#    return
+#  fi
+#
+#  # Setup environment to build images inside minikube
+#  eval "$(minikube docker-env -p "$MINIKUBE_PROFILE")"
+#  SETUP_ENV=1
 }
 
 build_server() {
@@ -87,7 +88,8 @@ build_image() {
   FOLDER=$2
   echo_build_header "$NAME"
 
-  run docker build --network host -t konstellation/"${NAME}":latest "$FOLDER"
+  run docker build --network host -t localhost:32000/konstellation/"${NAME}":latest "$FOLDER"
+  run docker push localhost:32000/konstellation/"${NAME}":latest
 }
 
 echo_build_header() {

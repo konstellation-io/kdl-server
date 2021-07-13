@@ -12,10 +12,11 @@ cmd_restart() {
       restart_version "$@"
     fi
 
-    if [ "$TYPE" = "minikube" ]; then
-      minikube_stop
-      # minikube_start
-    fi
+# TODO restart
+#    if [ "$TYPE" = "minikube" ]; then
+#      minikube_stop
+#      minikube_start
+#    fi
 
 }
 

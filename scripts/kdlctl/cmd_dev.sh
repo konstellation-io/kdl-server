@@ -31,12 +31,13 @@ cmd_dev() {
   # minikube_start
   # minikube_clean
   microk8s_start
-  # if [ "$SKIP_BUILD" = "0" ]; then
-  #   cmd_build "$@"
-  # else
-  #   sleep 10
-  # fi
-  # IP=$(minikube -p $MINIKUBE_PROFILE ip)
+
+  if [ "$SKIP_BUILD" = "0" ]; then
+    cmd_build "$@"
+  else
+    sleep 10
+  fi
+
   IP=$(hostname -I | cut -d' ' -f1)
   export DOMAIN=kdl.$IP.nip.io
   deploy

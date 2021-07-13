@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: kdl-kg
-          image: {{ .Values.kdlKG.image.repository }}:{{ .Values.kdlKG.image.tag }}
+          image: {{ .Values.docker.registry }}{{ .Values.kdlKG.image.repository }}:{{ .Values.kdlKG.image.tag }}
           imagePullPolicy: {{ .Values.kdlKG.image.pullPolicy }}
           envFrom:
             - configMapRef:

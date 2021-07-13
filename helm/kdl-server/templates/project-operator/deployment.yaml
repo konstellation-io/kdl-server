@@ -33,7 +33,7 @@ spec:
         - --metrics-bind-address=127.0.0.1:8080
         - --leader-elect
         - --leader-election-id=project-operator
-        image: {{ .Values.projectOperator.image.repository }}:{{ .Values.projectOperator.image.tag }}
+        image: {{ .Values.docker.registry }}{{ .Values.projectOperator.image.repository }}:{{ .Values.projectOperator.image.tag }}
         imagePullPolicy: {{ .Values.projectOperator.image.pullPolicy }}
         livenessProbe:
           httpGet:

@@ -25,8 +25,8 @@ check_requirements() {
 
   OPERATOR_SDK_INSTALLED=$(cmd_installed operator-sdk)
 
-  MINIKUBE_INSTALLED=$(cmd_installed minikube)
-  [ "$MINIKUBE_INSTALLED" = "1" ] || { REQUIREMENTS_OK=0 && echo_warning "Missing Minikube installation"; }
+  MICROK8S_INSTALLED=$(cmd_installed microk8s)
+  [ "$MICROK8S_INSTALLED" = "1" ] || { REQUIREMENTS_OK=0 && echo_warning "Missing microk8s installation"; }
 
   ENVSUBT_INSTALLED=$(cmd_installed envsubst)
   [ "$ENVSUBT_INSTALLED" = "1" ] || { REQUIREMENTS_OK=0 && echo_warning "Missing gettext installation"; }

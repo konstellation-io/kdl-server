@@ -3,6 +3,9 @@
 cmd_login() {
   microk8s_start
   local_login
+
+  echo "👤 User    : ${GITEA_ADMIN_USER}"
+  echo "🔑 Password: ${GITEA_ADMIN_PASSWORD}"
 }
 
 show_login_help() {
@@ -14,6 +17,7 @@ show_login_help() {
 
 local_login() {
   LINK=https://kdlapp.kdl.$(hostname -I | cut -d' ' -f1).nip.io
+  echo "Login link: ${LINK}"
 
   if [ "$OS" = "Darwin" ]; then
     open "$LINK"

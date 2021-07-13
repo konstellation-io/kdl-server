@@ -28,8 +28,7 @@ cmd_dev() {
   #   minikube_hard_reset
   # fi
 
-  # minikube_start
-  # minikube_clean
+  microk8s_clean
   microk8s_start
 
   if [ "$SKIP_BUILD" = "0" ]; then

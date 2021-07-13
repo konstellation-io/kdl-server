@@ -13,28 +13,14 @@
 #   done
 # }
 
-MICROK8S_CHECK=0
 microk8s_start() {
-  # if [ "$MICROK8S_CHECK" = "1" ]; then
-  #   return
-  # fi
-
-  # MICROK8S_STATUS=$(microk8s.status | head -1 | cut -d " " -f3)
-
-  # case $MICROK8S_STATUS in
-  #   running)
-  #     echo_check "Minikube already running"
-  #   ;;
-  #   *)
-  #     echo_check "Restarting minikube profile"
-  #     microk8s.start
-  #     microk8s.config > ~/.kube/config-microk8s
-  #     export KUBECONFIG=~/.kube/config-microk8s
-  #   ;;
-  # esac
-  # MICROK8S_CHECK=1
-
-  export KUBECONFIG=${HOME}/.kube/config-microk8s
+  MICROK8S_STATUS=$(microk8s.status)
+  case "$MICROK8S_STATUS" in
+    *"is running"*)
+      echo_check "Microk8s already running"
+      return
+      ;;
+  esac
 
   microk8s.start
   microk8s.enable dns storage ingress registry
@@ -44,23 +30,20 @@ microk8s_start() {
     microk8s.enable gpu
   fi
 
-  microk8s.config > ${KUBECONFIG}
+  microk8s_kubeconfig
 }
 
-# get_admin_api_pod() {
-#   kubectl -n ${NAMESPACE} get pod -l app=${RELEASE_NAME}-kdl-server -o custom-columns=":metadata.name" --no-headers
-# }
-
-# get_mongo_pod() {
-#   kubectl -n ${NAMESPACE} get pod -l app=${NAMESPACE}-mongo -o custom-columns=":metadata.name" --no-headers
-# }
+microk8s_kubeconfig() {
+  export KUBECONFIG=${HOME}/.kube/config-microk8s
+  microk8s.config > ${KUBECONFIG}
+}
 
 microk8s_stop() {
   microk8s.stop
 }
 
-minikube_clean() {
-  echo "TODO Remove minikube_clean"
+microk8s_clean() {
+  echo "TODO microk8s_clean"
 #   eval "$(minikube docker-env -p "$MINIKUBE_PROFILE")"
 #   KEEP_THRESHOLD_HOURS="12"
 #   # Clean unused containers and images inside minikube

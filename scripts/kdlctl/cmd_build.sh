@@ -23,7 +23,7 @@ cmd_build() {
   done
 
   if [ "$CLEAN_DOCKER" = "1" ]; then
-    minikube_clean
+    microk8s_clean
   fi
   build_docker_images
 }

@@ -99,6 +99,7 @@ deploy_helm_chart() {
     --set mlflow.volume.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.kdl.local="true" \
     --set science-toolkit.domain=$DOMAIN \
+    --set science-toolkit.mlflow.volume.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.sharedVolume.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.gitea.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.postgres.storage.storageClassName=$STORAGE_CLASS_NAME \

@@ -1,7 +1,6 @@
 #!/bin/sh
 
 CLEAN_DOCKER=0
-SETUP_ENV=0
 BUILD_SERVER=0
 
 cmd_build() {
@@ -48,38 +47,21 @@ build_docker_images() {
     build_kg
     build_project_operator
   fi
-
-  setup_env
-}
-
-setup_env() {
-  echo "TODO remove setup_env"
-#  if [ "$SETUP_ENV" = 1 ]; then
-#    return
-#  fi
-#
-#  # Setup environment to build images inside minikube
-#  eval "$(minikube docker-env -p "$MINIKUBE_PROFILE")"
-#  SETUP_ENV=1
 }
 
 build_server() {
-  setup_env
   build_image kdl-server app
 }
 
 build_drone_authorizer() {
-  setup_env
   build_image drone-authorizer app/drone-authorizer
 }
 
 build_kg() {
-  setup_env
   build_image kdl-kg kg
 }
 
 build_project_operator() {
-  setup_env
   build_image project-operator project-operator
 }
 

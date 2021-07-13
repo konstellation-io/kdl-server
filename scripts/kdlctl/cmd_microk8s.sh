@@ -37,7 +37,13 @@ microk8s_start() {
   export KUBECONFIG=${HOME}/.kube/config-microk8s
 
   microk8s.start
-  microk8s.enable dns storage gpu ingress registry
+  microk8s.enable dns storage ingress registry
+
+  if [ "$ENABLE_GPU" = "1" ]; then
+    echo "⚙️ Enabling Microk8s GPU..."
+    microk8s.enable gpu
+  fi
+
   microk8s.config > ${KUBECONFIG}
 }
 
@@ -49,9 +55,8 @@ microk8s_start() {
 #   kubectl -n ${NAMESPACE} get pod -l app=${NAMESPACE}-mongo -o custom-columns=":metadata.name" --no-headers
 # }
 
-minikube_stop() {
-  echo "TODO Remove minikube_stop"
-#   minikube -p "$MINIKUBE_PROFILE" stop
+microk8s_stop() {
+  microk8s.stop
 }
 
 minikube_clean() {

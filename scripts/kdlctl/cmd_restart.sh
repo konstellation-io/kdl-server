@@ -1,7 +1,7 @@
 #!/bin/sh
 
 cmd_restart() {
-    TYPE=${1:-"minikube"}
+    TYPE=${1:-"microk8s"}
 
     if [ "$TYPE" = "kdl" ]; then
       restart_admin_pods
@@ -12,12 +12,10 @@ cmd_restart() {
       restart_version "$@"
     fi
 
-# TODO restart
-#    if [ "$TYPE" = "minikube" ]; then
-#      minikube_stop
-#      minikube_start
-#    fi
-
+    if [ "$TYPE" = "microk8s" ]; then
+      microk8s_stop
+      microk8s_start
+    fi
 }
 
 show_restart_help() {

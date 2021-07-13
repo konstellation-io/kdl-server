@@ -1,52 +1,23 @@
 #!/bin/sh
 
-CLEAN_DOCKER=0
-BUILD_SERVER=0
-
 cmd_build() {
-  # NOTE: Use this loop to capture multiple unsorted args
-  while test $# -gt 0; do
-    case "$1" in
-     --clean)
-      CLEAN_DOCKER=1
-      shift
-    ;;
-    --server)
-      BUILD_SERVER=1
-      BUILD_ALL=0
-      shift
-    ;;
-    *)
-     shift
-     ;;
-    esac
-  done
-
-  if [ "$CLEAN_DOCKER" = "1" ]; then
-    microk8s_clean
-  fi
   build_docker_images
 }
 
 show_build_help() {
   echo "$(help_global_header "build")
 
-    options:
-      --clean          sends a prune command to remove old docker images and containers. (will keep last 24h).
-      --server        build only kdl server .
+    Build all KDL docker images.
 
     $(help_global_options)
 "
 }
 
 build_docker_images() {
-  # Server
-  if [ "$BUILD_SERVER" = "1" ] || [ "$BUILD_ALL" = "1" ]; then
-    build_server
-    build_drone_authorizer
-    build_kg
-    build_project_operator
-  fi
+  build_server
+  build_drone_authorizer
+  build_kg
+  build_project_operator
 }
 
 build_server() {

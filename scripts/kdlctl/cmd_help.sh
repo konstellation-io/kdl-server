@@ -51,11 +51,11 @@ show_root_help() {
 
     commands:
       dev     creates a complete local environment.
-      start   starts minikube kdl profile.
-      stop    stops minikube kdl profile.
-      build   calls docker to build all images inside minikube.
-      deploy  calls helm to create install/upgrade a kdl release on minikube.
-      restart restarts kdl or versions, useful after build command.
+      start   starts microk8s.
+      stop    stops microk8s.
+      build   calls docker to build all images and push them to microk8s registry.
+      deploy  calls helm to create install/upgrade a kdl release on microk8s.
+      restart restarts kdl pods or microk8s useful after build command.
 
     $(help_global_options)
 "

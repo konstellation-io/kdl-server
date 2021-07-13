@@ -23,7 +23,6 @@ show_deploy_help() {
 }
 
 deploy() {
-  # minikube_start
   microk8s_start
   prepare_helm
 

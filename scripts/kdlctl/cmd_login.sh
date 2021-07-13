@@ -1,8 +1,7 @@
 #!/bin/sh
 
 cmd_login() {
-  # minikube_start
-  # microk8s_start
+  microk8s_start
   local_login
 }
 

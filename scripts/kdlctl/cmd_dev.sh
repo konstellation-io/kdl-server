@@ -14,7 +14,6 @@ cmd_dev() {
      esac
    done
 
-  microk8s_clean
   microk8s_start
 
   if [ "$SKIP_BUILD" = "0" ]; then

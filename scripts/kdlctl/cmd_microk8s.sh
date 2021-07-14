@@ -17,19 +17,26 @@ microk8s_start() {
   case "$MICROK8S_STATUS" in
     *"is running"*)
       echo_check "Microk8s already running"
+      microk8s_enable_addons
       return
       ;;
   esac
 
   microk8s.start
+
+  microk8s_enable_addons
+
+  microk8s_kubeconfig
+}
+
+microk8s_enable_addons() {
+  echo_info "Checking if all microk8s addons are enabled"
   microk8s.enable dns storage ingress registry
 
   if [ "$ENABLE_GPU" = "1" ]; then
-    echo "⚙️ Enabling Microk8s GPU..."
+    echo_info "⚙️ Enabling microk8s GPU..."
     microk8s.enable gpu
   fi
-
-  microk8s_kubeconfig
 }
 
 microk8s_kubeconfig() {

@@ -21,7 +21,6 @@ BUILD_RUNNERS=0
 SKIP_FRONTEND_BUILD=0
 SKIP_OPERATOR_BUILD=0
 OPERATOR_SDK_INSTALLED=0
-MINIKUBE_RESET=0
 MONGO_POD=""
 ENABLE_TLS=false
 OS=$(uname)
@@ -34,7 +33,7 @@ MONGO_PASS=123456
 . ./.kdlctl.conf
 . ./scripts/kdlctl/common_functions.sh
 . ./scripts/kdlctl/cmd_help.sh
-. ./scripts/kdlctl/cmd_minikube.sh
+. ./scripts/kdlctl/cmd_microk8s.sh
 . ./scripts/kdlctl/cmd_dev.sh
 . ./scripts/kdlctl/cmd_build.sh
 . ./scripts/kdlctl/cmd_deploy.sh
@@ -77,13 +76,13 @@ COMMAND_ARGS=$(echo "$*" | sed -e 's/ +-v//g')
 # Check which command is requested
 case $COMMAND in
   start)
-    minikube_start
+    microk8s_start "$@"
     echo_done "Start done"
     exit 0
   ;;
 
   stop)
-    minikube_stop
+    microk8s_stop
     echo_done "Stop done"
     exit 0
   ;;

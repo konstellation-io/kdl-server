@@ -2,6 +2,8 @@
 
 BUILD_DOCKER_IMAGES=0
 cmd_deploy() {
+  microk8s_start "$@"
+
   case $* in
     --build)
       BUILD_DOCKER_IMAGES=1
@@ -15,15 +17,14 @@ show_deploy_help() {
   echo "$(help_global_header "deploy")
 
     options:
-      --build  re-build all docker images before deploying on minikube.
-      --clean  sends a prune command to remove old docker images and containers.
+      --build  re-build all docker images before deploying on microk8s.
+      --gpu enables the GPU in MicroK8s
 
     $(help_global_options)
 "
 }
 
 deploy() {
-  minikube_start
   prepare_helm
 
   if [ "$BUILD_DOCKER_IMAGES" = "1" ]; then
@@ -53,16 +54,7 @@ prepare_helm() {
     run helm init --upgrade --wait
   fi
 
-  if [ "$MINIKUBE_RESET" = "1" ]; then
-    clean_helm_deps
-  fi
-
   HELM_READY=1
-}
-
-clean_helm_deps() {
-  rm -rf helm/kdl-server/charts/*
-  helm dep update helm/kdl-server
 }
 
 get_kubectl_dry_run() {
@@ -82,6 +74,8 @@ get_kubectl_dry_run() {
 }
 
 create_namespace() {
+  microk8s_kubeconfig
+
   DRY_RUN=$(get_kubectl_dry_run)
   echo_info "📚️ Create Namespace if not exist..."
   NS=$(kubectl create ns "${NAMESPACE}" ${DRY_RUN} -o yaml)
@@ -102,8 +96,17 @@ deploy_helm_chart() {
     --install "${RELEASE_NAME}" \
     --namespace "${NAMESPACE}" \
     --set domain=$DOMAIN \
+    --set docker.registry="localhost:32000/" \
+    --set mongodb.persistentVolume.storageClass=$STORAGE_CLASS_NAME \
+    --set mlflow.volume.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.kdl.local="true" \
     --set science-toolkit.domain=$DOMAIN \
+    --set science-toolkit.mlflow.volume.storageClassName=$STORAGE_CLASS_NAME \
+    --set science-toolkit.sharedVolume.storageClassName=$STORAGE_CLASS_NAME \
+    --set science-toolkit.gitea.storage.storageClassName=$STORAGE_CLASS_NAME \
+    --set science-toolkit.postgres.storage.storageClassName=$STORAGE_CLASS_NAME \
+    --set science-toolkit.drone.storage.storageClassName=$STORAGE_CLASS_NAME \
+    --set science-toolkit.vscode.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.tls.enabled=$ENABLE_TLS \
     --set science-toolkit.minio.securityContext.runAsUser=0 \
     --set science-toolkit.gitea.admin.username=$GITEA_ADMIN_USER \

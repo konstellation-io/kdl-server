@@ -14,6 +14,9 @@ science-toolkit:
       size: 10Gi
       storageClassName: standard
 
+docker:
+  registry: ""
+
 kdlServer:
   image:
     repository: konstellation/kdl-server

@@ -76,7 +76,7 @@ COMMAND_ARGS=$(echo "$*" | sed -e 's/ +-v//g')
 # Check which command is requested
 case $COMMAND in
   start)
-    microk8s_start
+    microk8s_start "$@"
     echo_done "Start done"
     exit 0
   ;;

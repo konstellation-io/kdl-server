@@ -1,6 +1,8 @@
 #!/bin/sh
 
 cmd_dev() {
+  microk8s_start "$@"
+
   # NOTE: Use this loop to capture multiple unsorted args
    while test $# -gt 0; do
      case "$1" in
@@ -13,8 +15,6 @@ cmd_dev() {
        ;;
      esac
    done
-
-  microk8s_start
 
   if [ "$SKIP_BUILD" = "0" ]; then
     cmd_build "$@"
@@ -32,6 +32,7 @@ show_dev_help() {
 
     options:
       --skip-build        skip all docker images build, useful for non-development environments
+      --gpu enables the GPU in MicroK8s
 
     $(help_global_options)
 "

@@ -9,7 +9,7 @@ cmd_restart() {
 
     if [ "$TYPE" = "microk8s" ]; then
       microk8s_stop
-      microk8s_start
+      microk8s_start "$@"
     fi
 }
 
@@ -19,6 +19,9 @@ show_restart_help() {
     types:
       microk8s  restarts microk8s.
       kdl       restarts pods on kdl namespace (default option).
+
+    options:
+      --gpu enables the GPU in MicroK8s
 
     $(help_global_options)
 "

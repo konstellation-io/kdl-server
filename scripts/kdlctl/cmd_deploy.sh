@@ -2,6 +2,8 @@
 
 BUILD_DOCKER_IMAGES=0
 cmd_deploy() {
+  microk8s_start "$@"
+
   case $* in
     --build)
       BUILD_DOCKER_IMAGES=1
@@ -16,14 +18,13 @@ show_deploy_help() {
 
     options:
       --build  re-build all docker images before deploying on microk8s.
-      --clean  sends a prune command to remove old docker images and containers.
+      --gpu enables the GPU in MicroK8s
 
     $(help_global_options)
 "
 }
 
 deploy() {
-  microk8s_start
   prepare_helm
 
   if [ "$BUILD_DOCKER_IMAGES" = "1" ]; then
@@ -73,6 +74,8 @@ get_kubectl_dry_run() {
 }
 
 create_namespace() {
+  microk8s_kubeconfig
+
   DRY_RUN=$(get_kubectl_dry_run)
   echo_info "📚️ Create Namespace if not exist..."
   NS=$(kubectl create ns "${NAMESPACE}" ${DRY_RUN} -o yaml)

@@ -1,5 +1,18 @@
 
+ENABLE_GPU=0
 microk8s_start() {
+  while test $# -gt 0; do
+     case "$1" in
+       --gpu)
+         ENABLE_GPU=1
+         shift
+       ;;
+       *)
+         shift
+       ;;
+     esac
+   done
+
   MICROK8S_STATUS=$(microk8s.status)
   case "$MICROK8S_STATUS" in
     *"is running"*)

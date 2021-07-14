@@ -1,7 +1,6 @@
 #!/bin/sh
 
 cmd_login() {
-  microk8s_start
   local_login
 
   echo "👤 User    : ${GITEA_ADMIN_USER}"

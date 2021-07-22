@@ -22,8 +22,7 @@ cmd_dev() {
     sleep 10
   fi
 
-  IP=$(hostname -I | cut -d' ' -f1)
-  export DOMAIN=kdl.$IP.nip.io
+  export DOMAIN=kdl.$HOST_IP.nip.io
   deploy
 }
 

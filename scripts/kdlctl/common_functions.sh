@@ -28,6 +28,13 @@ check_requirements() {
   MICROK8S_INSTALLED=$(cmd_installed microk8s)
   [ "$MICROK8S_INSTALLED" = "1" ] || { REQUIREMENTS_OK=0 && echo_warning "Missing microk8s installation"; }
 
+  MICROK8S_VERSION=$(snap info microk8s | grep installed | awk '{print $2}')
+  MICROK8S_VERSION_MAJOR=$(echo ${MICROK8S_VERSION} | cut -d '.' -f 1)
+  MICROK8S_VERSION_MINOR=$(echo ${MICROK8S_VERSION} | cut -d '.' -f 2)
+
+  [ "$MICROK8S_VERSION_MAJOR" = "v1" ] || { REQUIREMENTS_OK=0 && echo "Required version 1.19.+ of microk8s"; }
+  [ "$MICROK8S_VERSION_MINOR" -ge "19" ] || { REQUIREMENTS_OK=0 && echo "Required version 1.19.+ of microk8s"; }
+
   ENVSUBT_INSTALLED=$(cmd_installed envsubst)
   [ "$ENVSUBT_INSTALLED" = "1" ] || { REQUIREMENTS_OK=0 && echo_warning "Missing gettext installation"; }
 

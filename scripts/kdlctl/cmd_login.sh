@@ -15,7 +15,7 @@ show_login_help() {
 }
 
 local_login() {
-  LINK=https://kdlapp.kdl.$(hostname -I | cut -d' ' -f1).nip.io
+  LINK=https://kdlapp.kdl.$HOST_IP.nip.io
   echo "Login link: ${LINK}"
 
   if [ "$OS" = "Darwin" ]; then

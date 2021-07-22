@@ -474,7 +474,7 @@ func TestInteractor_UpdateAccessLevel(t *testing.T) {
 
 	s.mocks.repo.EXPECT().UpdateAccessLevel(ctx, ids, accessLevel).Return(nil)
 	s.mocks.repo.EXPECT().FindByIDs(ctx, ids).Return(users, nil).AnyTimes()
-	s.mocks.giteaService.EXPECT().UpdateUserPermissions(username, email, accessLevel).Return(nil)
+	s.mocks.giteaService.EXPECT().UpdateUserPermissions(username, accessLevel).Return(nil)
 
 	returnedUsers, err := s.interactor.UpdateAccessLevel(ctx, ids, accessLevel)
 

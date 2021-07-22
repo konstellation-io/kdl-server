@@ -203,7 +203,7 @@ func (i *interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, le
 	}
 
 	for _, user := range users {
-		err := i.giteaService.UpdateUserPermissions(user.Username, user.Email, level)
+		err := i.giteaService.UpdateUserPermissions(user.Username, level)
 		if err != nil {
 			return nil, err
 		}

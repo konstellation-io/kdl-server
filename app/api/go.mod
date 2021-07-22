@@ -3,7 +3,7 @@ module github.com/konstellation-io/kdl-server/app/api
 go 1.15
 
 require (
-	code.gitea.io/sdk/gitea v0.13.2
+	code.gitea.io/sdk/gitea v0.14.1
 	github.com/99designs/gqlgen v0.13.0
 	github.com/drone/drone-go v1.5.0
 	github.com/go-co-op/gocron v1.1.0

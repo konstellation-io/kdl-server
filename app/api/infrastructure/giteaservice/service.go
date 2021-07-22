@@ -153,7 +153,7 @@ func (g *giteaService) UpdateCollaboratorPermissions(repoName, username string, 
 }
 
 // UpdateUserPermissions changes the permissions for the given user.
-func (g *giteaService) UpdateUserPermissions(username, email string, level entity.AccessLevel) error {
+func (g *giteaService) UpdateUserPermissions(username string, level entity.AccessLevel) error {
 	isAdmin := false
 
 	if level == entity.AccessLevelAdmin {
@@ -163,7 +163,6 @@ func (g *giteaService) UpdateUserPermissions(username, email string, level entit
 	// gitea AdminEditUser call requires Email and LoginName in editUserOptions to work properly
 	editUserOptions := gitea.EditUserOption{
 		LoginName: username,
-		Email:     email,
 		Admin:     &isAdmin,
 	}
 

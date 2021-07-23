@@ -111,6 +111,12 @@ deploy_helm_chart() {
     --set science-toolkit.minio.securityContext.runAsUser=0 \
     --set science-toolkit.gitea.admin.username=$GITEA_ADMIN_USER \
     --set science-toolkit.gitea.admin.password=$GITEA_ADMIN_PASSWORD \
+    --set kdlServer.image.pullPolicy="Always" \
+    --set kdlKG.image.pullPolicy="Always" \
+    --set projectOperator.image.pullPolicy="Always" \
+    --set droneAuthorizer.image.pullPolicy="Always" \
+    --set giteaOauth2Setup.image.pullPolicy="Always" \
+    --set mlflow.image.pullPolicy="Always" \
     --timeout 60m \
     helm/kdl-server
 }

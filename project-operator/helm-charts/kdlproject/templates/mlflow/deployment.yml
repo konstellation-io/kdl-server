@@ -35,9 +35,9 @@ spec:
           env:
             - name: MLFLOW_S3_ENDPOINT_URL
               valueFrom:
-                configMapKeyRef:
-                  name: mlflow-server-config
-                  key: MLFLOW_S3_ENDPOINT_URL
+                secretKeyRef:
+                  name: tools-secret
+                  key: MINIO_URL
           envFrom:
             - configMapRef:
                 name: {{ .Values.projectId }}-mlflow-config

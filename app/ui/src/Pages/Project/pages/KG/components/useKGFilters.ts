@@ -1,8 +1,7 @@
-import { useCallback, useMemo, useState } from 'react';
-
-import { KGItem } from '../KG';
-import { TopicSections, topicOthers } from '../KGUtils';
 import useKgScores from 'Graphql/hooks/useKgScores';
+import { useCallback, useMemo, useState } from 'react';
+import { KGItem } from '../KG';
+import { topicOthers, TopicSections } from '../KGUtils';
 
 export interface KGFilters {
   topics?: string[];
@@ -35,16 +34,22 @@ function useKGFilters(
     return selectedTopics;
   }, [filters.topics, filters.showOthers]);
 
-  const filteredResources = useMemo<KGItem[]>(
-    () =>
-      resources.map((resource) => ({
-        ...resource,
-        topic: filteredSections.includes(resource.topic?.name || '')
-          ? resource.topic
-          : topicOthers,
-      })),
-    [filteredSections, resources]
-  );
+  const filteredResources = useMemo<KGItem[]>(() => {
+    const isInSelectedTopics = (resource: KGItem) =>
+      filteredSections.includes(resource.topic?.name || '');
+
+    // If show others filter is not activated, it must remove others resources from the filtered resources.
+    if (!filters.showOthers) {
+      return resources.filter(isInSelectedTopics);
+    }
+
+    // Show others filter is activated so it will return all resources changing the resource topic to "other"
+    // in case the resource topic is not in the selected topics.
+    return resources.map((resource) => ({
+      ...resource,
+      topic: isInSelectedTopics(resource) ? resource.topic : topicOthers,
+    }));
+  }, [filteredSections, resources, filters.showOthers]);
 
   function restoreScores() {
     updateScores(scoreDomain);

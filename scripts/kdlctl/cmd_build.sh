@@ -41,8 +41,8 @@ build_image() {
   FOLDER=$2
   echo_build_header "$NAME"
 
-  run docker build --network host -t localhost:32000/konstellation/"${NAME}":latest "$FOLDER"
-  run docker push localhost:32000/konstellation/"${NAME}":latest
+  run docker build --network host -t ${HOST_IP}:32000/konstellation/"${NAME}":latest "$FOLDER"
+  run docker push ${HOST_IP}:32000/konstellation/"${NAME}":latest
 }
 
 echo_build_header() {

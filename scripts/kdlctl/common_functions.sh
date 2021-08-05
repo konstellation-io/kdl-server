@@ -21,16 +21,27 @@ run() {
 }
 
 check_requirements() {
-  REQUIREMENTS_OK=1
+  check_so
 
-  OPERATOR_SDK_INSTALLED=$(cmd_installed operator-sdk)
+  REQUIREMENTS_OK=1
 
   MICROK8S_INSTALLED=$(cmd_installed microk8s)
   [ "$MICROK8S_INSTALLED" = "1" ] || { REQUIREMENTS_OK=0 && echo_warning "Missing microk8s installation"; }
 
-  MICROK8S_VERSION=$(snap info microk8s | grep installed | awk '{print $2}')
-  MICROK8S_VERSION_MAJOR=$(echo ${MICROK8S_VERSION} | cut -d '.' -f 1)
-  MICROK8S_VERSION_MINOR=$(echo ${MICROK8S_VERSION} | cut -d '.' -f 2)
+  case ${OS} in
+    "Linux")
+      MICROK8S_INFO=$(snap info microk8s)
+      ;;
+
+    "Darwin")
+      check_requirements_mac
+      MICROK8S_INFO=$(multipass exec microk8s-vm -- snap info microk8s)
+      ;;
+  esac
+
+  MICROK8S_VERSION=$(echo "${MICROK8S_INFO}" | grep installed | awk '{print $2}')
+  MICROK8S_VERSION_MAJOR=$(echo "${MICROK8S_VERSION}" | cut -d '.' -f 1)
+  MICROK8S_VERSION_MINOR=$(echo "${MICROK8S_VERSION}" | cut -d '.' -f 2)
 
   [ "$MICROK8S_VERSION_MAJOR" = "v1" ] || { REQUIREMENTS_OK=0 && echo "Required version 1.19.+ of microk8s"; }
   [ "$MICROK8S_VERSION_MINOR" -ge "19" ] || { REQUIREMENTS_OK=0 && echo "Required version 1.19.+ of microk8s"; }
@@ -49,6 +60,22 @@ check_requirements() {
 
   if [ "$REQUIREMENTS_OK" = "0" ]; then
     exit 1
+  fi
+}
+
+check_so() {
+  if [[ "$OS" != "Linux" ]] && [[ "$OS" != "Darwin" ]]; then
+    echo_warning "Error: ${$OS} SO is not supported"
+    exit 1
+  fi
+
+  echo_info "OS: ${OS}"
+}
+
+check_requirements_mac() {
+  MICROK8S_VM_INSTALLED=$(multipass list | { grep microk8s-vm || true; })
+  if [[ -z "$MICROK8S_VM_INSTALLED" ]]; then
+    microk8s_install_vm
   fi
 }
 

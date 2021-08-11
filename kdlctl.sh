@@ -45,10 +45,12 @@ MONGO_PASS=123456
 case ${OS} in
   "Linux")
     HOST_IP=10.0.1.1
+    DOCKER_REGISTRY_HOST=localhost
     ;;
 
   "Darwin")
     HOST_IP=$(microk8s_get_ip)
+    DOCKER_REGISTRY_HOST=${HOST_IP}
     ;;
 esac
 

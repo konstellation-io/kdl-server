@@ -64,8 +64,8 @@ check_requirements() {
 }
 
 check_so() {
-  if [[ "$OS" != "Linux" ]] && [[ "$OS" != "Darwin" ]]; then
-    echo_warning "Error: ${$OS} SO is not supported"
+  if [ "$OS" != "Linux" ] && [ "$OS" != "Darwin" ]; then
+    echo_warning "Error: ${OS} SO is not supported"
     exit 1
   fi
 
@@ -74,7 +74,7 @@ check_so() {
 
 check_requirements_mac() {
   MICROK8S_VM_INSTALLED=$(multipass list | { grep microk8s-vm || true; })
-  if [[ -z "$MICROK8S_VM_INSTALLED" ]]; then
+  if [ -z "$MICROK8S_VM_INSTALLED" ]; then
     microk8s_install_vm
   fi
 }

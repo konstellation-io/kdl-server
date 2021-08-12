@@ -170,6 +170,8 @@ OS: Darwin
 Login link: https://kdlapp.kdl.192.168.64.2.nip.io
 ```
 
+You can find the admin credentials `GITEA_ADMIN_USER` and `GITEA_ADMIN_PASSWORD` in the `.kdlctl.conf` file.
+
 ### Uninstall local environment
 
 If you want to delete all resources generated into your microk8s run the following command:

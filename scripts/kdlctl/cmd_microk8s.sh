@@ -43,7 +43,7 @@ microk8s_enable_addons() {
 
 microk8s_wait_for_registry() {
   echo_info "⚙️ Waiting for Docker registry..."
-  until $(curl -s -o /dev/null ${DOCKER_REGISTRY_HOST}:32000)
+  until [ $(curl -w %{http_code} -s -o /dev/null ${DOCKER_REGISTRY_HOST}:32000) = "200" ]
     do printf "."; sleep 5;
   done
 }

@@ -26,6 +26,8 @@ microk8s_start() {
 
   microk8s_enable_addons
 
+  microk8s_wait_for_registry
+
   microk8s_kubeconfig
 }
 
@@ -37,6 +39,13 @@ microk8s_enable_addons() {
     echo_info "⚙️ Enabling microk8s GPU..."
     microk8s enable gpu
   fi
+}
+
+microk8s_wait_for_registry() {
+  echo_info "⚙️ Waiting for Docker registry..."
+  until $(curl -s -o /dev/null ${DOCKER_REGISTRY_HOST}:32000)
+    do printf "."; sleep 5;
+  done
 }
 
 microk8s_kubeconfig() {

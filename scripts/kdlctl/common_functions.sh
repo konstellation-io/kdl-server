@@ -58,6 +58,9 @@ check_requirements() {
   HELM_INSTALLED=$(cmd_installed helm)
   [ "$HELM_INSTALLED" = "1" ] || { REQUIREMENTS_OK=0 && echo_warning "Missing helm command"; }
 
+  CURL_INSTALLED=$(cmd_installed curl)
+  [ "$CURL_INSTALLED" = "1" ] || { REQUIREMENTS_OK=0 && echo_warning "Missing curl command"; }
+
   if [ "$REQUIREMENTS_OK" = "0" ]; then
     exit 1
   fi

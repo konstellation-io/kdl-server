@@ -41,6 +41,19 @@ MONGO_PASS=123456
 . ./scripts/kdlctl/cmd_login.sh
 . ./scripts/kdlctl/cmd_uninstall.sh
 
+# Variables depending on SO
+case ${OS} in
+  "Linux")
+    HOST_IP=10.0.1.1
+    DOCKER_REGISTRY_HOST=localhost
+    ;;
+
+  "Darwin")
+    HOST_IP=$(microk8s_get_ip)
+    DOCKER_REGISTRY_HOST=${HOST_IP}
+    ;;
+esac
+
 check_requirements
 
 echo

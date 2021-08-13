@@ -71,8 +71,6 @@ check_so() {
     echo_warning "Error: ${OS} SO is not supported"
     exit 1
   fi
-
-  echo_info "OS: ${OS}"
 }
 
 check_requirements_mac() {

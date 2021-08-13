@@ -17,7 +17,10 @@ microk8s_start() {
   case "$MICROK8S_STATUS" in
     *"is running"*)
       echo_check "Microk8s already running"
+
       microk8s_enable_addons
+      microk8s_wait_for_registry
+
       return
       ;;
   esac

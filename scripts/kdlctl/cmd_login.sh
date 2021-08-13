@@ -2,9 +2,6 @@
 
 cmd_login() {
   local_login
-
-  echo "👤 User    : ${GITEA_ADMIN_USER}"
-  echo "🔑 Password: ${GITEA_ADMIN_PASSWORD}"
 }
 
 show_login_help() {
@@ -16,7 +13,9 @@ show_login_help() {
 
 local_login() {
   LINK=https://kdlapp.kdl.$HOST_IP.nip.io
-  echo "Login link: ${LINK}"
+  echo "Login link  : ${LINK}"
+  echo "👤 User     : ${GITEA_ADMIN_USER}"
+  echo "🔑 Password : ${GITEA_ADMIN_PASSWORD}"
 
   if [ "$OS" = "Darwin" ]; then
     open "$LINK"

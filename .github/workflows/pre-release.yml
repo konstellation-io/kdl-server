@@ -7,8 +7,13 @@ on:
       - "KDL Server App UI Quality"
       - "Knowledge Graph Quality"
     branches: [main]
-    types: 
+    types:
       - completed
+  pull_request:
+    branches: ["main"]
+    tags-ignore: [v*]
+    paths:
+      - "project-operator/**/*"
 
 jobs:
   generate-prerelease:

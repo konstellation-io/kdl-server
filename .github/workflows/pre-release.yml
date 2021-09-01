@@ -9,7 +9,7 @@ on:
     branches: [main]
     types:
       - completed
-  push:
+  pull_request:
     branches: ["main"]
     tags-ignore: [v*]
     paths:

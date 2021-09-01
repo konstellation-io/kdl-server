@@ -1,0 +1,24 @@
+name: KDL Server Project Operator Quality
+
+on:
+  push:
+    branches-ignore:
+      - "v*"
+    tags-ignore:
+      - v*
+    paths:
+      - "project-operator/**/*"
+      - ".github/workflows/kdl-server-project-operator-quality*"
+
+jobs:
+  lint-project-operator-dockerfile:
+    runs-on: ubuntu-latest
+    steps: 
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: lint
+      uses: luke142367/Docker-Lint-Action@v1.0.0
+      with:
+        target: project-operator/Dockerfile
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

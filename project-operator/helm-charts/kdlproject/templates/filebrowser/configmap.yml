@@ -20,6 +20,6 @@ data:
     /filebrowser config init
     /filebrowser config set --auth.method=noauth
     /filebrowser users add kdladmin not_used_pass --perm.admin=false --perm.download=true --perm.create=true \
-        --perm.delete=true --perm.execute=false --perm.modify=false --perm.rename=false --perm.share=false \
+        --perm.delete=true --perm.execute=false --perm.modify=false --perm.rename=true --perm.share=false \
         --lockPassword=true
     /filebrowser

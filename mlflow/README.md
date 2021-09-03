@@ -16,8 +16,6 @@ The following inputs must be provided:
 | MLFLOW_S3_ENDPOINT_URL | AWS S3 Endpoint where [Min.io][3] bucket can be reached |
 | ARTIFACTS_BUCKET  | AWS S3 bucket name where artifacts are stored  |
 
-
-
 ## Outputs
 
 The following outputs are generated for

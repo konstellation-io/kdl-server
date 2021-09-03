@@ -68,7 +68,7 @@ droneAuthorizer:
 
 mlflow:
   image:
-    repository: terminus7/mlflow
+    repository: konstellation/mlflow
     tag: latest
     pullPolicy: IfNotPresent
   volume:

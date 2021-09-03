@@ -1,5 +1,7 @@
 .idea
 .run/*.xml
 .certs
+.vscode/
+coverage/
 
 node_modules

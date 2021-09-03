@@ -214,7 +214,7 @@ jobs:
           yq w -i helm/kdl-server/Chart.yaml 'version' ${{ steps.get_version.outputs.RELEASE_VERSION }}
 
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.0.0
+        uses: helm/chart-releaser-action@v1.2.1
         with:
           charts_dir: 'helm'
           charts_repo_url: 'http://kdl.konstellation.io'

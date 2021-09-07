@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-tools-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: user-tools-operator
+  template:
+    metadata:
+      labels:
+        name: user-tools-operator
+      annotations:
+        helm.sh/restart-deployment: {{ randAlphaNum 5 | quote }}
+    spec:
+      serviceAccountName: user-tools-operator
+      containers:
+        - name: user-tools-operator
+          # Replace this with the built image name
+          image: "{{ .Values.userToolsOperator.image.repository }}:{{ .Values.userToolsOperator.image.tag }}"
+          imagePullPolicy: {{ .Values.userToolsOperator.image.pullPolicy }}
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "user-tools-operator"

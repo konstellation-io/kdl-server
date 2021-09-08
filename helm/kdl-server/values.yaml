@@ -1,6 +1,7 @@
 domain: kdl.local
 serverName: Local Server
-argocd: false
+argocd:
+  enabled: false
 tls: 
   enabled: true
 ingress:
@@ -98,3 +99,9 @@ mongodb:
     enabled: true
     storageClass: standard
     size: 5Gi
+
+userToolsOperator:
+  image:
+    repository: terminus7/sci-toolkit-user-tools-operator
+    tag: latest
+    pullPolicy: IfNotPresent

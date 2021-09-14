@@ -110,6 +110,11 @@ mongodb:
     storageClass: standard
     size: 5Gi
 
+sharedVolume:
+  name: received-data
+  storageClassName: standard
+  size: 10Gi
+
 userToolsOperator:
   image:
     repository: terminus7/sci-toolkit-user-tools-operator

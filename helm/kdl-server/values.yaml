@@ -13,7 +13,7 @@ cleaner:
   trashPath: /shared-storage/.trash
   threshold: 5 # minimun age of files to be removed
   image:
-    repository: terminus7/cleaner
+    repository: konstellation/cleaner
     tag: latest
     pull: IfNotPresent
 

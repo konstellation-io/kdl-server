@@ -213,6 +213,7 @@ jobs:
       - docker-kdl-kg
       - docker-project-operator
       - docker-mlflow
+      - docker-cleaner
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -241,6 +242,7 @@ jobs:
           yq w -i helm/kdl-server/values.yaml 'kdlKG.image.tag' ${{ steps.get_version.outputs.VERSION }}
           yq w -i helm/kdl-server/values.yaml 'projectOperator.image.tag' ${{ steps.get_version.outputs.VERSION }}
           yq w -i helm/kdl-server/values.yaml 'mlflow.image.tag' ${{ steps.get_version.outputs.VERSION }}
+          yq w -i helm/kdl-server/values.yaml 'cleaner.image.tag' ${{ steps.get_version.outputs.VERSION }}
 
           # set app version and chart version for kdl
           yq w -i helm/kdl-server/Chart.yaml 'appVersion' ${{ steps.get_version.outputs.VERSION }}

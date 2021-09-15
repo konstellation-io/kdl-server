@@ -5,6 +5,7 @@ on:
     workflows:
       - "KDL Server App API Quality"
       - "KDL Server App UI Quality"
+      - "KDL Server Backup Quality"
       - "KDL Server Cleaner Quality"
       - "KDL Server MLFlow Quality"
       - "KDL Server Project Operator Quality"

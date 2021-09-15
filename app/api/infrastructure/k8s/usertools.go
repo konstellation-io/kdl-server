@@ -174,6 +174,27 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 				"kdl": map[string]interface{}{
 					"enabled": true,
 				},
+				"jupyter": map[string]interface{}{
+					"image": map[string]string{
+						"repository": k.cfg.Jupyter.Image.Repository,
+						"tag":        k.cfg.Jupyter.Image.Tag,
+						"pullPolicy": k.cfg.Jupyter.Image.PullPolicy,
+					},
+				},
+				"vscode": map[string]interface{}{
+					"image": map[string]string{
+						"repository": k.cfg.VSCode.Image.Repository,
+						"tag":        k.cfg.VSCode.Image.Tag,
+						"pullPolicy": k.cfg.VSCode.Image.PullPolicy,
+					},
+				},
+				"repoCloner": map[string]interface{}{
+					"image": map[string]string{
+						"repository": k.cfg.RepoCloner.Image.Repository,
+						"tag":        k.cfg.RepoCloner.Image.Tag,
+						"pullPolicy": k.cfg.RepoCloner.Image.PullPolicy,
+					},
+				},
 			},
 		},
 	}

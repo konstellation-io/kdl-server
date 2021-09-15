@@ -9,7 +9,7 @@ backup:
   name: backup-gitea
   image: 
     repository: konstellation/kdl-backup
-    tag: 1.0.0
+    tag: latest
     pullPolicy: IfNotPresent
   gitea:
     enabled: false

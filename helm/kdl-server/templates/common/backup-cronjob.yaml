@@ -41,7 +41,7 @@ spec:
                   cd / &&
                   pg_dump -h postgres -p 5432 -U postgres -d gitea -v -F c -f backup_gitea_$(date +%Y%m%d)/postgres_gitea.dump &&
                   tar zcvf backup_gitea_$(date +%Y%m%d).tar.gz backup_gitea_$(date +%Y%m%d) &&
-                  /root/.local/bin/aws s3 cp backup_gitea_$(date +%Y%m%d).tar.gz s3://{{ .Values.backup.s3.bucketName }}/backup_gitea_$(date +%Y%m%d).tar.gz 
+                  /usr/local/bin/aws s3 cp backup_gitea_$(date +%Y%m%d).tar.gz s3://$BUCKET_NAME/backup_gitea_$(date +%Y%m%d).tar.gz 
 
           {{- if .Values.imagePullSecrets }}
           imagePullSecrets:

@@ -1,11 +1,23 @@
 domain: kdl.local
+
 serverName: Local Server
+
 argocd:
   enabled: false
-tls: 
-  enabled: true
-ingress:
-  type: nginx
+
+backup:
+  name: backup-gitea
+  image: 
+    repository: terminus7/toolkit-backup
+    tag: 1.1.0
+    pullPolicy: IfNotPresent
+  gitea:
+    enabled: false
+    schedule: "0 1 * * 0" # every sunday at 1:00 AM
+  s3:
+    awsAccessKeyID: aws-access-key-id
+    awsSecretAccessKey: aws-secret-access-key
+    bucketName: s3-bucket-name
 
 cleaner:
   enabled: false
@@ -15,24 +27,25 @@ cleaner:
   image:
     repository: konstellation/cleaner
     tag: latest
-    pull: IfNotPresent
-
-science-toolkit:
-  kdl:
-    enabled: true
-  vscode:
-    storage:
-      size: 10Gi
-      storageClassName: standard
+    pullPolicy: IfNotPresent
 
 docker:
   registry: ""
 
-kdlServer:
+droneAuthorizer:
   image:
-    repository: konstellation/kdl-server
+    repository: konstellation/drone-authorizer
     tag: latest
     pullPolicy: IfNotPresent
+
+giteaOauth2Setup:
+  image:
+    repository: terminus7/gitea-oauth2-setup
+    tag: latest
+    pullPolicy: IfNotPresent
+
+ingress:
+  type: nginx
 
 kdlKG:
   image:
@@ -46,35 +59,17 @@ kdlKG:
   numberOfOutputs: 10
   logPath: /var/log/app/kg.log
   logLevel: INFO
-  
-projectOperator:
- image:
-    repository: konstellation/project-operator
+
+kdlServer:
+  image:
+    repository: konstellation/kdl-server
     tag: latest
     pullPolicy: IfNotPresent
 
 kubeRbacProxy:
- image:
+  image:
     repository: gcr.io/kubebuilder/kube-rbac-proxy
     tag: v0.8.0
-    pullPolicy: IfNotPresent
-
-oauth2Proxy:
-  image:
-    repository: quay.io/oauth2-proxy/oauth2-proxy
-    tag: v7.0.1-amd64
-    pullPolicy: IfNotPresent
-
-giteaOauth2Setup:
-  image:
-    repository: terminus7/gitea-oauth2-setup
-    tag: latest
-    pullPolicy: IfNotPresent
-
-droneAuthorizer:
-  image:
-    repository: konstellation/drone-authorizer
-    tag: latest
     pullPolicy: IfNotPresent
 
 mlflow:
@@ -114,6 +109,30 @@ sharedVolume:
   name: received-data
   storageClassName: standard
   size: 10Gi
+
+oauth2Proxy:
+  image:
+    repository: quay.io/oauth2-proxy/oauth2-proxy
+    tag: v7.0.1-amd64
+    pullPolicy: IfNotPresent
+
+projectOperator:
+  image:
+    repository: konstellation/project-operator
+    tag: latest
+    pullPolicy: IfNotPresent
+
+
+science-toolkit:
+  kdl:
+    enabled: true
+  vscode:
+    storage:
+      size: 10Gi
+      storageClassName: standard
+
+tls:
+  enabled: true
 
 userToolsOperator:
   image:

@@ -20,7 +20,7 @@ spec:
           containers:
             - name: cleaner
               image: {{ .Values.cleaner.image.repository }}:{{ .Values.cleaner.image.tag }}
-              imagePullPolicy: {{ .Values.cleaner.image.pull }}
+              imagePullPolicy: {{ .Values.cleaner.image.pullPolicy }}
               volumeMounts:
               - name: {{ .Values.sharedVolume.name }}
                 mountPath: /shared-storage

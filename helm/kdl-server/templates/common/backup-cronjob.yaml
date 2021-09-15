@@ -1,5 +1,4 @@
 {{ if .Values.backup.gitea.enabled }}
-apiVersion: extensions/v1beta1
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:

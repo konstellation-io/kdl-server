@@ -25,7 +25,6 @@ spec:
         limits:
           memory: "512Mi"
           cpu: "1000m"
-       
   volumes:
     - name: gitea-pvc
       persistentVolumeClaim:

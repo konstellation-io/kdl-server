@@ -34,23 +34,22 @@ backup:
 
 * Download the required backup from S3 Bucket
   
-`/root/.local/bin/aws s3 cp s3://science-toolkit-gitea-backup/backup_gitea_20200424.tar.gz .`
+`aws s3 cp s3://$BUCKET_NAME/backup_gitea_<date>.tar.gz .`
 
 * Unzip backup
 
-`tar zxvf backup_gitea_20200424.tar.gz`
+`tar zxvf backup_gitea_<date>.tar.gz`
 
 * Restore /data files
 
 ```bash
-cd backup_gitea_20200424/
+cd backup_gitea_<date>/
 tar zxvf data.tar.gz
 cp -R data/* /data/
 chown -R 1000:1000 /data/
 ```
-* Restore postgres db
 
-``
+* Restore postgres db
 
 ```bash
 $ dropdb -h postgres -U postgres gitea
@@ -66,7 +65,6 @@ postgres=# CREATE DATABASE gitea;
 
 $ pg_restore -h postgres -U postgres -v -d gitea ./postgres_gitea.dump
 ```
-
 
 * Redeploy kdl-server to create Gitea installation
 

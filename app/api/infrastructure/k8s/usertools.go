@@ -195,6 +195,13 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 						"pullPolicy": k.cfg.RepoCloner.Image.PullPolicy,
 					},
 				},
+				"giteaOAuth2Setup": map[string]interface{}{
+					"image": map[string]string{
+						"repository": k.cfg.UserToolsGiteaOAuth2Setup.Image.Repository,
+						"tag":        k.cfg.UserToolsGiteaOAuth2Setup.Image.Tag,
+						"pullPolicy": k.cfg.UserToolsGiteaOAuth2Setup.Image.PullPolicy,
+					},
+				},
 			},
 		},
 	}

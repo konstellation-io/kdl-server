@@ -1,8 +1,4 @@
-{{ if .Capabilities.APIVersions.Has "apiextensions.k8s.io/v1/CustomResourceDefinition" }}
 apiVersion: apiextensions.k8s.io/v1
-{{ else if .Capabilities.APIVersions.Has "apiextensions.k8s.io/v1beta1/CustomResourceDefinition" }}
-apiVersion: apiextensions.k8s.io/v1beta1
-{{ end }}
 kind: CustomResourceDefinition
 metadata:
   name: usertools.sci-toolkit.konstellation.io
@@ -18,7 +14,6 @@ spec:
   - name: v1alpha1
     served: true
     storage: true
-{{ if .Capabilities.APIVersions.Has "apiextensions.k8s.io/v1/CustomResourceDefinition" }}
     schema:
       openAPIV3Schema:
         type: object
@@ -121,4 +116,3 @@ spec:
                       pullPolicy:
                         description: image pull policy
                         type: string
-{{ end }}

@@ -1,7 +1,0 @@
-[core]
-    remote = s3-http
-['remote "s3"']
-    url = s3://kdl-kg-assets/assets
-    acl = public-read
-['remote "s3-http"']
-    url = https://kdl-kg-assets.s3.eu-central-1.amazonaws.com/assets

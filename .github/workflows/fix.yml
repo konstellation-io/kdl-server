@@ -9,7 +9,6 @@ on:
       - "KDL Server Cleaner Quality"
       - "KDL Server MLFlow Quality"
       - "KDL Server Project Operator Quality"
-      - "Knowledge Graph Quality"
     branches: ["release-*"]
     types: 
       - completed

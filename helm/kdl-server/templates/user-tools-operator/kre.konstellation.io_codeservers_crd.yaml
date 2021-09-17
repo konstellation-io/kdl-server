@@ -60,7 +60,7 @@ spec:
               usernameSlug:
                 description: username slug to create tools
                 type: string
-              giteaOauth2Ssetup:
+              giteaOauth2Setup:
                 type: object
                 properties:
                   image:

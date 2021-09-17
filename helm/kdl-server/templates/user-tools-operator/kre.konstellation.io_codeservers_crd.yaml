@@ -65,6 +65,7 @@ spec:
                 properties:
                   image:
                     type: object
+                    properties:
                       repository:
                         description: image repository
                         type: string
@@ -79,6 +80,7 @@ spec:
                 properties:
                   image:
                     type: object
+                    properties:
                       repository:
                         description: image repository
                         type: string
@@ -93,6 +95,7 @@ spec:
                 properties:
                   image:
                     type: object
+                    properties:
                       repository:
                         description: image repository
                         type: string
@@ -107,6 +110,7 @@ spec:
                 properties:
                   image:
                     type: object
+                    properties:
                       repository:
                         description: image repository
                         type: string

@@ -1,12 +1,4 @@
-{{- if .Values.argocd.enabled }}
 apiVersion: apiextensions.k8s.io/v1
-{{ else }}
-{{ if .Capabilities.APIVersions.Has "apiextensions.k8s.io/v1/CustomResourceDefinition" }}
-apiVersion: apiextensions.k8s.io/v1
-{{ else if .Capabilities.APIVersions.Has "apiextensions.k8s.io/v1beta1/CustomResourceDefinition" }}
-apiVersion: apiextensions.k8s.io/v1beta1
-{{ end }}
-{{- end }}
 kind: CustomResourceDefinition
 metadata:
   name: usertools.sci-toolkit.konstellation.io
@@ -22,7 +14,6 @@ spec:
   - name: v1alpha1
     served: true
     storage: true
-{{ if or (.Capabilities.APIVersions.Has "apiextensions.k8s.io/v1/CustomResourceDefinition") .Values.argocd.enabled }}
     schema:
       openAPIV3Schema:
         type: object
@@ -69,4 +60,59 @@ spec:
               usernameSlug:
                 description: username slug to create tools
                 type: string
-{{ end }}
+              giteaOauth2Ssetup:
+                type: object
+                properties:
+                  image:
+                    type: object
+                      repository:
+                        description: image repository
+                        type: string
+                      tag:
+                        description: image tag
+                        type: string
+                      pullPolicy:
+                        description: image pull policy
+                        type: string
+              jupyter:
+                type: object
+                properties:
+                  image:
+                    type: object
+                      repository:
+                        description: image repository
+                        type: string
+                      tag:
+                        description: image tag
+                        type: string
+                      pullPolicy:
+                        description: image pull policy
+                        type: string
+              vscode:
+                type: object
+                properties:
+                  image:
+                    type: object
+                      repository:
+                        description: image repository
+                        type: string
+                      tag:
+                        description: image tag
+                        type: string
+                      pullPolicy:
+                        description: image pull policy
+                        type: string
+              repoCloner:
+                type: object
+                properties:
+                  image:
+                    type: object
+                      repository:
+                        description: image repository
+                        type: string
+                      tag:
+                        description: image tag
+                        type: string
+                      pullPolicy:
+                        description: image pull policy
+                        type: string

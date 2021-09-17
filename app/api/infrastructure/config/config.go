@@ -49,12 +49,22 @@ type Config struct {
 		URL string `envconfig:"FILEBROWSER_URL"`
 	}
 	Jupyter struct {
-		URL string `envconfig:"JUPYTER_URL"`
+		URL   string `envconfig:"JUPYTER_URL"`
+		Image struct {
+			Repository string `envconfig:"JUPYTER_IMG_REPO"`
+			Tag        string `envconfig:"JUPYTER_IMG_TAG"`
+			PullPolicy string `envconfig:"JUPYTER_IMG_PULLPOLICY"`
+		}
 	}
 	VSCode struct {
 		URL     string `envconfig:"VSCODE_URL"`
 		Ingress struct {
 			Type string `envconfig:"TOOLKIT_INGRESS_TYPE"`
+		}
+		Image struct {
+			Repository string `envconfig:"VSCODE_IMG_REPO"`
+			Tag        string `envconfig:"VSCODE_IMG_TAG"`
+			PullPolicy string `envconfig:"VSCODE_IMG_PULLPOLICY"`
 		}
 	}
 	Drone struct {
@@ -94,6 +104,20 @@ type Config struct {
 			Repository string `envconfig:"GITEA_OAUTH2_SETUP_IMG_REPO"`
 			Tag        string `envconfig:"GITEA_OAUTH2_SETUP_IMG_TAG"`
 			PullPolicy string `envconfig:"GITEA_OAUTH2_SETUP_IMG_PULLPOLICY"`
+		}
+	}
+	RepoCloner struct {
+		Image struct {
+			Repository string `envconfig:"REPO_CLONER_IMG_REPO"`
+			Tag        string `envconfig:"REPO_CLONER_IMG_TAG"`
+			PullPolicy string `envconfig:"REPO_CLONER_IMG_PULLPOLICY"`
+		}
+	}
+	UserToolsGiteaOAuth2Setup struct {
+		Image struct {
+			Repository string `envconfig:"USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_REPO"`
+			Tag        string `envconfig:"USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_TAG"`
+			PullPolicy string `envconfig:"USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_PULLPOLICY"`
 		}
 	}
 }

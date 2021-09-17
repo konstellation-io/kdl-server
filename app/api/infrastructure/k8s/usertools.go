@@ -174,6 +174,34 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 				"kdl": map[string]interface{}{
 					"enabled": true,
 				},
+				"jupyter": map[string]interface{}{
+					"image": map[string]string{
+						"repository": k.cfg.Jupyter.Image.Repository,
+						"tag":        k.cfg.Jupyter.Image.Tag,
+						"pullPolicy": k.cfg.Jupyter.Image.PullPolicy,
+					},
+				},
+				"vscode": map[string]interface{}{
+					"image": map[string]string{
+						"repository": k.cfg.VSCode.Image.Repository,
+						"tag":        k.cfg.VSCode.Image.Tag,
+						"pullPolicy": k.cfg.VSCode.Image.PullPolicy,
+					},
+				},
+				"repoCloner": map[string]interface{}{
+					"image": map[string]string{
+						"repository": k.cfg.RepoCloner.Image.Repository,
+						"tag":        k.cfg.RepoCloner.Image.Tag,
+						"pullPolicy": k.cfg.RepoCloner.Image.PullPolicy,
+					},
+				},
+				"giteaOAuth2Setup": map[string]interface{}{
+					"image": map[string]string{
+						"repository": k.cfg.UserToolsGiteaOAuth2Setup.Image.Repository,
+						"tag":        k.cfg.UserToolsGiteaOAuth2Setup.Image.Tag,
+						"pullPolicy": k.cfg.UserToolsGiteaOAuth2Setup.Image.PullPolicy,
+					},
+				},
 			},
 		},
 	}

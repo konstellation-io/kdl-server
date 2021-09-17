@@ -137,22 +137,22 @@ tls:
 userToolsOperator:
   image:
     repository: terminus7/sci-toolkit-user-tools-operator
-    tag: latest
+    tag: "1.8.9"
     pullPolicy: IfNotPresent
   jupyter:
     image:
       repository: terminus7/jupyterlab-gpu
-      tag: latest
+      tag: "2.3.1"
       pullPolicy: IfNotPresent
   repoCloner:
     image:
       repository: konstellation/user-repo-cloner
-      tag: latest
+      tag: "1.0.2"
       pullPolicy: IfNotPresent
   vscode:
     image:
       repository: terminus7/sci-toolkit-vscode
-      tag: latest
+      tag: "1.5.2"
       pullPolicy: IfNotPresent
   giteaOauth2Setup:
     image:

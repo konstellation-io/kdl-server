@@ -16,7 +16,6 @@ show_build_help() {
 build_docker_images() {
   build_server
   build_drone_authorizer
-  build_kg
   build_project_operator
 }
 
@@ -26,10 +25,6 @@ build_server() {
 
 build_drone_authorizer() {
   build_image drone-authorizer app/drone-authorizer
-}
-
-build_kg() {
-  build_image kdl-kg kg
 }
 
 build_project_operator() {

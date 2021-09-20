@@ -117,7 +117,7 @@ deploy_helm_chart() {
     --set droneAuthorizer.image.pullPolicy="Always" \
     --set giteaOauth2Setup.image.pullPolicy="Always" \
     --set mlflow.image.pullPolicy="Always" \
-    --set kdlKG.image.pullPolicy="IfNotPresent"
+    --set kdlKG.image.pullPolicy="IfNotPresent" \
     --timeout 60m \
     helm/kdl-server
 }

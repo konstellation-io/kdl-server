@@ -50,7 +50,7 @@ ingress:
 kdlKG:
   image:
     repository: konstellation/kdl-kg
-    tag: latest
+    tag: "v0.13-alpha.7"
     pullPolicy: IfNotPresent
   assetRoute: "/kg/assets"
   workers: 1

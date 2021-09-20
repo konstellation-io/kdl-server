@@ -25,6 +25,8 @@ show_deploy_help() {
 }
 
 deploy() {
+  export DOMAIN=kdl.$HOST_IP.nip.io
+  
   prepare_helm
 
   if [ "$BUILD_DOCKER_IMAGES" = "1" ]; then
@@ -101,7 +103,6 @@ deploy_helm_chart() {
     --set mlflow.volume.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.kdl.local="true" \
     --set science-toolkit.domain=$DOMAIN \
-    --set science-toolkit.mlflow.volume.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.sharedVolume.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.gitea.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.postgres.storage.storageClassName=$STORAGE_CLASS_NAME \
@@ -112,11 +113,11 @@ deploy_helm_chart() {
     --set science-toolkit.gitea.admin.username=$GITEA_ADMIN_USER \
     --set science-toolkit.gitea.admin.password=$GITEA_ADMIN_PASSWORD \
     --set kdlServer.image.pullPolicy="Always" \
-    --set kdlKG.image.pullPolicy="Always" \
     --set projectOperator.image.pullPolicy="Always" \
     --set droneAuthorizer.image.pullPolicy="Always" \
     --set giteaOauth2Setup.image.pullPolicy="Always" \
     --set mlflow.image.pullPolicy="Always" \
+    --set kdlKG.image.pullPolicy="IfNotPresent"
     --timeout 60m \
     helm/kdl-server
 }

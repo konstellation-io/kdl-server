@@ -22,7 +22,6 @@ cmd_dev() {
     sleep 10
   fi
 
-  export DOMAIN=kdl.$HOST_IP.nip.io
   deploy
 }
 

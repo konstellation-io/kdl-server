@@ -1,4 +1,4 @@
-name: KDL Server Project Operator Quality
+name: KDL Server Drone Authorizer Quality
 
 on:
   push:
@@ -7,11 +7,11 @@ on:
     tags-ignore:
       - v*
     paths:
-      - "project-operator/**/*"
-      - ".github/workflows/kdl-server-project-operator-quality*"
+      - "drone-authorizer/**/*"
+      - ".github/workflows/kdl-server-drone-authorizer-quality*"
 
 jobs:
-  lint-project-operator-dockerfile:
+  lint-drone-authorizer-dockerfile:
     runs-on: ubuntu-latest
     steps: 
     - name: Checkout
@@ -19,6 +19,6 @@ jobs:
     - name: lint
       uses: luke142367/Docker-Lint-Action@v1.0.0
       with:
-        target: project-operator/Dockerfile
+        target: drone-authorizer/Dockerfile
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,5 +1,8 @@
 FROM python:3.6.9-stretch
 
+# Maintainer of the Dockerfile
+LABEL maintainer="Intelygenz - Konstellation Team"
+
 WORKDIR /mlflow/tracking
 
 # ENV MLFLOW_S3_ENDPOINT_URL

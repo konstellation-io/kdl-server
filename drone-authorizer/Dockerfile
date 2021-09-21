@@ -22,7 +22,8 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -yq --no-install-recommends google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 && \
     apt-get clean && apt-get autoremove -y && \
-    rm -rf /var/lib/{apt,dpkg,cache,log}/
+    rm -rf /var/lib/{apt,dpkg,cache,log,lists}/* && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
 

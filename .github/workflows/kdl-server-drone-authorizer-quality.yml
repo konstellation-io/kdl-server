@@ -19,4 +19,4 @@ jobs:
       with:
         dockerfile: ./drone-authorizer/Dockerfile
         format: tty
-        config: ./drone-authorizer/.hadolint.yml
+        config: ./.hadolint.yml

@@ -120,6 +120,13 @@ type Config struct {
 			PullPolicy string `envconfig:"USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_PULLPOLICY"`
 		}
 	}
+	UserToolsOAuth2Proxy struct {
+		Image struct {
+			Repository string `envconfig:"USER_TOOLS_OAUTH2_PROXY_IMG_REPO"`
+			Tag        string `envconfig:"USER_TOOLS_OAUTH2_PROXY_IMG_TAG"`
+			PullPolicy string `envconfig:"USER_TOOLS_OAUTH2_PROXY_IMG_PULLPOLICY"`
+		}
+	}
 }
 
 // NewConfig will read the config.yml file and override values with env vars.

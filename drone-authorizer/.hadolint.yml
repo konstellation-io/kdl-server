@@ -1,0 +1,13 @@
+# Docker linter https://github.com/hadolint/hadolint
+# # https://github.com/hadolint/hadolint#rules
+
+failure-threshold: warning
+
+label-schema:
+  maintainer: text
+
+override:
+  warning:
+    - DL3049
+  info:
+    - DL3008

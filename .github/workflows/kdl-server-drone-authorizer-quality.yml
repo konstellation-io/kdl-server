@@ -14,11 +14,9 @@ jobs:
   lint-drone-authorizer-dockerfile:
     runs-on: ubuntu-latest
     steps: 
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: lint
-      uses: luke142367/Docker-Lint-Action@v1.1.1
+    - uses: actions/checkout@v2
+    - uses: hadolint/hadolint-action@v1.6.0
       with:
-        target: drone-authorizer/Dockerfile
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        dockerfile: ./drone-authorizer/Dockerfile
+        format: tty
+        config: ./drone-authorizer/.hadolint.yml

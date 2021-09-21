@@ -1,7 +1,7 @@
 # Docker linter https://github.com/hadolint/hadolint
 # # https://github.com/hadolint/hadolint#rules
 
-failure-threshold: warning
+failure-threshold: info
 
 label-schema:
   maintainer: text

@@ -202,6 +202,13 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 						"pullPolicy": k.cfg.UserToolsGiteaOAuth2Setup.Image.PullPolicy,
 					},
 				},
+				"oauth2Proxy": map[string]interface{}{
+					"image": map[string]string{
+						"repository": k.cfg.UserToolsOAuth2Proxy.Image.Repository,
+						"tag":        k.cfg.UserToolsOAuth2Proxy.Image.Tag,
+						"pullPolicy": k.cfg.UserToolsOAuth2Proxy.Image.PullPolicy,
+					},
+				},
 			},
 		},
 	}

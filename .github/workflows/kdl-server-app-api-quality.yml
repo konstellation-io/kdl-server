@@ -49,6 +49,7 @@ jobs:
           dockerfile: ./app/Dockerfile
           format: tty
           config: ./.hadolint.yml
+
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest

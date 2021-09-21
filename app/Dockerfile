@@ -1,6 +1,9 @@
 # Build API.
 FROM golang:1.14.12-alpine3.12 as api-builder
 
+# Pass Hadolint
+LABEL maintainer="Builder"
+
 ENV CGO_ENABLED=0
 
 WORKDIR /app
@@ -11,6 +14,9 @@ RUN go build -o kdl-server http/main.go
 
 # Build UI
 FROM node:14 as ui-builder
+
+# Pass Hadolint
+LABEL maintainer="Builder"
 
 ENV SASS_PATH=src
 WORKDIR /app
@@ -23,6 +29,9 @@ RUN yarn build
 
 # Create APP image
 FROM alpine:3.10.2
+
+# Maintainer of the Dockerfile
+LABEL maintainer="Intelygenz - Konstellation Team"
 
 ENV USER=kdl
 ENV UID=10001

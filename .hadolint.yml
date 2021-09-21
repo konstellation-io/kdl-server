@@ -8,6 +8,8 @@ label-schema:
 
 override:
   warning:
-    - DL3049
+    - DL3049 # Label <label> is missing.
   info:
-    - DL3008
+    - DL3008 # Specify version with apt-get install -y <package>=<version>
+    - DL3018 # Pin versions in apk add. Instead of apk add <package> use apk add <package>=<version>
+    - DL3033 # Specify version with yum install -y <package>-<version>

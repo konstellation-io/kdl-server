@@ -14,6 +14,7 @@ ENV NODE_ENV production
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer
 # installs, work.
+SHELL ["/bin/bash", "-o", "pipefail", "-c"] 
 RUN apt-get update && \
     apt-get install -yq --no-install-recommends wget gnupg  && \
     wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \

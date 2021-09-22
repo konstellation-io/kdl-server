@@ -171,9 +171,6 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 					"name": k.cfg.SharedVolume.Name,
 				},
 				"tls": k.cfg.TLS,
-				"kdl": map[string]interface{}{
-					"enabled": true,
-				},
 				"jupyter": map[string]interface{}{
 					"image": map[string]string{
 						"repository": k.cfg.Jupyter.Image.Repository,

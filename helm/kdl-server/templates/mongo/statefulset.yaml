@@ -47,7 +47,7 @@ spec:
       spec:
         accessModes:
           - ReadWriteOnce
-        storageClassName: {{ .Values.mongodb.persistentVolume.storageClass }}
+        storageClassName: {{ .Values.mongodb.persistentVolume.storageClassName }}
         resources:
           requests:
             storage:  {{ .Values.mongodb.persistentVolume.size }}

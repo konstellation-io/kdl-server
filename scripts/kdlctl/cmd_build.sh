@@ -17,6 +17,7 @@ build_docker_images() {
   build_server
   build_drone_authorizer
   build_project_operator
+  build_user_tools_operator
 }
 
 build_server() {
@@ -29,6 +30,10 @@ build_drone_authorizer() {
 
 build_project_operator() {
   build_image project-operator project-operator
+}
+
+build_user_tools_operator() {
+  build_image user-tools-operator user-tools-operator
 }
 
 build_image() {

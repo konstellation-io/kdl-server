@@ -32,7 +32,7 @@ spec:
             - configMapRef:
                 name: kdl-server-configmap
         - name: drone-authorizer
-          image: {{ .Values.docker.registry }}{{ .Values.droneAuthorizer.image.repository }}:{{ .Values.droneAuthorizer.image.tag }}
+          image: {{ .Values.droneAuthorizer.image.repository }}:{{ .Values.droneAuthorizer.image.tag }}
           imagePullPolicy: IfNotPresent
           env:
             - name: DRONE_URL
@@ -47,7 +47,7 @@ spec:
                 name: gitea-admin-secrets
       containers:
         - name: kdl-app
-          image: {{ .Values.docker.registry }}{{ .Values.kdlServer.image.repository }}:{{ .Values.kdlServer.image.tag }}
+          image: {{ .Values.kdlServer.image.repository }}:{{ .Values.kdlServer.image.tag }}
           imagePullPolicy: {{ .Values.kdlServer.image.pullPolicy }}
           lifecycle:
             postStart:

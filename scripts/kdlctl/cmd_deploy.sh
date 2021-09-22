@@ -94,35 +94,33 @@ deploy_helm_chart() {
   echo_info "📦 Applying helm chart..."
   run helm dep update helm/kdl-server
   run helm upgrade \
-    --wait \
     --install "${RELEASE_NAME}" \
     --namespace "${NAMESPACE}" \
     --set domain=$DOMAIN \
+    --set droneAuthorizer.image.pullPolicy="Always" \
+    --set droneAuthorizer.image.repository="$IMAGE_REGISTRY/konstellation/drone-authorizer" \
+    --set kdlServer.image.pullPolicy="Always" \
+    --set kdlServer.image.repository="$IMAGE_REGISTRY/konstellation/kdl-server" \
+    --set mlflow.image.pullPolicy="Always" \
+    --set mlflow.image.repository="$IMAGE_REGISTRY/konstellation/mlflow" \
+    --set mlflow.volume.storageClassName=$STORAGE_CLASS_NAME \
     --set mongodb.persistentVolume.storageClassName=$STORAGE_CLASS_NAME \
+    --set projectOperator.image.pullPolicy="Always" \
+    --set projectOperator.image.repository="$IMAGE_REGISTRY/konstellation/project-operator" \
     --set science-toolkit.kdl.local="true" \
     --set science-toolkit.domain=$DOMAIN \
-    --set science-toolkit.sharedVolume.storageClassName=$STORAGE_CLASS_NAME \
-    --set science-toolkit.gitea.storage.storageClassName=$STORAGE_CLASS_NAME \
-    --set science-toolkit.postgres.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.drone.storage.storageClassName=$STORAGE_CLASS_NAME \
-    --set science-toolkit.vscode.storage.storageClassName=$STORAGE_CLASS_NAME \
-    --set science-toolkit.tls.enabled=$ENABLE_TLS \
-    --set science-toolkit.minio.securityContext.runAsUser=0 \
-    --set science-toolkit.gitea.admin.username=$GITEA_ADMIN_USER \
     --set science-toolkit.gitea.admin.password=$GITEA_ADMIN_PASSWORD \
-    --set kdlServer.image.repository="$IMAGE_REGISTRY/konstellation/kdl-server" \
-    --set kdlServer.image.pullPolicy="Always" \
-    --set projectOperator.image.repository="$IMAGE_REGISTRY/konstellation/project-operator" \
-    --set projectOperator.image.pullPolicy="Always" \
-    --set droneAuthorizer.image.repository="$IMAGE_REGISTRY/konstellation/drone-authorizer" \
-    --set droneAuthorizer.image.pullPolicy="Always" \
-    --set giteaOauth2Setup.image.pullPolicy="Always" \
-    --set mlflow.image.repository="$IMAGE_REGISTRY/konstellation/mlflow" \
-    --set mlflow.image.pullPolicy="Always" \
-    --set mlflow.volume.storageClassName=$STORAGE_CLASS_NAME \
-    --set userToolsOperator.image.repository="$IMAGE_REGISTRY/konstellation/user-tools-operator" \
+    --set science-toolkit.gitea.admin.username=$GITEA_ADMIN_USER \
+    --set science-toolkit.gitea.storage.storageClassName=$STORAGE_CLASS_NAME \
+    --set science-toolkit.minio.securityContext.runAsUser=0 \
+    --set science-toolkit.postgres.storage.storageClassName=$STORAGE_CLASS_NAME \
+    --set science-toolkit.tls.enabled=$ENABLE_TLS \
+    --set science-toolkit.sharedVolume.storageClassName=$STORAGE_CLASS_NAME \
+    --set science-toolkit.vscode.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set userToolsOperator.image.pullPolicy="Always" \
-    --set kdlKG.image.pullPolicy="IfNotPresent" \
+    --set userToolsOperator.image.repository="$IMAGE_REGISTRY/konstellation/user-tools-operator" \
     --timeout 60m \
+    --wait \
     helm/kdl-server
 }

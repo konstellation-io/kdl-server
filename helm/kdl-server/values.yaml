@@ -29,9 +29,6 @@ cleaner:
     tag: latest
     pullPolicy: IfNotPresent
 
-docker:
-  registry: ""
-
 droneAuthorizer:
   image:
     repository: konstellation/drone-authorizer
@@ -82,27 +79,11 @@ mlflow:
     size: 1Gi
 
 mongodb:
-  service:
-    name: "mongodb"
   auth:
     adminUser: "admin"
     adminPassword: "123456"
-  mongodbUsername: "admin"
-  mongodbPassword: "123456"
-  storage:
-    className: standard
-    size: 3G
-  volumePermissions:
-    enabled: false
-    image:
-      registry: docker.io
-      repository: debian
-      tag: buster-slim
-  initConfigMap:
-    name: kdl-mongo-init-script
   persistentVolume:
-    enabled: true
-    storageClass: standard
+    storageClassName: standard
     size: 5Gi
 
 sharedVolume:
@@ -136,8 +117,8 @@ tls:
 
 userToolsOperator:
   image:
-    repository: terminus7/sci-toolkit-user-tools-operator
-    tag: "1.9.1"
+    repository: konstellation/user-tools-operator
+    tag: "latest"
     pullPolicy: IfNotPresent
   jupyter:
     image:

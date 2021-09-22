@@ -1,0 +1,43 @@
+domain: toolkit.local
+
+ingress:
+  type: "nginx"
+
+username: user.name
+
+usernameSlug: user-name
+
+storage:
+  size: 10Gi
+  className: standard
+
+sharedVolume:
+  name: ""
+
+tls: false
+
+jupyter:
+  image:
+    repository: terminus7/jupyterlab-gpu
+    tag: "2.3.1"
+    pullPolicy: IfNotPresent
+repoCloner:
+  image:
+    repository: konstellation/user-repo-cloner
+    tag: "1.0.2"
+    pullPolicy: IfNotPresent
+vscode:
+  image:
+    repository: terminus7/sci-toolkit-vscode
+    tag: "1.5.2"
+    pullPolicy: IfNotPresent
+giteaOauth2Setup:
+  image:
+    repository: terminus7/gitea-oauth2-setup
+    tag: "1.1.6"
+    pullPolicy: IfNotPresent
+oauth2Proxy:
+  image:
+    repository: quay.io/oauth2-proxy/oauth2-proxy
+    tag: v7.0.1-amd64
+    pullPolicy: IfNotPresent

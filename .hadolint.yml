@@ -1,0 +1,15 @@
+# Docker linter https://github.com/hadolint/hadolint
+# # https://github.com/hadolint/hadolint#rules
+
+failure-threshold: warning
+
+label-schema:
+  maintainer: text
+
+override:
+  warning:
+    - DL3049 # Label <label> is missing.
+  info:
+    - DL3008 # Specify version with apt-get install -y <package>=<version>
+    - DL3018 # Pin versions in apk add. Instead of apk add <package> use apk add <package>=<version>
+    - DL3033 # Specify version with yum install -y <package>-<version>

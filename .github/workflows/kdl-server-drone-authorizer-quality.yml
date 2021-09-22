@@ -1,0 +1,22 @@
+name: KDL Server Drone Authorizer Quality
+
+on:
+  push:
+    branches-ignore:
+      - "v*"
+    tags-ignore:
+      - v*
+    paths:
+      - "drone-authorizer/**/*"
+      - ".github/workflows/kdl-server-drone-authorizer-quality*"
+
+jobs:
+  lint-drone-authorizer-dockerfile:
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - uses: hadolint/hadolint-action@v1.6.0
+      with:
+        dockerfile: ./drone-authorizer/Dockerfile
+        format: tty
+        config: ./.hadolint.yml

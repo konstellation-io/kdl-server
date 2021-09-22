@@ -24,7 +24,7 @@ build_server() {
 }
 
 build_drone_authorizer() {
-  build_image drone-authorizer app/drone-authorizer
+  build_image drone-authorizer drone-authorizer
 }
 
 build_project_operator() {

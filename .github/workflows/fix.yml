@@ -10,6 +10,7 @@ on:
       - "KDL Server Drone Authorizer Quality"
       - "KDL Server MLFlow Quality"
       - "KDL Server Project Operator Quality"
+      - "KDL Server User Tools Operator Quality"
     branches: ["release-*"]
     types: 
       - completed

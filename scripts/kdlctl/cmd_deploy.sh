@@ -102,7 +102,6 @@ deploy_helm_chart() {
     --set kdlServer.image.pullPolicy="Always" \
     --set kdlServer.image.repository="$IMAGE_REGISTRY/konstellation/kdl-server" \
     --set mlflow.image.pullPolicy="Always" \
-    --set mlflow.image.repository="$IMAGE_REGISTRY/konstellation/mlflow" \
     --set mlflow.volume.storageClassName=$STORAGE_CLASS_NAME \
     --set mongodb.persistentVolume.storageClassName=$STORAGE_CLASS_NAME \
     --set projectOperator.image.pullPolicy="Always" \

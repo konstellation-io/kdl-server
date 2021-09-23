@@ -44,10 +44,12 @@ LABEL maintainer="Intelygenz - Konstellation Team"
 
 ENV USER=kdl
 
-RUN adduser --disabled-password --gecos "" --no-create-home --uid 1001 ${USER} && \
-        mkdir -p -mg=w /var/log/app
-
 WORKDIR /app
+
+RUN adduser --disabled-password --gecos "" --no-create-home --uid 1001 ${USER} && \
+        mkdir -p -mg=w /var/log/app && \
+        mkdir .ssh && chown -R ${USER}:0 .ssh
+
 
 COPY --from=api-builder --chown=kdl:0 /app/kdl-server /app/config.yml ./
 COPY --from=api-builder --chown=kdl:0 /app/templates ./templates

@@ -1,0 +1,22 @@
+name: KDL Server App Dockerfile Quality
+
+on:
+  push:
+    branches-ignore:
+      - "v*"
+    tags-ignore:
+      - v*
+    paths:
+      - "app/Dockerfile"
+      - ".github/workflows/kdl-server-app-dockerfile-quality*"
+
+jobs:
+  lint-dockerfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hadolint/hadolint-action@v1.6.0
+        with:
+          dockerfile: ./app/Dockerfile
+          format: tty
+          config: ./.hadolint.yml

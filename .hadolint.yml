@@ -14,3 +14,4 @@ override:
     - DL3018 # Pin versions in apk add. Instead of apk add <package> use apk add <package>=<version>
     - DL3033 # Specify version with yum install -y <package>-<version>
     - DL4006 # Set the SHELL option -o pipefail before RUN with a pipe in it
+    - SC2174 # When used with -p, -m only applies to the deepest directory

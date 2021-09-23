@@ -7,9 +7,14 @@ LABEL maintainer="Builder"
 ENV CGO_ENABLED=0
 
 WORKDIR /app
+
+# Only reinstall go deps if go.* has changed
 COPY api/go.* ./
+
 RUN go mod download
+
 COPY api .
+
 RUN go build -o kdl-server http/main.go
 
 # Build UI
@@ -19,48 +24,39 @@ FROM node:14 as ui-builder
 LABEL maintainer="Builder"
 
 ENV SASS_PATH=src
+
 WORKDIR /app
-COPY ui/package.* ./
-COPY ui/yarn* ./
-RUN mkdir -p cypress/plugins
-RUN yarn install
+
+COPY ui/package.* ui/yarn* ./
+
+RUN mkdir -p cypress/plugins && \
+        yarn install
+
 COPY ui/ .
+
 RUN yarn build
 
 # Create APP image
-FROM alpine:3.10.2
+FROM alpine:3.13.6
 
 # Maintainer of the Dockerfile
 LABEL maintainer="Intelygenz - Konstellation Team"
 
 ENV USER=kdl
-ENV UID=10001
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    "${USER}"
 
-# openssh-client is needed to clone git repositories using ssh on project creation
-RUN apk add -U --no-cache ca-certificates openssh-client
-RUN mkdir -p /var/log/app
+RUN adduser --disabled-password --gecos "" --no-create-home --uid 1001 ${USER} && \
+        mkdir -p -mg=w /var/log/app
 
 WORKDIR /app
-COPY --from=api-builder /app/kdl-server .
-COPY --from=api-builder /app/config.yml .
-COPY --from=api-builder /app/templates /app/templates
-COPY --from=ui-builder /app/build /public
-RUN apk add libcap && setcap 'cap_net_bind_service=+ep' /app/kdl-server
-RUN chown -R kdl:0 /app \
-    && chmod -R g+w /app \
-    && chown -R kdl:0 /var/log/app \
-    && chmod -R g+w /var/log/app \
-    && chown -R kdl:0 /public \
-    && chmod -R g+w /public 
 
-USER kdl
+COPY --from=api-builder --chown=kdl:0 /app/kdl-server /app/config.yml ./
+COPY --from=api-builder --chown=kdl:0 /app/templates ./templates
+COPY --from=ui-builder --chown=kdl:0 /app/build/ /public
+
+# openssh-client is needed to clone git repositories using ssh on project creation
+RUN apk add -U --no-cache ca-certificates openssh-client libcap && \
+        setcap 'cap_net_bind_service=+ep' /app/kdl-server
+
+USER ${USER}
 
 CMD ["sh","-c","/app/kdl-server 2>&1 | tee -a /var/log/app/app.log"]

@@ -11,7 +11,7 @@ on:
       - ".github/workflows/kdl-server-drone-authorizer-quality*"
 
 jobs:
-  lint-drone-authorizer-dockerfile:
+  lint-dockerfile:
     runs-on: ubuntu-latest
     steps: 
     - uses: actions/checkout@v2

@@ -55,7 +55,7 @@ spec:
                 command:
                   - "/bin/sh"
                   - "-c"
-                  - "mkdir /app/.ssh && ssh-keyscan -H gitea >> /app/.ssh/known_hosts"
+                  - "ssh-keyscan -H gitea >> /app/.ssh/known_hosts"
           env:
             - name: KDL_ADMIN_USERNAME
               value: "{{ index .Values "science-toolkit" "gitea" "admin" "username" }}"

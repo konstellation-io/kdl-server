@@ -1,3 +1,10 @@
+Dockerfile
+README.md
+Makefile
 ui/mock-server
 ui/README.md
 ui/node_modules
+.dockerignore
+.git
+.gitignore
+.hadolint.yml

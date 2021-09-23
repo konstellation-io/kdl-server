@@ -5,6 +5,7 @@ on:
     workflows:
       - "KDL Server App API Quality"
       - "KDL Server App UI Quality"
+      - "KDL Server App Dockerfile Quality"
       - "KDL Server Backup Quality"
       - "KDL Server Cleaner Quality"
       - "KDL Server Drone Authorizer Quality"
@@ -24,7 +25,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Generate a fix
-        uses: intelygenz/action-product-version-tags@v0.1.8
+        uses: intelygenz/action-product-version-tags@v0.2.0
         with:
           prefix: "release-"
           mode: 'fix'

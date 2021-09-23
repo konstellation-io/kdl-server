@@ -5,6 +5,7 @@ on:
     workflows:
       - "KDL Server App API Quality"
       - "KDL Server App UI Quality"
+      - "KDL Server App Dockerfile Quality"
       - "KDL Server Backup Quality"
       - "KDL Server Cleaner Quality"
       - "KDL Server Drone Authorizer Quality"
@@ -22,7 +23,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Generate a pre-release
-        uses: intelygenz/action-product-version-tags@v0.1.8
+        uses: intelygenz/action-product-version-tags@v0.2.0
         with:
           current-major: 0
           prefix: "release-"

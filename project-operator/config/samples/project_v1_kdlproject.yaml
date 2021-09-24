@@ -19,7 +19,7 @@ spec:
 
   giteaOauth2Setup:
     image:
-      repository: terminus7/gitea-oauth2-setup
+      repository: konstellation/gitea-oauth2-setup
       tag: latest
       pullPolicy: IfNotPresent
 

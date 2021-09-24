@@ -2,7 +2,7 @@ domain: toolkit.local
 
 giteaOauth2Setup:
   image:
-    repository: terminus7/gitea-oauth2-setup
+    repository: konstellation/gitea-oauth2-setup
     tag: "1.1.6"
     pullPolicy: IfNotPresent
 

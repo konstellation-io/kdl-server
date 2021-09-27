@@ -16,6 +16,7 @@ show_build_help() {
 build_docker_images() {
   build_server
   build_drone_authorizer
+  build_gitea_oauth2_setup
   build_project_operator
   build_user_tools_operator
 }
@@ -26,6 +27,10 @@ build_server() {
 
 build_drone_authorizer() {
   build_image drone-authorizer drone-authorizer
+}
+
+build_gitea_oauth2_setup() {
+  build_image gitea-oauth2-setup gitea-oauth2-setup
 }
 
 build_project_operator() {

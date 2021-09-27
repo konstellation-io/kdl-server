@@ -106,6 +106,8 @@ deploy_helm_chart() {
     --set mongodb.persistentVolume.storageClassName=$STORAGE_CLASS_NAME \
     --set projectOperator.image.pullPolicy="Always" \
     --set projectOperator.image.repository="$IMAGE_REGISTRY/konstellation/project-operator" \
+    --set giteaOauth2Setup.image.pullPolicy="Always" \
+    --set giteaOauth2Setup.image.repository="$IMAGE_REGISTRY/konstellation/gitea-oauth2-setup" \
     --set science-toolkit.kdl.local="true" \
     --set science-toolkit.domain=$DOMAIN \
     --set science-toolkit.drone.storage.storageClassName=$STORAGE_CLASS_NAME \

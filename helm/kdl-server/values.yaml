@@ -37,8 +37,8 @@ droneAuthorizer:
 
 giteaOauth2Setup:
   image:
-    repository: terminus7/gitea-oauth2-setup
-    tag: "1.1.6"
+    repository: konstellation/gitea-oauth2-setup
+    tag: latest
     pullPolicy: IfNotPresent
 
 ingress:
@@ -137,7 +137,7 @@ userToolsOperator:
       pullPolicy: IfNotPresent
   giteaOauth2Setup:
     image:
-      repository: terminus7/gitea-oauth2-setup
+      repository: konstellation/gitea-oauth2-setup
       tag: "1.1.6"
       pullPolicy: IfNotPresent
   oauth2Proxy:

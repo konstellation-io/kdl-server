@@ -122,8 +122,8 @@ userToolsOperator:
     pullPolicy: IfNotPresent
   jupyter:
     image:
-      repository: terminus7/jupyterlab-gpu
-      tag: "2.3.1"
+      repository: konstellation/jupyter-gpu
+      tag: "latest"
       pullPolicy: IfNotPresent
   repoCloner:
     image:

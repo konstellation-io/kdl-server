@@ -1,4 +1,4 @@
-name: KDL Server MLFlow Quality
+name: KDL Server Jupyter GPU Quality
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     tags-ignore:
       - v*
     paths:
-      - "mlflow/**/*"
-      - ".github/workflows/kdl-server-mlflow-quality*"
+      - "jupyter-gpu/**/*"
+      - ".github/workflows/kdl-server-jupyter-gpu-quality*"
 
 jobs:
   lint-dockerfile:
@@ -17,6 +17,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: hadolint/hadolint-action@v1.6.0
         with:
-          dockerfile: ./mlflow/Dockerfile
+          dockerfile: ./jupyter-gpu/Dockerfile
           format: tty
           config: ./.hadolint.yml

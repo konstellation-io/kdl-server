@@ -19,6 +19,7 @@ build_docker_images() {
   build_gitea_oauth2_setup
   build_project_operator
   build_user_tools_operator
+  build_vscode
 }
 
 build_server() {
@@ -39,6 +40,10 @@ build_project_operator() {
 
 build_user_tools_operator() {
   build_image user-tools-operator user-tools-operator
+}
+
+build_vscode() {
+  build_image vscode vscode
 }
 
 build_image() {

@@ -132,8 +132,8 @@ userToolsOperator:
       pullPolicy: IfNotPresent
   vscode:
     image:
-      repository: terminus7/sci-toolkit-vscode
-      tag: "1.5.2"
+      repository: konstellation/vscode
+      tag: "latest"
       pullPolicy: IfNotPresent
   giteaOauth2Setup:
     image:

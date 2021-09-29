@@ -1,8 +1,4 @@
 .dockerignore
-.git
-.gitignore
 Dockerfile
-node_modules
-npm-debug.log
+Makefile
 README.md
-package*

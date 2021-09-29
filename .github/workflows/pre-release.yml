@@ -14,6 +14,7 @@ on:
       - "KDL Server MLFlow Quality"
       - "KDL Server Project Operator Quality"
       - "KDL Server User Tools Operator Quality"
+      - "KDL Server VSCode Quality"
     branches: [main]
     types:
       - completed

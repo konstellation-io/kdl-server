@@ -11,6 +11,7 @@ override:
     - DL3049 # Label <label> is missing.
   info:
     - DL3008 # Specify version with apt-get install -y <package>=<version>
+    - DL3013 # Pin versions in pip. Instead of `pip install <package>` use `pip install <package>==<version>` or `pip install --requirement <requirements file>
     - DL3018 # Pin versions in apk add. Instead of apk add <package> use apk add <package>=<version>
     - DL3033 # Specify version with yum install -y <package>-<version>
     - DL4006 # Set the SHELL option -o pipefail before RUN with a pipe in it

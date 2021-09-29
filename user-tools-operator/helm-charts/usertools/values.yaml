@@ -42,6 +42,6 @@ usernameSlug: user-name
 
 vscode:
   image:
-    repository: terminus7/vscode
+    repository: konstellation/vscode
     tag: "latest"
     pullPolicy: IfNotPresent

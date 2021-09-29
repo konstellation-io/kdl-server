@@ -122,8 +122,8 @@ userToolsOperator:
     pullPolicy: IfNotPresent
   jupyter:
     image:
-      repository: terminus7/jupyterlab-gpu
-      tag: "2.3.1"
+      repository: konstellation/jupyter-gpu
+      tag: "latest"
       pullPolicy: IfNotPresent
   repoCloner:
     image:
@@ -138,7 +138,7 @@ userToolsOperator:
   giteaOauth2Setup:
     image:
       repository: konstellation/gitea-oauth2-setup
-      tag: "1.1.6"
+      tag: "latest"
       pullPolicy: IfNotPresent
   oauth2Proxy:
     image:

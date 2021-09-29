@@ -10,10 +10,11 @@ on:
       - "KDL Server Cleaner Quality"
       - "KDL Server Drone Authorizer Quality"
       - "KDL Server Gitea OAuth2 Setup Quality"
+      - "KDL Server Jupyter GPU Quality"
       - "KDL Server MLFlow Quality"
       - "KDL Server Project Operator Quality"
       - "KDL Server User Tools Operator Quality"
-      - "KDL Server VSCode Dockerfile Quality"
+      - "KDL Server VSCode Quality"
     branches: [main]
     types:
       - completed

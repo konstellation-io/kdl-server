@@ -11,8 +11,8 @@ ingress:
 
 jupyter:
   image:
-    repository: terminus7/jupyterlab-gpu
-    tag: "2.3.1"
+    repository: konstellation/jupyterlab-gpu
+    tag: "latest"
     pullPolicy: IfNotPresent
 
 oauth2Proxy:

@@ -121,6 +121,8 @@ deploy_helm_chart() {
     --set science-toolkit.vscode.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set userToolsOperator.image.pullPolicy="Always" \
     --set userToolsOperator.image.repository="$IMAGE_REGISTRY/konstellation/user-tools-operator" \
+    --set userToolsOperator.jupyter.image.pullPolicy="Always" \
+    --set userToolsOperator.jupyter.image.repository="$IMAGE_REGISTRY/konstellation/jupyter-gpu" \
     --set userToolsOperator.vscode.image.pullPolicy="Always" \
     --set userToolsOperator.vscode.image.repository="$IMAGE_REGISTRY/konstellation/vscode" \
     --timeout 60m \

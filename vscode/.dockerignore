@@ -1,4 +1,4 @@
 .dockerignore
 Dockerfile
-Makefile
 README.md
+Makefile

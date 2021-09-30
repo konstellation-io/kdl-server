@@ -1,4 +1,4 @@
-module user-repo-cloner
+module github.com/konstellation-io/kdl-server/repo-cloner
 
 go 1.13
 

@@ -6,14 +6,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/konstellation-io/kdl-server/repo-cloner/config"
+	"github.com/konstellation-io/kdl-server/repo-cloner/repository"
+	"github.com/konstellation-io/kdl-server/repo-cloner/utils"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
-
-	"user-repo-cloner/config"
-	"user-repo-cloner/repository"
-	"user-repo-cloner/utils"
 )
 
 type UserRepoCloner struct {

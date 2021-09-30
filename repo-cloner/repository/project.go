@@ -3,7 +3,8 @@ package repository
 import (
 	"context"
 	"time"
-	"user-repo-cloner/config"
+	
+	"github.com/konstellation-io/kdl-server/repo-cloner/config"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"

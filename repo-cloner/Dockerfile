@@ -9,7 +9,7 @@ WORKDIR /app
 COPY go.* ./
 RUN go mod download
 COPY . .
-RUN go build -o user-repo-cloner .
+RUN go build -o repo-cloner .
 
 
 FROM alpine:3.10.2
@@ -33,11 +33,11 @@ RUN adduser \
     apk add --no-cache git openssh-client
 
 # Copy build from previous stage 
-COPY --from=builder --chown=${USER}:0 /app/user-repo-cloner/ /app/config.yml ./
+COPY --from=builder --chown=${USER}:0 /app/repo-cloner /app/config.yml ./
 
 RUN chown -R kdl:0 /app \
     && chmod -R g+w /app
 
 USER kdl
 
-CMD ["/app/user-repo-cloner"]
+CMD ["/app/repo-cloner"]

@@ -2,7 +2,8 @@ package repository
 
 import (
 	"context"
-	"user-repo-cloner/config"
+	
+	"github.com/konstellation-io/kdl-server/repo-cloner/config"
 
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"go.mongodb.org/mongo-driver/bson"

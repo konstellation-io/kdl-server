@@ -3,13 +3,13 @@ package main
 import (
 	"os"
 	"strings"
-	"user-repo-cloner/cloner"
+	
+	"github.com/konstellation-io/kdl-server/repo-cloner/config"
+	"github.com/konstellation-io/kdl-server/repo-cloner/repository"
+	"github.com/konstellation-io/kdl-server/repo-cloner/cloner"
 
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
 	"github.com/konstellation-io/kre/libs/simplelogger"
-
-	"user-repo-cloner/config"
-	"user-repo-cloner/repository"
 )
 
 func main() {

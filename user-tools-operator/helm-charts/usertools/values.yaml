@@ -11,7 +11,7 @@ ingress:
 
 jupyter:
   image:
-    repository: konstellation/jupyterlab-gpu
+    repository: konstellation/jupyter-gpu
     tag: "latest"
     pullPolicy: IfNotPresent
 
@@ -23,8 +23,8 @@ oauth2Proxy:
 
 repoCloner:
   image:
-    repository: konstellation/user-repo-cloner
-    tag: "1.0.2"
+    repository: konstellation/repo-cloner
+    tag: "latest"
     pullPolicy: IfNotPresent
 
 sharedVolume:

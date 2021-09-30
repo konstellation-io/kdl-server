@@ -361,8 +361,8 @@ jobs:
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
         with:
-          context: ./jupyter-gpu
-          file: ./jupyter-gpu/Dockerfile
+          context: ./repo-cloner
+          file: ./repo-cloner/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |

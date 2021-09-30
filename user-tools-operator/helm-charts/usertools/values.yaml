@@ -23,7 +23,7 @@ oauth2Proxy:
 
 repoCloner:
   image:
-    repository: konstellation/user-repo-cloner
+    repository: konstellation/repo-cloner
     tag: "latest"
     pullPolicy: IfNotPresent
 

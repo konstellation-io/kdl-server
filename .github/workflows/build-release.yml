@@ -335,6 +335,39 @@ jobs:
           tags: |
             konstellation/jupyter-gpu:${{ steps.get_version.outputs.VERSION }}
             konstellation/jupyter-gpu:latest
+  
+  docker-repo-cloner:
+    runs-on: ubuntu-latest    
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub Registry
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Get Version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          context: ./jupyter-gpu
+          file: ./jupyter-gpu/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            konstellation/repo-cloner:${{ steps.get_version.outputs.VERSION }}
+            konstellation/repo-cloner:latest
 
   helm:
     if: ${{ ! contains( github.event.ref, 'alpha' ) }}
@@ -350,6 +383,7 @@ jobs:
       - docker-user-tools-operator
       - docker-vscode
       - docker-jupyter-gpu
+      - docker-repo-cloner
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -381,7 +415,8 @@ jobs:
           yq w -i helm/kdl-server/values.yaml 'cleaner.image.tag' ${{ steps.get_version.outputs.VERSION }}
           yq w -i helm/kdl-server/values.yaml 'userToolsOperator.image.tag' ${{ steps.get_version.outputs.VERSION }}
           yq w -i helm/kdl-server/values.yaml 'userToolsOperator.vscode.image.tag' ${{ steps.get_version.outputs.VERSION }}
-          yq w -i helm/kdl-server/values.yaml 'userToolsOperator.jupytimage.tag' ${{ steps.get_version.outputs.VERSION }}
+          yq w -i helm/kdl-server/values.yaml 'userToolsOperator.jupyter.image.tag' ${{ steps.get_version.outputs.VERSION }}
+          yq w -i helm/kdl-server/values.yaml 'userToolsOperator.repoCloner.image.tag' ${{ steps.get_version.outputs.VERSION }}
 
           # set app version and chart version for kdl
           yq w -i helm/kdl-server/Chart.yaml 'appVersion' ${{ steps.get_version.outputs.VERSION }}

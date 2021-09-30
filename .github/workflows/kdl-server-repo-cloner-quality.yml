@@ -1,0 +1,22 @@
+name: KDL Server Repo Cloner Quality
+
+on:
+  push:
+    branches-ignore:
+      - "v*"
+    tags-ignore:
+      - v*
+    paths:
+      - "vscode/Dockerfile"
+      - ".github/workflows/kdl-server-repo-cloner-quality*"
+
+jobs:
+  lint-dockerfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hadolint/hadolint-action@v1.6.0
+        with:
+          dockerfile: ./repo-cloner/Dockerfile
+          format: tty
+          config: ./.hadolint.yml

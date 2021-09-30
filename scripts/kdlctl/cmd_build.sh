@@ -21,6 +21,7 @@ build_docker_images() {
   build_user_tools_operator
   build_jupyter_gpu
   build_vscode
+  build_repo_cloner
 }
 
 build_server() {
@@ -49,6 +50,10 @@ build_jupyter_gpu() {
 
 build_vscode() {
   build_image vscode vscode
+}
+
+build_repo_cloner() {
+  build_image repo-cloner repo-cloner
 }
 
 build_image() {

@@ -128,7 +128,7 @@ userToolsOperator:
   repoCloner:
     image:
       repository: konstellation/user-repo-cloner
-      tag: "1.0.2"
+      tag: "latest"
       pullPolicy: IfNotPresent
   vscode:
     image:

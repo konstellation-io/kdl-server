@@ -63,17 +63,24 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 				},
 				"mlflow": map[string]interface{}{
 					"image": map[string]string{
-						"repository": k.cfg.MLFlow.Image.Repository,
-						"tag":        k.cfg.MLFlow.Image.Tag,
-						"pullPolicy": k.cfg.MLFlow.Image.PullPolicy,
+						"repository": k.cfg.ProjectMLFlow.Image.Repository,
+						"tag":        k.cfg.ProjectMLFlow.Image.Tag,
+						"pullPolicy": k.cfg.ProjectMLFlow.Image.PullPolicy,
 					},
 					"volume": map[string]interface{}{
-						"storageClassName": k.cfg.MLFlow.Volume.StorageClassName,
-						"size":             k.cfg.MLFlow.Volume.Size,
+						"storageClassName": k.cfg.ProjectMLFlow.Volume.StorageClassName,
+						"size":             k.cfg.ProjectMLFlow.Volume.Size,
 					},
 
 					"s3": map[string]string{
 						"bucket": fmt.Sprintf("%s/mlflow-artifacts", projectID),
+					},
+				},
+				"filebrowser": map[string]interface{}{
+					"image": map[string]string{
+						"repository": k.cfg.ProjectFilebrowser.Image.Repository,
+						"tag":        k.cfg.ProjectFilebrowser.Image.Tag,
+						"pullPolicy": k.cfg.ProjectFilebrowser.Image.PullPolicy,
 					},
 				},
 			},

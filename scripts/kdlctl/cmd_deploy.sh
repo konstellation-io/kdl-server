@@ -101,11 +101,7 @@ deploy_helm_chart() {
     --set droneAuthorizer.image.repository="$IMAGE_REGISTRY/konstellation/drone-authorizer" \
     --set kdlServer.image.pullPolicy="Always" \
     --set kdlServer.image.repository="$IMAGE_REGISTRY/konstellation/kdl-server" \
-    --set mlflow.image.pullPolicy="Always" \
-    --set mlflow.volume.storageClassName=$STORAGE_CLASS_NAME \
     --set mongodb.persistentVolume.storageClassName=$STORAGE_CLASS_NAME \
-    --set projectOperator.image.pullPolicy="Always" \
-    --set projectOperator.image.repository="$IMAGE_REGISTRY/konstellation/project-operator" \
     --set giteaOauth2Setup.image.pullPolicy="Always" \
     --set giteaOauth2Setup.image.repository="$IMAGE_REGISTRY/konstellation/gitea-oauth2-setup" \
     --set science-toolkit.kdl.local="true" \
@@ -119,6 +115,11 @@ deploy_helm_chart() {
     --set science-toolkit.tls.enabled=$ENABLE_TLS \
     --set science-toolkit.sharedVolume.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.vscode.storage.storageClassName=$STORAGE_CLASS_NAME \
+    --set projectOperator.image.pullPolicy="Always" \
+    --set projectOperator.image.repository="$IMAGE_REGISTRY/konstellation/project-operator" \
+    --set projectOperator.mlflow.image.pullPolicy="Always" \
+    --set projectOperator.mlflow.image.repository="$IMAGE_REGISTRY/konstellation/mlflow" \
+    --set projectOperator.mlflow.volume.storageClassName=$STORAGE_CLASS_NAME \
     --set userToolsOperator.image.pullPolicy="Always" \
     --set userToolsOperator.image.repository="$IMAGE_REGISTRY/konstellation/user-tools-operator" \
     --set userToolsOperator.jupyter.image.pullPolicy="Always" \

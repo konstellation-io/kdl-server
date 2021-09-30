@@ -69,15 +69,6 @@ kubeRbacProxy:
     tag: v0.8.0
     pullPolicy: IfNotPresent
 
-mlflow:
-  image:
-    repository: konstellation/mlflow
-    tag: latest
-    pullPolicy: IfNotPresent
-  volume:
-    storageClassName: standard
-    size: 1Gi
-
 mongodb:
   auth:
     adminUser: "admin"
@@ -102,6 +93,19 @@ projectOperator:
     repository: konstellation/project-operator
     tag: latest
     pullPolicy: IfNotPresent
+  mlflow:
+    image:
+      repository: konstellation/mlflow
+      tag: latest
+      pullPolicy: IfNotPresent
+    volume:
+      storageClassName: standard
+      size: 1Gi
+  filebrowser:
+    image:
+      repository: filebrowser/filebrowser
+      tag: v2
+      pullPolicy: IfNotPresent
 
 
 science-toolkit:

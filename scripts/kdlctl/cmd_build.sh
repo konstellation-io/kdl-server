@@ -22,6 +22,7 @@ build_docker_images() {
   build_jupyter_gpu
   build_vscode
   build_repo_cloner
+  build_mlflow
 }
 
 build_server() {
@@ -54,6 +55,9 @@ build_vscode() {
 
 build_repo_cloner() {
   build_image repo-cloner repo-cloner
+
+build_mlflow() {
+  build_image mlflow mlflow
 }
 
 build_image() {

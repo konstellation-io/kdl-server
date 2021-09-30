@@ -46,7 +46,7 @@ type Config struct {
 		SecretKey string `envconfig:"MINIO_SECRET_KEY"`
 	}
 	Jupyter struct {
-		URL   string `envconfig:"JUPYTER_URL"`
+		URL   string `envconfig:"USER_TOOLS_JUPYTER_URL"`
 		Image struct {
 			Repository string `envconfig:"JUPYTER_IMG_REPO"`
 			Tag        string `envconfig:"JUPYTER_IMG_TAG"`
@@ -54,7 +54,7 @@ type Config struct {
 		}
 	}
 	VSCode struct {
-		URL     string `envconfig:"VSCODE_URL"`
+		URL     string `envconfig:"USER_TOOLS_VSCODE_URL"`
 		Ingress struct {
 			Type string `envconfig:"TOOLKIT_INGRESS_TYPE"`
 		}

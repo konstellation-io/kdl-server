@@ -8,12 +8,12 @@ data:
   KDL_SERVER_PORT: '8080'
 
   # URL Setup
-  FILEBROWSER_URL: "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/filebrowser/PROJECT_ID/"
+  PROJECT_FILEBROWSER_URL: "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/filebrowser/PROJECT_ID/"
   MINIO_ENDPOINT: "{{ .Release.Name }}-minio:9000"
-  JUPYTER_URL: "{{ include "protocol" . }}://USERNAME-jupyter.{{ .Values.domain }}/lab/workspaces/REPO_FOLDER/tree/repos/REPO_FOLDER"
-  VSCODE_URL: "{{ include "protocol" . }}://USERNAME-code.{{ .Values.domain }}/?folder=/home/coder/repos/REPO_FOLDER"
+  USER_TOOLS_JUPYTER_URL: "{{ include "protocol" . }}://USERNAME-jupyter.{{ .Values.domain }}/lab/workspaces/REPO_FOLDER/tree/repos/REPO_FOLDER"
+  USER_TOOLS_VSCODE_URL: "{{ include "protocol" . }}://USERNAME-code.{{ .Values.domain }}/?folder=/home/coder/repos/REPO_FOLDER"
   DRONE_URL: "{{ include "protocol" . }}://drone.{{ .Values.domain }}"
-  MLFLOW_URL: "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/mlflow/PROJECT_ID/"
+  PROJECT_MLFLOW_URL: "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/mlflow/PROJECT_ID/"
   KG_URL: "kdl-kg:{{ .Values.kdlKG.port }}"
 
   config.cfg: |+

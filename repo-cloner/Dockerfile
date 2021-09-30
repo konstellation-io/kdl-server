@@ -35,9 +35,6 @@ RUN adduser \
 # Copy build from previous stage 
 COPY --from=builder --chown=${USER}:0 /app/repo-cloner /app/config.yml ./
 
-RUN chown -R kdl:0 /app \
-    && chmod -R g+w /app
-
-USER kdl
+USER ${USER}
 
 CMD ["/app/repo-cloner"]

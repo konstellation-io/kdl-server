@@ -7,7 +7,7 @@ on:
     tags-ignore:
       - v*
     paths:
-      - "vscode/Dockerfile"
+      - "repo-cloner/Dockerfile"
       - ".github/workflows/kdl-server-repo-cloner-quality*"
 
 jobs:

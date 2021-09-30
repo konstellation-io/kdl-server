@@ -11,7 +11,7 @@ ingress:
 
 jupyter:
   image:
-    repository: konstellation/jupyterlab-gpu
+    repository: konstellation/jupyter-gpu
     tag: "latest"
     pullPolicy: IfNotPresent
 

@@ -45,9 +45,6 @@ type Config struct {
 		AccessKey string `envconfig:"MINIO_ACCESS_KEY"`
 		SecretKey string `envconfig:"MINIO_SECRET_KEY"`
 	}
-	Filebrowser struct {
-		URL string `envconfig:"FILEBROWSER_URL"`
-	}
 	Jupyter struct {
 		URL   string `envconfig:"JUPYTER_URL"`
 		Image struct {
@@ -72,16 +69,24 @@ type Config struct {
 		InternalURL string `envconfig:"DRONE_INTERNAL_URL"`
 		Token       string `envconfig:"DRONE_TOKEN"`
 	}
-	MLFlow struct {
-		URL   string `envconfig:"MLFLOW_URL"`
+	ProjectMLFlow struct {
+		URL   string `envconfig:"PROJECT_MLFLOW_URL"`
 		Image struct {
-			Repository string `envconfig:"MLFLOW_IMG_REPO"`
-			Tag        string `envconfig:"MLFLOW_IMG_TAG"`
-			PullPolicy string `envconfig:"MLFLOW_IMG_PULLPOLICY"`
+			Repository string `envconfig:"PROJECT_MLFLOW_IMG_REPO"`
+			Tag        string `envconfig:"PROJECT_MLFLOW_IMG_TAG"`
+			PullPolicy string `envconfig:"PROJECT_MLFLOW_IMG_PULLPOLICY"`
 		}
 		Volume struct {
-			StorageClassName string `envconfig:"MLFLOW_STORAGE_CLASS_NAME"`
-			Size             string `envconfig:"MLFLOW_STORAGE_SIZE"`
+			StorageClassName string `envconfig:"PROJECT_MLFLOW_STORAGE_CLASS_NAME"`
+			Size             string `envconfig:"PROJECT_MLFLOW_STORAGE_SIZE"`
+		}
+	}
+	ProjectFilebrowser struct {
+		URL   string `envconfig:"PROJECT_FILEBROWSER_URL"`
+		Image struct {
+			Repository string `envconfig:"PROJECT_FILEBROWSER_IMG_REPO"`
+			Tag        string `envconfig:"PROJECT_FILEBROWSER_IMG_TAG"`
+			PullPolicy string `envconfig:"PROJECT_FILEBROWSER_IMG_PULLPOLICY"`
 		}
 	}
 	KGservice struct {

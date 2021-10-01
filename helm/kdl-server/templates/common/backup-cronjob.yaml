@@ -25,6 +25,8 @@ spec:
                 - configMapRef:
                     name: gitea-config
                 - secretRef:
+                    name: postgres
+                - secretRef:
                     name: backup-secrets
               volumeMounts:
               - name: gitea-pvc

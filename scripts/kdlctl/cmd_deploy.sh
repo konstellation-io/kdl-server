@@ -102,6 +102,7 @@ deploy_helm_chart() {
     --set droneAuthorizer.image.repository="$IMAGE_REGISTRY/konstellation/drone-authorizer" \
     --set gitea.admin.password=${GITEA_ADMIN_PASSWORD} \
     --set gitea.admin.username="$GITEA_ADMIN_USER" \
+    --set gitea.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set giteaOauth2Setup.image.pullPolicy="Always" \
     --set giteaOauth2Setup.image.repository="$IMAGE_REGISTRY/konstellation/gitea-oauth2-setup" \
     --set kdl.local="true" \
@@ -111,7 +112,6 @@ deploy_helm_chart() {
     --set science-toolkit.domain=$DOMAIN \
     --set science-toolkit.gitea.admin.password=${GITEA_ADMIN_PASSWORD} \
     --set science-toolkit.gitea.admin.username="$GITEA_ADMIN_USER" \
-    --set science-toolkit.gitea.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.minio.securityContext.runAsUser=0 \
     --set science-toolkit.tls.enabled=$ENABLE_TLS \
     --set science-toolkit.sharedVolume.storageClassName=$STORAGE_CLASS_NAME \

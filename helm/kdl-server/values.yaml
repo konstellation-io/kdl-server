@@ -52,7 +52,7 @@ droneRunner:
 
 gitea:
   admin:
-    username: "admin"
+    username: "kdladmin"
     password: "123456"
     email: test@test.com
   image:

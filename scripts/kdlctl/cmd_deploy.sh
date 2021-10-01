@@ -97,18 +97,20 @@ deploy_helm_chart() {
     --install "${RELEASE_NAME}" \
     --namespace "${NAMESPACE}" \
     --set domain=$DOMAIN \
+    --set drone.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set droneAuthorizer.image.pullPolicy="Always" \
     --set droneAuthorizer.image.repository="$IMAGE_REGISTRY/konstellation/drone-authorizer" \
+    --set kdl.local="true" \
     --set kdlServer.image.pullPolicy="Always" \
     --set kdlServer.image.repository="$IMAGE_REGISTRY/konstellation/kdl-server" \
     --set mongodb.persistentVolume.storageClassName=$STORAGE_CLASS_NAME \
+    --set gitea.admin.password=${GITEA_ADMIN_PASSWORD} \
+    --set gitea.admin.username="$GITEA_ADMIN_USER" \
     --set giteaOauth2Setup.image.pullPolicy="Always" \
     --set giteaOauth2Setup.image.repository="$IMAGE_REGISTRY/konstellation/gitea-oauth2-setup" \
-    --set science-toolkit.kdl.local="true" \
     --set science-toolkit.domain=$DOMAIN \
-    --set science-toolkit.drone.storage.storageClassName=$STORAGE_CLASS_NAME \
-    --set science-toolkit.gitea.admin.password=$GITEA_ADMIN_PASSWORD \
-    --set science-toolkit.gitea.admin.username=$GITEA_ADMIN_USER \
+    --set science-toolkit.gitea.admin.password=${GITEA_ADMIN_PASSWORD} \
+    --set science-toolkit.gitea.admin.username="$GITEA_ADMIN_USER" \
     --set science-toolkit.gitea.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.minio.securityContext.runAsUser=0 \
     --set science-toolkit.postgres.storage.storageClassName=$STORAGE_CLASS_NAME \

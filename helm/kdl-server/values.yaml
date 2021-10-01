@@ -2,9 +2,6 @@ domain: kdl.local
 
 serverName: Local Server
 
-argocd:
-  enabled: false
-
 backup:
   name: backup-gitea
   image: 
@@ -29,11 +26,42 @@ cleaner:
     tag: latest
     pullPolicy: IfNotPresent
 
+drone:
+  image:
+    repository: drone/drone
+    tag: 1.10.1
+    pullPolicy: IfNotPresent
+  storage:
+    size: 10Gi
+    storageClassName: standard
+  rpcSecret: runner-shared-secret
+  pluginSecret: d97d8ee407af1002fa2449f578bb47a9
+  adminToken: 7GSipOV0wJZQioZNBxaw3AotHV1tA4K4
+
 droneAuthorizer:
   image:
     repository: konstellation/drone-authorizer
     tag: latest
     pullPolicy: IfNotPresent
+
+droneRunner:
+  image:
+    repository: drone/drone-runner-kube
+    tag: 1.0.0-beta.6
+    pullPolicy: IfNotPresent
+
+gitea:
+  admin:
+    username: "admin"
+    password: "123456"
+    email: test@test.com
+  image:
+    repository: gitea/gitea
+    tag: 1.14.4
+    pullPolicy: IfNotPresent
+  storage:
+    size: 10Gi
+    storageClassName: standard
 
 giteaOauth2Setup:
   image:
@@ -43,6 +71,9 @@ giteaOauth2Setup:
 
 ingress:
   type: nginx
+
+kdl:
+  local: false
 
 kdlKG:
   image:
@@ -106,7 +137,6 @@ projectOperator:
       repository: filebrowser/filebrowser
       tag: v2
       pullPolicy: IfNotPresent
-
 
 science-toolkit:
   kdl:

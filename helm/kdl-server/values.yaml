@@ -119,6 +119,17 @@ oauth2Proxy:
     tag: v7.0.1-amd64
     pullPolicy: IfNotPresent
 
+postgres:
+  image:
+    repository: postgres
+    tag: 12.1
+    pullPolicy: IfNotPresent
+  dbName: gitea
+  dbPassword: test
+  storage:
+    size: 10Gi
+    storageClassName: standard
+
 projectOperator:
   image:
     repository: konstellation/project-operator

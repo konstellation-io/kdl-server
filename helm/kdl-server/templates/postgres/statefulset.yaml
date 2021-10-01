@@ -1,0 +1,51 @@
+{{ if .Capabilities.APIVersions.Has "apps/v1" }}
+apiVersion: apps/v1
+{{ else if .Capabilities.APIVersions.Has "apps/v1beta1" }}
+apiVersion: apps/v1beta1
+{{ end }}
+kind: StatefulSet
+metadata:
+  labels:
+    app: postgres
+  name: postgres
+spec:
+  serviceName: "postgres"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - image: {{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag }}
+        imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
+        name: postgres
+        envFrom:
+          - secretRef:
+              name: postgres
+        volumeMounts:
+          - name: postgres-pvc
+            mountPath: /var/lib/postgresql/data
+            subPath: data # to prevent warning: "initdb: directory "/var/lib/postgresql/data" exists but is not empty"
+          - name: postgres-initdb
+            mountPath: /docker-entrypoint-initdb.d/
+      volumes:
+        - name: postgres-initdb
+          configMap:
+            name: postgres-initdb
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-pvc
+        labels:
+          app: postgres
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: {{ .Values.postgres.storage.storageClassName }}
+        resources:
+          requests:
+            storage:  {{ .Values.postgres.storage.size }}

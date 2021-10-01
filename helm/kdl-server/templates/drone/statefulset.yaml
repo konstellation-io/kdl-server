@@ -24,7 +24,7 @@ spec:
       initContainers:
         - name: gitea-oauth2-setup
           image: {{ .Values.giteaOauth2Setup.image.repository }}:{{ .Values.giteaOauth2Setup.image.tag }}
-          imagePullPolicy: {{ .Values.giteaOauth2Setup.image.repository }}
+          imagePullPolicy: {{ .Values.giteaOauth2Setup.image.pullPolicy }}
           env:
           - name: POD_NAMESPACE
             valueFrom:

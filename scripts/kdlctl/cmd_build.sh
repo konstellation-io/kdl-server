@@ -55,6 +55,7 @@ build_vscode() {
 
 build_repo_cloner() {
   build_image repo-cloner repo-cloner
+}
 
 build_mlflow() {
   build_image mlflow mlflow

@@ -1,6 +1,9 @@
 dependencies:
 - name: science-toolkit
   repository: https://konstellation-io.github.io/science-toolkit/helm-chart/
-  version: 1.0.246
-digest: sha256:35d30484f07b51402bad6173a5da9cdccd47e38dd8e8d275c0affb25c516e541
-generated: "2021-10-01T14:19:18.857498773+02:00"
+  version: 1.0.247
+- name: minio
+  repository: https://helm.min.io/
+  version: 8.0.2
+digest: sha256:5064d61c34c560333d7a09e0ee42d4edc3b410cfa5d62598f03b58f60d88c035
+generated: "2021-10-04T12:08:17.15825735+02:00"

@@ -108,11 +108,11 @@ deploy_helm_chart() {
     --set kdl.local="true" \
     --set kdlServer.image.pullPolicy="Always" \
     --set kdlServer.image.repository="$IMAGE_REGISTRY/konstellation/kdl-server" \
+    --set minio.securityContext.runAsUser=0 \
     --set mongodb.persistentVolume.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.domain=$DOMAIN \
     --set science-toolkit.gitea.admin.password=${GITEA_ADMIN_PASSWORD} \
     --set science-toolkit.gitea.admin.username="$GITEA_ADMIN_USER" \
-    --set science-toolkit.minio.securityContext.runAsUser=0 \
     --set science-toolkit.tls.enabled=$ENABLE_TLS \
     --set science-toolkit.sharedVolume.storageClassName=$STORAGE_CLASS_NAME \
     --set science-toolkit.vscode.storage.storageClassName=$STORAGE_CLASS_NAME \

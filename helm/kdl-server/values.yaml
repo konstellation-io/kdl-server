@@ -100,6 +100,20 @@ kubeRbacProxy:
     tag: v0.8.0
     pullPolicy: IfNotPresent
 
+minio:
+  accessKey: minio
+  secretKey: minio123
+  persistence:
+    storageClass: standard
+    existingClaim: received-data-claim
+    accessMode: ReadWriteMany
+  ingress:
+    enabled: true
+    hosts:
+      - minio.local
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+
 mongodb:
   auth:
     adminUser: "admin"

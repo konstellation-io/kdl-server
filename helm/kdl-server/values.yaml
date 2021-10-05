@@ -107,8 +107,9 @@ minio:
     storageClass: standard
     existingClaim: received-data-claim
     accessMode: ReadWriteMany
+# This Chart feature is disabled because we have to deal with different Kubernetes API versions. Please check the ingress template in Helm chart
   ingress:
-    enabled: true
+    enabled: false
     hosts:
       - minio.local
     annotations:

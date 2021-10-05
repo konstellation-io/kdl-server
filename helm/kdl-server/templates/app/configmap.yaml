@@ -60,3 +60,10 @@ data:
   USER_TOOLS_OAUTH2_PROXY_IMG_REPO: "{{ .Values.userToolsOperator.oauth2Proxy.image.repository }}"
   USER_TOOLS_OAUTH2_PROXY_IMG_TAG: "{{ .Values.userToolsOperator.oauth2Proxy.image.tag }}"
   USER_TOOLS_OAUTH2_PROXY_IMG_PULLPOLICY: "{{ .Values.userToolsOperator.oauth2Proxy.image.pullPolicy }}"
+
+  TOOLKIT_VSCODE_STORAGE_SIZE: {{ .Values.vscode.storage.size }}
+  TOOLKIT_VSCODE_STORAGE_CLASSNAME: {{ .Values.vscode.storage.storageClassName }}
+  TOOLKIT_BASE_DOMAIN_NAME: {{ .Values.domain }}
+  TOOLKIT_INGRESS_TYPE: {{ .Values.ingress.type }}
+  TOOLKIT_SHARED_VOLUME: {{ .Values.sharedVolume.name }}
+  TOOLKIT_TLS: "{{ .Values.tls.enabled }}"

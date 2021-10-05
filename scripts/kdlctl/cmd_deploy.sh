@@ -115,7 +115,6 @@ deploy_helm_chart() {
     --set science-toolkit.gitea.admin.username="$GITEA_ADMIN_USER" \
     --set science-toolkit.tls.enabled=$ENABLE_TLS \
     --set science-toolkit.sharedVolume.storageClassName=$STORAGE_CLASS_NAME \
-    --set science-toolkit.vscode.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set postgres.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set projectOperator.image.pullPolicy="Always" \
     --set projectOperator.image.repository="$IMAGE_REGISTRY/konstellation/project-operator" \

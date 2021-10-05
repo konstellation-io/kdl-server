@@ -173,6 +173,11 @@ science-toolkit:
 
 tls:
   enabled: true
+  certManager:
+    enabled: false
+    acme:
+      server: https://acme-v02.api.letsencrypt.org/directory
+      email: user@email.com
 
 userToolsOperator:
   image:

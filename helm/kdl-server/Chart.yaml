@@ -6,9 +6,6 @@ type: application
 version: 0.0.0
 appVersion: 0.0.0
 dependencies:
-  - name: science-toolkit
-    version: "1.0.248"
-    repository: "https://konstellation-io.github.io/science-toolkit/helm-chart/"
   - name: minio
     version: "8.0.10"
     repository: "https://helm.min.io/"

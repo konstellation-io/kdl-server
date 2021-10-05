@@ -3,6 +3,5 @@
 .certs
 .vscode/
 coverage/
-helm/kdl-server/charts/minio-*
-
+helm/kdl-server/charts/
 node_modules

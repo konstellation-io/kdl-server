@@ -123,11 +123,6 @@ mongodb:
     storageClassName: standard
     size: 5Gi
 
-sharedVolume:
-  name: received-data
-  storageClassName: standard
-  size: 10Gi
-
 oauth2Proxy:
   image:
     repository: quay.io/oauth2-proxy/oauth2-proxy
@@ -164,13 +159,10 @@ projectOperator:
       tag: v2
       pullPolicy: IfNotPresent
 
-science-toolkit:
-  kdl:
-    enabled: true
-  vscode:
-    storage:
-      size: 10Gi
-      storageClassName: standard
+sharedVolume:
+  name: received-data
+  storageClassName: standard
+  size: 10Gi
 
 tls:
   enabled: true
@@ -210,3 +202,8 @@ userToolsOperator:
       repository: quay.io/oauth2-proxy/oauth2-proxy
       tag: v7.0.1-amd64
       pullPolicy: IfNotPresent
+
+vscode:
+  storage:
+    size: 10Gi
+    storageClassName: standard

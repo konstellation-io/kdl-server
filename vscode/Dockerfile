@@ -64,7 +64,6 @@ LABEL maintainer="Intelygenz - Konstellation Team"
 
 COPY instantclient-basic-linux.x64-18.5.0.0.0dbru.zip \
       instantclient-sdk-linux.x64-18.5.0.0.0dbru.zip /tmp/
-COPY --chown=coder:coder default_user_settings.json /config/default_user_settings.json
 
 COPY --from=odbc-builder /opt/odbc/ /usr/local/
 COPY --from=golang-builder --chown=coder:coder $GOPATH/ $GOPATH/
@@ -129,6 +128,7 @@ USER coder
 WORKDIR /home/coder
 
 # Install VSCode extensions
+COPY --chown=coder:coder default_user_settings.json /vscode/config/default_user_settings.json
 COPY --chown=coder:coder entrypoint.sh /entrypoint.sh
 RUN code-server \
       --install-extension christian-kohler.path-intellisense \
@@ -146,6 +146,6 @@ RUN code-server \
       --install-extension wayou.vscode-todo-highlight \
       --install-extension yzhang.markdown-all-in-one \
       --install-extension zxh404.vscode-proto3 \
-      --extensions-dir ~/.vscode/extensions
+      --extensions-dir /vscode/extensions
 
 ENTRYPOINT ["/entrypoint.sh"]

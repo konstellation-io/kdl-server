@@ -63,8 +63,7 @@ FROM base
 LABEL maintainer="Intelygenz - Konstellation Team"
 
 COPY instantclient-basic-linux.x64-18.5.0.0.0dbru.zip \
-     instantclient-sdk-linux.x64-18.5.0.0.0dbru.zip /tmp/
-COPY --chown=coder:coder default_user_settings.json /config/default_user_settings.json
+      instantclient-sdk-linux.x64-18.5.0.0.0dbru.zip /tmp/
 
 COPY --from=odbc-builder /opt/odbc/ /usr/local/
 COPY --from=golang-builder --chown=coder:coder $GOPATH/ $GOPATH/
@@ -117,9 +116,6 @@ RUN curl -L -o /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64
       rm -rf /var/lib/{apt,dpkg,cache,log}/ && \
       rm -rf -- * 
 
-# Copy entrypoint
-COPY --chown=coder:coder entrypoint.sh /entrypoint.sh
-
 # Install python libraries
 COPY deps/requirements.txt /tmp/
 RUN pip install --no-cache-dir setuptools wheel && \
@@ -132,6 +128,8 @@ USER coder
 WORKDIR /home/coder
 
 # Install VSCode extensions
+COPY --chown=coder:coder default_user_settings.json /vscode/config/default_user_settings.json
+COPY --chown=coder:coder entrypoint.sh /entrypoint.sh
 RUN code-server \
       --install-extension christian-kohler.path-intellisense \
       --install-extension eamodio.gitlens \
@@ -147,6 +145,7 @@ RUN code-server \
       --install-extension vscode-icons-team.vscode-icons \
       --install-extension wayou.vscode-todo-highlight \
       --install-extension yzhang.markdown-all-in-one \
-      --install-extension zxh404.vscode-proto3
+      --install-extension zxh404.vscode-proto3 \
+      --extensions-dir /vscode/extensions
 
 ENTRYPOINT ["/entrypoint.sh"]

@@ -120,19 +120,12 @@ jobs:
 
   helm:
     if: ${{ ! contains( github.event.ref, 'alpha' ) }}
+
     runs-on: ubuntu-latest
+
     needs:
-      - docker-kdl-server
-      - docker-drone-authorizer
-      - docker-gitea-oauth2-setup
-      - docker-project-operator
-      - docker-mlflow
-      - docker-cleaner
-      - docker-backup
-      - docker-user-tools-operator
-      - docker-vscode
-      - docker-jupyter-gpu
-      - docker-repo-cloner
+      - docker-build
+
     steps:
       - uses: actions/checkout@v2
         with:
@@ -152,6 +145,7 @@ jobs:
           echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
 
       - uses: chrisdickinson/setup-yq@latest
+
       - name: Replace component version with YQ
         run:  |
           # set image tags on kdl

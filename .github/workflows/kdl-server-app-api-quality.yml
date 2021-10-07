@@ -9,6 +9,7 @@ on:
     paths:
       - "app/api/**/*"
       - ".github/workflows/kdl-server-app-api*"
+      - ".github/workflows/build-release.yml"
 
 jobs:
   test:

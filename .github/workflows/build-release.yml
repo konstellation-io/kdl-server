@@ -8,6 +8,7 @@ on:
 jobs:
   docker-build:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - image: kdl-server

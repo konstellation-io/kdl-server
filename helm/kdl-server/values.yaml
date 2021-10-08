@@ -177,6 +177,9 @@ userToolsOperator:
     repository: konstellation/user-tools-operator
     tag: "latest"
     pullPolicy: IfNotPresent
+  storage:
+    size: 10Gi
+    storageClassName: standard
   jupyter:
     image:
       repository: konstellation/jupyter-gpu
@@ -202,8 +205,3 @@ userToolsOperator:
       repository: quay.io/oauth2-proxy/oauth2-proxy
       tag: v7.0.1-amd64
       pullPolicy: IfNotPresent
-
-vscode:
-  storage:
-    size: 10Gi
-    storageClassName: standard

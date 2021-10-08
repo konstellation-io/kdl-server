@@ -21,8 +21,8 @@ type Config struct {
 		Email    string `envconfig:"KDL_ADMIN_EMAIL"`
 	}
 	Storage struct {
-		Size      string `envconfig:"TOOLKIT_VSCODE_STORAGE_SIZE"`
-		ClassName string `envconfig:"TOOLKIT_VSCODE_STORAGE_CLASSNAME"`
+		Size      string `envconfig:"USER_TOOLS_STORAGE_SIZE"`
+		ClassName string `envconfig:"USER_TOOLS_STORAGE_CLASSNAME"`
 	}
 	SharedVolume struct {
 		Name string `envconfig:"TOOLKIT_SHARED_VOLUME"`

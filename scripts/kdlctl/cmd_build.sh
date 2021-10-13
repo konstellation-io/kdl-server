@@ -23,6 +23,7 @@ build_docker_images() {
   build_vscode
   build_repo_cloner
   build_mlflow
+  build_backup
 }
 
 build_server() {
@@ -59,6 +60,10 @@ build_repo_cloner() {
 
 build_mlflow() {
   build_image mlflow mlflow
+}
+
+build_backup() {
+  build_image kdl-backup backup
 }
 
 build_image() {

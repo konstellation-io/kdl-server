@@ -89,6 +89,7 @@ Needed to build the KDL images. Installation:
 
 https://docs.docker.com/get-docker/
 
+
 #### Helm
 
 K8s package manager. Make sure you have v3+. Installation:
@@ -153,6 +154,16 @@ $ ./kdlctl.sh dev
 ```
 
 It will install everything in the namespace specified in your development `.kdlconf` file.
+
+Mac:
+If you get the following error:
+```
+Get "https://192.168.64.2:32000/v2/": http: server gave HTTP response to HTTPS client
+```
+Add insecure registries entry to `$HOME/.docker/daemon.json` with the IP that appears in the log:
+```json
+"insecure-registries": [ "192.168.64.2:32000" ]
+```
 
 ### Login to local environment
 

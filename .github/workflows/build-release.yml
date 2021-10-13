@@ -18,7 +18,7 @@ jobs:
           - image: gitea-oauth2-setup
             path: gitea-oauth2-setup
           - image: project-operator
-            path: gitea-oauth2-setup
+            path: project-operator
           - image: mlflow
             path: mlflow
           - image: cleaner

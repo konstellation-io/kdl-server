@@ -31,15 +31,16 @@ spec:
               volumeMounts:
               - name: gitea-pvc
                 mountPath: "/data"
+              command:
+                - /bin/bash
               args:
-                - /bin/sh
                 - -c
                 - >-
-                  echo "postgres:5432:gitea:postgres:$DB_PASSWD" > ~/.pgpass && 
+                  echo "$DB_HOST:$POSTGRES_DB:$DB_USER:$POSTGRES_PASSWORD" > ~/.pgpass && 
                   chmod 600 ~/.pgpass &&
                   mkdir /backup &&
                   tar zcvf /backup/data.tar.gz --directory '/data' --exclude './gitea/indexers' . &&
-                  pg_dump -v -F c -f /backup/postgres_gitea.dump gitea &&
+                  pg_dump -h $(echo $DB_HOST | cut -f 1 -d ":" ) -p $(echo $DB_HOST | cut -f 2 -d ":" ) -U $DB_USER -v -F c -f /backup/postgres_gitea.dump $POSTGRES_DB &&
                   tar zcvf /backup.tar.gz /backup &&
                   aws s3 cp /backup.tar.gz s3://$BUCKET_NAME/backup_gitea_$(date +%Y%m%d).tar.gz
 

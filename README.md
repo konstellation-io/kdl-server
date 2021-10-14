@@ -89,7 +89,6 @@ Needed to build the KDL images. Installation:
 
 https://docs.docker.com/get-docker/
 
-
 #### Helm
 
 K8s package manager. Make sure you have v3+. Installation:

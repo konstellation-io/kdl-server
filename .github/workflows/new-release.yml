@@ -1,0 +1,20 @@
+name: New Release Branch
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-release-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Generate a new release branch
+        uses: intelygenz/monorepo-tagger-action@v1.0-rc.1
+        with:
+          release-branch-prefix: "release/v"
+          mode: 'product'
+          type: 'new-release-branch'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PATNAME }}

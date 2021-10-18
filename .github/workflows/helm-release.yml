@@ -69,13 +69,12 @@ jobs:
   release:
     if: |
       always() &&
-      (needs.calculate-rc-tag.outputs.tag || needs.calculate-fix-tag.outputs.tag || needs.calculate-release-tag.outputs.tag)
-    needs: [calculate-rc-tag, calculate-fix-tag, calculate-release-tag]
+      (needs.calculate-rc-tag.outputs.tag || needs.calculate-fix-tag.outputs.tag)
+    needs: [calculate-rc-tag, calculate-fix-tag]
     runs-on: ubuntu-latest
     outputs:
       rc: needs.calculate-rc-tag.outputs.tag != null
       fix: needs.calculate-fix-tag.outputs.tag != null
-      release: needs.calculate-release-tag.outputs.tag != null
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -86,7 +85,7 @@ jobs:
         id: get_version
         # When setting the version just one of the 3 vars will have a value
         run: |
-          VERSION=${{needs.calculate-rc-tag.outputs.tag}}${{needs.calculate-fix-tag.outputs.tag}}${{needs.calculate-release-tag.outputs.tag}}
+          VERSION=${{needs.calculate-rc-tag.outputs.tag}}${{needs.calculate-fix-tag.outputs.tag}}
           echo ::set-output name=VERSION::${VERSION}
 
       - uses: chrisdickinson/setup-yq@latest

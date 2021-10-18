@@ -26,7 +26,7 @@ LABEL maintainer="Builder"
 ENV SASS_PATH=src
 
 WORKDIR /app
-
+ 
 COPY ui/package.* ui/yarn* ./
 
 RUN mkdir -p cypress/plugins && \

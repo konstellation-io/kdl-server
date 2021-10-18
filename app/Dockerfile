@@ -14,7 +14,7 @@ COPY api/go.* ./
 RUN go mod download
 
 COPY api .
-
+ 
 RUN go build -o kdl-server http/main.go
 
 # Build UI

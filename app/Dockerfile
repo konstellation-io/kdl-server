@@ -19,7 +19,7 @@ RUN go build -o kdl-server http/main.go
 
 # Build UI
 FROM node:14 as ui-builder
-
+ 
 # Pass Hadolint
 LABEL maintainer="Builder"
 

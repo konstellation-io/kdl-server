@@ -8,5 +8,5 @@ WORKDIR /
 RUN yum install -y --setopt=tsflags=nodocs tar gzip && \
     amazon-linux-extras install -y postgresql12 && \
     yum clean all 
-
+ 
 ENTRYPOINT [""]

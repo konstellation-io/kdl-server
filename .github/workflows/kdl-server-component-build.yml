@@ -27,14 +27,49 @@ jobs:
       - name: CheckOut
         uses: actions/checkout@v2
 
-      - name: Set up Python environment
-        uses: actions/setup-python@v1
+      - uses: hadolint/hadolint-action@v1.6.0
         with:
-          python-version: "2.7"
+          dockerfile: ./app/Dockerfile
+          format: tty
+          config: ./.hadolint.yml
 
-      - name: flake8 Lint
-        uses: py-actions/flake8@v1
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.14.x
 
+      - name: API Test
+        run: go test ./... -cover -v -coverprofile=coverage.out
+        working-directory: ./app/api
+
+      - name: API Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: app/api/coverage.out
+
+      - name: API Go Lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.37
+          working-directory: ./app/api
+          args: --timeout 5m
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "14"
+
+      - name: UI Run tests
+        run: yarn install && yarn run test:cov:sonar
+        working-directory: ./app/ui
+
+      - name: UI Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: |
+            ./app/ui/coverage
+            ./app/ui/test-report.xml
 
   create-release-tag:
     if: github.ref == 'refs/heads/main' # only in main branch

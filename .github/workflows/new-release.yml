@@ -12,11 +12,14 @@ jobs:
 
   create-release-branch:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.release_branch.outputs.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Generate a new release branch
+        id: release_branch
         uses: intelygenz/monorepo-tagger-action@v1.0-rc.1
         with:
           release-branch-prefix: "release/v"

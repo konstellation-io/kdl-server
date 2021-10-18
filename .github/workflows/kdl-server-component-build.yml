@@ -160,23 +160,23 @@ jobs:
       - name: CheckOut
         uses: actions/checkout@v2
 
-      - name: Changelog
-        uses: ./.github/actions/git-chglog
-        id: Changelog
-        with:
-          path: app
-          tag: ${{ steps.set_tag.outputs.VERSION }}
+        #- name: Changelog
+        #  uses: ./.github/actions/git-chglog
+        #  id: Changelog
+        #  with:
+        #    path: app
+        #    tag: ${{ steps.set_tag.outputs.VERSION }}
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@latest
-        with:
-          tag_name: ${{ steps.set_tag.outputs.VERSION }}
-          release_name: Release ${{ steps.set_tag.outputs.VERSION }}
-          body: |
-            ${{ steps.Changelog.outputs.changelog }}
-          draft: false
-          prerelease: false
+        #- name: Create Release
+        #  id: create_release
+        #  uses: actions/create-release@latest
+        #  with:
+        #    tag_name: ${{ steps.set_tag.outputs.VERSION }}
+        #    release_name: Release ${{ steps.set_tag.outputs.VERSION }}
+        #    body: |
+        #      ${{ steps.Changelog.outputs.changelog }}
+        #    draft: false
+        #    prerelease: false
 
 
   chart-update:

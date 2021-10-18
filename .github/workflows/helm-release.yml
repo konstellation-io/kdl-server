@@ -66,28 +66,6 @@ jobs:
           dry-run: true
 
 
-  calculate-release-tag:
-    if: startsWith(github.ref, 'refs/heads/release') # only in release branches
-    runs-on: ubuntu-latest
-    outputs:
-      tag: ${{ steps.release_tag.outputs.tag }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Get branch name
-        run: |
-          echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
-
-      - name: Generate a release
-        id: release_tag
-        uses: intelygenz/monorepo-tagger-action@v1.0-rc.1
-        with:
-          mode: 'product'
-          type: 'final'
-          dry-run: true
-
-
   release:
     if: |
       always() &&

@@ -49,22 +49,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: ${{ needs.create-release-branch.output.tag }} # Checkout the branch that was created for the release
+          ref: ${{ needs.create-release-branch.outputs.tag }} # Checkout the branch that was created for the release
 
       - uses: chrisdickinson/setup-yq@latest
       - name: Replace component versions
         run: |
           # set app version and chart version for kdl
-          yq w -i helm/kdl-server/Chart.yaml 'version' ${{ needs.calculate-release-tag.output.tag  }}
+          yq w -i helm/kdl-server/Chart.yaml 'version' ${{ needs.calculate-release-tag.outputs.tag  }}
 
           # debug output
-          echo 'version' ${{ needs.calculate-release-tag.output.tag  }}
+          echo 'version' ${{ needs.calculate-release-tag.outputs.tag  }}
 
       - name: Commit files
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git commit -m "Update chart to version ${{ needs.calculate-release-tag.output.tag }} [skip-ci]" -a
+          git commit -m "Update chart to version ${{ needs.calculate-release-tag.outputs.tag }} [skip-ci]" -a
           git push
 
 

@@ -12,7 +12,6 @@ on:
       - "KDLServer Application Build"
     types:
       - completed
-  create:
 
 
 env:
@@ -162,19 +161,3 @@ jobs:
           mode: 'product'
           type: 'fix'
           release-branch-prefix: "release/v"
-
-
-  create-release-tag:
-    if: always() && needs.calculate-release-tag.outputs.tag
-    needs: [release, calculate-release-tag]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Generate a release
-        id: release_tag
-        uses: intelygenz/monorepo-tagger-action@v1.0-rc.1
-        with:
-          mode: 'product'
-          type: 'final'

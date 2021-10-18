@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
+
   create-release-branch:
     runs-on: ubuntu-latest
     steps:
@@ -18,3 +19,63 @@ jobs:
           type: 'new-release-branch'
         env:
           GITHUB_TOKEN: ${{ secrets.PATNAME }}
+
+
+  calculate-release-tag:
+    needs: create-release-branch
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.release_tag.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Generate a release
+        id: release_tag
+        uses: intelygenz/monorepo-tagger-action@v1.0-rc.1
+        with:
+          mode: 'product'
+          type: 'final'
+          dry-run: true
+
+
+  release:
+    needs: [create-release-branch, calculate-release-tag]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ needs.create-release-branch.output.tag }} # Checkout the branch that was created for the release
+
+      - uses: chrisdickinson/setup-yq@latest
+      - name: Replace component versions
+        run: |
+          # set app version and chart version for kdl
+          yq w -i helm/kdl-server/Chart.yaml 'version' ${{ needs.calculate-release-tag.output.tag  }}
+
+          # debug output
+          echo 'version' ${{ needs.calculate-release-tag.output.tag  }}
+
+      - name: Commit files
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git commit -m "Update chart to version ${{ needs.calculate-release-tag.output.tag }} [skip-ci]" -a
+          git push
+
+
+  create-release-tag:
+    if: always()
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Generate a release
+        id: release_tag
+        uses: intelygenz/monorepo-tagger-action@v1.0-rc.1
+        with:
+          mode: 'product'
+          type: 'final'

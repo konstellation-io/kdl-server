@@ -77,11 +77,13 @@ jobs:
 
   create-release-tag:
     if: always()
-    needs: release
+    needs: [release, create-release-branch]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: ${{ needs.create-release-branch.outputs.tag }} # Checkout the branch that was created for the release
 
       - name: Generate a release
         id: release_tag
@@ -89,3 +91,4 @@ jobs:
         with:
           mode: 'product'
           type: 'final'
+          default-branch: ${{ needs.create-release-branch.outputs.tag }}

@@ -41,7 +41,6 @@ FROM alpine:3.13.6
 
 # Maintainer of the Dockerfile
 LABEL maintainer="Intelygenz - Konstellation Team"
-
 ENV USER=kdl
 
 WORKDIR /app

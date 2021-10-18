@@ -1,12 +1,10 @@
 domain: kdl.local
-
 serverName: Local Server
-
 backup:
   name: backup-gitea
-  image: 
+  image:
     repository: konstellation/kdl-backup
-    tag: latest
+    tag: backup-v0.15.0
     pullPolicy: IfNotPresent
   gitea:
     enabled: false
@@ -15,7 +13,6 @@ backup:
     awsAccessKeyID: aws-access-key-id
     awsSecretAccessKey: aws-secret-access-key
     bucketName: s3-bucket-name
-
 cleaner:
   enabled: false
   schedule: "0 1 * * 0" # every sunday at 1:00 AM
@@ -25,7 +22,6 @@ cleaner:
     repository: konstellation/cleaner
     tag: latest
     pullPolicy: IfNotPresent
-
 drone:
   image:
     repository: drone/drone
@@ -37,19 +33,16 @@ drone:
   rpcSecret: runner-shared-secret
   pluginSecret: d97d8ee407af1002fa2449f578bb47a9
   adminToken: 7GSipOV0wJZQioZNBxaw3AotHV1tA4K4
-
 droneAuthorizer:
   image:
     repository: konstellation/drone-authorizer
     tag: latest
     pullPolicy: IfNotPresent
-
 droneRunner:
   image:
     repository: drone/drone-runner-kube
     tag: 1.0.0-beta.6
     pullPolicy: IfNotPresent
-
 gitea:
   admin:
     username: "kdladmin"
@@ -62,19 +55,15 @@ gitea:
   storage:
     size: 10Gi
     storageClassName: standard
-
 giteaOauth2Setup:
   image:
     repository: konstellation/gitea-oauth2-setup
     tag: latest
     pullPolicy: IfNotPresent
-
 ingress:
   type: nginx
-
 kdl:
   local: false
-
 kdlKG:
   image:
     repository: konstellation/kdl-kg
@@ -87,19 +76,16 @@ kdlKG:
   numberOfOutputs: 10
   logPath: /var/log/app/kg.log
   logLevel: INFO
-
 kdlServer:
   image:
     repository: konstellation/kdl-server
     tag: latest
     pullPolicy: IfNotPresent
-
 kubeRbacProxy:
   image:
     repository: gcr.io/kubebuilder/kube-rbac-proxy
     tag: v0.8.0
     pullPolicy: IfNotPresent
-
 minio:
   accessKey: minio
   secretKey: minio123
@@ -107,14 +93,13 @@ minio:
     storageClass: standard
     existingClaim: received-data-claim
     accessMode: ReadWriteMany
-# This Chart feature is disabled because we have to deal with different Kubernetes API versions. Please check the ingress template in Helm chart
+    # This Chart feature is disabled because we have to deal with different Kubernetes API versions. Please check the ingress template in Helm chart
   ingress:
     enabled: false
     hosts:
       - minio.local
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
-
 mongodb:
   auth:
     adminUser: "admin"
@@ -122,13 +107,11 @@ mongodb:
   persistentVolume:
     storageClassName: standard
     size: 5Gi
-
 oauth2Proxy:
   image:
     repository: quay.io/oauth2-proxy/oauth2-proxy
     tag: v7.0.1-amd64
     pullPolicy: IfNotPresent
-
 postgres:
   image:
     repository: postgres
@@ -139,7 +122,6 @@ postgres:
   storage:
     size: 10Gi
     storageClassName: standard
-
 projectOperator:
   image:
     repository: konstellation/project-operator
@@ -158,12 +140,10 @@ projectOperator:
       repository: filebrowser/filebrowser
       tag: v2
       pullPolicy: IfNotPresent
-
 sharedVolume:
   name: received-data
   storageClassName: standard
   size: 10Gi
-
 tls:
   enabled: true
   certManager:
@@ -171,7 +151,6 @@ tls:
     acme:
       server: https://acme-v02.api.letsencrypt.org/directory
       email: user@email.com
-
 userToolsOperator:
   image:
     repository: konstellation/user-tools-operator

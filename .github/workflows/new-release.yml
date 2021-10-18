@@ -46,6 +46,10 @@ jobs:
     needs: [create-release-branch, calculate-release-tag]
     runs-on: ubuntu-latest
     steps:
+
+      - name: Show branch
+        run: echo checkout branch with name ${{ needs.create-release-branch.outputs.tag }}
+
       - name: Checkout
         uses: actions/checkout@v2
         with:

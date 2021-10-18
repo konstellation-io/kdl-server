@@ -3,6 +3,11 @@ name: New Release Branch
 on:
   workflow_dispatch:
 
+
+env:
+  GITHUB_TOKEN: ${{ secrets.PATNAME }}
+
+
 jobs:
 
   create-release-branch:
@@ -17,8 +22,6 @@ jobs:
           release-branch-prefix: "release/v"
           mode: 'product'
           type: 'new-release-branch'
-        env:
-          GITHUB_TOKEN: ${{ secrets.PATNAME }}
 
 
   calculate-release-tag:

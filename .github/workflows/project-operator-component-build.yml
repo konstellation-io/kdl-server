@@ -1,4 +1,4 @@
-name: Backup Component Build
+name: Project Operator Component Build
 
 on:
   pull_request:
@@ -6,15 +6,15 @@ on:
       - main
       - "release/v*"
     paths:
-      - "backup/**/*"
-      - ".github/workflows/backup*"
+      - "project-operator/**/*"
+      - ".github/workflows/project-operator*"
   push:
     branches:
       - main
       - "release/v*"
     paths:
-      - "backup/**/*"
-      - ".github/workflows/backup*"
+      - "project-operator/**/*"
+      - ".github/workflows/project-operator*"
 
 
 env:
@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: hadolint/hadolint-action@v1.6.0
         with:
-          dockerfile: ./backup/Dockerfile
+          dockerfile: ./project-operator/Dockerfile
           format: tty
           config: ./.hadolint.yml
 
@@ -50,7 +50,7 @@ jobs:
         with:
           mode: 'component'
           type: 'final'
-          component-prefix: "backup-"
+          component-prefix: "project-operator-"
 
 
   create-fix-tag:
@@ -67,7 +67,7 @@ jobs:
       - name: Get component versions
         id: component_version
         run: |
-          TAG=`yq r helm/kdl-server/values.yaml 'backup.image.tag'`
+          TAG=`yq r helm/kdl-server/values.yaml 'projectOperator.image.tag'`
           echo ::set-output name=TAG::${TAG}
           echo Component version in release branch is ${TAG}
 
@@ -77,7 +77,7 @@ jobs:
         with:
           mode: 'component'
           type: 'fix'
-          component-prefix: "backup-"
+          component-prefix: "project-operator-"
           current-tag: ${{ steps.component_version.outputs.TAG }}
 
 
@@ -112,13 +112,13 @@ jobs:
       #- name: Push to Docker Hub
       #  uses: docker/build-push-action@v2
       #  with:
-      #    context: ./backup
-      #    file: ./backup/Dockerfile
+      #    context: ./project-operator
+      #    file: ./project-operator/Dockerfile
       #    platforms: linux/amd64
       #    push: true
       #    tags: |
-      #      konstellation/kdl-backup:${{ steps.version.outputs.tag }}
-      #      konstellation/kdl-backup:latest
+      #      konstellation/project-operator:${{ steps.version.outputs.tag }}
+      #      konstellation/project-operator:latest
 
       - name: CheckOut
         uses: actions/checkout@v2
@@ -129,7 +129,7 @@ jobs:
       #  uses: ./.github/actions/git-chglog
       #  id: Changelog
       #  with:
-      #    path: backup
+      #    path: project-operator
       #    tag: ${{needs.create-release-tag.outputs.tag}}${{needs.create-fix-tag.outputs.tag}}
 
       #- name: Create Release
@@ -156,12 +156,12 @@ jobs:
       - name: Replace component versions
         run: |
           # set app version and chart version for kdl
-          yq w -i helm/kdl-server/values.yaml 'backup.image.tag' ${{ needs.build-release.outputs.component-version }}
+          yq w -i helm/kdl-server/values.yaml 'projectOperator.image.tag' ${{ needs.build-release.outputs.component-version }}
           echo 'component version' ${{ needs.build-release.outputs.component-version }}
 
       - name: Commit files
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git commit -m "Update backup component to ${{ needs.build-release.outputs.component-version }} [skip-ci]" -a
+          git commit -m "Update project-operator component to ${{ needs.build-release.outputs.component-version }} [skip-ci]" -a
           git push

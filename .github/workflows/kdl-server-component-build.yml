@@ -82,7 +82,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Generate a release tag
-        uses: intelygenz/monorepo-tagger-action@v1.0-rc.1
+        uses: intelygenz/monorepo-tagger-action@v1.0
         id: release_tag
         with:
           mode: 'component'
@@ -109,7 +109,7 @@ jobs:
           echo Component version in release branch is ${TAG}
 
       - name: Generate a fix
-        uses: intelygenz/monorepo-tagger-action@v1.0-rc.1
+        uses: intelygenz/monorepo-tagger-action@v1.0
         id: fix_tag
         with:
           mode: 'component'
@@ -154,8 +154,8 @@ jobs:
       #    platforms: linux/amd64
       #    push: true
       #    tags: |
-      #      konstellation/app:${{ steps.version.outputs.tag }}
-      #      konstellation/app:latest
+      #      konstellation/kdl-server:${{ steps.version.outputs.tag }}
+      #      konstellation/kdl-server:latest
 
       - name: CheckOut
         uses: actions/checkout@v2

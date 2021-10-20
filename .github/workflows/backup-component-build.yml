@@ -30,6 +30,7 @@ jobs:
       component: backup
       component_helm: backup
       component_path: backup
+      component_image: kdl-backup
     secrets:
       github_token: ${{ secrets.PATNAME }}
 

@@ -86,6 +86,7 @@ RUN curl -L -o /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64
       jq \
       libaio1 \
       libffi-dev  \
+      libgl1-mesa-glx \
       libgtk2.0-dev \
       libllvm-7-ocaml-dev \
       libltdl7 \

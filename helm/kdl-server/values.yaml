@@ -71,7 +71,7 @@ giteaOauth2Setup:
 
 ingress:
   type: nginx
-  timeout: "3600"
+  nginxConnectionTimeout: "3600"
 
 kdl:
   local: false

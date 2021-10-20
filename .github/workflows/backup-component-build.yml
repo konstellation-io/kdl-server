@@ -18,13 +18,13 @@ on:
 
 jobs:
 
-  lint:
+  lint-dockerfile:
     uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@main
     with:
       component_path: backup
 
   build:
-    needs: lint
+    needs: lint-dockerfile
     uses: konstellation-io/github-workflows/.github/workflows/build.yaml@main
     with:
       component: backup

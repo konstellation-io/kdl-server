@@ -2,7 +2,7 @@ apiVersion: v2
 name: kdl-server
 description: KDL server
 type: application
-version: v0.19-rc.0
+version: v0.19-rc.1
 appVersion: kdl-server-v0.17.0
 dependencies:
   - name: minio

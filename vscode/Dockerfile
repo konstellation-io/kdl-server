@@ -104,9 +104,13 @@ RUN curl -L -o /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64
       unzip \
       zip \
       zlib1g-dev && \
-    # Alternatives
-    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 2 && \
-    update-alternatives --set pip /usr/bin/pip3 && \
+# Set Python 3.7 as default
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1 && \
+        update-alternatives --set python3 /usr/bin/python3.7 && \
+        update-alternatives --install /usr/bin/python python /usr/bin/python3.7 2 && \
+        update-alternatives --set python /usr/bin/python3.7 && \
+        update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 3 && \
+        update-alternatives --set pip /usr/bin/pip3 && \
 # Install Oracle client
     unzip "/tmp/instantclient*.zip" -d /opt/oracle && \
       echo "$ORACLE_HOME" > /etc/ld.so.conf.d/oracle-instantclient.conf && \

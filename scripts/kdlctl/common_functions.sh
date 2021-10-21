@@ -28,6 +28,27 @@ check_requirements() {
   MICROK8S_INSTALLED=$(cmd_installed microk8s)
   [ "$MICROK8S_INSTALLED" = "1" ] || { REQUIREMENTS_OK=0 && echo_warning "Missing microk8s installation"; }
 
+  if [ "${OS}" = "Darwin" ]; then
+    JQ_INSTALLED=$(cmd_installed jq)
+    if [ "$JQ_INSTALLED" = "1" ]; then
+      docker_daemon_file="${HOME}/.docker/daemon.json"
+      modified_daemon_file=$(jq --arg ip "$HOST_IP:32000" '
+        if has("insecure-registries") then
+          if all(."insecure-registries"[] != $ip; .) then
+            ."insecure-registries" += [$ip]
+          else
+            .
+          end
+        else
+          . + {"insecure-registries":[$ip]}
+        end' "$docker_daemon_file")
+
+      echo "$modified_daemon_file" > "$docker_daemon_file"
+    else
+     REQUIREMENTS_OK=0 && echo_warning "Missing jq installation";
+    fi
+  fi
+
   case ${OS} in
     "Linux")
       MICROK8S_INFO=$(snap info microk8s)

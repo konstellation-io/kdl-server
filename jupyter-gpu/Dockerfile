@@ -76,6 +76,7 @@ RUN apt-get update && \
         less \
         libaio1 \
         libffi-dev  \
+        libgl1-mesa-glx \
         libgtk2.0-dev \
         libltdl7 \
         libllvm-10-ocaml-dev \

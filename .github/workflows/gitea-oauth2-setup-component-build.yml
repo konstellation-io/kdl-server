@@ -33,6 +33,7 @@ jobs:
       component_path: gitea-oauth2-setup
       component_image: gitea-oauth2-setup
       component_usertools_operator: true
+      chart_name: kdl-server
     secrets:
       github_token: ${{ secrets.PATNAME }}
 

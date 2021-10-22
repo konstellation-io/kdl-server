@@ -31,6 +31,7 @@ jobs:
       component_helm: droneAuthorizer
       component_path: drone-authorizer
       component_image: drone-authorizer
+      chart_name: kdl-server
     secrets:
       github_token: ${{ secrets.PATNAME }}
 

@@ -31,6 +31,7 @@ jobs:
       component_helm: backup
       component_path: backup
       component_image: kdl-backup
+      chart_name: kdl-server
     secrets:
       github_token: ${{ secrets.PATNAME }}
 

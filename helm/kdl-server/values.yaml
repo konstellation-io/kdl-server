@@ -79,7 +79,7 @@ kdlKG:
 kdlServer:
   image:
     repository: konstellation/kdl-server
-    tag: v0.18.0
+    tag: v0.19.0
     pullPolicy: IfNotPresent
 kubeRbacProxy:
   image:

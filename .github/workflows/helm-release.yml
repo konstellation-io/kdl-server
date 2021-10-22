@@ -23,7 +23,7 @@ env:
 
 jobs:
 
-  calculate-rc-tag:
+  create-rc-tag:
     # Just after a workflow completes successfully and the workflows was triggered in main branch
     if: |
       github.event.workflow_run.conclusion == 'success' &&
@@ -44,10 +44,8 @@ jobs:
           type: 'pre-release'
           release-branch-prefix: "release/v"
           pre-release-name: 'rc'
-          dry-run: true
 
-
-  calculate-fix-tag:
+  create-fix-tag:
     # Just after a workflow completes successfully and the workflows was triggered in a release branch
     if: |
       github.event.workflow_run.conclusion == 'success' &&
@@ -66,18 +64,17 @@ jobs:
           mode: 'product'
           type: 'fix'
           release-branch-prefix: "release/v"
-          dry-run: true
 
 
   release:
     if: |
       always() &&
-      (needs.calculate-rc-tag.outputs.tag || needs.calculate-fix-tag.outputs.tag)
-    needs: [calculate-rc-tag, calculate-fix-tag]
+      (needs.create-rc-tag.outputs.tag || needs.create-fix-tag.outputs.tag)
+    needs: [create-rc-tag, create-fix-tag]
     runs-on: ubuntu-latest
     outputs:
-      rc: needs.calculate-rc-tag.outputs.tag != null
-      fix: needs.calculate-fix-tag.outputs.tag != null
+      rc: needs.create-rc-tag.outputs.tag != null
+      fix: needs.create-fix-tag.outputs.tag != null
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -88,7 +85,7 @@ jobs:
         id: get_version
         # When setting the version just one of the 3 vars will have a value
         run: |
-          VERSION=${{needs.calculate-rc-tag.outputs.tag}}${{needs.calculate-fix-tag.outputs.tag}}
+          VERSION=${{needs.create-rc-tag.outputs.tag}}${{needs.create-fix-tag.outputs.tag}}
           echo ::set-output name=VERSION::${VERSION}
 
       - uses: chrisdickinson/setup-yq@latest
@@ -105,39 +102,6 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git commit -m "Update chart to version ${{ steps.get_version.outputs.VERSION }} [skip-ci]" -a
+          git tag -f "${{ steps.get_version.outputs.VERSION }}"
           git push
-
-
-  create-rc-tag:
-    if: always() && needs.calculate-rc-tag.outputs.tag
-    needs: [release, calculate-rc-tag]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Generate a pre-release
-        uses: intelygenz/monorepo-tagger-action@v1.0
-        with:
-          mode: 'product'
-          type: 'pre-release'
-          release-branch-prefix: "release/v"
-          current-major: 0
-          pre-release-name: 'rc'
-
-
-  create-fix-tag:
-    if: always() && needs.calculate-fix-tag.outputs.tag
-    needs: [release, calculate-fix-tag]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Generate a fix tag
-        id: fix_tag
-        uses: intelygenz/monorepo-tagger-action@v1.0
-        with:
-          mode: 'product'
-          type: 'fix'
-          release-branch-prefix: "release/v"
+          git push --tags --force

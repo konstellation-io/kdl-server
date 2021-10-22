@@ -60,4 +60,3 @@ RUN apk add -U --no-cache ca-certificates openssh-client libcap && \
 USER ${USER}
 
 CMD ["sh","-c","/app/kdl-server 2>&1 | tee -a /var/log/app/app.log"]
-

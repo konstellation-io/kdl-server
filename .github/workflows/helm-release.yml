@@ -17,91 +17,11 @@ on:
       - completed
 
 
-env:
-  GITHUB_TOKEN: ${{ secrets.PATNAME }}
-
-
 jobs:
+  helm-release:
+    uses: konstellation-io/github-workflows/.github/workflows/helm-release.yaml@main
+    with:
+      chart_name: kdl-server
+    secrets:
+      github_token: ${{ secrets.PATNAME }}
 
-  create-rc-tag:
-    # Just after a workflow completes successfully and the workflows was triggered in main branch
-    if: |
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.head_branch == 'main'
-    runs-on: ubuntu-latest
-    outputs:
-      tag: ${{ steps.rc_tag.outputs.tag }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Generate a pre-release
-        id: rc_tag
-        uses: intelygenz/monorepo-tagger-action@v1.0
-        with:
-          current-major: 0
-          mode: 'product'
-          type: 'pre-release'
-          release-branch-prefix: "release/v"
-          pre-release-name: 'rc'
-
-  create-fix-tag:
-    # Just after a workflow completes successfully and the workflows was triggered in a release branch
-    if: |
-      github.event.workflow_run.conclusion == 'success' &&
-      startsWith(github.event.workflow_run.head_branch, 'release')
-    runs-on: ubuntu-latest
-    outputs:
-      tag: ${{ steps.fix_tag.outputs.tag }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Generate a fix tag
-        id: fix_tag
-        uses: intelygenz/monorepo-tagger-action@v1.0
-        with:
-          mode: 'product'
-          type: 'fix'
-          release-branch-prefix: "release/v"
-
-
-  release:
-    if: |
-      always() &&
-      (needs.create-rc-tag.outputs.tag || needs.create-fix-tag.outputs.tag)
-    needs: [create-rc-tag, create-fix-tag]
-    runs-on: ubuntu-latest
-    outputs:
-      rc: needs.create-rc-tag.outputs.tag != null
-      fix: needs.create-fix-tag.outputs.tag != null
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }} # Checkout the branch in the original workflow
-
-      - name: App Version
-        id: get_version
-        # When setting the version just one of the 3 vars will have a value
-        run: |
-          VERSION=${{needs.create-rc-tag.outputs.tag}}${{needs.create-fix-tag.outputs.tag}}
-          echo ::set-output name=VERSION::${VERSION}
-
-      - uses: chrisdickinson/setup-yq@latest
-      - name: Replace component versions
-        run: |
-          # set app version and chart version for kdl
-          yq w -i helm/kdl-server/Chart.yaml 'version' ${{ steps.get_version.outputs.VERSION }}
-
-          # debug output
-          echo 'version' ${{ steps.get_version.outputs.VERSION }}
-
-      - name: Commit files
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git commit -m "Update chart to version ${{ steps.get_version.outputs.VERSION }} [skip-ci]" -a
-          git tag -f "${{ steps.get_version.outputs.VERSION }}"
-          git push
-          git push --tags --force

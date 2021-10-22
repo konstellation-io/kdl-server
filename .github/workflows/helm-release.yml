@@ -9,6 +9,7 @@ on:
   workflow_run:
     workflows:
       - "Backup Component Build"
+      - "Cleaner Component Build"
       - "KDLServer Application Build"
     types:
       - completed

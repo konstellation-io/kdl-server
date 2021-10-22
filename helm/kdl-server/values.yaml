@@ -36,7 +36,7 @@ drone:
 droneAuthorizer:
   image:
     repository: konstellation/drone-authorizer
-    tag: latest
+    tag: v0.14.0
     pullPolicy: IfNotPresent
 droneRunner:
   image:

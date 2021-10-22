@@ -15,23 +15,17 @@ on:
       - "app/**/*"
 
 
-env:
-  GITHUB_TOKEN: ${{ secrets.PATNAME }}
-
-
 jobs:
+  lint-dockerfile:
+    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@main
+    with:
+      component_path: app
 
   quality-checks:
     runs-on: ubuntu-20.04
     steps:
       - name: CheckOut
         uses: actions/checkout@v2
-
-      - uses: hadolint/hadolint-action@v1.6.0
-        with:
-          dockerfile: ./app/Dockerfile
-          format: tty
-          config: ./.hadolint.yml
 
       #- uses: actions/setup-go@v2
       #  with:
@@ -71,133 +65,15 @@ jobs:
       #      ./app/ui/coverage
       #      ./app/ui/test-report.xml
 
-  create-release-tag:
-    if: github.ref == 'refs/heads/main' # only in main branch
-    needs: quality-checks
-    runs-on: ubuntu-20.04
-    outputs:
-      tag: ${{ steps.release_tag.outputs.tag }}
-    steps:
-      - name: CheckOut
-        uses: actions/checkout@v2
-
-      - name: Generate a release tag
-        uses: intelygenz/monorepo-tagger-action@v1.0
-        id: release_tag
-        with:
-          mode: 'component'
-          type: 'final'
-          component-prefix: "kdl-server-"
-
-
-  create-fix-tag:
-    if: startsWith(github.ref, 'refs/heads/release') # only in release branches
-    needs: quality-checks
-    runs-on: ubuntu-20.04
-    outputs:
-       tag: ${{ steps.fix_tag.outputs.tag }}
-    steps:
-      - name: CheckOut
-        uses: actions/checkout@v2
-
-      - uses: chrisdickinson/setup-yq@latest
-      - name: Get component versions
-        id: component_version
-        run: |
-          TAG=`yq r helm/kdl-server/values.yaml 'kdlServer.image.tag'`
-          echo ::set-output name=TAG::${TAG}
-          echo Component version in release branch is ${TAG}
-
-      - name: Generate a fix
-        uses: intelygenz/monorepo-tagger-action@v1.0
-        id: fix_tag
-        with:
-          mode: 'component'
-          type: 'fix'
-          component-prefix: "kdl-server-"
-          current-tag: ${{ steps.component_version.outputs.TAG }}
-
-
-  build-release:
-    if: |
-      always() &&
-      (needs.create-release-tag.outputs.tag || needs.create-fix-tag.outputs.tag)
-    needs: [create-release-tag, create-fix-tag]
-    runs-on: ubuntu-latest
-    outputs:
-      app-version: ${{ steps.set_tag.outputs.VERSION }}
-    steps:
-      #- name: Set up QEMU
-      #  uses: docker/setup-qemu-action@v1
-
-      #- name: Set up Docker Buildx
-      #  uses: docker/setup-buildx-action@v1
-
-      #- name: Login to DockerHub Registry
-      #  uses: docker/login-action@v1
-      #  with:
-      #    username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #    password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Store tag
-        id: set_tag
-        run: |
-          VERSION=${{needs.create-release-tag.outputs.tag}}${{needs.create-fix-tag.outputs.tag}}
-          echo Tag set to ${VERSION}
-          echo ::set-output name=VERSION::${VERSION}
-
-      #- name: Push to Docker Hub
-      #  uses: docker/build-push-action@v2
-      #  with:
-      #    context: ./app
-      #    file: ./app/Dockerfile
-      #    platforms: linux/amd64
-      #    push: true
-      #    tags: |
-      #      konstellation/kdl-server:${{ steps.version.outputs.tag }}
-      #      konstellation/kdl-server:latest
-
-      - name: CheckOut
-        uses: actions/checkout@v2
-
-        #- name: Changelog
-        #  uses: ./.github/actions/git-chglog
-        #  id: Changelog
-        #  with:
-        #    path: app
-        #    tag: ${{ steps.set_tag.outputs.VERSION }}
-
-        #- name: Create Release
-        #  id: create_release
-        #  uses: actions/create-release@latest
-        #  with:
-        #    tag_name: ${{ steps.set_tag.outputs.VERSION }}
-        #    release_name: Release ${{ steps.set_tag.outputs.VERSION }}
-        #    body: |
-        #      ${{ steps.Changelog.outputs.changelog }}
-        #    draft: false
-        #    prerelease: false
-
-
-  chart-update:
-    if: always() && needs.build-release.outputs.app-version
-    needs: build-release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - uses: chrisdickinson/setup-yq@latest
-      - name: Replace component versions
-        run: |
-          # set app version and chart version for kdl
-          yq w -i helm/kdl-server/values.yaml 'kdlServer.image.tag' ${{ needs.build-release.outputs.app-version }}
-          yq w -i helm/kdl-server/Chart.yaml 'appVersion' ${{ needs.build-release.outputs.app-version }}
-          echo 'appVersion' ${{ needs.build-release.outputs.app-version }}
-
-      - name: Commit files
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git commit -m "Update chart kdl-server version to ${{ needs.build-release.outputs.app-version }} [skip-ci]" -a
-          git push
+  build:
+    needs: lint-dockerfile
+    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@main
+    with:
+      component: kdl-server
+      component_helm: kdlServer
+      component_path: app
+      component_image: kdl-server
+      component_app: true
+      chart_name: kdl-server
+    secrets:
+      github_token: ${{ secrets.PATNAME }}

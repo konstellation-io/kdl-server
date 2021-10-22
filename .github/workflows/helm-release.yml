@@ -10,6 +10,8 @@ on:
     workflows:
       - "Backup Component Build"
       - "Cleaner Component Build"
+      - "Drone Authorizer Component Build"
+      - "Gitea Oauth2 Setup Component Build"
       - "KDLServer Application Build"
     types:
       - completed

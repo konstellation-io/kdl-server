@@ -16,7 +16,6 @@ on:
       - "cleaner/**/*"
       - ".github/workflows/cleaner*"
 
-
 jobs:
   lint-dockerfile:
     uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@main

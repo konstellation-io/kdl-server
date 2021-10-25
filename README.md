@@ -115,6 +115,13 @@ The Kubernetes command-line tool is useful to run commands against Kubernetes cl
 
 https://kubernetes.io/docs/tasks/tools/
 
+#### jq (Mac only)
+
+JSON processor to configre insecure-registries on Mac.
+```
+brew install jq
+```
+
 ## Local Environment
 
 This repo contains a tool called `./kdlctl.sh` to handle common actions you need during development.

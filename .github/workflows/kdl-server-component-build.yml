@@ -66,7 +66,7 @@ jobs:
       #      ./app/ui/test-report.xml
 
   build:
-    needs: lint-dockerfile
+    needs: [lint-dockerfile, quality-checks]
     uses: konstellation-io/github-workflows/.github/workflows/build.yaml@main
     with:
       component: kdl-server

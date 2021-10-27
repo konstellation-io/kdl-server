@@ -17,7 +17,7 @@ on:
 
 jobs:
   lint-dockerfile:
-    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@main
+    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.0.0
     with:
       component_path: app
 
@@ -67,7 +67,7 @@ jobs:
 
   build:
     needs: [lint-dockerfile, quality-checks]
-    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@main
+    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.0.0
     with:
       component: kdl-server
       component_helm: kdlServer

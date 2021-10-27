@@ -76,4 +76,4 @@ jobs:
       component_app: true
       chart_name: kdl-server
     secrets:
-      github_token: ${{ secrets.PATNAME }}
+      github_token: ${{ secrets.GITHUB_TOKEN }}

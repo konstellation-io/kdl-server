@@ -32,5 +32,5 @@ jobs:
       component_image: cleaner
       chart_name: kdl-server
     secrets:
-      github_token: ${{ secrets.PATNAME }}
+      github_token: ${{ secrets.GITHUB_TOKEN }}
 

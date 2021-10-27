@@ -58,7 +58,7 @@ gitea:
 giteaOauth2Setup:
   image:
     repository: konstellation/gitea-oauth2-setup
-    tag: v0.15.0
+    tag: v0.16.0
     pullPolicy: IfNotPresent
 ingress:
   type: nginx
@@ -177,7 +177,7 @@ userToolsOperator:
   giteaOauth2Setup:
     image:
       repository: konstellation/gitea-oauth2-setup
-      tag: v0.15.0
+      tag: v0.16.0
       pullPolicy: IfNotPresent
   oauth2Proxy:
     image:

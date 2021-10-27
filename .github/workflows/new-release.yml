@@ -6,7 +6,7 @@ on:
 
 jobs:
   new-release:
-    uses: konstellation-io/github-workflows/.github/workflows/new-release.yaml@main
+    uses: konstellation-io/github-workflows/.github/workflows/new-release.yaml@v1.0.0
     with:
       chart_name: kdl-server
     secrets:

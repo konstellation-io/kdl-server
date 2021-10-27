@@ -3,7 +3,7 @@ black==21.5b2
 boto3==1.17.91
 csvkit==1.0.5
 cx-Oracle==8.1.0
-dask==2021.6.0
+dask==2021.10.0
 deepwalk==1.0.3
 dgl==0.6.1
 facets-overview==1.0.0

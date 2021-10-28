@@ -2,7 +2,6 @@ import ROUTE from 'Constants/routes';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
 import { GetMe } from 'Graphql/queries/types/GetMe';
-import KG from './pages/KG/KG';
 import Overview from './pages/Overview/Overview';
 import { ProjectRoute } from './ProjectPanels';
 import ProjectToolsRoutes from './components/ProjectToolsRoutes/ProjectToolsRoutes';
@@ -45,7 +44,6 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
         component={() => <Overview openedProject={openedProject} />}
       />
       <Route path={ROUTE.PROJECT_TOOL} component={ProjectToolsRoutes} />
-      <Route exact path={ROUTE.PROJECT_KG} component={KG} />
     </Switch>
   );
 }

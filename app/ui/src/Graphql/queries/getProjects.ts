@@ -20,6 +20,7 @@ export default gql`
       archived
       error
       toolUrls {
+        knowledgeGalaxy
         drone
         gitea
         jupyter

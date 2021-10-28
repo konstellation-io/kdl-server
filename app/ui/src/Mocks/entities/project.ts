@@ -2,6 +2,7 @@ import { member1, member2 } from './member';
 import { RepositoryType } from '../../Graphql/types/globalTypes';
 
 const toolUrls = {
+  knowledgeGalaxy: 'https://knowledgeGalaxy',
   drone: 'https://drone',
   gitea: 'https://gitea',
   jupyter: 'https://jupyter',

@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: kdl-kg
+  name: knowledge-galaxy
   labels:
-    app: kdl-kg
+    app: knowledge-galaxy
 spec:
   clusterIP: None
   ports:
@@ -12,4 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: kdl-kg
+    app: knowledge-galaxy

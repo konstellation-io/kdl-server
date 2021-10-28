@@ -89,8 +89,13 @@ type Config struct {
 			PullPolicy string `envconfig:"PROJECT_FILEBROWSER_IMG_PULLPOLICY"`
 		}
 	}
-	KGservice struct {
-		URL string `envconfig:"KG_URL"`
+	Kg struct {
+		URL   string `envconfig:"KG_URL"`
+		Image struct {
+			Repository string `envconfig:"KG_IMG_REPO"`
+			Tag        string `envconfig:"KG_IMG_TAG"`
+			PullPolicy string `envconfig:"KG_IMG_PULLPOLICY"`
+		}
 	}
 	ScheduledJob struct {
 		UsersSync struct {

@@ -78,8 +78,8 @@ kdl:
 
 kdlKG:
   image:
-    repository: konstellation/kdl-kg
-    tag: "v0.13-alpha.7"
+    repository: konstellation/knowledge-galaxy
+    tag: latest
     pullPolicy: IfNotPresent
   assetRoute: "/kg/assets"
   workers: 1

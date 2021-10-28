@@ -108,6 +108,8 @@ deploy_helm_chart() {
     --set kdl.local="true" \
     --set kdlServer.image.pullPolicy="Always" \
     --set kdlServer.image.repository="$IMAGE_REGISTRY/konstellation/kdl-server" \
+    --set kdlKG.image.pullPolicy="Always" \
+    --set kdlKG.image.repository="$IMAGE_REGISTRY/konstellation/knowledge-galaxy" \
     --set minio.securityContext.runAsUser=0 \
     --set mongodb.persistentVolume.storageClassName=$STORAGE_CLASS_NAME \
     --set sharedVolume.storageClassName=$STORAGE_CLASS_NAME \

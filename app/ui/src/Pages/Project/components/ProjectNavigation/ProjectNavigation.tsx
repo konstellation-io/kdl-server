@@ -1,15 +1,14 @@
-import { NavLink, useParams, useRouteMatch } from 'react-router-dom';
-import React, { FC, useEffect, useState } from 'react';
+import { NavLink, useParams } from 'react-router-dom';
+import React, { FC, useState } from 'react';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import useWorkspace, { CONFIG } from 'Hooks/useWorkspace';
 
 import IconCollapse from '@material-ui/icons/KeyboardBackspace';
-import IconKGViewer from 'Components/Icons/AutoStories';
 import IconSettings from '@material-ui/icons/Settings';
 import NavElements from './components/NavElements/NavElements';
 import NavigationButton from './components/NavigationButton/NavigationButton';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
-import ROUTE, { RouteProjectParams } from 'Constants/routes';
+import { RouteProjectParams } from 'Constants/routes';
 import cx from 'classnames';
 import navButtonStyles from './components/NavigationButton/NavigationButton.module.scss';
 import styles from './ProjectNavigation.module.scss';
@@ -30,13 +29,7 @@ export const NavButtonLink: FC<any> = ({ children, ...props }) => {
   );
 };
 
-const KG_PANEL_OPTIONS = {
-  id: PANEL_ID.KG_RESULTS,
-  title: 'Knowledge Viewer',
-};
-
 function ProjectNavigation() {
-  const atKGRoute = useRouteMatch(ROUTE.PROJECT_KG)?.isExact;
   const { projectId } = useParams<RouteProjectParams>();
   const [{ navigationOpened }, saveConfiguration] = useWorkspace(projectId);
   const [opened, setOpened] = useState(navigationOpened);
@@ -46,16 +39,6 @@ function ProjectNavigation() {
     PanelType.PRIMARY,
     SETTINGS_PANEL_OPTIONS
   );
-  const { openPanel: openKGPanel, closePanel: closeKGPanel } = usePanel(
-    PanelType.PRIMARY,
-    KG_PANEL_OPTIONS
-  );
-
-  // Closes KG Results panel when entering Knowledge Galaxy view
-  useEffect(() => {
-    if (atKGRoute && panelData?.id === PANEL_ID.KG_RESULTS) closeKGPanel();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [atKGRoute]);
 
   function onToggleOpened() {
     setOpened(!opened);
@@ -69,13 +52,6 @@ function ProjectNavigation() {
     else closeSettings();
   }
 
-  function toggleKGPanel() {
-    const shouldOpen = !panelData || panelData.id !== PANEL_ID.KG_RESULTS;
-
-    if (shouldOpen) openKGPanel();
-    else closeKGPanel();
-  }
-
   return (
     <div
       className={cx(styles.container, { [styles.opened]: opened })}
@@ -85,13 +61,6 @@ function ProjectNavigation() {
         <NavElements isOpened={opened} />
       </div>
       <div className={styles.bottom}>
-        <NavigationButton
-          dataTestId="toggleKnowledgeViewer"
-          onClick={toggleKGPanel}
-          label="Knowledge Viewer"
-          Icon={IconKGViewer}
-          disabled={!!atKGRoute}
-        />
         <NavigationButton
           dataTestId="toggleSettings"
           onClick={toggleSettingsPanel}

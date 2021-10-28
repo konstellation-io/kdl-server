@@ -23,6 +23,7 @@ build_docker_images() {
   build_vscode
   build_repo_cloner
   build_mlflow
+  build_kg
   build_backup
 }
 
@@ -60,6 +61,10 @@ build_repo_cloner() {
 
 build_mlflow() {
   build_image mlflow mlflow
+}
+
+build_kg() {
+  build_image knowledge-galaxy knowledge-galaxy
 }
 
 build_backup() {

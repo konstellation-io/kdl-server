@@ -4,7 +4,6 @@ type Query {
   project(id: ID!): Project!
   users: [User!]!
   qualityProjectDesc(description: String!): QualityProjectDesc!
-  knowledgeGraph(projectId: ID!): KnowledgeGraph!
 }
 
 type Mutation {
@@ -18,7 +17,6 @@ type Mutation {
   updateMembers(input: UpdateMembersInput!): Project!
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
-  setKGStarred(input: SetKGStarredInput!): SetKGStarredRes!
   setActiveUserTools(input: SetActiveUserToolsInput!): User!
   syncUsers: SyncUsersResponse!
 }
@@ -30,29 +28,6 @@ type QualityProjectDesc {
 type Topic {
   name: String!
   relevance: Float!
-}
-
-type KnowledgeGraph {
-  items: [KnowledgeGraphItem!]!
-  topics: [Topic!]!
-}
-
-type KnowledgeGraphItem {
-  id: ID!
-  category: KnowledgeGraphItemCat!
-  title: String!
-  abstract: String!
-  authors: [String!]!
-  score: Float!
-  date: String!
-  url: String!
-  topics: [Topic!]!
-  starred: Boolean!
-
-  # optional fields
-  repoUrls: [String!]
-  externalId: ID # for example: arxivId
-  frameworks: [String!]
 }
 
 type SSHKey {
@@ -89,6 +64,7 @@ type Member {
 }
 
 type ToolUrls {
+  knowledgeGalaxy: String!
   gitea: String!
   filebrowser: String!
   jupyter: String!
@@ -113,12 +89,6 @@ input UpdateProjectInput {
   name: String
   description: String
   archived: Boolean
-}
-
-input SetKGStarredInput {
-  projectId: ID!
-  kgItemId: ID!
-  starred: Boolean!
 }
 
 input AddMembersInput {
@@ -173,11 +143,6 @@ input SetActiveUserToolsInput {
   active: Boolean!
 }
 
-type SetKGStarredRes {
-  kgItemId: ID!
-  starred: Boolean!
-}
-
 type Project {
   id: ID!
   name: String!
@@ -213,11 +178,6 @@ type Repository {
 enum RepositoryType {
   INTERNAL
   EXTERNAL
-}
-
-enum KnowledgeGraphItemCat {
-  Paper
-  Code
 }
 
 type SyncUsersResponse {

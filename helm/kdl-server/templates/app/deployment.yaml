@@ -111,6 +111,7 @@ spec:
             - "--upstream=http://127.0.0.1:8080/"
             - "--upstream=http://127.0.0.1:9000/mlflow/"
             - "--upstream=http://127.0.0.1:9000/filebrowser/"
+            - "--upstream=http://127.0.0.1:5000/knowledge-galaxy/"
             - "--pass-user-headers=true"
             - "--skip-provider-button=true"
             - "--skip-auth-route=/config.json"

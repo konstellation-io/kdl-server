@@ -31,14 +31,15 @@ export const mainRoutesConfig: RouteConfiguration[] = [
     Icon: IconHome,
     route: ROUTE.PROJECT_OVERVIEW,
   },
-  {
-    id: 'knowledge-galaxy',
-    label: 'Knowledge Galaxy',
-    Icon: IconKG,
-    route: ROUTE.PROJECT_KG,
-  },
+
 ];
 export const projectToolsRoutesConfig: RouteConfiguration[] = [
+  {
+    id: 'knowledgeGalaxy',
+    label: 'Knowledge Galaxy',
+    Icon: IconKG,
+    route: ROUTE.PROJECT_TOOL_KG,
+  },
   {
     id: 'gitea',
     label: 'Gitea',

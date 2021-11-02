@@ -128,7 +128,7 @@ jobs:
             'userToolsOperator.vscode.image.tag' \
             'userToolsOperator.jupyter.image.tag' \
             'userToolsOperator.repoCloner.image.tag' \
-            'userToolsOperator.gitea-oauth2-setup.tag'
+            'userToolsOperator.giteaOauth2Setup.tag'
           do
               yq w -i helm/kdl-server/values.yaml $image ${{ steps.get_version.outputs.VERSION }}; 
           done

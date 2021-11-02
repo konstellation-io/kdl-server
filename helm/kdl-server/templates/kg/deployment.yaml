@@ -20,5 +20,15 @@ spec:
           envFrom:
             - configMapRef:
                 name: knowledge-galaxy-configmap
+            - secretRef:
+                name: kdl-server-secrets
+          volumeMounts:
+            - name: knowledge-galaxy-configmap
+              mountPath: /kg/public/config.json
+              subPath: config.cfg
           ports:
-            - containerPort: {{ .Values.kdlKG.port }}
+            - containerPort: 8080
+      volumes:
+        - name: knowledge-galaxy-configmap
+          configMap:
+            name: knowledge-galaxy-configmap

@@ -14,7 +14,7 @@ data:
   USER_TOOLS_VSCODE_URL: "{{ include "protocol" . }}://USERNAME-code.{{ .Values.domain }}/?folder=/home/coder/repos/REPO_FOLDER"
   DRONE_URL: "{{ include "protocol" . }}://drone.{{ .Values.domain }}"
   PROJECT_MLFLOW_URL: "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/mlflow/PROJECT_ID/"
-  KG_URL: "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/knowledge-galaxy/PROJECT_ID/"
+  KG_URL: "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/knowledge-galaxy/projects/PROJECT_ID/"
 
   config.cfg: |+
     {

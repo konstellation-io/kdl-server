@@ -34,7 +34,7 @@ func (a *AuthController) HandleProjectAuth(res http.ResponseWriter, req *http.Re
 		return
 	}
 
-	projectIDRegExp := regexp.MustCompile("^/[^/]+/([^/]+)")
+	projectIDRegExp := regexp.MustCompile("^/[^/]+/(?:projects/)?([^/]+)")
 	matches := projectIDRegExp.FindAllStringSubmatch(originalURI, 1)
 
 	if !projectIDRegExp.MatchString(originalURI) {

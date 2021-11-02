@@ -84,7 +84,6 @@ kdlKG:
   assetRoute: "/kg/assets"
   workers: 1
   bindAddress: 0.0.0.0
-  port: 8080
   numberOfOutputs: 10
   logPath: /var/log/app/kg.log
   logLevel: INFO

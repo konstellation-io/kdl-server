@@ -8,9 +8,17 @@ data:
   KG_ASSET_ROUTE: "{{ .Values.kdlKG.assetRoute }}" # Asset route this is a mandatory variable
   KG_WORKERS: "{{ .Values.kdlKG.workers }}" # Number of threads for the server defaults to 1
   KG_HOST: "{{ .Values.kdlKG.bindAddress }}" # Address for the server defaults to localhost
-  KG_PORT: "{{ .Values.kdlKG.port }}" # KG server port defaults to 5555
+  KDL_SERVER_PORT: "8080"
   # Recommender Settings
   KG_N_HITS: "{{ .Values.kdlKG.numberOfOutputs }}" # Number of outputs that the recommender outputs defaults to 10
   # Log file
   KG_LOG_FILE: "{{ .Values.kdlKG.logPath }}" # Log file path defaults to /var/log/kg.log
   KG_LOG_LEVEL: "{{ .Values.kdlKG.logLevel }}" # Log level defaults to info
+
+  config.cfg: |+
+    {
+      "SERVER_NAME": "{{ .Values.serverName }}",
+      "SERVER_URL": "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/knowledge-galaxy",
+      "MODE": "iframe",
+      "BASENAME": "/knowledge-galaxy/"
+    }

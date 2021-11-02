@@ -118,15 +118,17 @@ jobs:
         run:  |
           # set image tags on kdl
           for image in 'kdlServer.image.tag' \
+            'backup.image.tag' \
             'droneAuthorizer.image.tag' \
             'giteaOauth2Setup.image.tag' \
             'projectOperator.image.tag' \
-            'mlflow.image.tag' \
+            'projectOperator.mlflow.image.tag' \
             'cleaner.image.tag' \
             'userToolsOperator.image.tag' \
             'userToolsOperator.vscode.image.tag' \
             'userToolsOperator.jupyter.image.tag' \
-            'userToolsOperator.repoCloner.image.tag' 
+            'userToolsOperator.repoCloner.image.tag' \
+            'userToolsOperator.gitea-oauth2-setup.tag'
           do
               yq w -i helm/kdl-server/values.yaml $image ${{ steps.get_version.outputs.VERSION }}; 
           done

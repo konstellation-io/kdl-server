@@ -407,16 +407,18 @@ jobs:
       - name: Replace component version with YQ
         run:  |
           # set image tags on kdl
+          yq w -i helm/kdl-server/values.yaml 'backup.image.tag' ${{ steps.get_version.outputs.VERSION }}
           yq w -i helm/kdl-server/values.yaml 'kdlServer.image.tag' ${{ steps.get_version.outputs.VERSION }}
           yq w -i helm/kdl-server/values.yaml 'droneAuthorizer.image.tag' ${{ steps.get_version.outputs.VERSION }}
           yq w -i helm/kdl-server/values.yaml 'giteaOauth2Setup.image.tag' ${{ steps.get_version.outputs.VERSION }}
           yq w -i helm/kdl-server/values.yaml 'projectOperator.image.tag' ${{ steps.get_version.outputs.VERSION }}
-          yq w -i helm/kdl-server/values.yaml 'mlflow.image.tag' ${{ steps.get_version.outputs.VERSION }}
+          yq w -i helm/kdl-server/values.yaml 'projectOperator.mlflow.image.tag' ${{ steps.get_version.outputs.VERSION }}
           yq w -i helm/kdl-server/values.yaml 'cleaner.image.tag' ${{ steps.get_version.outputs.VERSION }}
           yq w -i helm/kdl-server/values.yaml 'userToolsOperator.image.tag' ${{ steps.get_version.outputs.VERSION }}
           yq w -i helm/kdl-server/values.yaml 'userToolsOperator.vscode.image.tag' ${{ steps.get_version.outputs.VERSION }}
           yq w -i helm/kdl-server/values.yaml 'userToolsOperator.jupyter.image.tag' ${{ steps.get_version.outputs.VERSION }}
           yq w -i helm/kdl-server/values.yaml 'userToolsOperator.repoCloner.image.tag' ${{ steps.get_version.outputs.VERSION }}
+          yq w -i helm/kdl-server/values.yaml 'userToolsOperator.giteaOauth2Setup.image.tag' ${{ steps.get_version.outputs.VERSION }}
 
           # set app version and chart version for kdl
           yq w -i helm/kdl-server/Chart.yaml 'appVersion' ${{ steps.get_version.outputs.VERSION }}

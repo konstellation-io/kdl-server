@@ -30,7 +30,7 @@ mypy-extensions==0.4.3
 nbdime==2.0.0
 nbresuse==0.3.3
 networkx==2.5.1
-nltk==3.6.2
+nltk==3.6.5
 node2vec==0.4.3
 nose2==0.10.0
 notebook==6.0.1

@@ -1,4 +1,4 @@
-FROM nvidia/cuda:10.2-cudnn7-runtime-ubuntu18.04 as odbc-builder
+FROM nvidia/cuda:11.0.3-cudnn8-runtime-ubuntu18.04 as odbc-builder
 
 LABEL maintainer="ODBC Builder"
 
@@ -26,7 +26,7 @@ RUN apt-get update && \
     # It is needed to tar the files to preserve symlinks
     tar cf /opt/odbc.tar -C /opt odbc/
 
-FROM nvidia/cuda:10.2-cudnn7-runtime-ubuntu18.04
+FROM nvidia/cuda:11.0.3-cudnn8-runtime-ubuntu18.04
 
 # Maintainer of the Dockerfile
 LABEL maintainer="Intelygenz - Konstellation Team"
@@ -76,6 +76,7 @@ RUN apt-get update && \
         less \
         libaio1 \
         libffi-dev  \
+        libgl1-mesa-glx \
         libgtk2.0-dev \
         libltdl7 \
         libllvm-10-ocaml-dev \

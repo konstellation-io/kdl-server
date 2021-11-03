@@ -18,7 +18,7 @@ data:
   config.cfg: |+
     {
       "SERVER_NAME": "{{ .Values.serverName }}",
-      "SERVER_URL": "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/knowledge-galaxy",
+      "SERVER_URL": "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/kg",
       "MODE": "iframe",
-      "BASENAME": "/knowledge-galaxy/"
+      "BASENAME": "/kg/"
     }

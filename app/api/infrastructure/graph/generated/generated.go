@@ -93,10 +93,6 @@ type ComplexityRoot struct {
 		ToolUrls           func(childComplexity int) int
 	}
 
-	QualityProjectDesc struct {
-		Quality func(childComplexity int) int
-	}
-
 	Query struct {
 		Me       func(childComplexity int) int
 		Project  func(childComplexity int, id string) int
@@ -484,13 +480,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.ToolUrls(childComplexity), true
 
-	case "QualityProjectDesc.quality":
-		if e.complexity.QualityProjectDesc.Quality == nil {
-			break
-		}
-
-		return e.complexity.QualityProjectDesc.Quality(childComplexity), true
-
 	case "Query.me":
 		if e.complexity.Query.Me == nil {
 			break
@@ -790,10 +779,6 @@ type Mutation {
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
   setActiveUserTools(input: SetActiveUserToolsInput!): User!
   syncUsers: SyncUsersResponse!
-}
-
-type QualityProjectDesc {
-  quality: Int!
 }
 
 type Topic {
@@ -2359,41 +2344,6 @@ func (ec *executionContext) _Project_archived(ctx context.Context, field graphql
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _QualityProjectDesc_quality(ctx context.Context, field graphql.CollectedField, obj *model.QualityProjectDesc) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "QualityProjectDesc",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Quality, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_me(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -5330,33 +5280,6 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
-var qualityProjectDescImplementors = []string{"QualityProjectDesc"}
-
-func (ec *executionContext) _QualityProjectDesc(ctx context.Context, sel ast.SelectionSet, obj *model.QualityProjectDesc) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, qualityProjectDescImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("QualityProjectDesc")
-		case "quality":
-			out.Values[i] = ec._QualityProjectDesc_quality(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -6145,21 +6068,6 @@ func (ec *executionContext) marshalNID2ᚕstringᚄ(ctx context.Context, sel ast
 	}
 
 	return ret
-}
-
-func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
-	res, err := graphql.UnmarshalInt(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
-	res := graphql.MarshalInt(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-	}
-	return res
 }
 
 func (ec *executionContext) marshalNMember2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMember(ctx context.Context, sel ast.SelectionSet, v entity.Member) graphql.Marshaler {

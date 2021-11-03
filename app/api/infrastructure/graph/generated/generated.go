@@ -759,7 +759,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "infrastructure/graph/schema.graphqls", Input: `type Query {
+	{Name: "../graphql/schema.graphqls", Input: `type Query {
   me: User!
   projects: [Project!]!
   project(id: ID!): Project!

@@ -1,18 +1,11 @@
-const relevances = require('./mocks/topic_relevance.json');
 const casual = require('casual');
 const buildProject = require('./mocks/projectMock');
 const buildUser = require('./mocks/usersMock');
-const { kgData, kgDataLowScores } = require('./mocks/kgMock');
 const { buildMember, meAsMember } = require('./mocks/membersMock');
 const { meId, me } = require('./mocks/meMock');
 
 const projects = Array(8).fill(0).map(buildProject);
 const users = Array(casual.integer(20, 30)).fill(0).map(buildUser);
-let kfidx = 0;
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 module.exports = {
   Query: () => ({
@@ -20,18 +13,6 @@ module.exports = {
     projects: () => projects,
     users: () => users,
     project: (_, { id }) => projects.find((project) => project.id === id),
-    qualityProjectDesc: () => ({
-      quality: Math.round((Math.random() * 1000) % 100),
-    }),
-    knowledgeGraph: async () => {
-      await sleep(2000);
-      kfidx += 1;
-
-      return {
-        items: () => (kfidx % 2 ? kgData : kgDataLowScores),
-        topics: () => relevances,
-      };
-    },
   }),
   Mutation: () => ({
     updateProject: (_, { input: { id, name, description, archived } }) => {
@@ -70,17 +51,9 @@ module.exports = {
     removeApiToken: (_, { input: { apiTokenId } }) => ({
       id: apiTokenId,
     }),
-    setStarredKGItem: (_, { input: { kgItemId, starred } }) => ({
-      id: kgItemId,
-      starred,
-    }),
     regenerateSSHKey: () => ({
       id: meId,
       sshKey: this.SSHKey,
-    }),
-    setKGStarred: (_, { input: { kgItemId, starred } }) => ({
-      kgItemId,
-      starred,
     }),
     addApiToken: this.ApiToken,
     updateAccessLevel: (_, { input: { userIds, accessLevel } }) => {
@@ -149,25 +122,5 @@ module.exports = {
     private: casual.uuid,
     creationDate: new Date().toUTCString(),
     lastActivity: new Date().toUTCString(),
-  }),
-  KnowledgeGraphItem: () => ({
-    id: casual.id,
-    category: casual.random_element(['Code', 'Paper']),
-    topics: [
-      {
-        name: 'Topic 1',
-        relevance: 0.8,
-      },
-      {
-        name: 'Topic 2',
-        relevance: 0.2,
-      },
-    ],
-    title: casual.name,
-    abstract: casual.words(200),
-    authors: ['Xingyi Zhou', 'Vladlen Koltun', 'Philipp Krähenbühl'],
-    score: casual.random,
-    date: new Date().toISOString(),
-    url: 'https://paperswithcode.com/paper/probabilistic-two-stage-detection',
   }),
 };

@@ -1,6 +1,7 @@
 {
   "SERVER_NAME": "MockServer",
   "SERVER_URL": "http://localhost:4000",
+  "KG_SERVER_URL": "http://localhost:4001",
   "GITEA_URL": "https://gitea.local",
   "RELEASE_VERSION": "kdl-server-0.10.0"
 }

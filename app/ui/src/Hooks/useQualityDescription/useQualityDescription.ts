@@ -33,6 +33,7 @@ function useQualityDescription(
       setDescriptionScore(data.qualityProjectDesc.quality || 0);
       setLoading(false);
     },
+    context: { clientName: 'kg' }
   });
 
   const isLengthAcceptable = description.split(' ').length >= minWordsNumber;

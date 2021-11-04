@@ -33,5 +33,5 @@ jobs:
       component_image: kdl-backup
       chart_name: kdl-server
     secrets:
-      github_token: ${{ secrets.GITHUB_TOKEN }}
+      github_token: ${{ secrets.PATNAME }}
 

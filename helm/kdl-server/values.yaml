@@ -95,12 +95,6 @@ kdlServer:
     tag: latest
     pullPolicy: IfNotPresent
 
-kubeRbacProxy:
-  image:
-    repository: gcr.io/kubebuilder/kube-rbac-proxy
-    tag: v0.8.0
-    pullPolicy: IfNotPresent
-
 minio:
   accessKey: minio
   secretKey: minio123
@@ -108,7 +102,10 @@ minio:
     storageClass: standard
     existingClaim: received-data-claim
     accessMode: ReadWriteMany
-# This Chart feature is disabled because we have to deal with different Kubernetes API versions. Please check the ingress template in Helm chart
+
+## This Chart feature is disabled because we have to deal with different Kubernetes API versions.
+## Please check the ingress template in Helm chart
+##
   ingress:
     enabled: false
     hosts:
@@ -142,10 +139,36 @@ postgres:
     storageClassName: standard
 
 projectOperator:
-  image:
-    repository: konstellation/project-operator
-    tag: latest
-    pullPolicy: IfNotPresent
+
+  ## Main container specs
+  ##
+  manager:
+    image:
+      repository: konstellation/project-operator
+      tag: latest
+      pullPolicy: IfNotPresent
+
+    ## Resource requests and limits for primary projectOperator container
+    ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+    ##
+    resources: {} 
+    # limits:
+    #   cpu: 500m
+    #   memory: 200Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 60Mi
+
+  ## kube-rbac-proxy container specs
+  ##
+  kubeRbacProxy:
+    image:
+      repository: gcr.io/kubebuilder/kube-rbac-proxy
+      tag: v0.8.0
+      pullPolicy: IfNotPresent
+
+  ## The following components are managed by the manager container when kdlproject custom resources are detected
+  ##
   mlflow:
     image:
       repository: konstellation/mlflow

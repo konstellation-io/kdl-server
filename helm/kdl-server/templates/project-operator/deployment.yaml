@@ -22,8 +22,8 @@ spec:
         - --upstream=http://127.0.0.1:8080/
         - --logtostderr=true
         - --v=10
-        image: {{ .Values.kubeRbacProxy.image.repository }}:{{ .Values.kubeRbacProxy.image.tag }}
-        imagePullPolicy: {{ .Values.kubeRbacProxy.image.pullPolicy }}
+        image: {{ .Values.projectOperator.kubeRbacProxy.image.repository }}:{{ .Values.projectOperator.kubeRbacProxy.image.tag }}
+        imagePullPolicy: {{ .Values.projectOperator.kubeRbacProxy.image.pullPolicy }}
         name: kube-rbac-proxy
         ports:
         - containerPort: 8443
@@ -33,8 +33,8 @@ spec:
         - --metrics-bind-address=127.0.0.1:8080
         - --leader-elect
         - --leader-election-id=project-operator
-        image: {{ .Values.projectOperator.image.repository }}:{{ .Values.projectOperator.image.tag }}
-        imagePullPolicy: {{ .Values.projectOperator.image.pullPolicy }}
+        image: {{ .Values.projectOperator.manager.image.repository }}:{{ .Values.projectOperator.manager.image.tag }}
+        imagePullPolicy: {{ .Values.projectOperator.manager.image.pullPolicy }}
         livenessProbe:
           httpGet:
             path: /healthz
@@ -48,13 +48,10 @@ spec:
             port: 8081
           initialDelaySeconds: 5
           periodSeconds: 10
+{{- if .Values.projectOperator.manager.resources }}
         resources:
-          limits:
-            cpu: 500m
-            memory: 200Mi
-          requests:
-            cpu: 100m
-            memory: 60Mi
+{{ toYaml .Values.projectOperator.manager.resources | indent 10 }}
+{{- end }}
         securityContext:
           allowPrivilegeEscalation: false
       securityContext:

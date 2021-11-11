@@ -1,4 +1,4 @@
-FROM quay.io/operator-framework/helm-operator:v1.3.0
+FROM quay.io/operator-framework/helm-operator:v1.6.2
 
 LABEL maintainer="Intelygenz - Konstellation Team"
 

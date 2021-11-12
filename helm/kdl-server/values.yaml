@@ -76,16 +76,15 @@ ingress:
 kdl:
   local: false
 
-kdlKG:
+knowledgeGalaxy:
+  enabled: false
   image:
     repository: konstellation/knowledge-galaxy
     tag: latest
     pullPolicy: IfNotPresent
-  assetRoute: "/kg/assets"
   workers: 1
-  bindAddress: 0.0.0.0
-  numberOfOutputs: 10
-  logPath: /var/log/app/kg.log
+  numberOfOutputs: 1000
+  descriptionMinWords: 50
   logLevel: INFO
 
 kdlServer:

@@ -1,3 +1,4 @@
+{{ if .Values.knowledgeGalaxy.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,20 +16,21 @@ spec:
     spec:
       containers:
         - name: knowledge-galaxy
-          image: {{ .Values.kdlKG.image.repository }}:{{ .Values.kdlKG.image.tag }}
-          imagePullPolicy: {{ .Values.kdlKG.image.pullPolicy }}
+          image: {{ .Values.knowledgeGalaxy.image.repository }}:{{ .Values.knowledgeGalaxy.image.tag }}
+          imagePullPolicy: {{ .Values.knowledgeGalaxy.image.pullPolicy }}
           envFrom:
             - configMapRef:
                 name: knowledge-galaxy-configmap
             - secretRef:
-                name: kdl-server-secrets
+                name: knowledge-galaxy-secrets
           volumeMounts:
             - name: knowledge-galaxy-configmap
               mountPath: /kg/public/config.json
-              subPath: config.cfg
+              subPath: config.json
           ports:
             - containerPort: 8080
       volumes:
         - name: knowledge-galaxy-configmap
           configMap:
             name: knowledge-galaxy-configmap
+{{ end }}

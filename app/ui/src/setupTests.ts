@@ -10,8 +10,10 @@ jest.mock('index', () => ({
   CONFIG: {
     SERVER_NAME: 'KDL Server',
     SERVER_URL: 'kdl.server.com',
+    KG_ENABLED: true,
     GITEA_URL: 'kdl.gitea.com',
     RELEASE_VERSION: 'v1.2.3',
+    DESCRIPTION_MIN_WORDS: 50,
   },
 }));
 

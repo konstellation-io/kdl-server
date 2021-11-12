@@ -90,12 +90,8 @@ type Config struct {
 		}
 	}
 	Kg struct {
-		URL   string `envconfig:"KG_URL"`
-		Image struct {
-			Repository string `envconfig:"KG_IMG_REPO"`
-			Tag        string `envconfig:"KG_IMG_TAG"`
-			PullPolicy string `envconfig:"KG_IMG_PULLPOLICY"`
-		}
+		Enabled bool   `envconfig:"KNOWLEDGE_GALAXY_ENABLED"`
+		URL     string `envconfig:"KNOWLEDGE_GALAXY_URL"`
 	}
 	ScheduledJob struct {
 		UsersSync struct {

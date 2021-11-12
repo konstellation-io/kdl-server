@@ -64,7 +64,17 @@ build_mlflow() {
 }
 
 build_kg() {
-  build_image knowledge-galaxy knowledge-galaxy
+    if [ "$KNOWLEDGE_GALAXY_ENABLED" != "true"  ]; then
+        echo_info "ℹ️ Knowledge Galaxy disabled. skipping build."
+        return
+    fi
+
+    if [ ! -d $KNOWLEDGE_GALAXY_PATH ] || [ -z $KNOWLEDGE_GALAXY_PATH ]; then
+      echo_warning "\$KNOWLEDGE_GALAXY_PATH=\"${KNOWLEDGE_GALAXY_PATH}\" is invalid. skipping build."
+      return
+    fi
+
+    build_image knowledge-galaxy $KNOWLEDGE_GALAXY_PATH
 }
 
 build_backup() {

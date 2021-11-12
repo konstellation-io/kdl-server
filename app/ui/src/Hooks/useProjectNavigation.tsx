@@ -13,6 +13,7 @@ import { OverridableComponent } from '@material-ui/core/OverridableComponent';
 import { SvgIconTypeMap } from '@material-ui/core';
 import VSIcon from 'Components/Icons/VSIcon/VSIcon';
 import { useQuery } from '@apollo/client';
+import { CONFIG } from 'index';
 
 import GetMeQuery from 'Graphql/queries/getMe';
 
@@ -108,8 +109,12 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
     }));
 
     const userToolsRoutes = userToolsRoutesDisabled.map(buildRoutes);
-    const projectToolsRoutes = projectToolsRoutesConfig.map(buildRoutes);
+    let projectToolsRoutes = projectToolsRoutesConfig.map(buildRoutes);
     const mainRoutes = mainRoutesConfig.map(buildRoutes);
+
+    if (!CONFIG.KG_ENABLED) {
+      projectToolsRoutes = projectToolsRoutes.filter((r: RouteConfiguration) => r.id === 'knowledgeGalaxy')
+    }
 
     return {
       allRoutes: [...mainRoutes, ...projectToolsRoutes, ...userToolsRoutes],

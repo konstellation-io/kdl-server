@@ -15,6 +15,7 @@ import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescrip
 import { useQuery, useReactiveVar } from '@apollo/client';
 import { GetProjects } from 'Graphql/queries/types/GetProjects';
 import GetProjectsQuery from 'Graphql/queries/getProjects';
+import { CONFIG } from 'index';
 
 const limits = {
   maxHeight: 400,
@@ -115,10 +116,10 @@ function Information({ showErrors }: Props) {
         textArea
         lockHorizontalGrowth
       />
-      <DescriptionScore
+        { CONFIG.KG_ENABLED && <DescriptionScore
         score={descriptionScore}
         loading={loadingQualityDescription}
-      />
+      /> }
     </div>
   );
 }

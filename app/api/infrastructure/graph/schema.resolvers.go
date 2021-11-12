@@ -199,7 +199,11 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 	vscodeWithUsernameAndFolder := strings.Replace(vscodeWithUsername, "REPO_FOLDER", folderName, 1)
 	mlflowWithProject := strings.Replace(r.cfg.ProjectMLFlow.URL, "PROJECT_ID", obj.ID, 1)
 	filebrowserWithProject := strings.Replace(r.cfg.ProjectFilebrowser.URL, "PROJECT_ID", obj.ID, 1)
-	kgWithProject := strings.Replace(r.cfg.Kg.URL, "PROJECT_ID", obj.ID, 1)
+	kgWithProject := ""
+
+	if r.cfg.Kg.Enabled {
+		kgWithProject = strings.Replace(r.cfg.Kg.URL, "PROJECT_ID", obj.ID, 1)
+	}
 
 	return &entity.ToolUrls{
 		KnowledgeGalaxy: kgWithProject,

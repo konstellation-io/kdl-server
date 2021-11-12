@@ -99,7 +99,7 @@ spec:
           volumeMounts:
             - name: kdl-server-configmap
               mountPath: /public/config.json
-              subPath: config.cfg
+              subPath: config.json
           ports:
             - containerPort: 3000
         - name: oauth2-proxy

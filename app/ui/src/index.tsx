@@ -10,7 +10,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import fetchConfig from './fetchConfig';
 
-export let CONFIG: { [key: string]: string };
+type Config = {
+  SERVER_NAME: string;
+  SERVER_URL: string;
+  KG_ENABLED: boolean;
+  KG_SERVER_URL: string;
+  GITEA_URL: string;
+  RELEASE_VERSION: string;
+  DESCRIPTION_MIN_WORDS: number;
+}
+export let CONFIG: Config;
 
 fetchConfig.then((configJson) => {
   CONFIG = configJson;

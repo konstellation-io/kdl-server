@@ -16,6 +16,7 @@ import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { SETTINGS_PANEL_OPTIONS } from '../../panelSettings';
 import IconLaunch from '@material-ui/icons/Launch';
 import cx from 'classnames';
+import { CONFIG } from "index";
 
 type Props = {
   openedProject: GetProjects_projects;
@@ -62,7 +63,7 @@ function Overview({ openedProject }: Props) {
           <div className={styles.description}>{openedProject.description}</div>
         </div>
         <div className={styles.section}>
-          <DescriptionScore score={descriptionScore} />
+          { CONFIG.KG_ENABLED && <DescriptionScore score={descriptionScore} /> }
         </div>
         <div
           data-testid="repositorySection"

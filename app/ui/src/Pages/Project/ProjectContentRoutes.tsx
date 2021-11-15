@@ -9,6 +9,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 
 import GetMeQuery from 'Graphql/queries/getMe';
+import {CONFIG} from "index";
 
 function ProjectContentRoutes({ openedProject }: ProjectRoute) {
   const { data } = useQuery<GetMe>(GetMeQuery);
@@ -31,12 +32,20 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
     );
   }
 
+  function redirectDisabledKG() {
+    return (
+        !CONFIG.KG_ENABLED  &&
+            <Redirect key={ROUTE.PROJECT_TOOL_KG} from={ROUTE.PROJECT_TOOL_KG} to={ROUTE.PROJECT_OVERVIEW} />
+    )
+  }
+
   return (
     <Switch>
       <Redirect exact from={ROUTE.PROJECT} to={ROUTE.PROJECT_OVERVIEW} />
 
       {redirectIfArchived()}
       {redirectIfToolsActives()}
+      {redirectDisabledKG()}
 
       <Route
         exact

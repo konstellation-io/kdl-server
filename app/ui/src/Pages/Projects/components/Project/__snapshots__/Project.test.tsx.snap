@@ -41,7 +41,7 @@ exports[`Project component Component match snapshot 1`] = `
               "accessLevel": "ADMIN",
               "addedDate": "2020-02-02",
               "user": Object {
-                "__typename": "User",
+                "accessLevel": "VIEWER",
                 "creationDate": "2020-02-02",
                 "email": "userEmail1",
                 "id": "userId1",
@@ -54,7 +54,7 @@ exports[`Project component Component match snapshot 1`] = `
               "accessLevel": "MANAGER",
               "addedDate": "2020-02-03",
               "user": Object {
-                "__typename": "User",
+                "accessLevel": "VIEWER",
                 "creationDate": "2020-02-03",
                 "email": "userEmail2",
                 "id": "userId2",
@@ -103,7 +103,7 @@ exports[`Project component Component match snapshot 1`] = `
                     "accessLevel": "ADMIN",
                     "addedDate": "2020-02-02",
                     "user": Object {
-                      "__typename": "User",
+                      "accessLevel": "VIEWER",
                       "creationDate": "2020-02-02",
                       "email": "userEmail1",
                       "id": "userId1",
@@ -116,7 +116,7 @@ exports[`Project component Component match snapshot 1`] = `
                     "accessLevel": "MANAGER",
                     "addedDate": "2020-02-03",
                     "user": Object {
-                      "__typename": "User",
+                      "accessLevel": "VIEWER",
                       "creationDate": "2020-02-03",
                       "email": "userEmail2",
                       "id": "userId2",
@@ -187,7 +187,7 @@ exports[`Project component Component match snapshot 1`] = `
                     "accessLevel": "ADMIN",
                     "addedDate": "2020-02-02",
                     "user": Object {
-                      "__typename": "User",
+                      "accessLevel": "VIEWER",
                       "creationDate": "2020-02-02",
                       "email": "userEmail1",
                       "id": "userId1",
@@ -200,7 +200,7 @@ exports[`Project component Component match snapshot 1`] = `
                     "accessLevel": "MANAGER",
                     "addedDate": "2020-02-03",
                     "user": Object {
-                      "__typename": "User",
+                      "accessLevel": "VIEWER",
                       "creationDate": "2020-02-03",
                       "email": "userEmail2",
                       "id": "userId2",
@@ -277,7 +277,7 @@ exports[`Project component Component match snapshot 1`] = `
                     "accessLevel": "ADMIN",
                     "addedDate": "2020-02-02",
                     "user": Object {
-                      "__typename": "User",
+                      "accessLevel": "VIEWER",
                       "creationDate": "2020-02-02",
                       "email": "userEmail1",
                       "id": "userId1",
@@ -290,7 +290,7 @@ exports[`Project component Component match snapshot 1`] = `
                     "accessLevel": "MANAGER",
                     "addedDate": "2020-02-03",
                     "user": Object {
-                      "__typename": "User",
+                      "accessLevel": "VIEWER",
                       "creationDate": "2020-02-03",
                       "email": "userEmail2",
                       "id": "userId2",
@@ -348,7 +348,7 @@ exports[`Project component Component match snapshot 1`] = `
                     "accessLevel": "ADMIN",
                     "addedDate": "2020-02-02",
                     "user": Object {
-                      "__typename": "User",
+                      "accessLevel": "VIEWER",
                       "creationDate": "2020-02-02",
                       "email": "userEmail1",
                       "id": "userId1",
@@ -361,7 +361,7 @@ exports[`Project component Component match snapshot 1`] = `
                     "accessLevel": "MANAGER",
                     "addedDate": "2020-02-03",
                     "user": Object {
-                      "__typename": "User",
+                      "accessLevel": "VIEWER",
                       "creationDate": "2020-02-03",
                       "email": "userEmail2",
                       "id": "userId2",

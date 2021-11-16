@@ -13,7 +13,7 @@ export const userMe = {
 };
 
 export const user1 = {
-  id: 'user1',
+  id: 'userId1',
   email: 'userEmail1',
   username: 'username1',
   creationDate: '2020-02-02',
@@ -22,7 +22,7 @@ export const user1 = {
 };
 
 export const user2 = {
-  id: 'user2',
+  id: 'userId2',
   email: 'userEmail2',
   username: 'username2',
   creationDate: '2020-02-03',
@@ -31,7 +31,7 @@ export const user2 = {
 };
 
 export const newUser = {
-  id: 'user3',
+  id: 'userId3',
   email: 'userEmail3',
   username: 'username3',
   creationDate: '2020-02-04',

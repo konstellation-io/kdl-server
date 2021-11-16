@@ -7,6 +7,7 @@ export const userMe = {
   areToolsActive: true,
   accessLevel: AccessLevel.ADMIN,
   apiTokens: [apiToken1],
+  __typename: 'User',
 };
 
 export const user1 = {

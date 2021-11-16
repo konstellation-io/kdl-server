@@ -1,4 +1,4 @@
-import { member1, member2 } from './member';
+import { memberMe, member1, member2 } from './member';
 import { RepositoryType } from '../../Graphql/types/globalTypes';
 
 const toolUrls = {
@@ -27,7 +27,7 @@ export const project1 = {
   archived: false,
   error: null,
   toolUrls,
-  members: [member1, member2],
+  members: [memberMe, member1, member2],
   __typename: 'Project',
 };
 

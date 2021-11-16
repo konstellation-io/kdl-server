@@ -1,5 +1,11 @@
+import GetProjectsQuery from "../../src/Mocks/GetProjectsQuery";
+import GetMeQuery from "../../src/Mocks/GetMeQuery";
+
 describe('Project Navigation Bar Behavior', () => {
   beforeEach(() => {
+    cy.kstInterceptor('GetProjects', { data: GetProjectsQuery });
+    cy.kstInterceptor('GetMe', { data: GetMeQuery });
+
     cy.visit('http://localhost:3001');
     cy.getByTestId('project').first().parent().click();
   });

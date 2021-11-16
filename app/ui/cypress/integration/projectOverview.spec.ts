@@ -1,5 +1,15 @@
+import GetProjectsQuery from "../../src/Mocks/GetProjectsQuery";
+import GetMeQuery from "../../src/Mocks/GetMeQuery";
+import GetUsersQuery from "../../src/Mocks/GetUsersQuery";
+import GetProjectMembers from "../../src/Mocks/GetMembersQuery";
+
 describe('Project Overview Behavior', () => {
   beforeEach(() => {
+    cy.kstInterceptor('GetProjects', { data: GetProjectsQuery });
+    cy.kstInterceptor('GetMe', { data: GetMeQuery });
+    cy.kstInterceptor('GetUsers', { data: GetUsersQuery });
+    cy.kstInterceptor('GetProjectMembers', { data: GetProjectsQuery.projects[0] });
+
     cy.visit('http://localhost:3001');
     // Arrange.
     cy.getByTestId('projectName').first().invoke('text').as('projectName');

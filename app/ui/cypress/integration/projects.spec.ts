@@ -1,8 +1,18 @@
+import GetProjectsQuery from "../../src/Mocks/GetProjectsQuery";
+import GetMeQuery from "../../src/Mocks/GetMeQuery";
+import GetUsersQuery from "../../src/Mocks/GetUsersQuery";
+import GetProjectMembersQuery from "../../src/Mocks/GetMembersQuery";
+
 const { _ } = Cypress;
 
 describe('Home Behavior', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:3001');
+    cy.kstInterceptor('GetProjects', { data: GetProjectsQuery });
+    cy.kstInterceptor('GetMe', { data: GetMeQuery });
+    cy.kstInterceptor('GetUsers', { data: GetUsersQuery });
+    cy.kstInterceptor('GetProjectMembers', { data: GetProjectMembersQuery });
+
+    cy.visit('http://localhost:3001/#/projects');
   });
 
   it('should show projects page', () => {
@@ -10,9 +20,14 @@ describe('Home Behavior', () => {
     cy.url().should('include', '/projects');
   });
 
-  it('should show at least 4 projects in the page', () => {
+  it('should show at least 2 projects in the page', () => {
+    // Act.
+    cy.getByTestId('filterProjects')
+        .click()
+        .contains('active', { matchCase: false })
+        .click();
     // Assert.
-    cy.getByTestId('project').should('have.length.at.least', 4);
+    cy.getByTestId('project').should('have.length.at.least', 2);
   });
 
   it('should show 8 projects when filtering by all', () => {
@@ -23,7 +38,7 @@ describe('Home Behavior', () => {
       .click();
 
     // Assert.
-    cy.getByTestId('project').should('have.length.at.least', 8);
+    cy.getByTestId('project').should('have.length.at.least', 4);
   });
 
   it('should show only archived projects when filtering by archived', () => {
@@ -69,6 +84,7 @@ describe('Home Behavior', () => {
 
     // Assert
     cy.url().should('include', '/users');
+
     cy.getByTestId('usersTable').should('exist');
   });
 });

@@ -1,0 +1,17 @@
+{{ if .Values.knowledgeGalaxy.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: knowledge-galaxy-ui
+  labels:
+    app:  knowledge-galaxy
+data:
+  config.json: |+
+    {
+      "SERVER_NAME": "{{ .Values.serverName }}",
+      "SERVER_URL": "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/kg",
+      "MODE": "iframe",
+      "BASENAME": "/kg/",
+      "DESCRIPTION_MIN_WORDS": "{{ .Values.knowledgeGalaxy.config.descriptionMinWords }}"
+    }
+{{ end }}

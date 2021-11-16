@@ -14,23 +14,26 @@ spec:
       annotations:
         helm.sh/restart-deployment: {{ randAlphaNum 5 | quote }}
     spec:
+      {{- if .Values.knowledgeGalaxy.serviceaccount.enabled }}
+      serviceAccountName: knowledge-galaxy
+      {{- end }}
       containers:
         - name: knowledge-galaxy
           image: {{ .Values.knowledgeGalaxy.image.repository }}:{{ .Values.knowledgeGalaxy.image.tag }}
           imagePullPolicy: {{ .Values.knowledgeGalaxy.image.pullPolicy }}
           envFrom:
             - configMapRef:
-                name: knowledge-galaxy-configmap
+                name: knowledge-galaxy-env
             - secretRef:
-                name: knowledge-galaxy-secrets
+                name: knowledge-galaxy
           volumeMounts:
-            - name: knowledge-galaxy-configmap
+            - name: config
               mountPath: /kg/public/config.json
               subPath: config.json
           ports:
             - containerPort: 8080
       volumes:
-        - name: knowledge-galaxy-configmap
+        - name: config
           configMap:
-            name: knowledge-galaxy-configmap
+            name: knowledge-galaxy-ui
 {{ end }}

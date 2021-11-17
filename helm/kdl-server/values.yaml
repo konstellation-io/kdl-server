@@ -82,7 +82,7 @@ knowledgeGalaxy:
     repository: konstellation/knowledge-galaxy
     tag: v1.2.1
     pullPolicy: IfNotPresent
-  
+
   ## Knowledge Galaxy app config
   ##
   config: {}
@@ -96,13 +96,14 @@ knowledgeGalaxy:
   ##
   serviceaccount:
     enabled: true
+    name: ""
     annotations: {}
 
     ## Reference to one or more secrets to be used when pulling images
     ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
     ##
-    imagePullSecrets: 
-     - name: regcred
+    imagePullSecrets: []
+    # - name: regcred
 
 kdlServer:
   image:

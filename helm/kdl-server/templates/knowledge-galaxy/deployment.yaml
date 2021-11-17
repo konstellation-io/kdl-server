@@ -15,7 +15,7 @@ spec:
         helm.sh/restart-deployment: {{ randAlphaNum 5 | quote }}
     spec:
       {{- if .Values.knowledgeGalaxy.serviceaccount.enabled }}
-      serviceAccountName: knowledge-galaxy
+      serviceAccountName:  {{ template "knowledgeGalaxy.serviceAccountName" . }}
       {{- end }}
       containers:
         - name: knowledge-galaxy

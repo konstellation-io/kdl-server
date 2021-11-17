@@ -23,6 +23,7 @@ build_docker_images() {
   build_vscode
   build_repo_cloner
   build_mlflow
+  build_kg
   build_backup
 }
 
@@ -60,6 +61,20 @@ build_repo_cloner() {
 
 build_mlflow() {
   build_image mlflow mlflow
+}
+
+build_kg() {
+    if [ "$KNOWLEDGE_GALAXY_LOCAL" != "true"  ]; then
+        echo_info "ℹ️ Knowledge Galaxy disabled. skipping build."
+        return
+    fi
+
+    if [ ! -d $KNOWLEDGE_GALAXY_PATH ] || [ -z $KNOWLEDGE_GALAXY_PATH ]; then
+      echo_warning "\$KNOWLEDGE_GALAXY_PATH=\"${KNOWLEDGE_GALAXY_PATH}\" is invalid. skipping build."
+      return
+    fi
+
+    build_image knowledge-galaxy $KNOWLEDGE_GALAXY_PATH
 }
 
 build_backup() {

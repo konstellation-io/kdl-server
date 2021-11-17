@@ -7,13 +7,6 @@
 |  App API  | [![coverage][app-api-coverage]][app-api-coverage-link] | [![bugs][app-api-bugs]][app-api-bugs-link] | [![mr][app-api-mr]][app-api-mr-link] |
 |  App UI  | [![coverage][app-ui-coverage]][app-ui-coverage-link] | [![bugs][app-ui-bugs]][app-ui-bugs-link] | [![mr][app-ui-mr]][app-ui-mr-link] |
 
-## Knowledge Graph
-
-|  Component  | Coverage  |  Bugs  |  Maintainability Rating  |
-| :---------: | :-----:   |  :---: |  :--------------------:  |
-|  Knowledge Graph  | [![coverage][kg-coverage]][kg-coverage-link] | [![bugs][kg-bugs]][kg-bugs-link] | [![mr][kg-mr]][kg-mr-link] |
-
-
 [app-api-coverage]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_api&metric=coverage
 
 [app-api-coverage-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_api&metric=Coverage
@@ -45,22 +38,6 @@
 [app-ui-mr]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_ui&metric=sqale_rating
 
 [app-ui-mr-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_ui&metric=Maintainability
-
-[kg-coverage]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_konwledge_graph&metric=coverage
-
-[kg-coverage-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_konwledge_graph&metric=Coverage
-
-[kg-bugs]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_konwledge_graph&metric=bugs
-
-[kg-bugs-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_konwledge_graph&metric=Reliability
-
-[kg-loc]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_konwledge_graph&metric=ncloc
-
-[kg-loc-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_konwledge_graph&metric=Coverage
-
-[kg-mr]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_konwledge_graph&metric=sqale_rating
-
-[kg-mr-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_konwledge_graph&metric=Maintainability
 
 ## Development
 
@@ -202,3 +179,46 @@ After some alpha versions we can create what we call a release, and to do that w
 ### Fixes
 
 If we find out a bug in a release, we can apply a bugfix just by creating a fixed branch from the specific release branch, and creating a Pull Request to the same release branch. When the Pull Request is merged, after passing the tests, a new fix tag will be created just by increasing the patch number of the version, and a new release will be build and released.
+
+## Knowledge Galaxy
+
+This is an external tool for data scientist that can be integrated into KDL. You can read more info about this tool [here](https://github.com/konstellation-io/knowledge-galaxy)
+
+To enable the integration follow these steps: 
+
+- Enable Knowledge Galaxy in `helm/values.yaml` with a config like this:
+
+```yaml
+    knowledgeGalaxy:
+      enabled: true
+```
+- Create a secret named `regcred` with the docker credential needed in order to download the private image:
+
+```bash
+kubectl create secret docker-registry regcred \ 
+  --docker-username=$DOCKER_USERNAME \
+  --docker-password=$DOCKER_AUTH_TOKEN \
+   --dry-run=client -o yaml | kubectl -n kdl apply -f -
+```
+
+- Set the name imagePullSecret name in the `knowledgeGalaxy` config: 
+```yaml
+    knowledgeGalaxy:
+      enabled: true
+      ...
+      serviceaccount:
+        ...
+        imagePullSecrets:
+          - regcred
+```
+
+### Local environment
+
+To work with a local version of knowledge galaxy, edit your `.kdlctl.conf` file with the following information:
+
+```bash
+export KNOWLEDGE_GALAXY_LOCAL=true
+export KNOWLEDGE_GALAXY_PATH=<path/to/local/knowledge-galaxy>
+```
+
+This will trigger a build whenever you use `kdlctl.sh` script.

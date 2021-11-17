@@ -1,7 +1,9 @@
 import { project1 } from '../../src/Mocks/entities/project';
-import { newUser, userMe } from '../../src/Mocks/entities/user';
+import {newUser, user1, user2, userMe} from '../../src/Mocks/entities/user';
 import { AccessLevel } from '../../src/Graphql/types/globalTypes';
 import { newMember } from '../../src/Mocks/entities/member';
+import GetMeQuery from "../../src/Mocks/GetMeQuery";
+import GetProjectMembers from "../../src/Mocks/GetProjectMembers";
 
 function buildMockedData(myAccessLevel: AccessLevel) {
   const meAsMember = { ...project1.members[0], accessLevel: myAccessLevel };
@@ -15,6 +17,9 @@ function buildMockedData(myAccessLevel: AccessLevel) {
 
 describe('Settings Members Behavior', () => {
   beforeEach(() => {
+    cy.kstInterceptor('GetMe', {data: GetMeQuery});
+    cy.kstInterceptor('GetUsers', {data: { users: [user1, user2]}});
+    cy.kstInterceptor('GetProjectMembers', {data: GetProjectMembers});
     cy.kstInterceptor('GetProjects', { data: { projects: [project1] } });
   });
 

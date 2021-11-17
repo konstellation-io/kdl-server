@@ -68,7 +68,7 @@ function ProjectCreation() {
     () => () => {
       if (success) clearAll();
     },
-    [success, error]
+    [success, error, clearAll]
   );
 
   function getCircleProps() {

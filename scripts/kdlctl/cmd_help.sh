@@ -50,12 +50,13 @@ show_root_help() {
    echo "$(help_global_header "")
 
     commands:
-      dev     creates a complete local environment.
-      start   starts microk8s.
-      stop    stops microk8s.
-      build   calls docker to build all images and push them to microk8s registry.
-      deploy  calls helm to create install/upgrade a kdl release on microk8s.
-      restart restarts kdl pods or microk8s useful after build command.
+      dev       creates a complete local environment.
+      start     starts microk8s.
+      stop      stops microk8s.
+      build     calls docker to build all images and push them to microk8s registry.
+      deploy    calls helm to create install/upgrade a kdl release on microk8s.
+      restart   restarts kdl pods or microk8s useful after build command.
+      uninstall remove all resources form microk8s.
 
     $(help_global_options)
 "

@@ -51,8 +51,8 @@ function NavElements({ isOpened }: Props) {
         </NavButtonLink>
       ))}
       <div className={styles.projectTools}>
-        {projectToolsRoutes.map(({ Icon, label, route }) => (
-          <NavButtonLink to={route} key={label}>
+        {projectToolsRoutes.map(({ Icon, label, route, disabled }) => (
+          <NavButtonLink to={route} key={label} disabled={disabled}>
             <NavigationButton label={label} Icon={Icon} />
           </NavButtonLink>
         ))}

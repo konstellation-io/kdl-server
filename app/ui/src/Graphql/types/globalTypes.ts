@@ -13,11 +13,6 @@ export enum AccessLevel {
   VIEWER = 'VIEWER',
 }
 
-export enum KnowledgeGraphItemCat {
-  Code = 'Code',
-  Paper = 'Paper',
-}
-
 export enum RepositoryType {
   EXTERNAL = 'EXTERNAL',
   INTERNAL = 'INTERNAL',
@@ -62,12 +57,6 @@ export interface RepositoryInput {
 
 export interface SetActiveUserToolsInput {
   active: boolean;
-}
-
-export interface SetKGStarredInput {
-  projectId: string;
-  kgItemId: string;
-  starred: boolean;
 }
 
 export interface UpdateAccessLevelInput {

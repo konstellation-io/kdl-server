@@ -6,6 +6,7 @@ import useTools from 'Graphql/client/hooks/useTools';
 import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTools';
 
 const toolsRoutes: [ROUTE, keyof GetUserTools_project_toolUrls][] = [
+  [ROUTE.PROJECT_TOOL_KG, 'knowledgeGalaxy'],
   [ROUTE.PROJECT_TOOL_GITEA, 'gitea'],
   [ROUTE.PROJECT_TOOL_DRONE, 'drone'],
   [ROUTE.PROJECT_TOOL_JUPYTER, 'jupyter'],

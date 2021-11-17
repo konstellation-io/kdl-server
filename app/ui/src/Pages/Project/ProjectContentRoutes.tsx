@@ -2,7 +2,6 @@ import ROUTE from 'Constants/routes';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
 import { GetMe } from 'Graphql/queries/types/GetMe';
-import KG from './pages/KG/KG';
 import Overview from './pages/Overview/Overview';
 import { ProjectRoute } from './ProjectPanels';
 import ProjectToolsRoutes from './components/ProjectToolsRoutes/ProjectToolsRoutes';
@@ -10,6 +9,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 
 import GetMeQuery from 'Graphql/queries/getMe';
+import {CONFIG} from "index";
 
 function ProjectContentRoutes({ openedProject }: ProjectRoute) {
   const { data } = useQuery<GetMe>(GetMeQuery);
@@ -32,12 +32,20 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
     );
   }
 
+  function redirectDisabledKG() {
+    return (
+        !CONFIG.KNOWLEDGE_GALAXY_ENABLED  &&
+            <Redirect key={ROUTE.PROJECT_TOOL_KG} from={ROUTE.PROJECT_TOOL_KG} to={ROUTE.PROJECT_OVERVIEW} />
+    )
+  }
+
   return (
     <Switch>
       <Redirect exact from={ROUTE.PROJECT} to={ROUTE.PROJECT_OVERVIEW} />
 
       {redirectIfArchived()}
       {redirectIfToolsActives()}
+      {redirectDisabledKG()}
 
       <Route
         exact
@@ -45,7 +53,6 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
         component={() => <Overview openedProject={openedProject} />}
       />
       <Route path={ROUTE.PROJECT_TOOL} component={ProjectToolsRoutes} />
-      <Route exact path={ROUTE.PROJECT_KG} component={KG} />
     </Switch>
   );
 }

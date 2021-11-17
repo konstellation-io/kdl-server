@@ -1,5 +1,11 @@
+import GetProjectsQuery from "../../src/Mocks/GetProjectsQuery";
+import GetMeQuery from "../../src/Mocks/GetMeQuery";
+
 describe('Project Navigation Bar Behavior', () => {
   beforeEach(() => {
+    cy.kstInterceptor('GetProjects', { data: GetProjectsQuery });
+    cy.kstInterceptor('GetMe', { data: GetMeQuery });
+
     cy.visit('http://localhost:3001');
     cy.getByTestId('project').first().parent().click();
   });
@@ -49,25 +55,5 @@ describe('Project Navigation Bar Behavior', () => {
 
     // Assert.
     cy.getByTestId('confirmationModal').find('.modal').should('exist');
-  });
-
-  it('should open the knowledge viewer panel when click on the knowledge viewer button', () => {
-    // Act.
-    cy.getByTestId('toggleKnowledgeViewer').click();
-
-    // Assert.
-    cy.getByTestId('knowledgeViewerList').should('exist');
-  });
-
-  it('should close the knowledge viewer panel when click on the knowledge viewer button and it is already open', () => {
-    // Arrange.
-    cy.getByTestId('toggleKnowledgeViewer').click();
-    cy.wait(800);
-
-    // Act.
-    cy.getByTestId('toggleKnowledgeViewer').click();
-
-    // Assert.
-    cy.getByTestId('knowledgeViewerList').should('not.exist');
   });
 });

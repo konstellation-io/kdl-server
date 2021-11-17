@@ -23,3 +23,5 @@ yarn-error.log*
 
 .eslintcache
 /mock-server/node_modules
+screenshots
+videos

@@ -2,6 +2,7 @@ import { RepositoryType } from '../../src/Graphql/types/globalTypes';
 import GetProjectsQuery from '../../src/Mocks/GetProjectsQuery';
 import { project1 } from '../../src/Mocks/entities/project';
 import { generateSlug } from '../../src/Utils/string';
+import GetMeQuery from "../../src/Mocks/GetMeQuery";
 
 describe('New Project Behavior', () => {
   const projectName = `my new project`;
@@ -10,6 +11,7 @@ describe('New Project Behavior', () => {
   beforeEach(() => {
     // Stub response
     cy.kstInterceptor('GetProjects', { data: GetProjectsQuery });
+    cy.kstInterceptor('GetMe', { data: GetMeQuery });
     cy.visit('http://localhost:3001/#/new-project');
   });
 

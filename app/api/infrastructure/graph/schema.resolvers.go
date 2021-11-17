@@ -159,24 +159,6 @@ func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.Remo
 	return nil, entity.ErrNotImplemented
 }
 
-func (r *mutationResolver) SetKGStarred(ctx context.Context, input model.SetKGStarredInput) (*model.SetKGStarredRes, error) {
-	starred, err := r.projects.UpdateStarred(ctx, project.UpdateStarredOption{
-		ProjectID: input.ProjectID,
-		KGItemID:  input.KgItemID,
-		Starred:   input.Starred,
-	})
-	res := model.SetKGStarredRes{
-		KgItemID: input.KgItemID,
-		Starred:  starred,
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &res, nil
-}
-
 func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error) {
 	username := ctx.Value(middleware.LoggedUserNameKey).(string)
 
@@ -217,14 +199,20 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 	vscodeWithUsernameAndFolder := strings.Replace(vscodeWithUsername, "REPO_FOLDER", folderName, 1)
 	mlflowWithProject := strings.Replace(r.cfg.ProjectMLFlow.URL, "PROJECT_ID", obj.ID, 1)
 	filebrowserWithProject := strings.Replace(r.cfg.ProjectFilebrowser.URL, "PROJECT_ID", obj.ID, 1)
+	kgWithProject := ""
+
+	if r.cfg.Kg.Enabled {
+		kgWithProject = strings.Replace(r.cfg.Kg.URL, "PROJECT_ID", obj.ID, 1)
+	}
 
 	return &entity.ToolUrls{
-		Gitea:       giteaWithFolder,
-		Filebrowser: filebrowserWithProject,
-		Jupyter:     jupyterWithUsernameAndFolder,
-		VSCode:      vscodeWithUsernameAndFolder,
-		Drone:       r.cfg.Drone.URL,
-		MLFlow:      mlflowWithProject,
+		KnowledgeGalaxy: kgWithProject,
+		Gitea:           giteaWithFolder,
+		Filebrowser:     filebrowserWithProject,
+		Jupyter:         jupyterWithUsernameAndFolder,
+		VSCode:          vscodeWithUsernameAndFolder,
+		Drone:           r.cfg.Drone.URL,
+		MLFlow:          mlflowWithProject,
 	}, nil
 }
 
@@ -267,29 +255,6 @@ func (r *queryResolver) Project(ctx context.Context, id string) (*entity.Project
 
 func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
 	return r.users.FindAll(ctx)
-}
-
-func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
-	q, err := r.kg.DescriptionQuality(ctx, description)
-	if err != nil {
-		return nil, err
-	}
-
-	return &model.QualityProjectDesc{Quality: q}, nil
-}
-
-func (r *queryResolver) KnowledgeGraph(ctx context.Context, projectID string) (*entity.KnowledgeGraph, error) {
-	p, err := r.projects.GetByID(ctx, projectID)
-	if err != nil {
-		return nil, err
-	}
-
-	kg, err := r.kg.Graph(ctx, p)
-	if err != nil {
-		return nil, err
-	}
-
-	return &kg, nil
 }
 
 func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (string, error) {

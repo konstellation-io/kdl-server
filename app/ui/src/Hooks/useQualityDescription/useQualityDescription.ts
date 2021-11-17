@@ -7,11 +7,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 
 import GetQualityProjectDescQuery from 'Graphql/queries/getQualityProjectDesc';
+import { CONFIG } from 'index';
 
 type Options = {
   skipFirstRun?: boolean;
   debounceTime?: number;
-  minWordsNumber?: number;
 };
 
 function useQualityDescription(
@@ -19,7 +19,6 @@ function useQualityDescription(
   {
     skipFirstRun = true,
     debounceTime = 1000,
-    minWordsNumber = 50,
   }: Options = {}
 ) {
   const [descriptionScore, setDescriptionScore] = useState(0);
@@ -33,16 +32,17 @@ function useQualityDescription(
       setDescriptionScore(data.qualityProjectDesc.quality || 0);
       setLoading(false);
     },
+    context: { clientName: 'kg' }
   });
 
-  const isLengthAcceptable = description.split(' ').length >= minWordsNumber;
+  const isLengthAcceptable = description.split(' ').length >= CONFIG.DESCRIPTION_MIN_WORDS;
 
   function fetchDescriptionScore() {
     getQualityProjectDesc({ variables: { description } });
   }
 
   useEffect(() => {
-    if (!skipFirstRun) fetchDescriptionScore();
+    if (!skipFirstRun && CONFIG.KNOWLEDGE_GALAXY_ENABLED) fetchDescriptionScore();
     // We want to run this only on hook instantiation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

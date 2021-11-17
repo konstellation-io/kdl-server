@@ -16,12 +16,11 @@ type Project struct {
 	Error              *string
 	Repository         Repository
 	Members            []Member
-	StarredKGItems     []string
 }
 
 // NewProject is a constructor function.
 func NewProject(id, name, description string) Project {
-	return Project{ID: id, Name: name, Description: description, StarredKGItems: []string{}}
+	return Project{ID: id, Name: name, Description: description}
 }
 
 func (p Project) HasMember(userID string) bool {

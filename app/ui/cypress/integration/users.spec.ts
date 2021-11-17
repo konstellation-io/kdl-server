@@ -1,5 +1,17 @@
+import GetMeQuery from "../../src/Mocks/GetMeQuery";
+import GetProjectsQuery from "../../src/Mocks/GetProjectsQuery";
+import GetProjectMembers from "../../src/Mocks/GetProjectMembers";
+import {user1, user2} from "../../src/Mocks/entities/user";
+import UpdateAccessLevelMutation from "../../src/Mocks/UpdateAccessLevelMutation";
+
 describe('Users Behavior', () => {
   beforeEach(() => {
+    cy.kstInterceptor('GetMe', {data: GetMeQuery});
+    cy.kstInterceptor('GetUsers', {data: { users: [user1, user2]}});
+    cy.kstInterceptor('GetProjects', {data: GetProjectsQuery});
+    cy.kstInterceptor('GetProjectMembers', {data: GetProjectMembers});
+    cy.kstInterceptor('UpdateAccessLevel', { data: UpdateAccessLevelMutation });
+
     cy.visit('http://localhost:3001/#/users');
   });
 
@@ -23,7 +35,7 @@ describe('Users Behavior', () => {
   });
 
   describe('bulk actions', () => {
-    const usersToChange = 3;
+    const usersToChange = 2;
     const newBulkRole = 'Viewer';
 
     beforeEach(() => {

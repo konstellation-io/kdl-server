@@ -1,0 +1,41 @@
+# This workflow is responsible for releasing the helm chart:
+# - Updates the version attribute in the Chart.yml file
+# - Commit the changes
+# - Creates a new product tag for the release
+
+name: Helm Release
+
+on:
+  workflow_run:
+    workflows:
+      - "Backup Component Build"
+      - "Cleaner Component Build"
+      - "Drone Authorizer Component Build"
+      - "Gitea Oauth2 Setup Component Build"
+      - "Jupyter GPU Component Build"
+      - "Mlflow Component Build"
+      - "Project Operator Component Build"
+      - "RepoCloner Component Build"
+      - "UserTools Operator Component Build"
+      - "Vscode Component Build"
+      - "KDLServer Application Build"
+    types:
+      - completed
+
+
+jobs:
+  helm-release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    uses: konstellation-io/github-workflows/.github/workflows/helm-release.yaml@v1.3.0
+    with:
+      chart_file: helm/kdl-server/Chart.yaml
+    secrets:
+      pat: ${{ secrets.PATNAME }}
+
+  chart-release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: helm-release
+    uses: konstellation-io/github-workflows/.github/workflows/chart-release.yaml@1.3.0
+    with:
+      chart_dir: helm
+      chart_url: http://kdl.konstellation.io

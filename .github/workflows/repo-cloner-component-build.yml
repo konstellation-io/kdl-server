@@ -1,0 +1,38 @@
+name: RepoCloner Component Build
+
+on:
+  pull_request:
+    branches:
+      - main
+      - "release/v*"
+    paths:
+      - "repo-cloner/**/*"
+      - ".github/workflows/repo-cloner*"
+  push:
+    branches:
+      - main
+      - "release/v*"
+    paths:
+      - "repo-cloner/**/*"
+      - ".github/workflows/repo-cloner*"
+
+
+jobs:
+
+  lint-dockerfile:
+    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.3.0
+    with:
+      component_path: repo-cloner
+
+  build:
+    needs: lint-dockerfile
+    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.3.0
+    with:
+      component: repo-cloner
+      component_helm_tag: userToolsOperator.repoCloner.image.tag
+      component_path: repo-cloner
+      component_image: repo-cloner
+      values_file: helm/kdl-server/values.yaml
+    secrets:
+      pat: ${{ secrets.PATNAME }}
+

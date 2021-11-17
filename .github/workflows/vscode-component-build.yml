@@ -1,0 +1,38 @@
+name: Vscode Component Build
+
+on:
+  pull_request:
+    branches:
+      - main
+      - "release/v*"
+    paths:
+      - "vscode/**/*"
+      - ".github/workflows/vscode*"
+  push:
+    branches:
+      - main
+      - "release/v*"
+    paths:
+      - "vscode/**/*"
+      - ".github/workflows/vscode*"
+
+
+jobs:
+
+  lint-dockerfile:
+    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.3.0
+    with:
+      component_path: vscode
+
+  build:
+    needs: lint-dockerfile
+    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.3.0
+    with:
+      component: vscode
+      component_helm_tag: userToolsOperator.vscode.image.tag
+      component_path: vscode
+      component_image: vscode
+      values_file: helm/kdl-server/values.yaml
+    secrets:
+      pat: ${{ secrets.PATNAME }}
+

@@ -1,0 +1,38 @@
+name: Project Operator Component Build
+
+on:
+  pull_request:
+    branches:
+      - main
+      - "release/v*"
+    paths:
+      - "project-operator/**/*"
+      - ".github/workflows/project-operator*"
+  push:
+    branches:
+      - main
+      - "release/v*"
+    paths:
+      - "project-operator/**/*"
+      - ".github/workflows/project-operator*"
+
+
+jobs:
+
+  lint-dockerfile:
+    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.3.0
+    with:
+      component_path: project-operator
+
+  build:
+    needs: lint-dockerfile
+    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.3.0
+    with:
+      component: project-operator
+      component_helm_tag: projectOperator.image.tag
+      component_path: project-operator
+      component_image: project-operator
+      values_file: helm/kdl-server/values.yaml
+    secrets:
+      pat: ${{ secrets.PATNAME }}
+

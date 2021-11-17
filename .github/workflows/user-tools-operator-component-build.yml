@@ -1,0 +1,39 @@
+name: UserTools Operator Component Build
+
+on:
+  pull_request:
+    branches:
+      - main
+      - "release/v*"
+    paths:
+      - "user-tools-operator/**/*"
+      - ".github/workflows/user-tools-operator*"
+  push:
+    branches:
+      - main
+      - "release/v*"
+    paths:
+      - "user-tools-operator/**/*"
+      - ".github/workflows/user-tools-operator*"
+
+
+
+jobs:
+
+  lint-dockerfile:
+    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.3.0
+    with:
+      component_path: user-tools-operator
+
+  build:
+    needs: lint-dockerfile
+    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.3.0
+    with:
+      component: user-tools-operator
+      component_helm_tag: userToolsOperator.image.tag
+      component_path: user-tools-operator
+      component_image: user-tools-operator
+      values_file: helm/kdl-server/values.yaml
+    secrets:
+      pat: ${{ secrets.PATNAME }}
+

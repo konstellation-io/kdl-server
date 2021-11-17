@@ -1,52 +1,67 @@
 # Workflows
 
-Workflow uses actions defined in [this repository](https://github.com/intelygenz/action-product-version-tags) and extra
-info can be found in the repository README.md
+Workflow uses actions defined in [this repository](https://github.com/intelygenz/monorepo-tagger-action) and extra
+info can be found in the repository [README.md](https://github.com/intelygenz/monorepo-tagger-action/blob/main/README.md). The templates are in the [github-workflows repository](https://github.com/konstellation-io/github-workflows).
 
-These are the workflows defined in the repository, in order of execution:
+These are the workflows defined in the repository:
 
-1. Quality workflows per each component
+1. Quality workflows per app component:
    1. API
    2. UI
-   3. MLFLow
-   4. Project Operator
-2. Pre Release
-3. Release
-4. Build Release
 
 ## Quality workflows
 
 Each component in the repo has a workflow that verifies QA.
 
-- kdl-server-app-api-quality.yml
-- kdl-server-app-ui-quality.yml
-- kdl-server-mlflow-quality.yml
-- kdl-server-project-operator-quality.yml
+- kdl-server-component-build.yml
 
 Conditions:
-- Ignore tags starting with `v*`
-- Ignore branches starting with `v*`
-- Each workflow is triggered only if the component is changed
+- It's executed when a PR it's created and we have changes in the `app/` directory.
 
-## Pre Release Workflow
+## Hadolint rules
 
-This workflow makes an alpha tag, calculating the major and minor automatically from the tag list present in the repository.
+Each component have its own linter for Dockerfiles. Take a look inside the [.hadolint.yml](.hadolint.yml) file. 
+
+Conditions:
+- It's executed when a PR it's created and we have changes in the specific component directory.
+
+## Build Workflow RC
+
+This workflow makes a tag per component. And build the container image in the tag generated.
 
 Conditions:
 - Only in `main` branch
-- Only if a quality workflow was triggered
+- It depends of the path for the component updated.
+
+## Build Workflow Fix
+
+This workflow makes a fix tag per component. And build the container image in the tag generated.
+
+Conditions:
+- Only in `release*` branch
+- It depends of the path for the component updated.
+
+## Helm release RC
+
+Generates a rc tag and a chart release. 
+
+Conditions:
+- When a workflow runs successfully.
+- `main` branch.
+
+## Helm release Fix
+
+Generates a fix tag and a chart release. 
+
+Conditions:
+- When a workflow runs successfully.
+- `release` branch.
 
 ## Release
 
-Generates a new release tag and branch. The tag is calculated taking in account the last pre-release tag.
+Build a new release. Generates a new branch release and tag.
 
 Conditions:
-- Manual run
+- Manual
 
-## Build Release
-
-Builds a new release for the last created tag. This workflow build each component and makes a new release for each one
-with the same version tag. It also does a release for the KDL Helm Chart with the new artifacts versions.
-
-Conditions:
-- On tag creation with `v*.*.*`
+**All the workflows update the tag images automatically.**

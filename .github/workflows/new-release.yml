@@ -1,0 +1,21 @@
+name: New Release Branch
+
+on:
+  workflow_dispatch:
+
+
+jobs:
+  new-release:
+    uses: konstellation-io/github-workflows/.github/workflows/new-release.yaml@1.3.0
+    with:
+      chart_file: helm/kdl-server/Chart.yaml
+    secrets:
+      pat: ${{ secrets.PATNAME }}
+
+  chart-release:
+    needs: new-release
+    uses: konstellation-io/github-workflows/.github/workflows/chart-release.yaml@1.3.0
+    with:
+      chart_dir: helm
+      chart_url: http://kdl.konstellation.io
+

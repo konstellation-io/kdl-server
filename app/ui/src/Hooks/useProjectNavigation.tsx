@@ -112,7 +112,7 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
     let projectToolsRoutes = projectToolsRoutesConfig.map(buildRoutes);
     const mainRoutes = mainRoutesConfig.map(buildRoutes);
 
-    if (!CONFIG.KG_ENABLED) {
+    if (!CONFIG.KNOWLEDGE_GALAXY_ENABLED) {
       projectToolsRoutes = projectToolsRoutes
        .map((r: RouteConfiguration) => r.id === 'knowledgeGalaxy' ? { ...r, disabled: true} :  r);
     }

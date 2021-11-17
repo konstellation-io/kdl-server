@@ -10,8 +10,8 @@ data:
   HOST: "0.0.0.0"
   SERVER_PORT: "8080"
   # Recommender Settings
-  N_HITS: "{{ default "1000" .Values.knowledgeGalaxy.config.numberOfOutputs }}" # Number of outputs that the recommender outputs, defaults to 10
-  DESCRIPTION_MIN_WORDS: "{{ default "50" .Values.knowledgeGalaxy.config.descriptionMinWords }}" # Number of words to use for project description, defaults to 10
+  N_HITS: "{{ default "1000" .Values.knowledgeGalaxy.config.numberOfOutputs }}" # Number of outputs that the recommender outputs, defaults to 1000
+  DESCRIPTION_MIN_WORDS: "{{ default "50" .Values.knowledgeGalaxy.config.descriptionMinWords }}" # Number of words to use for project description, defaults to 50
   # Log file
   LOG_LEVEL: "{{ default "INFO" .Values.knowledgeGalaxy.config.logLevel }}" # Log level defaults to info
   STANDALONE_MODE: "false"

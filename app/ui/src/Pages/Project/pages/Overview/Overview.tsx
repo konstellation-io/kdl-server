@@ -63,7 +63,7 @@ function Overview({ openedProject }: Props) {
           <div className={styles.description}>{openedProject.description}</div>
         </div>
         <div className={styles.section}>
-          { CONFIG.KG_ENABLED && <DescriptionScore score={descriptionScore} /> }
+          { CONFIG.KNOWLEDGE_GALAXY_ENABLED && <DescriptionScore score={descriptionScore} /> }
         </div>
         <div
           data-testid="repositorySection"

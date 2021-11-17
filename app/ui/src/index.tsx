@@ -13,7 +13,7 @@ import fetchConfig from './fetchConfig';
 type Config = {
   SERVER_NAME: string;
   SERVER_URL: string;
-  KG_ENABLED: boolean;
+  KNOWLEDGE_GALAXY_ENABLED: boolean;
   KG_SERVER_URL: string;
   GITEA_URL: string;
   RELEASE_VERSION: string;

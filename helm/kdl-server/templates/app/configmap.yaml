@@ -20,7 +20,7 @@ data:
     {
       "SERVER_NAME": "{{ .Values.serverName }}",
       "SERVER_URL": "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}",
-      "KG_ENABLED": {{ .Values.knowledgeGalaxy.enabled }},
+      "KNOWLEDGE_GALAXY_ENABLED": {{ .Values.knowledgeGalaxy.enabled }},
       "KG_SERVER_URL": "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/kg",
       "GITEA_URL": "{{ include "protocol" . }}://gitea.{{ .Values.domain }}",
       "RELEASE_VERSION": "{{ .Chart.AppVersion }}",

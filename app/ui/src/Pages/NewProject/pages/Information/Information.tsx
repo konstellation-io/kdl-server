@@ -116,7 +116,7 @@ function Information({ showErrors }: Props) {
         textArea
         lockHorizontalGrowth
       />
-        { CONFIG.KG_ENABLED && <DescriptionScore
+        { CONFIG.KNOWLEDGE_GALAXY_ENABLED && <DescriptionScore
         score={descriptionScore}
         loading={loadingQualityDescription}
       /> }

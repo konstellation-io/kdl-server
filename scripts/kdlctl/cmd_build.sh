@@ -64,7 +64,7 @@ build_mlflow() {
 }
 
 build_kg() {
-    if [ "$KNOWLEDGE_GALAXY_ENABLED" != "true"  ]; then
+    if [ "$KNOWLEDGE_GALAXY_LOCAL" != "true"  ]; then
         echo_info "ℹ️ Knowledge Galaxy disabled. skipping build."
         return
     fi

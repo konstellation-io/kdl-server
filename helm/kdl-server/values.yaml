@@ -80,7 +80,7 @@ knowledgeGalaxy:
   enabled: false
   image:
     repository: konstellation/knowledge-galaxy
-    tag: v1.2.0
+    tag: v1.2.1
     pullPolicy: IfNotPresent
   
   ## Knowledge Galaxy app config

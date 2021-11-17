@@ -35,7 +35,7 @@ jobs:
   chart-release:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     needs: helm-release
-    uses: konstellation-io/github-workflows/.github/workflows/chart-release.yaml@1.3.0
+    uses: konstellation-io/github-workflows/.github/workflows/chart-release.yaml@v1.3.0
     with:
       chart_dir: helm
       chart_url: http://kdl.konstellation.io

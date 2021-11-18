@@ -24,7 +24,7 @@ data:
       "KG_SERVER_URL": "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/kg",
       "GITEA_URL": "{{ include "protocol" . }}://gitea.{{ .Values.domain }}",
       "RELEASE_VERSION": "{{ .Chart.AppVersion }}",
-      "DESCRIPTION_MIN_WORDS": "{{ .Values.knowledgeGalaxy.descriptionMinWords }}"
+      "DESCRIPTION_MIN_WORDS": {{ default "50" .Values.knowledgeGalaxy.config.descriptionMinWords }}
     }
 
   OAUTH2_PROXY_IMG_REPO: "{{ .Values.oauth2Proxy.image.repository }}"

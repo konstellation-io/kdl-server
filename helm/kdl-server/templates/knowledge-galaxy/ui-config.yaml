@@ -12,6 +12,6 @@ data:
       "SERVER_URL": "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/kg",
       "MODE": "iframe",
       "BASENAME": "/kg/",
-      "DESCRIPTION_MIN_WORDS": "{{ .Values.knowledgeGalaxy.config.descriptionMinWords }}"
+      "DESCRIPTION_MIN_WORDS": {{ default "50" .Values.knowledgeGalaxy.config.descriptionMinWords }}
     }
 {{ end }}

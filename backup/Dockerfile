@@ -5,7 +5,8 @@ LABEL maintainer="Intelygenz - Konstellation Team"
 
 WORKDIR /
 
-RUN yum install -y --setopt=tsflags=nodocs tar gzip && \
+RUN yum install -y --setopt=tsflags=nodocs \
+        tar gzip && \
     amazon-linux-extras install -y postgresql12 && \
     yum clean all 
 

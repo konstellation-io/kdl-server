@@ -130,7 +130,7 @@ spec:
                 properties:
                   enabled:
                     description: Boolean to specify if TLS is enabled
-                    type: string
+                    type: boolean
           status:
             description: Status defines the observed state of KDLProject
             type: object

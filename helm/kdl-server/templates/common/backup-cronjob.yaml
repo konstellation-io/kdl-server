@@ -1,17 +1,19 @@
-{{ if .Values.backup.gitea.enabled }}
+{{ if .Values.backup.enabled }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: backup-gitea
+  name: backup
   labels:
-    app: backup-gitea
+    app: backup
 spec:
-  schedule: {{ .Values.backup.gitea.schedule | quote }}
+  schedule: {{ .Values.backup.schedule | quote }}
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 5
   successfulJobsHistoryLimit: 2
   startingDeadlineSeconds: 60 # 1min
   jobTemplate:
+    metadata:
+      name: backup
     spec:
       backoffLimit: 3
       activeDeadlineSeconds: 60 # 1min
@@ -28,22 +30,18 @@ spec:
                     name: postgres
                 - secretRef:
                     name: backup-secrets
+                - secretRef:
+                    name: kdl-mongo-secret
+              env:
+                - name: MONGO_HOST
+                  value: {{ .Values.mongodb.host }}
+                - name: MONGO_PORT
+                  value: {{ .Values.mongodb.port | quote }}
               volumeMounts:
               - name: gitea-pvc
                 mountPath: "/data"
-              command:
-                - /bin/bash
-              args:
-                - -c
-                - >-
-                  echo "$DB_HOST:$POSTGRES_DB:$DB_USER:$POSTGRES_PASSWORD" > ~/.pgpass && 
-                  chmod 600 ~/.pgpass &&
-                  mkdir /backup &&
-                  tar zcvf /backup/data.tar.gz --directory '/data' --exclude './gitea/indexers' . &&
-                  pg_dump -h $(echo $DB_HOST | cut -f 1 -d ":" ) -p $(echo $DB_HOST | cut -f 2 -d ":" ) -U $DB_USER -v -F c -f /backup/postgres_gitea.dump $POSTGRES_DB &&
-                  tar zcvf /backup.tar.gz /backup &&
-                  aws s3 cp /backup.tar.gz s3://$BUCKET_NAME/backup_gitea_$(date +%Y%m%d).tar.gz
-
+              - name: shared-volume
+                mountPath: /shared-volume
           {{- if .Values.imagePullSecrets }}
           imagePullSecrets:
           {{- range .Values.imagePullSecrets  }}
@@ -54,5 +52,9 @@ spec:
             - name: gitea-pvc
               persistentVolumeClaim:
                 claimName: gitea-pvc-gitea-0
+            - name: shared-volume
+              hostPath:
+                path: /var/snap/microk8s/common/default-storage/
+                type: Directory
           restartPolicy: OnFailure
 {{- end }}

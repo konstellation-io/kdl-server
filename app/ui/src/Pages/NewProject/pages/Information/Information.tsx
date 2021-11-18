@@ -109,9 +109,11 @@ function Information({ showErrors }: Props) {
         }}
         limits={limits}
         error={showErrors ? errorDescription : ''}
-        helpText={`A minimum of ${CONFIG.DESCRIPTION_MIN_WORDS} words is required to get a valid score. Words: ${
-          description.split(' ').length
-        }`}
+        helpText={
+          CONFIG.KNOWLEDGE_GALAXY_ENABLED
+            ? `A minimum of ${CONFIG.DESCRIPTION_MIN_WORDS} words is required to get a valid score. Words: ${description.split(' ').length}`
+            : ''
+        }
         showClearButton
         textArea
         lockHorizontalGrowth

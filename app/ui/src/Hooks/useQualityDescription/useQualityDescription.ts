@@ -42,7 +42,7 @@ function useQualityDescription(
   }
 
   useEffect(() => {
-    if (!skipFirstRun && CONFIG.KNOWLEDGE_GALAXY_ENABLED) fetchDescriptionScore();
+    if (CONFIG.KNOWLEDGE_GALAXY_ENABLED && !skipFirstRun) fetchDescriptionScore();
     // We want to run this only on hook instantiation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -13,16 +13,29 @@ spec:
   startingDeadlineSeconds: 60 # 1min
   jobTemplate:
     metadata:
-      name: backup
+      name: {{ .Values.backup.name }}
     spec:
       backoffLimit: 3
       activeDeadlineSeconds: 60 # 1min
       template:
         spec:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
           containers:
             - name: {{ .Values.backup.name }}
               image: {{ .Values.backup.image.repository }}:{{ .Values.backup.image.tag }}
               imagePullPolicy: {{ .Values.backup.image.pullPolicy }}
+              securityContext:
+                allowPrivilegeEscalation: false
+              resources:
+                limits:
+                  memory: {{ .Values.backup.resources.limits.memory }}
+                  cpu: {{ .Values.backup.resources.limits.cpu }}
+                requests:
+                  memory: {{ .Values.backup.resources.requests.memory }}
+                  cpu: {{ .Values.backup.resources.requests.cpu }}
               envFrom:
                 - configMapRef:
                     name: gitea-config
@@ -40,8 +53,9 @@ spec:
               volumeMounts:
               - name: gitea-pvc
                 mountPath: "/data"
-              - name: shared-volume
-                mountPath: /shared-volume
+          {{- if .Values.extraVolumeMounts }}
+{{ toYaml .Values.extraVolumeMounts | indent 12 }}
+          {{- end }}
           {{- if .Values.imagePullSecrets }}
           imagePullSecrets:
           {{- range .Values.imagePullSecrets  }}
@@ -52,9 +66,8 @@ spec:
             - name: gitea-pvc
               persistentVolumeClaim:
                 claimName: gitea-pvc-gitea-0
-            - name: shared-volume
-              hostPath:
-                path: /var/snap/microk8s/common/default-storage/
-                type: Directory
+            {{- if .Values.extraVolumes }}
+{{ toYaml .Values.extraVolumes | indent 12 }}
+      {{- end }}
           restartPolicy: OnFailure
 {{- end }}

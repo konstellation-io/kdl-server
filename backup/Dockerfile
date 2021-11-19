@@ -13,12 +13,6 @@ ARG ID=1000
 # Change to ROOT user to do maintenance/install tasks
 USER root
 
-# Create a non-root user and a backup readable dir for the user
-RUN groupadd ${NON_ROOT_USER} --gid ${ID} && \
-    useradd ${NON_ROOT_USER} --system --create-home --uid ${ID} --gid ${ID} && \
-    chown ${NON_ROOT_USER}:${NON_ROOT_USER} /home/${NON_ROOT_USER} && \
-    mkdir -p -mg=w /backup
-
 # Working directory
 WORKDIR /tmp
 
@@ -28,13 +22,21 @@ RUN curl -o mongo-tools.rpm https://repo.mongodb.org/yum/amazon/2/mongodb-org/4.
     yum install -y --setopt=tsflags=nodocs \
         gzip \
         mongo-tools.rpm \
+        shadow-utils \
         tar && \
     amazon-linux-extras install -y \
         postgresql12 && \
     yum clean all
 
 # Clean up tmp directory
-RUN rm --recursive --force -- *
+RUN rm --recursive --force -- * && \
+    rm --recursive --force -- /var/cache/yum
+
+# Create a non-root user and a backup readable dir for the user
+RUN groupadd ${NON_ROOT_USER} --gid ${ID} && \
+    useradd ${NON_ROOT_USER} --system --create-home --uid ${ID} --gid ${ID} && \
+    chown ${NON_ROOT_USER}:${NON_ROOT_USER} /home/${NON_ROOT_USER} && \
+    mkdir -p -mg=w /backup
 
 # Copy script file to workdir
 COPY ./files/backup-script.sh /home/${NON_ROOT_USER}
@@ -46,4 +48,4 @@ USER ${NON_ROOT_USER}
 WORKDIR /home/${NON_ROOT_USER}
 
 # Execute script on run
-ENTRYPOINT ["/home/nroot/backup-script.sh", ]
+ENTRYPOINT ["./backup-script.sh"]

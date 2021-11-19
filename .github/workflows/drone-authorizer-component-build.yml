@@ -34,4 +34,6 @@ jobs:
       values_file: helm/kdl-server/values.yaml
     secrets:
       pat: ${{ secrets.PATNAME }}
+      docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
+      docker_password: ${{ secrets.DOCKERHUB_TOKEN }}
 

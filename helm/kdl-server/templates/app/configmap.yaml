@@ -53,9 +53,15 @@ data:
   REPO_CLONER_IMG_TAG: "{{ .Values.userToolsOperator.repoCloner.image.tag }}"
   REPO_CLONER_IMG_PULLPOLICY: "{{ .Values.userToolsOperator.repoCloner.image.pullPolicy }}"
 
+  {{- if kindIs "invalid" .Values.userToolsOperator.giteaOauth2Setup }}
+  USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_REPO: "{{ .Values.giteaOauth2Setup.image.repository }}"
+  USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_TAG: "{{ .Values.giteaOauth2Setup.image.tag }}"
+  USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_PULLPOLICY: "{{ .Values.giteaOauth2Setup.image.pullPolicy }}"
+  {{- else }}
   USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_REPO: "{{ .Values.userToolsOperator.giteaOauth2Setup.image.repository }}"
   USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_TAG: "{{ .Values.userToolsOperator.giteaOauth2Setup.image.tag }}"
   USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_PULLPOLICY: "{{ .Values.userToolsOperator.giteaOauth2Setup.image.pullPolicy }}"
+  {{- end }}
 
   USER_TOOLS_OAUTH2_PROXY_IMG_REPO: "{{ .Values.userToolsOperator.oauth2Proxy.image.repository }}"
   USER_TOOLS_OAUTH2_PROXY_IMG_TAG: "{{ .Values.userToolsOperator.oauth2Proxy.image.tag }}"

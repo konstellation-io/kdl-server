@@ -105,6 +105,9 @@ deploy_helm_chart() {
   run helm upgrade \
     --install "${RELEASE_NAME}" \
     --namespace "${NAMESPACE}" \
+    --set backup.enabled="false" \
+    --set backup.image.pullPolicy="Always" \
+    --set backup.image.repository="$IMAGE_REGISTRY/konstellation/kdl-backup" \
     --set domain=$DOMAIN \
     --set drone.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set droneAuthorizer.image.pullPolicy="Always" \
@@ -138,9 +141,6 @@ deploy_helm_chart() {
     --set userToolsOperator.vscode.image.pullPolicy="Always" \
     --set userToolsOperator.vscode.image.repository="$IMAGE_REGISTRY/konstellation/vscode" \
     --set userToolsOperator.storage.storageClassName=$STORAGE_CLASS_NAME \
-    --set backup.image.pullPolicy="Always" \
-    --set backup.image.repository="$IMAGE_REGISTRY/konstellation/kdl-backup" \
-    --set backup.gitea.enabled="false" \
     --timeout 60m \
     --wait \
     helm/kdl-server

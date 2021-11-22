@@ -14,15 +14,19 @@ data:
   USER_TOOLS_VSCODE_URL: "{{ include "protocol" . }}://USERNAME-code.{{ .Values.domain }}/?folder=/home/coder/repos/REPO_FOLDER"
   DRONE_URL: "{{ include "protocol" . }}://drone.{{ .Values.domain }}"
   PROJECT_MLFLOW_URL: "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/mlflow/PROJECT_ID/"
-  KG_URL: "kdl-kg:{{ .Values.kdlKG.port }}"
+  KNOWLEDGE_GALAXY_URL: "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/kg/projects/PROJECT_ID/"
 
-  config.cfg: |+
+  config.json: |+
     {
       "SERVER_NAME": "{{ .Values.serverName }}",
       "SERVER_URL": "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}",
+      "KNOWLEDGE_GALAXY_ENABLED": {{ .Values.knowledgeGalaxy.enabled }},
+      "KG_SERVER_URL": "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/kg",
       "GITEA_URL": "{{ include "protocol" . }}://gitea.{{ .Values.domain }}",
-      "RELEASE_VERSION": "{{ .Chart.AppVersion }}"
+      "RELEASE_VERSION": "{{ .Chart.AppVersion }}",
+      "DESCRIPTION_MIN_WORDS": {{ default "50" .Values.knowledgeGalaxy.config.descriptionMinWords }}
     }
+
   OAUTH2_PROXY_IMG_REPO: "{{ .Values.oauth2Proxy.image.repository }}"
   OAUTH2_PROXY_IMG_TAG: "{{ .Values.oauth2Proxy.image.tag }}"
   OAUTH2_PROXY_IMG_PULLPOLICY: "{{ .Values.oauth2Proxy.image.pullPolicy }}"
@@ -30,6 +34,8 @@ data:
   GITEA_OAUTH2_SETUP_IMG_REPO: "{{ .Values.giteaOauth2Setup.image.repository }}"
   GITEA_OAUTH2_SETUP_IMG_TAG: "{{ .Values.giteaOauth2Setup.image.tag }}"
   GITEA_OAUTH2_SETUP_IMG_PULLPOLICY: "{{ .Values.giteaOauth2Setup.image.pullPolicy }}"
+
+  KNOWLEDGE_GALAXY_ENABLED: "{{ .Values.knowledgeGalaxy.enabled }}"
 
   PROJECT_MLFLOW_IMG_REPO: "{{ .Values.projectOperator.mlflow.image.repository }}"
   PROJECT_MLFLOW_IMG_TAG: "{{ .Values.projectOperator.mlflow.image.tag }}"

@@ -93,18 +93,34 @@ ingress:
 kdl:
   local: false
 
-kdlKG:
+knowledgeGalaxy:
+  enabled: false
   image:
-    repository: konstellation/kdl-kg
-    tag: "v0.13-alpha.7"
+    repository: konstellation/knowledge-galaxy
+    tag: v1.2.1
     pullPolicy: IfNotPresent
-  assetRoute: "/kg/assets"
-  workers: 1
-  bindAddress: 0.0.0.0
-  port: 8080
-  numberOfOutputs: 10
-  logPath: /var/log/app/kg.log
-  logLevel: INFO
+
+  ## Knowledge Galaxy app config
+  ##
+  config: {}
+  #  logLevel: "INFO"
+  #  workers: 1
+  #  numberOfOutputs: 1000
+  #  descriptionMinWords: 50
+  
+  ## Service account for Knowledge Galaxy to use.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ##
+  serviceaccount:
+    enabled: true
+    name: ""
+    annotations: {}
+
+    ## Reference to one or more secrets to be used when pulling images
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ##
+    imagePullSecrets: []
+    # - name: regcred
 
 kdlServer:
   image:

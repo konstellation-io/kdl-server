@@ -10,7 +10,6 @@ import {
 } from './models/ProjectFilters';
 import { UserSelection, UserSettings } from './models/UserSettings';
 
-import { GetKnowledgeGraph_knowledgeGraph_items } from 'Graphql/queries/types/GetKnowledgeGraph';
 import { GetProjectMembers_project_members } from '../queries/types/GetProjectMembers';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTools';
@@ -65,15 +64,12 @@ const initialStateUserSettings: UserSettings = {
   },
 };
 
-export const kgScores = makeVar<[number, number]>([1, 0]);
 export const projectFilters = makeVar(initialProjectFilters);
 export const newProject = makeVar(initialNewProject);
 export const openedProject = makeVar<GetProjects_projects | null>(null);
 export const userSettings = makeVar<UserSettings>(initialStateUserSettings);
 export const memberDetails =
   makeVar<GetProjectMembers_project_members | null>(null);
-export const resourceDetails =
-  makeVar<GetKnowledgeGraph_knowledgeGraph_items | null>(null);
 export const primaryPanel = makeVar<PanelInfo | null>(null);
 export const secondaryPanel = makeVar<PanelInfo | null>(null);
 export const currentTool = makeVar<ToolName | null>(null);
@@ -107,12 +103,7 @@ const cache = new InMemoryCache({
     },
   },
   dataIdFromObject(responseObj) {
-    switch (responseObj.__typename) {
-      case 'SetKGStarredRes':
-        return `KnowledgeGraphItem:${responseObj.kgItemId}`;
-      default:
-        return defaultDataIdFromObject(responseObj);
-    }
+    return defaultDataIdFromObject(responseObj);
   },
 });
 

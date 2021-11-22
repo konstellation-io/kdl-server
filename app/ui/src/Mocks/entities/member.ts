@@ -1,5 +1,12 @@
-import { newUser, user1, user2 } from './user';
+import { newUser, user1, user2, userMe } from './user';
 import { AccessLevel } from '../../Graphql/types/globalTypes';
+
+export const memberMe = {
+  user: userMe,
+  accessLevel: AccessLevel.ADMIN,
+  addedDate: '2020-02-02',
+  __typename: 'Member',
+};
 
 export const member1 = {
   user: user1,

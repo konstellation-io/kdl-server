@@ -16,7 +16,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/kgservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/repository"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/templates"
@@ -24,7 +23,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/kg"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
@@ -56,12 +54,6 @@ func main() {
 	k8sClient, err := k8s.NewK8sClient(logger, cfg)
 	if err != nil {
 		logger.Errorf("Error creating k8s client: %s", err)
-		os.Exit(1)
-	}
-
-	kgService, err := kgservice.NewKGService(logger, cfg.KGservice.URL)
-	if err != nil {
-		logger.Errorf("Error connecting to KG server: %s", err)
 		os.Exit(1)
 	}
 
@@ -122,7 +114,6 @@ func main() {
 		cfg,
 		projectInteractor,
 		userInteractor,
-		kg.NewInteractor(logger, kgService),
 		logger,
 	)
 

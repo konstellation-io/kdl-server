@@ -17,10 +17,10 @@ backup:
   resources:
     requests:
       cpu: "100m"
-      memory: "256Mi"
-    limits:
-      cpu: "10m"
       memory: "100Mi"
+    limits:
+      cpu: "100m"
+      memory: "256Mi"
   extraVolumeMounts: []
   # extraVolumeMounts:
   #   - name: shared-storage

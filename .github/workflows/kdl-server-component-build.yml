@@ -1,0 +1,99 @@
+name: KDLServer Application Build
+
+on:
+  pull_request:
+    branches:
+      - main
+      - "release/v*"
+    paths:
+      - "app/**/*"
+  push:
+    branches:
+      - main
+      - "release/v*"
+    paths:
+      - "app/**/*"
+
+
+jobs:
+  lint-dockerfile:
+    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.3.0
+    with:
+      component_path: app
+
+  quality-checks:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: CheckOut
+        uses: actions/checkout@v2
+
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            api:
+              - 'app/api/**/*'
+            ui:
+              - 'app/ui/**/*'
+
+      - if: steps.changes.outputs.api == 'true'
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14.x
+
+      - if: steps.changes.outputs.api == 'true'
+        name: API Test
+        run: go test ./... -cover -v -coverprofile=coverage.out
+        working-directory: ./app/api
+
+      - if: steps.changes.outputs.api == 'true'
+        name: API Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: app/api/coverage.out
+
+      - if: steps.changes.outputs.api == 'true'
+        name: API Go Lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.37
+          working-directory: ./app/api
+          args: --timeout 5m
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - if: steps.changes.outputs.ui == 'true'
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14"
+
+      - if: steps.changes.outputs.ui == 'true'
+        name: UI Run tests
+        run: yarn install && yarn run test:cov:sonar
+        working-directory: ./app/ui
+
+      - if: steps.changes.outputs.ui == 'true'
+        name: UI Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: |
+            ./app/ui/coverage
+            ./app/ui/test-report.xml
+
+  build:
+    needs: [lint-dockerfile, quality-checks]
+    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.3.0
+    with:
+      component: kdl-server
+      component_helm_tag: kdlServer.image.tag
+      component_path: app
+      component_image: kdl-server
+      component_app: true
+      values_file: helm/kdl-server/values.yaml
+      chart_file: helm/kdl-server/Chart.yaml
+    secrets:
+      pat: ${{ secrets.PATNAME }}
+      docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
+      docker_token: ${{ secrets.DOCKERHUB_TOKEN }}
+

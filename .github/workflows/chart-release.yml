@@ -1,0 +1,16 @@
+name: Chart Release
+
+on:
+  workflow_run:
+    workflows:
+      - "New Release"
+    types:
+      - completed
+
+jobs:
+  chart-release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    uses: konstellation-io/github-workflows/.github/workflows/chart-release.yaml@v1.3.0
+    with:
+      chart_path: helm
+      chart_url: http://kdl.konstellation.io

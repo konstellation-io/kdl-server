@@ -7,14 +7,12 @@ on:
       - "release/v*"
     paths:
       - "drone-authorizer/**/*"
-      - ".github/workflows/drone-authorizer*"
   push:
     branches:
       - main
       - "release/v*"
     paths:
       - "drone-authorizer/**/*"
-      - ".github/workflows/drone-authorizer*"
 
 
 jobs:

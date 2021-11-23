@@ -7,14 +7,12 @@ on:
       - "release/v*"
     paths:
       - "user-tools-operator/**/*"
-      - ".github/workflows/user-tools-operator*"
   push:
     branches:
       - main
       - "release/v*"
     paths:
       - "user-tools-operator/**/*"
-      - ".github/workflows/user-tools-operator*"
 
 
 

@@ -7,14 +7,12 @@ on:
       - "release/v*"
     paths:
       - "vscode/**/*"
-      - ".github/workflows/vscode*"
   push:
     branches:
       - main
       - "release/v*"
     paths:
       - "vscode/**/*"
-      - ".github/workflows/vscode*"
 
 
 jobs:

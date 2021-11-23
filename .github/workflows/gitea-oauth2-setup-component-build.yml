@@ -7,14 +7,12 @@ on:
       - "release/v*"
     paths:
       - "gitea-oauth2-setup/**/*"
-      - ".github/workflows/gitea-oauth2-setup*"
   push:
     branches:
       - main
       - "release/v*"
     paths:
       - "gitea-oauth2-setup/**/*"
-      - ".github/workflows/gitea-oauth2-setup*"
 
 
 jobs:

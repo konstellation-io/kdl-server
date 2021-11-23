@@ -7,14 +7,12 @@ on:
       - "release/v*"
     paths:
       - "project-operator/**/*"
-      - ".github/workflows/project-operator*"
   push:
     branches:
       - main
       - "release/v*"
     paths:
       - "project-operator/**/*"
-      - ".github/workflows/project-operator*"
 
 
 jobs:

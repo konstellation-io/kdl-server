@@ -7,14 +7,12 @@ on:
       - "release/v*"
     paths:
       - "mlflow/**/*"
-      - ".github/workflows/mlflow*"
   push:
     branches:
       - main
       - "release/v*"
     paths:
       - "mlflow/**/*"
-      - ".github/workflows/mlflow*"
 
 
 jobs:

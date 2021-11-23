@@ -7,14 +7,12 @@ on:
       - "release/v*"
     paths:
       - "cleaner/**/*"
-      - ".github/workflows/cleaner*"
   push:
     branches:
       - main
       - "release/v*"
     paths:
       - "cleaner/**/*"
-      - ".github/workflows/cleaner*"
 
 
 jobs:

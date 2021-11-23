@@ -7,14 +7,12 @@ on:
       - "release/v*"
     paths:
       - "repo-cloner/**/*"
-      - ".github/workflows/repo-cloner*"
   push:
     branches:
       - main
       - "release/v*"
     paths:
       - "repo-cloner/**/*"
-      - ".github/workflows/repo-cloner*"
 
 
 jobs:

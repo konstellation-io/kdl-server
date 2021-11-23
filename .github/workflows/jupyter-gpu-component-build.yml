@@ -7,14 +7,12 @@ on:
       - "release/v*"
     paths:
       - "jupyter-gpu/**/*"
-      - ".github/workflows/jupyter-gpu*"
   push:
     branches:
       - main
       - "release/v*"
     paths:
       - "jupyter-gpu/**/*"
-      - ".github/workflows/jupyter-gpu*"
 
 
 jobs:

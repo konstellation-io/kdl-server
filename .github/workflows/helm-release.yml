@@ -34,11 +34,3 @@ jobs:
       chart_file: helm/kdl-server/Chart.yaml
     secrets:
       pat: ${{ secrets.PATNAME }}
-
-  chart-release:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    needs: helm-release
-    uses: konstellation-io/github-workflows/.github/workflows/chart-release.yaml@v1.3.0
-    with:
-      chart_path: helm
-      chart_url: http://kdl.konstellation.io

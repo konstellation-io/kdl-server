@@ -32,5 +32,7 @@ jobs:
     uses: konstellation-io/github-workflows/.github/workflows/helm-release.yaml@v1.3.1
     with:
       chart_file: helm/kdl-server/Chart.yaml
+      chart_path: helm
+      chart_url: http://kdl.konstellation.io
     secrets:
       pat: ${{ secrets.PATNAME }}

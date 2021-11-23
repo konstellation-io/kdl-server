@@ -40,5 +40,5 @@ jobs:
     needs: helm-release
     uses: konstellation-io/github-workflows/.github/workflows/chart-release.yaml@v1.3.0
     with:
-      chart_dir: helm
+      chart_path: helm
       chart_url: http://kdl.konstellation.io

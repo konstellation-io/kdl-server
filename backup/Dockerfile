@@ -1,4 +1,4 @@
-FROM amazon/aws-cli:2.2.45
+FROM amazon/aws-cli:2.4.0
 
 # Maintainer of the Dockerfile
 LABEL maintainer="Intelygenz - Konstellation Team"

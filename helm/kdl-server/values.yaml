@@ -6,9 +6,9 @@ backup:
   enabled: false
   schedule: "0 1 * * 0" # every sunday at 1:00 AM
   name: backup-gitea
-  image: 
+  image:
     repository: konstellation/kdl-backup
-    tag: latest
+    tag: v0.15.0
     pullPolicy: IfNotPresent
   s3:
     awsAccessKeyID: aws-access-key-id
@@ -107,7 +107,7 @@ knowledgeGalaxy:
   #  workers: 1
   #  numberOfOutputs: 1000
   #  descriptionMinWords: 50
-  
+
   ## Service account for Knowledge Galaxy to use.
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ##
@@ -141,7 +141,7 @@ minio:
     storageClass: standard
     existingClaim: received-data-claim
     accessMode: ReadWriteMany
-# This Chart feature is disabled because we have to deal with different Kubernetes API versions. Please check the ingress template in Helm chart
+  # This Chart feature is disabled because we have to deal with different Kubernetes API versions. Please check the ingress template in Helm chart
   ingress:
     enabled: false
     hosts:
@@ -231,7 +231,7 @@ userToolsOperator:
       repository: konstellation/vscode
       tag: "latest"
       pullPolicy: IfNotPresent
- #giteaOauth2Setup:
+  #giteaOauth2Setup:
   #  image:
   #    repository: konstellation/gitea-oauth2-setup
   #    tag: "latest"

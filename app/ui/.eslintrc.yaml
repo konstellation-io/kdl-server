@@ -1,0 +1,55 @@
+env:
+  browser: true
+  es2021: true
+extends:
+  - eslint:recommended
+  - plugin:react/recommended
+  - plugin:@typescript-eslint/recommended
+  - plugin:prettier/recommended
+parser: "@typescript-eslint/parser"
+parserOptions:
+  ecmaFeatures:
+    jsx: true
+  ecmaVersion: 2021
+  sourceType: module
+ignorePatterns:
+  - "cypress/plugins/*.js"
+plugins:
+  - react
+  - "@typescript-eslint"
+  - react-hooks
+  - prettier
+settings:
+  react:
+    version: detect
+rules:
+  "@typescript-eslint/ban-types":
+    - warn
+    - types:
+        Object: false
+        "{}": false
+      extendDefaults: true
+  "@typescript-eslint/no-explicit-any": warn
+  "@typescript-eslint/explicit-module-boundary-types": off
+  comma-dangle: [
+      "error",
+      "always-multiline"
+  ]
+  indent:
+    - error
+    - 2
+    - SwitchCase: 1
+  quotes:
+    - error
+    - single
+    - avoidEscape: true
+
+  no-prototype-builtins: 'off'
+  no-sequences:
+    - error
+  prettier/prettier:
+    - error
+  react-hooks/exhaustive-deps: error
+  semi:
+    - error
+    - always

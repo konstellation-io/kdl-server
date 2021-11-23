@@ -1,5 +1,5 @@
 import Breadcrumbs from './Breadcrumbs';
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 
 jest.mock('react-router-dom', () => ({

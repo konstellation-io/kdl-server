@@ -1,16 +1,9 @@
-import React from 'react';
+import * as React from 'react';
 import Projects from './Projects';
 import GetProjectsQuery from 'Graphql/queries/getProjects';
 import { createMockClient } from 'mock-apollo-client';
 import { screen, fireEvent, cleanup, within } from '@testing-library/react';
-import {
-  apolloRender,
-  loadingHandler,
-  dataHandler,
-  errorHandler,
-  getSnapshot,
-  ERROR_MESSAGE,
-} from 'testUtils';
+import { apolloRender, loadingHandler, dataHandler, errorHandler, getSnapshot, ERROR_MESSAGE } from 'testUtils';
 import data from 'Mocks/GetProjectsQuery';
 import { StaticRouter } from 'react-router';
 

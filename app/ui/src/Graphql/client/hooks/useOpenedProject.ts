@@ -1,5 +1,5 @@
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
-import { openedProject } from './../cache';
+import { openedProject } from '../cache';
 
 function useOpenedProject() {
   function updateOpenedProject(newProject: GetProjects_projects | null) {

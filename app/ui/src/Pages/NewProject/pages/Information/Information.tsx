@@ -1,13 +1,9 @@
 import { ErrorMessage, SpinnerCircular, TextInput } from 'kwc';
 import { generateSlug, getErrorMsg } from 'Utils/string';
-import {
-  validateProjectDescription,
-  validateProjectId,
-  validateProjectName,
-} from './InformationUtils';
+import { validateProjectDescription, validateProjectId, validateProjectName } from './InformationUtils';
 
 import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
-import React from 'react';
+import * as React from 'react';
 import { newProject } from 'Graphql/client/cache';
 import styles from './Information.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
@@ -31,17 +27,10 @@ function Information({ showErrors }: Props) {
 
   const { values, errors } = project.information;
   const { name, description, id } = values;
-  const {
-    name: errorName,
-    description: errorDescription,
-    id: errorId,
-  } = errors;
+  const { name: errorName, description: errorDescription, id: errorId } = errors;
 
   const { data, loading, error } = useQuery<GetProjects>(GetProjectsQuery);
-  const {
-    descriptionScore,
-    loading: loadingQualityDescription,
-  } = useQualityDescription(description);
+  const { descriptionScore, loading: loadingQualityDescription } = useQualityDescription(description);
 
   if (loading) return <SpinnerCircular />;
   if (!data || error) return <ErrorMessage />;
@@ -111,17 +100,17 @@ function Information({ showErrors }: Props) {
         error={showErrors ? errorDescription : ''}
         helpText={
           CONFIG.KNOWLEDGE_GALAXY_ENABLED
-            ? `A minimum of ${CONFIG.DESCRIPTION_MIN_WORDS} words is required to get a valid score. Words: ${description.split(' ').length}`
+            ? `A minimum of ${CONFIG.DESCRIPTION_MIN_WORDS} words is required to get a valid score.` +
+              `Words: ${description.split(' ').length}`
             : ''
         }
         showClearButton
         textArea
         lockHorizontalGrowth
       />
-        { CONFIG.KNOWLEDGE_GALAXY_ENABLED && <DescriptionScore
-        score={descriptionScore}
-        loading={loadingQualityDescription}
-      /> }
+      {CONFIG.KNOWLEDGE_GALAXY_ENABLED && (
+        <DescriptionScore score={descriptionScore} loading={loadingQualityDescription} />
+      )}
     </div>
   );
 }

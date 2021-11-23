@@ -1,7 +1,7 @@
 import { Button, Check } from 'kwc';
 import MessageActionBox, { BOX_THEME } from './MessageActionBox';
 
-import React from 'react';
+import * as React from 'react';
 import SomeIcon from '@material-ui/icons/Archive';
 import { shallow } from 'enzyme';
 
@@ -19,7 +19,7 @@ const component = shallow(
       Icon: SomeIcon,
     }}
     theme={BOX_THEME.DEFAULT}
-  />
+  />,
 );
 
 describe('MessageActionBox component', () => {

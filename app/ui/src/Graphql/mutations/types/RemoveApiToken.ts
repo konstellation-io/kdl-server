@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { RemoveApiTokenInput } from './../../types/globalTypes';
+import { RemoveApiTokenInput } from '../../types/globalTypes';
 
 // ====================================================
 // GraphQL mutation operation: RemoveApiToken

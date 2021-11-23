@@ -2,10 +2,10 @@ import { RepositoryType } from '../../src/Graphql/types/globalTypes';
 import GetProjectsQuery from '../../src/Mocks/GetProjectsQuery';
 import { project1 } from '../../src/Mocks/entities/project';
 import { generateSlug } from '../../src/Utils/string';
-import GetMeQuery from "../../src/Mocks/GetMeQuery";
+import GetMeQuery from '../../src/Mocks/GetMeQuery';
 
 describe('New Project Behavior', () => {
-  const projectName = `my new project`;
+  const projectName = 'my new project';
   const projectId = generateSlug(projectName);
 
   beforeEach(() => {
@@ -36,9 +36,7 @@ describe('New Project Behavior', () => {
       cy.getByTestId('goToProjectButton').click();
 
       // Assert.
-      cy.getByTestId('overview')
-        .should('contain', projectName)
-        .and('contain', projectId);
+      cy.getByTestId('overview').should('contain', projectName).and('contain', projectId);
       cy.url().should('contain', '/overview');
     });
   });
@@ -58,10 +56,7 @@ describe('New Project Behavior', () => {
       cy.getByTestId('tryAgainButton').click();
 
       // Assert.
-      cy.getByTestId('informationInputs')
-        .find('input')
-        .eq(0)
-        .should('have.value', projectName);
+      cy.getByTestId('informationInputs').find('input').eq(0).should('have.value', projectName);
     });
   });
 });
@@ -73,9 +68,7 @@ const createProject = (name: string, id: string, customResponse?: Object) => {
   cy.getByTestId('informationInputs').find('input').eq(0).type(name);
 
   // Type the description of the project
-  cy.getByTestId('informationInputs')
-    .find('textarea')
-    .type('My super detailed description');
+  cy.getByTestId('informationInputs').find('textarea').type('My super detailed description');
 
   // Go to the next step
   cy.getByTestId('nextButton').click();
@@ -99,10 +92,7 @@ const createProject = (name: string, id: string, customResponse?: Object) => {
   });
 
   // Stub CreateProject
-  cy.kstInterceptor(
-    'CreateProject',
-    customResponse || { data: { createProject: newProject } }
-  );
+  cy.kstInterceptor('CreateProject', customResponse || { data: { createProject: newProject } });
 
   cy.wait(1000);
 

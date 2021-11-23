@@ -1,7 +1,4 @@
-import {
-  GetQualityProjectDesc,
-  GetQualityProjectDescVariables,
-} from 'Graphql/queries/types/GetQualityProjectDesc';
+import { GetQualityProjectDesc, GetQualityProjectDescVariables } from 'Graphql/queries/types/GetQualityProjectDesc';
 import { useEffect, useRef, useState } from 'react';
 
 import { useLazyQuery } from '@apollo/client';
@@ -14,26 +11,20 @@ type Options = {
   debounceTime?: number;
 };
 
-function useQualityDescription(
-  description: string,
-  {
-    skipFirstRun = true,
-    debounceTime = 1000,
-  }: Options = {}
-) {
+function useQualityDescription(description: string, { skipFirstRun = true, debounceTime = 1000 }: Options = {}) {
   const [descriptionScore, setDescriptionScore] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const [getQualityProjectDesc, { error }] = useLazyQuery<
-    GetQualityProjectDesc,
-    GetQualityProjectDescVariables
-  >(GetQualityProjectDescQuery, {
-    onCompleted: (data) => {
-      setDescriptionScore(data.qualityProjectDesc.quality || 0);
-      setLoading(false);
+  const [getQualityProjectDesc, { error }] = useLazyQuery<GetQualityProjectDesc, GetQualityProjectDescVariables>(
+    GetQualityProjectDescQuery,
+    {
+      onCompleted: (data) => {
+        setDescriptionScore(data.qualityProjectDesc.quality || 0);
+        setLoading(false);
+      },
+      context: { clientName: 'kg' },
     },
-    context: { clientName: 'kg' }
-  });
+  );
 
   const isLengthAcceptable = description.split(' ').length >= CONFIG.DESCRIPTION_MIN_WORDS;
 
@@ -49,7 +40,7 @@ function useQualityDescription(
 
   const firstRun = useRef(true);
   useEffect(() => {
-    let scoreTimeoutId: number = 0;
+    let scoreTimeoutId = 0;
 
     if (firstRun.current) {
       firstRun.current = false;

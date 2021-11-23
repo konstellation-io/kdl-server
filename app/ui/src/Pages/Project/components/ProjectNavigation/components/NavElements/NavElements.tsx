@@ -5,7 +5,7 @@ import { NavButtonLink } from '../../ProjectNavigation';
 import NavigationButton from '../NavigationButton/NavigationButton';
 import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import React from 'react';
+import * as React from 'react';
 import { RouteProjectParams } from 'Constants/routes';
 import cx from 'classnames';
 import styles from './NavElements.module.scss';
@@ -23,8 +23,7 @@ type Props = {
 
 function NavElements({ isOpened }: Props) {
   const { projectId } = useParams<RouteProjectParams>();
-  const { mainRoutes, userToolsRoutes, projectToolsRoutes } =
-    useProjectNavigation(projectId);
+  const { mainRoutes, userToolsRoutes, projectToolsRoutes } = useProjectNavigation(projectId);
   const { updateProjectActiveTools, projectActiveTools } = useTool();
   const { data, loading } = useQuery<GetMe>(GetMeQuery);
   const areToolsActive = data?.me.areToolsActive;
@@ -36,10 +35,8 @@ function NavElements({ isOpened }: Props) {
   }
 
   function renderToggleToolsIcon() {
-    if (projectActiveTools.loading)
-      return () => (
-        <CircularProgress className={styles.loadingTools} size={16} />
-      );
+    const Progress = () => <CircularProgress className={styles.loadingTools} size={16} />;
+    if (projectActiveTools.loading) return Progress;
     return areToolsActive ? PauseIcon : PlayArrowIcon;
   }
 

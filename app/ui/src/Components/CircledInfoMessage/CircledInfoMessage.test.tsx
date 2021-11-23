@@ -1,14 +1,12 @@
-import CircledInfoMessage, {
-  CircledInfoMessageTypes,
-} from './CircledInfoMessage';
+import CircledInfoMessage, { CircledInfoMessageTypes } from './CircledInfoMessage';
 
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 
 const component = shallow(
   <CircledInfoMessage type={CircledInfoMessageTypes.SUCCESS} text="some text">
     <div id="children">Children</div>
-  </CircledInfoMessage>
+  </CircledInfoMessage>,
 );
 
 describe('CircledInfoMessage component', () => {

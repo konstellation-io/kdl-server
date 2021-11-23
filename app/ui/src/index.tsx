@@ -6,7 +6,7 @@ import 'Styles/react-tabs.scss';
 import 'Styles/react-toastify.scss';
 
 import App from './App';
-import React from 'react';
+import * as React from 'react';
 import ReactDOM from 'react-dom';
 import fetchConfig from './fetchConfig';
 
@@ -18,7 +18,7 @@ type Config = {
   GITEA_URL: string;
   RELEASE_VERSION: string;
   DESCRIPTION_MIN_WORDS: number;
-}
+};
 export let CONFIG: Config;
 
 fetchConfig.then((configJson) => {

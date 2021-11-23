@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import styles from './Crumb.module.scss';
 import cx from 'classnames';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -15,24 +15,11 @@ export type CrumbProps = {
   children: (props: BottomComponentProps) => JSX.Element;
 };
 
-function Crumb({
-  crumbText,
-  LeftIconComponent,
-  dataTestId,
-  children,
-}: CrumbProps) {
-  const {
-    value: opened,
-    toggle: toggleComponent,
-    deactivate: hideComponent,
-  } = useBoolState(false);
+function Crumb({ crumbText, LeftIconComponent, dataTestId, children }: CrumbProps) {
+  const { value: opened, toggle: toggleComponent, deactivate: hideComponent } = useBoolState(false);
 
   return (
-    <div
-      className={styles.container}
-      onClick={toggleComponent}
-      data-testid={dataTestId}
-    >
+    <div className={styles.container} onClick={toggleComponent} data-testid={dataTestId}>
       <div className={styles.crumbContainer}>
         {LeftIconComponent}
         <span className={styles.crumbText}>{crumbText}</span>
@@ -42,11 +29,7 @@ function Crumb({
           })}
         />
       </div>
-      <ExpandableMenu
-        opened={opened}
-        close={hideComponent}
-        className={styles.content}
-      >
+      <ExpandableMenu opened={opened} close={hideComponent} className={styles.content}>
         {children({
           closeComponent: hideComponent,
         })}

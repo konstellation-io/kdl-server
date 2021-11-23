@@ -3,7 +3,7 @@ import ROUTE from 'Constants/routes';
 
 import { GetMe } from 'Graphql/queries/types/GetMe';
 import Message from 'Components/Message/Message';
-import React from 'react';
+import * as React from 'react';
 import Token from './components/token/Token';
 import styles from './UserApiTokens.module.scss';
 import useAPIToken from 'Graphql/hooks/useAPIToken';
@@ -37,8 +37,7 @@ function UserApiTokens() {
       <h1 className={styles.title}>API Tokens</h1>
       <div className={styles.infoContainer}>
         <p className={styles.infoMessage}>
-          These are you API Tokens, use them to be authorized through API Token
-          auth.
+          These are you API Tokens, use them to be authorized through API Token auth.
         </p>
         <Button
           label="GENERATE"

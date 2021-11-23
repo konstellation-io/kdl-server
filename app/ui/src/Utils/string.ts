@@ -10,11 +10,7 @@ export function generateSlug(text: string) {
     .replace(INVALID_ID_CHARS_REGEXP, '')
     .substr(0, ID_MAX_LENGTH);
 }
-export function replaceAll(
-  text: string,
-  regex: RegExp,
-  replaceWith: string
-): string {
+export function replaceAll(text: string, regex: RegExp, replaceWith: string): string {
   return text.replace(new RegExp(regex, 'g'), replaceWith);
 }
 

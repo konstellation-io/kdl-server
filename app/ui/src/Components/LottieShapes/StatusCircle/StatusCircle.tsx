@@ -1,5 +1,5 @@
 import { Lottie } from 'kwc';
-import React from 'react';
+import * as React from 'react';
 import animationData from './animation.json';
 import cx from 'classnames';
 import styles from './StatusCircle.module.scss';
@@ -30,11 +30,7 @@ type Props = {
   size?: number;
 };
 
-function StatusCircle({
-  animation = States.INITIALIZING,
-  label = 'LOADING...',
-  size = 250,
-}: Props = {}) {
+function StatusCircle({ animation = States.INITIALIZING, label = 'LOADING...', size = 250 }: Props = {}) {
   const animationSegments = [ANIM_SEGMENTS.get(animation) as Timestamps];
 
   // Adds loading animation after finishing initiallization animation.
@@ -43,17 +39,8 @@ function StatusCircle({
   }
 
   return (
-    <div
-      className={styles.loaderContainer}
-      style={{ width: size, height: size }}
-    >
-      <Lottie
-        options={{ animationData }}
-        width={size}
-        height={size}
-        segments={animationSegments}
-        forceSegments
-      />
+    <div className={styles.loaderContainer} style={{ width: size, height: size }}>
+      <Lottie options={{ animationData }} width={size} height={size} segments={animationSegments} forceSegments />
       <div
         className={cx(styles.innerContainer, {
           [styles.initializing]: animation === States.INITIALIZING,

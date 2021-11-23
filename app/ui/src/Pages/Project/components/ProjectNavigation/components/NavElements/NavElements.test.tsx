@@ -1,15 +1,10 @@
-import React from 'react';
+import * as React from 'react';
 import NavElements from './NavElements';
 import GetMeQuery from 'Graphql/queries/getMe';
 import SetActiveUserToolsMutation from 'Graphql/mutations/setActiveUserTools';
 import { createMockClient } from 'mock-apollo-client';
 import { screen, fireEvent, cleanup, within } from '@testing-library/react';
-import {
-  apolloRender,
-  loadingHandler,
-  dataHandler,
-  getSnapshot,
-} from 'testUtils';
+import { apolloRender, loadingHandler, dataHandler, getSnapshot } from 'testUtils';
 import data from 'Mocks/GetMeQuery';
 import mutationData from 'Mocks/SetActiveProjectToolsMutation';
 import { StaticRouter } from 'react-router';
@@ -58,7 +53,7 @@ describe('When data is ready', () => {
 });
 
 describe('When stopping tools', () => {
-  let mockMutation = jest.fn();
+  const mockMutation = jest.fn();
 
   beforeEach(() => {
     mockMutation.mockResolvedValue({ data: mutationData });

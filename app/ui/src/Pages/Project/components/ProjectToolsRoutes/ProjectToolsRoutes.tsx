@@ -21,18 +21,13 @@ function ProjectToolsRoutes() {
     () => () => resetCurrentTool(),
     // We want to call this on component unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   return (
     <>
       {toolsRoutes.map(([route, toolName]) => (
-        <Route
-          key={toolName}
-          path={route}
-          component={() => <Tools toolName={toolName} />}
-          exact
-        />
+        <Route key={toolName} path={route} component={() => <Tools toolName={toolName} />} exact />
       ))}
     </>
   );

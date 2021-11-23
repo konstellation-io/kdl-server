@@ -6,7 +6,7 @@ import RepositoryTypeComponent, {
 
 import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
-import React from 'react';
+import * as React from 'react';
 import { RepositoryType } from 'Graphql/types/globalTypes';
 import styles from './Overview.module.scss';
 import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
@@ -16,23 +16,18 @@ import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { SETTINGS_PANEL_OPTIONS } from '../../panelSettings';
 import IconLaunch from '@material-ui/icons/Launch';
 import cx from 'classnames';
-import { CONFIG } from "index";
+import { CONFIG } from 'index';
 
 type Props = {
   openedProject: GetProjects_projects;
 };
 function Overview({ openedProject }: Props) {
-  const { openPanel: openSettings } = usePanel(
-    PanelType.PRIMARY,
-    SETTINGS_PANEL_OPTIONS
-  );
+  const { openPanel: openSettings } = usePanel(PanelType.PRIMARY, SETTINGS_PANEL_OPTIONS);
   const { updateSettingTab } = useSettingTabs();
 
-  const {
-    descriptionScore,
-    loading,
-    error,
-  } = useQualityDescription(openedProject.description, { skipFirstRun: false });
+  const { descriptionScore, loading, error } = useQualityDescription(openedProject.description, {
+    skipFirstRun: false,
+  });
 
   if (loading) return <SpinnerCircular />;
   if (error) return <ErrorMessage />;
@@ -63,7 +58,7 @@ function Overview({ openedProject }: Props) {
           <div className={styles.description}>{openedProject.description}</div>
         </div>
         <div className={styles.section}>
-          { CONFIG.KNOWLEDGE_GALAXY_ENABLED && <DescriptionScore score={descriptionScore} /> }
+          {CONFIG.KNOWLEDGE_GALAXY_ENABLED && <DescriptionScore score={descriptionScore} />}
         </div>
         <div
           data-testid="repositorySection"
@@ -76,17 +71,11 @@ function Overview({ openedProject }: Props) {
           </div>
           <div className={styles.repoType}>
             <RepositoryTypeComponent
-              squareLocation={
-                openedProject.repository?.type === RepositoryType.EXTERNAL
-                  ? LOCATION.OUT
-                  : LOCATION.IN
-              }
+              squareLocation={openedProject.repository?.type === RepositoryType.EXTERNAL ? LOCATION.OUT : LOCATION.IN}
               size={SIZE.TINY}
               shouldAnimate={false}
             />
-            <p
-              className={styles.repoTypeName}
-            >{`${openedProject.repository?.type} REPOSITORY`}</p>
+            <p className={styles.repoTypeName}>{`${openedProject.repository?.type} REPOSITORY`}</p>
           </div>
         </div>
         <div
@@ -98,9 +87,7 @@ function Overview({ openedProject }: Props) {
             <span>MEMBERS</span>
             <IconLaunch className={cx(styles.settingIcon, 'icon-small')} />
           </div>
-          <div
-            className={styles.nMembers}
-          >{`${openedProject.members.length} members`}</div>
+          <div className={styles.nMembers}>{`${openedProject.members.length} members`}</div>
         </div>
       </div>
     </div>

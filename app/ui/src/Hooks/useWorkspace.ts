@@ -6,9 +6,7 @@ type Workspace = {
   navigationOpened: boolean;
 };
 
-function useWorkspace(
-  projectId: string
-): [Workspace, (type: CONFIG, value: boolean) => void] {
+function useWorkspace(projectId: string): [Workspace, (type: CONFIG, value: boolean) => void] {
   function getBool(field: CONFIG, defaultValue: boolean) {
     const value = localStorage.getItem(`${projectId}-${field}`);
     return !value ? defaultValue : value === 'true';

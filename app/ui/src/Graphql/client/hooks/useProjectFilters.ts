@@ -1,8 +1,4 @@
-import {
-  ProjectFilters,
-  ProjectOrder,
-  ProjectSelection,
-} from '../models/ProjectFilters';
+import { ProjectFilters, ProjectOrder, ProjectSelection } from '../models/ProjectFilters';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { projectFilters } from 'Graphql/client/cache';
@@ -24,10 +20,8 @@ function useProjectFilters() {
     });
   }
 
-  const isProjectActive = (project: GetProjects_projects) =>
-    !project.needAccess && !project.archived;
-  const isProjectInaccessible = (project: GetProjects_projects) =>
-    project.needAccess;
+  const isProjectActive = (project: GetProjects_projects) => !project.needAccess && !project.archived;
+  const isProjectInaccessible = (project: GetProjects_projects) => project.needAccess;
   const isProjectArchived = (project: GetProjects_projects) => project.archived;
 
   function getProjectCounts(projects: GetProjects_projects[]) {
@@ -43,25 +37,18 @@ function useProjectFilters() {
     ]);
   }
 
-  function filterBySelection(
-    project: GetProjects_projects,
-    selection: ProjectSelection
-  ) {
+  function filterBySelection(project: GetProjects_projects, selection: ProjectSelection) {
     if (selection === ProjectSelection.ALL) return true;
 
     return (
       (selection === ProjectSelection.ARCHIVED && isProjectArchived(project)) ||
       (selection === ProjectSelection.ACTIVE && isProjectActive(project)) ||
-      (selection === ProjectSelection.INACCESSIBLE &&
-        isProjectInaccessible(project))
+      (selection === ProjectSelection.INACCESSIBLE && isProjectInaccessible(project))
     );
   }
 
-  function filterProjects(
-    projects: GetProjects_projects[],
-    filters: ProjectFilters
-  ) {
-    let filteredProjects = projects
+  function filterProjects(projects: GetProjects_projects[], filters: ProjectFilters) {
+    const filteredProjects = projects
       .filter((project) => project.name.includes(filters.name))
       .filter((project) => filterBySelection(project, filters.selection));
 

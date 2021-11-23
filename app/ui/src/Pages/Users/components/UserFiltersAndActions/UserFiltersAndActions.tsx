@@ -1,7 +1,7 @@
 import { Button, Left, Right } from 'kwc';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
-import React from 'react';
+import * as React from 'react';
 import UserActions from './UserActions';
 import UserFilters from './UserFilters';
 import IconSync from '@material-ui/icons/Cached';
@@ -25,7 +25,7 @@ function UserFiltersAndActions({ onUpdateAccessLevel, canManageUsers }: Props) {
   const [syncUsers, { loading }] = useMutation<SyncUsers>(syncUsersMutation, {
     onCompleted: () => {
       toast.dismiss();
-      toast.info(`User synchronization has started`);
+      toast.info('User synchronization has started');
 
       disableSyncAction();
     },
@@ -57,12 +57,7 @@ function UserFiltersAndActions({ onUpdateAccessLevel, canManageUsers }: Props) {
           />
         </div>
         <div>
-          <Button
-            label="Manage users"
-            onClick={onManageUsers}
-            disabled={!canManageUsers}
-            border
-          />
+          <Button label="Manage users" onClick={onManageUsers} disabled={!canManageUsers} border />
         </div>
       </Right>
     </div>

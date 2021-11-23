@@ -16,14 +16,7 @@ type Props = {
   disabled: boolean;
   onClick: (e: MouseEvent<HTMLDivElement>) => void;
 };
-function StepNode({
-  label,
-  completed,
-  active,
-  visited,
-  onClick,
-  disabled,
-}: Props) {
+function StepNode({ label, completed, active, visited, onClick, disabled }: Props) {
   let Icon;
   switch (true) {
     case completed:

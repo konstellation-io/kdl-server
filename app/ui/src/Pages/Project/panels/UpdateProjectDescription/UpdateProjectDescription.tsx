@@ -24,15 +24,7 @@ function UpdateProjectDescription({ project, close }: Props) {
     onUpdateCompleted: () => setCompleted(true),
   });
 
-  const {
-    handleSubmit,
-    clearErrors,
-    setValue,
-    unregister,
-    register,
-    watch,
-    errors,
-  } = useForm<FormData>({
+  const { handleSubmit, clearErrors, setValue, unregister, register, watch, errors } = useForm<FormData>({
     defaultValues: { description: project.description },
   });
 
@@ -46,12 +38,9 @@ function UpdateProjectDescription({ project, close }: Props) {
 
   const descriptionValue = watch('description');
 
-  const { descriptionScore, loading } = useQualityDescription(
-    descriptionValue,
-    {
-      skipFirstRun: false,
-    }
-  );
+  const { descriptionScore, loading } = useQualityDescription(descriptionValue, {
+    skipFirstRun: false,
+  });
 
   function submit({ description }: FormData) {
     updateProjectDescription(project.id, description);
@@ -61,9 +50,8 @@ function UpdateProjectDescription({ project, close }: Props) {
     <div className={styles.wrapper} data-testid="updateDescription">
       <div className={styles.container}>
         <div className={styles.descriptionLabel}>
-          Write a detailed description for your project. This description is
-          used by the Knowledge Galaxy to generate the recommendations. The more
-          detailed the description is, the better the recommendations are.
+          Write a detailed description for your project. This description is used by the Knowledge Galaxy to generate
+          the recommendations. The more detailed the description is, the better the recommendations are.
         </div>
       </div>
       <div className={styles.formInput}>

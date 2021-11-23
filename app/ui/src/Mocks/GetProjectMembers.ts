@@ -1,5 +1,5 @@
-import GetProjectsQuery from "./GetProjectsQuery";
+import GetProjectsQuery from './GetProjectsQuery';
 
 export default {
-    project: GetProjectsQuery.projects[0]
-}
+  project: GetProjectsQuery.projects[0],
+};

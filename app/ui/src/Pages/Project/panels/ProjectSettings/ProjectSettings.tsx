@@ -2,7 +2,7 @@ import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 import { ErrorMessage } from 'kwc';
 import ProjectInfo from './components/ProjectInfo/ProjectInfo';
-import React from 'react';
+import * as React from 'react';
 import TabDangerZone from './components/TabDangerZone/TabDangerZone';
 import TabGit from './components/TabGit/TabGit';
 import TabInfo from './components/TabInfo/TabInfo';
@@ -37,28 +37,16 @@ function ProjectSettings({ project }: Props) {
         </TabList>
 
         <div className={styles.tabContent}>
-          <TabPanel
-            className={styles.tab}
-            selectedClassName={styles.selectedTab}
-          >
+          <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
             <TabInfo project={project} />
           </TabPanel>
-          <TabPanel
-            className={styles.tab}
-            selectedClassName={styles.selectedTab}
-          >
+          <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
             <TabGit project={project} />
           </TabPanel>
-          <TabPanel
-            className={styles.tab}
-            selectedClassName={styles.selectedTab}
-          >
+          <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
             <TabMembers projectId={project.id} />
           </TabPanel>
-          <TabPanel
-            className={styles.tab}
-            selectedClassName={styles.selectedTab}
-          >
+          <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
             <TabDangerZone projectId={project.id} />
           </TabPanel>
         </div>

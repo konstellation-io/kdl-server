@@ -35,13 +35,7 @@ type Props = {
   customAction?: JSX.Element;
 };
 
-function MessageActionBox({
-  title,
-  description,
-  action,
-  customAction,
-  theme = BOX_THEME.DEFAULT,
-}: Props) {
+function MessageActionBox({ title, description, action, customAction, theme = BOX_THEME.DEFAULT }: Props) {
   const [confirmed, setConfirmed] = useState(false);
 
   useEffect(() => {
@@ -67,9 +61,7 @@ function MessageActionBox({
               label={action.label}
               theme={toButtonTheme.get(theme)}
               onClick={action.onClick}
-              disabled={
-                (action.needConfirmation && !confirmed) || action.loading
-              }
+              disabled={(action.needConfirmation && !confirmed) || action.loading}
               loading={action.loading}
               height={30}
               Icon={action.Icon}
@@ -82,10 +74,7 @@ function MessageActionBox({
   }
 
   return (
-    <div
-      className={cx(styles.container, styles[theme])}
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div className={cx(styles.container, styles[theme])} onClick={(e) => e.stopPropagation()}>
       <p className={styles.title}>{title}</p>
       <p className={styles.description}>{description}</p>
       {getAction()}

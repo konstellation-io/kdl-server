@@ -1,9 +1,7 @@
-import MessageActionBox, {
-  BOX_THEME,
-} from 'Components/MessageActionBox/MessageActionBox';
+import MessageActionBox, { BOX_THEME } from 'Components/MessageActionBox/MessageActionBox';
 
 import IconArchive from '@material-ui/icons/Archive';
-import React from 'react';
+import * as React from 'react';
 import styles from './TabDangerZone.module.scss';
 import useProject from 'Graphql/hooks/useProject';
 import { toast } from 'react-toastify';
@@ -19,11 +17,7 @@ function TabDangerZone({ projectId }: Props) {
     archiveProjectAction: { updateProjectArchived, loading },
   } = useProject({ onUpdateCompleted: handleUpdateCompleted });
 
-  const {
-    activate: showModal,
-    deactivate: closeModal,
-    value: isModalVisible,
-  } = useBoolState();
+  const { activate: showModal, deactivate: closeModal, value: isModalVisible } = useBoolState();
 
   function handleUpdateCompleted() {
     toast.info('The project has been archived successfully!');
@@ -31,9 +25,7 @@ function TabDangerZone({ projectId }: Props) {
 
   return (
     <div className={styles.container}>
-      <p className={styles.title}>
-        Everything you do in this area is dangerous, be careful.
-      </p>
+      <p className={styles.title}>Everything you do in this area is dangerous, be careful.</p>
       <div className={styles.actionBox}>
         <MessageActionBox
           title="Archive project"
@@ -61,9 +53,8 @@ function TabDangerZone({ projectId }: Props) {
           blocking
         >
           <ModalLayoutInfo>
-            You are going to archive this project. When a project is archived
-            you will not be able to make changes or use any resources associated
-            with this project. Are you sure you want archive it?
+            You are going to archive this project. When a project is archived you will not be able to make changes or
+            use any resources associated with this project. Are you sure you want archive it?
           </ModalLayoutInfo>
         </ModalContainer>
       )}

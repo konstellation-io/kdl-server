@@ -1,12 +1,10 @@
 import StatusCircle, { States } from './StatusCircle';
 
 import { Lottie } from 'kwc';
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 
-const component = shallow(
-  <StatusCircle animation={States.INITIALIZING} label="Some label" size={40} />
-);
+const component = shallow(<StatusCircle animation={States.INITIALIZING} label="Some label" size={40} />);
 
 describe('StatusCircle component', () => {
   it('show right texts', () => {

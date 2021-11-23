@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { AddMembersInput, AccessLevel } from './../../types/globalTypes';
+import { AddMembersInput, AccessLevel } from '../../types/globalTypes';
 
 // ====================================================
 // GraphQL mutation operation: AddMembers

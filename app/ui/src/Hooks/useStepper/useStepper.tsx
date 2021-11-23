@@ -35,6 +35,7 @@ type Step = {
 
 type Data = {
   id: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Component: any;
 };
 
@@ -62,11 +63,7 @@ export default function useStepper({ data, initialStep = 0 }: Params) {
     return <Component showErrors={showErrors} />;
   }
 
-  function updateState(
-    completed: boolean,
-    error: boolean,
-    stepNumber: number = actStep
-  ) {
+  function updateState(completed: boolean, error: boolean, stepNumber: number = actStep) {
     const newSteps = cloneDeep(steps);
     newSteps[stepNumber] = {
       ...newSteps[stepNumber],

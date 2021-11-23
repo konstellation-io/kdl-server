@@ -1,7 +1,5 @@
-import RepositoryTypeComponent, {
-  LOCATION,
-} from './components/RepositoryTypeComponent/RepositoryTypeComponent';
-import React from 'react';
+import RepositoryTypeComponent, { LOCATION } from './components/RepositoryTypeComponent/RepositoryTypeComponent';
+import * as React from 'react';
 import RepositoryOption from './components/RepositoryOption/RepositoryOption';
 import { RepositoryType } from 'Graphql/types/globalTypes';
 import cx from 'classnames';
@@ -10,7 +8,7 @@ import useNewProject from 'Graphql/client/hooks/useNewProject';
 import { useReactiveVar } from '@apollo/client';
 import { newProject } from 'Graphql/client/cache';
 
-function Repository(params: any) {
+function Repository(params: { showErrors: boolean }) {
   const { showErrors } = params;
   const { updateValue, clearError } = useNewProject('repository');
   const {

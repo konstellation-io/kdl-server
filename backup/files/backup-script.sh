@@ -15,7 +15,6 @@ function mongobackup () {
     mongodump --host "${MONGO_HOST}" --port "${MONGO_PORT}" --username "${MONGO_INITDB_ROOT_USERNAME}" --password "${MONGO_INITDB_ROOT_PASSWORD}" --out /backup/mongodb
 }
 # MLFlow backup
-
 function mlflow_backup (){
     for i in /shared-volume/*/mlflow.db; do
         path="/backup/mlflow/";

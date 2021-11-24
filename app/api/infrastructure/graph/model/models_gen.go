@@ -36,10 +36,6 @@ type ExternalRepositoryInput struct {
 	Token    string `json:"token"`
 }
 
-type QualityProjectDesc struct {
-	Quality int `json:"quality"`
-}
-
 type RemoveAPITokenInput struct {
 	APITokenID string `json:"apiTokenId"`
 }
@@ -67,19 +63,13 @@ type SetBoolFieldInput struct {
 	Value bool   `json:"value"`
 }
 
-type SetKGStarredInput struct {
-	ProjectID string `json:"projectId"`
-	KgItemID  string `json:"kgItemId"`
-	Starred   bool   `json:"starred"`
-}
-
-type SetKGStarredRes struct {
-	KgItemID string `json:"kgItemId"`
-	Starred  bool   `json:"starred"`
-}
-
 type SyncUsersResponse struct {
 	Msg string `json:"msg"`
+}
+
+type Topic struct {
+	Name      string  `json:"name"`
+	Relevance float64 `json:"relevance"`
 }
 
 type UpdateAccessLevelInput struct {

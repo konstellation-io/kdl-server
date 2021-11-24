@@ -18,8 +18,6 @@ type Repository interface {
 	UpdateMembersAccessLevel(ctx context.Context, projectID string, users []entity.User, accessLevel entity.AccessLevel) error
 	UpdateName(ctx context.Context, projectID, name string) error
 	UpdateDescription(ctx context.Context, projectID, description string) error
-	SetStarredKGItem(ctx context.Context, projectID, kgItemID string) error
-	UnsetStarredKGItem(ctx context.Context, projectID, kgItemID string) error
 	UpdateArchived(ctx context.Context, projectID string, archived bool) error
 }
 
@@ -32,5 +30,4 @@ type UseCase interface {
 	RemoveMembers(ctx context.Context, opt RemoveMembersOption) (entity.Project, error)
 	UpdateMembers(ctx context.Context, opt UpdateMembersOption) (entity.Project, error)
 	Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error)
-	UpdateStarred(ctx context.Context, opt UpdateStarredOption) (bool, error)
 }

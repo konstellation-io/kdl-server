@@ -1,26 +1,41 @@
-{{ if .Values.backup.gitea.enabled }}
+{{ if .Values.backup.enabled }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: backup-gitea
+  name: backup
   labels:
-    app: backup-gitea
+    app: backup
 spec:
-  schedule: {{ .Values.backup.gitea.schedule | quote }}
+  schedule: {{ .Values.backup.schedule | quote }}
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 5
   successfulJobsHistoryLimit: 2
   startingDeadlineSeconds: 60 # 1min
   jobTemplate:
+    metadata:
+      name: {{ .Values.backup.name }}
     spec:
       backoffLimit: 3
       activeDeadlineSeconds: 60 # 1min
       template:
         spec:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
           containers:
             - name: {{ .Values.backup.name }}
               image: {{ .Values.backup.image.repository }}:{{ .Values.backup.image.tag }}
               imagePullPolicy: {{ .Values.backup.image.pullPolicy }}
+              securityContext:
+                allowPrivilegeEscalation: false
+              resources:
+                limits:
+                  memory: {{ .Values.backup.resources.limits.memory }}
+                  cpu: {{ .Values.backup.resources.limits.cpu }}
+                requests:
+                  memory: {{ .Values.backup.resources.requests.memory }}
+                  cpu: {{ .Values.backup.resources.requests.cpu }}
               envFrom:
                 - configMapRef:
                     name: gitea-config
@@ -28,22 +43,19 @@ spec:
                     name: postgres
                 - secretRef:
                     name: backup-secrets
+                - secretRef:
+                    name: kdl-mongo-secret
+              env:
+                - name: MONGO_HOST
+                  value: {{ .Values.mongodb.host }}
+                - name: MONGO_PORT
+                  value: {{ .Values.mongodb.port | quote }}
               volumeMounts:
               - name: gitea-pvc
                 mountPath: "/data"
-              command:
-                - /bin/bash
-              args:
-                - -c
-                - >-
-                  echo "$DB_HOST:$POSTGRES_DB:$DB_USER:$POSTGRES_PASSWORD" > ~/.pgpass && 
-                  chmod 600 ~/.pgpass &&
-                  mkdir /backup &&
-                  tar zcvf /backup/data.tar.gz --directory '/data' --exclude './gitea/indexers' . &&
-                  pg_dump -h $(echo $DB_HOST | cut -f 1 -d ":" ) -p $(echo $DB_HOST | cut -f 2 -d ":" ) -U $DB_USER -v -F c -f /backup/postgres_gitea.dump $POSTGRES_DB &&
-                  tar zcvf /backup.tar.gz /backup &&
-                  aws s3 cp /backup.tar.gz s3://$BUCKET_NAME/backup_gitea_$(date +%Y%m%d).tar.gz
-
+          {{- if .Values.extraVolumeMounts }}
+{{ toYaml .Values.extraVolumeMounts | indent 12 }}
+          {{- end }}
           {{- if .Values.imagePullSecrets }}
           imagePullSecrets:
           {{- range .Values.imagePullSecrets  }}
@@ -54,5 +66,8 @@ spec:
             - name: gitea-pvc
               persistentVolumeClaim:
                 claimName: gitea-pvc-gitea-0
+            {{- if .Values.extraVolumes }}
+{{ toYaml .Values.extraVolumes | indent 12 }}
+      {{- end }}
           restartPolicy: OnFailure
 {{- end }}

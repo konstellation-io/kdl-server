@@ -46,13 +46,6 @@ exports[`ProjectNavigation component Component match snapshot 1`] = `
     className="bottom"
   >
     <NavigationButton
-      Icon={[Function]}
-      dataTestId="toggleKnowledgeViewer"
-      disabled={false}
-      label="Knowledge Viewer"
-      onClick={[Function]}
-    />
-    <NavigationButton
       Icon={
         Object {
           "$$typeof": Symbol(react.memo),

@@ -91,11 +91,23 @@ create_namespace() {
 }
 
 deploy_helm_chart() {
+
+  KNOWLEDGE_GALAXY_IMAGE_REPOSITORY="konstellation/knowledge-galaxy"
+  SET_KNOWLEDGE_GALAXY_IMAGE_TAG=""
+  if [ "$KNOWLEDGE_GALAXY_LOCAL" = "true"  ]; then
+    KNOWLEDGE_GALAXY_IMAGE_REPOSITORY="$IMAGE_REGISTRY/konstellation/knowledge-galaxy"
+    SET_KNOWLEDGE_GALAXY_IMAGE_TAG="--set knowledgeGalaxy.image.tag=latest"
+    echo_info "LOCAL KG"
+  fi
+
   echo_info "📦 Applying helm chart..."
   run helm dep update helm/kdl-server
   run helm upgrade \
     --install "${RELEASE_NAME}" \
     --namespace "${NAMESPACE}" \
+    --set backup.enabled="false" \
+    --set backup.image.pullPolicy="Always" \
+    --set backup.image.repository="$IMAGE_REGISTRY/konstellation/kdl-backup" \
     --set domain=$DOMAIN \
     --set drone.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set droneAuthorizer.image.pullPolicy="Always" \
@@ -108,6 +120,9 @@ deploy_helm_chart() {
     --set kdl.local="true" \
     --set kdlServer.image.pullPolicy="Always" \
     --set kdlServer.image.repository="$IMAGE_REGISTRY/konstellation/kdl-server" \
+    --set knowledgeGalaxy.image.pullPolicy="Always" \
+    --set knowledgeGalaxy.image.repository=$KNOWLEDGE_GALAXY_IMAGE_REPOSITORY \
+    $SET_KNOWLEDGE_GALAXY_IMAGE_TAG \
     --set minio.securityContext.runAsUser=0 \
     --set mongodb.persistentVolume.storageClassName=$STORAGE_CLASS_NAME \
     --set sharedVolume.storageClassName=$STORAGE_CLASS_NAME \
@@ -126,9 +141,6 @@ deploy_helm_chart() {
     --set userToolsOperator.vscode.image.pullPolicy="Always" \
     --set userToolsOperator.vscode.image.repository="$IMAGE_REGISTRY/konstellation/vscode" \
     --set userToolsOperator.storage.storageClassName=$STORAGE_CLASS_NAME \
-    --set backup.image.pullPolicy="Always" \
-    --set backup.image.repository="$IMAGE_REGISTRY/konstellation/kdl-backup" \
-    --set backup.gitea.enabled="false" \
     --timeout 60m \
     --wait \
     helm/kdl-server

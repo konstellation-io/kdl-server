@@ -18,6 +18,7 @@ export interface GetProjects_projects_repository {
 
 export interface GetProjects_projects_toolUrls {
   __typename: 'ToolUrls';
+  knowledgeGalaxy: string;
   drone: string;
   gitea: string;
   jupyter: string;

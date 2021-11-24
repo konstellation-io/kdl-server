@@ -36,7 +36,6 @@ type projectDTO struct {
 	RepoName        string                `bson:"repo_name"`
 	ExternalRepoURL string                `bson:"external_repo_url"`
 	Members         []memberDTO           `bson:"members"`
-	StarredKGItems  []string              `bson:"starred_kg_items"`
 }
 
 type projectMongoDBRepo struct {
@@ -171,40 +170,6 @@ func (m *projectMongoDBRepo) UpdateArchived(ctx context.Context, projectID strin
 	return m.updateProjectFields(ctx, projectID, bson.M{"archived": archived})
 }
 
-// SetStarredKGItem adds a kgItem to starred list.
-func (m *projectMongoDBRepo) SetStarredKGItem(ctx context.Context, projectID, kgItemID string) error {
-	m.logger.Debugf("Starring %s in project \"%s\"...", kgItemID, projectID)
-
-	filter := bson.M{"_id": projectID}
-
-	upd := bson.M{
-		"$push": bson.M{
-			"starred_kg_items": kgItemID,
-		},
-	}
-
-	_, err := m.collection.UpdateOne(ctx, filter, upd)
-
-	return err
-}
-
-// UnsetStarredKGItem unsets a kgItem from starred list.
-func (m *projectMongoDBRepo) UnsetStarredKGItem(ctx context.Context, projectID, kgItemID string) error {
-	m.logger.Debugf("Unstarring %s in project \"%s\"...", kgItemID, projectID)
-
-	filter := bson.M{"_id": projectID}
-
-	upd := bson.M{
-		"$pull": bson.M{
-			"starred_kg_items": kgItemID,
-		},
-	}
-
-	_, err := m.collection.UpdateOne(ctx, filter, upd)
-
-	return err
-}
-
 func (m *projectMongoDBRepo) updateProjectFields(ctx context.Context, projectID string, fields bson.M) error {
 	m.logger.Debugf("Updating the project \"%s\" with \"%s\"...", projectID, fields)
 
@@ -252,7 +217,6 @@ func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 		RepositoryType:  p.Repository.Type,
 		RepoName:        p.Repository.RepoName,
 		ExternalRepoURL: p.Repository.ExternalRepoURL,
-		StarredKGItems:  p.StarredKGItems,
 		Archived:        p.Archived,
 	}
 
@@ -287,11 +251,10 @@ func (m *projectMongoDBRepo) membersToDTOs(members []entity.Member) ([]memberDTO
 
 func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 	p := entity.Project{
-		ID:             dto.ID,
-		Name:           dto.Name,
-		Description:    dto.Description,
-		CreationDate:   dto.CreationDate,
-		StarredKGItems: dto.StarredKGItems,
+		ID:           dto.ID,
+		Name:         dto.Name,
+		Description:  dto.Description,
+		CreationDate: dto.CreationDate,
 		Repository: entity.Repository{
 			Type:            dto.RepositoryType,
 			ExternalRepoURL: dto.ExternalRepoURL,

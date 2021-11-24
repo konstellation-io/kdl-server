@@ -3,18 +3,35 @@ domain: kdl.local
 serverName: Local Server
 
 backup:
+  enabled: false
+  schedule: "0 1 * * 0" # every sunday at 1:00 AM
   name: backup-gitea
-  image: 
+  image:
     repository: konstellation/kdl-backup
-    tag: latest
+    tag: v0.16.0
     pullPolicy: IfNotPresent
-  gitea:
-    enabled: false
-    schedule: "0 1 * * 0" # every sunday at 1:00 AM
   s3:
     awsAccessKeyID: aws-access-key-id
     awsSecretAccessKey: aws-secret-access-key
     bucketName: s3-bucket-name
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "100Mi"
+    limits:
+      cpu: "100m"
+      memory: "256Mi"
+  extraVolumeMounts: []
+  # extraVolumeMounts:
+  #   - name: shared-storage
+  #     mountPath: /backup
+  #     readOnly: true
+  extraVolumes: []
+  # extraVolumes:
+  #   - name: shared-storage
+  #     hostPath:
+  #       path: /backup
+  #       type: Directory
 
 cleaner:
   enabled: false
@@ -76,18 +93,34 @@ ingress:
 kdl:
   local: false
 
-kdlKG:
+knowledgeGalaxy:
+  enabled: false
   image:
-    repository: konstellation/kdl-kg
-    tag: "v0.13-alpha.7"
+    repository: konstellation/knowledge-galaxy
+    tag: v1.2.1
     pullPolicy: IfNotPresent
-  assetRoute: "/kg/assets"
-  workers: 1
-  bindAddress: 0.0.0.0
-  port: 8080
-  numberOfOutputs: 10
-  logPath: /var/log/app/kg.log
-  logLevel: INFO
+
+  ## Knowledge Galaxy app config
+  ##
+  config: {}
+  #  logLevel: "INFO"
+  #  workers: 1
+  #  numberOfOutputs: 1000
+  #  descriptionMinWords: 50
+
+  ## Service account for Knowledge Galaxy to use.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ##
+  serviceaccount:
+    enabled: true
+    name: ""
+    annotations: {}
+
+    ## Reference to one or more secrets to be used when pulling images
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ##
+    imagePullSecrets: []
+    # - name: regcred
 
 kdlServer:
   image:
@@ -120,6 +153,8 @@ mongodb:
   persistentVolume:
     storageClassName: standard
     size: 5Gi
+  host: "kdl-mongo-0"
+  port: 27017
 
 oauth2Proxy:
   image:
@@ -219,11 +254,11 @@ userToolsOperator:
       repository: konstellation/vscode
       tag: "latest"
       pullPolicy: IfNotPresent
-  giteaOauth2Setup:
-    image:
-      repository: konstellation/gitea-oauth2-setup
-      tag: "latest"
-      pullPolicy: IfNotPresent
+  #giteaOauth2Setup:
+  #  image:
+  #    repository: konstellation/gitea-oauth2-setup
+  #    tag: "latest"
+  #    pullPolicy: IfNotPresent
   oauth2Proxy:
     image:
       repository: quay.io/oauth2-proxy/oauth2-proxy

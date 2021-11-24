@@ -91,11 +91,19 @@ function App() {
     uri: `${CONFIG.SERVER_URL}/api/query`,
   });
 
+  const kgHttpLink = new HttpLink({
+      uri: `${CONFIG.KG_SERVER_URL}/api/query`,
+  });
+
   const client = new ApolloClient({
     connectToDevTools: process.env.NODE_ENV === 'development',
     credentials: 'include',
     cache,
-    link: ApolloLink.from([errorLink, httpLink]),
+    link: ApolloLink.split(
+        operation => operation.getContext().clientName === 'kg',
+        ApolloLink.from([errorLink, kgHttpLink]),
+        ApolloLink.from([errorLink, httpLink]),
+    ),
   });
 
   return (

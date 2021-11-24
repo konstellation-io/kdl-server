@@ -1,8 +1,14 @@
 import { project1 } from '../../src/Mocks/entities/project';
+import GetMeQuery from "../../src/Mocks/GetMeQuery";
+import GetUsersQuery from "../../src/Mocks/GetUsersQuery";
+import GetProjectsQuery from "../../src/Mocks/GetProjectsQuery";
 
 describe('Settings Info Behavior', () => {
   beforeEach(() => {
-    cy.kstInterceptor('GetProjects', { data: { projects: [project1] } });
+    cy.kstInterceptor('GetMe', { data: GetMeQuery });
+    cy.kstInterceptor('GetUsers', { data: GetUsersQuery });
+    cy.kstInterceptor('GetProjects', { data: GetProjectsQuery });
+    cy.kstInterceptor('GetProjectMembers', { data: GetProjectsQuery.projects[0] });
     cy.openSettings();
   });
 

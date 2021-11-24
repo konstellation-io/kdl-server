@@ -5,6 +5,7 @@ export default gql`
     project(id: $id) {
       id
       toolUrls {
+        knowledgeGalaxy
         gitea
         filebrowser
         jupyter

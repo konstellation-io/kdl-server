@@ -99,7 +99,7 @@ spec:
           volumeMounts:
             - name: kdl-server-configmap
               mountPath: /public/config.json
-              subPath: config.cfg
+              subPath: config.json
           ports:
             - containerPort: 3000
         - name: oauth2-proxy
@@ -111,6 +111,7 @@ spec:
             - "--upstream=http://127.0.0.1:8080/"
             - "--upstream=http://127.0.0.1:9000/mlflow/"
             - "--upstream=http://127.0.0.1:9000/filebrowser/"
+            - "--upstream=http://127.0.0.1:9000/kg/"
             - "--pass-user-headers=true"
             - "--skip-provider-button=true"
             - "--skip-auth-route=/config.json"

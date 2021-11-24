@@ -8,7 +8,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/kg"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
@@ -22,7 +21,6 @@ type Resolver struct {
 	cfg      config.Config
 	projects project.UseCase
 	users    user.UseCase
-	kg       kg.UseCase
 	logger   logging.Logger
 }
 
@@ -31,14 +29,12 @@ func NewResolver(
 	cfg config.Config,
 	projectInteractor project.UseCase,
 	userInteractor user.UseCase,
-	kgInteractor kg.UseCase,
 	logger logging.Logger,
 ) *Resolver {
 	return &Resolver{
 		cfg:      cfg,
 		projects: projectInteractor,
 		users:    userInteractor,
-		kg:       kgInteractor,
 		logger:   logger,
 	}
 }

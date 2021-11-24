@@ -3,7 +3,7 @@ const path = require('path');
 const { gql } = require('apollo-server');
 
 const schema = fs.readFileSync(
-  path.join(__dirname, '../../../api/infrastructure/graph/schema.graphqls'),
+  path.join(__dirname, '../../../graphql/schema.graphqls'),
   'utf8'
 );
 const typeDefs = gql(schema);

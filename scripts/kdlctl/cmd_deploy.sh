@@ -117,7 +117,6 @@ deploy_helm_chart() {
     --set gitea.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set giteaOauth2Setup.image.pullPolicy="Always" \
     --set giteaOauth2Setup.image.repository="$IMAGE_REGISTRY/konstellation/gitea-oauth2-setup" \
-    --set kdl.local="true" \
     --set kdlServer.image.pullPolicy="Always" \
     --set kdlServer.image.repository="$IMAGE_REGISTRY/konstellation/kdl-server" \
     --set knowledgeGalaxy.image.pullPolicy="Always" \
@@ -132,6 +131,10 @@ deploy_helm_chart() {
     --set projectOperator.mlflow.image.pullPolicy="Always" \
     --set projectOperator.mlflow.image.repository="$IMAGE_REGISTRY/konstellation/mlflow" \
     --set projectOperator.mlflow.volume.storageClassName=$STORAGE_CLASS_NAME \
+    --set tls.enabled=${ENABLE_TLS} \
+    --set tls.secretName=${DOMAIN}-tls-secret \
+    --set tls.caSecret.name=mkcert-ca \
+    --set tls.caSecret.certFilename=mkcert-ca.crt \
     --set userToolsOperator.image.pullPolicy="Always" \
     --set userToolsOperator.image.repository="$IMAGE_REGISTRY/konstellation/user-tools-operator" \
     --set userToolsOperator.jupyter.image.pullPolicy="Always" \

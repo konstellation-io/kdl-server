@@ -18,3 +18,14 @@ Create MongoDB URI.
     {{ default "knowledge-galaxy" .Values.knowledgeGalaxy.serviceaccount.name }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Create tls secret name
+*/}}
+{{- define "tlsSecretName" -}}
+{{- if .Values.tls.certManager.enabled -}}
+  {{- printf "%s-tls-secret" $.Values.domain -}}
+{{- else -}}
+  {{- .Values.tls.secretName -}}
+{{- end -}}
+{{- end -}}

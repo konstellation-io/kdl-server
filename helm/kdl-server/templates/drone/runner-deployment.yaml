@@ -30,13 +30,13 @@ spec:
         envFrom:
           - configMapRef:
               name: drone-config
-      {{- if .Values.kdl.local }}
+      {{- if and (and .Values.tls.enabled (not .Values.tls.certManager.enabled)) .Values.tls.caSecret }}
         volumeMounts:
-        - mountPath: /etc/ssl/certs/mkcert-ca.pem
-          name: mkcert-ca
-          subPath: mkcert-ca.crt
+        - mountPath: /etc/ssl/certs/ca-cert.pem
+          name: ca-cert
+          subPath: {{ .Values.tls.caSecret.certFilename }}
       volumes:
-      - name: mkcert-ca
+      - name: ca-cert
         secret:
-          secretName: mkcert-ca
+          secretName: {{ .Values.tls.caSecret.name }}
       {{- end }}

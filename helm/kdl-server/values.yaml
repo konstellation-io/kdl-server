@@ -90,9 +90,6 @@ ingress:
   type: nginx
   nginxConnectionTimeout: "3600"
 
-kdl:
-  local: false
-
 knowledgeGalaxy:
   enabled: false
   image:
@@ -223,6 +220,13 @@ sharedVolume:
   storageClassName: standard
   size: 10Gi
 
+## TLS configuration for Ingresses, Gitea and Drone.
+## If tls.certManager.enabled=true, Cert Manager
+## certificates will be used.
+##
+## Alternatively a tls secret can be used. In that
+## case the secret must be manually created in the namespace
+##
 tls:
   enabled: true
   certManager:
@@ -230,6 +234,21 @@ tls:
     acme:
       server: https://acme-v02.api.letsencrypt.org/directory
       email: user@email.com
+
+  ## Custom TLS secret
+  ## Must be a valid wildcard certificate for the domain
+  ## declared in .Values.domain
+  ## Certificate name example:
+  ##   *.example.com
+  #
+  # secretName: kdl-server-tls
+
+  ## A secret containing the the CA cert is needed
+  ## in order to use a self-signed certificate
+  ## 
+  # caSecret:
+  #   name: kdl-ca-cert
+  #   certFilename: ca.crt
 
 userToolsOperator:
   image:

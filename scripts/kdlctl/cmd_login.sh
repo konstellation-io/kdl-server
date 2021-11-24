@@ -12,7 +12,13 @@ show_login_help() {
 }
 
 local_login() {
-  LINK=https://kdlapp.kdl.$HOST_IP.nip.io
+  if [ "$ENABLE_TLS" = "true" ];
+  then
+    export SCHEMA="https"
+  else
+    export SCHEMA="http"
+  fi
+  LINK=$SCHEMA://kdlapp.kdl.$HOST_IP.nip.io
   echo "Login link  : ${LINK}"
   echo "👤 User     : ${GITEA_ADMIN_USER}"
   echo "🔑 Password : ${GITEA_ADMIN_PASSWORD}"

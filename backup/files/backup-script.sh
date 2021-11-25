@@ -29,7 +29,6 @@ function kubernetes_backup (){
     kubectl --token "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" get kdlprojects -n kdl -o yaml > /backup/kubernetes/crds.yaml 
 }
 
-
 echo "Performing GITEA backup..."
 gitea_backup
 

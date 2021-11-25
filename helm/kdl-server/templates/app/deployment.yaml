@@ -70,13 +70,13 @@ spec:
             - name: MINIO_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  key: secretkey
-                  name: {{ .Release.Name }}-minio
+                  key: AWS_SECRET_ACCESS_KEY
+                  name: tools-secret
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  key: accesskey
-                  name: {{ .Release.Name }}-minio
+                  key: AWS_ACCESS_KEY_ID
+                  name: tools-secret
             - name: DRONE_INTERNAL_URL
               valueFrom:
                 configMapKeyRef:

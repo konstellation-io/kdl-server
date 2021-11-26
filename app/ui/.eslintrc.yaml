@@ -14,6 +14,7 @@ parserOptions:
   sourceType: module
 ignorePatterns:
   - "cypress/plugins/*.js"
+  - "mock-server"
 plugins:
   - react
   - "@typescript-eslint"

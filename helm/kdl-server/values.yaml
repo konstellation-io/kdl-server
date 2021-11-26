@@ -130,14 +130,12 @@ minio:
     requests:
       memory: 1Gi
   mode: standalone
-  rootUser: "admin"
-  rootPassword: "admin123"
-  users:
-  - accessKey: minio
-    secretKey: minio123
-    policy: readwrite
+  rootUser: "minio"
+  rootPassword: "minio123"
   environment:
     MINIO_UPDATE: "on"
+  serviceAccount:
+    create: false
   persistence:
     storageClass: standard
     existingClaim: received-data-claim

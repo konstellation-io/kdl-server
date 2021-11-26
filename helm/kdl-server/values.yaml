@@ -136,6 +136,8 @@ minio:
   - accessKey: minio
     secretKey: minio123
     policy: readwrite
+  environment:
+    MINIO_UPDATE: "on"
   persistence:
     storageClass: standard
     existingClaim: received-data-claim

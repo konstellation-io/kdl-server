@@ -1,10 +1,12 @@
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 import useBoolState from './useBoolState';
+import { HookWrapper } from '../testUtils';
 
-const HookWrapper = ({ hook }) => <div hook={hook()} />;
 const wrapper = shallow(<HookWrapper hook={() => useBoolState(false)} />);
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 const getHook = () => wrapper.find('div').props().hook;
 const getValue = () => getHook().value;
 

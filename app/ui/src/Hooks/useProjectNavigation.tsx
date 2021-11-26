@@ -20,7 +20,7 @@ import GetMeQuery from 'Graphql/queries/getMe';
 export interface RouteConfiguration {
   id: string;
   label: string;
-  Icon: OverridableComponent<SvgIconTypeMap<{}, 'svg'>>;
+  Icon: OverridableComponent<SvgIconTypeMap>;
   disabled?: boolean;
   route: ROUTE;
 }
@@ -32,7 +32,6 @@ export const mainRoutesConfig: RouteConfiguration[] = [
     Icon: IconHome,
     route: ROUTE.PROJECT_OVERVIEW,
   },
-
 ];
 export const projectToolsRoutesConfig: RouteConfiguration[] = [
   {
@@ -98,7 +97,7 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
         ...route,
         route: buildRoute(route.route, projectId),
       } as RouteConfiguration),
-    [projectId]
+    [projectId],
   );
 
   return useMemo(() => {
@@ -113,8 +112,9 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
     const mainRoutes = mainRoutesConfig.map(buildRoutes);
 
     if (!CONFIG.KNOWLEDGE_GALAXY_ENABLED) {
-      projectToolsRoutes = projectToolsRoutes
-       .map((r: RouteConfiguration) => r.id === 'knowledgeGalaxy' ? { ...r, disabled: true} :  r);
+      projectToolsRoutes = projectToolsRoutes.map((r: RouteConfiguration) =>
+        r.id === 'knowledgeGalaxy' ? { ...r, disabled: true } : r,
+      );
     }
 
     return {

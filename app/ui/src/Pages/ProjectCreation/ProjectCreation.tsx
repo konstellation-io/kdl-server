@@ -2,9 +2,7 @@ import { Button } from 'kwc';
 import ROUTE, { buildRoute } from 'Constants/routes';
 import React, { useEffect, useState } from 'react';
 import { RepositoryInput, RepositoryType } from 'Graphql/types/globalTypes';
-import StatusCircle, {
-  States,
-} from 'Components/LottieShapes/StatusCircle/StatusCircle';
+import StatusCircle, { States } from 'Components/LottieShapes/StatusCircle/StatusCircle';
 
 import styles from './ProjectCreation.module.scss';
 import useProject from 'Graphql/hooks/useProject';
@@ -24,16 +22,14 @@ function ProjectCreation() {
     create: { data: createData, error: createError },
   } = useProject();
 
-  const { repository, information, externalRepository } = useReactiveVar(
-    newProject
-  );
+  const { repository, information, externalRepository } = useReactiveVar(newProject);
 
   const error = animationFinished && !!createError;
   const success = animationFinished && !!createData;
 
   // Animation should last for at least 3 seconds
   useEffect(() => {
-    let timeout = window.setTimeout(() => {
+    const timeout = window.setTimeout(() => {
       setAnimationFinished(true);
     }, 3000);
 
@@ -68,7 +64,7 @@ function ProjectCreation() {
     () => () => {
       if (success) clearAll();
     },
-    [success, error, clearAll]
+    [success, error, clearAll],
   );
 
   function getCircleProps() {
@@ -86,22 +82,11 @@ function ProjectCreation() {
     const project = buildRoute(ROUTE.PROJECT, information.values.id);
     return (
       <div className={styles.actionButtons}>
-        <div
-          className={styles.actionButton}
-          data-testid="goToProjectsListButton"
-        >
-          <Button
-            label="Go to projects list"
-            className={styles.button}
-            to={ROUTE.HOME}
-          />
+        <div className={styles.actionButton} data-testid="goToProjectsListButton">
+          <Button label="Go to projects list" className={styles.button} to={ROUTE.HOME} />
         </div>
         <div className={styles.actionButton} data-testid="goToProjectButton">
-          <Button
-            label="Go to project"
-            to={project}
-            className={styles.button}
-          />
+          <Button label="Go to project" to={project} className={styles.button} />
         </div>
       </div>
     );
@@ -110,19 +95,10 @@ function ProjectCreation() {
     return (
       <div className={styles.actionButtons}>
         <div className={styles.actionButton}>
-          <Button
-            label="Cancel"
-            className={styles.button}
-            to={ROUTE.HOME}
-            onClick={clearAll}
-          />
+          <Button label="Cancel" className={styles.button} to={ROUTE.HOME} onClick={clearAll} />
         </div>
         <div className={styles.actionButton} data-testid="tryAgainButton">
-          <Button
-            label="Try again"
-            to={ROUTE.NEW_PROJECT}
-            className={styles.button}
-          />
+          <Button label="Try again" to={ROUTE.NEW_PROJECT} className={styles.button} />
         </div>
       </div>
     );
@@ -140,9 +116,7 @@ function ProjectCreation() {
             There was an error creating your project
           </p>
         )}
-        <div
-          className={cx(styles.infoMessageWrapper, { [styles.error]: error })}
-        >
+        <div className={cx(styles.infoMessageWrapper, { [styles.error]: error })}>
           <div className={styles.infoMessage}>
             {success &&
               'Your project has been created successfully, you can go to the project list or open the project page directly.'}

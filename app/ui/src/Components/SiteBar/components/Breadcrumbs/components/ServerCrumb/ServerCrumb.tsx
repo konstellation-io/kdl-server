@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { useQuery } from '@apollo/client';
 import { GetMe } from 'Graphql/queries/types/GetMe';
 import GetMeQuery from 'Graphql/queries/getMe';
@@ -42,9 +42,7 @@ function ServerCrumb() {
       crumbText={CONFIG.SERVER_NAME}
       LeftIconComponent={<ServerIcon className="icon-regular" />}
     >
-      {(props: BottomComponentProps) => (
-        <NavigationSelector options={serverSections} {...props} />
-      )}
+      {(props: BottomComponentProps) => <NavigationSelector options={serverSections} {...props} />}
     </Crumb>
   );
 }

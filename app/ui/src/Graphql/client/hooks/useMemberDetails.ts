@@ -1,4 +1,4 @@
-import { memberDetails } from './../cache';
+import { memberDetails } from '../cache';
 import { GetProjectMembers_project_members } from '../../queries/types/GetProjectMembers';
 
 function useMemberDetails() {

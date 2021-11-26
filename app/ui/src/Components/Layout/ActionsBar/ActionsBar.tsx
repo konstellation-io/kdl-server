@@ -9,18 +9,10 @@ type Props = {
   children: JSX.Element | JSX.Element[];
   className?: string;
 };
-const ActionsBar: FC<Props> = ({
-  children,
-  centerActions = false,
-  className,
-}) => {
+const ActionsBar: FC<Props> = ({ children, centerActions = false, className }) => {
   return (
     <div className={cx(styles.container, className)}>
-      <HorizontalBar
-        className={cx(styles.actions, { [styles.center]: centerActions })}
-      >
-        {children}
-      </HorizontalBar>
+      <HorizontalBar className={cx(styles.actions, { [styles.center]: centerActions })}>{children}</HorizontalBar>
     </div>
   );
 };

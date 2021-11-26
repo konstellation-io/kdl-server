@@ -18,14 +18,7 @@ const CopyToClipboard: FC<Props> = ({ children, className }) => {
     copyAndToast(children);
   }
 
-  return (
-    <Button
-      label=""
-      Icon={IconCopy}
-      onClick={onCopy}
-      className={cx(styles.container, className)}
-    />
-  );
+  return <Button label="" Icon={IconCopy} onClick={onCopy} className={cx(styles.container, className)} />;
 };
 
 export default CopyToClipboard;

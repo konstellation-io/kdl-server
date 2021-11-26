@@ -1,4 +1,3 @@
-import React from 'react';
 import useMembers from './useMembers';
 import AddMembersMutation from 'Graphql/mutations/addMembers';
 import RemoveMembersMutation from 'Graphql/mutations/removeMembers';
@@ -10,9 +9,9 @@ import dataRemoveMembers from 'Mocks/RemoveMembersMutation';
 import dataUpdateMembers from 'Mocks/UpdateMembersMutation';
 import { act } from 'react-dom/test-utils';
 
-let addMembersHandler = jest.fn();
-let removeMembersHandler = jest.fn();
-let updateMembersHandler = jest.fn();
+const addMembersHandler = jest.fn();
+const removeMembersHandler = jest.fn();
+const updateMembersHandler = jest.fn();
 
 let mockClient;
 beforeEach(() => {

@@ -1,19 +1,9 @@
-import {
-  Button,
-  BUTTON_ALIGN,
-  ModalContainer,
-  ModalLayoutConfirmList,
-  Select,
-} from 'kwc';
+import { Button, BUTTON_ALIGN, ModalContainer, ModalLayoutConfirmList, Select } from 'kwc';
 import React, { useRef } from 'react';
 import styles from './ManageMembers.module.scss';
 import useMembers from 'Graphql/hooks/useMembers';
 import { AccessLevel } from 'Graphql/types/globalTypes';
-import {
-  defaultModalInfo,
-  getModalInfo,
-  ModalInfo,
-} from '../../confirmationModals';
+import { defaultModalInfo, getModalInfo, ModalInfo } from '../../confirmationModals';
 import { GetProjectMembers_project_members } from 'Graphql/queries/types/GetProjectMembers';
 import MemberItem from './components/MemberItem/MemberItem';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -52,16 +42,8 @@ type Props = {
   selectedMembers: GetProjectMembers_project_members[];
   onCompleteManage: () => void;
 };
-function ManageMembers({
-  projectId,
-  selectedMembers,
-  onCompleteManage,
-}: Props) {
-  const {
-    activate: showModal,
-    deactivate: closeModal,
-    value: isModalVisible,
-  } = useBoolState();
+function ManageMembers({ projectId, selectedMembers, onCompleteManage }: Props) {
+  const { activate: showModal, deactivate: closeModal, value: isModalVisible } = useBoolState();
   const modalInfo = useRef<ModalInfo>(defaultModalInfo);
 
   function onComplete() {
@@ -69,13 +51,10 @@ function ManageMembers({
     onCompleteManage();
   }
 
-  const { updateMembersAccessLevel, removeMembersById } = useMembers(
-    projectId,
-    {
-      onCompleteUpdate: onComplete,
-      onCompleteRemove: onComplete,
-    }
-  );
+  const { updateMembersAccessLevel, removeMembersById } = useMembers(projectId, {
+    onCompleteUpdate: onComplete,
+    onCompleteRemove: onComplete,
+  });
 
   const nMembers = selectedMembers.length;
   const hasNotMembersSelected = nMembers === 0;
@@ -117,8 +96,7 @@ function ManageMembers({
     }
   }
 
-  const selectionText =
-    nMembers === 1 ? `${nMembers} User selected` : `${nMembers} Users selected`;
+  const selectionText = nMembers === 1 ? `${nMembers} User selected` : `${nMembers} Users selected`;
 
   return (
     <div className={styles.container} data-testid="manageMembersActions">

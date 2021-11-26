@@ -1,6 +1,8 @@
-import React from 'react';
+import * as React from 'react';
 import cx from 'classnames';
 import styles from './NavigationButton.module.scss';
+import { OverridableComponent } from '@material-ui/core/OverridableComponent';
+import { SvgIconTypeMap } from '@material-ui/core';
 
 export enum IconSize {
   SMALL = 'icon-small',
@@ -9,7 +11,7 @@ export enum IconSize {
 
 type Props = {
   label: string;
-  Icon: any;
+  Icon: OverridableComponent<SvgIconTypeMap>;
   title?: string;
   iconSize?: IconSize;
   onClick?: () => void;

@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import NavigationButton, { IconSize } from './NavigationButton';
 import Icon from '@material-ui/icons/Close';
 import { shallow } from 'enzyme';
@@ -12,7 +12,7 @@ const component = shallow(
     onClick={jest.fn()}
     className="someClass"
     disabled={false}
-  />
+  />,
 );
 
 describe('NavigationButton component', () => {

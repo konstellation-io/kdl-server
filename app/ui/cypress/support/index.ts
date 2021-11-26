@@ -5,14 +5,10 @@ Cypress.Commands.add('kstInterceptor', (operation, responseObject) => {
   });
 });
 
-Cypress.Commands.add('getByTestId', (dataTestId) =>
-  cy.get(`[data-testid="${dataTestId}"]`)
-);
+Cypress.Commands.add('getByTestId', (dataTestId) => cy.get(`[data-testid="${dataTestId}"]`));
 
-Cypress.Commands.add(
-  'findByTestId',
-  { prevSubject: true },
-  (subject, dataTestId) => subject.find(`[data-testid="${dataTestId}"]`)
+Cypress.Commands.add('findByTestId', { prevSubject: true }, (subject, dataTestId) =>
+  subject.find(`[data-testid="${dataTestId}"]`),
 );
 
 Cypress.Commands.add('openSettings', () => {
@@ -24,16 +20,14 @@ Cypress.Commands.add('openSettings', () => {
 // load type definitions that come with Cypress module
 /// <reference types="cypress" />
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 declare namespace Cypress {
   interface Chainable {
     /**
      * Custom command to intercept GraphQl queries from the KDL.
      * @example cy.kstInterceptor('GetMe', {name: 'Jon Doe'})
      */
-    kstInterceptor(
-      operation: string,
-      responseObject: Object
-    ): Chainable<Element>;
+    kstInterceptor(operation: string, responseObject: Object): Chainable<Element>;
 
     /**
      * Custom command to get element by data-testid

@@ -43,7 +43,7 @@ function Project() {
     },
     // We want to execute this on on component mount/unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   if (loading || !project) return <SpinnerCircular />;

@@ -1,5 +1,5 @@
 import { Left, Right } from 'kwc';
-import React from 'react';
+import * as React from 'react';
 
 import ArrowsNavigator from './components/ArrowsNavigator/ArrowsNavigator';
 import Breadcrumbs from './components/Breadcrumbs/Breadcrumbs';

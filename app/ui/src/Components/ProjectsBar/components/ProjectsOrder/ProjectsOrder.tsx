@@ -2,7 +2,7 @@ import { ErrorMessage, Select, SelectTheme, SpinnerCircular } from 'kwc';
 
 import { GetProjects } from 'Graphql/queries/types/GetProjects';
 import { ProjectOrder } from 'Graphql/client/models/ProjectFilters';
-import React from 'react';
+import * as React from 'react';
 import styles from './ProjectsOrder.module.scss';
 import useProjectFilters from 'Graphql/client/hooks/useProjectFilters';
 import { useQuery, useReactiveVar } from '@apollo/client';
@@ -29,9 +29,7 @@ function ProjectsOrder() {
     <div className={styles.container} data-testid="sortProjects">
       <p className={styles.label}>SORT BY</p>
       <Select
-        onChange={(newOrder: ProjectOrder) =>
-          updateFilters({ order: newOrder })
-        }
+        onChange={(newOrder: ProjectOrder) => updateFilters({ order: newOrder })}
         label=""
         hideError
         options={options}

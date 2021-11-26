@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import ProjectsOrder from './ProjectsOrder';
 import { createMockClient } from 'mock-apollo-client';
 import { screen, fireEvent, cleanup } from '@testing-library/react';
@@ -6,14 +6,7 @@ import GetProjectsQuery from 'Graphql/queries/getProjects';
 
 import data from 'Mocks/GetProjectsQuery';
 
-import {
-  apolloRender,
-  loadingHandler,
-  dataHandler,
-  errorHandler,
-  getSnapshot,
-  ERROR_MESSAGE,
-} from 'testUtils';
+import { apolloRender, loadingHandler, dataHandler, errorHandler, getSnapshot, ERROR_MESSAGE } from 'testUtils';
 
 const Component = <ProjectsOrder />;
 
@@ -53,12 +46,8 @@ describe('When data is ready', () => {
     // Assert.
     // Waits the action to finish
     setTimeout(() => {
-      expect(
-        screen.getByText('From A to Z', { exact: false })
-      ).toBeInTheDocument();
-      expect(
-        screen.queryByText('Creation date', { exact: false })
-      ).not.toBeInTheDocument();
+      expect(screen.getByText('From A to Z', { exact: false })).toBeInTheDocument();
+      expect(screen.queryByText('Creation date', { exact: false })).not.toBeInTheDocument();
     }, 0);
   });
 });

@@ -24,14 +24,13 @@ function usePanel(
     title: '',
     theme: PANEL_THEME.DEFAULT,
     fixedWidth: null,
-  }
+  },
 ) {
   const primaryPanelData = useReactiveVar(primaryPanel);
   const secondaryPanelData = useReactiveVar(secondaryPanel);
 
   const panel = type === PanelType.PRIMARY ? primaryPanel : secondaryPanel;
-  const data =
-    type === PanelType.PRIMARY ? primaryPanelData : secondaryPanelData;
+  const data = type === PanelType.PRIMARY ? primaryPanelData : secondaryPanelData;
   // null value in graphql is "null" not "undefined", we need to make sure we use "null"
   const panelProps: PanelInfo = {
     isDark: null,

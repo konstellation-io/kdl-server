@@ -1,14 +1,8 @@
-import {
-  AddApiToken,
-  AddApiTokenVariables,
-} from 'Graphql/mutations/types/AddApiToken';
+import { AddApiToken, AddApiTokenVariables } from 'Graphql/mutations/types/AddApiToken';
 import { ApolloCache, FetchResult, useMutation } from '@apollo/client';
 import { GetMe, GetMe_me } from 'Graphql/queries/types/GetMe';
 
-import {
-  RemoveApiToken,
-  RemoveApiTokenVariables,
-} from 'Graphql/mutations/types/RemoveApiToken';
+import { RemoveApiToken, RemoveApiTokenVariables } from 'Graphql/mutations/types/RemoveApiToken';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 
 import AddApiTokenMutation from 'Graphql/mutations/addApiToken';
@@ -16,18 +10,12 @@ import RemoveApiTokenMutation from 'Graphql/mutations/removeApiToken';
 import GetMeQuery from 'Graphql/queries/getMe';
 
 export default function useAPIToken() {
-  const [mutationAddApiToken, { loading, data }] = useMutation<
-    AddApiToken,
-    AddApiTokenVariables
-  >(AddApiTokenMutation, {
+  const [mutationAddApiToken, { loading, data }] = useMutation<AddApiToken, AddApiTokenVariables>(AddApiTokenMutation, {
     onError: (e) => console.error(`addMembers: ${e}`),
     update: updateCacheAdd,
   });
 
-  const [mutationRemoveApiToken] = useMutation<
-    RemoveApiToken,
-    RemoveApiTokenVariables
-  >(RemoveApiTokenMutation, {
+  const [mutationRemoveApiToken] = useMutation<RemoveApiToken, RemoveApiTokenVariables>(RemoveApiTokenMutation, {
     onError: (e) => console.error(`removeApiToken: ${e}`),
     update: updateCacheRemove,
   });
@@ -44,10 +32,7 @@ export default function useAPIToken() {
     }
   }
 
-  function updateCache(
-    cache: ApolloCache<AddApiToken | RemoveApiToken>,
-    write: (me: GetMe_me) => void
-  ) {
+  function updateCache(cache: ApolloCache<AddApiToken | RemoveApiToken>, write: (me: GetMe_me) => void) {
     const cacheResult = cache.readQuery<GetMe>({
       query: GetMeQuery,
     });
@@ -57,10 +42,7 @@ export default function useAPIToken() {
     }
   }
 
-  function updateCacheAdd(
-    cache: ApolloCache<AddApiToken>,
-    { data: dataAdd }: FetchResult<AddApiToken>
-  ) {
+  function updateCacheAdd(cache: ApolloCache<AddApiToken>, { data: dataAdd }: FetchResult<AddApiToken>) {
     if (dataAdd && dataAdd.addApiToken) {
       updateCache(cache, (me) =>
         cache.writeQuery({
@@ -71,15 +53,12 @@ export default function useAPIToken() {
               apiTokens: [...me.apiTokens, dataAdd.addApiToken],
             },
           },
-        })
+        }),
       );
     }
   }
 
-  function updateCacheRemove(
-    cache: ApolloCache<RemoveApiToken>,
-    { data: dataRemove }: FetchResult<RemoveApiToken>
-  ) {
+  function updateCacheRemove(cache: ApolloCache<RemoveApiToken>, { data: dataRemove }: FetchResult<RemoveApiToken>) {
     if (dataRemove && dataRemove.removeApiToken) {
       updateCache(cache, (me) =>
         cache.writeQuery({
@@ -87,12 +66,10 @@ export default function useAPIToken() {
           data: {
             me: {
               ...me,
-              apiTokens: me.apiTokens.filter(
-                (t) => t.id !== dataRemove.removeApiToken.id
-              ),
+              apiTokens: me.apiTokens.filter((t) => t.id !== dataRemove.removeApiToken.id),
             },
           },
-        })
+        }),
       );
     }
   }

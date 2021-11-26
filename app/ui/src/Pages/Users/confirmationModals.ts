@@ -24,14 +24,7 @@ type setModalInfoParams = {
   plural: boolean;
   accessLevel?: AccessLevel;
 };
-export function getModalInfo({
-  type,
-  action,
-  nUsers,
-  userIds,
-  plural,
-  accessLevel,
-}: setModalInfoParams): ModalInfo {
+export function getModalInfo({ type, action, nUsers, userIds, plural, accessLevel }: setModalInfoParams): ModalInfo {
   switch (type) {
     case 'delete':
       return {
@@ -46,9 +39,7 @@ export function getModalInfo({
         action,
         userIds,
         title: 'User access level update',
-        message: `The following user${
-          plural ? 's' : ''
-        }' Access Level will be updated to ${accessLevel}:`,
+        message: `The following user${plural ? 's' : ''}' Access Level will be updated to ${accessLevel}:`,
         acceptLabel: `Update ${nUsers} user${plural ? 's' : ''}`,
       };
     default:

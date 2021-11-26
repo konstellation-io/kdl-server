@@ -33,15 +33,7 @@ function GenerateApiToken() {
     add: { data: dataAddToken, loading },
   } = useAPIToken();
 
-  const {
-    handleSubmit,
-    setValue,
-    register,
-    unregister,
-    errors,
-    watch,
-    clearErrors,
-  } = useForm<FormData>();
+  const { handleSubmit, setValue, register, unregister, errors, watch, clearErrors } = useForm<FormData>();
 
   useEffect(() => {
     register('tokenName', { required: 'Please pick a token name' });
@@ -69,10 +61,8 @@ function GenerateApiToken() {
   }
 
   function renderCopyMessage() {
-    if (copied)
-      return 'Nice, your token is now in your clipboard, remember to store it.';
-    if (showCopyAlert && !copied)
-      return 'This token will be not accessible again, please copy and save it.';
+    if (copied) return 'Nice, your token is now in your clipboard, remember to store it.';
+    if (showCopyAlert && !copied) return 'This token will be not accessible again, please copy and save it.';
     return '';
   }
 
@@ -82,13 +72,7 @@ function GenerateApiToken() {
       subtitle="A new API token will be generated labeled with this name. You cannot set a custom token."
       actions={[
         <ActionButton key="cancel" label="Cancel" to={ROUTE.USER_API_TOKENS} />,
-        <ActionButton
-          key="accept"
-          label="Accept"
-          onClick={handleAcceptClick}
-          disabled={!dataAddToken}
-          primary
-        />,
+        <ActionButton key="accept" label="Accept" onClick={handleAcceptClick} disabled={!dataAddToken} primary />,
       ]}
     >
       <div className={styles.container}>
@@ -129,9 +113,8 @@ function GenerateApiToken() {
                 {dataAddToken?.addApiToken && (
                   <div className={styles.resultWrapper}>
                     <p className={styles.infoMessage}>
-                      API Token cannot be accessed after it has been generated,
-                      remember to copy and store the token as soon as it is
-                      generated.
+                      API Token cannot be accessed after it has been generated, remember to copy and store the token as
+                      soon as it is generated.
                     </p>
                     <div className={styles.token}>
                       <p
@@ -143,9 +126,7 @@ function GenerateApiToken() {
                         {renderCopyMessage()}
                       </p>
                       <span className={styles.label}>YOUR NEW TOKEN</span>
-                      <div className={styles.tokenValue}>
-                        {dataAddToken.addApiToken.token}
-                      </div>
+                      <div className={styles.tokenValue}>{dataAddToken.addApiToken.token}</div>
                       <Button
                         label="COPY YOUR TOKEN TO YOUR CLIPBOARD"
                         className={styles.copyButton}

@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { RepositoryType } from 'Graphql/types/globalTypes';
 import { useReactiveVar } from '@apollo/client';
 import ExternalRepository from './components/ExternalRepository/ExternalRepository';
@@ -13,15 +13,7 @@ function RepositoryDetails({ showErrors }: Props) {
   const { repository } = useReactiveVar(newProject);
   const isExternal = repository.values.type === RepositoryType.EXTERNAL;
 
-  return (
-    <div>
-      {isExternal ? (
-        <ExternalRepository showErrors={showErrors} />
-      ) : (
-        <InternalRepository />
-      )}
-    </div>
-  );
+  return <div>{isExternal ? <ExternalRepository showErrors={showErrors} /> : <InternalRepository />}</div>;
 }
 
 export default RepositoryDetails;

@@ -1,10 +1,4 @@
-import {
-  ApolloClient,
-  ApolloLink,
-  ApolloProvider,
-  HttpLink,
-  useQuery,
-} from '@apollo/client';
+import { ApolloClient, ApolloLink, ApolloProvider, HttpLink, useQuery } from '@apollo/client';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { Slide, toast, ToastContainer } from 'react-toastify';
 
@@ -14,7 +8,7 @@ import Project from 'Pages/Project/Project';
 import ProjectCreation from 'Pages/ProjectCreation/ProjectCreation';
 import Projects from 'Pages/Projects/Projects';
 import ROUTE from 'Constants/routes';
-import React from 'react';
+import * as React from 'react';
 import SiteBar from 'Components/SiteBar/SiteBar';
 import UserSshKey from 'Pages/UserSshKey/UserSshKey';
 import Users from 'Pages/Users/Users';
@@ -27,12 +21,7 @@ import GetMeQuery from './Graphql/queries/getMe';
 import { ErrorMessage, SpinnerCircular } from 'kwc';
 import { AccessLevel } from './Graphql/types/globalTypes';
 
-const routesWithTopBar = [
-  ROUTE.USERS,
-  ROUTE.HOME,
-  ROUTE.PROJECT,
-  ROUTE.USER_SSH_KEY,
-];
+const routesWithTopBar = [ROUTE.USERS, ROUTE.HOME, ROUTE.PROJECT, ROUTE.USER_SSH_KEY];
 
 function Routes() {
   const { data, loading, error } = useQuery<GetMe>(GetMeQuery);
@@ -52,11 +41,7 @@ function Routes() {
         <Route exact path={ROUTE.USER_SSH_KEY} component={UserSshKey} />
 
         <Route exact path={ROUTE.NEW_PROJECT} component={NewProject} />
-        <Route
-          exact
-          path={ROUTE.PROJECT_CREATION}
-          component={ProjectCreation}
-        />
+        <Route exact path={ROUTE.PROJECT_CREATION} component={ProjectCreation} />
 
         <Route exact path={ROUTE.PROJECTS} component={Projects} />
         <Route path={ROUTE.PROJECT} component={Project} />
@@ -65,26 +50,22 @@ function Routes() {
   );
 }
 
-const errorLink = onError(
-  ({ graphQLErrors, networkError, forward, operation }) => {
-    let errorMsg = 'Unknown error';
+const errorLink = onError(({ graphQLErrors, networkError, forward, operation }) => {
+  let errorMsg = 'Unknown error';
 
-    if (graphQLErrors) {
-      graphQLErrors.forEach(({ message, locations, path }) =>
-        console.error(
-          `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-        )
-      );
-      errorMsg = 'There was an error requesting information from the server';
-    } else if (networkError) {
-      console.error(`[Network error]: ${networkError}`);
-      errorMsg = 'Could not connect to the Server';
-    }
-
-    toast.error(errorMsg, { autoClose: false });
-    forward(operation);
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message, locations, path }) =>
+      console.error(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`),
+    );
+    errorMsg = 'There was an error requesting information from the server';
+  } else if (networkError) {
+    console.error(`[Network error]: ${networkError}`);
+    errorMsg = 'Could not connect to the Server';
   }
-);
+
+  toast.error(errorMsg, { autoClose: false });
+  forward(operation);
+});
 
 function App() {
   const httpLink = new HttpLink({
@@ -92,7 +73,7 @@ function App() {
   });
 
   const kgHttpLink = new HttpLink({
-      uri: `${CONFIG.KG_SERVER_URL}/api/query`,
+    uri: `${CONFIG.KG_SERVER_URL}/api/query`,
   });
 
   const client = new ApolloClient({
@@ -100,9 +81,9 @@ function App() {
     credentials: 'include',
     cache,
     link: ApolloLink.split(
-        operation => operation.getContext().clientName === 'kg',
-        ApolloLink.from([errorLink, kgHttpLink]),
-        ApolloLink.from([errorLink, httpLink]),
+      (operation) => operation.getContext().clientName === 'kg',
+      ApolloLink.from([errorLink, kgHttpLink]),
+      ApolloLink.from([errorLink, httpLink]),
     ),
   });
 

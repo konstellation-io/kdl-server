@@ -1,7 +1,7 @@
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import IconCloud from '@material-ui/icons/Cloud';
 import IconTime from '@material-ui/icons/AccessTime';
-import React from 'react';
+import * as React from 'react';
 import cx from 'classnames';
 import { formatDate } from 'Utils/format';
 import styles from './ProjectInfo.module.scss';
@@ -21,10 +21,7 @@ function ProjectInfo({ project }: Props) {
         {project.lastActivationDate && (
           <div className={styles.time}>
             <IconTime className="icon-small" />
-            <p>{`ACTIVE FROM: ${formatDate(
-              new Date(project.lastActivationDate),
-              true
-            )}`}</p>
+            <p>{`ACTIVE FROM: ${formatDate(new Date(project.lastActivationDate), true)}`}</p>
           </div>
         )}
         <div
@@ -32,11 +29,7 @@ function ProjectInfo({ project }: Props) {
             [styles.connected]: !repoError,
           })}
         >
-          <p>
-            {!repoError
-              ? 'Connection established'
-              : 'You are not connected to the repository'}
-          </p>
+          <p>{!repoError ? 'Connection established' : 'You are not connected to the repository'}</p>
         </div>
       </div>
     </div>

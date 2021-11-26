@@ -1,9 +1,4 @@
-import {
-  ErrorMessage,
-  ModalContainer,
-  ModalLayoutConfirmList,
-  SpinnerCircular,
-} from 'kwc';
+import { ErrorMessage, ModalContainer, ModalLayoutConfirmList, SpinnerCircular } from 'kwc';
 import AdminEmail from './components/AdminEmail/AdminEmail';
 
 import AddProject from './components/Project/AddProject';
@@ -24,8 +19,7 @@ export type ProjectAdmins = {
 };
 
 function Projects() {
-  const [showProjectAdmins, setShowProjectAdmins] =
-    useState<ProjectAdmins | null>(null);
+  const [showProjectAdmins, setShowProjectAdmins] = useState<ProjectAdmins | null>(null);
 
   const { data, error, loading } = useQuery<GetProjects>(GetProjectsQuery);
   const filters = useReactiveVar(projectFilters);
@@ -43,11 +37,7 @@ function Projects() {
       <div className={styles.container}>
         {[
           ...projects.map((project) => (
-            <Project
-              key={project.id}
-              project={project}
-              showAdmins={setShowProjectAdmins}
-            />
+            <Project key={project.id} project={project} showAdmins={setShowProjectAdmins} />
           )),
           <AddProject key="add-project" />,
         ]}
@@ -63,7 +53,7 @@ function Projects() {
         >
           <ModalLayoutConfirmList message="You can email the following users to ask for access to this project">
             {showProjectAdmins.administrators.map((email) => (
-              <AdminEmail email={email} />
+              <AdminEmail email={email} key={email} />
             ))}
           </ModalLayoutConfirmList>
         </ModalContainer>

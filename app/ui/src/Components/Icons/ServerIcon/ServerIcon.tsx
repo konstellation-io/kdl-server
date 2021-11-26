@@ -1,6 +1,6 @@
 import { SvgIcon, SvgIconProps } from '@material-ui/core';
 
-import React from 'react';
+import * as React from 'react';
 import cx from 'classnames';
 import styles from './ServerIcon.module.scss';
 

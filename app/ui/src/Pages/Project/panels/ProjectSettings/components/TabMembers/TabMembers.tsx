@@ -31,9 +31,7 @@ type Props = {
 function TabMembers({ projectId }: Props) {
   const { data: dataMe } = useQuery<GetMe>(GetMeQuery);
 
-  const [selectedMembers, setSelectedMembers] = useState<
-    GetProjectMembers_project_members[]
-  >([]);
+  const [selectedMembers, setSelectedMembers] = useState<GetProjectMembers_project_members[]>([]);
   const { updateMembersAccessLevel } = useMembers(projectId);
 
   const { updateMemberDetails } = useMemberDetails();
@@ -44,11 +42,7 @@ function TabMembers({ projectId }: Props) {
     theme: PANEL_THEME.DARK,
   });
 
-  const {
-    data: dataUsers,
-    loading: loadingUsers,
-    error: errorUsers,
-  } = useQuery<GetUsers>(GetUsersQuery);
+  const { data: dataUsers, loading: loadingUsers, error: errorUsers } = useQuery<GetUsers>(GetUsersQuery);
 
   const {
     data: dataMembers,
@@ -67,22 +61,18 @@ function TabMembers({ projectId }: Props) {
       updateMemberDetails(details);
       openPanel();
     },
-    [updateMemberDetails, openPanel]
+    [updateMemberDetails, openPanel],
   );
 
   const canManageMembers = useMemo(() => {
-    const meAsMember = dataMembers?.project.members.find(
-      ({ user }) => user.email === dataMe?.me.email
-    );
+    const meAsMember = dataMembers?.project.members.find(({ user }) => user.email === dataMe?.me.email);
     return meAsMember?.accessLevel === AccessLevel.ADMIN;
   }, [dataMe, dataMembers]);
 
   // Update opened member details as data is updated
   useEffect(() => {
     if (dataMembers && memberDetailsData) {
-      const selectedMember = dataMembers.project.members.find(
-        (m) => m.user.id === memberDetailsData.user.id
-      );
+      const selectedMember = dataMembers.project.members.find((m) => m.user.id === memberDetailsData.user.id);
 
       if (selectedMember) updateMemberDetails(selectedMember);
     }
@@ -91,18 +81,11 @@ function TabMembers({ projectId }: Props) {
   }, [dataMembers]);
 
   if (loadingMembers || loadingUsers) return <SpinnerCircular />;
-  if (!dataMembers || !dataUsers || errorMembers || errorUsers)
-    return <ErrorMessage />;
+  if (!dataMembers || !dataUsers || errorMembers || errorUsers) return <ErrorMessage />;
 
-  function handleCheckClick(
-    member: GetProjectMembers_project_members,
-    selected: boolean
-  ) {
+  function handleCheckClick(member: GetProjectMembers_project_members, selected: boolean) {
     if (selected) setSelectedMembers([...selectedMembers, member]);
-    else
-      setSelectedMembers(
-        selectedMembers.filter(({ user }) => user.id !== member.user.id)
-      );
+    else setSelectedMembers(selectedMembers.filter(({ user }) => user.id !== member.user.id));
   }
 
   const isMemberSelected = (member: GetProjectMembers_project_members) =>
@@ -112,11 +95,7 @@ function TabMembers({ projectId }: Props) {
     <div className={styles.container} data-testid="tabMembers">
       {canManageMembers && (
         <>
-          <AddMembers
-            projectId={projectId}
-            users={dataUsers.users}
-            members={dataMembers.project.members}
-          />
+          <AddMembers projectId={projectId} users={dataUsers.users} members={dataMembers.project.members} />
           <ManageMembers
             projectId={projectId}
             selectedMembers={selectedMembers}

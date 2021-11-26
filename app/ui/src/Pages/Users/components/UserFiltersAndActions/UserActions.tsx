@@ -13,10 +13,7 @@ type CheckSelectAllPros = {
   handleCheckClick: (value: boolean) => void;
   userSelection: UserSelection;
 };
-const CheckSelectAll: FC<CheckSelectAllPros> = ({
-  handleCheckClick,
-  userSelection,
-}) => (
+const CheckSelectAll: FC<CheckSelectAllPros> = ({ handleCheckClick, userSelection }) => (
   <div className={styles.selectAll}>
     <Check
       onChange={handleCheckClick}
@@ -87,10 +84,7 @@ function UserActions({ onUpdateUsers }: Props) {
 
   return (
     <div className={styles.actions}>
-      <CheckSelectAll
-        userSelection={userSelection}
-        handleCheckClick={handleCheckClick}
-      />
+      <CheckSelectAll userSelection={userSelection} handleCheckClick={handleCheckClick} />
       <span className={styles.nSelections}>{nSelectionsText}</span>
       <div className={styles.formActions} data-testid="bulkSelect">
         <Select

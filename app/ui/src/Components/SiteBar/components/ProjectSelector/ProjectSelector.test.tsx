@@ -1,7 +1,7 @@
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { NavLink } from 'react-router-dom';
 import ProjectSelector from './ProjectSelector';
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 
 const project: GetProjects_projects = {

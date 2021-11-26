@@ -1,10 +1,9 @@
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 import useNavigation from './useNavigation';
+import { HookWrapper } from '../testUtils';
 
 const beforeGoToStepMock = jest.fn();
-
-const HookWrapper = ({ hook }) => <div hook={hook()} />;
 
 describe('useNavigation hook - loop', () => {
   const wrapper = shallow(
@@ -17,9 +16,11 @@ describe('useNavigation hook - loop', () => {
           maxSteps: 4,
         })
       }
-    />
+    />,
   );
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const getHook = () => wrapper.find('div').props().hook;
 
   it('shows right initial state', () => {
@@ -91,9 +92,11 @@ describe('useNavigation hook - no loop', () => {
           maxSteps: 4,
         })
       }
-    />
+    />,
   );
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const getHook = () => wrapper.find('div').props().hook;
 
   it('shows right initial state', () => {

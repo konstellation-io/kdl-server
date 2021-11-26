@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import cx from 'classnames';
 import styles from './CircledInfoMessage.module.scss';
 
@@ -13,11 +13,7 @@ type Props = {
   className?: string;
 };
 
-const CircledInfoMessage: React.FC<Props> = ({
-  type = CircledInfoMessageTypes.SUCCESS,
-  text = '',
-  children,
-}) => {
+const CircledInfoMessage: React.FC<Props> = ({ type = CircledInfoMessageTypes.SUCCESS, text = '', children }) => {
   return (
     <div className={cx(styles.circledMessage, styles[type])}>
       {text}

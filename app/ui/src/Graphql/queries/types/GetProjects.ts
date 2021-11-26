@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { RepositoryType, AccessLevel } from './../../types/globalTypes';
+import { RepositoryType, AccessLevel } from '../../types/globalTypes';
 
 // ====================================================
 // GraphQL query operation: GetProjects

@@ -13,12 +13,7 @@ type Props = {
   removeToken: () => void;
 };
 
-const Token: FC<Props> = ({
-  name,
-  creationDate,
-  lastUsedDate,
-  removeToken,
-}) => (
+const Token: FC<Props> = ({ name, creationDate, lastUsedDate, removeToken }) => (
   <div className={styles.container}>
     <div className={styles.wrapper}>
       <div className={styles.labelContainer}>

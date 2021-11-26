@@ -1,10 +1,9 @@
-import React from 'react';
+import * as React from 'react';
 import ProjectNavigation, { NavButtonLink } from './ProjectNavigation';
 import { shallow } from 'enzyme';
 import { StaticRouter } from 'react-router';
 import NavElements from './components/NavElements/NavElements';
 import NavigationButton from './components/NavigationButton/NavigationButton';
-import * as usePanel from 'Graphql/client/hooks/usePanel';
 
 jest.mock('react-router-dom', () => ({
   useRouteMatch: () => ({
@@ -40,7 +39,7 @@ describe('NavButtonLink component', () => {
   const component = shallow(
     <StaticRouter>
       <NavButtonLink to="/home" disabled={false} />
-    </StaticRouter>
+    </StaticRouter>,
   );
 
   test('Component match snapshot', () => {

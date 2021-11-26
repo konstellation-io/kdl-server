@@ -1,5 +1,5 @@
 import { SvgIcon, SvgIconProps } from '@material-ui/core';
-import React from 'react';
+import * as React from 'react';
 import styles from './ProjectIcon.module.scss';
 import cx from 'classnames';
 

@@ -1,6 +1,7 @@
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 import useStepper from './useStepper';
+import { HookWrapper } from '../../testUtils';
 
 const Component1 = () => <div />;
 const Component2 = () => <div />;
@@ -16,7 +17,6 @@ const data = [
   },
 ];
 
-const HookWrapper = ({ hook }) => <div hook={hook()} />;
 const wrapper = shallow(<HookWrapper hook={() => useStepper({ data })} />);
 
 const getHook = () => wrapper.find('div').props().hook;
@@ -29,9 +29,7 @@ describe('useBoolState hook', () => {
     // Act.
     // Assert.
     expect(actStep).toBe(0);
-    expect(getActStepComponent()).toStrictEqual(
-      <Component1 showErrors={false} />
-    );
+    expect(getActStepComponent()).toStrictEqual(<Component1 showErrors={false} />);
     expect(steps[0]).toStrictEqual({
       id: 'step1',
       completed: false,
@@ -46,9 +44,7 @@ describe('useBoolState hook', () => {
 
     // Assert.
     expect(getHook().actStep).toBe(1);
-    expect(getHook().getActStepComponent()).toStrictEqual(
-      <Component2 showErrors={false} />
-    );
+    expect(getHook().getActStepComponent()).toStrictEqual(<Component2 showErrors={false} />);
   });
 
   it('handles state updates', () => {

@@ -1,22 +1,15 @@
 import Panel, { PANEL_SIZE } from './Panel';
 
 import { Button } from 'kwc';
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 
 const onCloseMock = jest.fn();
 
 const component = shallow(
-  <Panel
-    title="Some title"
-    show={true}
-    close={onCloseMock}
-    size={PANEL_SIZE.DEFAULT}
-    noShrink={true}
-    dark={false}
-  >
+  <Panel title="Some title" show={true} close={onCloseMock} size={PANEL_SIZE.DEFAULT} noShrink={true} dark={false}>
     <div>Children</div>
-  </Panel>
+  </Panel>,
 );
 
 describe('Panel component', () => {

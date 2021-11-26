@@ -1,5 +1,5 @@
 import { SpinnerCircular, TextInput } from 'kwc';
-import React from 'react';
+import * as React from 'react';
 import IconLink from '@material-ui/icons/Link';
 import styles from './ExternalRepository.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
@@ -14,9 +14,7 @@ type Props = {
 
 function ExternalRepository({ showErrors }: Props) {
   const project = useReactiveVar(newProject);
-  const { updateValue, updateError, clearError } = useNewProject(
-    'externalRepository'
-  );
+  const { updateValue, updateError, clearError } = useNewProject('externalRepository');
 
   if (!project) return <SpinnerCircular />;
 

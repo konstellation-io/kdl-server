@@ -1,6 +1,6 @@
 import DescriptionScore from './DescriptionScore';
 
-import React from 'react';
+import * as React from 'react';
 import { mount } from 'enzyme';
 import { getScoreLevel, ScoreLevels, scoreText } from './DescriptionScoreUtils';
 
@@ -70,16 +70,13 @@ describe('DescriptionScore utils', () => {
       ${80}  | ${ScoreLevels.VERY_HIGH}
       ${90}  | ${ScoreLevels.VERY_HIGH}
       ${100} | ${ScoreLevels.VERY_HIGH}
-    `(
-      'should return $expectedLevel when score is $score',
-      ({ score, expectedLevel }) => {
-        // Arrange.
-        // Act.
-        const result = getScoreLevel(score);
-        // Assert.
-        expect(result).toBe(expectedLevel);
-      }
-    );
+    `('should return $expectedLevel when score is $score', ({ score, expectedLevel }) => {
+      // Arrange.
+      // Act.
+      const result = getScoreLevel(score);
+      // Assert.
+      expect(result).toBe(expectedLevel);
+    });
   });
 
   describe('scoreText', () => {

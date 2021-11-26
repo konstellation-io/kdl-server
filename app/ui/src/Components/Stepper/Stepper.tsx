@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import StepNode from './StepNode';
 import styles from './Stepper.module.scss';
 
@@ -15,7 +15,7 @@ export type Step = {
 type Props = {
   steps: Step[];
   activeStep: number;
-  onStepClick: Function;
+  onStepClick: (stepIndex: number) => void;
 };
 function Stepper({ steps, onStepClick }: Props) {
   return (

@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import SettingsMenu from './SettingsMenu';
 import { createMockClient } from 'mock-apollo-client';
 import { screen, fireEvent, cleanup } from '@testing-library/react';
@@ -6,12 +6,7 @@ import GetMeQuery from 'Graphql/queries/getMe';
 
 import data from 'Mocks/GetMeQuery';
 
-import {
-  apolloRender,
-  dataHandler,
-  getSnapshot,
-  loadingHandler,
-} from 'testUtils';
+import { apolloRender, dataHandler, getSnapshot, loadingHandler } from 'testUtils';
 import ROUTE from 'Constants/routes';
 
 const mockHistoryPush = jest.fn();
@@ -47,9 +42,7 @@ describe('When data is ready', () => {
   });
 
   it('should render without crashing', () => {
-    expect(
-      screen.getByText(data.me.email, { exact: false })
-    ).toBeInTheDocument();
+    expect(screen.getByText(data.me.email, { exact: false })).toBeInTheDocument();
     expect(getSnapshot()).toMatchSnapshot();
   });
 
@@ -64,9 +57,7 @@ describe('When data is ready', () => {
       fireEvent.click(screen.getByText('USER SETTINGS', { exact: false }));
 
       // Assert.
-      expect(
-        screen.getByText('USER SETTINGS', { exact: false })
-      ).toBeInTheDocument();
+      expect(screen.getByText('USER SETTINGS', { exact: false })).toBeInTheDocument();
     });
 
     it('should redirect to ssh key page when clicking on this section', () => {
@@ -78,9 +69,7 @@ describe('When data is ready', () => {
       expect(mockHistoryPush).toHaveBeenCalledWith(ROUTE.USER_SSH_KEY);
 
       setTimeout(() => {
-        expect(
-          screen.queryByText('ssh key', { exact: false })
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText('ssh key', { exact: false })).not.toBeInTheDocument();
       }, 0);
     });
   });

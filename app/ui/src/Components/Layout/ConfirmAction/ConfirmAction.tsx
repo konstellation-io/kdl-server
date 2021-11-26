@@ -35,32 +35,18 @@ const ConfirmAction: FC<Props> = ({
   error = false,
   skipConfirmation = false,
 }) => {
-  const {
-    handleSubmit,
-    setValue,
-    register,
-    unregister,
-    errors,
-    clearErrors,
-  } = useForm<FormData>({
+  const { handleSubmit, setValue, register, unregister, errors, clearErrors } = useForm<FormData>({
     defaultValues: {
       message: '',
     },
   });
 
-  const {
-    value: modalVisible,
-    activate: showModal,
-    deactivate: hideModal,
-  } = useBoolState(false);
+  const { value: modalVisible, activate: showModal, deactivate: hideModal } = useBoolState(false);
 
   const validateMessage = useCallback(
     (value: string) =>
-      (confirmationWord &&
-        confirmationWord !== value &&
-        `You need to type: "${confirmationWord}"`) ||
-      true,
-    [confirmationWord]
+      (confirmationWord && confirmationWord !== value && `You need to type: "${confirmationWord}"`) || true,
+    [confirmationWord],
   );
 
   useEffect(() => {
@@ -109,11 +95,7 @@ const ConfirmAction: FC<Props> = ({
               }}
               submit={handleSubmit(onSubmit)}
               error={errors?.message?.message || ''}
-              label={
-                confirmationWord
-                  ? `WRITE "${confirmationWord}"`
-                  : 'Why are you doing that?'
-              }
+              label={confirmationWord ? `WRITE "${confirmationWord}"` : 'Why are you doing that?'}
               isInput={!!confirmationWord}
             />
           )}

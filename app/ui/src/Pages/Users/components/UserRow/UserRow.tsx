@@ -1,7 +1,7 @@
 import { Left, Right } from 'kwc';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
-import React from 'react';
+import * as React from 'react';
 import styles from './UserRow.module.scss';
 
 type Props = {

@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { StaticRouter } from 'react-router';
 import Project from './Project';
 import { projectNoAccess } from 'Mocks/entities/project';
@@ -9,7 +9,7 @@ const mockShowAdmins = jest.fn();
 const component = mount(
   <StaticRouter>
     <Project project={projectNoAccess} showAdmins={mockShowAdmins} />
-  </StaticRouter>
+  </StaticRouter>,
 );
 
 describe('Project component', () => {

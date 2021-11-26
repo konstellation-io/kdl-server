@@ -1,9 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-  memberDetails,
-  primaryPanel,
-  secondaryPanel,
-} from 'Graphql/client/cache';
+import { memberDetails, primaryPanel, secondaryPanel } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
@@ -44,15 +40,9 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
 
   const panels: { [key in PANEL_ID]: JSX.Element | null } = {
     [PANEL_ID.SETTINGS]: <ProjectSettings project={openedProject} />,
-    [PANEL_ID.PROJECT_DESCRIPTION]: (
-      <UpdateProjectDescription project={openedProject} close={panel2Close} />
-    ),
+    [PANEL_ID.PROJECT_DESCRIPTION]: <UpdateProjectDescription project={openedProject} close={panel2Close} />,
     [PANEL_ID.MEMBER_INFO]: memberDetailsData && (
-      <MemberDetails
-        member={memberDetailsData}
-        close={closeMemberInfoPanel}
-        projectId={openedProject.id}
-      />
+      <MemberDetails member={memberDetailsData} close={closeMemberInfoPanel} projectId={openedProject.id} />
     ),
   };
 

@@ -1,10 +1,8 @@
-import React from 'react';
+import * as React from 'react';
 import Sidebar from './Sidebar';
 import { shallow } from 'enzyme';
 
-const component = shallow(
-  <Sidebar title="Some title" subtitle="Some subtitle" />
-);
+const component = shallow(<Sidebar title="Some title" subtitle="Some subtitle" />);
 
 describe('Sidebar component', () => {
   test('Component match snapshot', () => {

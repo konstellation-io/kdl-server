@@ -8,12 +8,7 @@ type Props = {
   title: string;
   color: string;
 };
-function Legend({
-  lastValue,
-  title,
-  color,
-  highlightLastValue = false,
-}: Props) {
+function Legend({ lastValue, title, color, highlightLastValue = false }: Props) {
   const colorStyle = useMemo(() => ({ color }), [color]);
   const bgColorStyle = useMemo(() => ({ backgroundColor: color }), [color]);
 

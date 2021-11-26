@@ -1,11 +1,4 @@
-import {
-  Button,
-  BUTTON_ALIGN,
-  CustomOptionProps,
-  Select,
-  SelectTheme,
-  SpinnerCircular,
-} from 'kwc';
+import { Button, BUTTON_ALIGN, CustomOptionProps, Select, SelectTheme, SpinnerCircular } from 'kwc';
 import ROUTE from 'Constants/routes';
 import React, { memo } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -22,9 +15,7 @@ const UserSettingsSeparator = ({ label }: CustomOptionProps) => (
   <div className={styles.separator}>{label.toUpperCase()}</div>
 );
 
-const ReleaseVersion = ({ label }: CustomOptionProps) => (
-  <div className={styles.releaseVersion}>{label}</div>
-);
+const ReleaseVersion = ({ label }: CustomOptionProps) => <div className={styles.releaseVersion}>{label}</div>;
 
 function SettingsMenu() {
   const history = useHistory();

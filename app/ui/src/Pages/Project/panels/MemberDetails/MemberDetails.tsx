@@ -38,26 +38,18 @@ type Props = {
 };
 function MemberDetails({ member, projectId, close }: Props) {
   const { data: dataMe } = useQuery<GetMe>(GetMeQuery);
-  const { data: dataMembers } = useQuery<
-    GetProjectMembers,
-    GetProjectMembersVariables
-  >(GetMembersQuery, {
+  const { data: dataMembers } = useQuery<GetProjectMembers, GetProjectMembersVariables>(GetMembersQuery, {
     variables: {
       id: projectId,
     },
   });
 
   const [done, setDone] = useState(false);
-  const { removeMembersById, updateMembersAccessLevel } = useMembers(
-    projectId,
-    {
-      onCompleteUpdate: () => setDone(true),
-    }
-  );
+  const { removeMembersById, updateMembersAccessLevel } = useMembers(projectId, {
+    onCompleteUpdate: () => setDone(true),
+  });
 
-  const { handleSubmit, setValue, unregister, register, watch } = useForm<
-    FormData
-  >({
+  const { handleSubmit, setValue, unregister, register, watch } = useForm<FormData>({
     defaultValues: { accessLevel: member.accessLevel },
   });
 
@@ -73,9 +65,7 @@ function MemberDetails({ member, projectId, close }: Props) {
 
   const canManageMember = useMemo(() => {
     if (dataMe && dataMembers) {
-      const meAsMember = dataMembers.project.members.find(
-        ({ user }) => user.email === dataMe.me.email
-      );
+      const meAsMember = dataMembers.project.members.find(({ user }) => user.email === dataMe.me.email);
       const isNotMe = dataMe.me.email !== member.user.email;
       const isAdmin = meAsMember?.accessLevel === AccessLevel.ADMIN;
 
@@ -100,18 +90,12 @@ function MemberDetails({ member, projectId, close }: Props) {
     <div className={styles.wrapper}>
       <div className={styles.container}>
         <div className={styles.info}>
-          <Gravatar
-            email={member.user.email}
-            size={160}
-            style={gravatarStyle}
-          />
+          <Gravatar email={member.user.email} size={160} style={gravatarStyle} />
           <p className={styles.accessLevel}>{member.accessLevel}</p>
           <p className={styles.email}>{member.user.email}</p>
           <div className={styles.added}>
             <IconDate className="icon-small" />
-            <p className={styles.addedValue}>
-              {`ACTIVE FROM: ${formatDate(new Date(member.addedDate), true)}`}
-            </p>
+            <p className={styles.addedValue}>{`ACTIVE FROM: ${formatDate(new Date(member.addedDate), true)}`}</p>
           </div>
         </div>
         <div className={styles.form}>
@@ -119,9 +103,7 @@ function MemberDetails({ member, projectId, close }: Props) {
           {member.user.lastActivity ? (
             <div className={styles.lastActivity}>
               <IconTime className="icon-small" />
-              <p className={styles.lastActivityValue}>
-                {`${formatDate(new Date(member.user.lastActivity), true)}`}
-              </p>
+              <p className={styles.lastActivityValue}>{`${formatDate(new Date(member.user.lastActivity), true)}`}</p>
             </div>
           ) : (
             <p>User has no activity yet</p>
@@ -147,11 +129,7 @@ function MemberDetails({ member, projectId, close }: Props) {
                 actionLabel="REMOVE"
                 warning
               >
-                <Button
-                  label="Remove from project"
-                  Icon={IconRemove}
-                  className={styles.removeButton}
-                />
+                <Button label="Remove from project" Icon={IconRemove} className={styles.removeButton} />
               </ConfirmAction>
             </div>
           )}

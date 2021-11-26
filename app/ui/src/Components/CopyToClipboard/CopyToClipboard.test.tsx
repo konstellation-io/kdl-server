@@ -1,7 +1,7 @@
 import * as clipboard from 'Utils/clipboard';
 
 import CopyToClipboard from './CopyToClipboard';
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 
 let component;

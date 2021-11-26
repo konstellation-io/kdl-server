@@ -2,7 +2,7 @@ import styles from './AdminEmail.module.scss';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
 import { Button } from 'kwc';
 import IconSend from '@material-ui/icons/Send';
-import React from 'react';
+import * as React from 'react';
 
 type Props = {
   email: string;

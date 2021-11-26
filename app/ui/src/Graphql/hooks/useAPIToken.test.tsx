@@ -1,4 +1,3 @@
-import React from 'react';
 import useAPIToken from './useAPIToken';
 import GetMeQuery from 'Graphql/queries/getMe';
 import AddApiTokenMutation from 'Graphql/mutations/addApiToken';
@@ -10,8 +9,8 @@ import dataAddApiToken from 'Mocks/AddAPITokenMutation';
 import dataRemoveApiToken from 'Mocks/RemoveAPITokenMutation';
 import { act } from 'react-dom/test-utils';
 
-let addAPITokenHandler = jest.fn();
-let removeAPITokenHandler = jest.fn();
+const addAPITokenHandler = jest.fn();
+const removeAPITokenHandler = jest.fn();
 
 let mockClient;
 beforeEach(() => {

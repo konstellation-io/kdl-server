@@ -10,10 +10,7 @@ type Props = {
   options: RouteConfiguration[];
 };
 
-const NavigationSelector: FC<Props & BottomComponentProps> = ({
-  options,
-  closeComponent,
-}) => (
+const NavigationSelector: FC<Props & BottomComponentProps> = ({ options, closeComponent }) => (
   <div className={styles.container}>
     <ul>
       {options.map(({ route, Icon, label, disabled, id }) => (

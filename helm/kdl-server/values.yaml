@@ -122,7 +122,7 @@ knowledgeGalaxy:
 kdlServer:
   image:
     repository: konstellation/kdl-server
-    tag: latest
+    tag: v0.15.0
     pullPolicy: IfNotPresent
 
 minio:
@@ -133,9 +133,9 @@ minio:
     existingClaim: received-data-claim
     accessMode: ReadWriteMany
 
-## This Chart feature is disabled because we have to deal with different Kubernetes API versions.
-## Please check the ingress template in Helm chart
-##
+  ## This Chart feature is disabled because we have to deal with different Kubernetes API versions.
+  ## Please check the ingress template in Helm chart
+  ##
   ingress:
     enabled: false
     hosts:
@@ -183,7 +183,7 @@ projectOperator:
     ## Resource requests and limits for primary projectOperator container
     ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
     ##
-    resources: {} 
+    resources: {}
     # limits:
     #   cpu: 500m
     #   memory: 200Mi
@@ -191,8 +191,8 @@ projectOperator:
     #   cpu: 100m
     #   memory: 60Mi
 
-  ## kube-rbac-proxy container specs
-  ##
+    ## kube-rbac-proxy container specs
+    ##
   kubeRbacProxy:
     image:
       repository: gcr.io/kubebuilder/kube-rbac-proxy
@@ -234,7 +234,6 @@ tls:
     acme:
       server: https://acme-v02.api.letsencrypt.org/directory
       email: user@email.com
-
   ## Custom TLS secret
   ## Must be a valid wildcard certificate for the domain
   ## declared in .Values.domain

@@ -132,8 +132,6 @@ minio:
   mode: standalone
   rootUser: "minio"
   rootPassword: "minio123"
-  environment:
-    MINIO_UPDATE: "on"
   serviceAccount:
     create: false
   persistence:

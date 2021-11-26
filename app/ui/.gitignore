@@ -25,3 +25,5 @@ yarn-error.log*
 /mock-server/node_modules
 screenshots
 videos
+
+cypress/fixtures/example.json

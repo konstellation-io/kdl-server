@@ -14,7 +14,8 @@
     "cy": "cypress open",
     "cy:run": "cypress run --headless --browser chrome",
     "lint": "eslint src cypress",
-    "lint:fix": "eslint src cypress --fix"
+    "lint:fix": "eslint src cypress --fix",
+    "audit:fix": "yarn-audit-fix"
   },
   "dependencies": {
     "@apollo/client": "3.5.5",
@@ -38,7 +39,8 @@
     "react-transition-group": "4.4.2",
     "typeface-montserrat": "1.1.13",
     "typeface-roboto-mono": "1.1.13",
-    "typescript": "4.5.2"
+    "typescript": "4.5.2",
+    "yarn-audit-fix": "7.2.3"
   },
   "devDependencies": {
     "@bahmutov/add-typescript-to-cypress": "2.1.2",

@@ -1,0 +1,5 @@
+chart-dirs:
+  - helm
+chart-repos:
+  - minio=https://charts.min.io/
+validate-maintainers: false

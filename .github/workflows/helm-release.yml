@@ -17,14 +17,6 @@ on:
       - "KDLServer Application Build"
     types:
       - completed
-  push:
-    branches:
-      - main
-      - "release/v*"
-    paths:
-      - "helm/kdl-server/**/*"
-      - "!helm/kdl-server/Chart.yaml"
-      - "!helm/kdl-server/values.yaml"
 
 
 jobs:

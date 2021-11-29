@@ -126,8 +126,14 @@ kdlServer:
     pullPolicy: IfNotPresent
 
 minio:
-  accessKey: minio
-  secretKey: minio123
+  resources:
+    requests:
+      memory: 1Gi
+  mode: standalone
+  rootUser: "minio"
+  rootPassword: "minio123"
+  serviceAccount:
+    create: false
   persistence:
     storageClass: standard
     existingClaim: received-data-claim

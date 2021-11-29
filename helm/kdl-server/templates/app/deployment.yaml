@@ -70,12 +70,12 @@ spec:
             - name: MINIO_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  key: secretkey
+                  key: rootPassword
                   name: {{ .Release.Name }}-minio
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  key: accesskey
+                  key: rootUser
                   name: {{ .Release.Name }}-minio
             - name: DRONE_INTERNAL_URL
               valueFrom:

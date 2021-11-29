@@ -17,7 +17,7 @@
     "lint:fix": "eslint src cypress --fix"
   },
   "dependencies": {
-    "@apollo/client": "3.3.17",
+    "@apollo/client": "3.5.5",
     "classnames": "2.3.1",
     "graphql": "15.5.0",
     "is-electron": "2.2.1",
@@ -73,7 +73,7 @@
     "jest-canvas-mock": "2.3.1",
     "jest-sonar-reporter": "^2.0.0",
     "lint-staged": "11.0.0",
-    "mock-apollo-client": "1.1.0",
+    "mock-apollo-client": "1.2.0",
     "mutationobserver-shim": "^0.3.7",
     "prettier": "2.3.0"
   },

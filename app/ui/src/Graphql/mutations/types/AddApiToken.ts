@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { ApiTokenInput } from './../../types/globalTypes';
+import { ApiTokenInput } from '../../types/globalTypes';
 
 // ====================================================
 // GraphQL mutation operation: AddApiToken

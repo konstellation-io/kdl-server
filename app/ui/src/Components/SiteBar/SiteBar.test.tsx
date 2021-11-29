@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import ArrowsNavigator from './components/ArrowsNavigator/ArrowsNavigator';
 import SiteBar from './SiteBar';
 import { shallow } from 'enzyme';

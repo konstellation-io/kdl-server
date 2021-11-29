@@ -22,15 +22,11 @@ function AddMembers({ projectId, users, members }: Props) {
   const membersEmail = members.map((member) => member.user.email);
   const allMembersEmail = [...membersEmail, ...memberSelection];
 
-  const options = usersEmail.filter(
-    (email) => !allMembersEmail.includes(email)
-  );
+  const options = usersEmail.filter((email) => !allMembersEmail.includes(email));
 
   function performAddMembers() {
     if (users) {
-      const emailToId = Object.fromEntries(
-        users.map((user) => [user.email, user.id])
-      );
+      const emailToId = Object.fromEntries(users.map((user) => [user.email, user.id]));
       addMembersById(memberSelection.map((member) => emailToId[member]));
     }
   }
@@ -41,9 +37,7 @@ function AddMembers({ projectId, users, members }: Props) {
         options={options}
         theme={SearchSelectTheme.LIGHT}
         chipSelection={memberSelection}
-        onRemoveChip={(email) =>
-          setMemberSelection(memberSelection.filter((m) => m !== email))
-        }
+        onRemoveChip={(email) => setMemberSelection(memberSelection.filter((m) => m !== email))}
         onChange={(value: string) => {
           setError('');
           if (value) {
@@ -62,12 +56,7 @@ function AddMembers({ projectId, users, members }: Props) {
         showClear
         hideError
       />
-      <Button
-        label="Add"
-        height={44}
-        onClick={performAddMembers}
-        disabled={!memberSelection.length}
-      />
+      <Button label="Add" height={44} onClick={performAddMembers} disabled={!memberSelection.length} />
     </div>
   );
 }

@@ -75,16 +75,8 @@ function NewProject() {
 
   const type = data.repository.values.type;
 
-  const stepsWithData: (
-    | StepNames.INFORMATION
-    | StepNames.REPOSITORY
-    | StepNames.EXTERNAL
-  )[] = useMemo(() => {
-    return [
-      StepNames.INFORMATION,
-      StepNames.REPOSITORY,
-      repoTypeToStepName[type || ''],
-    ];
+  const stepsWithData: (StepNames.INFORMATION | StepNames.REPOSITORY | StepNames.EXTERNAL)[] = useMemo(() => {
+    return [StepNames.INFORMATION, StepNames.REPOSITORY, repoTypeToStepName[type || '']];
   }, [type]);
 
   // We want to execute this on on component mount and unmount
@@ -102,26 +94,14 @@ function NewProject() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const {
-    direction,
-    goToStep,
-    actStep,
-    getActStepComponent,
-    updateState,
-    nextStep,
-    prevStep,
-    steps,
-  } = useStepper({
+  const { direction, goToStep, actStep, getActStepComponent, updateState, nextStep, prevStep, steps } = useStepper({
     data: stepperSteps,
   });
 
   useEffect(() => {
     const isSomeInputDirty = stepsWithData.some((step) => {
       const stepByIndex = data[step];
-      return (
-        stepByIndex &&
-        Object.values(stepByIndex.values).some((value) => !!value)
-      );
+      return stepByIndex && Object.values(stepByIndex.values).some((value) => !!value);
     });
     setIsFormDirty(isSomeInputDirty);
   }, [data, stepsWithData]);
@@ -134,13 +114,7 @@ function NewProject() {
       disableUnloadPrompt();
       setIsPromptEnabled(false);
     }
-  }, [
-    isFormDirty,
-    actStep,
-    enableUnloadPrompt,
-    disableUnloadPrompt,
-    setIsPromptEnabled,
-  ]);
+  }, [isFormDirty, actStep, enableUnloadPrompt, disableUnloadPrompt, setIsPromptEnabled]);
 
   function getActions() {
     const onNextClick = () => {
@@ -150,13 +124,7 @@ function NewProject() {
       case 0:
         return [
           <ActionButton key="cancel" label="Cancel" to={ROUTE.HOME} />,
-          <ActionButton
-            dataTestId="nextButton"
-            key="next"
-            label="Next"
-            primary
-            onClick={onNextClick}
-          />,
+          <ActionButton dataTestId="nextButton" key="next" label="Next" primary onClick={onNextClick} />,
         ];
       case stepperSteps.length - 1:
         return [
@@ -172,13 +140,7 @@ function NewProject() {
       default:
         return [
           <ActionButton key="back" label="Back" onClick={prevStep} />,
-          <ActionButton
-            dataTestId="nextButton"
-            key="next"
-            label="Next"
-            primary
-            onClick={onNextClick}
-          />,
+          <ActionButton dataTestId="nextButton" key="next" label="Next" primary onClick={onNextClick} />,
         ];
     }
   }
@@ -191,12 +153,9 @@ function NewProject() {
     if (hasData && actStep !== Steps.SUMMARY) {
       const actStepData = data[stepData];
 
-      const error =
-        actStepData.errors && Object.values(actStepData.errors).some((e) => e);
+      const error = actStepData.errors && Object.values(actStepData.errors).some((e) => e);
 
-      const values = Object.values(actStepData.values).filter(
-        (v) => typeof v !== 'boolean'
-      );
+      const values = Object.values(actStepData.values).filter((v) => typeof v !== 'boolean');
       const completed = values && values.every((v) => !!v) && !error;
 
       updateState(completed, error);
@@ -244,14 +203,11 @@ function NewProject() {
                   error: s.error,
                   active: actStep === idx,
                   visited: actStep >= idx,
-                  disabled:
-                    idx > actStep + 1 &&
-                    (steps[idx - 1]?.error || !steps[idx - 1]?.completed),
+                  disabled: idx > actStep + 1 && (steps[idx - 1]?.error || !steps[idx - 1]?.completed),
                 }))}
                 activeStep={actStep}
                 onStepClick={(stepIndex: number) => {
-                  if (actStep > stepIndex || validateStep())
-                    goToStep(stepIndex);
+                  if (actStep > stepIndex || validateStep()) goToStep(stepIndex);
                 }}
               />
             </div>

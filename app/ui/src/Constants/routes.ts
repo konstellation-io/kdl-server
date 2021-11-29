@@ -23,7 +23,6 @@ export type RouteProjectParams = {
   projectId: string;
 };
 
-export const buildRoute = (route: ROUTE, projectId: string) =>
-  route.replace(':projectId', projectId);
+export const buildRoute = (route: ROUTE, projectId: string) => route.replace(':projectId', projectId);
 
 export default ROUTE;

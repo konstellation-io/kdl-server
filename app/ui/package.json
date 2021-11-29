@@ -2,6 +2,20 @@
   "name": "konstellation-dev-lab",
   "version": "v1.22.5",
   "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "test:cov": "react-scripts test --coverage --watchAll=false",
+    "test:cov:sonar": "react-scripts test --silent --env=jsdom --coverage --watchAll=false --testResultsProcessor jest-sonar-reporter",
+    "eject": "react-scripts eject",
+    "prettier:types": "prettier --write --single-quote \"src/Graphql/**/types/**/*.ts\"",
+    "gen:types": "apollo client:codegen types --globalTypesFile=src/Graphql/types/globalTypes.ts --target typescript --includes=./src/Graphql/\"{queries,mutations,fragments}\"/*.ts --localSchemaFile=../api/infrastructure/graph/schema.graphqls && yarn prettier:types",
+    "cy": "cypress open",
+    "cy:run": "cypress run --headless --browser chrome",
+    "lint": "eslint src cypress",
+    "lint:fix": "eslint src cypress --fix"
+  },
   "dependencies": {
     "@apollo/client": "3.3.17",
     "@visx/event": "1.7.0",
@@ -37,36 +51,6 @@
     "typeface-roboto-mono": "1.1.13",
     "typescript": "4.2.4"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "test:cov": "react-scripts test --coverage --watchAll=false",
-    "test:cov:sonar": "react-scripts test --silent --env=jsdom --coverage --watchAll=false --testResultsProcessor jest-sonar-reporter",
-    "eject": "react-scripts eject",
-    "prettier:types": "prettier --write --single-quote \"src/Graphql/**/types/**/*.ts\"",
-    "gen:types": "apollo client:codegen types --globalTypesFile=src/Graphql/types/globalTypes.ts --target typescript --includes=./src/Graphql/\"{queries,mutations,fragments}\"/*.ts --localSchemaFile=../api/infrastructure/graph/schema.graphqls && yarn prettier:types",
-    "cy": "cypress open",
-    "cy:run": "cypress run --headless --browser chrome"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
     "@bahmutov/add-typescript-to-cypress": "2.1.2",
     "@testing-library/jest-dom": "5.12.0",
@@ -91,11 +75,18 @@
     "@types/react-router-dom": "5.1.7",
     "@types/react-table": "7.7.0",
     "@types/react-tabs": "2.3.2",
+    "@typescript-eslint/eslint-plugin": "5.4.0",
+    "@typescript-eslint/parser": "5.4.0",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.1",
     "apollo": "^2.33.2",
     "cypress": "8.7.0",
     "enzyme": "3.11.0",
     "enzyme-to-json": "^3.6.2",
+    "eslint": "8.3.0",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-prettier": "4.0.0",
+    "eslint-plugin-react": "7.27.1",
+    "eslint-plugin-react-hooks": "4.3.0",
     "husky": "6.0.0",
     "jest-canvas-mock": "2.3.1",
     "jest-sonar-reporter": "^2.0.0",
@@ -103,6 +94,18 @@
     "mock-apollo-client": "1.1.0",
     "mutationobserver-shim": "^0.3.7",
     "prettier": "2.3.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "jest": {
     "snapshotSerializers": [
@@ -126,8 +129,12 @@
     ]
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+    "src/**/*.{js,json,css,scss,md}": [
       "prettier --write",
+      "git add"
+    ],
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix",
       "git add"
     ]
   },

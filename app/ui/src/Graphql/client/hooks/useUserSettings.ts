@@ -10,10 +10,7 @@ function useUserSettings() {
     });
   }
 
-  function updateSelection(
-    selectedUserIds: string[],
-    userSelection: UserSelection
-  ) {
+  function updateSelection(selectedUserIds: string[], userSelection: UserSelection) {
     userSettings({
       ...userSettings(),
       selectedUserIds,
@@ -21,10 +18,7 @@ function useUserSettings() {
     });
   }
 
-  function updateFilters(
-    email: string | null = null,
-    accessLevel: AccessLevel | null = null
-  ) {
+  function updateFilters(email: string | null = null, accessLevel: AccessLevel | null = null) {
     const prevSettings = userSettings();
     userSettings({
       ...prevSettings,

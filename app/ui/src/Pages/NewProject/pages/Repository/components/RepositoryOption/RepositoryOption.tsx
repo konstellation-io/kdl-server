@@ -15,37 +15,21 @@ type Props = {
   dataTestId?: string;
 };
 
-function RepositoryOption({
-  title,
-  subtitle,
-  isSelected,
-  onSelect,
-  Repository,
-  dataTestId,
-}: Props) {
+function RepositoryOption({ title, subtitle, isSelected, onSelect, Repository, dataTestId }: Props) {
   return (
     <div className={styles.container}>
       <div
         data-testid={dataTestId}
-        className={cx(
-          styles.repoContainer,
-          repositoryStyles.hoverContainer,
-          containerStyles.server,
-          {
-            [styles.selected]: isSelected,
-          }
-        )}
+        className={cx(styles.repoContainer, repositoryStyles.hoverContainer, containerStyles.server, {
+          [styles.selected]: isSelected,
+        })}
         onClick={onSelect}
       >
         <div>{Repository}</div>
         <p className={styles.title}>{title}</p>
         <p className={styles.subtitle}>{subtitle}</p>
       </div>
-      {isSelected && (
-        <p className={styles.selectedLabel}>
-          You have selected this type of repository
-        </p>
-      )}
+      {isSelected && <p className={styles.selectedLabel}>You have selected this type of repository</p>}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { SvgIcon, SvgIconProps } from '@material-ui/core';
-import React from 'react';
+import * as React from 'react';
 
 const MlFlowIcon = (props: SvgIconProps) => (
   <SvgIcon {...props} viewBox="0 0 24 25">

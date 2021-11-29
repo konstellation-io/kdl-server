@@ -1,7 +1,7 @@
 import CheckIcon from '@material-ui/icons/Check';
 import CreateIcon from '@material-ui/icons/Create';
 import NotInterestedIcon from '@material-ui/icons/NotInterested';
-import React from 'react';
+import * as React from 'react';
 import ScheduleIcon from '@material-ui/icons/Schedule';
 import StepNode from './StepNode';
 import Stepper from './Stepper';
@@ -31,9 +31,7 @@ const steps = [
 ];
 
 describe('Stepper component', () => {
-  const component = shallow(
-    <Stepper steps={steps} activeStep={0} onStepClick={onStepClickMock} />
-  );
+  const component = shallow(<Stepper steps={steps} activeStep={0} onStepClick={onStepClickMock} />);
 
   test('Component match snapshot', () => {
     expect(component).toMatchSnapshot();
@@ -53,9 +51,7 @@ describe('Stepper component', () => {
 });
 
 describe('Step component', () => {
-  const component = shallow(
-    <StepNode {...steps[0]} onClick={onStepClickMock} />
-  );
+  const component = shallow(<StepNode {...steps[0]} onClick={onStepClickMock} />);
 
   test('Component match snapshot', () => {
     expect(component).toMatchSnapshot();

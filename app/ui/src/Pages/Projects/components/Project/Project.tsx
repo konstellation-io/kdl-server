@@ -46,9 +46,7 @@ function Project({ project, showAdmins }: Props) {
 
 function UpperBg({ project, showAdmins }: Props) {
   function onContactAdmins() {
-    const projectAdmins = project.members
-      .filter((u) => u.accessLevel === AccessLevel.ADMIN)
-      .map((u) => u.user.email);
+    const projectAdmins = project.members.filter((u) => u.accessLevel === AccessLevel.ADMIN).map((u) => u.user.email);
 
     showAdmins({
       projectName: project.name,
@@ -66,11 +64,7 @@ function UpperBg({ project, showAdmins }: Props) {
           {project.name}
         </p>
         {project.needAccess && (
-          <div
-            className={styles.contactInfo}
-            onClick={onContactAdmins}
-            data-testid="showAdminsButton"
-          >
+          <div className={styles.contactInfo} onClick={onContactAdmins} data-testid="showAdminsButton">
             Need access?
           </div>
         )}
@@ -90,9 +84,7 @@ const LowerBg: FC<BaseProps> = ({ project }) => (
       </p>
       <div className={styles.creationDate}>
         <p className={styles.creationDateLabel}>CREATED:</p>
-        <p className={styles.date}>
-          {formatDate(new Date(project.creationDate), true)}
-        </p>
+        <p className={styles.date}>{formatDate(new Date(project.creationDate), true)}</p>
       </div>
     </div>
   </div>
@@ -107,9 +99,7 @@ const Band: FC<BaseProps> = ({ project }) => (
           Archived
         </div>
       )}
-      {project.needAccess && (
-        <div className={styles.labelNoAccess}>No Access</div>
-      )}
+      {project.needAccess && <div className={styles.labelNoAccess}>No Access</div>}
     </div>
     {project.error && <div className={styles.warning}>WARNING</div>}
   </div>
@@ -119,11 +109,7 @@ const Square: FC<BaseProps> = ({ project }) => (
   <div className={styles.square}>
     <div className={styles.repoType}>
       <RepositoryTypeComponent
-        squareLocation={
-          project.repository?.type === RepositoryType.EXTERNAL
-            ? LOCATION.OUT
-            : LOCATION.IN
-        }
+        squareLocation={project.repository?.type === RepositoryType.EXTERNAL ? LOCATION.OUT : LOCATION.IN}
         customSize={38}
         shouldAnimate={false}
       />

@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { UpdateProjectInput, RepositoryType } from './../../types/globalTypes';
+import { UpdateProjectInput, RepositoryType } from '../../types/globalTypes';
 
 // ====================================================
 // GraphQL mutation operation: UpdateProject

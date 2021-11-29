@@ -1,14 +1,5 @@
-import {
-  ErrorMessage,
-  ModalContainer,
-  ModalLayoutConfirmList,
-  SpinnerCircular,
-} from 'kwc';
-import {
-  defaultModalInfo,
-  getModalInfo,
-  ModalInfo,
-} from './confirmationModals';
+import { ErrorMessage, ModalContainer, ModalLayoutConfirmList, SpinnerCircular } from 'kwc';
+import { defaultModalInfo, getModalInfo, ModalInfo } from './confirmationModals';
 import React, { useRef } from 'react';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
@@ -27,18 +18,12 @@ import { GetMe } from 'Graphql/queries/types/GetMe';
 import GetMeQuery from 'Graphql/queries/getMe';
 
 function Users() {
-  const { data: dataMe, loading: loadingMe, error: errorMe } = useQuery<GetMe>(
-    GetMeQuery
-  );
+  const { data: dataMe, loading: loadingMe, error: errorMe } = useQuery<GetMe>(GetMeQuery);
   const { data, loading, error } = useQuery<GetUsers>(GetUsersQuery);
   const { selectedUserIds } = useReactiveVar(userSettings);
   const { updateUsersAccessLevel } = useUser();
 
-  const {
-    value: modalVisible,
-    activate: showModal,
-    deactivate: hideModal,
-  } = useBoolState(false);
+  const { value: modalVisible, activate: showModal, deactivate: hideModal } = useBoolState(false);
   const modalInfo = useRef<ModalInfo>(defaultModalInfo);
 
   function getUsersInfo(user?: [string]) {
@@ -96,13 +81,7 @@ function Users() {
           <ModalLayoutConfirmList message={modalInfo.current.message}>
             {modalInfo.current.userIds.map((userId) => {
               const user = data?.users.find((u) => u.id === userId);
-              return (
-                <UserRow
-                  key={user?.email}
-                  email={user?.email}
-                  accessLevel={user?.accessLevel}
-                />
-              );
+              return <UserRow key={user?.email} email={user?.email} accessLevel={user?.accessLevel} />;
             })}
           </ModalLayoutConfirmList>
         </ModalContainer>

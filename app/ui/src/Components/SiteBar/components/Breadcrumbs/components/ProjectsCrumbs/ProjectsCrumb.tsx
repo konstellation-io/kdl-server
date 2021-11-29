@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { useQuery, useReactiveVar } from '@apollo/client';
 import Crumb, { BottomComponentProps } from '../Crumb/Crumb';
 import { GetProjects } from 'Graphql/queries/types/GetProjects';
@@ -14,20 +14,14 @@ function ProjectsCrumb() {
   if (loading || !project || !data) return null;
   if (error) throw Error('cannot retrieve data at ProjectsCrumb');
 
-  const activeProjects = data.projects.filter(
-    (p) => !p.archived && !p.needAccess
-  );
+  const activeProjects = data.projects.filter((p) => !p.archived && !p.needAccess);
 
   return (
     <Crumb
       crumbText={project.name}
-      LeftIconComponent={
-        <ProjectIcon className="icon-regular" archived={project.archived} />
-      }
+      LeftIconComponent={<ProjectIcon className="icon-regular" archived={project.archived} />}
     >
-      {(props: BottomComponentProps) => (
-        <ProjectSelector options={activeProjects} {...props} />
-      )}
+      {(props: BottomComponentProps) => <ProjectSelector options={activeProjects} {...props} />}
     </Crumb>
   );
 }

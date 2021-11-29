@@ -5,8 +5,6 @@ import { GetProjectMembers_project_members } from 'Graphql/queries/types/GetProj
 type Props = {
   member: GetProjectMembers_project_members;
 };
-const MemberItem: FC<Props> = ({ member }) => (
-  <div className={styles.container}>{member.user.email}</div>
-);
+const MemberItem: FC<Props> = ({ member }) => <div className={styles.container}>{member.user.email}</div>;
 
 export default MemberItem;

@@ -1,16 +1,9 @@
-import React from 'react';
+import * as React from 'react';
 import ProjectsFilter from './ProjectsFilter';
 import GetProjectsQuery from 'Graphql/queries/getProjects';
 import { createMockClient } from 'mock-apollo-client';
 import { screen, fireEvent, cleanup } from '@testing-library/react';
-import {
-  apolloRender,
-  loadingHandler,
-  dataHandler,
-  errorHandler,
-  getSnapshot,
-  ERROR_MESSAGE,
-} from 'testUtils';
+import { apolloRender, loadingHandler, dataHandler, errorHandler, getSnapshot, ERROR_MESSAGE } from 'testUtils';
 import data from 'Mocks/GetProjectsQuery';
 
 const Component = <ProjectsFilter />;
@@ -53,9 +46,7 @@ describe('When data is ready', () => {
     // Waits the action to finish
     setTimeout(() => {
       expect(screen.getByText('all', { exact: false })).toBeInTheDocument();
-      expect(
-        screen.queryByText('active', { exact: false })
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText('active', { exact: false })).not.toBeInTheDocument();
     }, 0);
   });
 });

@@ -5,10 +5,7 @@ import React, { useEffect, useMemo } from 'react';
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import { GetUsers_users } from 'Graphql/queries/types/GetUsers';
 import Message from 'Components/Message/Message';
-import {
-  UserSelection,
-  UserSettingsFilters,
-} from 'Graphql/client/models/UserSettings';
+import { UserSelection, UserSettingsFilters } from 'Graphql/client/models/UserSettings';
 import cx from 'classnames';
 import { formatDate } from 'Utils/format';
 import styles from './UserList.module.scss';
@@ -27,12 +24,12 @@ export type Data = {
   selectedRowIds?: string[];
 };
 
-function TableColCheck({
-  indeterminate,
-  checked,
-  onChange,
-  className = '',
-}: any) {
+interface ColumnCell<D> {
+  value: string;
+  row: D;
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function TableColCheck({ indeterminate, checked, onChange, className = '' }: any) {
   return (
     <div className={styles.check} data-testid="checkUser">
       <Check
@@ -49,11 +46,7 @@ function rowNotFiltered(row: GetUsers_users, filters: UserSettingsFilters) {
   let filtered = false;
 
   if (filters.email && !row.email.includes(filters.email)) filtered = true;
-  if (
-    filters.accessLevel &&
-    row.accessLevel.toLowerCase() !== filters.accessLevel.toLowerCase()
-  )
-    filtered = true;
+  if (filters.accessLevel && row.accessLevel.toLowerCase() !== filters.accessLevel.toLowerCase()) filtered = true;
 
   return !filtered;
 }
@@ -66,17 +59,12 @@ function UsersTable({ users }: Props) {
   const { updateSelection } = useUserSettings();
   const { updateUsersAccessLevel } = useUser();
 
-  const { userSelection, filters, selectedUserIds } = useReactiveVar(
-    userSettings
-  );
+  const { userSelection, filters, selectedUserIds } = useReactiveVar(userSettings);
 
-  const data = useMemo(
-    () => users.filter((user) => rowNotFiltered(user, filters)),
-    [filters, users]
-  );
+  const data = useMemo(() => users.filter((user) => rowNotFiltered(user, filters)), [filters, users]);
 
   const initialStateSelectedRowIds = Object.fromEntries(
-    data.map((user, idx) => [idx, selectedUserIds.includes(user.id)])
+    data.map((user, idx) => [idx, selectedUserIds.includes(user.id)]),
   );
 
   const columns: Column<Data>[] = useMemo(
@@ -84,7 +72,7 @@ function UsersTable({ users }: Props) {
       {
         Header: 'Date added',
         accessor: 'creationDate',
-        Cell: ({ value }) => formatDate(new Date(value)),
+        Cell: ({ value }: ColumnCell<{ value: string }>) => formatDate(new Date(value)),
       },
       {
         Header: 'User email',
@@ -97,7 +85,7 @@ function UsersTable({ users }: Props) {
       {
         Header: 'Access level',
         accessor: 'accessLevel',
-        Cell: ({ value, row }) => {
+        Cell: ({ value, row }: ColumnCell<{ original: { id: string } }>) => {
           return (
             <div className={styles.levelSelector} data-testid="userRoleSelect">
               <Select
@@ -110,7 +98,6 @@ function UsersTable({ users }: Props) {
                 }}
                 height={30}
                 onChange={(newValue: AccessLevel) => {
-                  // @ts-ignore
                   updateUsersAccessLevel([row.original.id], newValue);
                 }}
                 disableScrollOnOpened
@@ -123,7 +110,7 @@ function UsersTable({ users }: Props) {
       {
         Header: 'Last activity',
         accessor: 'lastActivity',
-        Cell: ({ value }) => {
+        Cell: ({ value }: ColumnCell<{ value: string }>) => {
           if (value === null) {
             return '-';
           }
@@ -133,7 +120,7 @@ function UsersTable({ users }: Props) {
     ],
     // We want to execute this only when mounting/unmounting
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   const {
@@ -159,19 +146,14 @@ function UsersTable({ users }: Props) {
       hooks.visibleColumns.push((cols) => [
         {
           id: 'selection',
-          Header: ({ getToggleAllRowsSelectedProps }) => (
-            <TableColCheck
-              {...getToggleAllRowsSelectedProps()}
-              className={styles.headerCheck}
-            />
+          Header: ({ getToggleAllRowsSelectedProps }: Row<Data>) => (
+            <TableColCheck {...getToggleAllRowsSelectedProps()} className={styles.headerCheck} />
           ),
-          Cell: ({ row }: { row: Row }) => (
-            <TableColCheck {...row.getToggleRowSelectedProps()} />
-          ),
+          Cell: ({ row }: ColumnCell<Row<Data>>) => <TableColCheck {...row.getToggleRowSelectedProps()} />,
         },
         ...cols,
       ]);
-    }
+    },
   );
 
   useEffect(() => {
@@ -187,8 +169,8 @@ function UsersTable({ users }: Props) {
 
   useEffect(() => {
     const newSelectedUsersPos = Object.entries(selectedRowIds)
-      .filter(([_, isSelected]) => isSelected)
-      .map(([rowId, _]) => rowId);
+      .filter(([, isSelected]) => isSelected)
+      .map(([rowId]) => rowId);
 
     if (selectedUserIds.length !== newSelectedUsersPos.length) {
       let newUserSelection: UserSelection;
@@ -205,25 +187,18 @@ function UsersTable({ users }: Props) {
       }
 
       const newSelectedUsers: string[] = data
-        .filter((_: GetUsers_users, idx: number) =>
-          newSelectedUsersPos.includes(idx.toString())
-        )
+        .filter((_: GetUsers_users, idx: number) => newSelectedUsersPos.includes(idx.toString()))
         .map((user: GetUsers_users) => user.id);
 
       updateSelection(newSelectedUsers, newUserSelection);
     }
   }, [selectedRowIds, updateSelection, data, selectedUserIds]);
 
-  if (data.length === 0)
-    return <Message text="There are no users with the applied filters" />;
-
+  if (data.length === 0) return <Message text="There are no users with the applied filters" />;
+  /* eslint-disable react/jsx-key */
   return (
     <div className={styles.container}>
-      <table
-        {...getTableProps()}
-        className={styles.table}
-        data-testid="usersTable"
-      >
+      <table {...getTableProps()} className={styles.table} data-testid="usersTable">
         <thead>
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
@@ -248,6 +223,7 @@ function UsersTable({ users }: Props) {
       </table>
     </div>
   );
+  /* eslint-enable react/jsx-key */
 }
 
 export default UsersTable;

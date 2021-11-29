@@ -30,12 +30,7 @@ const ProjectSelector: FC<Props & BottomComponentProps> = ({
         </NavLink>
       ))}
     </ul>
-    <Button
-      Icon={IconAdd}
-      label="New project"
-      className={styles.addProjectButton}
-      to={ROUTE.NEW_PROJECT}
-    />
+    <Button Icon={IconAdd} label="New project" className={styles.addProjectButton} to={ROUTE.NEW_PROJECT} />
   </div>
 );
 export default ProjectSelector;

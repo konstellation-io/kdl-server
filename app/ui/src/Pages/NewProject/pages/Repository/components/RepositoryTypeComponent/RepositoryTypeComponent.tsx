@@ -25,12 +25,7 @@ type Props = {
   size?: SIZE;
   shouldAnimate?: boolean;
 };
-function RepositoryTypeComponent({
-  squareLocation,
-  size = SIZE.MEDIUM,
-  customSize,
-  shouldAnimate = true,
-}: Props) {
+function RepositoryTypeComponent({ squareLocation, size = SIZE.MEDIUM, customSize, shouldAnimate = true }: Props) {
   const side = customSize ? customSize : sizePixels[size];
   return (
     <div

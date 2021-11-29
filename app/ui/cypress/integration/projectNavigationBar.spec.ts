@@ -1,5 +1,5 @@
-import GetProjectsQuery from "../../src/Mocks/GetProjectsQuery";
-import GetMeQuery from "../../src/Mocks/GetMeQuery";
+import GetProjectsQuery from '../../src/Mocks/GetProjectsQuery';
+import GetMeQuery from '../../src/Mocks/GetMeQuery';
 
 describe('Project Navigation Bar Behavior', () => {
   beforeEach(() => {

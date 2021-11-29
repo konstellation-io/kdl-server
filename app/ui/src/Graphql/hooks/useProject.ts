@@ -1,16 +1,7 @@
 import { ApolloCache, FetchResult, useMutation } from '@apollo/client';
-import {
-  CreateProject,
-  CreateProjectVariables,
-} from 'Graphql/mutations/types/CreateProject';
-import {
-  GetProjects,
-  GetProjects_projects,
-} from 'Graphql/queries/types/GetProjects';
-import {
-  UpdateProject,
-  UpdateProjectVariables,
-} from '../mutations/types/UpdateProject';
+import { CreateProject, CreateProjectVariables } from 'Graphql/mutations/types/CreateProject';
+import { GetProjects, GetProjects_projects } from 'Graphql/queries/types/GetProjects';
+import { UpdateProject, UpdateProjectVariables } from '../mutations/types/UpdateProject';
 
 import { CreateProjectInput } from '../types/globalTypes';
 import { mutationPayloadHelper } from 'Utils/formUtils';
@@ -23,26 +14,23 @@ type UseProjectParams = {
   onUpdateCompleted?: () => void;
 };
 export default function useProject(options?: UseProjectParams) {
-  const [mutationCreateProject, { data, error }] = useMutation<
-    CreateProject,
-    CreateProjectVariables
-  >(CreateProjectMutation, {
-    onError: (e) => console.error(`createProject: ${e}`),
-    update: updateCacheAdd,
-  });
+  const [mutationCreateProject, { data, error }] = useMutation<CreateProject, CreateProjectVariables>(
+    CreateProjectMutation,
+    {
+      onError: (e) => console.error(`createProject: ${e}`),
+      update: updateCacheAdd,
+    },
+  );
 
-  const [mutationUpdateProject, { loading }] = useMutation<
-    UpdateProject,
-    UpdateProjectVariables
-  >(UpdateProjectMutation, {
-    onError: (e) => console.error(`updateProject: ${e}`),
-    onCompleted: options?.onUpdateCompleted,
-  });
+  const [mutationUpdateProject, { loading }] = useMutation<UpdateProject, UpdateProjectVariables>(
+    UpdateProjectMutation,
+    {
+      onError: (e) => console.error(`updateProject: ${e}`),
+      onCompleted: options?.onUpdateCompleted,
+    },
+  );
 
-  function updateCache(
-    cache: ApolloCache<CreateProject>,
-    write: (projects: GetProjects_projects[]) => void
-  ) {
+  function updateCache(cache: ApolloCache<CreateProject>, write: (projects: GetProjects_projects[]) => void) {
     const cacheResult = cache.readQuery<GetProjects>({
       query: GetProjectsQuery,
     });
@@ -52,10 +40,7 @@ export default function useProject(options?: UseProjectParams) {
     }
   }
 
-  function updateCacheAdd(
-    cache: ApolloCache<CreateProject>,
-    { data: dataCreate }: FetchResult<CreateProject>
-  ) {
+  function updateCacheAdd(cache: ApolloCache<CreateProject>, { data: dataCreate }: FetchResult<CreateProject>) {
     if (dataCreate && dataCreate.createProject) {
       updateCache(cache, (projects) =>
         cache.writeQuery({
@@ -63,7 +48,7 @@ export default function useProject(options?: UseProjectParams) {
           data: {
             projects: [...projects, dataCreate.createProject],
           },
-        })
+        }),
       );
     }
   }

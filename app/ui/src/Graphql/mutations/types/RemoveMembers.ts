@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { RemoveMembersInput, AccessLevel } from './../../types/globalTypes';
+import { RemoveMembersInput, AccessLevel } from '../../types/globalTypes';
 
 // ====================================================
 // GraphQL mutation operation: RemoveMembers

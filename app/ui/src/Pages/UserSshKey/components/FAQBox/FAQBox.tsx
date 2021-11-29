@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 
 import AnimateHeight from 'react-animate-height';
 import IconHelp from '@material-ui/icons/Help';
-import MessageActionBox, {
-  BoxActionProps,
-} from 'Components/MessageActionBox/MessageActionBox';
+import MessageActionBox, { BoxActionProps } from 'Components/MessageActionBox/MessageActionBox';
 import cx from 'classnames';
 import styles from './FAQBox.module.scss';
 
@@ -24,14 +22,7 @@ type Props = {
   customAction?: JSX.Element;
   theme?: BOX_THEME;
 };
-function FAQBox({
-  label,
-  title,
-  description,
-  action,
-  customAction,
-  theme = BOX_THEME.DEFAULT,
-}: Props) {
+function FAQBox({ label, title, description, action, customAction, theme = BOX_THEME.DEFAULT }: Props) {
   const [opened, setOpened] = useState(false);
 
   function toggleOpened() {

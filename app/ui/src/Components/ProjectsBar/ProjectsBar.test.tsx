@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import ProjectsBar from './ProjectsBar';
 import { shallow } from 'enzyme';
 

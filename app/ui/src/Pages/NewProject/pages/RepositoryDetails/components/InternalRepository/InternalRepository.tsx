@@ -1,12 +1,10 @@
-import React from 'react';
+import * as React from 'react';
 import { CONFIG } from 'index';
 import IconLink from '@material-ui/icons/Link';
 import styles from './InternalRepository.module.scss';
 import { useReactiveVar } from '@apollo/client';
 import { newProject } from 'Graphql/client/cache';
-import MessageActionBox, {
-  BOX_THEME,
-} from 'Components/MessageActionBox/MessageActionBox';
+import MessageActionBox, { BOX_THEME } from 'Components/MessageActionBox/MessageActionBox';
 
 function InternalRepository() {
   const {
@@ -23,17 +21,11 @@ function InternalRepository() {
         <p className={styles.urlTitle}>repository url</p>
         <div className={styles.serverUrlContainer}>
           <IconLink className="icon-regular" />
-          <span
-            className={styles.urlContent}
-          >{`${CONFIG.GITEA_URL}/kdl/${id}`}</span>
+          <span className={styles.urlContent}>{`${CONFIG.GITEA_URL}/kdl/${id}`}</span>
         </div>
       </div>
       <div className={styles.warningBox}>
-        <MessageActionBox
-          title="WARNING"
-          description={warningMessage}
-          theme={BOX_THEME.WARN}
-        />
+        <MessageActionBox title="WARNING" description={warningMessage} theme={BOX_THEME.WARN} />
       </div>
     </div>
   );

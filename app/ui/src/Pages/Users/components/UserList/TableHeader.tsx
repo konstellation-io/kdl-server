@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import IconArrowDown from '@material-ui/icons/ArrowDropDown';
 import IconArrowUp from '@material-ui/icons/ArrowDropUp';
 import styles from './UserList.module.scss';

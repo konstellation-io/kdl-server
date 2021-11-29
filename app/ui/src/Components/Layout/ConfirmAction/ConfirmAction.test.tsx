@@ -1,7 +1,7 @@
 import { ModalContainer, ModalLayoutJustify } from 'kwc';
 
 import ConfirmAction from './ConfirmAction';
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 
 const actionMock = jest.fn();
@@ -23,7 +23,7 @@ describe('ConfirmAction component - without input', () => {
         confirmationWord={undefined}
       >
         <div id="child-1">Child 1</div>
-      </ConfirmAction>
+      </ConfirmAction>,
     );
   });
 
@@ -37,7 +37,11 @@ describe('ConfirmAction component - without input', () => {
     component
       .find('div')
       .first()
-      .simulate('click', { stopPropagation() {} });
+      .simulate('click', {
+        stopPropagation() {
+          return;
+        },
+      });
 
     // Assert.
     expect(component.contains('Some message')).toBeTruthy();
@@ -49,7 +53,11 @@ describe('ConfirmAction component - without input', () => {
     component
       .find('div')
       .first()
-      .simulate('click', { stopPropagation() {} });
+      .simulate('click', {
+        stopPropagation() {
+          return;
+        },
+      });
     component.find(ModalContainer).props().onAccept();
 
     // Assert.
@@ -72,7 +80,7 @@ describe('ConfirmAction component - with input', () => {
         confirmationWord={'WORD'}
       >
         <div id="child-1">Child 1</div>
-      </ConfirmAction>
+      </ConfirmAction>,
     );
 
     actionMock.mockClear();
@@ -88,12 +96,14 @@ describe('ConfirmAction component - with input', () => {
     component
       .find('div')
       .first()
-      .simulate('click', { stopPropagation() {} });
+      .simulate('click', {
+        stopPropagation() {
+          return;
+        },
+      });
 
     // Assert.
     expect(component.contains('Some message')).toBeTruthy();
-    expect(component.find(ModalLayoutJustify).props().label).toBe(
-      'WRITE "WORD"'
-    );
+    expect(component.find(ModalLayoutJustify).props().label).toBe('WRITE "WORD"');
   });
 });

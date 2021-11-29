@@ -8,8 +8,8 @@ import {
   NewProject,
   RepositoryErrors,
   RepositoryValues,
-} from './../models/NewProject';
-import { initialNewProject, newProject } from './../cache';
+} from '../models/NewProject';
+import { initialNewProject, newProject } from '../cache';
 
 import { cloneDeep } from 'lodash';
 
@@ -20,9 +20,10 @@ function useNewProject(section: keyof NewProject) {
       | keyof RepositoryValues
       | keyof ExternalRepositoryValues
       | keyof InternalRepositoryValues,
-    value: string | boolean
+    value: string | boolean,
   ) {
     const newState = cloneDeep(newProject());
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     newState[section].values[key] = value;
 
@@ -35,9 +36,10 @@ function useNewProject(section: keyof NewProject) {
       | keyof RepositoryErrors
       | keyof ExternalRepositoryErrors
       | keyof InternalRepositoryErrors,
-    value: string
+    value: string,
   ) {
     const newState = cloneDeep(newProject());
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     newState[section].errors[key] = value;
 
@@ -46,6 +48,7 @@ function useNewProject(section: keyof NewProject) {
 
   function clearError(key: string) {
     const newState = cloneDeep(newProject());
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     newState[section].errors[key] = '';
 

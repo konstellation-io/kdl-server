@@ -1,15 +1,11 @@
 import DefaultPage from './DefaultPage';
-import React from 'react';
+import * as React from 'react';
 import { shallow } from 'enzyme';
 
 const component = shallow(
-  <DefaultPage
-    title="Some title"
-    subtitle="Some subtitle"
-    actions={[<div key="k1">Action 1</div>, <div key="k2" />]}
-  >
+  <DefaultPage title="Some title" subtitle="Some subtitle" actions={[<div key="k1">Action 1</div>, <div key="k2" />]}>
     <div id="children">Children</div>
-  </DefaultPage>
+  </DefaultPage>,
 );
 
 describe('DefaultPage component', () => {

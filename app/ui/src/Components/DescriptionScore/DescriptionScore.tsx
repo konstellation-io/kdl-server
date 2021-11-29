@@ -1,10 +1,5 @@
 import React, { memo, useEffect, useState } from 'react';
-import {
-  ScoreLevels,
-  getScoreLevel,
-  levels,
-  scoreText,
-} from './DescriptionScoreUtils';
+import { ScoreLevels, getScoreLevel, levels, scoreText } from './DescriptionScoreUtils';
 
 import { SpinnerLinear } from 'kwc';
 import cx from 'classnames';
@@ -20,7 +15,7 @@ function DescriptionScore({ score, loading = false }: Props) {
   const [scoreIndex, setScoreIndex] = useState(0);
 
   useEffect(() => {
-    let selectedLevel = getScoreLevel(score);
+    const selectedLevel = getScoreLevel(score);
     const selectedScoreIndex = levels.indexOf(selectedLevel);
 
     setScoreLevel(selectedLevel);
@@ -45,16 +40,12 @@ function DescriptionScore({ score, loading = false }: Props) {
   }
 
   function getScoreDescription() {
-    return loading
-      ? 'Computing new description score...'
-      : scoreText.get(scoreLevel);
+    return loading ? 'Computing new description score...' : scoreText.get(scoreLevel);
   }
 
   return (
     <div className={styles.container}>
-      <span className={cx(styles.scoreLabel, styles[scoreLevel])}>
-        {getScoreValue()}
-      </span>
+      <span className={cx(styles.scoreLabel, styles[scoreLevel])}>{getScoreValue()}</span>
       <div className={styles.scoreLevels}>{renderScoreLevels()}</div>
       <span className={styles.hintLabel}>{getScoreDescription()}</span>
     </div>

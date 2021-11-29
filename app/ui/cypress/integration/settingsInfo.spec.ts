@@ -1,14 +1,16 @@
 import { project1 } from '../../src/Mocks/entities/project';
-import GetMeQuery from "../../src/Mocks/GetMeQuery";
-import GetUsersQuery from "../../src/Mocks/GetUsersQuery";
-import GetProjectsQuery from "../../src/Mocks/GetProjectsQuery";
+import GetMeQuery from '../../src/Mocks/GetMeQuery';
+import GetUsersQuery from '../../src/Mocks/GetUsersQuery';
+import GetProjectsQuery from '../../src/Mocks/GetProjectsQuery';
 
 describe('Settings Info Behavior', () => {
   beforeEach(() => {
     cy.kstInterceptor('GetMe', { data: GetMeQuery });
     cy.kstInterceptor('GetUsers', { data: GetUsersQuery });
     cy.kstInterceptor('GetProjects', { data: GetProjectsQuery });
-    cy.kstInterceptor('GetProjectMembers', { data: GetProjectsQuery.projects[0] });
+    cy.kstInterceptor('GetProjectMembers', {
+      data: GetProjectsQuery.projects[0],
+    });
     cy.openSettings();
   });
 
@@ -22,12 +24,7 @@ describe('Settings Info Behavior', () => {
     });
 
     // Act.
-    cy.getByTestId('tabInfo')
-      .find('input')
-      .eq(0)
-      .clear()
-      .type(newProjectName)
-      .blur();
+    cy.getByTestId('tabInfo').find('input').eq(0).clear().type(newProjectName).blur();
 
     // Assert.
     cy.getByTestId('overview').should('contain', newProjectName);
@@ -39,10 +36,7 @@ describe('Settings Info Behavior', () => {
     cy.getByTestId('editAbstract').click();
 
     // Assert.
-    cy.getByTestId('updateDescription')
-      .should('exist')
-      .contains('Save')
-      .should('have.css', 'pointer-events', 'none');
+    cy.getByTestId('updateDescription').should('exist').contains('Save').should('have.css', 'pointer-events', 'none');
   });
 
   it('should show the new description in the overview page when edit the description', () => {
@@ -58,10 +52,7 @@ describe('Settings Info Behavior', () => {
     cy.getByTestId('editAbstract').click();
 
     // Type new description
-    cy.getByTestId('updateDescription')
-      .find('textarea')
-      .clear()
-      .type(newDescription);
+    cy.getByTestId('updateDescription').find('textarea').clear().type(newDescription);
 
     // Act.
     cy.getByTestId('updateDescription').contains('Save').click();

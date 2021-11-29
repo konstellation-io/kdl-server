@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { useReactiveVar } from '@apollo/client';
 import useProjectNavigation from 'Hooks/useProjectNavigation';
 import Crumb, { BottomComponentProps } from '../Crumb/Crumb';
@@ -19,13 +19,8 @@ function ProjectCrumb() {
 
   const { label, Icon } = projectRoute;
   return (
-    <Crumb
-      crumbText={label}
-      LeftIconComponent={<Icon className="icon-small" />}
-    >
-      {(props: BottomComponentProps) => (
-        <NavigationSelector options={allRoutes} {...props} />
-      )}
+    <Crumb crumbText={label} LeftIconComponent={<Icon className="icon-small" />}>
+      {(props: BottomComponentProps) => <NavigationSelector options={allRoutes} {...props} />}
     </Crumb>
   );
 }

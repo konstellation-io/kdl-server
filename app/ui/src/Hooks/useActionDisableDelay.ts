@@ -4,9 +4,7 @@ let disableTimeout: number;
 
 type UseActionDisableDelayOut = [boolean, () => void];
 
-export default function useActionDisableDelay(
-  delay: number
-): UseActionDisableDelayOut {
+export default function useActionDisableDelay(delay: number): UseActionDisableDelayOut {
   const [disabled, setDisabled] = useState(false);
 
   useEffect(() => () => clearTimeout(disableTimeout), []);

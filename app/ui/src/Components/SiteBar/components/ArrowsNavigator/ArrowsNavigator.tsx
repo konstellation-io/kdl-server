@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import styles from './ArrowsNavigator.module.scss';
 import ArrowBack from '@material-ui/icons/ArrowBackIos';
 import ArrowForward from '@material-ui/icons/ArrowForwardIos';

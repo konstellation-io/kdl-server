@@ -16,7 +16,14 @@ import { useReactiveVar } from '@apollo/client';
 import { primaryPanel } from 'Graphql/client/cache';
 import { SETTINGS_PANEL_OPTIONS } from '../../panelSettings';
 
-export const NavButtonLink: FC<any> = ({ children, ...props }) => {
+type Props = {
+  children: JSX.Element;
+  to: string;
+  key: string;
+  disabled?: boolean;
+};
+
+export const NavButtonLink: FC<Props> = ({ children, ...props }) => {
   return (
     <NavLink
       {...props}
@@ -35,10 +42,7 @@ function ProjectNavigation() {
   const [opened, setOpened] = useState(navigationOpened);
 
   const panelData = useReactiveVar(primaryPanel);
-  const { openPanel: openSettings, closePanel: closeSettings } = usePanel(
-    PanelType.PRIMARY,
-    SETTINGS_PANEL_OPTIONS
-  );
+  const { openPanel: openSettings, closePanel: closeSettings } = usePanel(PanelType.PRIMARY, SETTINGS_PANEL_OPTIONS);
 
   function onToggleOpened() {
     setOpened(!opened);
@@ -53,10 +57,7 @@ function ProjectNavigation() {
   }
 
   return (
-    <div
-      className={cx(styles.container, { [styles.opened]: opened })}
-      data-testid="navigationBar"
-    >
+    <div className={cx(styles.container, { [styles.opened]: opened })} data-testid="navigationBar">
       <div className={styles.top}>
         <NavElements isOpened={opened} />
       </div>

@@ -8,7 +8,7 @@
 // ====================================================
 
 export interface GetQualityProjectDesc_qualityProjectDesc {
-  __typename: 'QualityProjectDesc';
+  __typename: "QualityProjectDesc";
   quality: number;
 }
 

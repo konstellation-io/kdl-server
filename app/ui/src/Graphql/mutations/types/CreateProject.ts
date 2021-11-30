@@ -3,21 +3,21 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CreateProjectInput, RepositoryType } from '../../types/globalTypes';
+import { CreateProjectInput, RepositoryType } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: CreateProject
 // ====================================================
 
 export interface CreateProject_createProject_repository {
-  __typename: 'Repository';
+  __typename: "Repository";
   type: RepositoryType;
   url: string;
   error: string | null;
 }
 
 export interface CreateProject_createProject {
-  __typename: 'Project';
+  __typename: "Project";
   id: string;
   name: string;
   description: string;

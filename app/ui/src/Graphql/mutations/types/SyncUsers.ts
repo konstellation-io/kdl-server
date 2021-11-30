@@ -8,7 +8,7 @@
 // ====================================================
 
 export interface SyncUsers_syncUsers {
-  __typename: 'SyncUsersResponse';
+  __typename: "SyncUsersResponse";
   msg: string;
 }
 

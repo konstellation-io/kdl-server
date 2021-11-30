@@ -3,6 +3,7 @@ type Query {
   projects: [Project!]!
   project(id: ID!): Project!
   users: [User!]!
+  qualityProjectDesc(description: String!): QualityProjectDesc!
 }
 
 type Mutation {
@@ -18,6 +19,10 @@ type Mutation {
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
   setActiveUserTools(input: SetActiveUserToolsInput!): User!
   syncUsers: SyncUsersResponse!
+}
+
+type QualityProjectDesc {
+  quality: Int!
 }
 
 type Topic {

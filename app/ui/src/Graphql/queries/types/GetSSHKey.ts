@@ -8,7 +8,7 @@
 // ====================================================
 
 export interface GetSSHKey_me_sshKey {
-  __typename: 'SSHKey';
+  __typename: "SSHKey";
   public: string;
   private: string;
   creationDate: string;
@@ -16,7 +16,7 @@ export interface GetSSHKey_me_sshKey {
 }
 
 export interface GetSSHKey_me {
-  __typename: 'User';
+  __typename: "User";
   id: string;
   sshKey: GetSSHKey_me_sshKey;
 }

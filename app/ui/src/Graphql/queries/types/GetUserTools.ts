@@ -8,7 +8,7 @@
 // ====================================================
 
 export interface GetUserTools_project_toolUrls {
-  __typename: 'ToolUrls';
+  __typename: "ToolUrls";
   knowledgeGalaxy: string;
   gitea: string;
   filebrowser: string;
@@ -19,13 +19,13 @@ export interface GetUserTools_project_toolUrls {
 }
 
 export interface GetUserTools_project {
-  __typename: 'Project';
+  __typename: "Project";
   id: string;
   toolUrls: GetUserTools_project_toolUrls;
 }
 
 export interface GetUserTools_me {
-  __typename: 'User';
+  __typename: "User";
   id: string;
   areToolsActive: boolean;
 }

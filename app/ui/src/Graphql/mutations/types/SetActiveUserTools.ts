@@ -3,14 +3,14 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { SetActiveUserToolsInput } from '../../types/globalTypes';
+import { SetActiveUserToolsInput } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: SetActiveUserTools
 // ====================================================
 
 export interface SetActiveUserTools_setActiveUserTools {
-  __typename: 'User';
+  __typename: "User";
   id: string;
   areToolsActive: boolean;
 }

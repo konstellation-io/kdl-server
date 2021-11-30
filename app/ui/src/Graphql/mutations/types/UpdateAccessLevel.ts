@@ -3,14 +3,14 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { UpdateAccessLevelInput, AccessLevel } from '../../types/globalTypes';
+import { UpdateAccessLevelInput, AccessLevel } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: UpdateAccessLevel
 // ====================================================
 
 export interface UpdateAccessLevel_updateAccessLevel {
-  __typename: 'User';
+  __typename: "User";
   id: string;
   email: string;
   accessLevel: AccessLevel;

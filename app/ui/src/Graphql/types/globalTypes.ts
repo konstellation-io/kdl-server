@@ -8,14 +8,14 @@
 //==============================================================
 
 export enum AccessLevel {
-  ADMIN = 'ADMIN',
-  MANAGER = 'MANAGER',
-  VIEWER = 'VIEWER',
+  ADMIN = "ADMIN",
+  MANAGER = "MANAGER",
+  VIEWER = "VIEWER",
 }
 
 export enum RepositoryType {
-  EXTERNAL = 'EXTERNAL',
-  INTERNAL = 'INTERNAL',
+  EXTERNAL = "EXTERNAL",
+  INTERNAL = "INTERNAL",
 }
 
 export interface AddMembersInput {

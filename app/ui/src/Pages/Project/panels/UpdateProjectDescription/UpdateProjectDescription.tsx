@@ -24,7 +24,15 @@ function UpdateProjectDescription({ project, close }: Props) {
     onUpdateCompleted: () => setCompleted(true),
   });
 
-  const { handleSubmit, clearErrors, setValue, unregister, register, watch, errors } = useForm<FormData>({
+  const {
+    handleSubmit,
+    clearErrors,
+    setValue,
+    unregister,
+    register,
+    watch,
+    formState: { errors },
+  } = useForm<FormData>({
     defaultValues: { description: project.description },
   });
 

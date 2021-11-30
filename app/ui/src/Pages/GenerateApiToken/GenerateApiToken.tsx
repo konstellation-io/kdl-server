@@ -33,7 +33,15 @@ function GenerateApiToken() {
     add: { data: dataAddToken, loading },
   } = useAPIToken();
 
-  const { handleSubmit, setValue, register, unregister, errors, watch, clearErrors } = useForm<FormData>();
+  const {
+    handleSubmit,
+    setValue,
+    register,
+    unregister,
+    formState: { errors },
+    watch,
+    clearErrors,
+  } = useForm<FormData>();
 
   useEffect(() => {
     register('tokenName', { required: 'Please pick a token name' });

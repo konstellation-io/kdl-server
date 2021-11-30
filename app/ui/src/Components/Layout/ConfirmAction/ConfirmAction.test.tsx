@@ -47,7 +47,7 @@ describe('ConfirmAction component - without input', () => {
     expect(component.contains('Some message')).toBeTruthy();
   });
 
-  it('handles events', () => {
+  it('handles events', async () => {
     // Arrange.
     // Act.
     component
@@ -58,7 +58,7 @@ describe('ConfirmAction component - without input', () => {
           return;
         },
       });
-    component.find(ModalContainer).props().onAccept();
+    await component.find(ModalContainer).props().onAccept();
 
     // Assert.
     expect(actionMock).toHaveBeenCalledTimes(1);

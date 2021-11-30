@@ -23,7 +23,14 @@ function UserFilters() {
 
   const { data } = useQuery<GetUsers>(GetUsersQuery);
 
-  const { handleSubmit, register, unregister, setValue, errors, watch } = useForm<FormData>();
+  const {
+    handleSubmit,
+    register,
+    unregister,
+    setValue,
+    formState: { errors },
+    watch,
+  } = useForm<FormData>();
   const users = [...new Set(data?.users.map((user) => user.email))];
 
   useEffect(() => {

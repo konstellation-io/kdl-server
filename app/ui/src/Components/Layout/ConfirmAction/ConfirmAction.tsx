@@ -35,7 +35,14 @@ const ConfirmAction: FC<Props> = ({
   error = false,
   skipConfirmation = false,
 }) => {
-  const { handleSubmit, setValue, register, unregister, errors, clearErrors } = useForm<FormData>({
+  const {
+    handleSubmit,
+    setValue,
+    register,
+    unregister,
+    formState: { errors },
+    clearErrors,
+  } = useForm<FormData>({
     defaultValues: {
       message: '',
     },

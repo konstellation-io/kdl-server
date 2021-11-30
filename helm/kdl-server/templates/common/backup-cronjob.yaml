@@ -22,7 +22,6 @@ spec:
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
-            fsGroup: 1000
           containers:
             - name: {{ .Values.backup.name }}
               image: {{ .Values.backup.image.repository }}:{{ .Values.backup.image.tag }}

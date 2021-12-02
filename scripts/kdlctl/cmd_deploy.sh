@@ -108,6 +108,7 @@ deploy_helm_chart() {
     --set backup.enabled="false" \
     --set backup.image.pullPolicy="Always" \
     --set backup.image.repository="$IMAGE_REGISTRY/konstellation/kdl-backup" \
+    --set backup.image.tag="latest" \
     --set domain=$DOMAIN \
     --set drone.storage.storageClassName=$STORAGE_CLASS_NAME \
     --set droneAuthorizer.image.pullPolicy="Always" \
@@ -118,6 +119,7 @@ deploy_helm_chart() {
     --set giteaOauth2Setup.image.pullPolicy="Always" \
     --set giteaOauth2Setup.image.repository="$IMAGE_REGISTRY/konstellation/gitea-oauth2-setup" \
     --set kdlServer.image.pullPolicy="Always" \
+    --set kdlServer.image.tag="latest" \
     --set kdlServer.image.repository="$IMAGE_REGISTRY/konstellation/kdl-server" \
     --set knowledgeGalaxy.image.pullPolicy="Always" \
     --set knowledgeGalaxy.image.repository=$KNOWLEDGE_GALAXY_IMAGE_REPOSITORY \

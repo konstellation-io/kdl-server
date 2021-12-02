@@ -8,7 +8,7 @@ backup:
   name: backup-gitea
   image:
     repository: konstellation/kdl-backup
-    tag: v0.16.1
+    tag: v0.16.2
     pullPolicy: IfNotPresent
   s3:
     awsAccessKeyID: aws-access-key-id

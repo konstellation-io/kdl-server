@@ -1,0 +1,24 @@
+name: Helm Component
+
+on:
+  pull_request:
+    branches:
+      - main
+      - "release/v*"
+    paths:
+      - "helm/kdl-server/**/*"
+      - "!helm/kdl-server/Chart.yaml"
+      - "!helm/kdl-server/values.yaml"
+  push:
+    branches:
+      - main
+      - "release/v*"
+    paths:
+      - "helm/kdl-server/**/*"
+      - "!helm/kdl-server/Chart.yaml"
+      - "!helm/kdl-server/values.yaml"
+
+
+jobs:
+  helm-lint:
+    uses: konstellation-io/github-workflows/.github/workflows/helm-lint.yaml@v1.4.3 

@@ -6,7 +6,7 @@ on:
 
 jobs:
   new-release:
-    uses: konstellation-io/github-workflows/.github/workflows/new-release.yaml@v1.4.4
+    uses: konstellation-io/github-workflows/.github/workflows/new-release.yaml@v1.4.6
     with:
       chart_file: helm/kdl-server/Chart.yaml
       chart_path: helm

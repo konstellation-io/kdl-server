@@ -90,7 +90,6 @@ jobs:
       component_path: app
       component_image: kdl-server
       component_app: true
-      component_app_name: kdl-app
       values_file: helm/kdl-server/values.yaml
       chart_file: helm/kdl-server/Chart.yaml
     secrets:

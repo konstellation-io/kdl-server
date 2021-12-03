@@ -50,5 +50,5 @@ echo "Compressing backup..."
 tar zcvf "${HOME}/backup.tar.gz" /backup
 
 # Send to AWS S3
-echo "Sending backup to AWS..."    
+echo "Sending backup to AWS S3..."    
 aws s3 cp "${HOME}/backup.tar.gz" "s3://${BUCKET_NAME}/backup_${DATE}.tar.gz"

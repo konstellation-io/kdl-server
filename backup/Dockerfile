@@ -4,7 +4,7 @@ FROM amazon/aws-cli:2.4.0
 LABEL maintainer="Intelygenz - Konstellation Team"
 
 # Hadolint DL4006
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+SHELL ["/bin/bash", "-xeuo", "pipefail", "-c"]
 
 # Input data
 ARG NON_ROOT_USER=nroot

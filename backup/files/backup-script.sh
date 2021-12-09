@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -xeou pipefail
+
 DATE=$(date +%Y%m%d)
 mkdir -p /backup/{gitea,mongodb,mlflow,kubernetes}
 
@@ -7,7 +9,7 @@ mkdir -p /backup/{gitea,mongodb,mlflow,kubernetes}
 function gitea_backup (){
     echo "${DB_HOST}:${POSTGRES_DB}:${DB_USER}:${POSTGRES_PASSWORD}" > ~/.pgpass
     chmod 600 ~/.pgpass
-    tar zcvf /backup/gitea/data.tar.gz --directory '/data' --exclude './gitea/indexers' .
+    tar zcvf /backup/gitea/data.tar.gz --directory '/data' --exclude './gitea/indexers' --exclude './ssh' .
     pg_dump -h "$(echo ${DB_HOST} | cut -f 1 -d ":" )" -p "$(echo ${DB_HOST} | cut -f 2 -d ":" )" -U "${DB_USER}" -v -F c -f /backup/gitea/postgres_gitea.dump "${POSTGRES_DB}"
 }
 # MongoDB backup
@@ -28,7 +30,6 @@ function kubernetes_backup (){
         xargs kubectl --token "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" get secrets -n kdl -o yaml > /backup/kubernetes/ssh-secrets.yaml
     kubectl --token "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" get kdlprojects -n kdl -o yaml > /backup/kubernetes/crds.yaml 
 }
-
 
 echo "Performing GITEA backup..."
 gitea_backup

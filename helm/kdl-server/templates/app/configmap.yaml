@@ -73,6 +73,10 @@ data:
   USER_TOOLS_OAUTH2_PROXY_IMG_TAG: "{{ .Values.userToolsOperator.oauth2Proxy.image.tag }}"
   USER_TOOLS_OAUTH2_PROXY_IMG_PULLPOLICY: "{{ .Values.userToolsOperator.oauth2Proxy.image.pullPolicy }}"
 
+  USER_TOOLS_VSCODE_RUNTIME_IMG_REPO: "{{ .Values.userToolsOperator.vscodeRuntime.image.repository }}"
+  USER_TOOLS_VSCODE_RUNTIME_IMG_TAG: "{{ .Values.userToolsOperator.vscodeRuntime.image.tag }}"
+  USER_TOOLS_VSCODE_RUNTIME_IMG_PULLPOLICY: "{{ .Values.userToolsOperator.vscodeRuntime.image.pullPolicy }}"
+
   USER_TOOLS_STORAGE_SIZE: {{ .Values.userToolsOperator.storage.size }}
   USER_TOOLS_STORAGE_CLASSNAME: {{ .Values.userToolsOperator.storage.storageClassName }}
 

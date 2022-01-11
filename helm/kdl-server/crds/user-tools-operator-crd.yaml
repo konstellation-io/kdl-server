@@ -135,7 +135,7 @@ spec:
                       pullPolicy:
                         description: image pull policy
                         type: string
-              runtimeVSCode:
+              vscodeRuntime:
                 type: object
                 properties:
                   image:

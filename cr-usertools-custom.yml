@@ -3,7 +3,7 @@ kind: UserTools
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"sci-toolkit.konstellation.io/v1alpha1","kind":"UserTools","metadata":{"annotations":{},"creationTimestamp":"2021-11-26T08:23:52Z","finalizers":["helm.sdk.operatorframework.io/uninstall-release"],"generation":1,"labels":{"app":"usertools-kdladmin"},"name":"usertools-kdladmin","namespace":"kdl","resourceVersion":"36819","selfLink":"/apis/sci-toolkit.konstellation.io/v1alpha1/namespaces/kdl/usertools/usertools-kdladmin","uid":"f455fd55-3740-401b-b242-62d8b5adac9c"},"spec":{"domain":"kdl.10.0.1.1.nip.io","giteaOauth2Setup":{"image":{"pullPolicy":"Always","repository":"localhost:32000/konstellation/gitea-oauth2-setup","tag":"latest"}},"ingress":{"type":"nginx"},"jupyter":{"image":{"pullPolicy":"Always","repository":"localhost:32000/konstellation/jupyter-gpu","tag":"latest"}},"oauth2Proxy":{"image":{"pullPolicy":"IfNotPresent","repository":"quay.io/oauth2-proxy/oauth2-proxy","tag":"v7.0.1-amd64"}},"repoCloner":{"image":{"pullPolicy":"Always","repository":"localhost:32000/konstellation/repo-cloner","tag":"latest"}},"runtimeVSCode":{"image":{"pullPolicy":"Always","repository":"localhost:32000/konstellation/runtime","tag":"latest"}},"sharedVolume":{"name":"received-data"},"storage":{"className":"microk8s-hostpath","size":"10Gi"},"tls":true,"username":"kdladmin","usernameSlug":"kdladmin","vscode":{"image":{"pullPolicy":"Always","repository":"localhost:32000/konstellation/vscode","tag":"latest"}}}}
+      {"apiVersion":"sci-toolkit.konstellation.io/v1alpha1","kind":"UserTools","metadata":{"annotations":{},"creationTimestamp":"2021-11-26T08:23:52Z","finalizers":["helm.sdk.operatorframework.io/uninstall-release"],"generation":1,"labels":{"app":"usertools-kdladmin"},"name":"usertools-kdladmin","namespace":"kdl","resourceVersion":"36819","selfLink":"/apis/sci-toolkit.konstellation.io/v1alpha1/namespaces/kdl/usertools/usertools-kdladmin","uid":"f455fd55-3740-401b-b242-62d8b5adac9c"},"spec":{"domain":"kdl.10.0.1.1.nip.io","giteaOauth2Setup":{"image":{"pullPolicy":"Always","repository":"localhost:32000/konstellation/gitea-oauth2-setup","tag":"latest"}},"ingress":{"type":"nginx"},"jupyter":{"image":{"pullPolicy":"Always","repository":"localhost:32000/konstellation/jupyter-gpu","tag":"latest"}},"oauth2Proxy":{"image":{"pullPolicy":"IfNotPresent","repository":"quay.io/oauth2-proxy/oauth2-proxy","tag":"v7.0.1-amd64"}},"repoCloner":{"image":{"pullPolicy":"Always","repository":"localhost:32000/konstellation/repo-cloner","tag":"latest"}},"vscodeRuntime":{"image":{"pullPolicy":"Always","repository":"localhost:32000/konstellation/runtime","tag":"latest"}},"sharedVolume":{"name":"received-data"},"storage":{"className":"microk8s-hostpath","size":"10Gi"},"tls":true,"username":"kdladmin","usernameSlug":"kdladmin","vscode":{"image":{"pullPolicy":"Always","repository":"localhost:32000/konstellation/vscode","tag":"latest"}}}}
   creationTimestamp: "2022-01-11T09:50:25Z"
   finalizers:
   - helm.sdk.operatorframework.io/uninstall-release
@@ -39,7 +39,7 @@ spec:
       pullPolicy: Always
       repository: localhost:32000/konstellation/repo-cloner
       tag: latest
-  runtimeVSCode:
+  vscodeRuntime:
     image:
       pullPolicy: Always
       repository: localhost:32000/konstellation/runtime

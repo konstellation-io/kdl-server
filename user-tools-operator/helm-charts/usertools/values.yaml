@@ -45,3 +45,9 @@ vscode:
     repository: konstellation/vscode
     tag: "latest"
     pullPolicy: IfNotPresent
+
+vscodeRuntime:
+  image:
+    repository: localhost:32000/konstellation/jupyter-flavors-kai-python-tf
+    tag: "latest"
+    pullPolicy: IfNotPresent

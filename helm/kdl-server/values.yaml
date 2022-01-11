@@ -121,6 +121,7 @@ enterprise-gateway:
       - r_kubernetes
       - python_kubernetes
       - jupyter-flavors-kai-python-tf
+      - kernel-patata
       # - scala_kubernetes
       # - spark_r_kubernetes
       # - spark_python_kubernetes
@@ -314,11 +315,11 @@ projectOperator:
       tag: v2
       pullPolicy: IfNotPresent
 
-runtimeVSCode:
-  image:
-      repository: localhost:32000/konstellation/runtime
-      tag: latest
-      pullPolicy: IfNotPresent
+# vscodeRuntime:
+#   image:
+#       repository: localhost:32000/konstellation/runtime
+#       tag: latest
+#       pullPolicy: IfNotPresent
 
 sharedVolume:
   name: received-data
@@ -375,6 +376,11 @@ userToolsOperator:
   vscode:
     image:
       repository: konstellation/vscode
+      tag: "latest"
+      pullPolicy: IfNotPresent
+  vscodeRuntime:
+    image:
+      repository: konstellation/jupyter-flavors-kai-python-tf
       tag: "latest"
       pullPolicy: IfNotPresent
   #giteaOauth2Setup:

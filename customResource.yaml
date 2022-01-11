@@ -49,8 +49,8 @@ spec:
       pullPolicy: Always
       repository: localhost:32000/konstellation/vscode
       tag: latest
-  runtimeVSCode:
+  vscodeRuntime:
     image:
       pullPolicy: Always
-      repository: localhost:32000/konstellation/runtime
+      repository: localhost:32000/konstellation/jupyter-flavors-kai-python-tf
       tag: latest

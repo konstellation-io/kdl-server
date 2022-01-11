@@ -87,7 +87,6 @@ spec:
         - name: {{ .Chart.Name }}-vscode
           image: {{ .Values.vscode.image.repository }}:{{ .Values.vscode.image.tag }}
           imagePullPolicy: {{ .Values.vscode.image.pullPolicy }}
-          #command: ["/bin/bash"]
           envFrom:
           - secretRef:
               name: tools-secret
@@ -200,16 +199,27 @@ spec:
               containerPort: 4181
               protocol: TCP
         - name: {{ .Chart.Name }}-runtime-vscode
-          image: {{ .Values.runtimeVSCode.image.repository }}:{{ .Values.runtimeVSCode.image.tag }}
-          imagePullPolicy: {{ .Values.runtimeVSCode.image.pullPolicy }}
-          ports:
-            - name: ssh
-              containerPort: 2222
-              protocol: TCP
+          image: {{ .Values.vscodeRuntime.image.repository }}:{{ .Values.vscodeRuntime.image.tag }}
+          imagePullPolicy: {{ .Values.vscodeRuntime.image.pullPolicy }}
+          command:
+            - /bin/bash
+            - -c
+            - "trap : TERM INT; sleep infinity & wait"
           volumeMounts:
             - name: {{ .Values.usernameSlug }}-ssh-pub
               mountPath: /home/nroot/.ssh/authorized_keys
               subPath: authorized_keys
+          #   - name: user-pvc
+          #     mountPath: /home/coder
+          # {{- if .Values.sharedVolume.name }}
+          #   - name: {{ .Values.sharedVolume.name }}
+          #     mountPath: /home/coder/shared-storage
+          #     readOnly: true
+          # {{- end }}
+          #   - name: {{ .Values.usernameSlug }}-ssh-keys-vol
+          #     mountPath: /home/coder/.ssh/id_rsa
+          #     subPath: id_rsa
+          #     readOnly: true
       volumes:
         - name: oauth2-config
           configMap:

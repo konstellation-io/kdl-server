@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: runtime-nodeport
+  namespace: kdl
+spec:
+  ports:
+  - name: ssh
+    port: 2222
+    protocol: TCP
+    targetPort: 2222
+    nodePort: 30022
+  type: NodePort
+  selector:
+    app: user-tools-{{ .Values.usernameSlug }}

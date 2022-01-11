@@ -87,6 +87,7 @@ spec:
         - name: {{ .Chart.Name }}-vscode
           image: {{ .Values.vscode.image.repository }}:{{ .Values.vscode.image.tag }}
           imagePullPolicy: {{ .Values.vscode.image.pullPolicy }}
+          #command: ["/bin/bash"]
           envFrom:
           - secretRef:
               name: tools-secret
@@ -111,9 +112,12 @@ spec:
           env:
             - name: JUPYTER_ENABLE_LAB
               value: "yes"
-          args:
-            - "start-notebook.sh"
-            - "--LabApp.token=''"
+            - name: SHELL
+              value: /bin/bash
+            - name: KERNEL_USERNAME
+              value: "{{ .Values.usernameSlug }}"
+            # - name: KERNEL_VOLUME
+            #   value: "[{name: 'userclaim', persistentVolumeClaim: {claimName: 'user-pvc-usertools-{{ .Values.usernameSlug }}-user-tools-0'}}]"
           volumeMounts:
             - name: user-pvc
               mountPath: /home/jovyan
@@ -195,6 +199,17 @@ spec:
             - name: http
               containerPort: 4181
               protocol: TCP
+        - name: {{ .Chart.Name }}-runtime-vscode
+          image: {{ .Values.runtimeVSCode.image.repository }}:{{ .Values.runtimeVSCode.image.tag }}
+          imagePullPolicy: {{ .Values.runtimeVSCode.image.pullPolicy }}
+          ports:
+            - name: ssh
+              containerPort: 2222
+              protocol: TCP
+          volumeMounts:
+            - name: {{ .Values.usernameSlug }}-ssh-pub
+              mountPath: /home/nroot/.ssh/authorized_keys
+              subPath: authorized_keys
       volumes:
         - name: oauth2-config
           configMap:
@@ -211,6 +226,12 @@ spec:
             items:
             - key: KDL_USER_PRIVATE_SSH_KEY
               path: id_rsa
+        - name: {{ .Values.usernameSlug }}-ssh-pub
+          secret:
+            secretName: {{ .Values.usernameSlug }}-ssh-keys
+            items:
+            - key: KDL_USER_PUBLIC_SSH_KEY
+              path: authorized_keys
   volumeClaimTemplates:
     - metadata:
         name: user-pvc

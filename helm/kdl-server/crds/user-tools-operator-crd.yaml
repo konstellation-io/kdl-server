@@ -135,3 +135,18 @@ spec:
                       pullPolicy:
                         description: image pull policy
                         type: string
+              runtimeVSCode:
+                type: object
+                properties:
+                  image:
+                    type: object
+                    properties:
+                      repository:
+                        description: image repository
+                        type: string
+                      tag:
+                        description: image tag
+                        type: string
+                      pullPolicy:
+                        description: image pull policy
+                        type: string

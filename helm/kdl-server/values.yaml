@@ -91,6 +91,98 @@ ingress:
   type: nginx
   nginxConnectionTimeout: "3600"
 
+enterprise-gateway:
+  image: elyra/enterprise-gateway:2.5.0
+  imagePullPolicy: IfNotPresent
+  # The primary port on which Enterprise Gateway is servicing requests.
+  port: 8888
+  replicas: 1
+  logLevel: DEBUG
+  mirrorWorkingDirs: true
+  # Master public IP on which to expose EG.
+  k8sMasterPublicIP:
+  # create and require a secret token, supplied by client in an "Authorization: token" header
+  authTokenEnabled: true
+  affinity: {}
+
+  kernel:
+    # Kernel cluster role created by this chart.
+    clusterRole: kernel-controller
+    # Will start kernels in the same namespace as EG if True.
+    shareGatewayNamespace: true
+    # ignored if shareGatewayNamespace
+    # kernelNamespace: jupyter-notebooks
+    # Timeout for kernel launching in seconds.
+    launchTimeout: 60
+    # Timeout for an idle kernel before its culled in seconds. Default is 1 hour.
+    cullIdleTimeout: 3600
+    # List of kernel names that are available for use.
+    whitelist:
+      - r_kubernetes
+      - python_kubernetes
+      - jupyter-flavors-kai-python-tf
+      # - scala_kubernetes
+      # - spark_r_kubernetes
+      # - spark_python_kubernetes
+      # - spark_scala_kubernetes
+    # Default kernel name should be something from the whitelist
+    defaultKernelName: python_kubernetes
+    # kernel service account name
+    serviceAccount: kernel-sa
+
+  kernelspecs:
+    # Optional custom data image containing kernelspecs to use.
+    # image:
+    image: localhost:32000/konstellation/jupyter-enterprise-kernel-gateway:latest
+    # Kernelspecs image pull policy.
+    imagePullPolicy: Always
+
+  nfs:
+    enabled: false
+    # IP address of NFS server. Required if enabled.
+    internalServerIPAddress:
+
+  ingress:
+    enabled: false
+
+    # Ingress resource host
+    hostName: ""
+
+    # Ingress resource annotations to be included depending in ingress controller.
+    traefik:
+      enabled: false
+      path: /gateway
+      annotations:
+        kubernetes.io/ingress.class: "traefik"
+        traefik.frontend.rule.type: PathPrefixStrip
+
+    nginx:
+      enabled: false
+      tls:
+        enabled: false
+        hostname: gateway.wave.spot.io
+      path: /gateway/?(.*)
+      annotations:
+        kubernetes.io/ingress.class: "nginx"
+        nginx.ingress.kubernetes.io/rewrite-target: /$1
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+        nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+        cert-manager.io/cluster-issuer:
+
+  # Kernel Image Puller (daemonset)
+  kip:
+    enabled: true
+    # Kernel Image Puller image name and tag to use.
+    image: elyra/kernel-image-puller:2.5.0
+    # Kernel Image Puller image pull policy.
+    imagePullPolicy: IfNotPresent
+    # Determines whether the Kernel Image Puller will pull kernel images it has
+    # previously pulled
+    pullPolicy: IfNotPresent
+    # The interval (in seconds) at which the Kernel Image Puller fetches
+    # kernelspecs to pull kernel images.
+    interval: 300
+
 knowledgeGalaxy:
   enabled: false
   image:
@@ -220,6 +312,12 @@ projectOperator:
     image:
       repository: filebrowser/filebrowser
       tag: v2
+      pullPolicy: IfNotPresent
+
+runtimeVSCode:
+  image:
+      repository: localhost:32000/konstellation/runtime
+      tag: latest
       pullPolicy: IfNotPresent
 
 sharedVolume:

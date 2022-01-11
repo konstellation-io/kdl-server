@@ -20,11 +20,14 @@ build_docker_images() {
   build_project_operator
   build_user_tools_operator
   build_jupyter_gpu
+  build_jupyter_enterprise_kernel_gateway
+  build_jupyter_flavors_kai_python_tf
   build_vscode
   build_repo_cloner
   build_mlflow
   build_kg
   build_backup
+  build_runtime
 }
 
 build_server() {
@@ -48,7 +51,15 @@ build_user_tools_operator() {
 }
 
 build_jupyter_gpu() {
-  build_image jupyter-gpu jupyter-gpu
+  build_image jupyter-gpu jupyter-gpu-slim
+}
+
+build_jupyter_enterprise_kernel_gateway() {
+  build_image jupyter-enterprise-kernel-gateway jupyter-enterprise-kernel-gateway
+}
+
+build_jupyter_flavors_kai_python_tf() {
+  build_image jupyter-flavors-kai-python-tf jupyter-flavors-kai-conda-python-tf
 }
 
 build_vscode() {
@@ -79,6 +90,10 @@ build_kg() {
 
 build_backup() {
   build_image kdl-backup backup
+}
+
+build_runtime() {
+  build_image runtime runtime
 }
 
 build_image() {

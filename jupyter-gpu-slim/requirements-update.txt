@@ -1,0 +1,3 @@
+jupyterlab==3.2.5
+jupyterlab-dash==0.1.0a3
+jupyterlab-git==0.34.0

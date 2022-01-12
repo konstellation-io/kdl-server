@@ -23,7 +23,9 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     tzdata \
     unzip \
     ## CUDA SPECIFIC
-    gcc-8
+    gcc-8 && \
+    groupadd -g 1000 jovyan && \
+    usermod -g 1000 jovyan
 
 # Install any packages required for the kernel-wrapper.  If the image
 # does not contain the target kernel (i.e., IPython, IRkernel, etc.,
@@ -34,9 +36,9 @@ RUN pip install pycrypto future
 # files and deploy to /usr/local/bin. Change permissions to NB_UID:NB_GID.
 RUN curl -L https://github.com/jupyter/enterprise_gateway/releases/download/v${VERSION}/jupyter_enterprise_gateway_kernel_image_files-${VERSION}.tar.gz | \
     tar -xz -C /usr/local/bin && \
-    chown jovyan:users /usr/local/bin/bootstrap-kernel.sh && \
+    chown jovyan:jovyan /usr/local/bin/bootstrap-kernel.sh && \
     chmod 0755 /usr/local/bin/bootstrap-kernel.sh && \
-    chown -R jovyan:users /usr/local/bin/kernel-launchers
+    chown -R jovyan:jovyan /usr/local/bin/kernel-launchers
 
 # Clean up
 RUN rm --recursive --force -- /tmp/* && \

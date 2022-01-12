@@ -32,7 +32,9 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     openssh-server && \
     sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config && \
     sed -i 's/#Port 22/Port 2222/g' /etc/ssh/sshd_config && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd -g 1000 jovyan && \
+    usermod -g 1000 jovyan
 
 # Install any packages required for the kernel-wrapper.  If the image
 # does not contain the target kernel (i.e., IPython, IRkernel, etc.,

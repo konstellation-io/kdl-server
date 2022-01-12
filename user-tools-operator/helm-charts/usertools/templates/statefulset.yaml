@@ -115,8 +115,6 @@ spec:
               value: /bin/bash
             - name: KERNEL_USERNAME
               value: "{{ .Values.usernameSlug }}"
-            # - name: KERNEL_VOLUME
-            #   value: "[{name: 'userclaim', persistentVolumeClaim: {claimName: 'user-pvc-usertools-{{ .Values.usernameSlug }}-user-tools-0'}}]"
           volumeMounts:
             - name: user-pvc
               mountPath: /home/jovyan
@@ -206,20 +204,17 @@ spec:
             - -c
             - "trap : TERM INT; sleep infinity & wait"
           volumeMounts:
-            - name: {{ .Values.usernameSlug }}-ssh-pub
-              mountPath: /home/nroot/.ssh/authorized_keys
-              subPath: authorized_keys
-          #   - name: user-pvc
-          #     mountPath: /home/coder
-          # {{- if .Values.sharedVolume.name }}
-          #   - name: {{ .Values.sharedVolume.name }}
-          #     mountPath: /home/coder/shared-storage
-          #     readOnly: true
-          # {{- end }}
-          #   - name: {{ .Values.usernameSlug }}-ssh-keys-vol
-          #     mountPath: /home/coder/.ssh/id_rsa
-          #     subPath: id_rsa
-          #     readOnly: true
+            - name: user-pvc
+              mountPath: /home/jovyan
+          {{- if .Values.sharedVolume.name }}
+            - name: {{ .Values.sharedVolume.name }}
+              mountPath: /home/jovyan/shared-storage
+              readOnly: true
+          {{- end }}
+            - name: {{ .Values.usernameSlug }}-ssh-keys-vol
+              mountPath: /home/jovyan/.ssh/id_rsa
+              subPath: id_rsa
+              readOnly: true
       volumes:
         - name: oauth2-config
           configMap:

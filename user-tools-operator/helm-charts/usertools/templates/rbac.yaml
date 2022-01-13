@@ -20,7 +20,7 @@ rules:
   resources:
   - pods/exec
   resourceNames: 
-  - usertools-{{ .Values.usernameSlug }}-user-tools-0
+  - vscode-runtime-{{ .Values.usernameSlug }}
   verbs:
   - create
 ---

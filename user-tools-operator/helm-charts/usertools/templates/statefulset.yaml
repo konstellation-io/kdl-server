@@ -205,25 +205,6 @@ spec:
             - name: http
               containerPort: 4181
               protocol: TCP
-        - name: {{ .Chart.Name }}-runtime-vscode
-          image: {{ .Values.vscodeRuntime.image.repository }}:{{ .Values.vscodeRuntime.image.tag }}
-          imagePullPolicy: {{ .Values.vscodeRuntime.image.pullPolicy }}
-          command:
-            - /bin/bash
-            - -c
-            - "trap : TERM INT; sleep infinity & wait"
-          volumeMounts:
-            - name: user-pvc
-              mountPath: /home/jovyan
-          {{- if .Values.sharedVolume.name }}
-            - name: {{ .Values.sharedVolume.name }}
-              mountPath: /home/jovyan/shared-storage
-              readOnly: true
-          {{- end }}
-            - name: {{ .Values.usernameSlug }}-ssh-keys-vol
-              mountPath: /home/jovyan/.ssh/id_rsa
-              subPath: id_rsa
-              readOnly: true
       volumes:
         - name: oauth2-config
           configMap:

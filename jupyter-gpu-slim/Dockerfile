@@ -97,4 +97,4 @@ USER ${NB_USER}
 WORKDIR /home/${NB_USER}
 
 ENTRYPOINT ["jupyter-lab"]
-CMD ["--gateway-url=http://enterprise-gateway.kdl.svc.cluster.local:8888", "--GatewayClient.auth_token=1zULFYrnxsx98INNXkXqjXdHlNiQLezU", "--LabApp.token=''"]
+CMD ["--LabApp.token=''"]

@@ -109,6 +109,13 @@ spec:
           - secretRef:
               name: tools-secret
           env:
+            - name: JUPYTER_GATEWAY_URL
+              value: "http://enterprise-gateway.kdl.svc.cluster.local:8888"
+            - name: JUPYTER_GATEWAY_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: enterprise-gateway-auth
+                  key: token
             - name: JUPYTER_ENABLE_LAB
               value: "yes"
             - name: SHELL

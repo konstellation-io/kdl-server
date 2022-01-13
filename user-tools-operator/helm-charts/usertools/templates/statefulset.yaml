@@ -109,8 +109,10 @@ spec:
           - secretRef:
               name: tools-secret
           env:
+            ## MOVE TO VALUES
             - name: JUPYTER_GATEWAY_URL
               value: "http://enterprise-gateway.kdl.svc.cluster.local:8888"
+            ## MOVE TO VALUES
             - name: JUPYTER_GATEWAY_AUTH_TOKEN
               valueFrom:
                 secretKeyRef:

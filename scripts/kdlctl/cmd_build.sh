@@ -63,7 +63,7 @@ build_jupyter_flavors_kai_python_tf() {
 }
 
 build_vscode() {
-  build_image vscode vscode
+  build_image vscode vscode-slim
 }
 
 build_repo_cloner() {

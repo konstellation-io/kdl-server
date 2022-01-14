@@ -16,16 +16,14 @@ RUN apt-get update && \
 # python
 # ------------------------------------------------------------------
     DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
-        # software-properties-common \
         apt-utils \
-        # ca-certificates \
-        # gpg \
-        # dirmngr \
-        jq \
+        build-essential \
+        ca-certificates \
+        gpg \
         python3.9 \
         python3.9-dev \
         python3.9-distutils \
-        python3-distutils-extra \
+        # python3-distutils-extra \
         wget \
         && \
     wget -O ~/get-pip.py \
@@ -42,9 +40,9 @@ RUN apt-get update && \
 
 # Install python libraries
 COPY requirements.txt /tmp/
-# RUN pip install --no-cache-dir setuptools wheel && \
-#     pip install --no-cache-dir cython thriftpy && \
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
+ RUN pip install --no-cache-dir setuptools wheel && \
+        pip install --no-cache-dir -r /tmp/requirements.txt
+
 # RUN python -m pip --no-cache-dir install --upgrade \
 #         setuptools \
 #         wheel \
@@ -66,14 +64,13 @@ RUN code-server \
       --install-extension christian-kohler.path-intellisense \
       --install-extension eamodio.gitlens \
       --install-extension gruntfuggly.todo-tree \
-    #   --install-extension jithurjacob.nbpreviewer \
       --install-extension mechatroner.rainbow-csv \
+      --install-extension ms-pyright.pyright \
       --install-extension mhutchie.git-graph \
       --install-extension ms-kubernetes-tools.vscode-kubernetes-tools \
       --install-extension ms-python.python \
       --install-extension njpwerner.autodocstring \
       --install-extension redhat.vscode-yaml \
-    #   --install-extension tushortz.python-extended-snippets \
       --install-extension vscode-icons-team.vscode-icons \
       --install-extension wayou.vscode-todo-highlight \
       --install-extension yzhang.markdown-all-in-one \

@@ -16,7 +16,7 @@
     "editor.tabSize": 4,
     "editor.insertSpaces": true
   },
-  "python.autoComplete.extraPaths": [
+  "python.analysis.extraPaths": [
     "/home/coder/.local/lib/python3.9/site-packages/"
   ],
   "python.languageServer": "Pylance",

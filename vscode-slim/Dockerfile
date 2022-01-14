@@ -16,24 +16,21 @@ RUN apt-get update && \
 # python
 # ------------------------------------------------------------------
     DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
-        software-properties-common \
+        # software-properties-common \
         apt-utils \
-        ca-certificates \
-        gpg \
-        dirmngr \
-        && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
+        # ca-certificates \
+        # gpg \
+        # dirmngr \
+        jq \
         python3.9 \
         python3.9-dev \
         python3.9-distutils \
         python3-distutils-extra \
+        wget \
         && \
     wget -O ~/get-pip.py \
         https://bootstrap.pypa.io/get-pip.py && \
     python3.9 ~/get-pip.py && \
-    ln -s /usr/bin/python3.9 /usr/local/bin/python3 && \
     ln -s /usr/bin/python3.9 /usr/local/bin/python && \
 
 # ==================================================================
@@ -41,13 +38,22 @@ RUN apt-get update && \
 # ------------------------------------------------------------------
     apt-get clean && apt-get autoremove -y && \
         rm -rf /var/lib/{apt,dpkg,cache,log}/ && \
-        rm -rf -- * 
+        rm -rf -- *
 
 # Install python libraries
-COPY deps/requirements.txt /tmp/
+COPY requirements.txt /tmp/
 # RUN pip install --no-cache-dir setuptools wheel && \
 #     pip install --no-cache-dir cython thriftpy && \
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
+# RUN python -m pip --no-cache-dir install --upgrade \
+#         setuptools \
+#         wheel \
+#         && \
+#     python -m pip --no-cache-dir install --upgrade \
+#         pycrypto \
+#         future
+
+RUN echo 'export PATH="/home/coder/.local/bin:${PATH:+:$PATH}"\n' >> /etc/bash.bashrc
 
 USER coder
 
@@ -60,15 +66,14 @@ RUN code-server \
       --install-extension christian-kohler.path-intellisense \
       --install-extension eamodio.gitlens \
       --install-extension gruntfuggly.todo-tree \
-      --install-extension jithurjacob.nbpreviewer \
+    #   --install-extension jithurjacob.nbpreviewer \
       --install-extension mechatroner.rainbow-csv \
       --install-extension mhutchie.git-graph \
       --install-extension ms-kubernetes-tools.vscode-kubernetes-tools \
       --install-extension ms-python.python \
-      --install-extension golang.go \
       --install-extension njpwerner.autodocstring \
       --install-extension redhat.vscode-yaml \
-      --install-extension tushortz.python-extended-snippets \
+    #   --install-extension tushortz.python-extended-snippets \
       --install-extension vscode-icons-team.vscode-icons \
       --install-extension wayou.vscode-todo-highlight \
       --install-extension yzhang.markdown-all-in-one \

@@ -16,6 +16,10 @@
     "editor.tabSize": 4,
     "editor.insertSpaces": true
   },
+  "python.autoComplete.extraPaths": [
+    "/home/coder/.local/lib/python3.9/site-packages/"
+  ],
+  "python.languageServer": "Pylance",
   "python.formatting.provider": "black",
   "python.linting.pylintEnabled": true,
   "python.linting.flake8Enabled": true,
@@ -32,8 +36,6 @@
   "python.sortImports.args": [
     "--src=${workspaceFolder}/lab"
   ],
-  "go.autocompleteUnimportedPackages": true,
-  "go.formatTool": "gofmt",
   "workbench.editorAssociations": [
     {
       "viewType": "jupyter.notebook.ipynb",

@@ -2,10 +2,10 @@ port: "3000"
 staticFilesPath: "../public"
 logLevel: "debug"
 mongodb:
-  uri: "mongodb://admin:123456@mongodb:27017/admin"
+  uri: "mongodb://admin:123456@localhost:27017/admin"
   dbName: "kdl"
 gitea:
-  internal_url: "http://gitea:3000"
+  internal_url: "http://localhost:3001"
 scheduledJob:
   usersSync:
     interval: 10m

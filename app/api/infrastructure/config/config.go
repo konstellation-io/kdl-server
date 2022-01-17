@@ -17,7 +17,7 @@ type Config struct {
 	BaseDomainName  string `envconfig:"TOOLKIT_BASE_DOMAIN_NAME"`
 	TLS             bool   `envconfig:"TOOLKIT_TLS"`
 	Admin           struct {
-		Username string `envconfig:"KDL_ADMIN_USERNAME"`
+		Username string `envconfig:"KDL_ADMIN_USERNAME" default:"kdladmin"`
 		Email    string `envconfig:"KDL_ADMIN_EMAIL"`
 	}
 	Storage struct {
@@ -33,15 +33,15 @@ type Config struct {
 	} `yaml:"mongodb"`
 	Gitea struct {
 		InternalURL string `yaml:"internal_url" envconfig:"GITEA_INTERNAL_URL"`
-		URL         string `envconfig:"GITEA_URL"`
-		AdminUser   string `envconfig:"GITEA_ADMIN_USER"`
-		AdminPass   string `envconfig:"GITEA_ADMIN_PASSWORD"`
+		URL         string `envconfig:"GITEA_URL" default:"https://gitea.kdl.10.0.1.1.nip.io"`
+		AdminUser   string `envconfig:"GITEA_ADMIN_USER" default:"kdladmin"`
+		AdminPass   string `envconfig:"GITEA_ADMIN_PASSWORD" default:"a123456"`
 	} `yaml:"gitea"`
 	Kubernetes struct {
 		Namespace string `envconfig:"POD_NAMESPACE"`
 	} `yaml:"kubernetes"`
 	Minio struct {
-		Endpoint  string `envconfig:"MINIO_ENDPOINT"`
+		Endpoint  string `envconfig:"MINIO_ENDPOINT" default:"localhost"`
 		AccessKey string `envconfig:"MINIO_ACCESS_KEY"`
 		SecretKey string `envconfig:"MINIO_SECRET_KEY"`
 	}

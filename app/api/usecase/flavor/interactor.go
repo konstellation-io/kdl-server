@@ -23,6 +23,7 @@ func NewInteractor(
 	return &interactor{
 		logger: logger,
 		repo:   repo,
+		projectRepo: projectRepo,
 	}
 }
 

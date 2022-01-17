@@ -23,6 +23,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/flavor"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
@@ -69,6 +70,7 @@ func main() {
 
 	projectRepo := repository.NewProjectMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 	userRepo := repository.NewUserMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
+	flavorRepo := repository.NewFlavorMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 
 	tmpl := templates.NewTemplating(cfg, logger, k8sClient)
 
@@ -110,11 +112,14 @@ func main() {
 
 	projectInteractor := project.NewInteractor(projectDeps)
 
+	flavorInteractor := flavor.NewInteractor(logger, flavorRepo, projectRepo)
+
 	resolvers := graph.NewResolver(
+		logger,
 		cfg,
 		projectInteractor,
 		userInteractor,
-		logger,
+		flavorInteractor,
 	)
 
 	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, resolvers, userRepo, projectRepo)

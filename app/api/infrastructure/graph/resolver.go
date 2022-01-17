@@ -8,6 +8,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/flavor"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
@@ -18,24 +19,27 @@ import (
 
 // Resolver serves as dependency injection for the app, add any dependencies app require here.
 type Resolver struct {
+	logger   logging.Logger
 	cfg      config.Config
 	projects project.UseCase
 	users    user.UseCase
-	logger   logging.Logger
+	flavors  flavor.UseCase
 }
 
 // NewResolver is a constructor function.
 func NewResolver(
+	logger logging.Logger,
 	cfg config.Config,
 	projectInteractor project.UseCase,
 	userInteractor user.UseCase,
-	logger logging.Logger,
+	flavorInteractor flavor.UseCase,
 ) *Resolver {
 	return &Resolver{
+		logger:   logger,
 		cfg:      cfg,
 		projects: projectInteractor,
 		users:    userInteractor,
-		logger:   logger,
+		flavors:  flavorInteractor,
 	}
 }
 

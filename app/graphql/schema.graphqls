@@ -4,6 +4,7 @@ type Query {
   project(id: ID!): Project!
   users: [User!]!
   qualityProjectDesc(description: String!): QualityProjectDesc!
+  flavors(projectId: ID!): [Flavor!]!
 }
 
 type Mutation {
@@ -23,6 +24,12 @@ type Mutation {
 
 type QualityProjectDesc {
   quality: Int!
+}
+
+type Flavor {
+  id: ID!
+  name: String!
+  running: Boolean!
 }
 
 type Topic {
@@ -156,6 +163,7 @@ type Project {
   toolUrls: ToolUrls!
   needAccess: Boolean!
   archived: Boolean!
+  flavors: [Flavor!]!
 }
 
 input RepositoryInput {

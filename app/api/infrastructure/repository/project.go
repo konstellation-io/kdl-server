@@ -36,6 +36,7 @@ type projectDTO struct {
 	RepoName        string                `bson:"repo_name"`
 	ExternalRepoURL string                `bson:"external_repo_url"`
 	Members         []memberDTO           `bson:"members"`
+	Flavors         []flavorDTO           `bson:"flavors"`
 }
 
 type projectMongoDBRepo struct {
@@ -227,6 +228,13 @@ func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 
 	dto.Members = memberDTOS
 
+	flavorsDTOS, err := m.flavorsToDTOs(p.Flavors)
+	if err != nil {
+		return projectDTO{}, err
+	}
+
+	dto.Flavors = flavorsDTOS
+
 	return dto, nil
 }
 
@@ -243,6 +251,25 @@ func (m *projectMongoDBRepo) membersToDTOs(members []entity.Member) ([]memberDTO
 			UserID:      idFromHex,
 			AccessLevel: m.AccessLevel,
 			AddedDate:   m.AddedDate,
+		}
+	}
+
+	return dtos, nil
+}
+
+func (m *projectMongoDBRepo) flavorsToDTOs(flavors []entity.Flavor) ([]flavorDTO, error) {
+	dtos := make([]flavorDTO, len(flavors))
+
+	for i, f := range flavors {
+		idFromHex, err := primitive.ObjectIDFromHex(f.FlavorID)
+		if err != nil {
+			return nil, err
+		}
+
+		dtos[i] = flavorDTO{
+			FlavorID: idFromHex,
+			Name:     f.Name,
+			Running:  f.Running,
 		}
 	}
 
@@ -270,6 +297,16 @@ func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 			UserID:      m.UserID.Hex(),
 			AccessLevel: m.AccessLevel,
 			AddedDate:   m.AddedDate,
+		}
+	}
+
+	p.Flavors = make([]entity.Flavor, len(dto.Flavors))
+
+	for i, m := range dto.Flavors {
+		p.Flavors[i] = entity.Flavor{
+			FlavorID: m.FlavorID.Hex(),
+			Name:     m.Name,
+			Running:  m.Running,
 		}
 	}
 

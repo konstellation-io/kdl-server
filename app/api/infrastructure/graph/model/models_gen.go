@@ -36,6 +36,10 @@ type ExternalRepositoryInput struct {
 	Token    string `json:"token"`
 }
 
+type QualityProjectDesc struct {
+	Quality int `json:"quality"`
+}
+
 type RemoveAPITokenInput struct {
 	APITokenID string `json:"apiTokenId"`
 }

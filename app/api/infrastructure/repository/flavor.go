@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
@@ -10,6 +9,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+)
+
+const (
+	flavorsCollName         = "flavors"
 )
 
 type flavorDTO struct {
@@ -80,8 +83,8 @@ func (m *flavorMongoDBRepo) dtosToEntities(dtos []flavorDTO) []entity.Flavor {
 	return result
 }
 
-// NewFlavorMongoDBRepo implements user.Repository interface.
+// NewFlavorMongoDBRepo implements flavors.Repository interface.
 func NewFlavorMongoDBRepo(logger logging.Logger, client *mongo.Client, dbName string) flavor.Repository {
-	collection := client.Database(dbName).Collection(userCollName)
+	collection := client.Database(dbName).Collection(flavorsCollName)
 	return &flavorMongoDBRepo{logger, collection}
 }

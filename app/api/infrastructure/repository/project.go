@@ -261,7 +261,7 @@ func (m *projectMongoDBRepo) flavorsToDTOs(flavors []entity.Flavor) ([]flavorDTO
 	dtos := make([]flavorDTO, len(flavors))
 
 	for i, f := range flavors {
-		idFromHex, err := primitive.ObjectIDFromHex(f.FlavorID)
+		idFromHex, err := primitive.ObjectIDFromHex(f.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -304,9 +304,9 @@ func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 
 	for i, m := range dto.Flavors {
 		p.Flavors[i] = entity.Flavor{
-			FlavorID: m.FlavorID.Hex(),
-			Name:     m.Name,
-			Running:  m.Running,
+			ID:      m.FlavorID.Hex(),
+			Name:    m.Name,
+			Running: m.Running,
 		}
 	}
 

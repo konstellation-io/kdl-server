@@ -19,10 +19,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
-func (r *flavorResolver) ID(ctx context.Context, obj *entity.Flavor) (string, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *memberResolver) User(ctx context.Context, obj *entity.Member) (*entity.User, error) {
 	u, err := dataloader.For(ctx).UserByID.Load(obj.UserID)
 	return &u, err
@@ -262,7 +258,7 @@ func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
 }
 
 func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
-	panic(fmt.Errorf("implemented in knowledge galaxy server"))
+	panic(entity.ErrNotImplemented) // implemented in knowledge galaxy server
 }
 
 func (r *queryResolver) Flavors(ctx context.Context, projectID string) ([]entity.Flavor, error) {
@@ -314,9 +310,6 @@ func (r *userResolver) AreToolsActive(ctx context.Context, obj *entity.User) (bo
 	return r.users.AreToolsRunning(ctx, username)
 }
 
-// Flavor returns generated.FlavorResolver implementation.
-func (r *Resolver) Flavor() generated.FlavorResolver { return &flavorResolver{r} }
-
 // Member returns generated.MemberResolver implementation.
 func (r *Resolver) Member() generated.MemberResolver { return &memberResolver{r} }
 
@@ -338,7 +331,6 @@ func (r *Resolver) SSHKey() generated.SSHKeyResolver { return &sSHKeyResolver{r}
 // User returns generated.UserResolver implementation.
 func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
 
-type flavorResolver struct{ *Resolver }
 type memberResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type projectResolver struct{ *Resolver }

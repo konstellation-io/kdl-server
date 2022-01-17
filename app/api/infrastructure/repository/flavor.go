@@ -45,7 +45,7 @@ func (m *flavorMongoDBRepo) flavorsToDTOs(flavors []entity.Flavor) ([]flavorDTO,
 	dtos := make([]flavorDTO, len(flavors))
 
 	for i, f := range flavors {
-		idFromHex, err := primitive.ObjectIDFromHex(f.FlavorID)
+		idFromHex, err := primitive.ObjectIDFromHex(f.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -62,9 +62,9 @@ func (m *flavorMongoDBRepo) flavorsToDTOs(flavors []entity.Flavor) ([]flavorDTO,
 
 func (m *flavorMongoDBRepo) dtoToEntity(dto flavorDTO) entity.Flavor {
 	p := entity.Flavor{
-		FlavorID: dto.FlavorID.Hex(),
-		Name:     dto.Name,
-		Running:  dto.Running,
+		ID:      dto.FlavorID.Hex(),
+		Name:    dto.Name,
+		Running: dto.Running,
 	}
 
 	return p

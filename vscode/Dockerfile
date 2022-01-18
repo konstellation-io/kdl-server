@@ -142,6 +142,7 @@ RUN code-server \
       --install-extension jithurjacob.nbpreviewer \
       --install-extension mechatroner.rainbow-csv \
       --install-extension mhutchie.git-graph \
+      --install-extension ms-kubernetes-tools.vscode-kubernetes-tools \
       --install-extension ms-python.python \
       --install-extension golang.go \
       --install-extension njpwerner.autodocstring \

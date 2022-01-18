@@ -1,0 +1,1 @@
+jupyter kernelgateway --api='kernel_gateway.notebook_http' --seed_uri='House Price Prediction.ipynb' --port 8889

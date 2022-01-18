@@ -145,6 +145,8 @@ deploy_helm_chart() {
     --set userToolsOperator.repoCloner.image.repository="$IMAGE_REGISTRY/konstellation/repo-cloner" \
     --set userToolsOperator.vscode.image.pullPolicy="Always" \
     --set userToolsOperator.vscode.image.repository="$IMAGE_REGISTRY/konstellation/vscode" \
+    --set userToolsOperator.vscodeRuntime.image.pullPolicy="Always" \
+    --set userToolsOperator.vscodeRuntime.image.repository="$IMAGE_REGISTRY/konstellation/jupyter-flavors-kai-python-tf" \
     --set userToolsOperator.storage.storageClassName=$STORAGE_CLASS_NAME \
     --timeout 60m \
     --wait \

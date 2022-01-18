@@ -15,8 +15,8 @@ func DevAuthMiddleware(next http.Handler) http.Handler {
 		email := os.Getenv("KDL_ADMIN_EMAIL")
 		username := os.Getenv("KDL_ADMIN_USERNAME")
 
-		r = r.WithContext(context.WithValue(r.Context(), LoggedUserNameKey, email))
-		r = r.WithContext(context.WithValue(r.Context(), LoggedUserEmailKey, username))
+		r = r.WithContext(context.WithValue(r.Context(), LoggedUserNameKey, username))
+		r = r.WithContext(context.WithValue(r.Context(), LoggedUserEmailKey, email))
 
 		next.ServeHTTP(w, r)
 	})

@@ -77,9 +77,10 @@ RUN APT_INSTALL="apt-get install -y --no-install-recommends" && \
     python3.9 ~/get-pip.py && \
     ln -s /usr/bin/python3.9 /usr/local/bin/python3 && \
     ln -s /usr/bin/python3.9 /usr/local/bin/python && \
-    # $PIP_INSTALL \
-    #     setuptools \
-    #     && \
+    $PIP_INSTALL \
+        setuptools \
+        wheels \
+        && \
     $PIP_INSTALL \
         pycrypto \
         future \

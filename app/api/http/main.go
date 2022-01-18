@@ -143,10 +143,11 @@ func startHTTPServer(
 	authController := controller.NewAuthController(logger, userRepo, projectRepo)
 
 	devEnvironment := !insideK8Cluster
+	authMiddleware := middleware.GenerateMiddleware(devEnvironment)
 
 	http.Handle("/", fs)
-	http.Handle("/api/playground", middleware.AuthMiddleware(devEnvironment, pg))
-	http.Handle(apiQueryPath, middleware.AuthMiddleware(devEnvironment, dataloader.Middleware(userRepo, srv)))
+	http.Handle("/api/playground", authMiddleware(pg))
+	http.Handle(apiQueryPath, authMiddleware(dataloader.Middleware(userRepo, srv)))
 	http.HandleFunc("/api/auth/project", authController.HandleProjectAuth)
 
 	logger.Infof("Server running at port %s", port)

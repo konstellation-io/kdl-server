@@ -72,7 +72,8 @@ func NewK8sClient(logger logging.Logger, cfg config.Config) (K8sClient, error) {
 }
 
 func newKubernetesConfig(cfg config.Config) *rest.Config {
-	if os.Getenv("KUBERNETES_PORT") != "" {
+	if cfg.Kubernetes.IsInsideCluster == true {
+		// retrieve k8 config from the cluster service
 		log.Printf("Creating K8s config in-cluster")
 
 		kubeConfig, err := rest.InClusterConfig()
@@ -83,6 +84,7 @@ func newKubernetesConfig(cfg config.Config) *rest.Config {
 		return kubeConfig
 	}
 
+	// retrieve k8 config from the LOCAL KUBECONFIG file
 	log.Printf("Creating K8s config from local .kube/config")
 
 	// NOTE: It works only with the default user's config, not even the exported KUBECONFIG value

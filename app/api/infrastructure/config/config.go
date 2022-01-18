@@ -17,7 +17,7 @@ type Config struct {
 	BaseDomainName  string `envconfig:"TOOLKIT_BASE_DOMAIN_NAME"`
 	TLS             bool   `envconfig:"TOOLKIT_TLS"`
 	Admin           struct {
-		Username string `envconfig:"KDL_ADMIN_USERNAME" default:"kdladmin"`
+		Username string `envconfig:"KDL_ADMIN_USERNAME"`
 		Email    string `envconfig:"KDL_ADMIN_EMAIL"`
 	}
 	Storage struct {
@@ -33,15 +33,16 @@ type Config struct {
 	} `yaml:"mongodb"`
 	Gitea struct {
 		InternalURL string `yaml:"internal_url" envconfig:"GITEA_INTERNAL_URL"`
-		URL         string `envconfig:"GITEA_URL" default:"https://gitea.kdl.10.0.1.1.nip.io"`
-		AdminUser   string `envconfig:"GITEA_ADMIN_USER" default:"kdladmin"`
-		AdminPass   string `envconfig:"GITEA_ADMIN_PASSWORD" default:"a123456"`
+		URL         string `envconfig:"GITEA_URL"`
+		AdminUser   string `envconfig:"GITEA_ADMIN_USER"`
+		AdminPass   string `envconfig:"GITEA_ADMIN_PASSWORD"`
 	} `yaml:"gitea"`
 	Kubernetes struct {
-		Namespace string `envconfig:"POD_NAMESPACE"`
+		IsInsideCluster bool   `default:"true"`
+		Namespace       string `envconfig:"POD_NAMESPACE"`
 	} `yaml:"kubernetes"`
 	Minio struct {
-		Endpoint  string `envconfig:"MINIO_ENDPOINT" default:"localhost"`
+		Endpoint  string `envconfig:"MINIO_ENDPOINT"`
 		AccessKey string `envconfig:"MINIO_ACCESS_KEY"`
 		SecretKey string `envconfig:"MINIO_SECRET_KEY"`
 	}
@@ -153,6 +154,10 @@ func NewConfig() Config {
 	err = envconfig.Process("", &cfg)
 	if err != nil {
 		panic(err)
+	}
+
+	if os.Getenv("KDL_ENV") == "dev" {
+		cfg.Kubernetes.IsInsideCluster = false
 	}
 
 	return cfg

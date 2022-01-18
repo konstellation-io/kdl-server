@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"net/http"
+	"os"
 )
 
 type contextKey int
@@ -31,19 +32,34 @@ Use LoggedUserNameKey and LoggedUserEmailKey to retrieve this values from the co
 Example:
 	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
 */
-func AuthMiddleware(next http.Handler) http.Handler {
+func AuthMiddleware(devEnvironment bool, next http.Handler) http.Handler {
+
+	if !devEnvironment {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			email := r.Header.Get("X-Forwarded-Email")
+			username := r.Header.Get("X-Forwarded-User")
+
+			if email == "" || username == "" {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			r = r.WithContext(context.WithValue(r.Context(), LoggedUserNameKey, username))
+			r = r.WithContext(context.WithValue(r.Context(), LoggedUserEmailKey, email))
+
+			next.ServeHTTP(w, r)
+		})
+	}
+
+	// For development environments with the Auth from environment variables
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		email := "test@admin.com" //r.Header.Get("X-Forwarded-Email")
-		username := "kdladmin"    // r.Header.Get("X-Forwarded-User")
+		email := os.Getenv("KDL_ADMIN_EMAIL")
+		username := os.Getenv("KDL_ADMIN_USERNAME")
 
-		if email == "" || username == "" {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		r = r.WithContext(context.WithValue(r.Context(), LoggedUserNameKey, username))
-		r = r.WithContext(context.WithValue(r.Context(), LoggedUserEmailKey, email))
+		r = r.WithContext(context.WithValue(r.Context(), LoggedUserNameKey, email))
+		r = r.WithContext(context.WithValue(r.Context(), LoggedUserEmailKey, username))
 
 		next.ServeHTTP(w, r)
 	})
+
 }

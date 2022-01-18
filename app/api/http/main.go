@@ -122,12 +122,14 @@ func main() {
 		flavorInteractor,
 	)
 
-	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, resolvers, userRepo, projectRepo)
+	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, cfg.Kubernetes.IsInsideCluster, resolvers, userRepo, projectRepo)
 }
 
 func startHTTPServer(
 	logger logging.Logger,
-	port, staticFilesPath string,
+	port,
+	staticFilesPath string,
+	insideK8Cluster bool,
 	resolvers generated.ResolverRoot,
 	userRepo user.Repository,
 	projectRepo project.Repository,
@@ -140,9 +142,11 @@ func startHTTPServer(
 
 	authController := controller.NewAuthController(logger, userRepo, projectRepo)
 
+	devEnvironment := !insideK8Cluster
+
 	http.Handle("/", fs)
-	http.Handle("/api/playground", middleware.AuthMiddleware(pg))
-	http.Handle(apiQueryPath, middleware.AuthMiddleware(dataloader.Middleware(userRepo, srv)))
+	http.Handle("/api/playground", middleware.AuthMiddleware(devEnvironment, pg))
+	http.Handle(apiQueryPath, middleware.AuthMiddleware(devEnvironment, dataloader.Middleware(userRepo, srv)))
 	http.HandleFunc("/api/auth/project", authController.HandleProjectAuth)
 
 	logger.Infof("Server running at port %s", port)

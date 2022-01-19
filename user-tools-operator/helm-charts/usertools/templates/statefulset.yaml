@@ -25,6 +25,19 @@ spec:
       securityContext:
         fsGroup: 1000
       initContainers:
+        - name: create-kubeconfig
+          image: alpine:3.10
+          imagePullPolicy: IfNotPresent
+          command:
+            - sleep
+          args:
+            - "8000"
+          volumeMounts:
+            - name: user-pvc
+              mountPath: /home/coder
+            - name: kubeconfig-configmap
+              mountPath: /home/coder/kubeconfig.tpl
+              subPath: kubeconfig.tpl
         - name: create-ssh-folder
           image: alpine:3.10
           imagePullPolicy: IfNotPresent
@@ -109,21 +122,11 @@ spec:
           - secretRef:
               name: tools-secret
           env:
-            ## MOVE TO VALUES
-            - name: JUPYTER_GATEWAY_URL
-              value: "http://enterprise-gateway.kdl.svc.cluster.local:8888"
-            ## MOVE TO VALUES
-            - name: JUPYTER_GATEWAY_AUTH_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: enterprise-gateway-auth
-                  key: token
             - name: JUPYTER_ENABLE_LAB
               value: "yes"
-            - name: SHELL
-              value: /bin/bash
-            - name: KERNEL_USERNAME
-              value: "{{ .Values.usernameSlug }}"
+          args:
+            - "start-notebook.sh"
+            - "--LabApp.token=''"
           volumeMounts:
             - name: user-pvc
               mountPath: /home/jovyan
@@ -221,12 +224,6 @@ spec:
             items:
             - key: KDL_USER_PRIVATE_SSH_KEY
               path: id_rsa
-        - name: {{ .Values.usernameSlug }}-ssh-pub
-          secret:
-            secretName: {{ .Values.usernameSlug }}-ssh-keys
-            items:
-            - key: KDL_USER_PUBLIC_SSH_KEY
-              path: authorized_keys
   volumeClaimTemplates:
     - metadata:
         name: user-pvc

@@ -29,15 +29,17 @@ spec:
           image: alpine:3.10
           imagePullPolicy: IfNotPresent
           command:
-            - sleep
-          args:
-            - "8000"
+            - sh
+            - /generate-kubeconfig.sh
           volumeMounts:
             - name: user-pvc
               mountPath: /home/coder
-            - name: kubeconfig-configmap
-              mountPath: /home/coder/kubeconfig.tpl
+            - name: kubeconfig-tpl-configmap
+              mountPath: /kubeconfig.tpl
               subPath: kubeconfig.tpl
+            - name: kubeconfig-tpl-configmap
+              mountPath: /generate-kubeconfig.sh
+              subPath: generate-kubeconfig.sh
         - name: create-ssh-folder
           image: alpine:3.10
           imagePullPolicy: IfNotPresent
@@ -209,6 +211,9 @@ spec:
               containerPort: 4181
               protocol: TCP
       volumes:
+        - name: kubeconfig-tpl-configmap
+          configMap:
+            name: kubeconfig-tpl-configmap
         - name: oauth2-config
           configMap:
             name: {{ include "user-tools.fullname" . }}-oauth2-proxy

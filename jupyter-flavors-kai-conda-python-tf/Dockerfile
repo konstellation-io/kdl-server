@@ -5,7 +5,7 @@
 # ==================================================================
 
 FROM nvidia/cuda:10.2-cudnn7-runtime-ubuntu18.04
-ARG NB_USER="jovyan"
+ARG NB_USER="coder"
 ARG NB_UID="1000"
 ARG NB_GID="1000"
 ARG VERSION=2.5.0
@@ -24,10 +24,10 @@ RUN APT_INSTALL="apt-get install -y --no-install-recommends" && \
     apt-get update && \
 
 # ==================================================================
-# Create Jovyan user and group
+# Create NB_USER user and group
 # ------------------------------------------------------------------
     groupadd -g "${NB_GID}" "${NB_USER}" && \
-    useradd -l -m -s /bin/bash -N -u "${NB_UID}" "${NB_USER}" && \
+    useradd -l -m -s /bin/bash -N -g "${NB_GID}" -u "${NB_UID}" "${NB_USER}" && \
 
 # ==================================================================
 # tools
@@ -79,7 +79,7 @@ RUN APT_INSTALL="apt-get install -y --no-install-recommends" && \
     ln -s /usr/bin/python3.9 /usr/local/bin/python && \
     $PIP_INSTALL \
         setuptools \
-        wheels \
+        wheel \
         && \
     $PIP_INSTALL \
         pycrypto \
@@ -87,6 +87,7 @@ RUN APT_INSTALL="apt-get install -y --no-install-recommends" && \
         notebook \
         jupyterhub \
         jupyterlab \
+        pipenv \
         && \
 
 # ==================================================================
@@ -94,9 +95,9 @@ RUN APT_INSTALL="apt-get install -y --no-install-recommends" && \
 # ------------------------------------------------------------------
     curl -L https://github.com/jupyter/enterprise_gateway/releases/download/v${VERSION}/jupyter_enterprise_gateway_kernel_image_files-${VERSION}.tar.gz | \
     tar -xz -C /usr/local/bin && \
-    chown jovyan:jovyan /usr/local/bin/bootstrap-kernel.sh && \
+    chown ${NB_USER}:${NB_USER} /usr/local/bin/bootstrap-kernel.sh && \
     chmod 0755 /usr/local/bin/bootstrap-kernel.sh && \
-    chown -R jovyan:jovyan /usr/local/bin/kernel-launchers && \
+    chown -R ${NB_USER}:${NB_USER} /usr/local/bin/kernel-launchers && \
 
 # ==================================================================
 # config & cleanup

@@ -12,7 +12,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
         # Configure jupyter lab environment
         NB_GID="1000" \
         NB_UID="1000" \
-        NB_USER="jovyan" \
+        NB_USER="coder" \
         JUPYTERLAB_DIR=/opt/jupyter
 
 ARG NODE_VERSION=14.4.0
@@ -54,7 +54,7 @@ COPY scripts/motd /etc/update-motd.d/
 COPY fix-permissions /usr/local/bin/fix-permissions
 COPY jupyter_notebook_config.py /etc/jupyter/
 
-# Make directories writable by the `jovyan` group.
+# Make directories writable by the `$NB_UID` group.
 RUN fix-permissions /usr/bin /usr/sbin /var/ && \
         fix-permissions /etc/jupyter/
 

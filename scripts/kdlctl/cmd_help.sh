@@ -25,6 +25,9 @@ show_help() {
     *restart*)
       show_restart_help
     ;;
+    *usertools*)
+      show_usertools_help
+    ;;
     *)
       show_root_help
     ;;

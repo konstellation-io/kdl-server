@@ -5,6 +5,7 @@ type Query {
   users: [User!]!
   qualityProjectDesc(description: String!): QualityProjectDesc!
   flavors(projectId: ID!): [Flavor!]!
+  runningFlavor: [Flavor!]!
 }
 
 type Mutation {

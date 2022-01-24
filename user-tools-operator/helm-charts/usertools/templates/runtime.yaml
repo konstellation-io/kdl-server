@@ -3,6 +3,7 @@ kind: Pod
 metadata:
   labels:
     run: vscode-runtime-{{ .Values.usernameSlug }}
+    flavorId: 61383716a8c1d7ce4764f411
   name: vscode-runtime-{{ .Values.usernameSlug }}
 spec:
   containers:

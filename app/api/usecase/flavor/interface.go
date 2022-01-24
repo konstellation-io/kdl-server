@@ -15,5 +15,6 @@ type Repository interface {
 
 // UseCase interface to manage all operations related with flavors.
 type UseCase interface {
-	GetProjectFlavors(ctx context.Context, id string) ([]entity.Flavor, error)
+	GetProjectFlavors(ctx context.Context, projectId string) ([]entity.Flavor, error)
+	GetRunningFlavor(ctx context.Context, username string) ([]entity.Flavor, error)
 }

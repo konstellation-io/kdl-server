@@ -265,6 +265,10 @@ func (r *queryResolver) Flavors(ctx context.Context, projectID string) ([]entity
 	return r.flavors.GetProjectFlavors(ctx, projectID)
 }
 
+func (r *queryResolver) RunningFlavor(ctx context.Context) ([]entity.Flavor, error) {
+	return r.flavors.GetRunningFlavor(ctx, ctx.Value(middleware.LoggedUserNameKey).(string))
+}
+
 func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (string, error) {
 	switch obj.Type {
 	case entity.RepositoryTypeInternal:

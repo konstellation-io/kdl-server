@@ -70,10 +70,7 @@ func (k k8sClient) IsUserToolPODRunning(ctx context.Context, username string) (b
 	resName := k.getUserToolsResName(slugUsername)
 	labelSelector := k.userToolsPODLabelSelector(resName)
 
-	list, err := k.clientset.CoreV1().Pods(k.cfg.Kubernetes.Namespace).List(ctx, metav1.ListOptions{
-		LabelSelector: labelSelector,
-	})
-
+	list, err := k.getPodListForUser(ctx, labelSelector)
 	if err != nil {
 		return false, err
 	}
@@ -87,12 +84,60 @@ func (k k8sClient) IsUserToolPODRunning(ctx context.Context, username string) (b
 	return pod.Status.Phase == v1.PodRunning, nil
 }
 
+// GetRunningRuntimePODFlavor returns the user tools runtime POD that is running for the user
+func (k k8sClient) GetRunningRuntimePODFlavor(ctx context.Context, username string) (string, error) {
+	slugUsername := k.getSlugUsername(username)
+	userToolsRunning, err := k.IsUserToolPODRunning(ctx, username)
+	if err != nil {
+		return "", err
+	}
+
+	if userToolsRunning {
+		// if the user tools are running, get the flavor
+		flavorResName := k.getUserToolsRuntimeResName(slugUsername)
+		flavorLabelSelector := k.userToolsPODLabelSelector(flavorResName)
+
+		pods, err := k.getPodListForUser(ctx, flavorLabelSelector)
+		if err != nil {
+			return "", err
+		}
+
+		if len(pods.Items) < 1 {
+			return "", nil
+		}
+
+		pod := pods.Items[0]
+		labels := pod.GetLabels()
+		if flavorId, found := labels["flavorId"]; found {
+			return flavorId, nil
+		}
+	}
+
+	return "", nil
+}
+
+func (k *k8sClient) getPodListForUser(ctx context.Context, labelSelector string) (*v1.PodList, error) {
+	list, err := k.clientset.CoreV1().Pods(k.cfg.Kubernetes.Namespace).List(ctx, metav1.ListOptions{
+		LabelSelector: labelSelector,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}
+
 func (k *k8sClient) getSlugUsername(username string) string {
 	return slug.Make(username)
 }
 
 func (k *k8sClient) getUserToolsResName(slugUsername string) string {
 	return fmt.Sprintf("usertools-%s", slugUsername)
+}
+
+func (k *k8sClient) getUserToolsRuntimeResName(slugUsername string) string {
+	return fmt.Sprintf("vscode-runtime-%s", slugUsername)
 }
 
 func (k *k8sClient) userToolsPODLabelSelector(resName string) string {

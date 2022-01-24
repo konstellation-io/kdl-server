@@ -114,6 +114,7 @@ type ComplexityRoot struct {
 		Project            func(childComplexity int, id string) int
 		Projects           func(childComplexity int) int
 		QualityProjectDesc func(childComplexity int, description string) int
+		RunningFlavor      func(childComplexity int) int
 		Users              func(childComplexity int) int
 	}
 
@@ -194,6 +195,7 @@ type QueryResolver interface {
 	Users(ctx context.Context) ([]entity.User, error)
 	QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error)
 	Flavors(ctx context.Context, projectID string) ([]entity.Flavor, error)
+	RunningFlavor(ctx context.Context) ([]entity.Flavor, error)
 }
 type RepositoryResolver interface {
 	URL(ctx context.Context, obj *entity.Repository) (string, error)
@@ -612,6 +614,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.QualityProjectDesc(childComplexity, args["description"].(string)), true
 
+	case "Query.runningFlavor":
+		if e.complexity.Query.RunningFlavor == nil {
+			break
+		}
+
+		return e.complexity.Query.RunningFlavor(childComplexity), true
+
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
 			break
@@ -872,6 +881,7 @@ var sources = []*ast.Source{
   users: [User!]!
   qualityProjectDesc(description: String!): QualityProjectDesc!
   flavors(projectId: ID!): [Flavor!]!
+  runningFlavor: [Flavor!]!
 }
 
 type Mutation {
@@ -3023,6 +3033,41 @@ func (ec *executionContext) _Query_flavors(ctx context.Context, field graphql.Co
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().Flavors(rctx, args["projectId"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]entity.Flavor)
+	fc.Result = res
+	return ec.marshalNFlavor2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐFlavorᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_runningFlavor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().RunningFlavor(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6003,6 +6048,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_flavors(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "runningFlavor":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_runningFlavor(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

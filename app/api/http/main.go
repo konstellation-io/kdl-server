@@ -112,7 +112,7 @@ func main() {
 
 	projectInteractor := project.NewInteractor(projectDeps)
 
-	flavorInteractor := flavor.NewInteractor(logger, flavorRepo, projectRepo)
+	flavorInteractor := flavor.NewInteractor(logger, k8sClient, flavorRepo, projectRepo)
 
 	resolvers := graph.NewResolver(
 		logger,

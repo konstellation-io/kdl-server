@@ -74,16 +74,31 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // GetProjectFlavors mocks base method.
-func (m *MockUseCase) GetProjectFlavors(ctx context.Context, id string) ([]entity.Flavor, error) {
+func (m *MockUseCase) GetProjectFlavors(ctx context.Context, projectId string) ([]entity.Flavor, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProjectFlavors", ctx, id)
+	ret := m.ctrl.Call(m, "GetProjectFlavors", ctx, projectId)
 	ret0, _ := ret[0].([]entity.Flavor)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetProjectFlavors indicates an expected call of GetProjectFlavors.
-func (mr *MockUseCaseMockRecorder) GetProjectFlavors(ctx, id interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) GetProjectFlavors(ctx, projectId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectFlavors", reflect.TypeOf((*MockUseCase)(nil).GetProjectFlavors), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectFlavors", reflect.TypeOf((*MockUseCase)(nil).GetProjectFlavors), ctx, projectId)
+}
+
+// GetRunningFlavor mocks base method.
+func (m *MockUseCase) GetRunningFlavor(ctx context.Context, username string) ([]entity.Flavor, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRunningFlavor", ctx, username)
+	ret0, _ := ret[0].([]entity.Flavor)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRunningFlavor indicates an expected call of GetRunningFlavor.
+func (mr *MockUseCaseMockRecorder) GetRunningFlavor(ctx, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRunningFlavor", reflect.TypeOf((*MockUseCase)(nil).GetRunningFlavor), ctx, username)
 }

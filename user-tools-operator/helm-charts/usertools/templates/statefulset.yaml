@@ -141,14 +141,14 @@ spec:
               value: "{{ .Values.usernameSlug }}"
           volumeMounts:
             - name: user-pvc
-              mountPath: /home/jovyan
+              mountPath: /home/coder
           {{- if .Values.sharedVolume.name }}
             - name: {{ .Values.sharedVolume.name }}
-              mountPath: /home/jovyan/shared-storage
+              mountPath: /home/coder/shared-storage
               readOnly: true
           {{- end }}
             - name: {{ .Values.usernameSlug }}-ssh-keys-vol
-              mountPath: /home/jovyan/.ssh/id_rsa
+              mountPath: /home/coder/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
         - name: {{ .Chart.Name }}-vscode-proxy

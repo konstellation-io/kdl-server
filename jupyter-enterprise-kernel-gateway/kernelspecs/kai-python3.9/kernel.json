@@ -5,7 +5,7 @@
     "process_proxy": {
       "class_name": "enterprise_gateway.services.processproxies.k8s.KubernetesProcessProxy",
       "config": {
-        "image_name": "localhost:32000/konstellation/jupyter-flavors-kai-python-tf:latest"
+        "image_name": "konstellation/kai-python:3.9"
       }
     }
   },
@@ -14,7 +14,7 @@
   },
   "argv": [
     "python",
-    "/usr/local/share/jupyter/kernels/jupyter-flavors-kai-python-tf/scripts/launch_kubernetes.py",
+    "/usr/local/share/jupyter/kernels/kai-python3.9/scripts/launch_kubernetes.py",
     "--RemoteProcessProxy.kernel-id",
     "{kernel_id}",
     "--RemoteProcessProxy.port-range",

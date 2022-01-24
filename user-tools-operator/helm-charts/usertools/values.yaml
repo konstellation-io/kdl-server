@@ -41,7 +41,7 @@ username: user.name
 usernameSlug: user-name
 
 kubeconfig:
-  externalServerIP: https://192.168.0.21:16443
+  externalServerUrl: https://192.168.0.21:16443
 
 vscode:
   image:

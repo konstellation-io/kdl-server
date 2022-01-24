@@ -21,8 +21,8 @@ func NewInteractor(
 	projectRepo project.Repository,
 ) UseCase {
 	return &interactor{
-		logger: logger,
-		repo:   repo,
+		logger:      logger,
+		repo:        repo,
 		projectRepo: projectRepo,
 	}
 }

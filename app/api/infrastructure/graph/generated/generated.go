@@ -58,9 +58,13 @@ type ComplexityRoot struct {
 	}
 
 	Flavor struct {
-		ID      func(childComplexity int) int
-		Name    func(childComplexity int) int
-		Running func(childComplexity int) int
+		Desc         func(childComplexity int) int
+		DockerImage  func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Labels       func(childComplexity int) int
+		Name         func(childComplexity int) int
+		Running      func(childComplexity int) int
+		UsertoolsPod func(childComplexity int) int
 	}
 
 	Member struct {
@@ -256,12 +260,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.APIToken.Token(childComplexity), true
 
+	case "Flavor.desc":
+		if e.complexity.Flavor.Desc == nil {
+			break
+		}
+
+		return e.complexity.Flavor.Desc(childComplexity), true
+
+	case "Flavor.DockerImage":
+		if e.complexity.Flavor.DockerImage == nil {
+			break
+		}
+
+		return e.complexity.Flavor.DockerImage(childComplexity), true
+
 	case "Flavor.id":
 		if e.complexity.Flavor.ID == nil {
 			break
 		}
 
 		return e.complexity.Flavor.ID(childComplexity), true
+
+	case "Flavor.labels":
+		if e.complexity.Flavor.Labels == nil {
+			break
+		}
+
+		return e.complexity.Flavor.Labels(childComplexity), true
 
 	case "Flavor.name":
 		if e.complexity.Flavor.Name == nil {
@@ -276,6 +301,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Flavor.Running(childComplexity), true
+
+	case "Flavor.UsertoolsPod":
+		if e.complexity.Flavor.UsertoolsPod == nil {
+			break
+		}
+
+		return e.complexity.Flavor.UsertoolsPod(childComplexity), true
 
 	case "Member.accessLevel":
 		if e.complexity.Member.AccessLevel == nil {
@@ -864,6 +896,10 @@ type QualityProjectDesc {
 type Flavor {
   id: ID!
   name: String!
+  desc: String!
+  labels: [String!]
+  DockerImage: String!
+  UsertoolsPod: String
   running: Boolean!
 }
 
@@ -1525,6 +1561,140 @@ func (ec *executionContext) _Flavor_name(ctx context.Context, field graphql.Coll
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Flavor_desc(ctx context.Context, field graphql.CollectedField, obj *entity.Flavor) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Flavor",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Desc, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Flavor_labels(ctx context.Context, field graphql.CollectedField, obj *entity.Flavor) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Flavor",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Labels, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Flavor_DockerImage(ctx context.Context, field graphql.CollectedField, obj *entity.Flavor) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Flavor",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DockerImage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Flavor_UsertoolsPod(ctx context.Context, field graphql.CollectedField, obj *entity.Flavor) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Flavor",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UsertoolsPod, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Flavor_running(ctx context.Context, field graphql.CollectedField, obj *entity.Flavor) (ret graphql.Marshaler) {
@@ -5436,6 +5606,20 @@ func (ec *executionContext) _Flavor(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "desc":
+			out.Values[i] = ec._Flavor_desc(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "labels":
+			out.Values[i] = ec._Flavor_labels(ctx, field, obj)
+		case "DockerImage":
+			out.Values[i] = ec._Flavor_DockerImage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "UsertoolsPod":
+			out.Values[i] = ec._Flavor_UsertoolsPod(ctx, field, obj)
 		case "running":
 			out.Values[i] = ec._Flavor_running(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -7149,6 +7333,42 @@ func (ec *executionContext) unmarshalOString2string(ctx context.Context, v inter
 
 func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	return graphql.MarshalString(v)
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

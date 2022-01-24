@@ -29,6 +29,10 @@ type QualityProjectDesc {
 type Flavor {
   id: ID!
   name: String!
+  desc: String!
+  labels: [String!]
+  DockerImage: String!
+  UsertoolsPod: String
   running: Boolean!
 }
 

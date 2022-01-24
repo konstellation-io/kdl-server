@@ -12,13 +12,16 @@ import (
 )
 
 const (
-	flavorsCollName         = "flavors"
+	flavorsCollName = "flavors"
 )
 
 type flavorDTO struct {
-	FlavorID primitive.ObjectID `bson:"flavor_id"`
-	Name     string             `bson:"name"`
-	Running  bool               `bson:"running"`
+	FlavorID    primitive.ObjectID `bson:"flavor_id"`
+	Name        string             `bson:"name"`
+	Desc        string             `bson:"desc"`
+	Labels      []string           `bson:"labels"`
+	DockerImage string             `bson:"docker_image"`
+	Running     bool               `bson:"running"`
 }
 
 type flavorMongoDBRepo struct {
@@ -54,9 +57,12 @@ func (m *flavorMongoDBRepo) flavorsToDTOs(flavors []entity.Flavor) ([]flavorDTO,
 		}
 
 		dtos[i] = flavorDTO{
-			FlavorID: idFromHex,
-			Name:     f.Name,
-			Running:  f.Running,
+			FlavorID:    idFromHex,
+			Name:        f.Name,
+			Desc:        f.Desc,
+			Labels:      f.Labels,
+			DockerImage: f.DockerImage,
+			Running:     f.Running,
 		}
 	}
 
@@ -65,9 +71,12 @@ func (m *flavorMongoDBRepo) flavorsToDTOs(flavors []entity.Flavor) ([]flavorDTO,
 
 func (m *flavorMongoDBRepo) dtoToEntity(dto flavorDTO) entity.Flavor {
 	p := entity.Flavor{
-		ID:      dto.FlavorID.Hex(),
-		Name:    dto.Name,
-		Running: dto.Running,
+		ID:          dto.FlavorID.Hex(),
+		Name:        dto.Name,
+		Desc:        dto.Desc,
+		Labels:      dto.Labels,
+		DockerImage: dto.DockerImage,
+		Running:     dto.Running,
 	}
 
 	return p

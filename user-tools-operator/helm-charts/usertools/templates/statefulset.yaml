@@ -26,7 +26,7 @@ spec:
         fsGroup: 1000
       initContainers:
         - name: create-kubeconfig
-          image: alpine:3.10
+          image: alpine/k8s:1.20.7
           imagePullPolicy: IfNotPresent
           command:
             - sh
@@ -95,7 +95,7 @@ spec:
           volumeMounts:
             - name: user-pvc
               mountPath: /home/kdl
-            - name: {{ .Values.usernameSlug }}-ssh-keys-vol
+            - name: º-ssh-keys-vol
               mountPath: /home/kdl/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true

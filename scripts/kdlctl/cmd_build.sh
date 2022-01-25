@@ -21,7 +21,7 @@ build_docker_images() {
   build_user_tools_operator
   build_jupyter_gpu
   build_jupyter_enterprise_kernel_gateway
-  build_jupyter_flavors_kai_python_tf
+  build_jupyter_runtimes_kai_python_tf
   build_vscode
   build_repo_cloner
   build_mlflow
@@ -58,7 +58,7 @@ build_jupyter_enterprise_kernel_gateway() {
   build_image jupyter-enterprise-kernel-gateway jupyter-enterprise-kernel-gateway
 }
 
-build_jupyter_flavors_kai_python_tf() {
+build_jupyter_runtimes_kai_python_tf() {
   build_image jupyter-flavors-kai-python-tf jupyter-flavors-kai-conda-python-tf
 }
 

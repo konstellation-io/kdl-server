@@ -1,4 +1,4 @@
-package flavor
+package runtime
 
 import (
 	"context"
@@ -31,29 +31,39 @@ func NewInteractor(
 	}
 }
 
-// GetProjectFlavors retrieve all flavors related with the project.
-func (i interactor) GetProjectFlavors(ctx context.Context, projectId string) ([]entity.Flavor, error) {
-	// get generic project flavors
-	genericFlavors, err := i.repo.FindAll(ctx)
+// GetProjectRuntimes retrieve all runtimes related with the project.
+func (i interactor) GetProjectRuntimes(ctx context.Context, projectId string) ([]entity.Runtime, error) {
+	// get generic project runtimes
+	genericRuntimes, err := i.repo.FindAll(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// get project specific flavors
+	// get project specific runtimes
 	pr, err := i.projectRepo.Get(ctx, projectId)
 	if err != nil {
 		return nil, err
 	}
 
-	return append(genericFlavors, pr.Flavors...), nil
+	return append(genericRuntimes, pr.Runtimes...), nil
 }
 
-func (i interactor) GetRunningFlavor(ctx context.Context, username string) ([]entity.Flavor, error) {
-	podImage, err := i.k8sClient.GetRunningRuntimePODFlavor(ctx, username)
+func (i interactor) GetRunningRuntime(ctx context.Context, username string) (*entity.Runtime, error) {
+	runtimeId, err := i.k8sClient.GetRunningRuntimePODRuntimeId(ctx, username)
 	if err != nil {
 		return nil, err
 	}
-	i.logger.Infof("Flavor POD image " + podImage)
 
-	return nil, nil
+	if runtimeId != "" {
+		i.logger.Infof("RuntimeId in runtime POD " + runtimeId)
+
+		runtime, err := i.repo.Get(ctx, runtimeId)
+		if err != nil {
+			return nil, err
+		}
+
+		return &runtime, nil
+	}
+
+	return nil, entity.NoRunningRuntime
 }

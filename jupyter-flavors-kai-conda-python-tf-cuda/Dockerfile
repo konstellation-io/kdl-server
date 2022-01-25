@@ -39,7 +39,7 @@ ENV NV_LIBNPP_PACKAGE libnpp-{{ cuda.version.major }}-{{ cuda.version.minor }}=$
 {% endif %}
 ENV NV_LIBCUSPARSE_VERSION {{ cuda.arm64.components.libcusparse.version }}
 
-{% if cuda.flavor == "l4t" %}
+{% if cuda.runtime == "l4t" %}
     {% if cuda.version.major | int == 10 %}
 ENV NV_LIBCUBLAS_PACKAGE_NAME libcublas10
     {% else %}

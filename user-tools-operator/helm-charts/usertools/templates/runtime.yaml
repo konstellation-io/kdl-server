@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  labels:
-    run: vscode-runtime-{{ .Values.usernameSlug }}
-    flavorId: 61383716a8c1d7ce4764f411
   name: vscode-runtime-{{ .Values.usernameSlug }}
+  labels:
+{{ include "user-tools.labels" . | indent 4 }}
+    runtimeId: {{ .Values.vscodeRuntime.runtimeId }}
 spec:
   containers:
   - name: {{ .Chart.Name }}-runtime-vscode

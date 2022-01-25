@@ -13,10 +13,10 @@ type K8sClient interface {
 	CreateSecret(ctx context.Context, name string, values map[string]string) error
 	UpdateSecret(ctx context.Context, name string, values map[string]string) error
 	GetSecret(ctx context.Context, name string) (map[string][]byte, error)
-	CreateUserToolsCR(ctx context.Context, username string) error
+	CreateUserToolsCR(ctx context.Context, username string, runtimeId string, runtimeImage string) error
 	DeleteUserToolsCR(ctx context.Context, username string) error
 	IsUserToolPODRunning(ctx context.Context, username string) (bool, error)
-	GetRunningRuntimePODFlavor(ctx context.Context, username string) (string, error)
+	GetRunningRuntimePODRuntimeId(ctx context.Context, username string) (string, error)
 	CreateKDLProjectCR(ctx context.Context, projectID string) error
 	CreateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error
 	UpdateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error

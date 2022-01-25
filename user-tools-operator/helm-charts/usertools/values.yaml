@@ -50,6 +50,7 @@ vscode:
     pullPolicy: IfNotPresent
 
 vscodeRuntime:
+  runtimeId: "61383716a8c1d7ce4764f411"
   image:
     repository: konstellation/jupyter-flavors-kai-python-tf
     tag: "latest"

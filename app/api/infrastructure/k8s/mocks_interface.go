@@ -78,17 +78,17 @@ func (mr *MockK8sClientMockRecorder) CreateUserSSHKeySecret(ctx, user, public, p
 }
 
 // CreateUserToolsCR mocks base method.
-func (m *MockK8sClient) CreateUserToolsCR(ctx context.Context, username string) error {
+func (m *MockK8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeId, runtimeImage string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUserToolsCR", ctx, username)
+	ret := m.ctrl.Call(m, "CreateUserToolsCR", ctx, username, runtimeId, runtimeImage)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateUserToolsCR indicates an expected call of CreateUserToolsCR.
-func (mr *MockK8sClientMockRecorder) CreateUserToolsCR(ctx, username interface{}) *gomock.Call {
+func (mr *MockK8sClientMockRecorder) CreateUserToolsCR(ctx, username, runtimeId, runtimeImage interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserToolsCR", reflect.TypeOf((*MockK8sClient)(nil).CreateUserToolsCR), ctx, username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserToolsCR", reflect.TypeOf((*MockK8sClient)(nil).CreateUserToolsCR), ctx, username, runtimeId, runtimeImage)
 }
 
 // DeleteUserToolsCR mocks base method.
@@ -105,19 +105,19 @@ func (mr *MockK8sClientMockRecorder) DeleteUserToolsCR(ctx, username interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserToolsCR", reflect.TypeOf((*MockK8sClient)(nil).DeleteUserToolsCR), ctx, username)
 }
 
-// GetRunningRuntimePODFlavor mocks base method.
-func (m *MockK8sClient) GetRunningRuntimePODFlavor(ctx context.Context, username string) (string, error) {
+// GetRunningRuntimePODRuntimeId mocks base method.
+func (m *MockK8sClient) GetRunningRuntimePODRuntimeId(ctx context.Context, username string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRunningRuntimePODFlavor", ctx, username)
+	ret := m.ctrl.Call(m, "GetRunningRuntimePODRuntimeId", ctx, username)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetRunningRuntimePODFlavor indicates an expected call of GetRunningRuntimePODFlavor.
-func (mr *MockK8sClientMockRecorder) GetRunningRuntimePODFlavor(ctx, username interface{}) *gomock.Call {
+// GetRunningRuntimePODRuntimeId indicates an expected call of GetRunningRuntimePODRuntimeId.
+func (mr *MockK8sClientMockRecorder) GetRunningRuntimePODRuntimeId(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRunningRuntimePODFlavor", reflect.TypeOf((*MockK8sClient)(nil).GetRunningRuntimePODFlavor), ctx, username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRunningRuntimePODRuntimeId", reflect.TypeOf((*MockK8sClient)(nil).GetRunningRuntimePODRuntimeId), ctx, username)
 }
 
 // GetSecret mocks base method.

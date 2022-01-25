@@ -138,6 +138,9 @@ spec:
               vscodeRuntime:
                 type: object
                 properties:
+                  runtimeId:
+                    type: string
+                    description: runtime identifier
                   image:
                     type: object
                     properties:

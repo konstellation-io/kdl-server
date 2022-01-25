@@ -3,7 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
-
+	"github.com/konstellation-io/kdl-server/app/api/entity"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
@@ -45,7 +45,7 @@ func (k *k8sClient) DeleteUserToolsCR(ctx context.Context, username string) erro
 }
 
 // CreateUserToolsCR creates the user tools Custom Resource in Kubernetes.
-func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username string) error {
+func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username string, runtimeId string, runtimeImage string) error {
 	slugUsername := k.getSlugUsername(username)
 	resName := fmt.Sprintf("usertools-%s", slugUsername)
 
@@ -56,7 +56,7 @@ func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username string) erro
 
 	k.logger.Info("UserTools secrets created")
 
-	err = k.createUserToolsDefinition(ctx, username, slugUsername, resName)
+	err = k.createUserToolsDefinition(ctx, username, slugUsername, resName, runtimeId, runtimeImage)
 	if err != nil {
 		return err
 	}
@@ -84,33 +84,38 @@ func (k k8sClient) IsUserToolPODRunning(ctx context.Context, username string) (b
 	return pod.Status.Phase == v1.PodRunning, nil
 }
 
-// GetRunningRuntimePODFlavor returns the user tools runtime POD that is running for the user
-func (k k8sClient) GetRunningRuntimePODFlavor(ctx context.Context, username string) (string, error) {
+// GetRunningRuntimePODRuntimeId returns the runtimeId that the user tools runtime POD is using
+func (k k8sClient) GetRunningRuntimePODRuntimeId(ctx context.Context, username string) (string, error) {
 	slugUsername := k.getSlugUsername(username)
 	userToolsRunning, err := k.IsUserToolPODRunning(ctx, username)
 	if err != nil {
 		return "", err
 	}
 
-	if userToolsRunning {
-		// if the user tools are running, get the flavor
-		flavorResName := k.getUserToolsRuntimeResName(slugUsername)
-		flavorLabelSelector := k.userToolsPODLabelSelector(flavorResName)
+	if !userToolsRunning {
+		return "", nil
+	}
 
-		pods, err := k.getPodListForUser(ctx, flavorLabelSelector)
-		if err != nil {
-			return "", err
-		}
+	// if the user tools are running, get the runtime
+	runtimeResName := k.getUserToolsRuntimeResName(slugUsername)
 
-		if len(pods.Items) < 1 {
-			return "", nil
-		}
+	runtimeFieldSelector := k.userToolsRuntimePODFieldSelector(runtimeResName)
+	pods, err := k.clientset.CoreV1().Pods(k.cfg.Kubernetes.Namespace).List(ctx, metav1.ListOptions{
+		FieldSelector: runtimeFieldSelector,
+	})
 
-		pod := pods.Items[0]
-		labels := pod.GetLabels()
-		if flavorId, found := labels["flavorId"]; found {
-			return flavorId, nil
-		}
+	if err != nil {
+		return "", err
+	}
+
+	if len(pods.Items) < 1 {
+		return "", entity.RuntimeNotFound
+	}
+
+	pod := pods.Items[0]
+	labels := pod.GetLabels()
+	if runtimeId, found := labels["runtimeId"]; found {
+		return runtimeId, nil
 	}
 
 	return "", nil
@@ -142,6 +147,10 @@ func (k *k8sClient) getUserToolsRuntimeResName(slugUsername string) string {
 
 func (k *k8sClient) userToolsPODLabelSelector(resName string) string {
 	return fmt.Sprintf("app.kubernetes.io/instance=%s", resName)
+}
+
+func (k *k8sClient) userToolsRuntimePODFieldSelector(resName string) string {
+	return fmt.Sprintf("metadata.name=%s", resName)
 }
 
 // checkOrCreateToolsSecrets set ClientID and ClientSecret on Kubernetes secret objects.
@@ -189,7 +198,7 @@ func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName
 }
 
 // createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
-func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slugUsername, resName string) error {
+func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slugUsername, resName string, runtimeId string, runtimeImage string) error {
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",
@@ -252,8 +261,9 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 					},
 				},
 				"vscodeRuntime": map[string]interface{}{
+					"runtimeId": runtimeId,
 					"image": map[string]string{
-						"repository": k.cfg.UserToolsVsCodeRuntime.Image.Repository,
+						"repository": runtimeImage,
 						"tag":        k.cfg.UserToolsVsCodeRuntime.Image.Tag,
 						"pullPolicy": k.cfg.UserToolsVsCodeRuntime.Image.PullPolicy,
 					},

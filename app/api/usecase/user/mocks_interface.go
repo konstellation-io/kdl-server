@@ -365,18 +365,18 @@ func (mr *MockUseCaseMockRecorder) ScheduleUsersSyncJob(interval interface{}) *g
 }
 
 // StartTools mocks base method.
-func (m *MockUseCase) StartTools(ctx context.Context, username string) (entity.User, error) {
+func (m *MockUseCase) StartTools(ctx context.Context, username, runtimeId string) (entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StartTools", ctx, username)
+	ret := m.ctrl.Call(m, "StartTools", ctx, username, runtimeId)
 	ret0, _ := ret[0].(entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // StartTools indicates an expected call of StartTools.
-func (mr *MockUseCaseMockRecorder) StartTools(ctx, username interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) StartTools(ctx, username, runtimeId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartTools", reflect.TypeOf((*MockUseCase)(nil).StartTools), ctx, username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartTools", reflect.TypeOf((*MockUseCase)(nil).StartTools), ctx, username, runtimeId)
 }
 
 // StopTools mocks base method.

@@ -36,7 +36,7 @@ type projectDTO struct {
 	RepoName        string                `bson:"repo_name"`
 	ExternalRepoURL string                `bson:"external_repo_url"`
 	Members         []memberDTO           `bson:"members"`
-	Flavors         []flavorDTO           `bson:"flavors"`
+	Runtimes        []runtimeDTO          `bson:"runtimes"`
 }
 
 type projectMongoDBRepo struct {
@@ -228,12 +228,12 @@ func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 
 	dto.Members = memberDTOS
 
-	flavorsDTOS, err := m.flavorsToDTOs(p.Flavors)
+	runtimesDTOS, err := m.runtimesToDTOs(p.Runtimes)
 	if err != nil {
 		return projectDTO{}, err
 	}
 
-	dto.Flavors = flavorsDTOS
+	dto.Runtimes = runtimesDTOS
 
 	return dto, nil
 }
@@ -257,19 +257,19 @@ func (m *projectMongoDBRepo) membersToDTOs(members []entity.Member) ([]memberDTO
 	return dtos, nil
 }
 
-func (m *projectMongoDBRepo) flavorsToDTOs(flavors []entity.Flavor) ([]flavorDTO, error) {
-	dtos := make([]flavorDTO, len(flavors))
+func (m *projectMongoDBRepo) runtimesToDTOs(runtimes []entity.Runtime) ([]runtimeDTO, error) {
+	dtos := make([]runtimeDTO, len(runtimes))
 
-	for i, f := range flavors {
+	for i, f := range runtimes {
 		idFromHex, err := primitive.ObjectIDFromHex(f.ID)
 		if err != nil {
 			return nil, err
 		}
 
-		dtos[i] = flavorDTO{
-			FlavorID: idFromHex,
-			Name:     f.Name,
-			Running:  f.Running,
+		dtos[i] = runtimeDTO{
+			RuntimeID: idFromHex,
+			Name:      f.Name,
+			Running:   f.Running,
 		}
 	}
 
@@ -300,11 +300,11 @@ func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 		}
 	}
 
-	p.Flavors = make([]entity.Flavor, len(dto.Flavors))
+	p.Runtimes = make([]entity.Runtime, len(dto.Runtimes))
 
-	for i, m := range dto.Flavors {
-		p.Flavors[i] = entity.Flavor{
-			ID:      m.FlavorID.Hex(),
+	for i, m := range dto.Runtimes {
+		p.Runtimes[i] = entity.Runtime{
+			ID:      m.RuntimeID.Hex(),
 			Name:    m.Name,
 			Running: m.Running,
 		}

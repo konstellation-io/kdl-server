@@ -59,7 +59,8 @@ type RepositoryInput struct {
 }
 
 type SetActiveUserToolsInput struct {
-	Active bool `json:"active"`
+	Active    bool    `json:"active"`
+	RuntimeID *string `json:"runtimeId"`
 }
 
 type SetBoolFieldInput struct {

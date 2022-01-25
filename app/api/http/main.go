@@ -23,8 +23,8 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/flavor"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
 
@@ -70,7 +70,7 @@ func main() {
 
 	projectRepo := repository.NewProjectMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 	userRepo := repository.NewUserMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
-	flavorRepo := repository.NewFlavorMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
+	runtimeRepo := repository.NewRuntimeMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 
 	tmpl := templates.NewTemplating(cfg, logger, k8sClient)
 
@@ -79,7 +79,7 @@ func main() {
 		logger.Errorf("Error creating indexes for users: %s", err)
 	}
 
-	userInteractor := user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaService, k8sClient)
+	userInteractor := user.NewInteractor(logger, userRepo, runtimeRepo, sshHelper, realClock, giteaService, k8sClient)
 
 	err = userInteractor.CreateAdminUser(cfg.Admin.Username, cfg.Admin.Email)
 	if err != nil {
@@ -112,14 +112,14 @@ func main() {
 
 	projectInteractor := project.NewInteractor(projectDeps)
 
-	flavorInteractor := flavor.NewInteractor(logger, k8sClient, flavorRepo, projectRepo)
+	runtimeInteractor := runtime.NewInteractor(logger, k8sClient, runtimeRepo, projectRepo)
 
 	resolvers := graph.NewResolver(
 		logger,
 		cfg,
 		projectInteractor,
 		userInteractor,
-		flavorInteractor,
+		runtimeInteractor,
 	)
 
 	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, cfg.Kubernetes.IsInsideCluster, resolvers, userRepo, projectRepo)

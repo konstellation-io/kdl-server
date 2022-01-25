@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
@@ -22,6 +23,7 @@ var (
 type interactor struct {
 	logger       logging.Logger
 	repo         Repository
+	repoRuntimes runtime.Repository
 	sshGenerator sshhelper.SSHKeyGenerator
 	clock        clock.Clock
 	giteaService giteaservice.GiteaClient
@@ -33,6 +35,7 @@ type interactor struct {
 func NewInteractor(
 	logger logging.Logger,
 	repo Repository,
+	repoRuntimes runtime.Repository,
 	sshGenerator sshhelper.SSHKeyGenerator,
 	c clock.Clock,
 	giteaService giteaservice.GiteaClient,
@@ -41,6 +44,7 @@ func NewInteractor(
 	return &interactor{
 		logger:       logger,
 		repo:         repo,
+		repoRuntimes: repoRuntimes,
 		sshGenerator: sshGenerator,
 		clock:        c,
 		giteaService: giteaService,
@@ -126,7 +130,7 @@ func (i *interactor) GetByUsername(ctx context.Context, username string) (entity
 }
 
 // StartTools creates a user-tools CustomResource in K8s to initialize the VSCode and Jupyter for the given username.
-func (i *interactor) StartTools(ctx context.Context, username string) (entity.User, error) {
+func (i *interactor) StartTools(ctx context.Context, username string, runtimeId string) (entity.User, error) {
 	user, err := i.repo.GetByUsername(ctx, username)
 	if err != nil {
 		return entity.User{}, err
@@ -142,9 +146,14 @@ func (i *interactor) StartTools(ctx context.Context, username string) (entity.Us
 		return entity.User{}, ErrStartUserTools
 	}
 
+	runtime, err := i.repoRuntimes.Get(ctx, runtimeId)
+	if err != nil {
+		return entity.User{}, err
+	}
+
 	i.logger.Infof("Creating user tools for user: \"%s\"", username)
 
-	err = i.k8sClient.CreateUserToolsCR(ctx, username)
+	err = i.k8sClient.CreateUserToolsCR(ctx, username, runtime.ID, runtime.DockerImage)
 	if err != nil {
 		return entity.User{}, err
 	}

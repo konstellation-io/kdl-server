@@ -4,8 +4,8 @@ type Query {
   project(id: ID!): Project!
   users: [User!]!
   qualityProjectDesc(description: String!): QualityProjectDesc!
-  flavors(projectId: ID!): [Flavor!]!
-  runningFlavor: [Flavor!]!
+  runtimes(projectId: ID!): [Runtime!]!
+  runningRuntime: Runtime
 }
 
 type Mutation {
@@ -27,7 +27,7 @@ type QualityProjectDesc {
   quality: Int!
 }
 
-type Flavor {
+type Runtime {
   id: ID!
   name: String!
   desc: String!
@@ -152,7 +152,8 @@ input SetBoolFieldInput {
 }
 
 input SetActiveUserToolsInput {
-  active: Boolean!
+  active: Boolean!,
+  runtimeId: String,
 }
 
 type Project {
@@ -168,7 +169,7 @@ type Project {
   toolUrls: ToolUrls!
   needAccess: Boolean!
   archived: Boolean!
-  flavors: [Flavor!]!
+  runtimes: [Runtime!]!
 }
 
 input RepositoryInput {

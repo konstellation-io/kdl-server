@@ -14,7 +14,7 @@ export default function useTool() {
   );
 
   function updateProjectActiveTools(areToolsActive: boolean) {
-    mutationSetActiveProjectTools(mutationPayloadHelper({ active: areToolsActive }));
+    mutationSetActiveProjectTools(mutationPayloadHelper({ active: areToolsActive, runtimeId: "61383716a8c1d7ce4764f411" }));
   }
 
   return {

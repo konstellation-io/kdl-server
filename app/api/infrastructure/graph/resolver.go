@@ -8,8 +8,8 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/flavor"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
 
@@ -23,7 +23,7 @@ type Resolver struct {
 	cfg      config.Config
 	projects project.UseCase
 	users    user.UseCase
-	flavors  flavor.UseCase
+	runtimes runtime.UseCase
 }
 
 // NewResolver is a constructor function.
@@ -32,14 +32,14 @@ func NewResolver(
 	cfg config.Config,
 	projectInteractor project.UseCase,
 	userInteractor user.UseCase,
-	flavorInteractor flavor.UseCase,
+	runtimeInteractor runtime.UseCase,
 ) *Resolver {
 	return &Resolver{
 		logger:   logger,
 		cfg:      cfg,
 		projects: projectInteractor,
 		users:    userInteractor,
-		flavors:  flavorInteractor,
+		runtimes: runtimeInteractor,
 	}
 }
 

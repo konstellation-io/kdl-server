@@ -163,7 +163,7 @@ func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.S
 	username := ctx.Value(middleware.LoggedUserNameKey).(string)
 
 	if input.Active {
-		u, err := r.users.StartTools(ctx, username)
+		u, err := r.users.StartTools(ctx, username, *input.RuntimeID)
 		return &u, err
 	}
 
@@ -261,12 +261,13 @@ func (r *queryResolver) QualityProjectDesc(ctx context.Context, description stri
 	panic(entity.ErrNotImplemented) // implemented in knowledge galaxy server
 }
 
-func (r *queryResolver) Flavors(ctx context.Context, projectID string) ([]entity.Flavor, error) {
-	return r.flavors.GetProjectFlavors(ctx, projectID)
+func (r *queryResolver) Runtimes(ctx context.Context, projectID string) ([]entity.Runtime, error) {
+	return r.runtimes.GetProjectRuntimes(ctx, projectID)
 }
 
-func (r *queryResolver) RunningFlavor(ctx context.Context) ([]entity.Flavor, error) {
-	return r.flavors.GetRunningFlavor(ctx, ctx.Value(middleware.LoggedUserNameKey).(string))
+func (r *queryResolver) RunningRuntime(ctx context.Context) (*entity.Runtime, error) {
+	runtime, err := r.runtimes.GetRunningRuntime(ctx, ctx.Value(middleware.LoggedUserNameKey).(string))
+	return runtime, err
 }
 
 func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (string, error) {

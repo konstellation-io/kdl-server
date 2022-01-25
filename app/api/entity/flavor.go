@@ -10,3 +10,8 @@ type Flavor struct {
 	UsertoolsPod string
 	Running      bool
 }
+
+// NewFlavor is a constructor function.
+func NewFlavor(id, name string, running bool) Flavor {
+	return Flavor{ID: id, Name: name, Running: running}
+}

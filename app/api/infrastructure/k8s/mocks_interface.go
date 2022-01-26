@@ -135,6 +135,21 @@ func (mr *MockK8sClientMockRecorder) GetSecret(ctx, name interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecret", reflect.TypeOf((*MockK8sClient)(nil).GetSecret), ctx, name)
 }
 
+// GetUserKubeconfigSecret mocks base method.
+func (m *MockK8sClient) GetUserKubeconfigSecret(ctx context.Context, usernameSlug string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserKubeconfigSecret", ctx, usernameSlug)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserKubeconfigSecret indicates an expected call of GetUserKubeconfigSecret.
+func (mr *MockK8sClientMockRecorder) GetUserKubeconfigSecret(ctx, usernameSlug interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserKubeconfigSecret", reflect.TypeOf((*MockK8sClient)(nil).GetUserKubeconfigSecret), ctx, usernameSlug)
+}
+
 // GetUserSSHKeyPublic mocks base method.
 func (m *MockK8sClient) GetUserSSHKeyPublic(ctx context.Context, usernameSlug string) ([]byte, error) {
 	m.ctrl.T.Helper()

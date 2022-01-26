@@ -39,4 +39,5 @@ type UseCase interface {
 	RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error)
 	ScheduleUsersSyncJob(interval time.Duration) error
 	RunSyncUsersCronJob()
+	GetKubeconfig(ctx context.Context, username string) (string, error)
 }

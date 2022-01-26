@@ -6,6 +6,7 @@ type Query {
   qualityProjectDesc(description: String!): QualityProjectDesc!
   runtimes(projectId: ID!): [Runtime!]!
   runningRuntime: Runtime
+  kubeconfig: String!
 }
 
 type Mutation {

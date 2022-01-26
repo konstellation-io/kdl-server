@@ -537,3 +537,24 @@ func TestInteractor_UpdateAccessLevel(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, users, returnedUsers)
 }
+
+func TestInteractor_GetKubeconfig(t *testing.T) {
+	s := newUserSuite(t, nil)
+	defer s.ctrl.Finish()
+
+	const (
+		username       = "john"
+		areToolsActive = true
+	)
+
+	ctx := context.Background()
+	expectedKubeconfig := "Test Kubeconfig"
+
+	s.mocks.k8sClientMock.EXPECT().GetUserKubeconfigSecret(ctx, username).Return(expectedKubeconfig, nil)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(areToolsActive, nil)
+
+	returnedKubeconfig, err := s.interactor.GetKubeconfig(ctx, username)
+
+	require.NoError(t, err)
+	require.Equal(t, expectedKubeconfig, returnedKubeconfig)
+}

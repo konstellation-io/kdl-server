@@ -270,6 +270,12 @@ func (r *queryResolver) RunningRuntime(ctx context.Context) (*entity.Runtime, er
 	return runtime, err
 }
 
+func (r *queryResolver) Kubeconfig(ctx context.Context) (string, error) {
+	username := ctx.Value(middleware.LoggedUserNameKey).(string)
+	k, err := r.users.GetKubeconfig(ctx, username)
+	return k, err
+}
+
 func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (string, error) {
 	switch obj.Type {
 	case entity.RepositoryTypeInternal:

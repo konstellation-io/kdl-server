@@ -98,6 +98,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Kubeconfig         func(childComplexity int) int
 		Me                 func(childComplexity int) int
 		Project            func(childComplexity int, id string) int
 		Projects           func(childComplexity int) int
@@ -194,6 +195,7 @@ type QueryResolver interface {
 	QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error)
 	Runtimes(ctx context.Context, projectID string) ([]entity.Runtime, error)
 	RunningRuntime(ctx context.Context) (*entity.Runtime, error)
+	Kubeconfig(ctx context.Context) (string, error)
 }
 type RepositoryResolver interface {
 	URL(ctx context.Context, obj *entity.Repository) (string, error)
@@ -505,6 +507,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.QualityProjectDesc.Quality(childComplexity), true
+
+	case "Query.kubeconfig":
+		if e.complexity.Query.Kubeconfig == nil {
+			break
+		}
+
+		return e.complexity.Query.Kubeconfig(childComplexity), true
 
 	case "Query.me":
 		if e.complexity.Query.Me == nil {
@@ -866,6 +875,7 @@ var sources = []*ast.Source{
   qualityProjectDesc(description: String!): QualityProjectDesc!
   runtimes(projectId: ID!): [Runtime!]!
   runningRuntime: Runtime
+  kubeconfig: String!
 }
 
 type Mutation {
@@ -2788,6 +2798,41 @@ func (ec *executionContext) _Query_runningRuntime(ctx context.Context, field gra
 	res := resTmp.(*entity.Runtime)
 	fc.Result = res
 	return ec.marshalORuntime2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRuntime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_kubeconfig(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Kubeconfig(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -5924,6 +5969,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_runningRuntime(ctx, field)
+				return res
+			})
+		case "kubeconfig":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_kubeconfig(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "__type":

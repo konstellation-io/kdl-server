@@ -323,6 +323,21 @@ func (mr *MockUseCaseMockRecorder) GetByUsername(ctx, username interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByUsername", reflect.TypeOf((*MockUseCase)(nil).GetByUsername), ctx, username)
 }
 
+// GetKubeconfig mocks base method.
+func (m *MockUseCase) GetKubeconfig(ctx context.Context, username string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetKubeconfig", ctx, username)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetKubeconfig indicates an expected call of GetKubeconfig.
+func (mr *MockUseCaseMockRecorder) GetKubeconfig(ctx, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKubeconfig", reflect.TypeOf((*MockUseCase)(nil).GetKubeconfig), ctx, username)
+}
+
 // RegenerateSSHKeys mocks base method.
 func (m *MockUseCase) RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error) {
 	m.ctrl.T.Helper()

@@ -90,7 +90,6 @@ type ComplexityRoot struct {
 		Name               func(childComplexity int) int
 		NeedAccess         func(childComplexity int) int
 		Repository         func(childComplexity int) int
-		Runtimes           func(childComplexity int) int
 		ToolUrls           func(childComplexity int) int
 	}
 
@@ -492,13 +491,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Project.Repository(childComplexity), true
-
-	case "Project.runtimes":
-		if e.complexity.Project.Runtimes == nil {
-			break
-		}
-
-		return e.complexity.Project.Runtimes(childComplexity), true
 
 	case "Project.toolUrls":
 		if e.complexity.Project.ToolUrls == nil {
@@ -1036,7 +1028,6 @@ type Project {
   toolUrls: ToolUrls!
   needAccess: Boolean!
   archived: Boolean!
-  runtimes: [Runtime!]!
 }
 
 input RepositoryInput {
@@ -2499,41 +2490,6 @@ func (ec *executionContext) _Project_archived(ctx context.Context, field graphql
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Project_runtimes(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Project",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Runtimes, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]entity.Runtime)
-	fc.Result = res
-	return ec.marshalNRuntime2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRuntimeᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _QualityProjectDesc_quality(ctx context.Context, field graphql.CollectedField, obj *model.QualityProjectDesc) (ret graphql.Marshaler) {
@@ -5819,11 +5775,6 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			})
 		case "archived":
 			out.Values[i] = ec._Project_archived(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "runtimes":
-			out.Values[i] = ec._Project_runtimes(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}

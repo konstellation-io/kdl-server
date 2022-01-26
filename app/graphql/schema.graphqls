@@ -168,7 +168,6 @@ type Project {
   toolUrls: ToolUrls!
   needAccess: Boolean!
   archived: Boolean!
-  runtimes: [Runtime!]!
 }
 
 input RepositoryInput {

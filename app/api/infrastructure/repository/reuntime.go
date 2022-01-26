@@ -18,7 +18,7 @@ const (
 )
 
 type runtimeDTO struct {
-	RuntimeID   primitive.ObjectID `bson:"runtime_id"`
+	ID          primitive.ObjectID `bson:"_id"`
 	Name        string             `bson:"name"`
 	Desc        string             `bson:"desc"`
 	Labels      []string           `bson:"labels"`
@@ -36,7 +36,7 @@ func (m *runtimeMongoDBRepo) Get(ctx context.Context, id string) (entity.Runtime
 		return entity.Runtime{}, err
 	}
 
-	return m.findOne(ctx, bson.M{"runtime_id": idFromHex})
+	return m.findOne(ctx, bson.M{"_id": idFromHex})
 }
 
 func (m *runtimeMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.Runtime, error) {
@@ -80,7 +80,7 @@ func (m *runtimeMongoDBRepo) runtimesToDTOs(runtimes []entity.Runtime) ([]runtim
 		}
 
 		dtos[i] = runtimeDTO{
-			RuntimeID:   idFromHex,
+			ID:          idFromHex,
 			Name:        f.Name,
 			Desc:        f.Desc,
 			Labels:      f.Labels,
@@ -93,7 +93,7 @@ func (m *runtimeMongoDBRepo) runtimesToDTOs(runtimes []entity.Runtime) ([]runtim
 
 func (m *runtimeMongoDBRepo) dtoToEntity(dto runtimeDTO) entity.Runtime {
 	p := entity.Runtime{
-		ID:          dto.RuntimeID.Hex(),
+		ID:          dto.ID.Hex(),
 		Name:        dto.Name,
 		Desc:        dto.Desc,
 		Labels:      dto.Labels,

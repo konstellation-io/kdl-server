@@ -267,9 +267,11 @@ func (m *projectMongoDBRepo) runtimesToDTOs(runtimes []entity.Runtime) ([]runtim
 		}
 
 		dtos[i] = runtimeDTO{
-			RuntimeID: idFromHex,
-			Name:      f.Name,
-			Running:   f.Running,
+			ID:          idFromHex,
+			Name:        f.Name,
+			Desc:        f.Desc,
+			DockerImage: f.DockerImage,
+			Labels:      f.Labels,
 		}
 	}
 
@@ -304,9 +306,11 @@ func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 
 	for i, m := range dto.Runtimes {
 		p.Runtimes[i] = entity.Runtime{
-			ID:      m.RuntimeID.Hex(),
-			Name:    m.Name,
-			Running: m.Running,
+			ID:          m.ID.Hex(),
+			Name:        m.Name,
+			Desc:        m.Desc,
+			DockerImage: m.DockerImage,
+			Labels:      m.Labels,
 		}
 	}
 

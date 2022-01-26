@@ -13,3 +13,16 @@ export enum PANEL_ID {
   PROJECT_DESCRIPTION = 'projectDescription',
   MEMBER_INFO = 'memberInfo',
 }
+
+export type UsertoolsPanelInfo = {
+  id: USERTOOLS_PANEL_ID;
+  title: string;
+  fixedWidth: boolean | null;
+  theme: PANEL_THEME;
+  size: PANEL_SIZE;
+};
+
+export enum USERTOOLS_PANEL_ID {
+  RUNTIMES_LIST = 'runtimesList',
+  RUNTIME_INFO = 'runtimeInfo',
+}

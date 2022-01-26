@@ -23,7 +23,6 @@ type runtimeDTO struct {
 	Desc        string             `bson:"desc"`
 	Labels      []string           `bson:"labels"`
 	DockerImage string             `bson:"docker_image"`
-	Running     bool               `bson:"running"`
 }
 
 type runtimeMongoDBRepo struct {
@@ -86,7 +85,6 @@ func (m *runtimeMongoDBRepo) runtimesToDTOs(runtimes []entity.Runtime) ([]runtim
 			Desc:        f.Desc,
 			Labels:      f.Labels,
 			DockerImage: f.DockerImage,
-			Running:     f.Running,
 		}
 	}
 
@@ -100,7 +98,6 @@ func (m *runtimeMongoDBRepo) dtoToEntity(dto runtimeDTO) entity.Runtime {
 		Desc:        dto.Desc,
 		Labels:      dto.Labels,
 		DockerImage: dto.DockerImage,
-		Running:     dto.Running,
 	}
 
 	return p

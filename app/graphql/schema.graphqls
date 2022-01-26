@@ -34,7 +34,6 @@ type Runtime {
   labels: [String!]
   DockerImage: String!
   UsertoolsPod: String
-  running: Boolean!
 }
 
 type Topic {

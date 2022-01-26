@@ -8,7 +8,6 @@ type Runtime struct {
 	Labels       []string
 	DockerImage  string
 	UsertoolsPod string
-	Running      bool
 }
 
 // NewRuntime is a constructor function.

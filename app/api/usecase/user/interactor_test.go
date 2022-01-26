@@ -3,6 +3,7 @@ package user_test
 import (
 	"context"
 	"errors"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 	"testing"
 	"time"
@@ -29,6 +30,7 @@ type userSuite struct {
 
 type userMocks struct {
 	logger        *logging.MockLogger
+	cfg           config.Config
 	repo          *user.MockRepository
 	runtimeRepo   *runtime.MockRepository
 	sshGenerator  *sshhelper.MockSSHKeyGenerator
@@ -37,7 +39,7 @@ type userMocks struct {
 	k8sClientMock *k8s.MockK8sClient
 }
 
-func newUserSuite(t *testing.T) *userSuite {
+func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	ctrl := gomock.NewController(t)
 
 	logger := logging.NewMockLogger(ctrl)
@@ -51,13 +53,18 @@ func newUserSuite(t *testing.T) *userSuite {
 	giteaServiceMock := giteaservice.NewMockGiteaClient(ctrl)
 	k8sClientMock := k8s.NewMockK8sClient(ctrl)
 
-	interactor := user.NewInteractor(logger, repo, repoRuntimes, sshGenerator, clockMock, giteaServiceMock, k8sClientMock)
+	if cfg == nil {
+		cfg = &config.Config{}
+	}
+
+	interactor := user.NewInteractor(logger, *cfg, repo, repoRuntimes, sshGenerator, clockMock, giteaServiceMock, k8sClientMock)
 
 	return &userSuite{
 		ctrl:       ctrl,
 		interactor: interactor,
 		mocks: userMocks{
 			logger:        logger,
+			cfg:           *cfg,
 			repo:          repo,
 			runtimeRepo:   repoRuntimes,
 			sshGenerator:  sshGenerator,
@@ -69,7 +76,7 @@ func newUserSuite(t *testing.T) *userSuite {
 }
 
 func TestInteractor_Create(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -123,7 +130,7 @@ func TestInteractor_Create(t *testing.T) {
 }
 
 func TestInteractor_Create_UserDuplEmail(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -143,7 +150,7 @@ func TestInteractor_Create_UserDuplEmail(t *testing.T) {
 }
 
 func TestInteractor_Create_UserDuplUsername(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -162,7 +169,7 @@ func TestInteractor_Create_UserDuplUsername(t *testing.T) {
 }
 
 func TestInteractor_AreToolsRunning(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -182,7 +189,7 @@ func TestInteractor_AreToolsRunning(t *testing.T) {
 
 // nolint:dupl // similar code but no equal
 func TestInteractor_StopTools(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -204,7 +211,7 @@ func TestInteractor_StopTools(t *testing.T) {
 }
 
 func TestInteractor_StopTools_Err(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -227,15 +234,16 @@ func TestInteractor_StopTools_Err(t *testing.T) {
 
 // nolint:dupl // similar code but no equal
 func TestInteractor_StartTools(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
 		username     = "john"
 		toolsRunning = false
-		runtimeId    = "1234"
 		runtimeImage = "konstellation/image"
 	)
+
+	runtimeId := "12345"
 
 	ctx := context.Background()
 	expectedUser := entity.User{Username: username}
@@ -246,21 +254,60 @@ func TestInteractor_StartTools(t *testing.T) {
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeId, runtimeImage).Return(nil)
 
-	returnedUser, err := s.interactor.StartTools(ctx, username, runtimeId)
+	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeId)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, returnedUser)
 }
 
+// nolint:dupl // similar code but no equal
+func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
+	// GIVEN there is a default image defined for the Runtime
+	cfg := config.Config{}
+	cfg.UserToolsVsCodeRuntime.Image.Repository = "defaultImage"
+
+	s := newUserSuite(t, &cfg)
+	defer s.ctrl.Finish()
+
+	const (
+		username     = "john"
+		toolsRunning = false
+		runtimeId    = "default"
+	)
+
+	ctx := context.Background()
+	expectedUser := entity.User{Username: username}
+
+	// AND the user is the in repo
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
+	// AND the usertools for the user was not running
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
+	// AND the CR creation does not return any error
+	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeId, cfg.UserToolsVsCodeRuntime.Image.Repository).Return(nil)
+
+	// WHEN the tools are started
+	returnedUser, err := s.interactor.StartTools(ctx, username, nil)
+
+	// THEN
+	// There are no errors
+	require.NoError(t, err)
+	// The returned user is the expected
+	require.Equal(t, expectedUser, returnedUser)
+	// AND
+	// EXPECT - The username was used to look for the user in the repository
+	// EXPECT - The username was used to check if the usertools are running
+	// EXPECT - The CR was created with the default image defined for the Runtime
+}
+
 func TestInteractor_StartTools_Err(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
 		username     = "john"
 		toolsRunning = true
-		runtimeId    = "1234"
 	)
+	runtimeId := "12345"
 
 	ctx := context.Background()
 	u := entity.User{Username: username}
@@ -269,14 +316,14 @@ func TestInteractor_StartTools_Err(t *testing.T) {
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(u, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 
-	returnedUser, err := s.interactor.StartTools(ctx, username, runtimeId)
+	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeId)
 
 	require.Equal(t, user.ErrStartUserTools, err)
 	require.Equal(t, returnedUser, emptyUser)
 }
 
 func TestInteractor_FindAll(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	ctx := context.Background()
@@ -291,7 +338,7 @@ func TestInteractor_FindAll(t *testing.T) {
 }
 
 func TestInteractor_FindAll_Err(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	var emptyUsers []entity.User
@@ -308,7 +355,7 @@ func TestInteractor_FindAll_Err(t *testing.T) {
 }
 
 func TestInteractor_GetByUsername(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const username = "john"
@@ -325,7 +372,7 @@ func TestInteractor_GetByUsername(t *testing.T) {
 }
 
 func TestInteractor_GetByUsername_Err(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const username = "john"
@@ -343,7 +390,7 @@ func TestInteractor_GetByUsername_Err(t *testing.T) {
 }
 
 func TestInteractor_FindByIDs(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	ctx := context.Background()
@@ -360,7 +407,7 @@ func TestInteractor_FindByIDs(t *testing.T) {
 }
 
 func TestInteractor_GetByID(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	ctx := context.Background()
@@ -377,7 +424,7 @@ func TestInteractor_GetByID(t *testing.T) {
 }
 
 func TestInteractor_RegenerateSSHKeys(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -421,7 +468,7 @@ func TestInteractor_RegenerateSSHKeys(t *testing.T) {
 }
 
 func TestInteractor_RegenerateSSHKeys_UserToolsRunning(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -459,7 +506,7 @@ func TestInteractor_RegenerateSSHKeys_UserToolsRunning(t *testing.T) {
 }
 
 func TestInteractor_UpdateAccessLevel(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (

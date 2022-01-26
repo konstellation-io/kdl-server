@@ -365,7 +365,7 @@ func (mr *MockUseCaseMockRecorder) ScheduleUsersSyncJob(interval interface{}) *g
 }
 
 // StartTools mocks base method.
-func (m *MockUseCase) StartTools(ctx context.Context, username, runtimeId string) (entity.User, error) {
+func (m *MockUseCase) StartTools(ctx context.Context, username string, runtimeId *string) (entity.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "StartTools", ctx, username, runtimeId)
 	ret0, _ := ret[0].(entity.User)

@@ -163,7 +163,7 @@ func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.S
 	username := ctx.Value(middleware.LoggedUserNameKey).(string)
 
 	if input.Active {
-		u, err := r.users.StartTools(ctx, username, *input.RuntimeID)
+		u, err := r.users.StartTools(ctx, username, input.RuntimeID)
 		return &u, err
 	}
 

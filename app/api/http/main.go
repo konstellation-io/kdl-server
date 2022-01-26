@@ -79,7 +79,7 @@ func main() {
 		logger.Errorf("Error creating indexes for users: %s", err)
 	}
 
-	userInteractor := user.NewInteractor(logger, userRepo, runtimeRepo, sshHelper, realClock, giteaService, k8sClient)
+	userInteractor := user.NewInteractor(logger, cfg, userRepo, runtimeRepo, sshHelper, realClock, giteaService, k8sClient)
 
 	err = userInteractor.CreateAdminUser(cfg.Admin.Username, cfg.Admin.Email)
 	if err != nil {

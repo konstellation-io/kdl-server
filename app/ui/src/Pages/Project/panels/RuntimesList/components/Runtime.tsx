@@ -1,19 +1,24 @@
 import React from 'react';
-import cx from 'classnames';
 import styles from './Runtime.module.scss';
-import {GetRuntime_runtimes} from "Graphql/queries/types/GetRuntime";
-import {AccessLevel} from "../../../../../Graphql/types/globalTypes";
-import {run} from "apollo";
+import {GetRuntimes_runtimes} from "Graphql/queries/types/GetRuntimes";
+import cx from "classnames";
 
-type Props = {
-  runtime: GetRuntime_runtimes;
+type BaseProps = {
+  runtime: GetRuntimes_runtimes;
 };
 
-function Runtime({ runtime }: Props) {
+type Props = {
+  runtime: GetRuntimes_runtimes;
+  runtimeActive: boolean;
+};
+
+function Runtime({ runtime, runtimeActive }: Props) {
   return (
     <div
       data-testid="runtime"
-      className={cx(styles.container)}
+      className={cx(styles.container, {
+        [styles.active]: runtimeActive
+      })}
     >
       <div className={styles.content}>
         <p className={styles.name} data-testid="runtimeName">
@@ -28,13 +33,13 @@ function Runtime({ runtime }: Props) {
   );
 }
 
-function LabelList({ runtime }: Props) {
+function LabelList({ runtime }: BaseProps) {
 
   if (!runtime.labels ) return (<div></div>);
 
   return (
     <div className={styles.labels}>
-      <div className={styles.content}>
+      <div>
         {[
           ...runtime.labels.map((label) => (
             <div key={label} className={styles.label}>{label}</div>

@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: GetRuntime
+// GraphQL query operation: GetRunningRuntime
 // ====================================================
 
-export interface GetRuntime_runtimes {
+export interface GetRunningRuntime_runningRuntime {
   __typename: "Runtime";
   id: string;
   name: string;
@@ -16,10 +16,6 @@ export interface GetRuntime_runtimes {
   DockerImage: string;
 }
 
-export interface GetRuntime {
-  runtimes: GetRuntime_runtimes[];
-}
-
-export interface GetRuntimeVariables {
-  id: string;
+export interface GetRunningRuntime {
+  runningRuntime: GetRunningRuntime_runningRuntime | null;
 }

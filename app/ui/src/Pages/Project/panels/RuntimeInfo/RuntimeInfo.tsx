@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {GetRuntime_runtimes} from "Graphql/queries/types/GetRuntime";
+import {GetRuntimes_runtimes} from "Graphql/queries/types/GetRuntimes";
 
 
 type Props = {
-  selectedRuntime: GetRuntime_runtimes;
+  selectedRuntime: GetRuntimes_runtimes;
   close: () => void;
 };
 function RuntimeInfo({ selectedRuntime, close }: Props) {

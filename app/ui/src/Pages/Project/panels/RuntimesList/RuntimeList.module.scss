@@ -1,0 +1,10 @@
+@import 'Styles/colors';
+@import 'Styles/mixins';
+@import 'Styles/variables';
+@import 'Styles/borders';
+@import 'Styles/shadows';
+
+.runtimeContainer {
+  background-color: palette(base, 300);
+  padding: 1 * $grid-unit;
+}

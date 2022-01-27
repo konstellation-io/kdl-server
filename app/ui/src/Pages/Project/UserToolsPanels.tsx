@@ -7,7 +7,7 @@ import styles from './Project.module.scss';
 import { useReactiveVar } from '@apollo/client';
 import RuntimesList from './panels/RuntimesList/RuntimesList';
 import RuntimeInfo from './panels/RuntimeInfo/RuntimeInfo';
-import { GetRuntime_runtimes } from '../../Graphql/queries/types/GetRuntime';
+import { GetRuntimes_runtimes } from '../../Graphql/queries/types/GetRuntimes';
 
 const defaultPanel = USERTOOLS_PANEL_ID.RUNTIMES_LIST;
 
@@ -18,7 +18,7 @@ function UserToolsPanels() {
   const { closePanel: panel1Close } = usePanel(PanelType.PRIMARY);
   const { closePanel: panel2Close } = usePanel(PanelType.SECONDARY);
 
-  const selectedRuntime: GetRuntime_runtimes = {
+  const selectedRuntime: GetRuntimes_runtimes = {
     __typename: 'Runtime',
     id: '',
     name: '',

@@ -17,17 +17,22 @@ $desc-height: 5 * $grid-unit;
   width: 100%;
   background-color: palette(base, 400);
   border-radius: $grid-unit;
-  border-left: 2px solid palette(alert);
+  border-left: 3px solid palette(base);
+  cursor: pointer;
 
   &.active {
-    border-left: 2px solid palette(success);
+    border-left: 3px solid palette(success);
+  }
+
+  &:hover {
+    background-color: palette(base, 800);
   }
 }
 
 .label {
   position: relative;
   float: left;
-  margin: 0 0 1.1 * $grid-unit 1.5 * $grid-unit;
+  margin: 0 1.5 * $grid-unit 1.1 * $grid-unit 0;
   padding: 0.4 * $grid-unit 1.5 * $grid-unit;
   background-color: palette(base);
   border-radius: 0.5 * $grid-unit;

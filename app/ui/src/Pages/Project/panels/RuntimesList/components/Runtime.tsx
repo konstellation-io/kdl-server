@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './Runtime.module.scss';
-import {GetRuntimes_runtimes} from "Graphql/queries/types/GetRuntimes";
-import cx from "classnames";
+import { GetRuntimes_runtimes } from 'Graphql/queries/types/GetRuntimes';
+import cx from 'classnames';
 
 type BaseProps = {
   runtime: GetRuntimes_runtimes;
@@ -17,7 +17,7 @@ function Runtime({ runtime, runtimeActive }: Props) {
     <div
       data-testid="runtime"
       className={cx(styles.container, {
-        [styles.active]: runtimeActive
+        [styles.active]: runtimeActive,
       })}
     >
       <div className={styles.content}>
@@ -27,22 +27,23 @@ function Runtime({ runtime, runtimeActive }: Props) {
         <p className={styles.desc} data-testid="runtimeDesc">
           {runtime.desc}
         </p>
-        <LabelList runtime={runtime}/>
+        <LabelList runtime={runtime} />
       </div>
     </div>
   );
 }
 
 function LabelList({ runtime }: BaseProps) {
-
-  if (!runtime.labels ) return (<div></div>);
+  if (!runtime.labels) return <div></div>;
 
   return (
     <div className={styles.labels}>
       <div>
         {[
           ...runtime.labels.map((label) => (
-            <div key={label} className={styles.label}>{label}</div>
+            <div key={label} className={styles.label}>
+              {label}
+            </div>
           )),
         ]}
       </div>

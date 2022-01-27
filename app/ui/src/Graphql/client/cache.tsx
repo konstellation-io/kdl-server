@@ -6,7 +6,7 @@ import { GetProjectMembers_project_members } from '../queries/types/GetProjectMe
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTools';
 import { NewProject } from './models/NewProject';
-import {PanelInfo, UsertoolsPanelInfo} from './models/Panel';
+import { PanelInfo } from './models/Panel';
 import { SettingsTab } from './models/SettingsTab';
 
 type ToolName = keyof GetUserTools_project_toolUrls;
@@ -63,8 +63,6 @@ export const userSettings = makeVar<UserSettings>(initialStateUserSettings);
 export const memberDetails = makeVar<GetProjectMembers_project_members | null>(null);
 export const primaryPanel = makeVar<PanelInfo | null>(null);
 export const secondaryPanel = makeVar<PanelInfo | null>(null);
-export const usertoolsPrimaryPanel = makeVar<UsertoolsPanelInfo | null>(null);
-export const usertoolsSecondaryPanel = makeVar<UsertoolsPanelInfo | null>(null);
 export const currentTool = makeVar<ToolName | null>(null);
 export const openedTools = makeVar<ToolName[]>([]);
 export const openedSettingTab = makeVar<SettingsTab>(SettingsTab.INFO);

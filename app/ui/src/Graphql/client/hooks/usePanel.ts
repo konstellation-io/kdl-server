@@ -1,4 +1,4 @@
-import { PANEL_ID, PanelInfo } from '../models/Panel';
+import { PANEL_ID, PanelInfo, USERTOOLS_PANEL_ID } from '../models/Panel';
 import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
 import { primaryPanel, secondaryPanel } from '../cache';
 
@@ -10,7 +10,7 @@ export enum PanelType {
 }
 
 type UsePanelOptions = {
-  id: PANEL_ID;
+  id: PANEL_ID | USERTOOLS_PANEL_ID;
   title: string;
   isDark?: boolean | null;
   size?: PANEL_SIZE;

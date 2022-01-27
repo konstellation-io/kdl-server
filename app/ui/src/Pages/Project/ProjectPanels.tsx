@@ -56,7 +56,7 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
         theme={panel1Data?.theme}
         size={panel1Data?.size}
       >
-        {panels[panel1Data?.id || defaultPanel]}
+        {panels[(panel1Data?.id as PANEL_ID) || defaultPanel]}
       </Panel>
       <Panel
         title={panel2Data?.title}
@@ -66,7 +66,7 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
         theme={panel2Data?.theme}
         size={panel2Data?.size}
       >
-        {panels[panel2Data?.id || defaultPanel]}
+        {panels[(panel2Data?.id as PANEL_ID) || defaultPanel]}
       </Panel>
     </div>
   );

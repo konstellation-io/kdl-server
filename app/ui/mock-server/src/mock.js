@@ -16,6 +16,7 @@ module.exports = {
     users: () => users,
     project: (_, { id }) => projects.find((project) => project.id === id),
     runtimes: () => runtimes,
+    runningRuntime: () => runtimes[casual.integer(0, 7)],
   }),
   Mutation: () => ({
     updateProject: (_, { input: { id, name, description, archived } }) => {

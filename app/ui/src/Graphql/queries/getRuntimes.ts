@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 export default gql`
-  query GetRuntime($id: ID!) {
-    runtimes(projectId: $id) {
+  query GetRuntimes {
+    runtimes {
       id
       name
       desc

@@ -4,7 +4,7 @@ type Query {
   project(id: ID!): Project!
   users: [User!]!
   qualityProjectDesc(description: String!): QualityProjectDesc!
-  runtimes(projectId: ID!): [Runtime!]!
+  runtimes: [Runtime!]!
   runningRuntime: Runtime
   kubeconfig: String!
 }

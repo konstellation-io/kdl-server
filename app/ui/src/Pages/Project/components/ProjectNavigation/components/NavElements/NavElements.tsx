@@ -16,10 +16,10 @@ import { useQuery, useReactiveVar } from '@apollo/client';
 import useTool from 'Graphql/hooks/useTool';
 import ConfirmAction from 'Components/Layout/ConfirmAction/ConfirmAction';
 import GetMeQuery from 'Graphql/queries/getMe';
-import { USERTOOLS_PANEL_ID } from 'Graphql/client/models/Panel';
 import { primaryPanel } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
+import { PANEL_ID } from 'Graphql/client/models/Panel';
 
 type Props = {
   isOpened: boolean;
@@ -51,7 +51,7 @@ function NavElements({ isOpened }: Props) {
   }
 
   function toggleUsertoolsPanel() {
-    const shouldOpen = !panelData || panelData.id !== USERTOOLS_PANEL_ID.RUNTIMES_LIST;
+    const shouldOpen = !panelData || panelData.id !== PANEL_ID.RUNTIMES_LIST;
 
     if (shouldOpen) openRuntimesList();
     else closeRuntimesList();

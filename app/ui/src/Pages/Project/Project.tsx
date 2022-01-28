@@ -15,7 +15,6 @@ import { useParams } from 'react-router-dom';
 import useTools from 'Graphql/client/hooks/useTools';
 
 import GetProjectsQuery from 'Graphql/queries/getProjects';
-import UserToolsPanels from './UserToolsPanels';
 
 function Project() {
   const { projectId } = useParams<RouteProjectParams>();
@@ -66,9 +65,6 @@ function Project() {
       </div>
       <div className={styles.panelLayer}>
         <ProjectPanels openedProject={project} />
-      </div>
-      <div className={styles.panelLayer}>
-        <UserToolsPanels />
       </div>
     </div>
   );

@@ -11,6 +11,9 @@ import UpdateProjectDescription from './panels/UpdateProjectDescription/UpdatePr
 import styles from './Project.module.scss';
 import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
 import { useReactiveVar } from '@apollo/client';
+import RuntimesList from './panels/RuntimesList/RuntimesList';
+import RuntimeInfo from './panels/RuntimeInfo/RuntimeInfo';
+import { GetRuntimes_runtimes } from '../../Graphql/queries/types/GetRuntimes';
 
 const defaultPanel = 'settings';
 
@@ -38,12 +41,23 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
     unselectMemberDetails();
   }
 
+  const selectedRuntime: GetRuntimes_runtimes = {
+    __typename: 'Runtime',
+    id: '',
+    name: '',
+    desc: '',
+    labels: [],
+    DockerImage: '',
+  };
+
   const panels: { [key in PANEL_ID]: JSX.Element | null } = {
     [PANEL_ID.SETTINGS]: <ProjectSettings project={openedProject} />,
     [PANEL_ID.PROJECT_DESCRIPTION]: <UpdateProjectDescription project={openedProject} close={panel2Close} />,
     [PANEL_ID.MEMBER_INFO]: memberDetailsData && (
       <MemberDetails member={memberDetailsData} close={closeMemberInfoPanel} projectId={openedProject.id} />
     ),
+    [PANEL_ID.RUNTIMES_LIST]: <RuntimesList />,
+    [PANEL_ID.RUNTIME_INFO]: <RuntimeInfo selectedRuntime={selectedRuntime} close={panel2Close} />,
   };
 
   return (
@@ -56,7 +70,7 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
         theme={panel1Data?.theme}
         size={panel1Data?.size}
       >
-        {panels[(panel1Data?.id as PANEL_ID) || defaultPanel]}
+        {panels[panel1Data?.id || defaultPanel]}
       </Panel>
       <Panel
         title={panel2Data?.title}
@@ -66,7 +80,7 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
         theme={panel2Data?.theme}
         size={panel2Data?.size}
       >
-        {panels[(panel2Data?.id as PANEL_ID) || defaultPanel]}
+        {panels[panel2Data?.id || defaultPanel]}
       </Panel>
     </div>
   );

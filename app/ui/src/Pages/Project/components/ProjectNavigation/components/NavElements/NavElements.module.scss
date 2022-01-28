@@ -33,6 +33,23 @@
       padding-top: 0.75 * $grid-unit;
     }
 
+    .usertoolsIcon {
+      margin: $grid-unit;
+      cursor: pointer;
+
+      &.blocked {
+        color: palette(alert);
+      }
+
+      &:hover {
+        color: palette(highlight);
+      }
+    }
+
+    .usertoolsSettings {
+      float: right;
+    }
+
     .toggleToolsWrapper {
       border-top: 2px dotted palette(base, 400);
       transition: opacity 0.3s ease;

@@ -3,8 +3,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { GetMe } from 'Graphql/queries/types/GetMe';
 import { NavButtonLink } from '../../ProjectNavigation';
 import NavigationButton from '../NavigationButton/NavigationButton';
-import PauseIcon from '@material-ui/icons/Pause';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import IconPause from '@material-ui/icons/Pause';
+import IconPlay from '@material-ui/icons/PlayArrow';
 import IconSettings from '@material-ui/icons/Settings';
 import * as React from 'react';
 import { RouteProjectParams } from 'Constants/routes';
@@ -16,7 +16,6 @@ import { useQuery, useReactiveVar } from '@apollo/client';
 import useTool from 'Graphql/hooks/useTool';
 import ConfirmAction from 'Components/Layout/ConfirmAction/ConfirmAction';
 import GetMeQuery from 'Graphql/queries/getMe';
-import { Button } from 'kwc';
 import { USERTOOLS_PANEL_ID } from 'Graphql/client/models/Panel';
 import { primaryPanel } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
@@ -34,6 +33,8 @@ function NavElements({ isOpened }: Props) {
   const areToolsActive = data?.me.areToolsActive;
   const panelData = useReactiveVar(primaryPanel);
 
+  const runtimeSelected = true;
+
   const { openPanel: openRuntimesList, closePanel: closeRuntimesList } = usePanel(
     PanelType.PRIMARY,
     USERTOOLS_PANEL_OPTIONS,
@@ -42,7 +43,11 @@ function NavElements({ isOpened }: Props) {
   if (loading) return null;
 
   function toggleTools() {
-    updateProjectActiveTools(!areToolsActive);
+    if (runtimeSelected) {
+      updateProjectActiveTools(!areToolsActive);
+    } else {
+      toggleUsertoolsPanel();
+    }
   }
 
   function toggleUsertoolsPanel() {
@@ -53,9 +58,14 @@ function NavElements({ isOpened }: Props) {
   }
 
   function renderToggleToolsIcon() {
-    const Progress = () => <CircularProgress className={styles.loadingTools} size={16} />;
+    const Progress = <CircularProgress className={styles.loadingTools} size={16} />;
     if (projectActiveTools.loading) return Progress;
-    return areToolsActive ? PauseIcon : PlayArrowIcon;
+
+    return areToolsActive ? (
+      <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} />
+    ) : (
+      <IconPlay className={cx(styles.usertoolsIcon, 'icon-small', { [styles.blocked]: !runtimeSelected })} />
+    );
   }
 
   return (
@@ -77,11 +87,21 @@ function NavElements({ isOpened }: Props) {
             [styles.stopped]: !areToolsActive,
           })}
         >
+          <div className={styles.usertoolsSettings} data-testid="usertoolsSettings">
+            <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
+            <ConfirmAction
+              title="STOP YOUR TOOLS"
+              subtitle="You are going to stop your user tools, please confirm your choice."
+              action={toggleTools}
+              actionLabel="STOP"
+              skipConfirmation={!areToolsActive}
+              warning
+            >
+              {renderToggleToolsIcon()}
+            </ConfirmAction>
+          </div>
           <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
             <div className={styles.userToolLabel}>USER TOOLS</div>
-            <div className={styles.button} data-testid="usertoolsSettings">
-              <Button label="" Icon={IconSettings} onClick={toggleUsertoolsPanel} />
-            </div>
           </AnimateHeight>
           {userToolsRoutes.map(({ Icon, label, route, disabled }) => (
             <NavButtonLink to={route} key={label} disabled={disabled}>
@@ -93,22 +113,7 @@ function NavElements({ isOpened }: Props) {
               [styles.disabled]: projectActiveTools.loading,
             })}
             data-testid="confirmationModal"
-          >
-            <ConfirmAction
-              title="STOP YOUR TOOLS"
-              subtitle="You are going to stop your user tools, please confirm your choice."
-              action={toggleTools}
-              actionLabel="STOP"
-              skipConfirmation={!areToolsActive}
-              warning
-            >
-              <NavigationButton
-                dataTestId={areToolsActive ? 'stopTools' : 'runTools'}
-                label={areToolsActive ? 'Stop tools' : 'Run tools'}
-                Icon={renderToggleToolsIcon()}
-              />
-            </ConfirmAction>
-          </div>
+          ></div>
         </div>
       </div>
     </>

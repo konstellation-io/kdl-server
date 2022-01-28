@@ -8,6 +8,7 @@ import { GetUserTools_project_toolUrls } from 'Graphql/queries/types/GetUserTool
 import { NewProject } from './models/NewProject';
 import { PanelInfo } from './models/Panel';
 import { SettingsTab } from './models/SettingsTab';
+import { GetRuntimes_runtimes } from '../queries/types/GetRuntimes';
 
 type ToolName = keyof GetUserTools_project_toolUrls;
 
@@ -66,6 +67,8 @@ export const secondaryPanel = makeVar<PanelInfo | null>(null);
 export const currentTool = makeVar<ToolName | null>(null);
 export const openedTools = makeVar<ToolName[]>([]);
 export const openedSettingTab = makeVar<SettingsTab>(SettingsTab.INFO);
+export const selectedRuntime = makeVar<GetRuntimes_runtimes | null>(null);
+export const runningRuntime = makeVar<GetRuntimes_runtimes | null>(null);
 
 const cache = new InMemoryCache({
   typePolicies: {

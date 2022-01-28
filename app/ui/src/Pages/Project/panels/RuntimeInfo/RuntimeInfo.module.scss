@@ -1,0 +1,56 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.header {
+  padding: 2 * $grid-unit;
+}
+
+.body {
+  height: 100%;
+  padding: 4 * $grid-unit;
+  background-color: palette(base, 900);
+  h2 {
+    @include font-caption;
+    text-transform: uppercase;
+    color: font-color(regular);
+  }
+}
+
+.headerName {
+  color: white;
+  display: flex;
+  margin-bottom: 2 * $grid-unit;
+  @include font-headline;
+}
+
+.runtimeTags {
+   display: flex;
+   flex-direction: row;
+}
+
+.runningTag {
+  position: relative;
+  display: flex;
+  float: left;
+  margin: 0 1.5 * $grid-unit 1.1 * $grid-unit 0;
+  padding: 0.4 * $grid-unit 3.5 * $grid-unit;
+  background-color: palette(success, 700);
+  border-radius: 2 * $grid-unit;
+  @include font-small;
+  color: font-color(dark);
+  font-weight: bold;
+}
+
+.runtimeDescription {
+  @include font-body;
+  color: font-color(regular);
+}
+
+.dockerImage {
+  margin-top: 3 * $grid-unit;
+  p {
+    @include font-body;
+  }
+}

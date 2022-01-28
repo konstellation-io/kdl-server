@@ -6,14 +6,17 @@ import { GetRuntimes, GetRuntimes_runtimes } from 'Graphql/queries/types/GetRunt
 import { ErrorMessage, SpinnerCircular } from 'kwc';
 import styles from './RuntimeList.module.scss';
 import Runtime from './components/Runtime';
-import {
-  GetRunningRuntime,
-  GetRunningRuntime_runningRuntime,
-} from '../../../../Graphql/queries/types/GetRunningRuntime';
+import { GetRunningRuntime } from 'Graphql/queries/types/GetRunningRuntime';
+import useRunningRuntime from 'Graphql/client/hooks/useRunningRuntime';
 
 function RuntimesList() {
   const { data, error, loading } = useQuery<GetRuntimes>(GetRuntimesQuery);
   const { data: dataRunning, loading: loadingRunning } = useQuery<GetRunningRuntime>(GetRunningRuntimeQuery);
+  const { updateRunningRuntime } = useRunningRuntime();
+
+  if (dataRunning) {
+    updateRunningRuntime(dataRunning?.runningRuntime);
+  }
 
   if (loading || loadingRunning) return <SpinnerCircular />;
   if (error || !data || !dataRunning) return <ErrorMessage />;

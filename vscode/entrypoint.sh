@@ -5,17 +5,17 @@ USER_SETTINGS_DIR="$HOME/.local/share/code-server/User"
 SETTINGS_FILE="${USER_SETTINGS_DIR}/settings.json"
 TMP_FILE=$(mktemp)
 
-if [ ! -d ${USER_SETTINGS_DIR} ]; then
-  mkdir -p ${USER_SETTINGS_DIR}
+if [ ! -d "${USER_SETTINGS_DIR}" ]; then
+  mkdir -p "${USER_SETTINGS_DIR}"
 fi
 
-if [ ! -f ${SETTINGS_FILE} ]; then
-  echo "{}" > ${SETTINGS_FILE}
+if [ ! -f "${SETTINGS_FILE}" ]; then
+  echo "{}" > "${SETTINGS_FILE}"
 fi
 
 # Update users settings
-jq -s '.[1] * .[0]' ${DEFAULT_SETTINGS_FILE} ${SETTINGS_FILE} > ${TMP_FILE} \
-      && mv ${TMP_FILE} ${SETTINGS_FILE}
+jq -s '.[1] * .[0]' "${DEFAULT_SETTINGS_FILE}" "${SETTINGS_FILE}" > "${TMP_FILE}" \
+      && mv "${TMP_FILE}" "${SETTINGS_FILE}"
 
 
 

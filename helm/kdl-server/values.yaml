@@ -99,10 +99,9 @@ enterprise-gateway:
   replicas: 1
   logLevel: DEBUG
   mirrorWorkingDirs: true
-  # Master public IP on which to expose EG.
-  k8sMasterPublicIP:
+
   # create and require a secret token, supplied by client in an "Authorization: token" header
-  authTokenEnabled: true
+  authTokenEnabled: false
   affinity: {}
 
   kernel:
@@ -118,57 +117,18 @@ enterprise-gateway:
     cullIdleTimeout: 3600
     # List of kernel names that are available for use.
     whitelist:
-      - r_kubernetes
-      - python_kubernetes
-      - jupyter-flavors-kai-python-tf
-      - kernel-patata
-      # - scala_kubernetes
-      # - spark_r_kubernetes
-      # - spark_python_kubernetes
-      # - spark_scala_kubernetes
+      - kdl-py3.9
+      - kdl-py3.9-cuda10.2-cudnn7
     # Default kernel name should be something from the whitelist
-    defaultKernelName: python_kubernetes
+    defaultKernelName: kdl-py3.9
     # kernel service account name
     serviceAccount: kernel-sa
 
   kernelspecs:
     # Optional custom data image containing kernelspecs to use.
-    # image:
-    image: localhost:32000/konstellation/jupyter-enterprise-kernel-gateway:latest
+    image: "konstellation/jupyter-kernelspecs:latest"
     # Kernelspecs image pull policy.
-    imagePullPolicy: Always
-
-  nfs:
-    enabled: false
-    # IP address of NFS server. Required if enabled.
-    internalServerIPAddress:
-
-  ingress:
-    enabled: false
-
-    # Ingress resource host
-    hostName: ""
-
-    # Ingress resource annotations to be included depending in ingress controller.
-    traefik:
-      enabled: false
-      path: /gateway
-      annotations:
-        kubernetes.io/ingress.class: "traefik"
-        traefik.frontend.rule.type: PathPrefixStrip
-
-    nginx:
-      enabled: false
-      tls:
-        enabled: false
-        hostname: gateway.wave.spot.io
-      path: /gateway/?(.*)
-      annotations:
-        kubernetes.io/ingress.class: "nginx"
-        nginx.ingress.kubernetes.io/rewrite-target: /$1
-        nginx.ingress.kubernetes.io/ssl-redirect: "false"
-        nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-        cert-manager.io/cluster-issuer:
+    imagePullPolicy: IfNotPresent
 
   # Kernel Image Puller (daemonset)
   kip:
@@ -179,7 +139,7 @@ enterprise-gateway:
     imagePullPolicy: IfNotPresent
     # Determines whether the Kernel Image Puller will pull kernel images it has
     # previously pulled
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
     # The interval (in seconds) at which the Kernel Image Puller fetches
     # kernelspecs to pull kernel images.
     interval: 300
@@ -380,8 +340,8 @@ userToolsOperator:
       pullPolicy: IfNotPresent
   vscodeRuntime:
     image:
-      repository: konstellation/jupyter-flavors-kai-python-tf
-      tag: "latest"
+      repository: konstellation/kdl-py
+      tag: "3.9"
       pullPolicy: IfNotPresent
   #giteaOauth2Setup:
   #  image:

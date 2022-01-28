@@ -52,6 +52,7 @@ type Config struct {
 			Tag        string `envconfig:"JUPYTER_IMG_TAG"`
 			PullPolicy string `envconfig:"JUPYTER_IMG_PULLPOLICY"`
 		}
+		EnterpriseGatewayURL string `envconfig:"JUPYTER_ENTERPRISE_GATEWAY_URL"`
 	}
 	VSCode struct {
 		URL     string `envconfig:"USER_TOOLS_VSCODE_URL"`

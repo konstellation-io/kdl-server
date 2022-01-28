@@ -141,12 +141,12 @@ deploy_helm_chart() {
     --set userToolsOperator.image.repository="$IMAGE_REGISTRY/konstellation/user-tools-operator" \
     --set userToolsOperator.jupyter.image.pullPolicy="Always" \
     --set userToolsOperator.jupyter.image.repository="$IMAGE_REGISTRY/konstellation/jupyter-gpu" \
+    --set enterprise-gateway.kernelspecs.imagePullPolicy="Always" \
+    --set enterprise-gateway.kernelspecs.image="$IMAGE_REGISTRY/konstellation/jupyter-kernelspecs:latest" \
     --set userToolsOperator.repoCloner.image.pullPolicy="Always" \
     --set userToolsOperator.repoCloner.image.repository="$IMAGE_REGISTRY/konstellation/repo-cloner" \
     --set userToolsOperator.vscode.image.pullPolicy="Always" \
     --set userToolsOperator.vscode.image.repository="$IMAGE_REGISTRY/konstellation/vscode" \
-    --set userToolsOperator.vscodeRuntime.image.pullPolicy="Always" \
-    --set userToolsOperator.vscodeRuntime.image.repository="$IMAGE_REGISTRY/konstellation/jupyter-flavors-kai-python-tf" \
     --set userToolsOperator.storage.storageClassName=$STORAGE_CLASS_NAME \
     --timeout 60m \
     --wait \

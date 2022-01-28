@@ -177,6 +177,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 						"tag":        k.cfg.Jupyter.Image.Tag,
 						"pullPolicy": k.cfg.Jupyter.Image.PullPolicy,
 					},
+					"enterpriseGatewayUrl": k.cfg.Jupyter.EnterpriseGatewayURL,
 				},
 				"vscode": map[string]interface{}{
 					"image": map[string]string{

@@ -20,14 +20,12 @@ build_docker_images() {
   build_project_operator
   build_user_tools_operator
   build_jupyter_gpu
-  build_jupyter_enterprise_kernel_gateway
-  build_jupyter_flavors_kai_python_tf
+  build_jupyter_kernelspecs
   build_vscode
   build_repo_cloner
   build_mlflow
   build_kg
   build_backup
-  build_runtime
 }
 
 build_server() {
@@ -51,19 +49,23 @@ build_user_tools_operator() {
 }
 
 build_jupyter_gpu() {
-  build_image jupyter-gpu jupyter-gpu-slim
+  build_image jupyter-gpu jupyter-gpu
 }
 
-build_jupyter_enterprise_kernel_gateway() {
-  build_image jupyter-enterprise-kernel-gateway jupyter-enterprise-kernel-gateway
+build_jupyter_kernelspecs() {
+  build_image jupyter-kernelspecs jupyter-kernelspecs
 }
 
-build_jupyter_flavors_kai_python_tf() {
-  build_image jupyter-flavors-kai-python-tf jupyter-flavors-kai-conda-python-tf
+build_kdl_py_39() {
+  build_image kdl-py kdl-py3.9
+}
+
+build_kdl_py39_cuda10_2_cuddn7() {
+  build_image kdl-py-cuda kdl-py3.9-cuda10.2-cuddn7
 }
 
 build_vscode() {
-  build_image vscode vscode-slim
+  build_image vscode vscode
 }
 
 build_repo_cloner() {
@@ -90,10 +92,6 @@ build_kg() {
 
 build_backup() {
   build_image kdl-backup backup
-}
-
-build_runtime() {
-  build_image runtime runtime
 }
 
 build_image() {

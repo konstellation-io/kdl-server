@@ -7,7 +7,8 @@ export default gql`
       name
       desc
       labels
-      DockerImage
+      dockerImage
+      usertoolsPod
     }
   }
 `;

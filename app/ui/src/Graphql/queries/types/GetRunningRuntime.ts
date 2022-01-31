@@ -13,7 +13,8 @@ export interface GetRunningRuntime_runningRuntime {
   name: string;
   desc: string;
   labels: string[] | null;
-  DockerImage: string;
+  dockerImage: string;
+  usertoolsPod: string | null;
 }
 
 export interface GetRunningRuntime {

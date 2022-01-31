@@ -13,7 +13,8 @@ export interface GetRuntimes_runtimes {
   name: string;
   desc: string;
   labels: string[] | null;
-  DockerImage: string;
+  dockerImage: string;
+  usertoolsPod: string | null;
 }
 
 export interface GetRuntimes {

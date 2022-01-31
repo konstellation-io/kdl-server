@@ -48,7 +48,7 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
       <MemberDetails member={memberDetailsData} close={closeMemberInfoPanel} projectId={openedProject.id} />
     ),
     [PANEL_ID.RUNTIMES_LIST]: <RuntimesList />,
-    [PANEL_ID.RUNTIME_INFO]: runtime && <RuntimeInfo selectedRuntime={runtime} close={panel2Close} />,
+    [PANEL_ID.RUNTIME_INFO]: runtime && <RuntimeInfo selectedRuntime={runtime} />,
   };
 
   return (

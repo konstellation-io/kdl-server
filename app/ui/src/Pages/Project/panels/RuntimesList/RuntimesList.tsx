@@ -1,25 +1,17 @@
 import * as React from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
 import GetRuntimesQuery from 'Graphql/queries/getRuntimes';
-import GetRunningRuntimeQuery from 'Graphql/queries/GetRunningRuntime';
 import { GetRuntimes, GetRuntimes_runtimes } from 'Graphql/queries/types/GetRuntimes';
-import { ErrorMessage, SpinnerCircular } from 'kwc';
+import { ErrorMessage } from 'kwc';
 import styles from './RuntimeList.module.scss';
 import Runtime from './components/Runtime';
-import { GetRunningRuntime } from 'Graphql/queries/types/GetRunningRuntime';
-import useRunningRuntime from 'Graphql/client/hooks/useRunningRuntime';
+import { runningRuntime } from 'Graphql/client/cache';
 
 function RuntimesList() {
-  const { data, error, loading } = useQuery<GetRuntimes>(GetRuntimesQuery);
-  const { data: dataRunning, loading: loadingRunning } = useQuery<GetRunningRuntime>(GetRunningRuntimeQuery);
-  const { updateRunningRuntime } = useRunningRuntime();
+  const { data, error } = useQuery<GetRuntimes>(GetRuntimesQuery);
+  const runtimeRunning = useReactiveVar(runningRuntime);
 
-  if (dataRunning) {
-    updateRunningRuntime(dataRunning?.runningRuntime);
-  }
-
-  if (loading || loadingRunning) return <SpinnerCircular />;
-  if (error || !data || !dataRunning) return <ErrorMessage />;
+  if (error || !data) return <ErrorMessage />;
 
   function sortRuntimes(runtimes: GetRuntimes_runtimes[], runningRuntimeId?: string) {
     if (!runningRuntimeId) {
@@ -30,7 +22,7 @@ function RuntimesList() {
     });
   }
 
-  const runtimes = sortRuntimes(data.runtimes, dataRunning.runningRuntime?.id);
+  const runtimes = sortRuntimes(data.runtimes, runtimeRunning?.id);
 
   return (
     <div data-testid="runtimesListPanel" className={styles.runtimesListPanel}>
@@ -42,11 +34,7 @@ function RuntimesList() {
         <div className={styles.wrapper}>
           {[
             ...runtimes.map((runtime) => (
-              <Runtime
-                key={runtime.id}
-                runtime={runtime}
-                runtimeActive={runtime.id === dataRunning?.runningRuntime?.id}
-              />
+              <Runtime key={runtime.id} runtime={runtime} runtimeActive={runtime.id === runtimeRunning?.id} />
             )),
           ]}
         </div>

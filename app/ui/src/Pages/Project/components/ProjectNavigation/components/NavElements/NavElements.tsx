@@ -14,7 +14,6 @@ import { useParams } from 'react-router-dom';
 import useProjectNavigation from 'Hooks/useProjectNavigation';
 import { useQuery, useReactiveVar } from '@apollo/client';
 import useTool from 'Graphql/hooks/useTool';
-import ConfirmAction from 'Components/Layout/ConfirmAction/ConfirmAction';
 import GetMeQuery from 'Graphql/queries/getMe';
 import { primaryPanel } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
@@ -23,12 +22,14 @@ import { PANEL_ID } from 'Graphql/client/models/Panel';
 
 type Props = {
   isOpened: boolean;
+  pauseRuntime: () => void;
+  startRuntime: () => void;
 };
 
-function NavElements({ isOpened }: Props) {
+function NavElements({ isOpened, pauseRuntime, startRuntime }: Props) {
   const { projectId } = useParams<RouteProjectParams>();
   const { mainRoutes, userToolsRoutes, projectToolsRoutes } = useProjectNavigation(projectId);
-  const { updateProjectActiveTools, projectActiveTools } = useTool();
+  const { projectActiveTools } = useTool();
   const { data, loading } = useQuery<GetMe>(GetMeQuery);
   const areToolsActive = data?.me.areToolsActive;
   const panelData = useReactiveVar(primaryPanel);
@@ -42,14 +43,6 @@ function NavElements({ isOpened }: Props) {
 
   if (loading) return null;
 
-  function toggleTools() {
-    if (runtimeSelected) {
-      updateProjectActiveTools(!areToolsActive);
-    } else {
-      toggleUsertoolsPanel();
-    }
-  }
-
   function toggleUsertoolsPanel() {
     const shouldOpen = !panelData || panelData.id !== PANEL_ID.RUNTIMES_LIST;
 
@@ -62,9 +55,12 @@ function NavElements({ isOpened }: Props) {
     if (projectActiveTools.loading) return Progress;
 
     return areToolsActive ? (
-      <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} />
+      <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} onClick={pauseRuntime} />
     ) : (
-      <IconPlay className={cx(styles.usertoolsIcon, 'icon-small', { [styles.blocked]: !runtimeSelected })} />
+      <IconPlay
+        className={cx(styles.usertoolsIcon, 'icon-small', { [styles.blocked]: !runtimeSelected })}
+        onClick={startRuntime}
+      />
     );
   }
 
@@ -89,16 +85,7 @@ function NavElements({ isOpened }: Props) {
         >
           <div className={styles.usertoolsSettings} data-testid="usertoolsSettings">
             <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
-            <ConfirmAction
-              title="STOP YOUR TOOLS"
-              subtitle="You are going to stop your user tools, please confirm your choice."
-              action={toggleTools}
-              actionLabel="STOP"
-              skipConfirmation={!areToolsActive}
-              warning
-            >
-              {renderToggleToolsIcon()}
-            </ConfirmAction>
+            {renderToggleToolsIcon()}
           </div>
           <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
             <div className={styles.userToolLabel}>USER TOOLS</div>

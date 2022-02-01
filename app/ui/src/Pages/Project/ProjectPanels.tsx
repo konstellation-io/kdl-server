@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { memberDetails, primaryPanel, secondaryPanel, selectedRuntime } from 'Graphql/client/cache';
+import { memberDetails, primaryPanel, runningRuntime, secondaryPanel, selectedRuntime } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
@@ -13,18 +13,25 @@ import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
 import { useReactiveVar } from '@apollo/client';
 import RuntimesList from './panels/RuntimesList/RuntimesList';
 import RuntimeInfo from './panels/RuntimeInfo/RuntimeInfo';
+import { Button } from 'kwc';
+import IconPlay from '@material-ui/icons/PlayArrow';
+import IconPause from '@material-ui/icons/Pause';
 
 const defaultPanel = 'settings';
 
-export interface ProjectRoute {
+type Props = {
   openedProject: GetProjects_projects;
-}
-function ProjectPanels({ openedProject }: ProjectRoute) {
+  pauseRuntime: () => void;
+  startRuntime: () => void;
+};
+
+function ProjectPanels({ openedProject, pauseRuntime, startRuntime }: Props) {
   const panel1Data = useReactiveVar(primaryPanel);
   const panel2Data = useReactiveVar(secondaryPanel);
 
   const memberDetailsData = useReactiveVar(memberDetails);
-  const runtime = useReactiveVar(selectedRuntime);
+  const runtimeSelected = useReactiveVar(selectedRuntime);
+  const runtimeRunning = useReactiveVar(runningRuntime);
 
   const { closePanel: panel1Close } = usePanel(PanelType.PRIMARY);
   const { closePanel: panel2Close } = usePanel(PanelType.SECONDARY);
@@ -41,6 +48,16 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
     unselectMemberDetails();
   }
 
+  function extraPanelButtons(panelId?: string) {
+    if (panelId === PANEL_ID.RUNTIME_INFO) {
+      return runtimeSelected?.id === runtimeRunning?.id
+        ? [<Button key="toggleRuntime" label="" Icon={IconPause} onClick={pauseRuntime} />]
+        : [<Button key="toggleRuntime" label="" Icon={IconPlay} onClick={startRuntime} />];
+    }
+
+    return [];
+  }
+
   const panels: { [key in PANEL_ID]: JSX.Element | null } = {
     [PANEL_ID.SETTINGS]: <ProjectSettings project={openedProject} />,
     [PANEL_ID.PROJECT_DESCRIPTION]: <UpdateProjectDescription project={openedProject} close={panel2Close} />,
@@ -48,7 +65,7 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
       <MemberDetails member={memberDetailsData} close={closeMemberInfoPanel} projectId={openedProject.id} />
     ),
     [PANEL_ID.RUNTIMES_LIST]: <RuntimesList />,
-    [PANEL_ID.RUNTIME_INFO]: runtime && <RuntimeInfo selectedRuntime={runtime} />,
+    [PANEL_ID.RUNTIME_INFO]: runtimeSelected && <RuntimeInfo selectedRuntime={runtimeSelected} />,
   };
 
   return (
@@ -67,6 +84,7 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
         title={panel2Data?.title}
         show={!!panel2Data}
         close={panel2Close}
+        extraButtons={extraPanelButtons(panel2Data?.id)}
         noShrink={!!panel2Data?.fixedWidth}
         theme={panel2Data?.theme}
         size={panel2Data?.size}

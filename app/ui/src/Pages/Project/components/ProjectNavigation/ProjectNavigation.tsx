@@ -36,7 +36,12 @@ export const NavButtonLink: FC<Props> = ({ children, ...props }) => {
   );
 };
 
-function ProjectNavigation() {
+type ProjectNavProps = {
+  pauseRuntime: () => void;
+  startRuntime: () => void;
+};
+
+function ProjectNavigation({ pauseRuntime, startRuntime }: ProjectNavProps) {
   const { projectId } = useParams<RouteProjectParams>();
   const [{ navigationOpened }, saveConfiguration] = useWorkspace(projectId);
   const [opened, setOpened] = useState(navigationOpened);
@@ -59,7 +64,7 @@ function ProjectNavigation() {
   return (
     <div className={cx(styles.container, { [styles.opened]: opened })} data-testid="navigationBar">
       <div className={styles.top}>
-        <NavElements isOpened={opened} />
+        <NavElements isOpened={opened} pauseRuntime={pauseRuntime} startRuntime={startRuntime} />
       </div>
       <div className={styles.bottom}>
         <NavigationButton

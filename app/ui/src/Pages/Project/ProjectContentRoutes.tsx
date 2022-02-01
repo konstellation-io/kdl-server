@@ -3,13 +3,17 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 
 import { GetMe } from 'Graphql/queries/types/GetMe';
 import Overview from './pages/Overview/Overview';
-import { ProjectRoute } from './ProjectPanels';
 import ProjectToolsRoutes from './components/ProjectToolsRoutes/ProjectToolsRoutes';
 import * as React from 'react';
 import { useQuery } from '@apollo/client';
 
 import GetMeQuery from 'Graphql/queries/getMe';
 import { CONFIG } from 'index';
+import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
+
+export interface ProjectRoute {
+  openedProject: GetProjects_projects;
+}
 
 function ProjectContentRoutes({ openedProject }: ProjectRoute) {
   const { data } = useQuery<GetMe>(GetMeQuery);

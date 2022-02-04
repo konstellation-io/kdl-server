@@ -15,7 +15,7 @@ function RuntimeItem({ runtime }: Props) {
         <div className={styles.name}>{runtime.name}</div>
       </div>
       <div className={styles.labels}>
-        {runtime.labels?.map((label: string) => (
+        {runtime.labels?.slice(0, 2).map((label: string) => (
           <div key={label} className={styles.label}>
             {label}
           </div>

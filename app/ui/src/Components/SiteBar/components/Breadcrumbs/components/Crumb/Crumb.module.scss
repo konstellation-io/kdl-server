@@ -47,6 +47,7 @@
     }
   }
   .content {
+    display: flex;
     position: absolute;
     top: 5 * $grid-unit;
     left: 0;

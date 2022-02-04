@@ -34,7 +34,7 @@ function Crumb({ crumbText, LeftIconComponent, dataTestId, children, isSelect }:
           })}
         />
       </div>
-      <ExpandableMenu opened={opened} close={hideComponent} className={styles.content}>
+      <ExpandableMenu opened={opened} close={() => console.log('close')} className={styles.content}>
         {children({
           closeComponent: hideComponent,
         })}

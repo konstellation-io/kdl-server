@@ -35,6 +35,7 @@ import GetRunningRuntimeQuery from 'Graphql/queries/GetRunningRuntime';
 import { GetRuntimes_runtimes } from 'Graphql/queries/types/GetRuntimes';
 
 import { USERTOOLS_PANEL_OPTIONS } from './panelSettings';
+import Runtime from './panels/RuntimesList/components/Runtime';
 
 function Project() {
   const { projectId } = useParams<RouteProjectParams>();
@@ -158,10 +159,18 @@ function Project() {
           onCancel={closePauseRuntimeModal}
           actionButtonLabel="Stop Tools"
           actionButtonCancel="Cancel"
+          className={styles.stopModal}
           warning
           blocking
         >
-          <ModalLayoutInfo>You are going to stop your user tools, please confirm your choice.</ModalLayoutInfo>
+          <ModalLayoutInfo className={styles.stopModalInfo}>
+            You are going to stop your user tools, please confirm your choice.
+          </ModalLayoutInfo>
+          {runtimeRunning && (
+            <ModalLayoutInfo className={styles.stopModalInfo}>
+              <Runtime runtime={runtimeRunning} runtimeActive={true} />
+            </ModalLayoutInfo>
+          )}
         </ModalContainer>
       )}
       {isReplaceRuntimeModalVisible && (

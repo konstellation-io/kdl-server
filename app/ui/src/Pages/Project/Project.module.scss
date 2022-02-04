@@ -40,3 +40,11 @@
   flex-grow: 1;
   height: 100%;
 }
+
+.stopModal {
+  width: 75 * $grid-unit;
+  .stopModalInfo {
+    margin-top: 0;
+    margin-bottom: 2 * $grid-unit;
+  }
+}

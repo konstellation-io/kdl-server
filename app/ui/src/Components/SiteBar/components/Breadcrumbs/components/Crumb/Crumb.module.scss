@@ -13,8 +13,8 @@
 
   transition: background-color ease 0.3s;
 
-  &:hover {
-    background-color: palette(base, 400);
+  &:not(&.select):hover {
+      background-color: palette(base, 400);
   }
 
   .crumbContainer {
@@ -22,6 +22,20 @@
     align-items: center;
     height: 100%;
     width: 100%;
+
+    &.select {
+      border-radius: $grid-unit;
+      background-color: palette(base);
+      padding: $grid-unit;
+      height: 80%;
+
+      .crumbText {
+        @include font-body;
+        color: font-color(grey);
+        font-weight: bold;
+        margin-left: $grid-unit;
+      }
+    }
 
     .crumbText {
       @include font-body;

@@ -6,6 +6,7 @@ import Breadcrumbs from './components/Breadcrumbs/Breadcrumbs';
 import SettingsMenu from '../SettingsMenu/SettingsMenu';
 import styles from './SiteBar.module.scss';
 import isElectron from 'is-electron';
+import RuntimesCrumb from './components/Breadcrumbs/components/RuntimesCrumbs/RuntimesCrumb';
 
 const SiteBar = () => (
   <div className={styles.container}>
@@ -16,6 +17,7 @@ const SiteBar = () => (
       </>
     </Left>
     <Right className={styles.right}>
+      <RuntimesCrumb />
       <SettingsMenu />
     </Right>
   </div>

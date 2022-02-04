@@ -1,0 +1,22 @@
+@import 'Styles/colors';
+
+.icon {
+  color: palette(success);
+}
+
+.RUNNING {
+  fill: palette(success);
+}
+
+.STOPPED {
+  fill: palette(alert);
+}
+
+.LOADING {
+  fill: palette(highlight, 800);
+}
+
+.NOT_SELECTED {
+  fill: palette(base);
+  stroke: palette(lowlight);
+}

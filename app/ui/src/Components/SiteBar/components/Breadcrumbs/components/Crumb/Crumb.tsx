@@ -13,14 +13,19 @@ export type CrumbProps = {
   crumbText: string;
   LeftIconComponent: React.ReactElement;
   children: (props: BottomComponentProps) => JSX.Element;
+  isSelect?: boolean;
 };
 
-function Crumb({ crumbText, LeftIconComponent, dataTestId, children }: CrumbProps) {
+function Crumb({ crumbText, LeftIconComponent, dataTestId, children, isSelect }: CrumbProps) {
   const { value: opened, toggle: toggleComponent, deactivate: hideComponent } = useBoolState(false);
 
   return (
-    <div className={styles.container} onClick={toggleComponent} data-testid={dataTestId}>
-      <div className={styles.crumbContainer}>
+    <div
+      className={cx(styles.container, { [styles.select]: isSelect })}
+      onClick={toggleComponent}
+      data-testid={dataTestId}
+    >
+      <div className={cx(styles.crumbContainer, { [styles.select]: isSelect })}>
         {LeftIconComponent}
         <span className={styles.crumbText}>{crumbText}</span>
         <ExpandMoreIcon

@@ -41,10 +41,13 @@
   height: 100%;
 }
 
-.stopModal {
+.runtimeModal {
   width: 75 * $grid-unit;
-  .stopModalInfo {
+  .runtimeModalInfo {
     margin-top: 0;
     margin-bottom: 2 * $grid-unit;
+  }
+  p {
+    margin-bottom: $grid-unit;
   }
 }

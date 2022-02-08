@@ -159,18 +159,16 @@ function Project() {
           onCancel={closePauseRuntimeModal}
           actionButtonLabel="Stop Tools"
           actionButtonCancel="Cancel"
-          className={styles.stopModal}
+          className={styles.runtimeModal}
           warning
           blocking
         >
-          <ModalLayoutInfo className={styles.stopModalInfo}>
-            You are going to stop your user tools, please confirm your choice.
+          <ModalLayoutInfo className={styles.runtimeModalInfo}>
+            <div>
+              <p>You are going to stop your user tools, please confirm your choice.</p>
+              {runtimeRunning && <Runtime runtime={runtimeRunning} runtimeActive={true} />}
+            </div>
           </ModalLayoutInfo>
-          {runtimeRunning && (
-            <ModalLayoutInfo className={styles.stopModalInfo}>
-              <Runtime runtime={runtimeRunning} runtimeActive={true} />
-            </ModalLayoutInfo>
-          )}
         </ModalContainer>
       )}
       {isReplaceRuntimeModalVisible && (
@@ -180,11 +178,21 @@ function Project() {
           onCancel={closeReplaceRuntimeModal}
           actionButtonLabel="Replace Tools"
           actionButtonCancel="Cancel"
+          className={styles.runtimeModal}
           warning
           blocking
         >
-          <ModalLayoutInfo>
-            You are going to replace your user tools with a new runtime, please confirm your choice.
+          <ModalLayoutInfo className={styles.runtimeModalInfo}>
+            <div>
+              <p>You are about to stop this active Runtime. ¿Are you sure?</p>
+              {runtimeRunning && <Runtime runtime={runtimeRunning} runtimeActive={true} />}
+            </div>
+          </ModalLayoutInfo>
+          <ModalLayoutInfo className={styles.runtimeModalInfo}>
+            <div>
+              <p>And this Runtime will activate instead</p>
+              {runtimeSelected && <Runtime runtime={runtimeSelected} />}
+            </div>
           </ModalLayoutInfo>
         </ModalContainer>
       )}

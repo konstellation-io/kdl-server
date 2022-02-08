@@ -12,7 +12,7 @@ import LabelList from './LabelList';
 
 type Props = {
   runtime: GetRuntimes_runtimes;
-  runtimeActive: boolean;
+  runtimeActive?: boolean;
 };
 
 function Runtime({ runtime, runtimeActive }: Props) {

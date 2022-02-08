@@ -19,6 +19,7 @@ import { primaryPanel } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
+import ReactTooltip from 'react-tooltip';
 
 type Props = {
   isOpened: boolean;
@@ -55,12 +56,26 @@ function NavElements({ isOpened, pauseRuntime, startRuntime }: Props) {
     if (projectActiveTools.loading) return Progress;
 
     return areToolsActive ? (
-      <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} onClick={pauseRuntime} />
+      <div>
+        <ReactTooltip id="stop" effect="solid" textColor="white" backgroundColor="#888" className={styles.toolsTip}>
+          <span>Stop tools</span>
+        </ReactTooltip>
+        <div data-tip data-for="stop">
+          <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} onClick={pauseRuntime} />
+        </div>
+      </div>
     ) : (
-      <IconPlay
-        className={cx(styles.usertoolsIcon, 'icon-small', { [styles.blocked]: !runtimeSelected })}
-        onClick={startRuntime}
-      />
+      <div>
+        <ReactTooltip id="start" effect="solid" textColor="white" backgroundColor="#888" className={styles.toolsTip}>
+          <span>Start tools</span>
+        </ReactTooltip>
+        <div data-tip data-for="start">
+          <IconPlay
+            className={cx(styles.usertoolsIcon, 'icon-small', { [styles.blocked]: !runtimeSelected })}
+            onClick={startRuntime}
+          />
+        </div>
+      </div>
     );
   }
 
@@ -84,7 +99,18 @@ function NavElements({ isOpened, pauseRuntime, startRuntime }: Props) {
           })}
         >
           <div className={styles.usertoolsSettings} data-testid="usertoolsSettings">
-            <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
+            <ReactTooltip
+              id="settings"
+              effect="solid"
+              textColor="white"
+              backgroundColor="#888"
+              className={styles.toolsTip}
+            >
+              <span>Show available runtimes</span>
+            </ReactTooltip>
+            <div data-tip data-for="settings">
+              <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
+            </div>
             {renderToggleToolsIcon()}
           </div>
           <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>

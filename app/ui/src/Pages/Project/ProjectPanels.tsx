@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useEffect } from 'react';
 import { memberDetails, primaryPanel, runningRuntime, secondaryPanel, selectedRuntime } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
@@ -17,8 +16,6 @@ import RuntimeInfo from './panels/RuntimeInfo/RuntimeInfo';
 import { Button } from 'kwc';
 import IconPlay from '@material-ui/icons/PlayArrow';
 import IconPause from '@material-ui/icons/Pause';
-import cx from 'classnames';
-import Tooltip from '../../Components/Tooltip/Tooltip';
 
 const defaultPanel = 'settings';
 
@@ -54,12 +51,7 @@ function ProjectPanels({ openedProject, pauseRuntime, startRuntime }: Props) {
   function extraPanelButtons(panelId?: string) {
     if (panelId === PANEL_ID.RUNTIME_INFO) {
       return runtimeSelected?.id === runtimeRunning?.id
-        ? [
-          // eslint-disable-next-line react/jsx-key
-          <Tooltip content="Start tools" direction="top">
-            <Button key="toggleRuntime" label="" Icon={IconPause} onClick={pauseRuntime} />
-          </Tooltip>,
-        ]
+        ? [<Button key="toggleRuntime" label="" Icon={IconPause} onClick={pauseRuntime} />]
         : [<Button key="toggleRuntime" label="" Icon={IconPlay} onClick={startRuntime} />];
     }
 

@@ -58,7 +58,7 @@ function NavElements({ isOpened, pauseRuntime, startRuntime }: Props) {
     return areToolsActive ? (
       <div>
         <ReactTooltip id="stop" effect="solid" textColor="white" backgroundColor="#888" className={styles.toolsTip}>
-          <span>Stop tools settings</span>
+          <span>Stop tools</span>
         </ReactTooltip>
         <div data-tip data-for="stop">
           <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} onClick={pauseRuntime} />
@@ -67,7 +67,7 @@ function NavElements({ isOpened, pauseRuntime, startRuntime }: Props) {
     ) : (
       <div>
         <ReactTooltip id="start" effect="solid" textColor="white" backgroundColor="#888" className={styles.toolsTip}>
-          <span>Start tools settings</span>
+          <span>Start tools</span>
         </ReactTooltip>
         <div data-tip data-for="start">
           <IconPlay
@@ -106,7 +106,7 @@ function NavElements({ isOpened, pauseRuntime, startRuntime }: Props) {
               backgroundColor="#888"
               className={styles.toolsTip}
             >
-              <span>User tools settings</span>
+              <span>Show available runtimes</span>
             </ReactTooltip>
             <div data-tip data-for="settings">
               <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />

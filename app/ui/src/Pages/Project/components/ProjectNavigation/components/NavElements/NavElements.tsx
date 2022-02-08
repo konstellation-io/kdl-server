@@ -19,6 +19,7 @@ import { primaryPanel } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
+import Tooltip from '../../../../../../Components/Tooltip/Tooltip';
 
 type Props = {
   isOpened: boolean;
@@ -55,12 +56,16 @@ function NavElements({ isOpened, pauseRuntime, startRuntime }: Props) {
     if (projectActiveTools.loading) return Progress;
 
     return areToolsActive ? (
-      <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} onClick={pauseRuntime} />
+      <Tooltip content="Stop tools" direction="top">
+        <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} onClick={pauseRuntime} />
+      </Tooltip>
     ) : (
-      <IconPlay
-        className={cx(styles.usertoolsIcon, 'icon-small', { [styles.blocked]: !runtimeSelected })}
-        onClick={startRuntime}
-      />
+      <Tooltip content="Start tools" direction="top">
+        <IconPlay
+          className={cx(styles.usertoolsIcon, 'icon-small', { [styles.blocked]: !runtimeSelected })}
+          onClick={startRuntime}
+        />
+      </Tooltip>
     );
   }
 
@@ -84,7 +89,11 @@ function NavElements({ isOpened, pauseRuntime, startRuntime }: Props) {
           })}
         >
           <div className={styles.usertoolsSettings} data-testid="usertoolsSettings">
-            <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
+            <div>
+              <Tooltip content="Hello world" direction="top">
+                <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
+              </Tooltip>
+            </div>
             {renderToggleToolsIcon()}
           </div>
           <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>

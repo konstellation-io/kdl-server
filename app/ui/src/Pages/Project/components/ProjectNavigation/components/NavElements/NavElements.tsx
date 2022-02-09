@@ -98,35 +98,44 @@ function NavElements({ isOpened, pauseRuntime, startRuntime }: Props) {
             [styles.stopped]: !areToolsActive,
           })}
         >
-          <div className={styles.usertoolsSettings} data-testid="usertoolsSettings">
-            <ReactTooltip
-              id="settings"
-              effect="solid"
-              textColor="white"
-              backgroundColor="#888"
-              className={styles.toolsTip}
-            >
-              <span>Show available runtimes</span>
-            </ReactTooltip>
-            <div data-tip data-for="settings">
-              <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
+          <div className={styles.usertoolsOptions}>
+            <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
+              <div className={styles.userToolLabel}>USER TOOLS</div>
+            </AnimateHeight>
+
+            <div className={styles.usertoolsSettings} data-testid="usertoolsSettings">
+              <ReactTooltip
+                id="settings"
+                effect="solid"
+                textColor="white"
+                backgroundColor="#888"
+                className={styles.toolsTip}
+              >
+                <span>Show available runtimes</span>
+              </ReactTooltip>
+
+              <div data-tip data-for="settings">
+                <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
+              </div>
+              
+              {renderToggleToolsIcon()}
             </div>
-            {renderToggleToolsIcon()}
+
           </div>
-          <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
-            <div className={styles.userToolLabel}>USER TOOLS</div>
-          </AnimateHeight>
+
           {userToolsRoutes.map(({ Icon, label, route, disabled }) => (
             <NavButtonLink to={route} key={label} disabled={disabled}>
               <NavigationButton label={label} Icon={Icon} />
             </NavButtonLink>
           ))}
+
           <div
             className={cx(styles.toggleToolsWrapper, {
               [styles.disabled]: projectActiveTools.loading,
             })}
             data-testid="confirmationModal"
           ></div>
+          
         </div>
       </div>
     </>

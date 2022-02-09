@@ -102,7 +102,6 @@ function NavElements({ isOpened, pauseRuntime, startRuntime }: Props) {
             <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
               <div className={styles.userToolLabel}>USER TOOLS</div>
             </AnimateHeight>
-
             <div className={styles.usertoolsSettings} data-testid="usertoolsSettings">
               <ReactTooltip
                 id="settings"
@@ -113,29 +112,23 @@ function NavElements({ isOpened, pauseRuntime, startRuntime }: Props) {
               >
                 <span>Show available runtimes</span>
               </ReactTooltip>
-
               <div data-tip data-for="settings">
                 <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
               </div>
-              
               {renderToggleToolsIcon()}
             </div>
-
           </div>
-
           {userToolsRoutes.map(({ Icon, label, route, disabled }) => (
             <NavButtonLink to={route} key={label} disabled={disabled}>
               <NavigationButton label={label} Icon={Icon} />
             </NavButtonLink>
           ))}
-
           <div
             className={cx(styles.toggleToolsWrapper, {
               [styles.disabled]: projectActiveTools.loading,
             })}
             data-testid="confirmationModal"
           ></div>
-          
         </div>
       </div>
     </>

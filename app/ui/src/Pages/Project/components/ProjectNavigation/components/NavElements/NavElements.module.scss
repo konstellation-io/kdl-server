@@ -4,7 +4,6 @@
 
 .projectTools {
   background-color: palette(base, 300);
-  background: blue;
 
   a:hover > div {
     background-color: palette(base, 200) !important;
@@ -15,7 +14,6 @@
     margin-top: $grid-unit;
     transition: border-right 0.3s ease;
     border-right: 2px solid transparent;
-    background: yellow;
 
     &.started {
       border-right: 2px solid palette(success);
@@ -31,9 +29,10 @@
       width: 100%;
       white-space: nowrap;
       margin-left: 5 * $grid-unit;
+      /*
       margin-bottom: $grid-unit;
       padding-top: 0.75 * $grid-unit;
-      background: red;
+      */
     }
 
     .usertoolsIcon {
@@ -50,13 +49,15 @@
     }
 
     .usertoolsOptions {
-      background: #0cf;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 40px;
     }
 
     .usertoolsSettings {
-      float: right;
+      /*float: right;*/
       display: flex;
-      background: green;
     }
 
     .toggleToolsWrapper {

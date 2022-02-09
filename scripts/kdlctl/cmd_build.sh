@@ -19,7 +19,7 @@ build_docker_images() {
   build_gitea_oauth2_setup
   build_project_operator
   build_user_tools_operator
-  build_jupyter_gpu
+  # build_jupyter_gpu
   build_vscode
   build_repo_cloner
   build_mlflow

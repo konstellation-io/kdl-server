@@ -9,6 +9,7 @@ import { NewProject } from './models/NewProject';
 import { PanelInfo } from './models/Panel';
 import { SettingsTab } from './models/SettingsTab';
 import { GetRuntimes_runtimes } from '../queries/types/GetRuntimes';
+import { RuntimeAction } from './models/RuntimeAction';
 
 type ToolName = keyof GetUserTools_project_toolUrls;
 
@@ -73,6 +74,10 @@ export const selectedRuntime = makeVar<GetRuntimes_runtimes | null>(null);
 export const lastRanRuntime = makeVar<GetRuntimes_runtimes | null>(null);
 // the actual running runtime
 export const runningRuntime = makeVar<GetRuntimes_runtimes | null>(null);
+// The runtime to run
+export const actionRuntime = makeVar<RuntimeAction | null>(null);
+// start the runtime from a component
+export const startRuntime = makeVar<GetRuntimes_runtimes | null>(null);
 
 const cache = new InMemoryCache({
   typePolicies: {

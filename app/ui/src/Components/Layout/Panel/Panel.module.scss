@@ -14,76 +14,44 @@ $panel-width-big: 110 * $grid-unit;
   &.noShrink {
     flex-shrink: 0;
   }
+}
 
-  .container {
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    pointer-events: all;
-  
-    header {
-      display: flex;
-      align-items: center;
-    
-      .separator {
-        width: 2px;
-        height: 75%;
-        background-color: font-color(regular);
-        margin: 0 2 * $grid-unit;
-      }
-      .title {
-        @include font-body;
-        color: font-color(light);
-        margin: $grid-unit auto $grid-unit 0;
-      }
-    }
+.container {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  pointer-events: all;
 
+  &.default {
     .content {
-      height: 100%;
-      flex-grow: 1;
-      overflow: hidden;
-      max-width: 0;
-      min-width: $panel-width-default;
-      width: 0;
-      transition: width ease 0.5s, max-width ease 0.5s;
-    }
-
-    &.default {
       max-width: $panel-width-default;
-      .content {
-        min-width: $panel-width-default;
-        max-width: fit-content;
-        width: fit-content; 
-      }
-    }
-  
-    &.big {
-      max-width: $panel-width-big;
-      .content {
-        max-width:  $panel-width-big;
-        width: fit-content; 
-      }
-    }
-  
-    &.themeDefault {
-      background-color: palette(base, 800);
-    }
-    &.themeDark {
-      background-color: black;
-    }
-    &.themeLight {
-      background-color: palette(lowlight, 900);
+      width: $panel-width-default;
     }
   }
-  
+
+  &.big {
+    .content {
+      max-width: $panel-width-big;
+      width: $panel-width-big;
+    }
+  }
+
+  &.themeDefault {
+    background-color: palette(base, 800);
+  }
+  &.themeDark {
+    background-color: black;
+  }
+  &.themeLight {
+    background-color: palette(lowlight, 900);
+  }
 }
 
 $width-animations: (
   'default': $panel-width-default,
   'big': $panel-width-big,
 );
-
 @each $animation, $var in $width-animations {
   .#{$animation} {
     .enter {
@@ -95,13 +63,38 @@ $width-animations: (
   }
 }
 
+header {
+  display: flex;
+  align-items: center;
+
+  .separator {
+    width: 2px;
+    height: 1.5 * $grid-unit;
+    background-color: font-color(regular);
+    margin: 0 2 * $grid-unit;
+  }
+  .title {
+    @include font-body;
+    color: font-color(light);
+
+    margin: $grid-unit auto $grid-unit 0;
+  }
+}
+
+.content {
+  height: 100%;
+  flex-grow: 1;
+  overflow: hidden;
+  max-width: 0;
+  min-width: $panel-width-default;
+  width: 0;
+
+  transition: width ease 0.5s, max-width ease 0.5s;
+}
+
 @media screen and (max-width: $panel-width-default + $panel-width-big) {
-  .group {
-    .container {
-      .content {
-        width: 100%;
-      }
-    }
+  .content {
+    width: 100% !important;
   }
 }
 

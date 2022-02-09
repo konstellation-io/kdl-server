@@ -1,4 +1,4 @@
-import { ErrorMessage, ModalContainer, ModalLayoutInfo, SpinnerCircular } from 'kwc';
+import { ErrorMessage, SpinnerCircular } from 'kwc';
 import React, { useEffect } from 'react';
 import { useQuery, useReactiveVar } from '@apollo/client';
 
@@ -10,62 +10,25 @@ import { RouteProjectParams } from 'Constants/routes';
 import styles from './Project.module.scss';
 import { useParams } from 'react-router-dom';
 
-import {
-  currentTool,
-  lastRanRuntime,
-  openedProject,
-  openedTools,
-  runningRuntime,
-  selectedRuntime,
-} from 'Graphql/client/cache';
+import { currentTool, openedProject, openedTools } from 'Graphql/client/cache';
 
 import useTools from 'Graphql/client/hooks/useTools';
 import useOpenedProject from 'Graphql/client/hooks/useOpenedProject';
-import useRuningRuntime from 'Graphql/client/hooks/useRunningRuntime';
-import useSelectedRuntime from 'Graphql/client/hooks/useSelectedRuntime';
-import useLastRanRuntime from 'Graphql/client/hooks/useLastRanRuntime';
-import useTool from 'Graphql/hooks/useTool';
-import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
-import useBoolState from 'Hooks/useBoolState';
 
 import { GetProjects } from 'Graphql/queries/types/GetProjects';
 import GetProjectsQuery from 'Graphql/queries/getProjects';
-import { GetRunningRuntime } from 'Graphql/queries/types/GetRunningRuntime';
-import GetRunningRuntimeQuery from 'Graphql/queries/GetRunningRuntime';
-import { GetRuntimes_runtimes } from 'Graphql/queries/types/GetRuntimes';
-
-import { USERTOOLS_PANEL_OPTIONS } from './panelSettings';
-import Runtime from './panels/RuntimesList/components/Runtime';
+import RuntimeRunner from './components/RuntimeRunner/RuntimeRunner';
 
 function Project() {
   const { projectId } = useParams<RouteProjectParams>();
   const { data, error, loading } = useQuery<GetProjects>(GetProjectsQuery);
-  const { data: dataRuntimeRunning } = useQuery<GetRunningRuntime>(GetRunningRuntimeQuery);
 
   const project = useReactiveVar(openedProject);
-  const runtimeSelected = useReactiveVar(selectedRuntime);
-  const runtimeRunning = useReactiveVar(runningRuntime);
-  const runtimeLastRan = useReactiveVar(lastRanRuntime);
   const currentToolData = useReactiveVar(currentTool);
   const openedToolsData = useReactiveVar(openedTools);
 
   const { updateOpenedProject } = useOpenedProject();
-  const { updateRunningRuntime } = useRuningRuntime();
-  const { updateSelectedRuntime } = useSelectedRuntime();
-  const { updateLastRanRuntime } = useLastRanRuntime();
   const { resetTools } = useTools();
-  const { updateProjectActiveTools } = useTool();
-  const { openPanel: openRuntimesList } = usePanel(PanelType.PRIMARY, USERTOOLS_PANEL_OPTIONS);
-  const {
-    activate: showPauseRuntimeModal,
-    deactivate: closePauseRuntimeModal,
-    value: isPauseRuntimeModalVisible,
-  } = useBoolState();
-  const {
-    activate: showReplaceRuntimeModal,
-    deactivate: closeReplaceRuntimeModal,
-    value: isReplaceRuntimeModalVisible,
-  } = useBoolState();
 
   useEffect(() => {
     const currentProject = data?.projects.find((p) => p.id === projectId);
@@ -86,54 +49,12 @@ function Project() {
     [],
   );
 
-  useEffect(() => {
-    if (dataRuntimeRunning?.runningRuntime) {
-      updateRunningRuntime(dataRuntimeRunning.runningRuntime);
-      updateSelectedRuntime(dataRuntimeRunning.runningRuntime);
-      updateLastRanRuntime(dataRuntimeRunning.runningRuntime);
-    }
-
-    // updateRunningRuntime circular ref
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataRuntimeRunning]);
-
-  function startTools(runtime: GetRuntimes_runtimes | null) {
-    closeReplaceRuntimeModal();
-
-    if (!runtime) {
-      // if starting the tools and runtime is NOT selected
-      return openRuntimesList();
-    }
-
-    updateRunningRuntime(runtime);
-    updateLastRanRuntime(runtime);
-    updateProjectActiveTools(true);
-  }
-
-  function startToolsWithCurrentRuntime() {
-    startTools(runtimeLastRan);
-  }
-
-  function startToolsWithSelectedRuntime() {
-    if (runtimeRunning) {
-      return showReplaceRuntimeModal();
-    }
-
-    startTools(runtimeSelected);
-  }
-
-  function stopTools() {
-    closePauseRuntimeModal();
-    updateRunningRuntime(null);
-    updateProjectActiveTools(false);
-  }
-
   if (loading || !project) return <SpinnerCircular />;
   if (error || !data) return <ErrorMessage />;
 
   return (
     <div className={styles.container}>
-      <ProjectNavigation pauseRuntime={showPauseRuntimeModal} startRuntime={startToolsWithCurrentRuntime} />
+      <ProjectNavigation />
       <div className={styles.contentLayer}>
         <ProjectContentRoutes openedProject={project} />
         {openedToolsData.map((toolName) => (
@@ -146,56 +67,9 @@ function Project() {
         ))}
       </div>
       <div className={styles.panelLayer}>
-        <ProjectPanels
-          openedProject={project}
-          pauseRuntime={showPauseRuntimeModal}
-          startRuntime={startToolsWithSelectedRuntime}
-        />
+        <ProjectPanels openedProject={project} />
       </div>
-      {isPauseRuntimeModalVisible && (
-        <ModalContainer
-          title="STOP YOUR TOOLS"
-          onAccept={stopTools}
-          onCancel={closePauseRuntimeModal}
-          actionButtonLabel="Stop Tools"
-          actionButtonCancel="Cancel"
-          className={styles.runtimeModal}
-          warning
-          blocking
-        >
-          <ModalLayoutInfo className={styles.runtimeModalInfo}>
-            <div>
-              <p>You are going to stop your user tools, please confirm your choice.</p>
-              {runtimeRunning && <Runtime runtime={runtimeRunning} runtimeActive={true} />}
-            </div>
-          </ModalLayoutInfo>
-        </ModalContainer>
-      )}
-      {isReplaceRuntimeModalVisible && (
-        <ModalContainer
-          title="REPLACE YOUR TOOLS"
-          onAccept={() => startTools(runtimeSelected)}
-          onCancel={closeReplaceRuntimeModal}
-          actionButtonLabel="Replace Tools"
-          actionButtonCancel="Cancel"
-          className={styles.runtimeModal}
-          warning
-          blocking
-        >
-          <ModalLayoutInfo className={styles.runtimeModalInfo}>
-            <div>
-              <p>You are about to stop this active Runtime. ¿Are you sure?</p>
-              {runtimeRunning && <Runtime runtime={runtimeRunning} runtimeActive={true} />}
-            </div>
-          </ModalLayoutInfo>
-          <ModalLayoutInfo className={styles.runtimeModalInfo}>
-            <div>
-              <p>And this Runtime will activate instead</p>
-              {runtimeSelected && <Runtime runtime={runtimeSelected} />}
-            </div>
-          </ModalLayoutInfo>
-        </ModalContainer>
-      )}
+      <RuntimeRunner />
     </div>
   );
 }

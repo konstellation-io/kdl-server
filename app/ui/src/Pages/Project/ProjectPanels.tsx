@@ -16,22 +16,23 @@ import RuntimeInfo from './panels/RuntimeInfo/RuntimeInfo';
 import { Button } from 'kwc';
 import IconPlay from '@material-ui/icons/PlayArrow';
 import IconPause from '@material-ui/icons/Pause';
+import useRuntime from 'Graphql/client/hooks/useRuntime';
 
 const defaultPanel = 'settings';
 
 type Props = {
   openedProject: GetProjects_projects;
-  pauseRuntime: () => void;
-  startRuntime: () => void;
 };
 
-function ProjectPanels({ openedProject, pauseRuntime, startRuntime }: Props) {
+function ProjectPanels({ openedProject }: Props) {
   const panel1Data = useReactiveVar(primaryPanel);
   const panel2Data = useReactiveVar(secondaryPanel);
 
   const memberDetailsData = useReactiveVar(memberDetails);
   const runtimeSelected = useReactiveVar(selectedRuntime);
   const runtimeRunning = useReactiveVar(runningRuntime);
+
+  const { startRuntime, pauseRuntime } = useRuntime();
 
   const { closePanel: panel1Close } = usePanel(PanelType.PRIMARY);
   const { closePanel: panel2Close } = usePanel(PanelType.SECONDARY);
@@ -48,11 +49,15 @@ function ProjectPanels({ openedProject, pauseRuntime, startRuntime }: Props) {
     unselectMemberDetails();
   }
 
+  function runtimeStart() {
+    startRuntime(runtimeSelected);
+  }
+
   function extraPanelButtons(panelId?: string) {
     if (panelId === PANEL_ID.RUNTIME_INFO) {
       return runtimeSelected?.id === runtimeRunning?.id
         ? [<Button key="toggleRuntime" label="" Icon={IconPause} onClick={pauseRuntime} />]
-        : [<Button key="toggleRuntime" label="" Icon={IconPlay} onClick={startRuntime} />];
+        : [<Button key="toggleRuntime" label="" Icon={IconPlay} onClick={runtimeStart} />];
     }
 
     return [];

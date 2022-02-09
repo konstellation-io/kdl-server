@@ -15,7 +15,7 @@ metadata:
       more_set_headers "X-Frame-Options: ALLOW-FROM {{ include "protocol" . }}://kdlapp.{{ .Values.domain }}";
       more_set_headers "Content-Security-Policy: frame-ancestors 'self' {{ include "protocol" . }}://kdlapp.{{ .Values.domain}}";
     {{ end }}
-    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.ingressBodySize }}
   labels:
     app:  drone
 spec:

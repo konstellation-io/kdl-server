@@ -89,7 +89,6 @@ giteaOauth2Setup:
 
 ingress:
   type: nginx
-  nginxConnectionTimeout: "3600"
 
 knowledgeGalaxy:
   enabled: false
@@ -125,6 +124,10 @@ kdlServer:
     repository: konstellation/kdl-server
     tag: v0.18.0
     pullPolicy: IfNotPresent
+  ingress:
+    proxyReadTimeout: "3600"
+    proxySendTimeout: "3600"
+    proxyConnectTimeout: "3600"
 
 minio:
   resources:
@@ -178,7 +181,6 @@ postgres:
     storageClassName: standard
 
 projectOperator:
-
   ## Main container specs
   ##
   manager:
@@ -251,7 +253,7 @@ tls:
 
   ## A secret containing the the CA cert is needed
   ## in order to use a self-signed certificate
-  ## 
+  ##
   # caSecret:
   #   name: kdl-ca-cert
   #   certFilename: ca.crt

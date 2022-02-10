@@ -129,6 +129,10 @@ kdlServer:
     proxySendTimeout: "3600"
     proxyConnectTimeout: "3600"
 
+    ## Large values are needed to serve big files from Filebrowser
+    ##
+    proxyBodySize: "1000000m"
+
 minio:
   resources:
     requests:

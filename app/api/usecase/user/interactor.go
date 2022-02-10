@@ -16,7 +16,6 @@ import (
 )
 
 var (
-	ErrStartUserTools  = errors.New("cannot start running user tools")
 	ErrStopUserTools   = errors.New("cannot stop uninitialized user tools")
 	ErrUserToolsActive = errors.New("it is not possible to regenerate SSH keys with the usertools active")
 )
@@ -134,6 +133,7 @@ func (i *interactor) GetByUsername(ctx context.Context, username string) (entity
 }
 
 // StartTools creates a user-tools CustomResource in K8s to initialize the VSCode and Jupyter for the given username.
+// If there are already a user-tools for the user, they are replaced (stop + start new)
 func (i *interactor) StartTools(ctx context.Context, username string, runtimeId *string) (entity.User, error) {
 	user, err := i.repo.GetByUsername(ctx, username)
 	if err != nil {
@@ -147,7 +147,11 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeId 
 	}
 
 	if running {
-		return entity.User{}, ErrStartUserTools
+		// ignore the user returned by the stop, as it the same as we already have
+		_, err := i.StopTools(ctx, username)
+		if err != nil {
+			return entity.User{}, err
+		}
 	}
 
 	var rId, rImage string

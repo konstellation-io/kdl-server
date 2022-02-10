@@ -299,27 +299,42 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 	// EXPECT - The CR was created with the default image defined for the Runtime
 }
 
-func TestInteractor_StartTools_Err(t *testing.T) {
+func TestInteractor_StartTools_Replace(t *testing.T) {
+	// GIVEN
+
 	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
 		username     = "john"
 		toolsRunning = true
+		runtimeImage = "image"
 	)
 	runtimeId := "12345"
 
+	expectedRuntime := entity.Runtime{ID: runtimeId, DockerImage: runtimeImage}
+	expectedUser := entity.User{Username: username}
+
 	ctx := context.Background()
-	u := entity.User{Username: username}
-	emptyUser := entity.User{}
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(u, nil)
-	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
+	// AND the user is the in repo
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).AnyTimes().Return(expectedUser, nil)
+	// AND the runtime is in the repo
+	s.mocks.runtimeRepo.EXPECT().Get(ctx, runtimeId).Return(expectedRuntime, nil)
+	// AND the user-tools are running
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).AnyTimes().Return(toolsRunning, nil)
+	// AND the CR deletion does not return any error
+	s.mocks.k8sClientMock.EXPECT().DeleteUserToolsCR(ctx, username).Return(nil)
+	// AND the CR creation does not return any error
+	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeId, runtimeImage).Return(nil)
 
+	// WHEN the tools are started
 	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeId)
 
-	require.Equal(t, user.ErrStartUserTools, err)
-	require.Equal(t, returnedUser, emptyUser)
+	// THEN there are no errors
+	require.NoError(t, err)
+	require.Equal(t, expectedUser, returnedUser)
+	// AND the previously started tools were replaced by the new tools
 }
 
 func TestInteractor_FindAll(t *testing.T) {

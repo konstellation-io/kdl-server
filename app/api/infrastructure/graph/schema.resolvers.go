@@ -261,8 +261,8 @@ func (r *queryResolver) QualityProjectDesc(ctx context.Context, description stri
 	panic(entity.ErrNotImplemented) // implemented in knowledge galaxy server
 }
 
-func (r *queryResolver) Runtimes(ctx context.Context, projectID string) ([]entity.Runtime, error) {
-	return r.runtimes.GetProjectRuntimes(ctx, projectID)
+func (r *queryResolver) Runtimes(ctx context.Context) ([]entity.Runtime, error) {
+	return r.runtimes.GetRuntimes(ctx)
 }
 
 func (r *queryResolver) RunningRuntime(ctx context.Context) (*entity.Runtime, error) {

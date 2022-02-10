@@ -6,13 +6,10 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
-
-const someProjectID = "project-1234"
 
 type Runtimesuite struct {
 	ctrl       *gomock.Controller
@@ -20,10 +17,9 @@ type Runtimesuite struct {
 	mocks      flavorMocks
 }
 type flavorMocks struct {
-	logger      *logging.MockLogger
-	repo        *runtime.MockRepository
-	projectRepo *project.MockRepository
-	k8client    *k8s.MockK8sClient
+	logger   *logging.MockLogger
+	repo     *runtime.MockRepository
+	k8client *k8s.MockK8sClient
 }
 
 func newRuntimesuite(t *testing.T) *Runtimesuite {
@@ -32,16 +28,14 @@ func newRuntimesuite(t *testing.T) *Runtimesuite {
 	logging.AddLoggerExpects(logger)
 	repo := runtime.NewMockRepository(ctrl)
 	k8client := k8s.NewMockK8sClient(ctrl)
-	projectRepo := project.NewMockRepository(ctrl)
-	interactor := runtime.NewInteractor(logger, k8client, repo, projectRepo)
+	interactor := runtime.NewInteractor(logger, k8client, repo)
 	return &Runtimesuite{
 		ctrl:       ctrl,
 		interactor: interactor,
 		mocks: flavorMocks{
-			logger:      logger,
-			repo:        repo,
-			projectRepo: projectRepo,
-			k8client:    k8client,
+			logger:   logger,
+			repo:     repo,
+			k8client: k8client,
 		},
 	}
 }
@@ -75,29 +69,21 @@ func TestInteractor_GetProjectRuntimes(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const (
-		runtimeId    = "1234"
 		genRuntimeId = "5678"
 		runtimeName  = "Runtime 1"
 		dockerImage  = "konstellation/image"
 	)
 
 	ctx := context.Background()
-	expectedProjectRuntimes := []entity.Runtime{
-		entity.NewRuntime(runtimeId, runtimeName, dockerImage),
-	}
 
 	expectedGenericRuntimes := []entity.Runtime{
 		entity.NewRuntime(genRuntimeId, runtimeName, dockerImage),
 	}
 
-	expectedProject := entity.NewProject(someProjectID, "project-x", "Project X")
-	expectedProject.Runtimes = expectedProjectRuntimes
-
-	s.mocks.projectRepo.EXPECT().Get(ctx, someProjectID).Return(expectedProject, nil)
 	s.mocks.repo.EXPECT().FindAll(ctx).Return(expectedGenericRuntimes, nil)
 
-	f, err := s.interactor.GetProjectRuntimes(ctx, someProjectID)
+	f, err := s.interactor.GetRuntimes(ctx)
 
 	require.NoError(t, err)
-	require.Equal(t, f, append(expectedGenericRuntimes, expectedProjectRuntimes...))
+	require.Equal(t, f, expectedGenericRuntimes)
 }

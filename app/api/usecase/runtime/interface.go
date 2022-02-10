@@ -16,6 +16,6 @@ type Repository interface {
 
 // UseCase interface to manage all operations related with runtimes.
 type UseCase interface {
-	GetProjectRuntimes(ctx context.Context, projectId string) ([]entity.Runtime, error)
+	GetRuntimes(ctx context.Context) ([]entity.Runtime, error)
 	GetRunningRuntime(ctx context.Context, username string) (*entity.Runtime, error)
 }

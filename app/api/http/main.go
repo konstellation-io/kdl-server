@@ -112,7 +112,7 @@ func main() {
 
 	projectInteractor := project.NewInteractor(projectDeps)
 
-	runtimeInteractor := runtime.NewInteractor(logger, k8sClient, runtimeRepo, projectRepo)
+	runtimeInteractor := runtime.NewInteractor(logger, k8sClient, runtimeRepo)
 
 	resolvers := graph.NewResolver(
 		logger,

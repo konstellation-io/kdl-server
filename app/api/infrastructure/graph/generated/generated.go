@@ -104,7 +104,7 @@ type ComplexityRoot struct {
 		Projects           func(childComplexity int) int
 		QualityProjectDesc func(childComplexity int, description string) int
 		RunningRuntime     func(childComplexity int) int
-		Runtimes           func(childComplexity int, projectID string) int
+		Runtimes           func(childComplexity int) int
 		Users              func(childComplexity int) int
 	}
 
@@ -193,7 +193,7 @@ type QueryResolver interface {
 	Project(ctx context.Context, id string) (*entity.Project, error)
 	Users(ctx context.Context) ([]entity.User, error)
 	QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error)
-	Runtimes(ctx context.Context, projectID string) ([]entity.Runtime, error)
+	Runtimes(ctx context.Context) ([]entity.Runtime, error)
 	RunningRuntime(ctx context.Context) (*entity.Runtime, error)
 	Kubeconfig(ctx context.Context) (string, error)
 }
@@ -565,12 +565,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_runtimes_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Runtimes(childComplexity, args["projectId"].(string)), true
+		return e.complexity.Query.Runtimes(childComplexity), true
 
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
@@ -607,7 +602,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Runtime.Desc(childComplexity), true
 
-	case "Runtime.DockerImage":
+	case "Runtime.dockerImage":
 		if e.complexity.Runtime.DockerImage == nil {
 			break
 		}
@@ -635,7 +630,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Runtime.Name(childComplexity), true
 
-	case "Runtime.UsertoolsPod":
+	case "Runtime.usertoolsPod":
 		if e.complexity.Runtime.UsertoolsPod == nil {
 			break
 		}
@@ -873,7 +868,7 @@ var sources = []*ast.Source{
   project(id: ID!): Project!
   users: [User!]!
   qualityProjectDesc(description: String!): QualityProjectDesc!
-  runtimes(projectId: ID!): [Runtime!]!
+  runtimes: [Runtime!]!
   runningRuntime: Runtime
   kubeconfig: String!
 }
@@ -902,8 +897,8 @@ type Runtime {
   name: String!
   desc: String!
   labels: [String!]
-  DockerImage: String!
-  UsertoolsPod: String
+  dockerImage: String!
+  usertoolsPod: String
 }
 
 type Topic {
@@ -1265,21 +1260,6 @@ func (ec *executionContext) field_Query_qualityProjectDesc_args(ctx context.Cont
 		}
 	}
 	args["description"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_runtimes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["projectId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["projectId"] = arg0
 	return args, nil
 }
 
@@ -2742,16 +2722,9 @@ func (ec *executionContext) _Query_runtimes(ctx context.Context, field graphql.C
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_runtimes_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Runtimes(rctx, args["projectId"].(string))
+		return ec.resolvers.Query().Runtimes(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3145,7 +3118,7 @@ func (ec *executionContext) _Runtime_labels(ctx context.Context, field graphql.C
 	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Runtime_DockerImage(ctx context.Context, field graphql.CollectedField, obj *entity.Runtime) (ret graphql.Marshaler) {
+func (ec *executionContext) _Runtime_dockerImage(ctx context.Context, field graphql.CollectedField, obj *entity.Runtime) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3180,7 +3153,7 @@ func (ec *executionContext) _Runtime_DockerImage(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Runtime_UsertoolsPod(ctx context.Context, field graphql.CollectedField, obj *entity.Runtime) (ret graphql.Marshaler) {
+func (ec *executionContext) _Runtime_usertoolsPod(ctx context.Context, field graphql.CollectedField, obj *entity.Runtime) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -6071,13 +6044,13 @@ func (ec *executionContext) _Runtime(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "labels":
 			out.Values[i] = ec._Runtime_labels(ctx, field, obj)
-		case "DockerImage":
-			out.Values[i] = ec._Runtime_DockerImage(ctx, field, obj)
+		case "dockerImage":
+			out.Values[i] = ec._Runtime_dockerImage(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "UsertoolsPod":
-			out.Values[i] = ec._Runtime_UsertoolsPod(ctx, field, obj)
+		case "usertoolsPod":
+			out.Values[i] = ec._Runtime_usertoolsPod(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

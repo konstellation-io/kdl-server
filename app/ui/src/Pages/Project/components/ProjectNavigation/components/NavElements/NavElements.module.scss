@@ -18,7 +18,6 @@
     &.started {
       border-right: 2px solid palette(success);
     }
-
     &.stopped {
       border-right: 2px solid palette(alert);
     }
@@ -29,8 +28,6 @@
       width: 100%;
       white-space: nowrap;
       margin-left: 5 * $grid-unit;
-      margin-bottom: $grid-unit;
-      padding-top: 0.75 * $grid-unit;
     }
 
     .usertoolsIcon {
@@ -40,14 +37,19 @@
       &.blocked {
         color: palette(alert);
       }
-
       &:hover {
         color: palette(highlight);
       }
     }
 
+    .usertoolsOptions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 40px;
+    }
+
     .usertoolsSettings {
-      float: right;
       display: flex;
     }
 

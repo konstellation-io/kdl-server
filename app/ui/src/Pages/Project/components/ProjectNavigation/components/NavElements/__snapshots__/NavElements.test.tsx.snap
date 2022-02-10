@@ -165,15 +165,234 @@ exports[`When data is ready should render without crashing 1`] = `
         class="userTools started"
       >
         <div
-          aria-hidden="false"
-          class="rah-static rah-static--height-auto"
-          style="height: auto; overflow: visible;"
+          class="usertoolsOptions"
         >
-          <div>
+          <div
+            aria-hidden="false"
+            class="rah-static rah-static--height-auto"
+            style="height: auto; overflow: visible;"
+          >
+            <div>
+              <div
+                class="userToolLabel"
+              >
+                USER TOOLS
+              </div>
+            </div>
+          </div>
+          <div
+            class="usertoolsSettings"
+            data-testid="usertoolsSettings"
+          >
             <div
-              class="userToolLabel"
+              class="__react_component_tooltip tbf098639-7e54-4990-9b0b-14eb575a1a45 place-top type-dark"
+              data-id="tooltip"
+              id="settings"
             >
-              USER TOOLS
+              <style
+                aria-hidden="true"
+              >
+                
+  	.tbf098639-7e54-4990-9b0b-14eb575a1a45 {
+	    color: #fff;
+	    background: #222;
+	    border: 1px solid transparent;
+  	}
+
+  	.tbf098639-7e54-4990-9b0b-14eb575a1a45.place-top {
+        margin-top: -10px;
+    }
+    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-top::before {
+        border-top: 8px solid transparent;
+    }
+    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-top::after {
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        bottom: -6px;
+        left: 50%;
+        margin-left: -8px;
+        border-top-color: #222;
+        border-top-style: solid;
+        border-top-width: 6px;
+    }
+
+    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-bottom {
+        margin-top: 10px;
+    }
+    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-bottom::before {
+        border-bottom: 8px solid transparent;
+    }
+    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-bottom::after {
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        top: -6px;
+        left: 50%;
+        margin-left: -8px;
+        border-bottom-color: #222;
+        border-bottom-style: solid;
+        border-bottom-width: 6px;
+    }
+
+    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-left {
+        margin-left: -10px;
+    }
+    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-left::before {
+        border-left: 8px solid transparent;
+    }
+    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-left::after {
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+        right: -6px;
+        top: 50%;
+        margin-top: -4px;
+        border-left-color: #222;
+        border-left-style: solid;
+        border-left-width: 6px;
+    }
+
+    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-right {
+        margin-left: 10px;
+    }
+    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-right::before {
+        border-right: 8px solid transparent;
+    }
+    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-right::after {
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+        left: -6px;
+        top: 50%;
+        margin-top: -4px;
+        border-right-color: #222;
+        border-right-style: solid;
+        border-right-width: 6px;
+    }
+  
+              </style>
+              <span>
+                Show available runtimes
+              </span>
+            </div>
+            <div
+              currentitem="false"
+              data-for="settings"
+              data-tip="true"
+            >
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root usertoolsIcon icon-small"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"
+                />
+              </svg>
+            </div>
+            <div>
+              <div
+                class="__react_component_tooltip tac09d490-e4e9-47e1-9218-e9447725a640 place-top type-dark"
+                data-id="tooltip"
+                id="stop"
+              >
+                <style
+                  aria-hidden="true"
+                >
+                  
+  	.tac09d490-e4e9-47e1-9218-e9447725a640 {
+	    color: #fff;
+	    background: #222;
+	    border: 1px solid transparent;
+  	}
+
+  	.tac09d490-e4e9-47e1-9218-e9447725a640.place-top {
+        margin-top: -10px;
+    }
+    .tac09d490-e4e9-47e1-9218-e9447725a640.place-top::before {
+        border-top: 8px solid transparent;
+    }
+    .tac09d490-e4e9-47e1-9218-e9447725a640.place-top::after {
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        bottom: -6px;
+        left: 50%;
+        margin-left: -8px;
+        border-top-color: #222;
+        border-top-style: solid;
+        border-top-width: 6px;
+    }
+
+    .tac09d490-e4e9-47e1-9218-e9447725a640.place-bottom {
+        margin-top: 10px;
+    }
+    .tac09d490-e4e9-47e1-9218-e9447725a640.place-bottom::before {
+        border-bottom: 8px solid transparent;
+    }
+    .tac09d490-e4e9-47e1-9218-e9447725a640.place-bottom::after {
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        top: -6px;
+        left: 50%;
+        margin-left: -8px;
+        border-bottom-color: #222;
+        border-bottom-style: solid;
+        border-bottom-width: 6px;
+    }
+
+    .tac09d490-e4e9-47e1-9218-e9447725a640.place-left {
+        margin-left: -10px;
+    }
+    .tac09d490-e4e9-47e1-9218-e9447725a640.place-left::before {
+        border-left: 8px solid transparent;
+    }
+    .tac09d490-e4e9-47e1-9218-e9447725a640.place-left::after {
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+        right: -6px;
+        top: 50%;
+        margin-top: -4px;
+        border-left-color: #222;
+        border-left-style: solid;
+        border-left-width: 6px;
+    }
+
+    .tac09d490-e4e9-47e1-9218-e9447725a640.place-right {
+        margin-left: 10px;
+    }
+    .tac09d490-e4e9-47e1-9218-e9447725a640.place-right::before {
+        border-right: 8px solid transparent;
+    }
+    .tac09d490-e4e9-47e1-9218-e9447725a640.place-right::after {
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+        left: -6px;
+        top: 50%;
+        margin-top: -4px;
+        border-right-color: #222;
+        border-right-style: solid;
+        border-right-width: 6px;
+    }
+  
+                </style>
+                <span>
+                  Stop tools
+                </span>
+              </div>
+              <div
+                currentitem="false"
+                data-for="stop"
+                data-tip="true"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root usertoolsIcon icon-small"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"
+                  />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
@@ -250,31 +469,7 @@ exports[`When data is ready should render without crashing 1`] = `
         <div
           class="toggleToolsWrapper"
           data-testid="confirmationModal"
-        >
-          <div>
-            <div
-              class="navButton"
-              data-testid="stopTools"
-              title="Stop tools"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root icon-regular icon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"
-                />
-              </svg>
-              <span
-                class="label"
-              >
-                Stop tools
-              </span>
-            </div>
-          </div>
-        </div>
+        />
       </div>
     </div>
   </div>

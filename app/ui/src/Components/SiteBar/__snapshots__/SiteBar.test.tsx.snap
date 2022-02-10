@@ -12,6 +12,7 @@ exports[`SiteBar component Component match snapshot 1`] = `
   <ht
     className="right"
   >
+    <RuntimesCrumb />
     <Memo(SettingsMenu) />
   </ht>
 </div>

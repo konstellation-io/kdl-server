@@ -14,7 +14,7 @@
 
     .project {
       .projectName {
-        @include font-body;
+        @include font-small;
         color: font-color(lowlight);
         padding: $grid-unit 2 * $grid-unit;
 
@@ -32,6 +32,7 @@
         .projectName {
           color: palette(base);
           background-color: palette(highlight, 600);
+          /* background: rgba(255,0,0,0.2); */
         }
       }
     }

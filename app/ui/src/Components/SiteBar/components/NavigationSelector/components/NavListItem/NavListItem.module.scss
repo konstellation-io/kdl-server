@@ -11,7 +11,9 @@
   background-color: transparent;
   border-left: 3px solid transparent;
 
-  transition: background-color ease 0.3s, border-left-color ease 0.3s,
+  transition: 
+    background-color ease 0.3s, 
+    border-left-color ease 0.3s,
     color ease 0.2s, opacity ease 0.3s;
   color: font-color(lowlight);
 

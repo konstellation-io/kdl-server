@@ -82,13 +82,13 @@ function NavElements({ isOpened }: Props) {
     <>
       {mainRoutes.map(({ Icon, label, route }) => (
         <NavButtonLink to={route} key={label}>
-          <NavigationButton label={label} Icon={Icon} />
+          <NavigationButton label={label} Icon={Icon} isNavCollapsed={!isOpened} />
         </NavButtonLink>
       ))}
       <div className={styles.projectTools}>
         {projectToolsRoutes.map(({ Icon, label, route, disabled }) => (
           <NavButtonLink to={route} key={label} disabled={disabled}>
-            <NavigationButton label={label} Icon={Icon} />
+            <NavigationButton label={label} Icon={Icon} isNavCollapsed={!isOpened} />
           </NavButtonLink>
         ))}
         <div
@@ -101,7 +101,10 @@ function NavElements({ isOpened }: Props) {
             <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
               <div className={styles.userToolLabel}>USER TOOLS</div>
             </AnimateHeight>
-            <div className={styles.usertoolsSettings} data-testid="usertoolsSettings">
+            <div
+              className={cx(styles.usertoolsSettings, { [styles.opened]: isOpened })}
+              data-testid="usertoolsSettings"
+            >
               <ReactTooltip
                 id="settings"
                 effect="solid"
@@ -119,7 +122,7 @@ function NavElements({ isOpened }: Props) {
           </div>
           {userToolsRoutes.map(({ Icon, label, route, disabled }) => (
             <NavButtonLink to={route} key={label} disabled={disabled}>
-              <NavigationButton label={label} Icon={Icon} />
+              <NavigationButton label={label} Icon={Icon} isNavCollapsed={!isOpened} />
             </NavButtonLink>
           ))}
           <div
@@ -127,7 +130,7 @@ function NavElements({ isOpened }: Props) {
               [styles.disabled]: projectActiveTools.loading,
             })}
             data-testid="confirmationModal"
-          ></div>
+          />
         </div>
       </div>
     </>

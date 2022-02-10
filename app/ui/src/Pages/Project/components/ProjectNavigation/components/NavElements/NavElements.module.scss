@@ -51,6 +51,13 @@
 
     .usertoolsSettings {
       display: flex;
+      //background-color: green;
+
+      &.opened {
+        //background-color: red;
+      }
+
+
     }
 
     .toggleToolsWrapper {

@@ -107,47 +107,47 @@ deploy_helm_chart() {
     --namespace "${NAMESPACE}" \
     --set backup.enabled="false" \
     --set backup.image.pullPolicy="Always" \
-    --set backup.image.repository="$IMAGE_REGISTRY/konstellation/kdl-backup" \
+    --set backup.image.repository="${IMAGE_REGISTRY}/konstellation/kdl-backup" \
     --set backup.image.tag="latest" \
-    --set domain=$DOMAIN \
-    --set drone.storage.storageClassName=$STORAGE_CLASS_NAME \
+    --set domain="${DOMAIN}" \
+    --set drone.storage.storageClassName="${STORAGE_CLASS_NAME}" \
     --set droneAuthorizer.image.pullPolicy="Always" \
-    --set droneAuthorizer.image.repository="$IMAGE_REGISTRY/konstellation/drone-authorizer" \
-    --set gitea.admin.password=${GITEA_ADMIN_PASSWORD} \
-    --set gitea.admin.username="$GITEA_ADMIN_USER" \
-    --set gitea.storage.storageClassName=$STORAGE_CLASS_NAME \
+    --set droneAuthorizer.image.repository="${IMAGE_REGISTRY}/konstellation/drone-authorizer" \
+    --set gitea.admin.password="${GITEA_ADMIN_PASSWORD}" \
+    --set gitea.admin.username="${GITEA_ADMIN_USER}" \
+    --set gitea.storage.storageClassName="${STORAGE_CLASS_NAME}" \
     --set giteaOauth2Setup.image.pullPolicy="Always" \
-    --set giteaOauth2Setup.image.repository="$IMAGE_REGISTRY/konstellation/gitea-oauth2-setup" \
+    --set giteaOauth2Setup.image.repository="${IMAGE_REGISTRY}/konstellation/gitea-oauth2-setup" \
     --set kdlServer.image.pullPolicy="Always" \
     --set kdlServer.image.tag="latest" \
-    --set kdlServer.image.repository="$IMAGE_REGISTRY/konstellation/kdl-server" \
+    --set kdlServer.image.repository="${IMAGE_REGISTRY}/konstellation/kdl-server" \
     --set knowledgeGalaxy.image.pullPolicy="Always" \
-    --set knowledgeGalaxy.image.repository=$KNOWLEDGE_GALAXY_IMAGE_REPOSITORY \
-    $SET_KNOWLEDGE_GALAXY_IMAGE_TAG \
+    --set knowledgeGalaxy.image.repository="${KNOWLEDGE_GALAXY_IMAGE_REPOSITORY}" \
+    "${SET_KNOWLEDGE_GALAXY_IMAGE_TAG}" \
     --set minio.securityContext.runAsUser=0 \
-    --set mongodb.persistentVolume.storageClassName=$STORAGE_CLASS_NAME \
-    --set sharedVolume.storageClassName=$STORAGE_CLASS_NAME \
-    --set postgres.storage.storageClassName=$STORAGE_CLASS_NAME \
-    --set projectOperator.image.pullPolicy="Always" \
-    --set projectOperator.image.repository="$IMAGE_REGISTRY/konstellation/project-operator" \
+    --set mongodb.persistentVolume.storageClassName="${STORAGE_CLASS_NAME}" \
+    --set sharedVolume.storageClassName="${STORAGE_CLASS_NAME}" \
+    --set postgres.storage.storageClassName="${STORAGE_CLASS_NAME}" \
+    --set projectOperator.manager.image.pullPolicy="Always" \
+    --set projectOperator.manager.image.repository="${IMAGE_REGISTRY}/konstellation/project-operator" \
     --set projectOperator.mlflow.image.pullPolicy="Always" \
-    --set projectOperator.mlflow.image.repository="$IMAGE_REGISTRY/konstellation/mlflow" \
-    --set projectOperator.mlflow.volume.storageClassName=$STORAGE_CLASS_NAME \
-    --set tls.enabled=${ENABLE_TLS} \
-    --set tls.secretName=${DOMAIN}-tls-secret \
+    --set projectOperator.mlflow.image.repository="${IMAGE_REGISTRY}/konstellation/mlflow" \
+    --set projectOperator.mlflow.volume.storageClassName="${STORAGE_CLASS_NAME}" \
+    --set tls.enabled="${ENABLE_TLS}" \
+    --set tls.secretName="${DOMAIN}-tls-secret" \
     --set tls.caSecret.name=mkcert-ca \
     --set tls.caSecret.certFilename=mkcert-ca.crt \
     --set userToolsOperator.image.pullPolicy="Always" \
-    --set userToolsOperator.image.repository="$IMAGE_REGISTRY/konstellation/user-tools-operator" \
+    --set userToolsOperator.image.repository="${IMAGE_REGISTRY}/konstellation/user-tools-operator" \
     --set userToolsOperator.jupyter.image.pullPolicy="Always" \
     --set userToolsOperator.jupyter.image.repository="konstellation/jupyter-gpu" \
     --set userToolsOperator.jupyter.image.tag="v0.14-alpha.8" \
     --set userToolsOperator.jupyter.image.pullPolicy="IfNotPrensent" \
     --set userToolsOperator.repoCloner.image.pullPolicy="Always" \
-    --set userToolsOperator.repoCloner.image.repository="$IMAGE_REGISTRY/konstellation/repo-cloner" \
+    --set userToolsOperator.repoCloner.image.repository="${IMAGE_REGISTRY}/konstellation/repo-cloner" \
     --set userToolsOperator.vscode.image.pullPolicy="Always" \
-    --set userToolsOperator.vscode.image.repository="$IMAGE_REGISTRY/konstellation/vscode" \
-    --set userToolsOperator.storage.storageClassName=$STORAGE_CLASS_NAME \
+    --set userToolsOperator.vscode.image.repository="${IMAGE_REGISTRY}/konstellation/vscode" \
+    --set userToolsOperator.storage.storageClassName="${STORAGE_CLASS_NAME}" \
     --timeout 60m \
     --wait \
     helm/kdl-server

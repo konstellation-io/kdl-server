@@ -38,6 +38,7 @@ func (i interactor) GetRuntimes(ctx context.Context) ([]entity.Runtime, error) {
 	return runtimes, nil
 }
 
+// GetRunningRuntime return the running runtime if any. If not it returns a null.
 func (i interactor) GetRunningRuntime(ctx context.Context, username string) (*entity.Runtime, error) {
 	runtimeId, err := i.k8sClient.GetRunningRuntimePODRuntimeId(ctx, username)
 	if err != nil {
@@ -55,5 +56,5 @@ func (i interactor) GetRunningRuntime(ctx context.Context, username string) (*en
 		return &runtime, nil
 	}
 
-	return nil, entity.NoRunningRuntime
+	return nil, nil
 }

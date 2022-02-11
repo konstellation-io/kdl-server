@@ -18,6 +18,7 @@ type Props = {
   className?: string;
   disabled?: boolean;
   dataTestId?: string;
+  isNavCollapsed?: boolean;
 };
 
 function NavigationButton({
@@ -25,6 +26,7 @@ function NavigationButton({
   title,
   Icon,
   onClick,
+  isNavCollapsed = false,
   className = '',
   dataTestId = undefined,
   iconSize = IconSize.REGULAR,
@@ -32,9 +34,16 @@ function NavigationButton({
 }: Props) {
   return (
     <div
-      className={cx(styles.navButton, className, {
-        [styles.disabled]: disabled,
-      })}
+      className={cx(
+        styles.navButton,
+        className,
+        {
+          [styles.navCollapsed]: isNavCollapsed,
+        },
+        {
+          [styles.disabled]: disabled,
+        },
+      )}
       title={title || label}
       onClick={onClick}
       data-testid={dataTestId}

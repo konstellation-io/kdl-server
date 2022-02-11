@@ -18,6 +18,7 @@ import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
 import useRuntime from 'Graphql/client/hooks/useRuntime';
+import ReactTooltip from 'react-tooltip';
 
 type Props = {
   isOpened: boolean;
@@ -57,9 +58,23 @@ function NavElements({ isOpened }: Props) {
     if (projectActiveTools.loading) return Progress;
 
     return runtimeRunning ? (
-      <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStop} />
+      <div>
+        <ReactTooltip id="stop" effect="solid" textColor="white" backgroundColor="#888" className={styles.toolsTip}>
+          <span>Stop tools</span>
+        </ReactTooltip>
+        <div data-tip data-for="stop">
+          <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStop} />
+        </div>
+      </div>
     ) : (
-      <IconPlay className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStart} />
+      <div>
+        <ReactTooltip id="start" effect="solid" textColor="white" backgroundColor="#888" className={styles.toolsTip}>
+          <span>Start tools</span>
+        </ReactTooltip>
+        <div data-tip data-for="start">
+          <IconPlay className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStart} />
+        </div>
+      </div>
     );
   }
 
@@ -67,13 +82,13 @@ function NavElements({ isOpened }: Props) {
     <>
       {mainRoutes.map(({ Icon, label, route }) => (
         <NavButtonLink to={route} key={label}>
-          <NavigationButton label={label} Icon={Icon} />
+          <NavigationButton label={label} Icon={Icon} isNavCollapsed={!isOpened} />
         </NavButtonLink>
       ))}
       <div className={styles.projectTools}>
         {projectToolsRoutes.map(({ Icon, label, route, disabled }) => (
           <NavButtonLink to={route} key={label} disabled={disabled}>
-            <NavigationButton label={label} Icon={Icon} />
+            <NavigationButton label={label} Icon={Icon} isNavCollapsed={!isOpened} />
           </NavButtonLink>
         ))}
         <div
@@ -82,16 +97,32 @@ function NavElements({ isOpened }: Props) {
             [styles.stopped]: !runtimeRunning,
           })}
         >
-          <div className={styles.usertoolsSettings} data-testid="usertoolsSettings">
-            <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
-            {renderToggleToolsIcon()}
+          <div className={cx(styles.usertoolsOptions, { [styles.opened]: isOpened })}>
+            <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
+              <div className={styles.userToolLabel}>USER TOOLS</div>
+            </AnimateHeight>
+            <div
+              className={cx(styles.usertoolsSettings, { [styles.opened]: isOpened })}
+              data-testid="usertoolsSettings"
+            >
+              <ReactTooltip
+                id="settings"
+                effect="solid"
+                textColor="white"
+                backgroundColor="#888"
+                className={styles.toolsTip}
+              >
+                <span>Show available runtimes</span>
+              </ReactTooltip>
+              <div data-tip data-for="settings">
+                <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
+              </div>
+              {renderToggleToolsIcon()}
+            </div>
           </div>
-          <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
-            <div className={styles.userToolLabel}>USER TOOLS</div>
-          </AnimateHeight>
           {userToolsRoutes.map(({ Icon, label, route, disabled }) => (
             <NavButtonLink to={route} key={label} disabled={disabled}>
-              <NavigationButton label={label} Icon={Icon} />
+              <NavigationButton label={label} Icon={Icon} isNavCollapsed={!isOpened} />
             </NavButtonLink>
           ))}
           <div
@@ -99,7 +130,7 @@ function NavElements({ isOpened }: Props) {
               [styles.disabled]: projectActiveTools.loading,
             })}
             data-testid="confirmationModal"
-          ></div>
+          />
         </div>
       </div>
     </>

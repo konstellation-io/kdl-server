@@ -4,8 +4,9 @@
 
 .projectTools {
   background-color: palette(base, 300);
-
-  a:hover > div {
+  a:active > div,
+  a:hover > div,
+  a:focus > div {
     background-color: palette(base, 200) !important;
   }
 
@@ -18,7 +19,6 @@
     &.started {
       border-right: 2px solid palette(success);
     }
-
     &.stopped {
       border-right: 2px solid palette(alert);
     }
@@ -29,39 +29,69 @@
       width: 100%;
       white-space: nowrap;
       margin-left: 5 * $grid-unit;
-      margin-bottom: $grid-unit;
-      padding-top: 0.75 * $grid-unit;
     }
 
     .usertoolsIcon {
       margin: $grid-unit;
       cursor: pointer;
-
       &.blocked {
         color: palette(alert);
       }
-
-      &:hover {
+      &:active,
+      &:hover,
+      &:focus {
         color: palette(highlight);
       }
     }
 
-    .usertoolsSettings {
-      float: right;
+    .usertoolsOptions {
       display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      div[data-for="settings"],
+      div[data-for="start"],
+      div[data-for="stop"] {
+        display: flex;
+        justify-content: center;
+        svg {
+          width:  $grid-unit * 2;
+          height: $grid-unit * 2;
+        }
+      }
+      
+      &.opened {
+        height: 40px;
+        div[data-for="settings"],
+        div[data-for="start"],
+        div[data-for="stop"] {
+          svg {
+            width: $grid-unit + 4;
+            height: $grid-unit + 4;
+          }
+        }
+      }
+    }
+
+    .usertoolsSettings {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      &.opened {
+        flex-direction: row;
+        width: auto;
+      }
     }
 
     .toggleToolsWrapper {
       border-top: 2px dotted palette(base, 400);
       transition: opacity 0.3s ease;
-
       .loadingTools {
         color: palette(highlight);
         margin: 0 1.4 * $grid-unit;
         transition: transform ease 0.3s;
         flex-shrink: 0;
       }
-
       &.disabled {
         pointer-events: none;
         opacity: 0.5;

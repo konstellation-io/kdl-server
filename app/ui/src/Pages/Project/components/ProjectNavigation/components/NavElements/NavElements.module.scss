@@ -46,18 +46,38 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 40px;
+
+      div[data-for="settings"],
+      div[data-for="start"],
+      div[data-for="stop"] {
+        display: flex;
+        justify-content: center;
+        svg {
+          width:  $grid-unit * 2;
+          height: $grid-unit * 2;
+        }
+      }
+      &.opened {
+        height: 40px;
+        div[data-for="settings"],
+        div[data-for="start"],
+        div[data-for="stop"] {
+          svg {
+            width: $grid-unit + 4;
+            height: $grid-unit + 4;
+          }
+        }
+      }
     }
 
     .usertoolsSettings {
       display: flex;
-      //background-color: green;
-
+      flex-direction: column;
+      width: 100%;
       &.opened {
-        //background-color: red;
+        flex-direction: row;
+        width: auto;
       }
-
-
     }
 
     .toggleToolsWrapper {

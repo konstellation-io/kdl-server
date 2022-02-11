@@ -48,7 +48,10 @@
 }
 
 .navCollapsed {
-  //background-color: aqua;
+  justify-content: center;
+  .label {
+    display: none;
+  }
 }
 
 .collapsed .icon {

@@ -10,12 +10,12 @@
   width: 100%;
   background-color: transparent;
   border-left: 3px solid transparent;
+  color: font-color(lowlight);
 
   transition: 
     background-color ease 0.3s, 
     border-left-color ease 0.3s,
     color ease 0.2s, opacity ease 0.3s;
-  color: font-color(lowlight);
 
   &.disabled {
     color: palette(lowlight, 300);
@@ -25,6 +25,7 @@
   &:hover {
     border-left-color: palette(highlight);
     color: font-color(highlight);
+    text-shadow: 0 0 16px  palette(highlight);
   }
 
   .icon {

@@ -15,14 +15,21 @@
     .project {
       .projectName {
         @include font-small;
+        padding: $grid-unit 2 * $grid-unit;
         border-left: 3px solid transparent;
         color: font-color(lowlight);
-        padding: $grid-unit 2 * $grid-unit;
+
+        transition: 
+          background-color ease 0.3s, 
+          border-left-color ease 0.3s,
+          color ease 0.2s, opacity ease 0.3s;
+
         &:active,
         &:hover,
         &:focus {
           border-left-color: palette(highlight);
           color: palette(highlight);
+          text-shadow: 0 0 16px  palette(highlight);
         }
       }
 

@@ -76,7 +76,6 @@ header {
   .title {
     @include font-body;
     color: font-color(light);
-
     margin: $grid-unit auto $grid-unit 0;
   }
 }
@@ -88,7 +87,6 @@ header {
   max-width: 0;
   min-width: $panel-width-default;
   width: 0;
-
   transition: width ease 0.5s, max-width ease 0.5s;
 }
 

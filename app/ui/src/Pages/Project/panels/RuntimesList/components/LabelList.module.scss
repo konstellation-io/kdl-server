@@ -12,7 +12,7 @@ $desc-height: 5 * $grid-unit;
   float: left;
   margin: 0 1.5 * $grid-unit 1.1 * $grid-unit 0;
   padding: 0.4 * $grid-unit 1.5 * $grid-unit;
-  background-color: palette(base);
+  background-color: palette(tag);
   border-radius: 0.5 * $grid-unit;
   @include font-small;
   color: font-color(regular);
@@ -21,8 +21,8 @@ $desc-height: 5 * $grid-unit;
 .runningTag {
   @extend .label;
   padding: 0.4 * $grid-unit 3.5 * $grid-unit;
-  background-color: palette(success, 700);
+  background-color: transparent;
   border-radius: 2 * $grid-unit;
-  color: font-color(dark);
+  color: palette(success, 700);
   font-weight: bold;
 }

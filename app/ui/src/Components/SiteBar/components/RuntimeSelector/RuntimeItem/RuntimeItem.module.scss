@@ -9,15 +9,20 @@
   flex-direction: column;
   background-color: palette(base);
   padding: $grid-unit;
-  @include font-body;
+  @include font-small;
   color: font-color(grey);
+  border-left: 3px solid transparent;
+
+  transition: 
+    background-color ease 0.3s, 
+    border-left-color ease 0.3s,
+    color ease 0.2s, opacity ease 0.3s;
 
   &:hover {
-    background-color: palette(lowlight, 900);
-
+    border-left-color: palette(highlight);
     .name {
-      @include font-body;
-      color: font-color(light);
+      color: font-color(highlight);
+      text-shadow: 0 0 16px  palette(highlight);
     }
   }
 
@@ -43,10 +48,10 @@
       float: left;
       margin: 0 1.5 * $grid-unit 0 0;
       padding: 0.4 * $grid-unit 1.5 * $grid-unit;
-      background-color: palette(lowlight);
+      background-color: palette(tag);
       border-radius: 0.5 * $grid-unit;
       @include font-small;
-      color: font-color(dark);
+      color: font-color(regular);
     }
   }
 

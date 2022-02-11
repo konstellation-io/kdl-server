@@ -4,8 +4,9 @@
 
 .projectTools {
   background-color: palette(base, 300);
-
-  a:hover > div {
+  a:active > div,
+  a:hover > div,
+  a:focus > div {
     background-color: palette(base, 200) !important;
   }
 
@@ -33,11 +34,12 @@
     .usertoolsIcon {
       margin: $grid-unit;
       cursor: pointer;
-
       &.blocked {
         color: palette(alert);
       }
-      &:hover {
+      &:active,
+      &:hover,
+      &:focus {
         color: palette(highlight);
       }
     }
@@ -83,14 +85,12 @@
     .toggleToolsWrapper {
       border-top: 2px dotted palette(base, 400);
       transition: opacity 0.3s ease;
-
       .loadingTools {
         color: palette(highlight);
         margin: 0 1.4 * $grid-unit;
         transition: transform ease 0.3s;
         flex-shrink: 0;
       }
-
       &.disabled {
         pointer-events: none;
         opacity: 0.5;

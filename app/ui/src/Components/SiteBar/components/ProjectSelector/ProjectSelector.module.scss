@@ -15,24 +15,24 @@
     .project {
       .projectName {
         @include font-small;
+        border-left: 3px solid transparent;
         color: font-color(lowlight);
         padding: $grid-unit 2 * $grid-unit;
-
-        &:hover {
-          @include glow(3, palette(highlight, 800));
-          color: palette(base);
-          background-color: palette(highlight);
+        &:active,
+        &:hover,
+        &:focus {
+          border-left-color: palette(highlight);
+          color: palette(highlight);
         }
       }
 
       &.selectedProject {
         cursor: default;
         pointer-events: none;
-
         .projectName {
-          color: palette(base);
-          background-color: palette(highlight, 600);
-          /* background: rgba(255,0,0,0.2); */
+          border-left-color: palette(highlight);
+          color: palette(highlight);
+
         }
       }
     }

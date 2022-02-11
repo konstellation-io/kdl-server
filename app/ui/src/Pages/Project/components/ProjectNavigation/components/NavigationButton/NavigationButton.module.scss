@@ -10,7 +10,10 @@
   background-color: transparent;
   border-left: 0.25 * $grid-unit solid transparent;
 
-  transition: background-color ease 0.3s, border-left ease 0.3s, color ease 0.2s,
+  transition: 
+    background-color ease 0.3s, 
+    border-left ease 0.3s, 
+    color ease 0.2s,
     opacity ease 0.3s;
   color: font-color(lowlight);
 
@@ -24,8 +27,9 @@
     margin-left: $grid-unit/4;
     white-space: nowrap;
   }
-
-  &:hover {
+  &:active,
+  &:hover,
+  &:focus {
     background-color: palette(base, 300);
     color: font-color(light);
   }
@@ -38,7 +42,6 @@
 
 .disabled {
   pointer-events: none;
-
   .navButton,
   .label,
   .icon {

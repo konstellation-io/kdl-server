@@ -54,6 +54,7 @@ data:
   JUPYTER_IMG_REPO: "{{ .Values.userToolsOperator.jupyter.image.repository }}"
   JUPYTER_IMG_TAG: "{{ .Values.userToolsOperator.jupyter.image.tag }}"
   JUPYTER_IMG_PULLPOLICY: "{{ .Values.userToolsOperator.jupyter.image.pullPolicy }}"
+  JUPYTER_ENTERPRISE_GATEWAY_URL: http://enterprise-gateway:{{ index .Values "enterprise-gateway" "port" }}
 
   REPO_CLONER_IMG_REPO: "{{ .Values.userToolsOperator.repoCloner.image.repository }}"
   REPO_CLONER_IMG_TAG: "{{ .Values.userToolsOperator.repoCloner.image.tag }}"

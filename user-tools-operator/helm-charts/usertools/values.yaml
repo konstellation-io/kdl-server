@@ -14,6 +14,7 @@ jupyter:
     repository: konstellation/jupyter-gpu
     tag: "latest"
     pullPolicy: IfNotPresent
+  enterpriseGatewayUrl: http://enterprise-gateway.kdl.svc.cluster.local:8888
 
 oauth2Proxy:
   image:
@@ -52,6 +53,6 @@ vscode:
 vscodeRuntime:
   runtimeId: "61383716a8c1d7ce4764f411"
   image:
-    repository: konstellation/jupyter-flavors-kai-python-tf
-    tag: "latest"
-    pullPolicy: IfNotPresent
+    repository: konstellation/kdl-py
+    tag: "3.9"
+    pullPolicy: Always

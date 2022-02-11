@@ -90,6 +90,9 @@ spec:
                       pullPolicy:
                         description: image pull policy
                         type: string
+                  enterpriseGatewayUrl:
+                    description: enterprise gateway url
+                    type: string
               vscode:
                 type: object
                 properties:

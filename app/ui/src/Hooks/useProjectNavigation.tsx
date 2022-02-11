@@ -12,10 +12,11 @@ import FolderIcon from '@material-ui/icons/Folder';
 import { OverridableComponent } from '@material-ui/core/OverridableComponent';
 import { SvgIconTypeMap } from '@material-ui/core';
 import VSIcon from 'Components/Icons/VSIcon/VSIcon';
-import { useQuery } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
 import { CONFIG } from 'index';
 
 import GetMeQuery from 'Graphql/queries/getMe';
+import { runningRuntime } from '../Graphql/client/cache';
 
 export interface RouteConfiguration {
   id: string;
@@ -89,7 +90,7 @@ export interface RoutesConfiguration {
 }
 
 function useProjectNavigation(projectId: string): RoutesConfiguration {
-  const { data } = useQuery<GetMe>(GetMeQuery);
+  const runtimeRunning = useReactiveVar(runningRuntime);
 
   const buildRoutes = useCallback(
     (route: RouteConfiguration) =>
@@ -101,7 +102,7 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
   );
 
   return useMemo(() => {
-    const disabled = !data?.me.areToolsActive;
+    const disabled = !runtimeRunning;
     const userToolsRoutesDisabled = userToolsRoutesConfig.map((route) => ({
       ...route,
       disabled,
@@ -123,7 +124,7 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
       projectToolsRoutes,
       userToolsRoutes,
     };
-  }, [buildRoutes, data?.me.areToolsActive]);
+  }, [buildRoutes, runtimeRunning]);
 }
 
 export default useProjectNavigation;

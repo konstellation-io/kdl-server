@@ -13,10 +13,8 @@ export default function useTool() {
     },
   );
 
-  function updateProjectActiveTools(areToolsActive: boolean) {
-    mutationSetActiveProjectTools(
-      mutationPayloadHelper({ active: areToolsActive, runtimeId: '61383716a8c1d7ce4764f411' }),
-    );
+  function updateProjectActiveTools(areToolsActive: boolean, runtimeId: string | null) {
+    mutationSetActiveProjectTools(mutationPayloadHelper({ active: areToolsActive, runtimeId }));
   }
 
   return {

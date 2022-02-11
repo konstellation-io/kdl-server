@@ -163,6 +163,7 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeId 
 
 		rId = r.ID
 		rImage = r.DockerImage
+		i.logger.Debugf("Runtime id \"%s\" with docker image \"%s\"", rId, rImage)
 	} else {
 		rId = "default"
 		rImage = i.cfg.UserToolsVsCodeRuntime.Image.Repository

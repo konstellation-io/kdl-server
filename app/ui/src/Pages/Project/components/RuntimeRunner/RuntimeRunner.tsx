@@ -81,14 +81,14 @@ function RuntimeRunner() {
     closeReplaceRuntimeModal();
     updateRunningRuntime(runtimeAction.runtime);
     updateLastRanRuntime(runtimeAction.runtime);
-    updateProjectActiveTools(true);
+    updateProjectActiveTools(true, runtimeAction.runtime.id);
     // TODO: make the real call to start the tools
   }
 
   function stopTools() {
     closePauseRuntimeModal();
     updateRunningRuntime(null);
-    updateProjectActiveTools(false);
+    updateProjectActiveTools(false, null);
   }
 
   return (

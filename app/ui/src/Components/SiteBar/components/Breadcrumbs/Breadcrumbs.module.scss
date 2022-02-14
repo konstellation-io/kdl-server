@@ -5,12 +5,14 @@
 .container {
   position: relative;
   display: flex;
+  gap: $grid-unit * 3;
+  padding: 0 $grid-unit * 2;
   align-items: center;
   justify-content: space-between;
 
   > div:not(:last-child):after {
     position: absolute;
-    right: -6px;
+    right: -12px;
     content: '/';
   }
 }

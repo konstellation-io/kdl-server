@@ -271,6 +271,7 @@ func (m *projectMongoDBRepo) runtimesToDTOs(runtimes []entity.Runtime) ([]runtim
 			Name:        f.Name,
 			Desc:        f.Desc,
 			DockerImage: f.DockerImage,
+			DockerTag:   f.DockerTag,
 			Labels:      f.Labels,
 		}
 	}
@@ -310,6 +311,7 @@ func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 			Name:        m.Name,
 			Desc:        m.Desc,
 			DockerImage: m.DockerImage,
+			DockerTag:   m.DockerTag,
 			Labels:      m.Labels,
 		}
 	}

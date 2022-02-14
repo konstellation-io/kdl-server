@@ -7,10 +7,11 @@ type Runtime struct {
 	Desc         string
 	Labels       []string
 	DockerImage  string
+	DockerTag    string
 	UsertoolsPod string
 }
 
 // NewRuntime is a constructor function.
-func NewRuntime(id, name, dockerImage string) Runtime {
-	return Runtime{ID: id, Name: name, DockerImage: dockerImage}
+func NewRuntime(id, name, dockerImage, dockerTag string) Runtime {
+	return Runtime{ID: id, Name: name, DockerImage: dockerImage, DockerTag: dockerTag}
 }

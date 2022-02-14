@@ -56,10 +56,6 @@ build_jupyter_kernelspecs() {
   build_image jupyter-kernelspecs jupyter-kernelspecs
 }
 
-build_kdl_py39_cuda10_2_cuddn7() {
-  build_image kdl-py-cuda kdl-py3.9-cuda10.2-cuddn7
-}
-
 build_vscode() {
   build_image vscode vscode
 }

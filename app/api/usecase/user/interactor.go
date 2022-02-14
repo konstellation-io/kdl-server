@@ -154,7 +154,7 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeId 
 		}
 	}
 
-	var rId, rImage string
+	var rId, rImage, rTag string
 	if runtimeId != nil {
 		r, err := i.repoRuntimes.Get(ctx, *runtimeId)
 		if err != nil {
@@ -163,16 +163,18 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeId 
 
 		rId = r.ID
 		rImage = r.DockerImage
+		rTag = r.DockerTag
 		i.logger.Debugf("Runtime id \"%s\" with docker image \"%s\"", rId, rImage)
 	} else {
 		rId = "default"
 		rImage = i.cfg.UserToolsVsCodeRuntime.Image.Repository
+		rTag = i.cfg.UserToolsVsCodeRuntime.Image.Tag
 		i.logger.Debugf("Using default runtime image \"%s\"", rImage)
 	}
 
 	i.logger.Infof("Creating user tools for user: \"%s\"", username)
 
-	err = i.k8sClient.CreateUserToolsCR(ctx, username, rId, rImage)
+	err = i.k8sClient.CreateUserToolsCR(ctx, username, rId, rImage, rTag)
 	if err != nil {
 		return entity.User{}, err
 	}

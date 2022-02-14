@@ -45,15 +45,16 @@ func TestInteractor_GetRunningRuntime(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const (
-		username    = "john.doe"
-		runtimeId   = "1234"
-		runtimeName = "Runtime 1"
-		dockerImage = "konstellation/image"
+		username     = "john.doe"
+		runtimeId    = "1234"
+		runtimeName  = "Runtime 1"
+		runtimeImage = "konstellation/image"
+		runtimeTag   = "3.9"
 	)
 
 	ctx := context.Background()
 
-	expectedRuntime := entity.NewRuntime(runtimeId, runtimeName, dockerImage)
+	expectedRuntime := entity.NewRuntime(runtimeId, runtimeName, runtimeImage, runtimeTag)
 
 	s.mocks.k8client.EXPECT().GetRunningRuntimePODRuntimeId(ctx, username).Return(runtimeId, nil)
 	s.mocks.repo.EXPECT().Get(ctx, runtimeId).Return(expectedRuntime, nil)
@@ -71,13 +72,14 @@ func TestInteractor_GetProjectRuntimes(t *testing.T) {
 	const (
 		genRuntimeId = "5678"
 		runtimeName  = "Runtime 1"
-		dockerImage  = "konstellation/image"
+		runtimeImage = "konstellation/image"
+		runtimeTag   = "3.9"
 	)
 
 	ctx := context.Background()
 
 	expectedGenericRuntimes := []entity.Runtime{
-		entity.NewRuntime(genRuntimeId, runtimeName, dockerImage),
+		entity.NewRuntime(genRuntimeId, runtimeName, runtimeImage, runtimeTag),
 	}
 
 	s.mocks.repo.EXPECT().FindAll(ctx).Return(expectedGenericRuntimes, nil)

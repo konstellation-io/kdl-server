@@ -13,7 +13,7 @@ type K8sClient interface {
 	CreateSecret(ctx context.Context, name string, values map[string]string) error
 	UpdateSecret(ctx context.Context, name string, values map[string]string) error
 	GetSecret(ctx context.Context, name string) (map[string][]byte, error)
-	CreateUserToolsCR(ctx context.Context, username string, runtimeId string, runtimeImage string) error
+	CreateUserToolsCR(ctx context.Context, username, runtimeId, runtimeImage, runtimeTag string) error
 	DeleteUserToolsCR(ctx context.Context, username string) error
 	IsUserToolPODRunning(ctx context.Context, username string) (bool, error)
 	GetRunningRuntimePODRuntimeId(ctx context.Context, username string) (string, error)

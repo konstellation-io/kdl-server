@@ -3,14 +3,13 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"github.com/gosimple/slug"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/watch"
-
-	"github.com/gosimple/slug"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/watch"
 )
 
 // DeleteUserToolsCR removes the Custom Resource from Kubernetes.
@@ -45,7 +44,7 @@ func (k *k8sClient) DeleteUserToolsCR(ctx context.Context, username string) erro
 }
 
 // CreateUserToolsCR creates the user tools Custom Resource in Kubernetes.
-func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username string, runtimeId string, runtimeImage string) error {
+func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeId, runtimeImage, runtimeTag string) error {
 	slugUsername := k.getSlugUsername(username)
 	resName := fmt.Sprintf("usertools-%s", slugUsername)
 
@@ -56,7 +55,7 @@ func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username string, runt
 
 	k.logger.Info("UserTools secrets created")
 
-	err = k.createUserToolsDefinition(ctx, username, slugUsername, resName, runtimeId, runtimeImage)
+	err = k.createUserToolsDefinition(ctx, username, slugUsername, resName, runtimeId, runtimeImage, runtimeTag)
 	if err != nil {
 		return err
 	}
@@ -198,7 +197,7 @@ func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName
 }
 
 // createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
-func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slugUsername, resName string, runtimeId string, runtimeImage string) error {
+func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slugUsername, resName, runtimeId, runtimeImage, runtimeTag string) error {
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",
@@ -265,7 +264,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 					"runtimeId": runtimeId,
 					"image": map[string]string{
 						"repository": runtimeImage,
-						"tag":        k.cfg.UserToolsVsCodeRuntime.Image.Tag,
+						"tag":        runtimeTag,
 						"pullPolicy": k.cfg.UserToolsVsCodeRuntime.Image.PullPolicy,
 					},
 				},

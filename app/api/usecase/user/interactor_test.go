@@ -241,18 +241,19 @@ func TestInteractor_StartTools(t *testing.T) {
 		username     = "john"
 		toolsRunning = false
 		runtimeImage = "konstellation/image"
+		runtimeTag   = "3.9"
 	)
 
 	runtimeId := "12345"
 
 	ctx := context.Background()
 	expectedUser := entity.User{Username: username}
-	expectedRuntime := entity.Runtime{ID: runtimeId, DockerImage: runtimeImage}
+	expectedRuntime := entity.Runtime{ID: runtimeId, DockerImage: runtimeImage, DockerTag: runtimeTag}
 
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
 	s.mocks.runtimeRepo.EXPECT().Get(ctx, runtimeId).Return(expectedRuntime, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
-	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeId, runtimeImage).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeId, runtimeImage, runtimeTag).Return(nil)
 
 	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeId)
 
@@ -265,6 +266,7 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 	// GIVEN there is a default image defined for the Runtime
 	cfg := config.Config{}
 	cfg.UserToolsVsCodeRuntime.Image.Repository = "defaultImage"
+	cfg.UserToolsVsCodeRuntime.Image.Tag = "3.9"
 
 	s := newUserSuite(t, &cfg)
 	defer s.ctrl.Finish()
@@ -283,7 +285,7 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 	// AND the usertools for the user was not running
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 	// AND the CR creation does not return any error
-	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeId, cfg.UserToolsVsCodeRuntime.Image.Repository).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeId, cfg.UserToolsVsCodeRuntime.Image.Repository, cfg.UserToolsVsCodeRuntime.Image.Tag).Return(nil)
 
 	// WHEN the tools are started
 	returnedUser, err := s.interactor.StartTools(ctx, username, nil)
@@ -308,11 +310,12 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 	const (
 		username     = "john"
 		toolsRunning = true
-		runtimeImage = "image"
+		dockerImage  = "image"
+		dockerTag    = "3.9"
 	)
 	runtimeId := "12345"
 
-	expectedRuntime := entity.Runtime{ID: runtimeId, DockerImage: runtimeImage}
+	expectedRuntime := entity.Runtime{ID: runtimeId, DockerImage: dockerImage, DockerTag: dockerTag}
 	expectedUser := entity.User{Username: username}
 
 	ctx := context.Background()
@@ -326,7 +329,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 	// AND the CR deletion does not return any error
 	s.mocks.k8sClientMock.EXPECT().DeleteUserToolsCR(ctx, username).Return(nil)
 	// AND the CR creation does not return any error
-	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeId, runtimeImage).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeId, dockerImage, dockerTag).Return(nil)
 
 	// WHEN the tools are started
 	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeId)

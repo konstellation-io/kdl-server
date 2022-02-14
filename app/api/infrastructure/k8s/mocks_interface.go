@@ -78,17 +78,17 @@ func (mr *MockK8sClientMockRecorder) CreateUserSSHKeySecret(ctx, user, public, p
 }
 
 // CreateUserToolsCR mocks base method.
-func (m *MockK8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeId, runtimeImage string) error {
+func (m *MockK8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeId, runtimeImage, runtimeTag string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUserToolsCR", ctx, username, runtimeId, runtimeImage)
+	ret := m.ctrl.Call(m, "CreateUserToolsCR", ctx, username, runtimeId, runtimeImage, runtimeTag)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateUserToolsCR indicates an expected call of CreateUserToolsCR.
-func (mr *MockK8sClientMockRecorder) CreateUserToolsCR(ctx, username, runtimeId, runtimeImage interface{}) *gomock.Call {
+func (mr *MockK8sClientMockRecorder) CreateUserToolsCR(ctx, username, runtimeId, runtimeImage, runtimeTag interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserToolsCR", reflect.TypeOf((*MockK8sClient)(nil).CreateUserToolsCR), ctx, username, runtimeId, runtimeImage)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserToolsCR", reflect.TypeOf((*MockK8sClient)(nil).CreateUserToolsCR), ctx, username, runtimeId, runtimeImage, runtimeTag)
 }
 
 // DeleteUserToolsCR mocks base method.

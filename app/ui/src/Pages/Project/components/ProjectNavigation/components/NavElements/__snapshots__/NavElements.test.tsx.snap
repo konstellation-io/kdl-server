@@ -162,10 +162,10 @@ exports[`When data is ready should render without crashing 1`] = `
         </div>
       </a>
       <div
-        class="userTools started"
+        class="userTools stopped"
       >
         <div
-          class="usertoolsOptions"
+          class="usertoolsOptions opened"
         >
           <div
             aria-hidden="false"
@@ -181,11 +181,11 @@ exports[`When data is ready should render without crashing 1`] = `
             </div>
           </div>
           <div
-            class="usertoolsSettings"
+            class="usertoolsSettings opened"
             data-testid="usertoolsSettings"
           >
             <div
-              class="__react_component_tooltip tbf098639-7e54-4990-9b0b-14eb575a1a45 place-top type-dark"
+              class="__react_component_tooltip t6d9c9759-1d4b-4a14-90c0-0571b8873244 place-top type-dark"
               data-id="tooltip"
               id="settings"
             >
@@ -193,19 +193,19 @@ exports[`When data is ready should render without crashing 1`] = `
                 aria-hidden="true"
               >
                 
-  	.tbf098639-7e54-4990-9b0b-14eb575a1a45 {
+  	.t6d9c9759-1d4b-4a14-90c0-0571b8873244 {
 	    color: #fff;
 	    background: #222;
 	    border: 1px solid transparent;
   	}
 
-  	.tbf098639-7e54-4990-9b0b-14eb575a1a45.place-top {
+  	.t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-top {
         margin-top: -10px;
     }
-    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-top::before {
+    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-top::before {
         border-top: 8px solid transparent;
     }
-    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-top::after {
+    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-top::after {
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
         bottom: -6px;
@@ -216,13 +216,13 @@ exports[`When data is ready should render without crashing 1`] = `
         border-top-width: 6px;
     }
 
-    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-bottom {
+    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-bottom {
         margin-top: 10px;
     }
-    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-bottom::before {
+    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-bottom::before {
         border-bottom: 8px solid transparent;
     }
-    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-bottom::after {
+    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-bottom::after {
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
         top: -6px;
@@ -233,13 +233,13 @@ exports[`When data is ready should render without crashing 1`] = `
         border-bottom-width: 6px;
     }
 
-    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-left {
+    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-left {
         margin-left: -10px;
     }
-    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-left::before {
+    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-left::before {
         border-left: 8px solid transparent;
     }
-    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-left::after {
+    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-left::after {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         right: -6px;
@@ -250,13 +250,13 @@ exports[`When data is ready should render without crashing 1`] = `
         border-left-width: 6px;
     }
 
-    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-right {
+    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-right {
         margin-left: 10px;
     }
-    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-right::before {
+    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-right::before {
         border-right: 8px solid transparent;
     }
-    .tbf098639-7e54-4990-9b0b-14eb575a1a45.place-right::after {
+    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-right::after {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         left: -6px;
@@ -290,27 +290,27 @@ exports[`When data is ready should render without crashing 1`] = `
             </div>
             <div>
               <div
-                class="__react_component_tooltip tac09d490-e4e9-47e1-9218-e9447725a640 place-top type-dark"
+                class="__react_component_tooltip t8e6811c2-92fd-4ad9-a8de-57db1db4da74 place-top type-dark"
                 data-id="tooltip"
-                id="stop"
+                id="start"
               >
                 <style
                   aria-hidden="true"
                 >
                   
-  	.tac09d490-e4e9-47e1-9218-e9447725a640 {
+  	.t8e6811c2-92fd-4ad9-a8de-57db1db4da74 {
 	    color: #fff;
 	    background: #222;
 	    border: 1px solid transparent;
   	}
 
-  	.tac09d490-e4e9-47e1-9218-e9447725a640.place-top {
+  	.t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-top {
         margin-top: -10px;
     }
-    .tac09d490-e4e9-47e1-9218-e9447725a640.place-top::before {
+    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-top::before {
         border-top: 8px solid transparent;
     }
-    .tac09d490-e4e9-47e1-9218-e9447725a640.place-top::after {
+    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-top::after {
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
         bottom: -6px;
@@ -321,13 +321,13 @@ exports[`When data is ready should render without crashing 1`] = `
         border-top-width: 6px;
     }
 
-    .tac09d490-e4e9-47e1-9218-e9447725a640.place-bottom {
+    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-bottom {
         margin-top: 10px;
     }
-    .tac09d490-e4e9-47e1-9218-e9447725a640.place-bottom::before {
+    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-bottom::before {
         border-bottom: 8px solid transparent;
     }
-    .tac09d490-e4e9-47e1-9218-e9447725a640.place-bottom::after {
+    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-bottom::after {
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
         top: -6px;
@@ -338,13 +338,13 @@ exports[`When data is ready should render without crashing 1`] = `
         border-bottom-width: 6px;
     }
 
-    .tac09d490-e4e9-47e1-9218-e9447725a640.place-left {
+    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-left {
         margin-left: -10px;
     }
-    .tac09d490-e4e9-47e1-9218-e9447725a640.place-left::before {
+    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-left::before {
         border-left: 8px solid transparent;
     }
-    .tac09d490-e4e9-47e1-9218-e9447725a640.place-left::after {
+    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-left::after {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         right: -6px;
@@ -355,13 +355,13 @@ exports[`When data is ready should render without crashing 1`] = `
         border-left-width: 6px;
     }
 
-    .tac09d490-e4e9-47e1-9218-e9447725a640.place-right {
+    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-right {
         margin-left: 10px;
     }
-    .tac09d490-e4e9-47e1-9218-e9447725a640.place-right::before {
+    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-right::before {
         border-right: 8px solid transparent;
     }
-    .tac09d490-e4e9-47e1-9218-e9447725a640.place-right::after {
+    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-right::after {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         left: -6px;
@@ -374,12 +374,12 @@ exports[`When data is ready should render without crashing 1`] = `
   
                 </style>
                 <span>
-                  Stop tools
+                  Start tools
                 </span>
               </div>
               <div
                 currentitem="false"
-                data-for="stop"
+                data-for="start"
                 data-tip="true"
               >
                 <svg
@@ -389,7 +389,7 @@ exports[`When data is ready should render without crashing 1`] = `
                   viewBox="0 0 24 24"
                 >
                   <path
-                    d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"
+                    d="M8 5v14l11-7z"
                   />
                 </svg>
               </div>
@@ -397,7 +397,8 @@ exports[`When data is ready should render without crashing 1`] = `
           </div>
         </div>
         <a
-          class=""
+          class="disabled"
+          disabled=""
           href="/projects/undefined/tool/jupyter"
         >
           <div
@@ -441,7 +442,8 @@ exports[`When data is ready should render without crashing 1`] = `
           </div>
         </a>
         <a
-          class=""
+          class="disabled"
+          disabled=""
           href="/projects/undefined/tool/vscode"
         >
           <div

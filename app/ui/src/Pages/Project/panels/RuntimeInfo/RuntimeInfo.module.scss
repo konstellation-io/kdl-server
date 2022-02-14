@@ -22,6 +22,7 @@
   color: white;
   display: flex;
   margin-bottom: 2 * $grid-unit;
+  text-align: left;
   @include font-headline;
 }
 

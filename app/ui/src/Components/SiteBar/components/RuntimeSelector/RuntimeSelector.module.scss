@@ -5,12 +5,14 @@
 
 
 $shape-width: 50 * $grid-unit;
+$shape-height: 65 * $grid-unit;
 
 .container {
   @include shadow(2);
   overflow: auto;
   max-width: $shape-width;
-  background-color: red;
+  height: $shape-height;
+  overflow-y: auto;
 
   ul {
     list-style-type: none;

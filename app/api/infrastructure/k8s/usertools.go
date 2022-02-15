@@ -12,6 +12,9 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 )
 
+// this is the number of pods that the UserToolsCR is handling
+const usertoolsPods = 2
+
 // DeleteUserToolsCR removes the Custom Resource from Kubernetes.
 func (k *k8sClient) DeleteUserToolsCR(ctx context.Context, username string) error {
 	slugUsername := k.getSlugUsername(username)
@@ -278,6 +281,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 	return err
 }
 
+// Returns a watcher for the UserTools and the number of resources that the watcher is watching
 func (k *k8sClient) createUserToolsWatcher(ctx context.Context, resName string) (watch.Interface, error) {
 	labelSelector := k.userToolsPODLabelSelector(resName)
 	k.logger.Debugf("Creating watcher for POD with label: %s", labelSelector)
@@ -291,6 +295,7 @@ func (k *k8sClient) createUserToolsWatcher(ctx context.Context, resName string) 
 	return k.clientset.CoreV1().Pods(k.cfg.Kubernetes.Namespace).Watch(ctx, opts)
 }
 
+// Wait until all the resources in the Usertools CR are deleted
 func (k *k8sClient) waitUserToolsDeleted(ctx context.Context, resName string) error {
 	watcher, err := k.createUserToolsWatcher(ctx, resName)
 	if err != nil {
@@ -299,13 +304,22 @@ func (k *k8sClient) waitUserToolsDeleted(ctx context.Context, resName string) er
 
 	defer watcher.Stop()
 
+	deletedEventsReceived := 0
+
 	for {
 		select {
 		case event := <-watcher.ResultChan():
 			if event.Type == watch.Deleted {
-				k.logger.Debugf("The POD \"%s\" is deleted", resName)
+				deletedEventsReceived++
+				pod := event.Object.(*v1.Pod)
 
-				return nil
+				k.logger.Infof("Pod %s has being deleted", pod.Name)
+				k.logger.Debugf("EventsReceived %d VS ResourcesWatched %d", deletedEventsReceived, usertoolsPods)
+
+				if usertoolsPods == deletedEventsReceived {
+					// we already have all Deleted events that we need
+					return nil
+				}
 			}
 
 		case <-ctx.Done():
@@ -315,6 +329,7 @@ func (k *k8sClient) waitUserToolsDeleted(ctx context.Context, resName string) er
 	}
 }
 
+// Wait until all the resources in the Usertools CR are running
 func (k *k8sClient) waitUserToolsRunning(ctx context.Context, resName string) error {
 	watcher, err := k.createUserToolsWatcher(ctx, resName)
 	if err != nil {
@@ -323,16 +338,23 @@ func (k *k8sClient) waitUserToolsRunning(ctx context.Context, resName string) er
 
 	defer watcher.Stop()
 
+	podsRunning := 0
+
 	for {
 		select {
 		case event := <-watcher.ResultChan():
 			pod := event.Object.(*v1.Pod)
 
 			if pod.Status.Phase == v1.PodRunning {
-				k.logger.Debugf("The POD \"%s\" is running", resName)
-				watcher.Stop()
+				podsRunning++
+				k.logger.Infof("The POD \"%s\" is running", resName)
+				k.logger.Debugf("PodRunning %d VS ResourcesWatched %d", podsRunning, usertoolsPods)
 
-				return nil
+				if usertoolsPods == podsRunning {
+					// we already have all the running pods that we need
+					return nil
+				}
+
 			}
 
 		case <-ctx.Done():

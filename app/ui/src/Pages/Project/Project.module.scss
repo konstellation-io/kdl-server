@@ -3,6 +3,9 @@
 @import 'Styles/colors';
 @import 'Styles/shadows';
 
+:root {
+  --ktPanelsMaxWidth: 200px;
+}
 .container {
   flex-grow: 1;
   position: relative;
@@ -27,10 +30,12 @@
   z-index: 6;
 }
 .panels {
-  @include glow(3, black);
   display: flex;
   justify-content: flex-end;
   height: 100%;
+  margin-left: var(--ktPanelsMaxWidth);
+  @include glow(3, black);
+  transition: width ease 0.3s, margin-left ease 0.3s;
 }
 .content {
   flex-grow: 1;
@@ -44,5 +49,10 @@
   }
   p {
     margin-bottom: $grid-unit;
+  }
+}
+@media ( min-width: $kt-mq-low-width ) {
+  .panels {
+    margin-left: 0;
   }
 }

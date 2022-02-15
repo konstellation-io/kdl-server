@@ -118,6 +118,26 @@ spec:
               mountPath: /home/coder/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
+        - name: {{ .Chart.Name }}-vscode-runtime
+          image: {{ .Values.vscodeRuntime.image.repository }}:{{ .Values.vscodeRuntime.image.tag }}
+          imagePullPolicy: {{ .Values.vscodeRuntime.image.pullPolicy }}
+          command:
+            - "/bin/bash"
+          args:
+            - "-c"
+            - "trap : TERM INT; sleep infinity & wait"
+          volumeMounts:
+            - name: user-pvc
+              mountPath: /home/coder
+            {{- if .Values.sharedVolume.name }}
+            - name: {{ .Values.sharedVolume.name }}
+              mountPath: /home/coder/shared-storage
+              readOnly: true
+            {{- end }}
+            - name: {{ .Values.usernameSlug }}-ssh-keys-vol
+              mountPath: /home/coder/.ssh/id_rsa
+              subPath: id_rsa
+              readOnly: true
         - name: {{ .Chart.Name }}-jupyter
           image: {{ .Values.jupyter.image.repository }}:{{ .Values.jupyter.image.tag }}
           imagePullPolicy: {{ .Values.jupyter.image.pullPolicy }}

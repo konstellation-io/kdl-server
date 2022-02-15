@@ -20,7 +20,7 @@ rules:
   resources:
   - pods/exec
   resourceNames: 
-  - vscode-runtime-{{ .Values.usernameSlug }}
+  - "{{ include "user-tools.fullname" . }}-0"
   verbs:
   - create
 - apiGroups:

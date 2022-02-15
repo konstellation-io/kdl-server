@@ -49,4 +49,25 @@
   p {
     margin-bottom: $grid-unit;
   }
+
+  &.close {
+    border-left-color: palette(highlight);
+    div + div {
+      &:last-of-type {
+        div > div {
+          padding: 4px 20px;
+          height: auto!important;
+          &:first-of-type {
+            background: palette(highlight);
+            margin: 0;
+            &:active,
+            &:focus,
+            &:hover {
+              box-shadow: 0 2px 16px 0 palette(highlight);
+            }
+          }
+        }
+      }
+    }
+  }
 }

@@ -1,8 +1,8 @@
 import { ModalContainer, ModalLayoutInfo } from 'kwc';
 import React, { useEffect } from 'react';
 import { useQuery, useReactiveVar } from '@apollo/client';
+import cx from 'classnames';
 import styles from './RuntimeRunner.module.scss';
-
 import { actionRuntime, runningRuntime } from 'Graphql/client/cache';
 import useTool from 'Graphql/hooks/useTool';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
@@ -100,7 +100,7 @@ function RuntimeRunner() {
           onCancel={closePauseRuntimeModal}
           actionButtonLabel="Stop Tools"
           actionButtonCancel="Cancel"
-          className={styles.runtimeModal}
+          className={cx( styles.runtimeModal, styles.close)}
           warning
           blocking
         >

@@ -8,7 +8,6 @@
   position: relative;
   height: 100%;
   background-color: palette(base, 600);
-
   display: flex;
   overflow: hidden;
 }
@@ -20,6 +19,7 @@
   overflow: auto;
   background-color: palette(base, 900);
 }
+
 .panelLayer {
   position: absolute;
   height: 100%;
@@ -55,7 +55,7 @@
     div + div {
       &:last-of-type {
         div > div {
-          padding: 4px 20px;
+          padding: $grid-unit / 2 $grid-unit * 2;
           height: auto!important;
           &:first-of-type {
             background: palette(highlight);

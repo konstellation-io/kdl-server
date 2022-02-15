@@ -185,7 +185,7 @@ exports[`When data is ready should render without crashing 1`] = `
             data-testid="usertoolsSettings"
           >
             <div
-              class="__react_component_tooltip t6d9c9759-1d4b-4a14-90c0-0571b8873244 place-top type-dark"
+              class="__react_component_tooltip t0f3f5945-3d4d-4a1c-87cb-e01aaece352c place-top type-dark"
               data-id="tooltip"
               id="settings"
             >
@@ -193,19 +193,19 @@ exports[`When data is ready should render without crashing 1`] = `
                 aria-hidden="true"
               >
                 
-  	.t6d9c9759-1d4b-4a14-90c0-0571b8873244 {
+  	.t0f3f5945-3d4d-4a1c-87cb-e01aaece352c {
 	    color: #fff;
 	    background: #222;
 	    border: 1px solid transparent;
   	}
 
-  	.t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-top {
+  	.t0f3f5945-3d4d-4a1c-87cb-e01aaece352c.place-top {
         margin-top: -10px;
     }
-    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-top::before {
+    .t0f3f5945-3d4d-4a1c-87cb-e01aaece352c.place-top::before {
         border-top: 8px solid transparent;
     }
-    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-top::after {
+    .t0f3f5945-3d4d-4a1c-87cb-e01aaece352c.place-top::after {
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
         bottom: -6px;
@@ -216,13 +216,13 @@ exports[`When data is ready should render without crashing 1`] = `
         border-top-width: 6px;
     }
 
-    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-bottom {
+    .t0f3f5945-3d4d-4a1c-87cb-e01aaece352c.place-bottom {
         margin-top: 10px;
     }
-    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-bottom::before {
+    .t0f3f5945-3d4d-4a1c-87cb-e01aaece352c.place-bottom::before {
         border-bottom: 8px solid transparent;
     }
-    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-bottom::after {
+    .t0f3f5945-3d4d-4a1c-87cb-e01aaece352c.place-bottom::after {
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
         top: -6px;
@@ -233,13 +233,13 @@ exports[`When data is ready should render without crashing 1`] = `
         border-bottom-width: 6px;
     }
 
-    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-left {
+    .t0f3f5945-3d4d-4a1c-87cb-e01aaece352c.place-left {
         margin-left: -10px;
     }
-    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-left::before {
+    .t0f3f5945-3d4d-4a1c-87cb-e01aaece352c.place-left::before {
         border-left: 8px solid transparent;
     }
-    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-left::after {
+    .t0f3f5945-3d4d-4a1c-87cb-e01aaece352c.place-left::after {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         right: -6px;
@@ -250,13 +250,13 @@ exports[`When data is ready should render without crashing 1`] = `
         border-left-width: 6px;
     }
 
-    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-right {
+    .t0f3f5945-3d4d-4a1c-87cb-e01aaece352c.place-right {
         margin-left: 10px;
     }
-    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-right::before {
+    .t0f3f5945-3d4d-4a1c-87cb-e01aaece352c.place-right::before {
         border-right: 8px solid transparent;
     }
-    .t6d9c9759-1d4b-4a14-90c0-0571b8873244.place-right::after {
+    .t0f3f5945-3d4d-4a1c-87cb-e01aaece352c.place-right::after {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         left: -6px;
@@ -290,7 +290,7 @@ exports[`When data is ready should render without crashing 1`] = `
             </div>
             <div>
               <div
-                class="__react_component_tooltip t8e6811c2-92fd-4ad9-a8de-57db1db4da74 place-top type-dark"
+                class="__react_component_tooltip t49fdc715-ad76-4850-8b38-cb937f68b900 place-top type-dark"
                 data-id="tooltip"
                 id="start"
               >
@@ -298,19 +298,19 @@ exports[`When data is ready should render without crashing 1`] = `
                   aria-hidden="true"
                 >
                   
-  	.t8e6811c2-92fd-4ad9-a8de-57db1db4da74 {
+  	.t49fdc715-ad76-4850-8b38-cb937f68b900 {
 	    color: #fff;
 	    background: #222;
 	    border: 1px solid transparent;
   	}
 
-  	.t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-top {
+  	.t49fdc715-ad76-4850-8b38-cb937f68b900.place-top {
         margin-top: -10px;
     }
-    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-top::before {
+    .t49fdc715-ad76-4850-8b38-cb937f68b900.place-top::before {
         border-top: 8px solid transparent;
     }
-    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-top::after {
+    .t49fdc715-ad76-4850-8b38-cb937f68b900.place-top::after {
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
         bottom: -6px;
@@ -321,13 +321,13 @@ exports[`When data is ready should render without crashing 1`] = `
         border-top-width: 6px;
     }
 
-    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-bottom {
+    .t49fdc715-ad76-4850-8b38-cb937f68b900.place-bottom {
         margin-top: 10px;
     }
-    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-bottom::before {
+    .t49fdc715-ad76-4850-8b38-cb937f68b900.place-bottom::before {
         border-bottom: 8px solid transparent;
     }
-    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-bottom::after {
+    .t49fdc715-ad76-4850-8b38-cb937f68b900.place-bottom::after {
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
         top: -6px;
@@ -338,13 +338,13 @@ exports[`When data is ready should render without crashing 1`] = `
         border-bottom-width: 6px;
     }
 
-    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-left {
+    .t49fdc715-ad76-4850-8b38-cb937f68b900.place-left {
         margin-left: -10px;
     }
-    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-left::before {
+    .t49fdc715-ad76-4850-8b38-cb937f68b900.place-left::before {
         border-left: 8px solid transparent;
     }
-    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-left::after {
+    .t49fdc715-ad76-4850-8b38-cb937f68b900.place-left::after {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         right: -6px;
@@ -355,13 +355,13 @@ exports[`When data is ready should render without crashing 1`] = `
         border-left-width: 6px;
     }
 
-    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-right {
+    .t49fdc715-ad76-4850-8b38-cb937f68b900.place-right {
         margin-left: 10px;
     }
-    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-right::before {
+    .t49fdc715-ad76-4850-8b38-cb937f68b900.place-right::before {
         border-right: 8px solid transparent;
     }
-    .t8e6811c2-92fd-4ad9-a8de-57db1db4da74.place-right::after {
+    .t49fdc715-ad76-4850-8b38-cb937f68b900.place-right::after {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         left: -6px;

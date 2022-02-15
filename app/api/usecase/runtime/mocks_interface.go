@@ -104,16 +104,16 @@ func (mr *MockUseCaseMockRecorder) GetRunningRuntime(ctx, username interface{}) 
 }
 
 // GetRuntimes mocks base method.
-func (m *MockUseCase) GetRuntimes(ctx context.Context) ([]entity.Runtime, error) {
+func (m *MockUseCase) GetRuntimes(ctx context.Context, username string) ([]entity.Runtime, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRuntimes", ctx)
+	ret := m.ctrl.Call(m, "GetRuntimes", ctx, username)
 	ret0, _ := ret[0].([]entity.Runtime)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetRuntimes indicates an expected call of GetRuntimes.
-func (mr *MockUseCaseMockRecorder) GetRuntimes(ctx interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) GetRuntimes(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRuntimes", reflect.TypeOf((*MockUseCase)(nil).GetRuntimes), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRuntimes", reflect.TypeOf((*MockUseCase)(nil).GetRuntimes), ctx, username)
 }

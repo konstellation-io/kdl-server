@@ -26,7 +26,9 @@ function RuntimeInfo({ selectedRuntime: runtime }: Props) {
         <div className={styles.runtimeDescription}>{runtime.desc}</div>
         <div className={styles.dockerImage}>
           <h2>Docker image</h2>
-          <p>{runtime.dockerImage}</p>
+          <p>
+            {runtime.dockerImage}:{runtime.dockerTag}
+          </p>
         </div>
         {running && (
           <div className={styles.dockerImage}>

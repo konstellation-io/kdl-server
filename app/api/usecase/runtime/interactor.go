@@ -28,11 +28,16 @@ func NewInteractor(
 }
 
 // GetRuntimes retrieve all available runtimes.
-func (i interactor) GetRuntimes(ctx context.Context) ([]entity.Runtime, error) {
-	// get generic project runtimes
+func (i interactor) GetRuntimes(ctx context.Context, username string) ([]entity.Runtime, error) {
+	// get all runtimes
 	runtimes, err := i.repo.FindAll(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	// update the runtime pods names
+	for i := range runtimes {
+		runtimes[i].UsertoolsPod = "runtime-" + username
 	}
 
 	return runtimes, nil
@@ -52,6 +57,8 @@ func (i interactor) GetRunningRuntime(ctx context.Context, username string) (*en
 		if err != nil {
 			return nil, err
 		}
+
+		runtime.UsertoolsPod = "runtime-" + username
 
 		return &runtime, nil
 	}

@@ -262,7 +262,7 @@ func (r *queryResolver) QualityProjectDesc(ctx context.Context, description stri
 }
 
 func (r *queryResolver) Runtimes(ctx context.Context) ([]entity.Runtime, error) {
-	return r.runtimes.GetRuntimes(ctx)
+	return r.runtimes.GetRuntimes(ctx, ctx.Value(middleware.LoggedUserNameKey).(string))
 }
 
 func (r *queryResolver) RunningRuntime(ctx context.Context) (*entity.Runtime, error) {

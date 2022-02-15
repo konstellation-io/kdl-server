@@ -74,6 +74,7 @@ func TestInteractor_GetProjectRuntimes(t *testing.T) {
 		runtimeName  = "Runtime 1"
 		runtimeImage = "konstellation/image"
 		runtimeTag   = "3.9"
+		username     = "jhondoe"
 	)
 
 	ctx := context.Background()
@@ -84,7 +85,7 @@ func TestInteractor_GetProjectRuntimes(t *testing.T) {
 
 	s.mocks.repo.EXPECT().FindAll(ctx).Return(expectedGenericRuntimes, nil)
 
-	f, err := s.interactor.GetRuntimes(ctx)
+	f, err := s.interactor.GetRuntimes(ctx, username)
 
 	require.NoError(t, err)
 	require.Equal(t, f, expectedGenericRuntimes)

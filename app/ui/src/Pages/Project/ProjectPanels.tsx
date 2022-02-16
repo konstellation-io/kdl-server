@@ -64,7 +64,12 @@ function ProjectPanels({ openedProject }: Props) {
 
   function extraPanelButtons(panelId?: string) {
     if (panelId === PANEL_ID.RUNTIME_INFO) {
-      if (isLoading) return [<CircularProgress key="circularProgress" className={styles.loadingTools} size={16} />];
+      if (isLoading)
+        return [
+          <div key="circularProgress" className={styles.progressSpinerContainer}>
+            <CircularProgress color="inherit" className={styles.loadingTools} size={12} />
+          </div>,
+        ];
 
       return runtimeSelected?.id === runtimeRunning?.id
         ? [<Button key="toggleRuntime" label="" Icon={IconPause} onClick={pauseRuntime} />]

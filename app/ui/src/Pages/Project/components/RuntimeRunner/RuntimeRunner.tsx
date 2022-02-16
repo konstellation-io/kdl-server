@@ -102,7 +102,7 @@ function RuntimeRunner() {
           onCancel={closePauseRuntimeModal}
           actionButtonLabel="Stop Tools"
           actionButtonCancel="Cancel"
-          className={cx( styles.runtimeModal, styles.close)}
+          className={cx(styles.runtimeModal, styles.close)}
           warning
           blocking
         >

@@ -76,9 +76,18 @@
       display: flex;
       flex-direction: column;
       width: 100%;
+      .progressSpinnerContainer {
+        margin-top: 0;
+        margin-left: 13px;
+      }
       &.opened {
         flex-direction: row;
         width: auto;
+        .progressSpinnerContainer {
+          margin-top: $grid-unit;
+          margin-left: $grid-unit;
+          margin-right: $grid-unit;
+        }
       }
     }
 
@@ -98,3 +107,4 @@
     }
   }
 }
+

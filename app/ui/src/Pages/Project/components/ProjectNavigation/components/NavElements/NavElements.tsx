@@ -54,7 +54,11 @@ function NavElements({ isOpened }: Props) {
   }
 
   function renderToggleToolsIcon() {
-    const Progress = <CircularProgress className={styles.loadingTools} size={16} />;
+    const Progress = (
+      <div className={styles.progressSpinnerContainer}>
+        <CircularProgress color="inherit" className={styles.loadingTools} size={12} />{' '}
+      </div>
+    );
     if (isLoading) return Progress;
 
     return runtimeRunning ? (

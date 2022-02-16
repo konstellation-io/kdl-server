@@ -78,6 +78,7 @@ export const runningRuntime = makeVar<GetRuntimes_runtimes | null>(null);
 export const actionRuntime = makeVar<RuntimeAction | null>(null);
 // start the runtime from a component
 export const startRuntime = makeVar<GetRuntimes_runtimes | null>(null);
+export const isRuntimeLoading = makeVar<boolean>(false);
 
 const cache = new InMemoryCache({
   typePolicies: {

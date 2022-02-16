@@ -1,6 +1,6 @@
 import { lastRanRuntime, runningRuntime, actionRuntime, selectedRuntime } from '../cache';
 import { GetRuntimes_runtimes } from '../../queries/types/GetRuntimes';
-import { RuntimeAction, RuntimeActions } from '../models/RuntimeAction';
+import { RuntimeActions } from '../models/RuntimeAction';
 
 function useRuntime() {
   function updateRunningRuntime(runtime: GetRuntimes_runtimes | null) {

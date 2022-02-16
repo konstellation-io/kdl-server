@@ -1,8 +1,7 @@
 import ROUTE, { buildRoute } from 'Constants/routes';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import DroneIcon from 'Components/Icons/DroneIcon/DroneIcon';
-import { GetMe } from 'Graphql/queries/types/GetMe';
 import GiteaIcon from 'Components/Icons/GiteaIcon/GiteaIcon';
 import IconHome from '@material-ui/icons/Dashboard';
 import IconKG from '@material-ui/icons/EmojiObjects';
@@ -15,7 +14,6 @@ import VSIcon from 'Components/Icons/VSIcon/VSIcon';
 import { useQuery, useReactiveVar } from '@apollo/client';
 import { CONFIG } from 'index';
 
-import GetMeQuery from 'Graphql/queries/getMe';
 import { runningRuntime } from '../Graphql/client/cache';
 
 export interface RouteConfiguration {

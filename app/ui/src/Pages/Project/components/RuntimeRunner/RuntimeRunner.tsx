@@ -13,10 +13,11 @@ import { USERTOOLS_PANEL_OPTIONS } from '../../panelSettings';
 import Runtime from '../../panels/RuntimesList/components/Runtime';
 import useRuntime from 'Graphql/client/hooks/useRuntime';
 import { RuntimeActions } from 'Graphql/client/models/RuntimeAction';
+import useRuntimeLoading from 'Graphql/client/hooks/useRuntimeLoading';
 
 function RuntimeRunner() {
-  const { data: dataRuntimeRunning } = useQuery<GetRunningRuntime>(GetRunningRuntimeQuery);
-
+  const { data: dataRuntimeRunning, loading } = useQuery<GetRunningRuntime>(GetRunningRuntimeQuery);
+  const { setRuntimeLoading } = useRuntimeLoading();
   const runtimeRunning = useReactiveVar(runningRuntime);
   const runtimeAction = useReactiveVar(actionRuntime);
 
@@ -37,6 +38,7 @@ function RuntimeRunner() {
   } = useBoolState();
 
   useEffect(() => {
+    setRuntimeLoading(loading);
     if (dataRuntimeRunning?.runningRuntime) {
       updateRunningRuntime(dataRuntimeRunning.runningRuntime);
       updateLastRanRuntime(dataRuntimeRunning.runningRuntime);
@@ -75,20 +77,20 @@ function RuntimeRunner() {
     startTools();
   }
 
-  function startTools() {
+  async function startTools() {
     if (!runtimeAction?.runtime) return;
 
     closeReplaceRuntimeModal();
+    await updateProjectActiveTools(true, runtimeAction.runtime.id);
     updateRunningRuntime(runtimeAction.runtime);
     updateLastRanRuntime(runtimeAction.runtime);
-    updateProjectActiveTools(true, runtimeAction.runtime.id);
     // TODO: make the real call to start the tools
   }
 
-  function stopTools() {
+  async function stopTools() {
     closePauseRuntimeModal();
+    await updateProjectActiveTools(false, null);
     updateRunningRuntime(null);
-    updateProjectActiveTools(false, null);
   }
 
   return (

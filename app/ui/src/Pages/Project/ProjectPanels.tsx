@@ -1,5 +1,12 @@
 import React, { useEffect } from 'react';
-import { memberDetails, primaryPanel, runningRuntime, secondaryPanel, selectedRuntime } from 'Graphql/client/cache';
+import {
+  isRuntimeLoading,
+  memberDetails,
+  primaryPanel,
+  runningRuntime,
+  secondaryPanel,
+  selectedRuntime,
+} from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
@@ -17,6 +24,7 @@ import { Button } from 'kwc';
 import IconPlay from '@material-ui/icons/PlayArrow';
 import IconPause from '@material-ui/icons/Pause';
 import useRuntime from 'Graphql/client/hooks/useRuntime';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const defaultPanel = 'settings';
 
@@ -31,6 +39,7 @@ function ProjectPanels({ openedProject }: Props) {
   const memberDetailsData = useReactiveVar(memberDetails);
   const runtimeSelected = useReactiveVar(selectedRuntime);
   const runtimeRunning = useReactiveVar(runningRuntime);
+  const isLoading = useReactiveVar(isRuntimeLoading);
 
   const { startRuntime, pauseRuntime } = useRuntime();
 
@@ -55,6 +64,8 @@ function ProjectPanels({ openedProject }: Props) {
 
   function extraPanelButtons(panelId?: string) {
     if (panelId === PANEL_ID.RUNTIME_INFO) {
+      if (isLoading) return [<CircularProgress key="circularProgress" className={styles.loadingTools} size={16} />];
+
       return runtimeSelected?.id === runtimeRunning?.id
         ? [<Button key="toggleRuntime" label="" Icon={IconPause} onClick={pauseRuntime} />]
         : [<Button key="toggleRuntime" label="" Icon={IconPlay} onClick={runtimeStart} />];

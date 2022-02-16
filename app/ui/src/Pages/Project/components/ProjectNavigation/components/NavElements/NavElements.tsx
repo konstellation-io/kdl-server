@@ -12,8 +12,7 @@ import styles from './NavElements.module.scss';
 import { useParams } from 'react-router-dom';
 import useProjectNavigation from 'Hooks/useProjectNavigation';
 import { useReactiveVar } from '@apollo/client';
-import useTool from 'Graphql/hooks/useTool';
-import { lastRanRuntime, primaryPanel, runningRuntime } from 'Graphql/client/cache';
+import { isRuntimeLoading, lastRanRuntime, primaryPanel, runningRuntime } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
@@ -27,7 +26,8 @@ type Props = {
 function NavElements({ isOpened }: Props) {
   const { projectId } = useParams<RouteProjectParams>();
   const { mainRoutes, userToolsRoutes, projectToolsRoutes } = useProjectNavigation(projectId);
-  const { projectActiveTools } = useTool();
+  const isLoading = useReactiveVar(isRuntimeLoading);
+
   const runtimeRunning = useReactiveVar(runningRuntime);
   const panelData = useReactiveVar(primaryPanel);
   const runtimeLastRun = useReactiveVar(lastRanRuntime);
@@ -55,7 +55,7 @@ function NavElements({ isOpened }: Props) {
 
   function renderToggleToolsIcon() {
     const Progress = <CircularProgress className={styles.loadingTools} size={16} />;
-    if (projectActiveTools.loading) return Progress;
+    if (isLoading) return Progress;
 
     return runtimeRunning ? (
       <div>
@@ -127,7 +127,7 @@ function NavElements({ isOpened }: Props) {
           ))}
           <div
             className={cx(styles.toggleToolsWrapper, {
-              [styles.disabled]: projectActiveTools.loading,
+              [styles.disabled]: isLoading,
             })}
             data-testid="confirmationModal"
           />

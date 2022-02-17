@@ -35,7 +35,7 @@ type Runtime {
   labels: [String!]
   dockerImage: String!
   dockerTag: String!
-  usertoolsPod: String!
+  runtimePod: String!
 }
 
 type Topic {

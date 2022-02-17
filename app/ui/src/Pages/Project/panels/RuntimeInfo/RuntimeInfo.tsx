@@ -32,8 +32,31 @@ function RuntimeInfo({ selectedRuntime: runtime }: Props) {
         </div>
         {running && (
           <div className={styles.dockerImage}>
-            <h2>Usertools pod</h2>
-            <p>{runtime.usertoolsPod}</p>
+            <h2>VSCode Runtime</h2>
+            <div className={styles.description}>
+              <p>
+                You can use the kubernetes extension in VSCode to attach a terminal to the runtime. To do so, open the
+                kubernetes extension and follow this steps:
+                <ol>
+                  <li>
+                    Configure the kubeconfig located in <span className={styles.highlight}>/home/coder/kubeconfig</span>{' '}
+                    (You just need to this one time)
+                  </li>
+                  <li>
+                    In the kubernetes extension, navigate to{' '}
+                    <span className={styles.highlight}>&ldquo;Workloads &gt; Pods&ldquo;</span>
+                  </li>
+                  <li>
+                    Locate the runtime pod named <span className={styles.highlight}>{runtime.runtimePod}</span>, and
+                    right click &gt; &ldquo;Terminal&ldquo;
+                  </li>
+                  <li>
+                    Then attach your terminal to the container named{' '}
+                    <span className={styles.highlight}>user-tools-vscode-runtime</span>
+                  </li>
+                </ol>
+              </p>
+            </div>
           </div>
         )}
       </div>

@@ -4,16 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/gosimple/slug"
-	"github.com/konstellation-io/kdl-server/app/api/entity"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
 )
-
-// this is the number of pods that the UserToolsCR is handling
-const usertoolsPods = 2
 
 // DeleteUserToolsCR removes the Custom Resource from Kubernetes.
 func (k *k8sClient) DeleteUserToolsCR(ctx context.Context, username string) error {
@@ -68,53 +64,39 @@ func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeId, 
 
 // IsUserToolPODRunning checks if the there is a user tool POD running for the given username.
 func (k k8sClient) IsUserToolPODRunning(ctx context.Context, username string) (bool, error) {
+	pod, err := k.getUserToolsPod(ctx, username)
+	if err != nil {
+		return false, nil
+	}
+
+	return pod.Status.Phase == v1.PodRunning, nil
+}
+
+// getUserToolsPod returns the UserToolsPod object
+func (k k8sClient) getUserToolsPod(ctx context.Context, username string) (v1.Pod, error) {
 	slugUsername := k.getSlugUsername(username)
 	resName := k.getUserToolsResName(slugUsername)
 	labelSelector := k.userToolsPODLabelSelector(resName)
 
 	list, err := k.getPodListForUser(ctx, labelSelector)
 	if err != nil {
-		return false, err
+		return v1.Pod{}, err
 	}
 
 	if len(list.Items) < 1 {
-		return false, nil
+		return v1.Pod{}, nil
 	}
 
-	pod := list.Items[0]
-
-	return pod.Status.Phase == v1.PodRunning, nil
+	return list.Items[0], nil
 }
 
-// GetRunningRuntimePODRuntimeId returns the runtimeId that the user tools runtime POD is using
-func (k k8sClient) GetRunningRuntimePODRuntimeId(ctx context.Context, username string) (string, error) {
-	slugUsername := k.getSlugUsername(username)
-	userToolsRunning, err := k.IsUserToolPODRunning(ctx, username)
+// GetRuntimeIdFromUserTools returns the runtimeId that the user tools runtime POD is using
+func (k k8sClient) GetRuntimeIdFromUserTools(ctx context.Context, username string) (string, error) {
+	pod, err := k.getUserToolsPod(ctx, username)
 	if err != nil {
-		return "", err
-	}
-
-	if !userToolsRunning {
 		return "", nil
 	}
 
-	// if the user tools are running, get the runtime
-	runtimeResName := k.getUserToolsRuntimeResName(slugUsername)
-
-	runtimeFieldSelector := k.userToolsRuntimePODFieldSelector(runtimeResName)
-	pods, err := k.clientset.CoreV1().Pods(k.cfg.Kubernetes.Namespace).List(ctx, metav1.ListOptions{
-		FieldSelector: runtimeFieldSelector,
-	})
-
-	if err != nil {
-		return "", err
-	}
-
-	if len(pods.Items) < 1 {
-		return "", entity.RuntimeNotFound
-	}
-
-	pod := pods.Items[0]
 	labels := pod.GetLabels()
 	if runtimeId, found := labels["runtimeId"]; found {
 		return runtimeId, nil
@@ -304,22 +286,13 @@ func (k *k8sClient) waitUserToolsDeleted(ctx context.Context, resName string) er
 
 	defer watcher.Stop()
 
-	deletedEventsReceived := 0
-
 	for {
 		select {
 		case event := <-watcher.ResultChan():
 			if event.Type == watch.Deleted {
-				deletedEventsReceived++
 				pod := event.Object.(*v1.Pod)
-
 				k.logger.Infof("Pod %s has being deleted", pod.Name)
-				k.logger.Debugf("EventsReceived %d VS ResourcesWatched %d", deletedEventsReceived, usertoolsPods)
-
-				if usertoolsPods == deletedEventsReceived {
-					// we already have all Deleted events that we need
-					return nil
-				}
+				return nil
 			}
 
 		case <-ctx.Done():
@@ -338,23 +311,14 @@ func (k *k8sClient) waitUserToolsRunning(ctx context.Context, resName string) er
 
 	defer watcher.Stop()
 
-	podsRunning := 0
-
 	for {
 		select {
 		case event := <-watcher.ResultChan():
 			pod := event.Object.(*v1.Pod)
 
 			if pod.Status.Phase == v1.PodRunning {
-				podsRunning++
 				k.logger.Infof("The POD \"%s\" is running", resName)
-				k.logger.Debugf("PodRunning %d VS ResourcesWatched %d", podsRunning, usertoolsPods)
-
-				if usertoolsPods == podsRunning {
-					// we already have all the running pods that we need
-					return nil
-				}
-
+				return nil
 			}
 
 		case <-ctx.Done():

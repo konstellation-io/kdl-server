@@ -11,11 +11,28 @@
   height: 100%;
   padding: 4 * $grid-unit;
   background-color: palette(base, 900);
+
   h2 {
     @include font-caption;
     text-transform: uppercase;
     color: font-color(regular);
   }
+
+  .description {
+      @include font-small;
+      color: font-color(lowlight);
+      white-space: pre-line;
+
+      background-color: palette(base, 400);
+      margin-top: 2 * $grid-unit;
+      padding: 2 * $grid-unit;
+      border-radius: 0.5 * $grid-unit;
+      max-width: 125 * $grid-unit;
+
+      .highlight {
+        font-weight: bold;
+      }
+    }
 }
 
 .headerName {

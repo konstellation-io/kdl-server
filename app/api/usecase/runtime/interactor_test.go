@@ -55,8 +55,9 @@ func TestInteractor_GetRunningRuntime(t *testing.T) {
 	ctx := context.Background()
 
 	expectedRuntime := entity.NewRuntime(runtimeId, runtimeName, runtimeImage, runtimeTag)
+	expectedRuntime.RuntimePod = "usertools-" + username + "-user-tools-0"
 
-	s.mocks.k8client.EXPECT().GetRunningRuntimePODRuntimeId(ctx, username).Return(runtimeId, nil)
+	s.mocks.k8client.EXPECT().GetRuntimeIdFromUserTools(ctx, username).Return(runtimeId, nil)
 	s.mocks.repo.EXPECT().Get(ctx, runtimeId).Return(expectedRuntime, nil)
 
 	f, err := s.interactor.GetRunningRuntime(ctx, username)

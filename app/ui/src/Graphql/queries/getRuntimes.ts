@@ -9,7 +9,7 @@ export default gql`
       labels
       dockerImage
       dockerTag
-      usertoolsPod
+      runtimePod
     }
   }
 `;

@@ -14,7 +14,7 @@ jupyter:
     repository: konstellation/jupyter-gpu
     tag: "latest"
     pullPolicy: IfNotPresent
-  enterpriseGatewayUrl: http://enterprise-gateway.kdl.svc.cluster.local:8888
+  enterpriseGatewayUrl: http://enterprise-gateway:8888
 
 oauth2Proxy:
   image:

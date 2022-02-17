@@ -8,7 +8,7 @@ import useTool from 'Graphql/hooks/useTool';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import useBoolState from 'Hooks/useBoolState';
 import { GetRunningRuntime } from 'Graphql/queries/types/GetRunningRuntime';
-import GetRunningRuntimeQuery from 'Graphql/queries/GetRunningRuntime';
+import GetRunningRuntimeQuery from 'Graphql/queries/getRunningRuntime';
 import { USERTOOLS_PANEL_OPTIONS } from '../../panelSettings';
 import Runtime from '../../panels/RuntimesList/components/Runtime';
 import useRuntime from 'Graphql/client/hooks/useRuntime';

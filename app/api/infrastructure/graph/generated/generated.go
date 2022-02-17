@@ -115,12 +115,13 @@ type ComplexityRoot struct {
 	}
 
 	Runtime struct {
-		Desc         func(childComplexity int) int
-		DockerImage  func(childComplexity int) int
-		ID           func(childComplexity int) int
-		Labels       func(childComplexity int) int
-		Name         func(childComplexity int) int
-		UsertoolsPod func(childComplexity int) int
+		Desc        func(childComplexity int) int
+		DockerImage func(childComplexity int) int
+		DockerTag   func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Labels      func(childComplexity int) int
+		Name        func(childComplexity int) int
+		RuntimePod  func(childComplexity int) int
 	}
 
 	SSHKey struct {
@@ -609,6 +610,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Runtime.DockerImage(childComplexity), true
 
+	case "Runtime.dockerTag":
+		if e.complexity.Runtime.DockerTag == nil {
+			break
+		}
+
+		return e.complexity.Runtime.DockerTag(childComplexity), true
+
 	case "Runtime.id":
 		if e.complexity.Runtime.ID == nil {
 			break
@@ -630,12 +638,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Runtime.Name(childComplexity), true
 
-	case "Runtime.usertoolsPod":
-		if e.complexity.Runtime.UsertoolsPod == nil {
+	case "Runtime.runtimePod":
+		if e.complexity.Runtime.RuntimePod == nil {
 			break
 		}
 
-		return e.complexity.Runtime.UsertoolsPod(childComplexity), true
+		return e.complexity.Runtime.RuntimePod(childComplexity), true
 
 	case "SSHKey.creationDate":
 		if e.complexity.SSHKey.CreationDate == nil {
@@ -898,7 +906,8 @@ type Runtime {
   desc: String!
   labels: [String!]
   dockerImage: String!
-  usertoolsPod: String
+  dockerTag: String!
+  runtimePod: String!
 }
 
 type Topic {
@@ -3153,7 +3162,7 @@ func (ec *executionContext) _Runtime_dockerImage(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Runtime_usertoolsPod(ctx context.Context, field graphql.CollectedField, obj *entity.Runtime) (ret graphql.Marshaler) {
+func (ec *executionContext) _Runtime_dockerTag(ctx context.Context, field graphql.CollectedField, obj *entity.Runtime) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3171,18 +3180,56 @@ func (ec *executionContext) _Runtime_usertoolsPod(ctx context.Context, field gra
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.UsertoolsPod, nil
+		return obj.DockerTag, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Runtime_runtimePod(ctx context.Context, field graphql.CollectedField, obj *entity.Runtime) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Runtime",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RuntimePod, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _SSHKey_public(ctx context.Context, field graphql.CollectedField, obj *entity.SSHKey) (ret graphql.Marshaler) {
@@ -6049,8 +6096,16 @@ func (ec *executionContext) _Runtime(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "usertoolsPod":
-			out.Values[i] = ec._Runtime_usertoolsPod(ctx, field, obj)
+		case "dockerTag":
+			out.Values[i] = ec._Runtime_dockerTag(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "runtimePod":
+			out.Values[i] = ec._Runtime_runtimePod(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

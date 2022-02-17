@@ -28,11 +28,16 @@ func NewInteractor(
 }
 
 // GetRuntimes retrieve all available runtimes.
-func (i interactor) GetRuntimes(ctx context.Context) ([]entity.Runtime, error) {
-	// get generic project runtimes
+func (i interactor) GetRuntimes(ctx context.Context, username string) ([]entity.Runtime, error) {
+	// get all runtimes
 	runtimes, err := i.repo.FindAll(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	// update the runtime pods names
+	for i := range runtimes {
+		runtimes[i].RuntimePod = getUsertoolsPodName(username)
 	}
 
 	return runtimes, nil
@@ -40,7 +45,7 @@ func (i interactor) GetRuntimes(ctx context.Context) ([]entity.Runtime, error) {
 
 // GetRunningRuntime return the running runtime if any. If not it returns a null.
 func (i interactor) GetRunningRuntime(ctx context.Context, username string) (*entity.Runtime, error) {
-	runtimeId, err := i.k8sClient.GetRunningRuntimePODRuntimeId(ctx, username)
+	runtimeId, err := i.k8sClient.GetRuntimeIdFromUserTools(ctx, username)
 	if err != nil {
 		return nil, err
 	}
@@ -53,8 +58,14 @@ func (i interactor) GetRunningRuntime(ctx context.Context, username string) (*en
 			return nil, err
 		}
 
+		runtime.RuntimePod = getUsertoolsPodName(username)
+
 		return &runtime, nil
 	}
 
 	return nil, nil
+}
+
+func getUsertoolsPodName(username string) string {
+	return "usertools-" + username + "-user-tools-0"
 }

@@ -7,7 +7,8 @@ function buildRuntime(_) {
     desc: casual.words(200),
     labels: casual.array_of_words(n = 7),
     dockerImage: casual.url,
-    usertoolsPod: casual.url,
+    dockerTag: casual.numerify("#.##"),
+    runtimePod: casual.url,
   };
 }
 

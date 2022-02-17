@@ -16,7 +16,7 @@ type K8sClient interface {
 	CreateUserToolsCR(ctx context.Context, username, runtimeId, runtimeImage, runtimeTag string) error
 	DeleteUserToolsCR(ctx context.Context, username string) error
 	IsUserToolPODRunning(ctx context.Context, username string) (bool, error)
-	GetRunningRuntimePODRuntimeId(ctx context.Context, username string) (string, error)
+	GetRuntimeIdFromUserTools(ctx context.Context, username string) (string, error)
 	CreateKDLProjectCR(ctx context.Context, projectID string) error
 	CreateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error
 	UpdateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error

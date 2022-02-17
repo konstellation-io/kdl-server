@@ -105,19 +105,19 @@ func (mr *MockK8sClientMockRecorder) DeleteUserToolsCR(ctx, username interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserToolsCR", reflect.TypeOf((*MockK8sClient)(nil).DeleteUserToolsCR), ctx, username)
 }
 
-// GetRunningRuntimePODRuntimeId mocks base method.
-func (m *MockK8sClient) GetRunningRuntimePODRuntimeId(ctx context.Context, username string) (string, error) {
+// GetRuntimeIdFromUserTools mocks base method.
+func (m *MockK8sClient) GetRuntimeIdFromUserTools(ctx context.Context, username string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRunningRuntimePODRuntimeId", ctx, username)
+	ret := m.ctrl.Call(m, "GetRuntimeIdFromUserTools", ctx, username)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetRunningRuntimePODRuntimeId indicates an expected call of GetRunningRuntimePODRuntimeId.
-func (mr *MockK8sClientMockRecorder) GetRunningRuntimePODRuntimeId(ctx, username interface{}) *gomock.Call {
+// GetRuntimeIdFromUserTools indicates an expected call of GetRuntimeIdFromUserTools.
+func (mr *MockK8sClientMockRecorder) GetRuntimeIdFromUserTools(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRunningRuntimePODRuntimeId", reflect.TypeOf((*MockK8sClient)(nil).GetRunningRuntimePODRuntimeId), ctx, username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRuntimeIdFromUserTools", reflect.TypeOf((*MockK8sClient)(nil).GetRuntimeIdFromUserTools), ctx, username)
 }
 
 // GetSecret mocks base method.

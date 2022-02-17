@@ -21,8 +21,8 @@ $desc-height: 5 * $grid-unit;
 .runningTag {
   @extend .label;
   padding: 0.4 * $grid-unit 3.5 * $grid-unit;
-  background-color: transparent;
+  background-color: palette(success, 700);
   border-radius: 2 * $grid-unit;
-  color: palette(success, 700);
+  color: palette(base);
   font-weight: bold;
 }

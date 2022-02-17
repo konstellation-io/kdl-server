@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"context"
+
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
@@ -10,14 +11,14 @@ import (
 
 type interactor struct {
 	logger    logging.Logger
-	k8sClient k8s.K8sClient
+	k8sClient k8s.Client
 	repo      Repository
 }
 
 // NewInteractor factory function.
 func NewInteractor(
 	logger logging.Logger,
-	k8sClient k8s.K8sClient,
+	k8sClient k8s.Client,
 	repo Repository,
 ) UseCase {
 	return &interactor{
@@ -45,15 +46,15 @@ func (i interactor) GetRuntimes(ctx context.Context, username string) ([]entity.
 
 // GetRunningRuntime return the running runtime if any. If not it returns a null.
 func (i interactor) GetRunningRuntime(ctx context.Context, username string) (*entity.Runtime, error) {
-	runtimeId, err := i.k8sClient.GetRuntimeIdFromUserTools(ctx, username)
+	runtimeID, err := i.k8sClient.GetRuntimeIDFromUserTools(ctx, username)
 	if err != nil {
 		return nil, err
 	}
 
-	if runtimeId != "" {
-		i.logger.Infof("RuntimeId in runtime POD " + runtimeId)
+	if runtimeID != "" {
+		i.logger.Infof("RuntimeId in runtime POD " + runtimeID)
 
-		runtime, err := i.repo.Get(ctx, runtimeId)
+		runtime, err := i.repo.Get(ctx, runtimeID)
 		if err != nil {
 			return nil, err
 		}

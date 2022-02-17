@@ -47,7 +47,7 @@ func (m *runtimeMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entit
 
 	err := m.collection.FindOne(ctx, filters).Decode(&dto)
 	if errors.Is(err, mongo.ErrNoDocuments) {
-		return entity.Runtime{}, entity.RuntimeNotFound
+		return entity.Runtime{}, entity.ErrRuntimeNotFound
 	}
 
 	return m.dtoToEntity(dto), err
@@ -69,28 +69,6 @@ func (m *runtimeMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity
 	}
 
 	return m.dtosToEntities(dtos), nil
-}
-
-func (m *runtimeMongoDBRepo) runtimesToDTOs(runtimes []entity.Runtime) ([]runtimeDTO, error) {
-	dtos := make([]runtimeDTO, len(runtimes))
-
-	for i, f := range runtimes {
-		idFromHex, err := primitive.ObjectIDFromHex(f.ID)
-		if err != nil {
-			return nil, err
-		}
-
-		dtos[i] = runtimeDTO{
-			ID:          idFromHex,
-			Name:        f.Name,
-			Desc:        f.Desc,
-			Labels:      f.Labels,
-			DockerImage: f.DockerImage,
-			DockerTag:   f.DockerTag,
-		}
-	}
-
-	return dtos, nil
 }
 
 func (m *runtimeMongoDBRepo) dtoToEntity(dto runtimeDTO) entity.Runtime {

@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 
@@ -28,7 +29,7 @@ type interactor struct {
 	sshGenerator sshhelper.SSHKeyGenerator
 	clock        clock.Clock
 	giteaService giteaservice.GiteaClient
-	k8sClient    k8s.K8sClient
+	k8sClient    k8s.Client
 	scheduler    cron.Scheduler
 }
 
@@ -41,7 +42,7 @@ func NewInteractor(
 	sshGenerator sshhelper.SSHKeyGenerator,
 	c clock.Clock,
 	giteaService giteaservice.GiteaClient,
-	k8sClient k8s.K8sClient,
+	k8sClient k8s.Client,
 ) UseCase {
 	return &interactor{
 		logger:       logger,
@@ -133,8 +134,8 @@ func (i *interactor) GetByUsername(ctx context.Context, username string) (entity
 }
 
 // StartTools creates a user-tools CustomResource in K8s to initialize the VSCode and Jupyter for the given username.
-// If there are already a user-tools for the user, they are replaced (stop + start new)
-func (i *interactor) StartTools(ctx context.Context, username string, runtimeId *string) (entity.User, error) {
+// If there are already a user-tools for the user, they are replaced (stop + start new).
+func (i *interactor) StartTools(ctx context.Context, username string, runtimeID *string) (entity.User, error) {
 	user, err := i.repo.GetByUsername(ctx, username)
 	if err != nil {
 		return entity.User{}, err
@@ -154,27 +155,28 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeId 
 		}
 	}
 
-	var rId, rImage, rTag string
-	if runtimeId != nil {
-		r, err := i.repoRuntimes.Get(ctx, *runtimeId)
+	var rID, rImage, rTag string
+
+	if runtimeID != nil {
+		r, err := i.repoRuntimes.Get(ctx, *runtimeID)
 		if err != nil {
 			return entity.User{}, err
 		}
 
-		rId = r.ID
+		rID = r.ID
 		rImage = r.DockerImage
 		rTag = r.DockerTag
-		i.logger.Debugf("Runtime id \"%s\" with docker image \"%s\"", rId, rImage)
+		i.logger.Debugf("Runtime id \"%s\" with docker image \"%s:%s\"", rID, rImage, rTag)
 	} else {
-		rId = "default"
+		rID = "default"
 		rImage = i.cfg.UserToolsVsCodeRuntime.Image.Repository
 		rTag = i.cfg.UserToolsVsCodeRuntime.Image.Tag
-		i.logger.Debugf("Using default runtime image \"%s\"", rImage)
+		i.logger.Debugf("Using default runtime image \"%s:%s\"", rImage, rTag)
 	}
 
 	i.logger.Infof("Creating user tools for user: \"%s\"", username)
 
-	err = i.k8sClient.CreateUserToolsCR(ctx, username, rId, rImage, rTag)
+	err = i.k8sClient.CreateUserToolsCR(ctx, username, rID, rImage, rTag)
 	if err != nil {
 		return entity.User{}, err
 	}

@@ -32,20 +32,18 @@ Example:
 	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
 */
 func AuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		email := r.Header.Get("X-Forwarded-Email")
+		username := r.Header.Get("X-Forwarded-User")
 
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			email := r.Header.Get("X-Forwarded-Email")
-			username := r.Header.Get("X-Forwarded-User")
+		if email == "" || username == "" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 
-			if email == "" || username == "" {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
+		r = r.WithContext(context.WithValue(r.Context(), LoggedUserNameKey, username))
+		r = r.WithContext(context.WithValue(r.Context(), LoggedUserEmailKey, email))
 
-			r = r.WithContext(context.WithValue(r.Context(), LoggedUserNameKey, username))
-			r = r.WithContext(context.WithValue(r.Context(), LoggedUserEmailKey, email))
-
-			next.ServeHTTP(w, r)
-		})
-
+		next.ServeHTTP(w, r)
+	})
 }

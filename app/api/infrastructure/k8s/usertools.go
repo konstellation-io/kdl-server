@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+
 	"github.com/gosimple/slug"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -43,7 +44,7 @@ func (k *k8sClient) DeleteUserToolsCR(ctx context.Context, username string) erro
 }
 
 // CreateUserToolsCR creates the user tools Custom Resource in Kubernetes.
-func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeId, runtimeImage, runtimeTag string) error {
+func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeID, runtimeImage, runtimeTag string) error {
 	slugUsername := k.getSlugUsername(username)
 	resName := fmt.Sprintf("usertools-%s", slugUsername)
 
@@ -54,7 +55,7 @@ func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeId, 
 
 	k.logger.Info("UserTools secrets created")
 
-	err = k.createUserToolsDefinition(ctx, username, slugUsername, resName, runtimeId, runtimeImage, runtimeTag)
+	err = k.createUserToolsDefinition(ctx, username, slugUsername, resName, runtimeID, runtimeImage, runtimeTag)
 	if err != nil {
 		return err
 	}
@@ -72,7 +73,7 @@ func (k k8sClient) IsUserToolPODRunning(ctx context.Context, username string) (b
 	return pod.Status.Phase == v1.PodRunning, nil
 }
 
-// getUserToolsPod returns the UserToolsPod object
+// getUserToolsPod returns the UserToolsPod object.
 func (k k8sClient) getUserToolsPod(ctx context.Context, username string) (v1.Pod, error) {
 	slugUsername := k.getSlugUsername(username)
 	resName := k.getUserToolsResName(slugUsername)
@@ -90,16 +91,16 @@ func (k k8sClient) getUserToolsPod(ctx context.Context, username string) (v1.Pod
 	return list.Items[0], nil
 }
 
-// GetRuntimeIdFromUserTools returns the runtimeId that the user tools runtime POD is using
-func (k k8sClient) GetRuntimeIdFromUserTools(ctx context.Context, username string) (string, error) {
+// GetRuntimeIDFromUserTools returns the runtimeId that the user tools runtime POD is using.
+func (k k8sClient) GetRuntimeIDFromUserTools(ctx context.Context, username string) (string, error) {
 	pod, err := k.getUserToolsPod(ctx, username)
 	if err != nil {
 		return "", nil
 	}
 
 	labels := pod.GetLabels()
-	if runtimeId, found := labels["runtimeId"]; found {
-		return runtimeId, nil
+	if runtimeID, found := labels["runtimeId"]; found {
+		return runtimeID, nil
 	}
 
 	return "", nil
@@ -125,16 +126,8 @@ func (k *k8sClient) getUserToolsResName(slugUsername string) string {
 	return fmt.Sprintf("usertools-%s", slugUsername)
 }
 
-func (k *k8sClient) getUserToolsRuntimeResName(slugUsername string) string {
-	return fmt.Sprintf("vscode-runtime-%s", slugUsername)
-}
-
 func (k *k8sClient) userToolsPODLabelSelector(resName string) string {
 	return fmt.Sprintf("app.kubernetes.io/instance=%s", resName)
-}
-
-func (k *k8sClient) userToolsRuntimePODFieldSelector(resName string) string {
-	return fmt.Sprintf("metadata.name=%s", resName)
 }
 
 // checkOrCreateToolsSecrets set ClientID and ClientSecret on Kubernetes secret objects.
@@ -182,7 +175,7 @@ func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName
 }
 
 // createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
-func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slugUsername, resName, runtimeId, runtimeImage, runtimeTag string) error {
+func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slugUsername, resName, runtimeID, runtimeImage, runtimeTag string) error {
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",
@@ -246,7 +239,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 					},
 				},
 				"vscodeRuntime": map[string]interface{}{
-					"runtimeId": runtimeId,
+					"runtimeId": runtimeID,
 					"image": map[string]string{
 						"repository": runtimeImage,
 						"tag":        runtimeTag,
@@ -263,7 +256,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 	return err
 }
 
-// Returns a watcher for the UserTools and the number of resources that the watcher is watching
+// Returns a watcher for the UserTools and the number of resources that the watcher is watching.
 func (k *k8sClient) createUserToolsWatcher(ctx context.Context, resName string) (watch.Interface, error) {
 	labelSelector := k.userToolsPODLabelSelector(resName)
 	k.logger.Debugf("Creating watcher for POD with label: %s", labelSelector)
@@ -277,7 +270,7 @@ func (k *k8sClient) createUserToolsWatcher(ctx context.Context, resName string) 
 	return k.clientset.CoreV1().Pods(k.cfg.Kubernetes.Namespace).Watch(ctx, opts)
 }
 
-// Wait until all the resources in the Usertools CR are deleted
+// Wait until all the resources in the Usertools CR are deleted.
 func (k *k8sClient) waitUserToolsDeleted(ctx context.Context, resName string) error {
 	watcher, err := k.createUserToolsWatcher(ctx, resName)
 	if err != nil {
@@ -292,6 +285,7 @@ func (k *k8sClient) waitUserToolsDeleted(ctx context.Context, resName string) er
 			if event.Type == watch.Deleted {
 				pod := event.Object.(*v1.Pod)
 				k.logger.Infof("Pod %s has being deleted", pod.Name)
+
 				return nil
 			}
 
@@ -302,7 +296,7 @@ func (k *k8sClient) waitUserToolsDeleted(ctx context.Context, resName string) er
 	}
 }
 
-// Wait until all the resources in the Usertools CR are running
+// Wait until all the resources in the Usertools CR are running.
 func (k *k8sClient) waitUserToolsRunning(ctx context.Context, resName string) error {
 	watcher, err := k.createUserToolsWatcher(ctx, resName)
 	if err != nil {

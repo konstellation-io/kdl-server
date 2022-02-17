@@ -273,6 +273,7 @@ func (r *queryResolver) RunningRuntime(ctx context.Context) (*entity.Runtime, er
 func (r *queryResolver) Kubeconfig(ctx context.Context) (string, error) {
 	username := ctx.Value(middleware.LoggedUserNameKey).(string)
 	k, err := r.users.GetKubeconfig(ctx, username)
+
 	return k, err
 }
 

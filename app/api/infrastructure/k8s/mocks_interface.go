@@ -12,7 +12,7 @@ import (
 	entity "github.com/konstellation-io/kdl-server/app/api/entity"
 )
 
-// MockK8sClient is a mock of K8sClient interface.
+// MockK8sClient is a mock of Client interface.
 type MockK8sClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockK8sClientMockRecorder
@@ -78,17 +78,17 @@ func (mr *MockK8sClientMockRecorder) CreateUserSSHKeySecret(ctx, user, public, p
 }
 
 // CreateUserToolsCR mocks base method.
-func (m *MockK8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeId, runtimeImage, runtimeTag string) error {
+func (m *MockK8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeID, runtimeImage, runtimeTag string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUserToolsCR", ctx, username, runtimeId, runtimeImage, runtimeTag)
+	ret := m.ctrl.Call(m, "CreateUserToolsCR", ctx, username, runtimeID, runtimeImage, runtimeTag)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateUserToolsCR indicates an expected call of CreateUserToolsCR.
-func (mr *MockK8sClientMockRecorder) CreateUserToolsCR(ctx, username, runtimeId, runtimeImage, runtimeTag interface{}) *gomock.Call {
+func (mr *MockK8sClientMockRecorder) CreateUserToolsCR(ctx, username, runtimeID, runtimeImage, runtimeTag interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserToolsCR", reflect.TypeOf((*MockK8sClient)(nil).CreateUserToolsCR), ctx, username, runtimeId, runtimeImage, runtimeTag)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserToolsCR", reflect.TypeOf((*MockK8sClient)(nil).CreateUserToolsCR), ctx, username, runtimeID, runtimeImage, runtimeTag)
 }
 
 // DeleteUserToolsCR mocks base method.
@@ -105,19 +105,19 @@ func (mr *MockK8sClientMockRecorder) DeleteUserToolsCR(ctx, username interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserToolsCR", reflect.TypeOf((*MockK8sClient)(nil).DeleteUserToolsCR), ctx, username)
 }
 
-// GetRuntimeIdFromUserTools mocks base method.
-func (m *MockK8sClient) GetRuntimeIdFromUserTools(ctx context.Context, username string) (string, error) {
+// GetRuntimeIDFromUserTools mocks base method.
+func (m *MockK8sClient) GetRuntimeIDFromUserTools(ctx context.Context, username string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRuntimeIdFromUserTools", ctx, username)
+	ret := m.ctrl.Call(m, "GetRuntimeIDFromUserTools", ctx, username)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetRuntimeIdFromUserTools indicates an expected call of GetRuntimeIdFromUserTools.
-func (mr *MockK8sClientMockRecorder) GetRuntimeIdFromUserTools(ctx, username interface{}) *gomock.Call {
+// GetRuntimeIDFromUserTools indicates an expected call of GetRuntimeIDFromUserTools.
+func (mr *MockK8sClientMockRecorder) GetRuntimeIDFromUserTools(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRuntimeIdFromUserTools", reflect.TypeOf((*MockK8sClient)(nil).GetRuntimeIdFromUserTools), ctx, username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRuntimeIDFromUserTools", reflect.TypeOf((*MockK8sClient)(nil).GetRuntimeIDFromUserTools), ctx, username)
 }
 
 // GetSecret mocks base method.

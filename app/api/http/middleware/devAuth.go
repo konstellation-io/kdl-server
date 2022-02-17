@@ -7,9 +7,8 @@ import (
 )
 
 // DevAuthMiddleware Development purpose authentication middleware with user and email
-// obtained from environment variables
+// obtained from environment variables.
 func DevAuthMiddleware(next http.Handler) http.Handler {
-
 	// For development environments with the Auth from environment variables
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		email := os.Getenv("KDL_ADMIN_EMAIL")
@@ -20,5 +19,4 @@ func DevAuthMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
-
 }

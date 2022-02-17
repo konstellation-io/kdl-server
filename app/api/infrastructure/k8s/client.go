@@ -34,8 +34,7 @@ type k8sClient struct {
 	kdlprojectRes dynamic.NamespaceableResourceInterface
 }
 
-func NewK8sClient(logger logging.Logger, cfg config.Config) (K8sClient, error) {
-
+func NewK8sClient(logger logging.Logger, cfg config.Config) (Client, error) {
 	kubeConfig := newKubernetesConfig(cfg)
 
 	clientset, err := kubernetes.NewForConfig(kubeConfig)
@@ -72,7 +71,7 @@ func NewK8sClient(logger logging.Logger, cfg config.Config) (K8sClient, error) {
 }
 
 func newKubernetesConfig(cfg config.Config) *rest.Config {
-	if cfg.Kubernetes.IsInsideCluster == true {
+	if cfg.Kubernetes.IsInsideCluster {
 		// retrieve k8 config from the cluster service
 		log.Printf("Creating K8s config in-cluster")
 

@@ -283,12 +283,6 @@ projectOperator:
       tag: v2
       pullPolicy: IfNotPresent
 
-# vscodeRuntime:
-#   image:
-#       repository: localhost:32000/konstellation/runtime
-#       tag: latest
-#       pullPolicy: IfNotPresent
-
 sharedVolume:
   name: received-data
   storageClassName: standard

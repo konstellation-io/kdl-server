@@ -57,7 +57,7 @@ jobs:
         name: API Go Lint
         uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.37
+          version: v1.44
           working-directory: ./app/api
           args: --timeout 5m
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -82,7 +82,7 @@ jobs:
             ./app/ui/test-report.xml
 
   build:
-    needs: [lint-dockerfile, quality-checks]
+    needs: [ lint-dockerfile, quality-checks ]
     uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.4.7
     with:
       component: kdl-app

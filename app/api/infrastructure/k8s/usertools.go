@@ -175,7 +175,8 @@ func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName
 }
 
 // createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
-func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slugUsername, resName, runtimeID, runtimeImage, runtimeTag string) error {
+func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slugUsername, resName, runtimeID,
+	runtimeImage, runtimeTag string) error {
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",

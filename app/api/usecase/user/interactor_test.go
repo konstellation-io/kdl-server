@@ -296,7 +296,7 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 	// EXPECT - The username was used to look for the user in the repository
 	// EXPECT - The username was used to check if the usertools are running
 	// EXPECT - The CR was created with the default image defined for the Runtime
-}
+} //nolint:wsl // we want the test to end with the comment to respect the AND orders
 
 func TestInteractor_StartTools_Replace(t *testing.T) {
 	// GIVEN there is a valid context
@@ -334,7 +334,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, returnedUser)
 	// AND the previously started tools were replaced by the new tools
-}
+} //nolint:wsl // we want the test to end with the comment to respect the AND orders
 
 func TestInteractor_FindAll(t *testing.T) {
 	s := newUserSuite(t, nil)

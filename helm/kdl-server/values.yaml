@@ -55,6 +55,8 @@ drone:
   pluginSecret: d97d8ee407af1002fa2449f578bb47a9
   adminToken: 7GSipOV0wJZQioZNBxaw3AotHV1tA4K4
   runnerCapacity: 5
+  ingress:
+    proxyBodySize: 100m
 
 droneAuthorizer:
   image:
@@ -89,7 +91,6 @@ giteaOauth2Setup:
 
 ingress:
   type: nginx
-  nginxConnectionTimeout: "3600"
 
 enterprise-gateway:
   image: elyra/enterprise-gateway:2.5.0
@@ -178,6 +179,14 @@ kdlServer:
     repository: konstellation/kdl-server
     tag: v0.18.0
     pullPolicy: IfNotPresent
+  ingress:
+    proxyReadTimeout: "3600"
+    proxySendTimeout: "3600"
+    proxyConnectTimeout: "3600"
+
+    ## Large values are needed to serve big files from Filebrowser
+    ##
+    proxyBodySize: "1000000m"
 
 minio:
   resources:
@@ -231,7 +240,6 @@ postgres:
     storageClassName: standard
 
 projectOperator:
-
   ## Main container specs
   ##
   manager:
@@ -310,7 +318,7 @@ tls:
 
   ## A secret containing the the CA cert is needed
   ## in order to use a self-signed certificate
-  ## 
+  ##
   # caSecret:
   #   name: kdl-ca-cert
   #   certFilename: ca.crt

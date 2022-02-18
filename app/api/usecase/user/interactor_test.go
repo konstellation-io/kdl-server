@@ -37,7 +37,7 @@ type userMocks struct {
 	sshGenerator  *sshhelper.MockSSHKeyGenerator
 	clock         *clock.MockClock
 	giteaService  *giteaservice.MockGiteaClient
-	k8sClientMock *k8s.MockK8sClient
+	k8sClientMock *k8s.MockClient
 }
 
 func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
@@ -48,7 +48,7 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	clockMock := clock.NewMockClock(ctrl)
 	sshGenerator := sshhelper.NewMockSSHKeyGenerator(ctrl)
 	giteaServiceMock := giteaservice.NewMockGiteaClient(ctrl)
-	k8sClientMock := k8s.NewMockK8sClient(ctrl)
+	k8sClientMock := k8s.NewMockClient(ctrl)
 
 	logging.AddLoggerExpects(logger)
 

@@ -1,8 +1,8 @@
-import { isRuntimeLoading } from '../cache';
+import { loadingRuntime } from '../cache';
 
 function useRuntimeLoading() {
-  function setRuntimeLoading(isLoading?: boolean) {
-    isRuntimeLoading(isLoading);
+  function setRuntimeLoading(runtimeLoading: string) {
+    loadingRuntime(runtimeLoading);
   }
 
   return { setRuntimeLoading };

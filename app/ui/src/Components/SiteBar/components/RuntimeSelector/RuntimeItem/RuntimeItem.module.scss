@@ -11,8 +11,8 @@
   padding: $grid-unit;
   @include font-small;
   color: font-color(lowlight);
-  transition: 
-    background-color ease 0.3s, 
+  transition:
+    background-color ease 0.3s,
     color ease 0.2s, opacity ease 0.3s;
 
   &:hover {
@@ -47,5 +47,4 @@
       color: font-color(regular);
     }
   }
-
 }

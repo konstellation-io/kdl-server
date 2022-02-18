@@ -12,7 +12,7 @@ import styles from './NavElements.module.scss';
 import { useParams } from 'react-router-dom';
 import useProjectNavigation from 'Hooks/useProjectNavigation';
 import { useReactiveVar } from '@apollo/client';
-import { isRuntimeLoading, lastRanRuntime, primaryPanel, runningRuntime } from 'Graphql/client/cache';
+import { loadingRuntime, lastRanRuntime, primaryPanel, runningRuntime } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
@@ -26,7 +26,8 @@ type Props = {
 function NavElements({ isOpened }: Props) {
   const { projectId } = useParams<RouteProjectParams>();
   const { mainRoutes, userToolsRoutes, projectToolsRoutes } = useProjectNavigation(projectId);
-  const isLoading = useReactiveVar(isRuntimeLoading);
+  const runtimeLoading = useReactiveVar(loadingRuntime);
+  const isLoading = runtimeLoading !== '';
 
   const runtimeRunning = useReactiveVar(runningRuntime);
   const panelData = useReactiveVar(primaryPanel);
@@ -99,6 +100,7 @@ function NavElements({ isOpened }: Props) {
           className={cx(styles.userTools, {
             [styles.started]: runtimeRunning,
             [styles.stopped]: !runtimeRunning,
+            [styles.loading]: isLoading,
           })}
         >
           <div className={cx(styles.usertoolsOptions, { [styles.opened]: isOpened })}>

@@ -22,6 +22,9 @@
     &.stopped {
       border-right: 2px solid palette(alert);
     }
+    &.loading {
+      border-right: 2px solid palette(feedback);
+    }
 
     .userToolLabel {
       @include font-caption;

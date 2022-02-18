@@ -23,6 +23,9 @@ $desc-height: 5 * $grid-unit;
   &.active {
     border-left: 3px solid palette(success);
   }
+  &.loading {
+    border-left: 3px solid palette(feedback);
+  }
 
   &:hover {
     background-color: palette(base, 800);

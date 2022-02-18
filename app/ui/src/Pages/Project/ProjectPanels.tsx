@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import {
-  isRuntimeLoading,
+  loadingRuntime,
   memberDetails,
   primaryPanel,
   runningRuntime,
@@ -39,7 +39,8 @@ function ProjectPanels({ openedProject }: Props) {
   const memberDetailsData = useReactiveVar(memberDetails);
   const runtimeSelected = useReactiveVar(selectedRuntime);
   const runtimeRunning = useReactiveVar(runningRuntime);
-  const isLoading = useReactiveVar(isRuntimeLoading);
+  const runtimeLoading = useReactiveVar(loadingRuntime);
+  const isLoading = runtimeLoading !== '';
 
   const { startRuntime, pauseRuntime } = useRuntime();
 

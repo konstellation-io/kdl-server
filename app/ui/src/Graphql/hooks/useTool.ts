@@ -16,9 +16,9 @@ export default function useTool() {
   );
 
   async function updateProjectActiveTools(areToolsActive: boolean, runtimeId: string | null) {
-    setRuntimeLoading(true);
+    setRuntimeLoading(runtimeId ?? '');
     await mutationSetActiveProjectTools(mutationPayloadHelper({ active: areToolsActive, runtimeId }));
-    setRuntimeLoading(false);
+    setRuntimeLoading('');
   }
 
   return {

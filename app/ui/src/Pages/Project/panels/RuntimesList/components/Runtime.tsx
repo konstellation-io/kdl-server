@@ -7,7 +7,7 @@ import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
 import useSelectedRuntime from 'Graphql/client/hooks/useSelectedRuntime';
 import { useReactiveVar } from '@apollo/client';
-import { selectedRuntime } from 'Graphql/client/cache';
+import { loadingRuntime, selectedRuntime } from 'Graphql/client/cache';
 import LabelList from './LabelList';
 
 type Props = {
@@ -24,6 +24,7 @@ function Runtime({ runtime, runtimeActive }: Props) {
   });
   const { updateSelectedRuntime } = useSelectedRuntime();
   const actualRuntime = useReactiveVar(selectedRuntime);
+  const runtimeLoading = useReactiveVar(loadingRuntime);
 
   function toggleRuntimePanel() {
     if (runtime.id !== actualRuntime?.id) {
@@ -39,6 +40,7 @@ function Runtime({ runtime, runtimeActive }: Props) {
       data-testid="runtime"
       className={cx(styles.container, {
         [styles.active]: runtimeActive,
+        [styles.loading]: runtimeLoading === runtime.id || (runtimeActive && runtimeLoading !== ''),
       })}
       onClick={toggleRuntimePanel}
     >

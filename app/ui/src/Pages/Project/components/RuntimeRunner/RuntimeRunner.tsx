@@ -38,7 +38,8 @@ function RuntimeRunner() {
   } = useBoolState();
 
   useEffect(() => {
-    setRuntimeLoading(loading);
+    const loadingRuntime = loading ? 'unknown' : '';
+    setRuntimeLoading(loadingRuntime);
     if (dataRuntimeRunning?.runningRuntime) {
       updateRunningRuntime(dataRuntimeRunning.runningRuntime);
       updateLastRanRuntime(dataRuntimeRunning.runningRuntime);
@@ -89,7 +90,7 @@ function RuntimeRunner() {
 
   async function stopTools() {
     closePauseRuntimeModal();
-    await updateProjectActiveTools(false, null);
+    await updateProjectActiveTools(false, runtimeRunning?.id ?? null);
     updateRunningRuntime(null);
   }
 

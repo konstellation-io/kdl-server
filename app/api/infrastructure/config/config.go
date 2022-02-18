@@ -135,6 +135,10 @@ type Config struct {
 			PullPolicy string `envconfig:"USER_TOOLS_OAUTH2_PROXY_IMG_PULLPOLICY"`
 		}
 	}
+	UserToolsKubeconfig struct {
+		Enabled           bool   `envconfig:"USER_TOOLS_KUBECONFIG_DOWNLOAD_ENABLED"`
+		ExternalServerURL string `envconfig:"USER_TOOLS_KUBECONFIG_EXTERNAL_SERVER_URL"`
+	}
 	UserToolsVsCodeRuntime struct {
 		Image struct {
 			Repository string `envconfig:"USER_TOOLS_VSCODE_RUNTIME_IMG_REPO"`

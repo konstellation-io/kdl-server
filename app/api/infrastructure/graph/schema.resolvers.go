@@ -322,6 +322,10 @@ func (r *userResolver) AreToolsActive(ctx context.Context, obj *entity.User) (bo
 	return r.users.AreToolsRunning(ctx, username)
 }
 
+func (r *userResolver) IsKubeconfigEnabled(ctx context.Context, obj *entity.User) (bool, error) {
+	return r.users.IsKubeconfigActive(), nil
+}
+
 // Member returns generated.MemberResolver implementation.
 func (r *Resolver) Member() generated.MemberResolver { return &memberResolver{r} }
 

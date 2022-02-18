@@ -149,6 +149,8 @@ deploy_helm_chart() {
     --set userToolsOperator.vscode.image.pullPolicy="Always" \
     --set userToolsOperator.vscode.image.repository="${IMAGE_REGISTRY}/konstellation/vscode" \
     --set userToolsOperator.storage.storageClassName="${STORAGE_CLASS_NAME}" \
+    --set userToolsOperator.kubeconfig.enabled="true" \
+    --set userToolsOperator.kubeconfig.externalServerUrl="https://192.168.0.21:16443" \
     --timeout 60m \
     --wait \
     helm/kdl-server

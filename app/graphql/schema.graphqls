@@ -59,6 +59,7 @@ type User {
   lastActivity: String
   apiTokens: [ApiToken!]!
   areToolsActive: Boolean!
+  isKubeconfigEnabled: Boolean!
   sshKey: SSHKey!
 }
 

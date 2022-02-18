@@ -177,6 +177,7 @@ func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName
 // createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
 func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slugUsername, resName, runtimeID,
 	runtimeImage, runtimeTag string) error {
+	k.logger.Debugf("Kubeconfig enabled %t", k.cfg.UserToolsKubeconfig.Enabled)
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",
@@ -238,6 +239,10 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 						"tag":        k.cfg.UserToolsOAuth2Proxy.Image.Tag,
 						"pullPolicy": k.cfg.UserToolsOAuth2Proxy.Image.PullPolicy,
 					},
+				},
+				"kubeconfig": map[string]interface{}{
+					"enabled":           k.cfg.UserToolsKubeconfig.Enabled,
+					"externalServerUrl": k.cfg.UserToolsKubeconfig.ExternalServerURL,
 				},
 				"vscodeRuntime": map[string]interface{}{
 					"runtimeId": runtimeID,

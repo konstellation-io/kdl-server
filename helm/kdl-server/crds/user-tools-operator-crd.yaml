@@ -138,6 +138,15 @@ spec:
                       pullPolicy:
                         description: image pull policy
                         type: string
+              kubeconfig:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                    description: if the kubeconfig for external connections is enabled
+                  externalServerUrl:
+                    type: string
+                    description: the external url to connect to the cluster
               vscodeRuntime:
                 type: object
                 properties:

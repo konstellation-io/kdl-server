@@ -78,6 +78,9 @@ data:
   USER_TOOLS_VSCODE_RUNTIME_IMG_TAG: "{{ .Values.userToolsOperator.vscodeRuntime.image.tag }}"
   USER_TOOLS_VSCODE_RUNTIME_IMG_PULLPOLICY: "{{ .Values.userToolsOperator.vscodeRuntime.image.pullPolicy }}"
 
+  USER_TOOLS_KUBECONFIG_DOWNLOAD_ENABLED: "{{ .Values.userToolsOperator.kubeconfig.enabled }}"
+  USER_TOOLS_KUBECONFIG_EXTERNAL_SERVER_URL: "{{ .Values.userToolsOperator.kubeconfig.externalServerUrl }}"
+
   USER_TOOLS_STORAGE_SIZE: {{ .Values.userToolsOperator.storage.size }}
   USER_TOOLS_STORAGE_CLASSNAME: {{ .Values.userToolsOperator.storage.storageClassName }}
 

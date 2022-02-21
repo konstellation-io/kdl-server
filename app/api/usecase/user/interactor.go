@@ -216,7 +216,7 @@ func (i *interactor) AreToolsRunning(ctx context.Context, username string) (bool
 	return i.k8sClient.IsUserToolPODRunning(ctx, username)
 }
 
-// IsKubeconfigActive checks if the kubeconfig is active
+// IsKubeconfigActive checks if the kubeconfig is active.
 func (i *interactor) IsKubeconfigActive() bool {
 	return i.cfg.UserToolsKubeconfig.Enabled
 }

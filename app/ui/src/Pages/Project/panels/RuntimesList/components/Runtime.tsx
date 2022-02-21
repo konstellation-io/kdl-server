@@ -13,9 +13,10 @@ import LabelList from './LabelList';
 type Props = {
   runtime: GetRuntimes_runtimes;
   runtimeActive?: boolean;
+  disabled?: boolean;
 };
 
-function Runtime({ runtime, runtimeActive }: Props) {
+function Runtime({ runtime, runtimeActive, disabled }: Props) {
   const { openPanel, togglePanel } = usePanel(PanelType.SECONDARY, {
     id: PANEL_ID.RUNTIME_INFO,
     title: 'Detail',
@@ -27,6 +28,8 @@ function Runtime({ runtime, runtimeActive }: Props) {
   const runtimeLoading = useReactiveVar(loadingRuntime);
 
   function toggleRuntimePanel() {
+    if (disabled) return;
+
     if (runtime.id !== actualRuntime?.id) {
       updateSelectedRuntime(runtime);
       openPanel();
@@ -41,6 +44,7 @@ function Runtime({ runtime, runtimeActive }: Props) {
       className={cx(styles.container, {
         [styles.active]: runtimeActive,
         [styles.loading]: runtimeLoading === runtime.id || (runtimeActive && runtimeLoading !== ''),
+        [styles.disabled]: disabled,
       })}
       onClick={toggleRuntimePanel}
     >

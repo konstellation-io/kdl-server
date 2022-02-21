@@ -110,7 +110,7 @@ function RuntimeRunner() {
           <ModalLayoutInfo className={styles.runtimeModalInfo}>
             <div>
               <p>You are going to stop your user tools, please confirm your choice.</p>
-              {runtimeRunning && <Runtime runtime={runtimeRunning} runtimeActive={true} />}
+              {runtimeRunning && <Runtime runtime={runtimeRunning} runtimeActive={true} disabled={true} />}
             </div>
           </ModalLayoutInfo>
         </ModalContainer>
@@ -129,13 +129,13 @@ function RuntimeRunner() {
           <ModalLayoutInfo className={styles.runtimeModalInfo}>
             <div>
               <p>You are about to stop this active Runtime. ¿Are you sure?</p>
-              {runtimeRunning && <Runtime runtime={runtimeRunning} runtimeActive={true} />}
+              {runtimeRunning && <Runtime runtime={runtimeRunning} runtimeActive={true} disabled={true} />}
             </div>
           </ModalLayoutInfo>
           <ModalLayoutInfo className={styles.runtimeModalInfo}>
             <div>
               <p>And this Runtime will activate instead</p>
-              {runtimeAction?.runtime && <Runtime runtime={runtimeAction?.runtime} />}
+              {runtimeAction?.runtime && <Runtime runtime={runtimeAction?.runtime} disabled={true} />}
             </div>
           </ModalLayoutInfo>
         </ModalContainer>

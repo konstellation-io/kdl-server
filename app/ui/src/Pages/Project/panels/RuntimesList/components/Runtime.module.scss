@@ -27,7 +27,7 @@ $desc-height: 5 * $grid-unit;
     border-left: 3px solid palette(feedback);
   }
 
-  &:hover {
+  &:hover:not(.disabled) {
     background-color: palette(base, 800);
   }
 }

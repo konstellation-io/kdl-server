@@ -177,7 +177,6 @@ func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName
 // createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
 func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slugUsername, resName, runtimeID,
 	runtimeImage, runtimeTag string) error {
-	k.logger.Debugf("Kubeconfig enabled %t", k.cfg.UserToolsKubeconfig.Enabled)
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",
@@ -262,7 +261,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 	return err
 }
 
-// Returns a watcher for the UserTools and the number of resources that the watcher is watching.
+// Returns a watcher for the UserTools.
 func (k *k8sClient) createUserToolsWatcher(ctx context.Context, resName string) (watch.Interface, error) {
 	labelSelector := k.userToolsPODLabelSelector(resName)
 	k.logger.Debugf("Creating watcher for POD with label: %s", labelSelector)

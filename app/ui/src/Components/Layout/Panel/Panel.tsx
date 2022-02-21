@@ -21,7 +21,7 @@ type Props = {
   title?: string;
   show: boolean;
   close: () => void;
-  extraButtons?: JSX.Element[] | null;
+  extraButton?: JSX.Element | null;
   children?: JSX.Element | null | false;
   size?: PANEL_SIZE;
   noShrink?: boolean;
@@ -30,7 +30,7 @@ type Props = {
 const Panel: FC<Props> = ({
   show,
   close,
-  extraButtons,
+  extraButton,
   children,
   title = '',
   size = PANEL_SIZE.DEFAULT,
@@ -57,7 +57,7 @@ const Panel: FC<Props> = ({
               <header>
                 <div className={styles.separator} />
                 <p className={styles.title}>{title}</p>
-                {extraButtons}
+                {extraButton}
                 <Button label="" Icon={IconClose} onClick={close} />
               </header>
             )}

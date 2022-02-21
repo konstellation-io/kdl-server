@@ -25,6 +25,7 @@ import IconPlay from '@material-ui/icons/PlayArrow';
 import IconPause from '@material-ui/icons/Pause';
 import useRuntime from 'Graphql/client/hooks/useRuntime';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import ReactTooltip from 'react-tooltip';
 
 const defaultPanel = 'settings';
 
@@ -63,21 +64,41 @@ function ProjectPanels({ openedProject }: Props) {
     startRuntime(runtimeSelected);
   }
 
-  function extraPanelButtons(panelId?: string) {
+  function extraPanelButton(panelId?: string) {
     if (panelId === PANEL_ID.RUNTIME_INFO) {
       if (isLoading)
-        return [
+        return (
           <div key="circularProgress" className={styles.progressSpinerContainer}>
             <CircularProgress color="inherit" className={styles.loadingTools} size={12} />
-          </div>,
-        ];
+          </div>
+        );
 
-      return runtimeSelected?.id === runtimeRunning?.id
-        ? [<Button key="toggleRuntime" label="" Icon={IconPause} onClick={pauseRuntime} />]
-        : [<Button key="toggleRuntime" label="" Icon={IconPlay} onClick={runtimeStart} />];
+      const pauseButtom = (
+        <div>
+          <ReactTooltip id="stopPanel" effect="solid" textColor="white" backgroundColor="#888" place="bottom">
+            <span>Stop tools</span>
+          </ReactTooltip>
+          <div data-tip={true} data-for="stopPanel">
+            <Button label="" Icon={IconPause} onClick={pauseRuntime} />
+          </div>
+        </div>
+      );
+
+      const startButton = (
+        <div>
+          <ReactTooltip id="startPanel" effect="solid" textColor="white" backgroundColor="#888" place="bottom">
+            <span>Start tools</span>
+          </ReactTooltip>
+          <div data-tip={true} data-for="startPanel">
+            <Button label="" Icon={IconPlay} onClick={runtimeStart} />
+          </div>
+        </div>
+      );
+
+      return runtimeSelected?.id === runtimeRunning?.id ? pauseButtom : startButton;
     }
 
-    return [];
+    return null;
   }
 
   const panels: { [key in PANEL_ID]: JSX.Element | null } = {
@@ -108,7 +129,7 @@ function ProjectPanels({ openedProject }: Props) {
         title={panel2Data?.title}
         show={!!panel2Data}
         close={panel2Close}
-        extraButtons={extraPanelButtons(panel2Data?.id)}
+        extraButton={extraPanelButton(panel2Data?.id)}
         noShrink={!!panel2Data?.fixedWidth}
         theme={panel2Data?.theme}
         size={panel2Data?.size}

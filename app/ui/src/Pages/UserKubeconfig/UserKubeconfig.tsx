@@ -10,7 +10,7 @@ function UserKubeconfig() {
   const { data, loading } = useQuery<GetKubeconfig>(getKubeconfig);
 
   function getContent() {
-    if (loading) return <SpinnerCircular size={50} />;
+    if (loading) return <SpinnerCircular />;
     if (data) {
       return <Kubeconfig kubeconfig={data.kubeconfig} />;
     }

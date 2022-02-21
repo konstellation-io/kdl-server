@@ -9,6 +9,7 @@ const me = {
   areToolsActive: true,
   apiTokens: () => new MockList([4, 8]),
   accessLevel: 'ADMIN',
+  isKubeconfigEnabled: true,
 };
 
 module.exports = { me, meId };

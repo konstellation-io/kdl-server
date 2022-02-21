@@ -46,6 +46,8 @@ function SettingsMenu() {
   }
 
   function kubeconfigButton() {
+    if (!data?.me.isKubeconfigEnabled) return <div />;
+
     return (
       <Button
         label="Kubeconfig"

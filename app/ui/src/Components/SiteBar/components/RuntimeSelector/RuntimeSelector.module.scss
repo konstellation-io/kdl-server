@@ -10,8 +10,9 @@ $shape-height: 65 * $grid-unit;
 .container {
   @include shadow(2);
   overflow: auto;
-  max-width: $shape-width;
-  height: $shape-height;
+  width: 40 * $grid-unit;
+  max-height: $shape-height;
+  min-height: 100%;
   overflow-y: auto;
 
   ul {

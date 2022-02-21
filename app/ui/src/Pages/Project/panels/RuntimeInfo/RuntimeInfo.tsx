@@ -7,9 +7,10 @@ import { runningRuntime } from 'Graphql/client/cache';
 
 type Props = {
   selectedRuntime: GetRuntimes_runtimes;
+  isKubeconfigEnabled: boolean;
 };
 
-function RuntimeInfo({ selectedRuntime: runtime }: Props) {
+function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
   const activeRuntime = useReactiveVar(runningRuntime);
   const running = activeRuntime?.id === runtime.id;
   return (
@@ -30,7 +31,7 @@ function RuntimeInfo({ selectedRuntime: runtime }: Props) {
             {runtime.dockerImage}:{runtime.dockerTag}
           </p>
         </div>
-        {running && (
+        {running && isKubeconfigEnabled && (
           <div className={styles.dockerImage}>
             <h2>VSCode Runtime</h2>
             <div className={styles.description}>

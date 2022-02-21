@@ -216,6 +216,11 @@ func (i *interactor) AreToolsRunning(ctx context.Context, username string) (bool
 	return i.k8sClient.IsUserToolPODRunning(ctx, username)
 }
 
+// IsKubeconfigActive checks if the kubeconfig is active
+func (i *interactor) IsKubeconfigActive() bool {
+	return i.cfg.UserToolsKubeconfig.Enabled
+}
+
 // FindByIDs retrieves the users for the given identifiers.
 func (i *interactor) FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error) {
 	return i.repo.FindByIDs(ctx, userIDs)

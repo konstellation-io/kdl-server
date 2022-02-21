@@ -36,7 +36,6 @@ type projectDTO struct {
 	RepoName        string                `bson:"repo_name"`
 	ExternalRepoURL string                `bson:"external_repo_url"`
 	Members         []memberDTO           `bson:"members"`
-	Runtimes        []runtimeDTO          `bson:"runtimes"`
 }
 
 type projectMongoDBRepo struct {
@@ -228,13 +227,6 @@ func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 
 	dto.Members = memberDTOS
 
-	runtimesDTOS, err := m.runtimesToDTOs(p.Runtimes)
-	if err != nil {
-		return projectDTO{}, err
-	}
-
-	dto.Runtimes = runtimesDTOS
-
 	return dto, nil
 }
 
@@ -251,28 +243,6 @@ func (m *projectMongoDBRepo) membersToDTOs(members []entity.Member) ([]memberDTO
 			UserID:      idFromHex,
 			AccessLevel: m.AccessLevel,
 			AddedDate:   m.AddedDate,
-		}
-	}
-
-	return dtos, nil
-}
-
-func (m *projectMongoDBRepo) runtimesToDTOs(runtimes []entity.Runtime) ([]runtimeDTO, error) {
-	dtos := make([]runtimeDTO, len(runtimes))
-
-	for i, f := range runtimes {
-		idFromHex, err := primitive.ObjectIDFromHex(f.ID)
-		if err != nil {
-			return nil, err
-		}
-
-		dtos[i] = runtimeDTO{
-			ID:          idFromHex,
-			Name:        f.Name,
-			Desc:        f.Desc,
-			DockerImage: f.DockerImage,
-			DockerTag:   f.DockerTag,
-			Labels:      f.Labels,
 		}
 	}
 
@@ -300,19 +270,6 @@ func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 			UserID:      m.UserID.Hex(),
 			AccessLevel: m.AccessLevel,
 			AddedDate:   m.AddedDate,
-		}
-	}
-
-	p.Runtimes = make([]entity.Runtime, len(dto.Runtimes))
-
-	for i, m := range dto.Runtimes {
-		p.Runtimes[i] = entity.Runtime{
-			ID:          m.ID.Hex(),
-			Name:        m.Name,
-			Desc:        m.Desc,
-			DockerImage: m.DockerImage,
-			DockerTag:   m.DockerTag,
-			Labels:      m.Labels,
 		}
 	}
 

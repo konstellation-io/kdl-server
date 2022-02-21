@@ -87,7 +87,9 @@ function ProjectPanels({ openedProject }: Props) {
       <MemberDetails member={memberDetailsData} close={closeMemberInfoPanel} projectId={openedProject.id} />
     ),
     [PANEL_ID.RUNTIMES_LIST]: <RuntimesList />,
-    [PANEL_ID.RUNTIME_INFO]: runtimeSelected && <RuntimeInfo selectedRuntime={runtimeSelected} />,
+    [PANEL_ID.RUNTIME_INFO]: runtimeSelected && (
+      <RuntimeInfo selectedRuntime={runtimeSelected} isKubeconfigEnabled={true} />
+    ),
   };
 
   return (

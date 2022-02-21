@@ -345,6 +345,9 @@ userToolsOperator:
       repository: konstellation/kdl-py
       tag: "3.9"
       pullPolicy: IfNotPresent
+  kubeconfig:
+    enabled: true
+    #externalServerUrl: https://192.168.0.21:16443
   #giteaOauth2Setup:
   #  image:
   #    repository: konstellation/gitea-oauth2-setup

@@ -41,8 +41,14 @@ username: user.name
 
 usernameSlug: user-name
 
+## If enabled, users will be able to download a kubeconfig file, so they can attach an external terminal/IDE to
+## the vscodeRuntime running inside KST.
 kubeconfig:
-  externalServerUrl: https://192.168.0.21:16443
+  enabled: false
+  # enabled: true
+
+  ## External cluster address to be able to connect to it from the outside.
+  # externalServerUrl: https://192.168.0.21:16443
 
 vscode:
   image:

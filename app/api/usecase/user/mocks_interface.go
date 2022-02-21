@@ -338,6 +338,20 @@ func (mr *MockUseCaseMockRecorder) GetKubeconfig(ctx, username interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKubeconfig", reflect.TypeOf((*MockUseCase)(nil).GetKubeconfig), ctx, username)
 }
 
+// IsKubeconfigActive mocks base method.
+func (m *MockUseCase) IsKubeconfigActive() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsKubeconfigActive")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsKubeconfigActive indicates an expected call of IsKubeconfigActive.
+func (mr *MockUseCaseMockRecorder) IsKubeconfigActive() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsKubeconfigActive", reflect.TypeOf((*MockUseCase)(nil).IsKubeconfigActive))
+}
+
 // RegenerateSSHKeys mocks base method.
 func (m *MockUseCase) RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error) {
 	m.ctrl.T.Helper()
@@ -380,18 +394,18 @@ func (mr *MockUseCaseMockRecorder) ScheduleUsersSyncJob(interval interface{}) *g
 }
 
 // StartTools mocks base method.
-func (m *MockUseCase) StartTools(ctx context.Context, username string, runtimeId *string) (entity.User, error) {
+func (m *MockUseCase) StartTools(ctx context.Context, username string, runtimeID *string) (entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StartTools", ctx, username, runtimeId)
+	ret := m.ctrl.Call(m, "StartTools", ctx, username, runtimeID)
 	ret0, _ := ret[0].(entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // StartTools indicates an expected call of StartTools.
-func (mr *MockUseCaseMockRecorder) StartTools(ctx, username, runtimeId interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) StartTools(ctx, username, runtimeID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartTools", reflect.TypeOf((*MockUseCase)(nil).StartTools), ctx, username, runtimeId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartTools", reflect.TypeOf((*MockUseCase)(nil).StartTools), ctx, username, runtimeID)
 }
 
 // StopTools mocks base method.

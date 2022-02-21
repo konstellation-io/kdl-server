@@ -37,7 +37,7 @@ type projectMocks struct {
 	giteaService *giteaservice.MockGiteaClient
 	minioService *minioservice.MockMinioService
 	droneService *droneservice.MockDroneService
-	k8sClient    *k8s.MockK8sClient
+	k8sClient    *k8s.MockClient
 	templating   *templates.MockTemplating
 }
 
@@ -49,7 +49,7 @@ func newProjectSuite(t *testing.T) *projectSuite {
 	giteaService := giteaservice.NewMockGiteaClient(ctrl)
 	minioService := minioservice.NewMockMinioService(ctrl)
 	droneService := droneservice.NewMockDroneService(ctrl)
-	k8sClient := k8s.NewMockK8sClient(ctrl)
+	k8sClient := k8s.NewMockClient(ctrl)
 	templating := templates.NewMockTemplating(ctrl)
 
 	logging.AddLoggerExpects(logger)

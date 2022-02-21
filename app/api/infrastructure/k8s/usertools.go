@@ -239,6 +239,10 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 						"pullPolicy": k.cfg.UserToolsOAuth2Proxy.Image.PullPolicy,
 					},
 				},
+				"kubeconfig": map[string]interface{}{
+					"enabled":           k.cfg.UserToolsKubeconfig.Enabled,
+					"externalServerUrl": k.cfg.UserToolsKubeconfig.ExternalServerURL,
+				},
 				"vscodeRuntime": map[string]interface{}{
 					"runtimeId": runtimeID,
 					"image": map[string]string{
@@ -257,7 +261,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 	return err
 }
 
-// Returns a watcher for the UserTools and the number of resources that the watcher is watching.
+// Returns a watcher for the UserTools.
 func (k *k8sClient) createUserToolsWatcher(ctx context.Context, resName string) (watch.Interface, error) {
 	labelSelector := k.userToolsPODLabelSelector(resName)
 	k.logger.Debugf("Creating watcher for POD with label: %s", labelSelector)

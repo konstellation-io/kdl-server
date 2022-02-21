@@ -16,7 +16,6 @@ type Project struct {
 	Error              *string
 	Repository         Repository
 	Members            []Member
-	Runtimes           []Runtime
 }
 
 // NewProject is a constructor function.

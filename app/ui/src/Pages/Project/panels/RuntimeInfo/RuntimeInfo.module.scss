@@ -5,6 +5,31 @@
 
 .header {
   padding: 2 * $grid-unit;
+  .title {
+    margin-bottom: $grid-unit;
+  }
+  .headerName {
+    display: inline;
+    color: white;
+    margin-bottom: 2 * $grid-unit;
+    text-align: left;
+    @include font-headline;
+  }
+  .runningTag {
+    @include font-small;
+    display: inline;
+    position: absolute;
+    margin-left: 2*$grid-unit;
+    justify-self: center;
+    margin-top: 0.75 * $grid-unit;
+    text-align: center;
+    padding: 0.4 * $grid-unit 3.5 * $grid-unit;
+    background-color: palette(success, 700);
+    border-radius: 2 * $grid-unit;
+    color: palette(base);
+    font-weight: bold;
+    max-width: 13 *$grid-unit;
+  }
 }
 
 .body {
@@ -35,31 +60,14 @@
     }
 }
 
-.headerName {
-  color: white;
-  display: flex;
-  margin-bottom: 2 * $grid-unit;
-  text-align: left;
-  @include font-headline;
-}
+
 
 .runtimeTags {
    display: flex;
    flex-direction: row;
 }
 
-.runningTag {
-  position: relative;
-  display: flex;
-  float: left;
-  margin: 0 1.5 * $grid-unit 1.1 * $grid-unit 0;
-  padding: 0.4 * $grid-unit 3.5 * $grid-unit;
-  background-color: transparent;
-  border-radius: 2 * $grid-unit;
-  @include font-small;
-  color: palette(success, 700);
-  font-weight: bold;
-}
+
 
 .runtimeDescription {
   @include font-body;

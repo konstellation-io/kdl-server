@@ -17,12 +17,3 @@ $desc-height: 5 * $grid-unit;
   @include font-small;
   color: font-color(regular);
 }
-
-.runningTag {
-  @extend .label;
-  padding: 0.4 * $grid-unit 3.5 * $grid-unit;
-  background-color: palette(success, 700);
-  border-radius: 2 * $grid-unit;
-  color: palette(base);
-  font-weight: bold;
-}

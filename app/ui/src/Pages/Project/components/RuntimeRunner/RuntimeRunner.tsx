@@ -50,12 +50,12 @@ function RuntimeRunner() {
   }, [dataRuntimeRunning]);
 
   useEffect(() => {
+    if (!runtimeAction) return;
     if (runtimeAction?.action === RuntimeActions.STOP) {
       // pause
       showPauseRuntimeModal();
       return;
     }
-
     // play
     handleStartTools();
 

@@ -48,12 +48,4 @@ describe('Project Navigation Bar Behavior', () => {
       return classList.some((c) => c.includes('opened'));
     });
   });
-
-  it('should open a warning modal when the user try to stop the tools', () => {
-    // Act.
-    cy.getByTestId('stopTools').click();
-
-    // Assert.
-    cy.getByTestId('confirmationModal').find('.modal').should('exist');
-  });
 });

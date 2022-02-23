@@ -4,3 +4,4 @@ FROM alpine:3.10
 LABEL maintainer "Intelygenz - Konstellation Team"
 
 COPY kernelspecs/ /kernels
+

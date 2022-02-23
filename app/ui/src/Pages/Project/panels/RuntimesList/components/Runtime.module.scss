@@ -26,24 +26,21 @@ $desc-height: 5 * $grid-unit;
   &.loading {
     border-left: 3px solid palette(feedback);
   }
-
   &:hover:not(.disabled) {
     background-color: palette(base, 800);
   }
-}
+  .content {
+    width: 100%;
 
-.content {
-  width: 100%;
-}
-
-.name {
-  @include font-caption;
-  font-weight: bold;
-}
-
-.desc {
-  @include font-small;
-  color: font-color(regular);
-  max-height: 15px;
-  overflow: hidden;
+    .name {
+      @include font-caption;
+      font-weight: bold;
+    }
+    .desc {
+      @include font-small;
+      color: font-color(regular);
+      max-height: 15px;
+      overflow: hidden;
+    }
+  }
 }

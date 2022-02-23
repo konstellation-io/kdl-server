@@ -338,7 +338,7 @@ userToolsOperator:
   vscode:
     image:
       repository: konstellation/vscode
-      tag: "latest"
+      tag: "v0.15.0"
       pullPolicy: IfNotPresent
   vscodeRuntime:
     image:

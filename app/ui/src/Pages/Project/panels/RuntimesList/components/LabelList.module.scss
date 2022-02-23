@@ -8,12 +8,12 @@ $shape-height: 30 * $grid-unit;
 $desc-height: 5 * $grid-unit;
 
 .label {
+  @include font-small;
+  color: font-color(regular);
   position: relative;
   float: left;
   margin: 0 1.5 * $grid-unit 1.1 * $grid-unit 0;
   padding: 0.4 * $grid-unit 1.5 * $grid-unit;
   background-color: palette(tag);
   border-radius: 0.5 * $grid-unit;
-  @include font-small;
-  color: font-color(regular);
 }

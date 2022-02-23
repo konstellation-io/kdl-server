@@ -328,7 +328,7 @@ userToolsOperator:
   jupyter:
     image:
       repository: konstellation/jupyter-gpu
-      tag: "latest"
+      tag: "v0.15.0"
       pullPolicy: IfNotPresent
   repoCloner:
     image:

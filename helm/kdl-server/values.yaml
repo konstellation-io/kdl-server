@@ -345,9 +345,16 @@ userToolsOperator:
       repository: konstellation/kdl-py
       tag: "3.9"
       pullPolicy: IfNotPresent
+
+  ## If enabled, users will be able to download a kubeconfig file, so they can attach an external terminal/IDE to
+  ## the vscodeRuntime running inside KST.
   kubeconfig:
-    enabled: true
-    #externalServerUrl: https://192.168.0.21:16443
+    enabled: false
+
+    ## External cluster address to be able to connect to it from the outside.
+    # enabled: true
+    # externalServerUrl: https://192.168.0.21:16443
+
   #giteaOauth2Setup:
   #  image:
   #    repository: konstellation/gitea-oauth2-setup

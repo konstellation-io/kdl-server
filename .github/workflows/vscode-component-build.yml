@@ -14,6 +14,7 @@ on:
     paths:
       - "vscode/**/*"
 
+concurrency: build_component
 
 jobs:
   lint-dockerfile:

@@ -14,7 +14,7 @@ on:
     paths:
       - "user-tools-operator/**/*"
 
-
+concurrency: build_component
 
 jobs:
   lint-dockerfile:

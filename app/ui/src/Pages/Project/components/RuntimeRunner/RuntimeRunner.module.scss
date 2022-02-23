@@ -1,0 +1,73 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.container {
+  flex-grow: 1;
+  position: relative;
+  height: 100%;
+  background-color: palette(base, 600);
+  display: flex;
+  overflow: hidden;
+}
+
+.contentLayer {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow: auto;
+  background-color: palette(base, 900);
+}
+
+.panelLayer {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.panels {
+  @include glow(3, black);
+  display: flex;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.content {
+  flex-grow: 1;
+  height: 100%;
+}
+
+.runtimeModal {
+  width: 75 * $grid-unit;
+  .runtimeModalInfo {
+    margin-top: 0;
+    margin-bottom: 2 * $grid-unit;
+  }
+  p {
+    margin-bottom: $grid-unit;
+  }
+
+  &.close {
+    border-left-color: palette(highlight);
+    div + div {
+      &:last-of-type {
+        div > div {
+          padding: $grid-unit / 2 $grid-unit * 2;
+          height: auto!important;
+          &:first-of-type {
+            background: palette(highlight);
+            margin: 0;
+            &:active,
+            &:focus,
+            &:hover {
+              box-shadow: 0 2px 16px 0 palette(highlight);
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,12 @@
 import React, { useEffect } from 'react';
-import { memberDetails, primaryPanel, secondaryPanel } from 'Graphql/client/cache';
+import {
+  loadingRuntime,
+  memberDetails,
+  primaryPanel,
+  runningRuntime,
+  secondaryPanel,
+  selectedRuntime,
+} from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
@@ -11,17 +18,32 @@ import UpdateProjectDescription from './panels/UpdateProjectDescription/UpdatePr
 import styles from './Project.module.scss';
 import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
 import { useReactiveVar } from '@apollo/client';
+import RuntimesList from './panels/RuntimesList/RuntimesList';
+import RuntimeInfo from './panels/RuntimeInfo/RuntimeInfo';
+import { Button } from 'kwc';
+import IconPlay from '@material-ui/icons/PlayArrow';
+import IconPause from '@material-ui/icons/Pause';
+import useRuntime from 'Graphql/client/hooks/useRuntime';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import ReactTooltip from 'react-tooltip';
 
 const defaultPanel = 'settings';
 
-export interface ProjectRoute {
+type Props = {
   openedProject: GetProjects_projects;
-}
-function ProjectPanels({ openedProject }: ProjectRoute) {
+};
+
+function ProjectPanels({ openedProject }: Props) {
   const panel1Data = useReactiveVar(primaryPanel);
   const panel2Data = useReactiveVar(secondaryPanel);
 
   const memberDetailsData = useReactiveVar(memberDetails);
+  const runtimeSelected = useReactiveVar(selectedRuntime);
+  const runtimeRunning = useReactiveVar(runningRuntime);
+  const runtimeLoading = useReactiveVar(loadingRuntime);
+  const isLoading = runtimeLoading !== '';
+
+  const { startRuntime, pauseRuntime } = useRuntime();
 
   const { closePanel: panel1Close } = usePanel(PanelType.PRIMARY);
   const { closePanel: panel2Close } = usePanel(PanelType.SECONDARY);
@@ -38,11 +60,56 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
     unselectMemberDetails();
   }
 
+  function runtimeStart() {
+    startRuntime(runtimeSelected);
+  }
+
+  function extraPanelButton(panelId?: string) {
+    if (panelId === PANEL_ID.RUNTIME_INFO) {
+      if (isLoading)
+        return (
+          <div key="circularProgress" className={styles.progressSpinerContainer}>
+            <CircularProgress color="inherit" className={styles.loadingTools} size={12} />
+          </div>
+        );
+
+      const pauseButtom = (
+        <div>
+          <ReactTooltip id="stopPanel" effect="solid" textColor="white" backgroundColor="#888" place="bottom">
+            <span>Stop tools</span>
+          </ReactTooltip>
+          <div data-tip={true} data-for="stopPanel">
+            <Button label="" Icon={IconPause} onClick={pauseRuntime} />
+          </div>
+        </div>
+      );
+
+      const startButton = (
+        <div>
+          <ReactTooltip id="startPanel" effect="solid" textColor="white" backgroundColor="#888" place="bottom">
+            <span>Start tools</span>
+          </ReactTooltip>
+          <div data-tip={true} data-for="startPanel">
+            <Button label="" Icon={IconPlay} onClick={runtimeStart} />
+          </div>
+        </div>
+      );
+
+      return runtimeSelected?.id === runtimeRunning?.id ? pauseButtom : startButton;
+    }
+
+    return null;
+  }
+
   const panels: { [key in PANEL_ID]: JSX.Element | null } = {
     [PANEL_ID.SETTINGS]: <ProjectSettings project={openedProject} />,
     [PANEL_ID.PROJECT_DESCRIPTION]: <UpdateProjectDescription project={openedProject} close={panel2Close} />,
     [PANEL_ID.MEMBER_INFO]: memberDetailsData && (
       <MemberDetails member={memberDetailsData} close={closeMemberInfoPanel} projectId={openedProject.id} />
+    ),
+    [PANEL_ID.RUNTIMES_LIST]: <RuntimesList />,
+    [PANEL_ID.RUNTIME_INFO]: runtimeSelected && (
+      <RuntimeInfo selectedRuntime={runtimeSelected} isKubeconfigEnabled={true} />
     ),
   };
 
@@ -62,6 +129,7 @@ function ProjectPanels({ openedProject }: ProjectRoute) {
         title={panel2Data?.title}
         show={!!panel2Data}
         close={panel2Close}
+        extraButton={extraPanelButton(panel2Data?.id)}
         noShrink={!!panel2Data?.fixedWidth}
         theme={panel2Data?.theme}
         size={panel2Data?.size}

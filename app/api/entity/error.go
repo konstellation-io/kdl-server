@@ -20,4 +20,10 @@ var (
 
 	// ErrInvalidRepoType error definition.
 	ErrInvalidRepoType = fmt.Errorf("invalid repo type")
+
+	// ErrRuntimeNotFound error definition.
+	ErrRuntimeNotFound = fmt.Errorf("runtime not found")
+
+	// ErrNoRunningRuntime error definition.
+	ErrNoRunningRuntime = fmt.Errorf("no running runtime")
 )

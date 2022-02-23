@@ -6,6 +6,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
+
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 
@@ -28,34 +31,41 @@ type userSuite struct {
 
 type userMocks struct {
 	logger        *logging.MockLogger
+	cfg           config.Config
 	repo          *user.MockRepository
+	runtimeRepo   *runtime.MockRepository
 	sshGenerator  *sshhelper.MockSSHKeyGenerator
 	clock         *clock.MockClock
 	giteaService  *giteaservice.MockGiteaClient
-	k8sClientMock *k8s.MockK8sClient
+	k8sClientMock *k8s.MockClient
 }
 
-func newUserSuite(t *testing.T) *userSuite {
+func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	ctrl := gomock.NewController(t)
-
 	logger := logging.NewMockLogger(ctrl)
-	logging.AddLoggerExpects(logger)
-
 	repo := user.NewMockRepository(ctrl)
-
+	repoRuntimes := runtime.NewMockRepository(ctrl)
 	clockMock := clock.NewMockClock(ctrl)
 	sshGenerator := sshhelper.NewMockSSHKeyGenerator(ctrl)
 	giteaServiceMock := giteaservice.NewMockGiteaClient(ctrl)
-	k8sClientMock := k8s.NewMockK8sClient(ctrl)
+	k8sClientMock := k8s.NewMockClient(ctrl)
 
-	interactor := user.NewInteractor(logger, repo, sshGenerator, clockMock, giteaServiceMock, k8sClientMock)
+	logging.AddLoggerExpects(logger)
+
+	if cfg == nil {
+		cfg = &config.Config{}
+	}
+
+	interactor := user.NewInteractor(logger, *cfg, repo, repoRuntimes, sshGenerator, clockMock, giteaServiceMock, k8sClientMock)
 
 	return &userSuite{
 		ctrl:       ctrl,
 		interactor: interactor,
 		mocks: userMocks{
 			logger:        logger,
+			cfg:           *cfg,
 			repo:          repo,
+			runtimeRepo:   repoRuntimes,
 			sshGenerator:  sshGenerator,
 			clock:         clockMock,
 			giteaService:  giteaServiceMock,
@@ -65,7 +75,7 @@ func newUserSuite(t *testing.T) *userSuite {
 }
 
 func TestInteractor_Create(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -119,7 +129,7 @@ func TestInteractor_Create(t *testing.T) {
 }
 
 func TestInteractor_Create_UserDuplEmail(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -139,7 +149,7 @@ func TestInteractor_Create_UserDuplEmail(t *testing.T) {
 }
 
 func TestInteractor_Create_UserDuplUsername(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -158,7 +168,7 @@ func TestInteractor_Create_UserDuplUsername(t *testing.T) {
 }
 
 func TestInteractor_AreToolsRunning(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -176,9 +186,8 @@ func TestInteractor_AreToolsRunning(t *testing.T) {
 	require.Equal(t, expectedResponse, running)
 }
 
-// nolint:dupl // similar code but no equal
 func TestInteractor_StopTools(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -200,7 +209,7 @@ func TestInteractor_StopTools(t *testing.T) {
 }
 
 func TestInteractor_StopTools_Err(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -221,53 +230,114 @@ func TestInteractor_StopTools_Err(t *testing.T) {
 	require.Equal(t, returnedUser, emptyUser)
 }
 
-// nolint:dupl // similar code but no equal
 func TestInteractor_StartTools(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
 		username     = "john"
 		toolsRunning = false
+		runtimeImage = "konstellation/image"
+		runtimeTag   = "3.9"
 	)
+
+	runtimeID := "12345"
 
 	ctx := context.Background()
 	expectedUser := entity.User{Username: username}
+	expectedRuntime := entity.Runtime{ID: runtimeID, DockerImage: runtimeImage, DockerTag: runtimeTag}
 
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
+	s.mocks.runtimeRepo.EXPECT().Get(ctx, runtimeID).Return(expectedRuntime, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
-	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeID, runtimeImage, runtimeTag).Return(nil)
 
-	returnedUser, err := s.interactor.StartTools(ctx, username)
+	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeID)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, returnedUser)
 }
 
-func TestInteractor_StartTools_Err(t *testing.T) {
-	s := newUserSuite(t)
+func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
+	// GIVEN there is a default image defined for the Runtime
+	cfg := config.Config{}
+	cfg.UserToolsVsCodeRuntime.Image.Repository = "defaultImage"
+	cfg.UserToolsVsCodeRuntime.Image.Tag = "3.9"
+
+	s := newUserSuite(t, &cfg)
+	defer s.ctrl.Finish()
+
+	const (
+		username     = "john"
+		toolsRunning = false
+		runtimeID    = "default"
+	)
+
+	ctx := context.Background()
+	expectedUser := entity.User{Username: username}
+
+	// AND the user is the in repo
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
+	// AND the usertools for the user was not running
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
+	// AND the CR creation does not return any error
+	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeID,
+		cfg.UserToolsVsCodeRuntime.Image.Repository, cfg.UserToolsVsCodeRuntime.Image.Tag).Return(nil)
+
+	// WHEN the tools are started
+	returnedUser, err := s.interactor.StartTools(ctx, username, nil)
+
+	// THEN
+	// There are no errors
+	require.NoError(t, err)
+	// The returned user is the expected
+	require.Equal(t, expectedUser, returnedUser)
+	// AND
+	// EXPECT - The username was used to look for the user in the repository
+	// EXPECT - The username was used to check if the usertools are running
+	// EXPECT - The CR was created with the default image defined for the Runtime
+} //nolint:wsl // we want the test to end with the comment to respect the AND orders
+
+func TestInteractor_StartTools_Replace(t *testing.T) {
+	// GIVEN there is a valid context
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
 		username     = "john"
 		toolsRunning = true
+		dockerImage  = "image"
+		dockerTag    = "3.9"
 	)
 
+	runtimeID := "12345"
+	expectedRuntime := entity.Runtime{ID: runtimeID, DockerImage: dockerImage, DockerTag: dockerTag}
+	expectedUser := entity.User{Username: username}
+
 	ctx := context.Background()
-	u := entity.User{Username: username}
-	emptyUser := entity.User{}
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(u, nil)
-	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
+	// AND the user is the in repo
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).AnyTimes().Return(expectedUser, nil)
+	// AND the runtime is in the repo
+	s.mocks.runtimeRepo.EXPECT().Get(ctx, runtimeID).Return(expectedRuntime, nil)
+	// AND the user-tools are running
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).AnyTimes().Return(toolsRunning, nil)
+	// AND the CR deletion does not return any error
+	s.mocks.k8sClientMock.EXPECT().DeleteUserToolsCR(ctx, username).Return(nil)
+	// AND the CR creation does not return any error
+	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeID, dockerImage, dockerTag).Return(nil)
 
-	returnedUser, err := s.interactor.StartTools(ctx, username)
+	// WHEN the tools are started
+	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeID)
 
-	require.Equal(t, user.ErrStartUserTools, err)
-	require.Equal(t, returnedUser, emptyUser)
-}
+	// THEN there are no errors
+	require.NoError(t, err)
+	require.Equal(t, expectedUser, returnedUser)
+	// AND the previously started tools were replaced by the new tools
+} //nolint:wsl // we want the test to end with the comment to respect the AND orders
 
 func TestInteractor_FindAll(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	ctx := context.Background()
@@ -282,7 +352,7 @@ func TestInteractor_FindAll(t *testing.T) {
 }
 
 func TestInteractor_FindAll_Err(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	var emptyUsers []entity.User
@@ -299,7 +369,7 @@ func TestInteractor_FindAll_Err(t *testing.T) {
 }
 
 func TestInteractor_GetByUsername(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const username = "john"
@@ -316,7 +386,7 @@ func TestInteractor_GetByUsername(t *testing.T) {
 }
 
 func TestInteractor_GetByUsername_Err(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const username = "john"
@@ -334,7 +404,7 @@ func TestInteractor_GetByUsername_Err(t *testing.T) {
 }
 
 func TestInteractor_FindByIDs(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	ctx := context.Background()
@@ -351,7 +421,7 @@ func TestInteractor_FindByIDs(t *testing.T) {
 }
 
 func TestInteractor_GetByID(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	ctx := context.Background()
@@ -368,7 +438,7 @@ func TestInteractor_GetByID(t *testing.T) {
 }
 
 func TestInteractor_RegenerateSSHKeys(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -412,7 +482,7 @@ func TestInteractor_RegenerateSSHKeys(t *testing.T) {
 }
 
 func TestInteractor_RegenerateSSHKeys_UserToolsRunning(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -450,7 +520,7 @@ func TestInteractor_RegenerateSSHKeys_UserToolsRunning(t *testing.T) {
 }
 
 func TestInteractor_UpdateAccessLevel(t *testing.T) {
-	s := newUserSuite(t)
+	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
 	const (
@@ -480,4 +550,25 @@ func TestInteractor_UpdateAccessLevel(t *testing.T) {
 
 	require.NoError(t, err)
 	require.Equal(t, users, returnedUsers)
+}
+
+func TestInteractor_GetKubeconfig(t *testing.T) {
+	s := newUserSuite(t, nil)
+	defer s.ctrl.Finish()
+
+	const (
+		username       = "john"
+		areToolsActive = true
+	)
+
+	ctx := context.Background()
+	expectedKubeconfig := "Test Kubeconfig"
+
+	s.mocks.k8sClientMock.EXPECT().GetUserKubeconfigSecret(ctx, username).Return(expectedKubeconfig, nil)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(areToolsActive, nil)
+
+	returnedKubeconfig, err := s.interactor.GetKubeconfig(ctx, username)
+
+	require.NoError(t, err)
+	require.Equal(t, expectedKubeconfig, returnedKubeconfig)
 }

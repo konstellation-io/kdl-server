@@ -5,3 +5,9 @@ export const SETTINGS_PANEL_OPTIONS = {
   title: 'Settings',
   fixedWidth: true,
 };
+
+export const USERTOOLS_PANEL_OPTIONS = {
+  id: PANEL_ID.RUNTIMES_LIST,
+  title: 'Usertools Settings',
+  fixedWidth: true,
+};

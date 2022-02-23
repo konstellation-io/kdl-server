@@ -9,8 +9,8 @@ export function copyToClipboard(value: string) {
   document.body.removeChild(tempInput);
 }
 
-export function copyAndToast(value: string) {
-  copyToClipboard(value);
+export async function copyAndToast(value: string) {
+  await navigator.clipboard.writeText(value);
 
   toast.info('Copied to clipboard');
   toast.clearWaitingQueue();

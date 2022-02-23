@@ -57,6 +57,7 @@ exports[`ProjectNavigation component Component match snapshot 1`] = `
         }
       }
       dataTestId="toggleSettings"
+      isNavCollapsed={false}
       label="Settings"
       onClick={[Function]}
     />
@@ -73,6 +74,7 @@ exports[`ProjectNavigation component Component match snapshot 1`] = `
       }
       className=""
       dataTestId="toggleBar"
+      isNavCollapsed={false}
       label="Collapse"
       onClick={[Function]}
       title="Collapse"

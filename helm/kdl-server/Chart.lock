@@ -2,5 +2,8 @@ dependencies:
 - name: minio
   repository: https://charts.min.io/
   version: 3.2.0
-digest: sha256:45484fc0179c8dd999a8dd794f59914a9e5b0c0ae2fc3b6088db7154c3a87bb0
-generated: "2021-11-25T12:18:44.018715322+01:00"
+- name: enterprise-gateway
+  repository: https://charts.spot.io
+  version: 2.5.0
+digest: sha256:5c7fa88597668a4b5192a6fa22143cf388990f34fd4789baa06d3c2e8ee2d161
+generated: "2021-12-13T15:58:50.642274791+01:00"

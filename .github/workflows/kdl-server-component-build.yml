@@ -14,6 +14,7 @@ on:
     paths:
       - "app/**/*"
 
+concurrency: build_component
 
 jobs:
   lint-dockerfile:
@@ -39,7 +40,7 @@ jobs:
       - if: steps.changes.outputs.api == 'true'
         uses: actions/setup-go@v2
         with:
-          go-version: 1.14.x
+          go-version: 1.16.x
 
       - if: steps.changes.outputs.api == 'true'
         name: API Test
@@ -57,7 +58,7 @@ jobs:
         name: API Go Lint
         uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.37
+          version: v1.44
           working-directory: ./app/api
           args: --timeout 5m
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -82,7 +83,7 @@ jobs:
             ./app/ui/test-report.xml
 
   build:
-    needs: [lint-dockerfile, quality-checks]
+    needs: [ lint-dockerfile, quality-checks ]
     uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.4.7
     with:
       component: kdl-app

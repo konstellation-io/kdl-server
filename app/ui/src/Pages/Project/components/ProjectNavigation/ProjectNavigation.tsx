@@ -67,6 +67,7 @@ function ProjectNavigation() {
           onClick={toggleSettingsPanel}
           label="Settings"
           Icon={IconSettings}
+          isNavCollapsed={!opened}
         />
         <NavigationButton
           dataTestId="toggleBar"
@@ -74,6 +75,7 @@ function ProjectNavigation() {
           title={opened ? 'Collapse' : 'Expand'}
           Icon={IconCollapse}
           onClick={onToggleOpened}
+          isNavCollapsed={!opened}
           className={cx({
             [navButtonStyles.collapsed]: !opened,
           })}

@@ -1,0 +1,82 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.header {
+  padding: 2 * $grid-unit;
+  .title {
+    margin-bottom: $grid-unit;
+  }
+  .headerName {
+    display: inline;
+    color: white;
+    margin-bottom: 2 * $grid-unit;
+    text-align: left;
+    @include font-headline;
+  }
+  .runningTag {
+    @include font-small;
+    display: inline;
+    position: absolute;
+    margin-left: 2*$grid-unit;
+    justify-self: center;
+    margin-top: 0.75 * $grid-unit;
+    text-align: center;
+    padding: 0.4 * $grid-unit 3.5 * $grid-unit;
+    background-color: palette(success, 700);
+    border-radius: 2 * $grid-unit;
+    color: palette(base);
+    font-weight: bold;
+    max-width: 13 *$grid-unit;
+  }
+}
+
+.body {
+  height: 100%;
+  padding: 4 * $grid-unit;
+  background-color: palette(base, 900);
+
+  h2 {
+    @include font-caption;
+    text-transform: uppercase;
+    color: font-color(regular);
+  }
+
+  .description {
+      @include font-small;
+      color: font-color(lowlight);
+      white-space: pre-line;
+
+      background-color: palette(base, 400);
+      margin-top: 2 * $grid-unit;
+      padding: 2 * $grid-unit;
+      border-radius: 0.5 * $grid-unit;
+      max-width: 125 * $grid-unit;
+
+      .highlight {
+        font-weight: bold;
+      }
+    }
+}
+
+
+
+.runtimeTags {
+   display: flex;
+   flex-direction: row;
+}
+
+
+
+.runtimeDescription {
+  @include font-body;
+  color: font-color(regular);
+}
+
+.dockerImage {
+  margin-top: 3 * $grid-unit;
+  p {
+    @include font-body;
+  }
+}

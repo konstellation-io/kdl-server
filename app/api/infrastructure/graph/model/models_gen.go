@@ -36,6 +36,10 @@ type ExternalRepositoryInput struct {
 	Token    string `json:"token"`
 }
 
+type QualityProjectDesc struct {
+	Quality int `json:"quality"`
+}
+
 type RemoveAPITokenInput struct {
 	APITokenID string `json:"apiTokenId"`
 }
@@ -55,7 +59,8 @@ type RepositoryInput struct {
 }
 
 type SetActiveUserToolsInput struct {
-	Active bool `json:"active"`
+	Active    bool    `json:"active"`
+	RuntimeID *string `json:"runtimeId"`
 }
 
 type SetBoolFieldInput struct {

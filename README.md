@@ -128,6 +128,20 @@ Run help to get info for each command:
       q     silent mode.
 ```
 
+### IPV6
+
+As chrome is having some issues with IPV6 and docker (https://bugs.chromium.org/p/chromium/issues/detail?id=974711) 
+before you start microk8s you need to disable IPV6 in your local machine, so when microk8s is started it is configured 
+without PIV6 capabilities.
+
+To disable IPV6:
+
+```
+sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sysctl -w net.ipv6.conf.default.disable_ipv6=1
+```
+
+
 ### Install local environment
 
 To install KDL in your local environment:

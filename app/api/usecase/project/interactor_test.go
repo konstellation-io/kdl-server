@@ -37,29 +37,22 @@ type projectMocks struct {
 	giteaService *giteaservice.MockGiteaClient
 	minioService *minioservice.MockMinioService
 	droneService *droneservice.MockDroneService
-	k8sClient    *k8s.MockK8sClient
+	k8sClient    *k8s.MockClient
 	templating   *templates.MockTemplating
 }
 
 func newProjectSuite(t *testing.T) *projectSuite {
 	ctrl := gomock.NewController(t)
-
 	logger := logging.NewMockLogger(ctrl)
-	logging.AddLoggerExpects(logger)
-
 	repo := project.NewMockRepository(ctrl)
-
 	clockMock := clock.NewMockClock(ctrl)
-
 	giteaService := giteaservice.NewMockGiteaClient(ctrl)
-
 	minioService := minioservice.NewMockMinioService(ctrl)
-
 	droneService := droneservice.NewMockDroneService(ctrl)
-
-	k8sClient := k8s.NewMockK8sClient(ctrl)
-
+	k8sClient := k8s.NewMockClient(ctrl)
 	templating := templates.NewMockTemplating(ctrl)
+
+	logging.AddLoggerExpects(logger)
 
 	deps := &project.InteractorDeps{
 		Logger:       logger,

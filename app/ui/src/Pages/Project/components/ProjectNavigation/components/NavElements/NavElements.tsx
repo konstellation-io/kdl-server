@@ -1,21 +1,23 @@
 import AnimateHeight from 'react-animate-height';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { GetMe } from 'Graphql/queries/types/GetMe';
 import { NavButtonLink } from '../../ProjectNavigation';
 import NavigationButton from '../NavigationButton/NavigationButton';
-import PauseIcon from '@material-ui/icons/Pause';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import IconPause from '@material-ui/icons/Pause';
+import IconPlay from '@material-ui/icons/PlayArrow';
+import IconSettings from '@material-ui/icons/Settings';
 import * as React from 'react';
 import { RouteProjectParams } from 'Constants/routes';
 import cx from 'classnames';
 import styles from './NavElements.module.scss';
 import { useParams } from 'react-router-dom';
 import useProjectNavigation from 'Hooks/useProjectNavigation';
-import { useQuery } from '@apollo/client';
-import useTool from 'Graphql/hooks/useTool';
-import ConfirmAction from 'Components/Layout/ConfirmAction/ConfirmAction';
-
-import GetMeQuery from 'Graphql/queries/getMe';
+import { useReactiveVar } from '@apollo/client';
+import { loadingRuntime, lastRanRuntime, primaryPanel, runningRuntime } from 'Graphql/client/cache';
+import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
+import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
+import { PANEL_ID } from 'Graphql/client/models/Panel';
+import useRuntime from 'Graphql/client/hooks/useRuntime';
+import ReactTooltip from 'react-tooltip';
 
 type Props = {
   isOpened: boolean;
@@ -24,70 +26,117 @@ type Props = {
 function NavElements({ isOpened }: Props) {
   const { projectId } = useParams<RouteProjectParams>();
   const { mainRoutes, userToolsRoutes, projectToolsRoutes } = useProjectNavigation(projectId);
-  const { updateProjectActiveTools, projectActiveTools } = useTool();
-  const { data, loading } = useQuery<GetMe>(GetMeQuery);
-  const areToolsActive = data?.me.areToolsActive;
+  const runtimeLoading = useReactiveVar(loadingRuntime);
+  const isLoading = runtimeLoading !== '';
 
-  if (loading) return null;
+  const runtimeRunning = useReactiveVar(runningRuntime);
+  const panelData = useReactiveVar(primaryPanel);
+  const runtimeLastRun = useReactiveVar(lastRanRuntime);
+  const { startRuntime, pauseRuntime } = useRuntime();
 
-  function toggleTools() {
-    updateProjectActiveTools(!areToolsActive);
+  const { openPanel: openRuntimesList, closePanel: closeRuntimesList } = usePanel(
+    PanelType.PRIMARY,
+    USERTOOLS_PANEL_OPTIONS,
+  );
+
+  function toggleUsertoolsPanel() {
+    const shouldOpen = !panelData || panelData.id !== PANEL_ID.RUNTIMES_LIST;
+
+    if (shouldOpen) openRuntimesList();
+    else closeRuntimesList();
+  }
+
+  function runtimeStart() {
+    startRuntime(runtimeLastRun);
+  }
+
+  function runtimeStop() {
+    pauseRuntime();
   }
 
   function renderToggleToolsIcon() {
-    const Progress = () => <CircularProgress className={styles.loadingTools} size={16} />;
-    if (projectActiveTools.loading) return Progress;
-    return areToolsActive ? PauseIcon : PlayArrowIcon;
+    const Progress = (
+      <div className={styles.progressSpinnerContainer}>
+        <CircularProgress color="inherit" className={styles.loadingTools} size={12} />{' '}
+      </div>
+    );
+    if (isLoading) return Progress;
+
+    return runtimeRunning ? (
+      <div>
+        <ReactTooltip id="stop" effect="solid" textColor="white" backgroundColor="#888" className={styles.toolsTip}>
+          <span>Stop tools</span>
+        </ReactTooltip>
+        <div data-tip data-for="stop">
+          <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStop} />
+        </div>
+      </div>
+    ) : (
+      <div>
+        <ReactTooltip id="start" effect="solid" textColor="white" backgroundColor="#888" className={styles.toolsTip}>
+          <span>Start tools</span>
+        </ReactTooltip>
+        <div data-tip data-for="start">
+          <IconPlay className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStart} />
+        </div>
+      </div>
+    );
   }
 
   return (
     <>
       {mainRoutes.map(({ Icon, label, route }) => (
         <NavButtonLink to={route} key={label}>
-          <NavigationButton label={label} Icon={Icon} />
+          <NavigationButton label={label} Icon={Icon} isNavCollapsed={!isOpened} />
         </NavButtonLink>
       ))}
       <div className={styles.projectTools}>
         {projectToolsRoutes.map(({ Icon, label, route, disabled }) => (
           <NavButtonLink to={route} key={label} disabled={disabled}>
-            <NavigationButton label={label} Icon={Icon} />
+            <NavigationButton label={label} Icon={Icon} isNavCollapsed={!isOpened} />
           </NavButtonLink>
         ))}
         <div
           className={cx(styles.userTools, {
-            [styles.started]: areToolsActive,
-            [styles.stopped]: !areToolsActive,
+            [styles.started]: runtimeRunning,
+            [styles.stopped]: !runtimeRunning,
+            [styles.loading]: isLoading,
           })}
         >
-          <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
-            <div className={styles.userToolLabel}>USER TOOLS</div>
-          </AnimateHeight>
+          <div className={cx(styles.usertoolsOptions, { [styles.opened]: isOpened })}>
+            <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
+              <div className={styles.userToolLabel}>USER TOOLS</div>
+            </AnimateHeight>
+            <div
+              className={cx(styles.usertoolsSettings, { [styles.opened]: isOpened })}
+              data-testid="usertoolsSettings"
+            >
+              <ReactTooltip
+                id="settings"
+                effect="solid"
+                textColor="white"
+                backgroundColor="#888"
+                className={styles.toolsTip}
+              >
+                <span>Show available runtimes</span>
+              </ReactTooltip>
+              <div data-tip data-for="settings">
+                <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
+              </div>
+              {renderToggleToolsIcon()}
+            </div>
+          </div>
           {userToolsRoutes.map(({ Icon, label, route, disabled }) => (
             <NavButtonLink to={route} key={label} disabled={disabled}>
-              <NavigationButton label={label} Icon={Icon} />
+              <NavigationButton label={label} Icon={Icon} isNavCollapsed={!isOpened} />
             </NavButtonLink>
           ))}
           <div
             className={cx(styles.toggleToolsWrapper, {
-              [styles.disabled]: projectActiveTools.loading,
+              [styles.disabled]: isLoading,
             })}
             data-testid="confirmationModal"
-          >
-            <ConfirmAction
-              title="STOP YOUR TOOLS"
-              subtitle="You are going to stop your user tools, please confirm your choice."
-              action={toggleTools}
-              actionLabel="STOP"
-              skipConfirmation={!areToolsActive}
-              warning
-            >
-              <NavigationButton
-                dataTestId={areToolsActive ? 'stopTools' : 'runTools'}
-                label={areToolsActive ? 'Stop tools' : 'Run tools'}
-                Icon={renderToggleToolsIcon()}
-              />
-            </ConfirmAction>
-          </div>
+          />
         </div>
       </div>
     </>

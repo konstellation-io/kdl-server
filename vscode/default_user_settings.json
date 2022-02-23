@@ -16,6 +16,7 @@
     "editor.tabSize": 4,
     "editor.insertSpaces": true
   },
+  "python.languageServer": "Jedi",
   "python.formatting.provider": "black",
   "python.linting.pylintEnabled": true,
   "python.linting.flake8Enabled": true,
@@ -32,14 +33,28 @@
   "python.sortImports.args": [
     "--src=${workspaceFolder}/lab"
   ],
-  "go.autocompleteUnimportedPackages": true,
-  "go.formatTool": "gofmt",
   "workbench.editorAssociations": [
     {
       "viewType": "jupyter.notebook.ipynb",
       "filenamePattern": "*.ipynb"
     }
   ],
+  "terminal.integrated.defaultProfile.linux": "Remote Runtime",
+  "terminal.integrated.profiles.linux": {
+    "Remote Runtime": {
+      "path": "bash",
+      "args": [
+        "-c",
+        "kubectl exec --stdin --tty ${HOSTNAME} -c user-tools-vscode-runtime -- /bin/bash"
+      ],
+      "icon": "remote-explorer",
+      "env": {
+        "KUBECONFIG": "/home/coder/.kube/config",
+        "HOSTNAME": "${env:HOSTNAME}"
+      },
+      "overrideName": true
+    }
+  },
   "terminal.integrated.env.linux": {
     "PYTHONPATH": "${workspaceFolder}/lab:${env:PYTHONPATH}"
   }

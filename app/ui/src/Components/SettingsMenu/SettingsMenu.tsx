@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom';
 
 import { GetMe } from 'Graphql/queries/types/GetMe';
 import KeyIcon from '@material-ui/icons/VpnKey';
+import DescriptionIcon from '@material-ui/icons/Description';
 import styles from './SettingsMenu.module.scss';
 import { useQuery } from '@apollo/client';
 import { CONFIG } from 'index';
@@ -27,6 +28,10 @@ function SettingsMenu() {
     history.push(ROUTE.USER_SSH_KEY);
   }
 
+  function goToUserKubeconfig() {
+    history.push(ROUTE.USER_KUBECONFIG);
+  }
+
   function SSHKeyButton() {
     return (
       <Button
@@ -40,9 +45,25 @@ function SettingsMenu() {
     );
   }
 
+  function kubeconfigButton() {
+    if (!data?.me.isKubeconfigEnabled) return <div />;
+
+    return (
+      <Button
+        label="Kubeconfig"
+        key="Kubeconfig"
+        onClick={goToUserKubeconfig}
+        Icon={DescriptionIcon}
+        className={styles.settingButton}
+        align={BUTTON_ALIGN.LEFT}
+      />
+    );
+  }
+
   const optionToButton = {
     'user settings': UserSettingsSeparator,
     'ssh key': SSHKeyButton,
+    kubeconfig: kubeconfigButton,
     [CONFIG.RELEASE_VERSION]: ReleaseVersion,
   };
 

@@ -92,6 +92,59 @@ giteaOauth2Setup:
 ingress:
   type: nginx
 
+enterprise-gateway:
+  image: elyra/enterprise-gateway:2.5.0
+  imagePullPolicy: IfNotPresent
+  # The primary port on which Enterprise Gateway is servicing requests.
+  port: 8888
+  replicas: 1
+  logLevel: DEBUG
+  mirrorWorkingDirs: true
+
+  # create and require a secret token, supplied by client in an "Authorization: token" header
+  authTokenEnabled: false
+  affinity: {}
+
+  kernel:
+    # Kernel cluster role created by this chart.
+    clusterRole: kernel-controller
+    # Will start kernels in the same namespace as EG if True.
+    shareGatewayNamespace: true
+    # ignored if shareGatewayNamespace
+    # kernelNamespace: jupyter-notebooks
+    # Timeout for kernel launching in seconds.
+    launchTimeout: 60
+    # Timeout for an idle kernel before its culled in seconds. Default is 1 hour.
+    cullIdleTimeout: 3600
+    # List of kernel names that are available for use.
+    whitelist:
+      - kdl-py3.9
+      - kdl-py3.9-cuda10.2-cudnn7
+    # Default kernel name should be something from the whitelist
+    defaultKernelName: kdl-py3.9
+    # kernel service account name
+    serviceAccount: kernel-sa
+
+  kernelspecs:
+    # Optional custom data image containing kernelspecs to use.
+    image: "konstellation/jupyter-kernelspecs:latest"
+    # Kernelspecs image pull policy.
+    imagePullPolicy: IfNotPresent
+
+  # Kernel Image Puller (daemonset)
+  kip:
+    enabled: true
+    # Kernel Image Puller image name and tag to use.
+    image: elyra/kernel-image-puller:2.5.0
+    # Kernel Image Puller image pull policy.
+    imagePullPolicy: IfNotPresent
+    # Determines whether the Kernel Image Puller will pull kernel images it has
+    # previously pulled
+    pullPolicy: Always
+    # The interval (in seconds) at which the Kernel Image Puller fetches
+    # kernelspecs to pull kernel images.
+    interval: 300
+
 knowledgeGalaxy:
   enabled: false
   image:
@@ -287,6 +340,21 @@ userToolsOperator:
       repository: konstellation/vscode
       tag: "latest"
       pullPolicy: IfNotPresent
+  vscodeRuntime:
+    image:
+      repository: konstellation/kdl-py
+      tag: "3.9"
+      pullPolicy: IfNotPresent
+
+  ## If enabled, users will be able to download a kubeconfig file, so they can attach an external terminal/IDE to
+  ## the vscodeRuntime running inside KST.
+  kubeconfig:
+    enabled: false
+
+    ## External cluster address to be able to connect to it from the outside.
+    # enabled: true
+    # externalServerUrl: https://192.168.0.21:16443
+
   #giteaOauth2Setup:
   #  image:
   #    repository: konstellation/gitea-oauth2-setup

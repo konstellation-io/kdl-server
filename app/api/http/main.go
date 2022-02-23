@@ -24,6 +24,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
 
@@ -69,6 +70,7 @@ func main() {
 
 	projectRepo := repository.NewProjectMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 	userRepo := repository.NewUserMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
+	runtimeRepo := repository.NewRuntimeMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 
 	tmpl := templates.NewTemplating(cfg, logger, k8sClient)
 
@@ -77,7 +79,7 @@ func main() {
 		logger.Errorf("Error creating indexes for users: %s", err)
 	}
 
-	userInteractor := user.NewInteractor(logger, userRepo, sshHelper, realClock, giteaService, k8sClient)
+	userInteractor := user.NewInteractor(logger, cfg, userRepo, runtimeRepo, sshHelper, realClock, giteaService, k8sClient)
 
 	err = userInteractor.CreateAdminUser(cfg.Admin.Username, cfg.Admin.Email)
 	if err != nil {
@@ -110,19 +112,24 @@ func main() {
 
 	projectInteractor := project.NewInteractor(projectDeps)
 
+	runtimeInteractor := runtime.NewInteractor(logger, k8sClient, runtimeRepo)
+
 	resolvers := graph.NewResolver(
+		logger,
 		cfg,
 		projectInteractor,
 		userInteractor,
-		logger,
+		runtimeInteractor,
 	)
 
-	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, resolvers, userRepo, projectRepo)
+	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, cfg.Kubernetes.IsInsideCluster, resolvers, userRepo, projectRepo)
 }
 
 func startHTTPServer(
 	logger logging.Logger,
-	port, staticFilesPath string,
+	port,
+	staticFilesPath string,
+	insideK8Cluster bool,
 	resolvers generated.ResolverRoot,
 	userRepo user.Repository,
 	projectRepo project.Repository,
@@ -135,9 +142,12 @@ func startHTTPServer(
 
 	authController := controller.NewAuthController(logger, userRepo, projectRepo)
 
+	devEnvironment := !insideK8Cluster
+	authMiddleware := middleware.GenerateMiddleware(devEnvironment)
+
 	http.Handle("/", fs)
-	http.Handle("/api/playground", middleware.AuthMiddleware(pg))
-	http.Handle(apiQueryPath, middleware.AuthMiddleware(dataloader.Middleware(userRepo, srv)))
+	http.Handle("/api/playground", authMiddleware(pg))
+	http.Handle(apiQueryPath, authMiddleware(dataloader.Middleware(userRepo, srv)))
 	http.HandleFunc("/api/auth/project", authController.HandleProjectAuth)
 
 	logger.Infof("Server running at port %s", port)

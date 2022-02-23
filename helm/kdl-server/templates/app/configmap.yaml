@@ -54,6 +54,7 @@ data:
   JUPYTER_IMG_REPO: "{{ .Values.userToolsOperator.jupyter.image.repository }}"
   JUPYTER_IMG_TAG: "{{ .Values.userToolsOperator.jupyter.image.tag }}"
   JUPYTER_IMG_PULLPOLICY: "{{ .Values.userToolsOperator.jupyter.image.pullPolicy }}"
+  JUPYTER_ENTERPRISE_GATEWAY_URL: http://enterprise-gateway:{{ index .Values "enterprise-gateway" "port" }}
 
   REPO_CLONER_IMG_REPO: "{{ .Values.userToolsOperator.repoCloner.image.repository }}"
   REPO_CLONER_IMG_TAG: "{{ .Values.userToolsOperator.repoCloner.image.tag }}"
@@ -72,6 +73,13 @@ data:
   USER_TOOLS_OAUTH2_PROXY_IMG_REPO: "{{ .Values.userToolsOperator.oauth2Proxy.image.repository }}"
   USER_TOOLS_OAUTH2_PROXY_IMG_TAG: "{{ .Values.userToolsOperator.oauth2Proxy.image.tag }}"
   USER_TOOLS_OAUTH2_PROXY_IMG_PULLPOLICY: "{{ .Values.userToolsOperator.oauth2Proxy.image.pullPolicy }}"
+
+  USER_TOOLS_VSCODE_RUNTIME_IMG_REPO: "{{ .Values.userToolsOperator.vscodeRuntime.image.repository }}"
+  USER_TOOLS_VSCODE_RUNTIME_IMG_TAG: "{{ .Values.userToolsOperator.vscodeRuntime.image.tag }}"
+  USER_TOOLS_VSCODE_RUNTIME_IMG_PULLPOLICY: "{{ .Values.userToolsOperator.vscodeRuntime.image.pullPolicy }}"
+
+  USER_TOOLS_KUBECONFIG_DOWNLOAD_ENABLED: "{{ .Values.userToolsOperator.kubeconfig.enabled }}"
+  USER_TOOLS_KUBECONFIG_EXTERNAL_SERVER_URL: "{{ .Values.userToolsOperator.kubeconfig.externalServerUrl }}"
 
   USER_TOOLS_STORAGE_SIZE: {{ .Values.userToolsOperator.storage.size }}
   USER_TOOLS_STORAGE_CLASSNAME: {{ .Values.userToolsOperator.storage.storageClassName }}

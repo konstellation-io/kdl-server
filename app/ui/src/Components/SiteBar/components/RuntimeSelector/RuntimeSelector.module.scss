@@ -1,0 +1,49 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+
+$shape-width: 50 * $grid-unit;
+$shape-height: 65 * $grid-unit;
+
+.container {
+  @include shadow(2);
+  overflow: auto;
+  width: 40 * $grid-unit;
+  max-height: $shape-height;
+  min-height: 100%;
+  overflow-y: auto;
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    background-color: palette(lowlight, 900);
+
+    .project {
+      .projectName {
+        @include font-body;
+        color: font-color(lowlight);
+        padding: $grid-unit 2 * $grid-unit;
+
+        &:hover {
+          @include glow(3, palette(highlight, 800));
+          color: palette(base);
+          background-color: palette(highlight);
+        }
+      }
+
+      &.selectedProject {
+        cursor: default;
+        pointer-events: none;
+
+        .projectName {
+          color: palette(base);
+          background-color: palette(highlight, 600);
+        }
+      }
+    }
+  }
+
+}

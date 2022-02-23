@@ -14,6 +14,7 @@ on:
     paths:
       - "drone-authorizer/**/*"
 
+concurrency: build_component
 
 jobs:
   lint-dockerfile:

@@ -3,17 +3,18 @@
 @import 'Styles/colors';
 @import 'Styles/shadows';
 
+:root {
+  --ktPanelsMaxWidth: 200px;
+}
 .container {
   flex-grow: 1;
   position: relative;
   width: 100%;
   height: 100%;
   background-color: palette(base, 600);
-
   display: flex;
   overflow: hidden;
 }
-
 .contentLayer {
   height: 100%;
   width: 100%;
@@ -28,15 +29,34 @@
   pointer-events: none;
   z-index: 6;
 }
-
 .panels {
-  @include glow(3, black);
   display: flex;
   justify-content: flex-end;
   height: 100%;
+  margin-left: var(--ktPanelsMaxWidth);
+  @include glow(3, black);
+  transition: width ease 0.3s, margin-left ease 0.3s;
 }
-
 .content {
   flex-grow: 1;
   height: 100%;
+}
+.runtimeModal {
+  width: 75 * $grid-unit;
+  .runtimeModalInfo {
+    margin-top: 0;
+    margin-bottom: 2 * $grid-unit;
+  }
+  p {
+    margin-bottom: $grid-unit;
+  }
+}
+@media ( min-width: $kt-mq-low-width ) {
+  .panels {
+    margin-left: 0;
+  }
+}
+
+.progressSpinerContainer {
+  margin: 2px 2*$grid-unit 0 2*$grid-unit;
 }

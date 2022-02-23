@@ -4,6 +4,9 @@ type Query {
   project(id: ID!): Project!
   users: [User!]!
   qualityProjectDesc(description: String!): QualityProjectDesc!
+  runtimes: [Runtime!]!
+  runningRuntime: Runtime
+  kubeconfig: String!
 }
 
 type Mutation {
@@ -23,6 +26,16 @@ type Mutation {
 
 type QualityProjectDesc {
   quality: Int!
+}
+
+type Runtime {
+  id: ID!
+  name: String!
+  desc: String!
+  labels: [String!]
+  dockerImage: String!
+  dockerTag: String!
+  runtimePod: String!
 }
 
 type Topic {
@@ -46,6 +59,7 @@ type User {
   lastActivity: String
   apiTokens: [ApiToken!]!
   areToolsActive: Boolean!
+  isKubeconfigEnabled: Boolean!
   sshKey: SSHKey!
 }
 
@@ -140,7 +154,8 @@ input SetBoolFieldInput {
 }
 
 input SetActiveUserToolsInput {
-  active: Boolean!
+  active: Boolean!,
+  runtimeId: String,
 }
 
 type Project {

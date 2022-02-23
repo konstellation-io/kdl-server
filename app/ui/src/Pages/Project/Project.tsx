@@ -1,30 +1,33 @@
 import { ErrorMessage, SpinnerCircular } from 'kwc';
 import React, { useEffect } from 'react';
-import { currentTool, openedProject, openedTools } from 'Graphql/client/cache';
 import { useQuery, useReactiveVar } from '@apollo/client';
 
-import { GetProjects } from 'Graphql/queries/types/GetProjects';
 import ProjectContentRoutes from './ProjectContentRoutes';
 import ProjectNavigation from './components/ProjectNavigation/ProjectNavigation';
+import Tool from './pages/Tools/components/Tool/Tool';
 import ProjectPanels from './ProjectPanels';
 import { RouteProjectParams } from 'Constants/routes';
-import Tool from './pages/Tools/components/Tool/Tool';
 import styles from './Project.module.scss';
-import useOpenedProject from 'Graphql/client/hooks/useOpenedProject';
 import { useParams } from 'react-router-dom';
-import useTools from 'Graphql/client/hooks/useTools';
 
+import { currentTool, openedProject, openedTools } from 'Graphql/client/cache';
+
+import useTools from 'Graphql/client/hooks/useTools';
+import useOpenedProject from 'Graphql/client/hooks/useOpenedProject';
+
+import { GetProjects } from 'Graphql/queries/types/GetProjects';
 import GetProjectsQuery from 'Graphql/queries/getProjects';
+import RuntimeRunner from './components/RuntimeRunner/RuntimeRunner';
 
 function Project() {
   const { projectId } = useParams<RouteProjectParams>();
   const { data, error, loading } = useQuery<GetProjects>(GetProjectsQuery);
 
   const project = useReactiveVar(openedProject);
-  const { updateOpenedProject } = useOpenedProject();
-
   const currentToolData = useReactiveVar(currentTool);
   const openedToolsData = useReactiveVar(openedTools);
+
+  const { updateOpenedProject } = useOpenedProject();
   const { resetTools } = useTools();
 
   useEffect(() => {
@@ -66,6 +69,7 @@ function Project() {
       <div className={styles.panelLayer}>
         <ProjectPanels openedProject={project} />
       </div>
+      <RuntimeRunner />
     </div>
   );
 }

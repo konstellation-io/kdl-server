@@ -163,7 +163,7 @@ func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.S
 	username := ctx.Value(middleware.LoggedUserNameKey).(string)
 
 	if input.Active {
-		u, err := r.users.StartTools(ctx, username)
+		u, err := r.users.StartTools(ctx, username, input.RuntimeID)
 		return &u, err
 	}
 
@@ -257,6 +257,26 @@ func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
 	return r.users.FindAll(ctx)
 }
 
+func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
+	panic(entity.ErrNotImplemented) // implemented in knowledge galaxy server
+}
+
+func (r *queryResolver) Runtimes(ctx context.Context) ([]entity.Runtime, error) {
+	return r.runtimes.GetRuntimes(ctx, ctx.Value(middleware.LoggedUserNameKey).(string))
+}
+
+func (r *queryResolver) RunningRuntime(ctx context.Context) (*entity.Runtime, error) {
+	runtime, err := r.runtimes.GetRunningRuntime(ctx, ctx.Value(middleware.LoggedUserNameKey).(string))
+	return runtime, err
+}
+
+func (r *queryResolver) Kubeconfig(ctx context.Context) (string, error) {
+	username := ctx.Value(middleware.LoggedUserNameKey).(string)
+	k, err := r.users.GetKubeconfig(ctx, username)
+
+	return k, err
+}
+
 func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (string, error) {
 	switch obj.Type {
 	case entity.RepositoryTypeInternal:
@@ -300,6 +320,10 @@ func (r *userResolver) AreToolsActive(ctx context.Context, obj *entity.User) (bo
 	username := ctx.Value(middleware.LoggedUserNameKey).(string)
 
 	return r.users.AreToolsRunning(ctx, username)
+}
+
+func (r *userResolver) IsKubeconfigEnabled(ctx context.Context, obj *entity.User) (bool, error) {
+	return r.users.IsKubeconfigActive(), nil
 }
 
 // Member returns generated.MemberResolver implementation.

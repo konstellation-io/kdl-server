@@ -19,7 +19,8 @@ build_docker_images() {
   build_gitea_oauth2_setup
   build_project_operator
   build_user_tools_operator
-  # build_jupyter_gpu
+  build_jupyter_gpu
+  build_jupyter_kernelspecs
   build_vscode
   build_repo_cloner
   build_mlflow
@@ -49,6 +50,10 @@ build_user_tools_operator() {
 
 build_jupyter_gpu() {
   build_image jupyter-gpu jupyter-gpu
+}
+
+build_jupyter_kernelspecs() {
+  build_image jupyter-kernelspecs jupyter-kernelspecs
 }
 
 build_vscode() {

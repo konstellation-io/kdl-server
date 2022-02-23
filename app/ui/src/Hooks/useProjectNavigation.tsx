@@ -2,7 +2,6 @@ import ROUTE, { buildRoute } from 'Constants/routes';
 import { useCallback, useMemo } from 'react';
 
 import DroneIcon from 'Components/Icons/DroneIcon/DroneIcon';
-import { GetMe } from 'Graphql/queries/types/GetMe';
 import GiteaIcon from 'Components/Icons/GiteaIcon/GiteaIcon';
 import IconHome from '@material-ui/icons/Dashboard';
 import IconKG from '@material-ui/icons/EmojiObjects';
@@ -12,10 +11,10 @@ import FolderIcon from '@material-ui/icons/Folder';
 import { OverridableComponent } from '@material-ui/core/OverridableComponent';
 import { SvgIconTypeMap } from '@material-ui/core';
 import VSIcon from 'Components/Icons/VSIcon/VSIcon';
-import { useQuery } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
 import { CONFIG } from 'index';
 
-import GetMeQuery from 'Graphql/queries/getMe';
+import { loadingRuntime, runningRuntime } from '../Graphql/client/cache';
 
 export interface RouteConfiguration {
   id: string;
@@ -89,7 +88,8 @@ export interface RoutesConfiguration {
 }
 
 function useProjectNavigation(projectId: string): RoutesConfiguration {
-  const { data } = useQuery<GetMe>(GetMeQuery);
+  const runtimeRunning = useReactiveVar(runningRuntime);
+  const runtimeLoading = useReactiveVar(loadingRuntime);
 
   const buildRoutes = useCallback(
     (route: RouteConfiguration) =>
@@ -101,7 +101,7 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
   );
 
   return useMemo(() => {
-    const disabled = !data?.me.areToolsActive;
+    const disabled = !runtimeRunning || runtimeLoading !== '';
     const userToolsRoutesDisabled = userToolsRoutesConfig.map((route) => ({
       ...route,
       disabled,
@@ -123,7 +123,7 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
       projectToolsRoutes,
       userToolsRoutes,
     };
-  }, [buildRoutes, data?.me.areToolsActive]);
+  }, [buildRoutes, runtimeRunning, runtimeLoading]);
 }
 
 export default useProjectNavigation;

@@ -3,7 +3,6 @@ package kdlutil
 import (
 	"errors"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -110,7 +109,7 @@ func CopyDir(src, dst string, opt CopyDirOptions) error {
 		return err
 	}
 
-	entries, err := ioutil.ReadDir(src)
+	entries, err := os.ReadDir(src)
 	if err != nil {
 		return err
 	}
@@ -141,9 +140,9 @@ func CopyDir(src, dst string, opt CopyDirOptions) error {
 	return nil
 }
 
-func shouldSkipFile(fInfo os.FileInfo, skipSuffix string) bool {
+func shouldSkipFile(fInfo os.DirEntry, skipSuffix string) bool {
 	// Skip symlinks.
-	if fInfo.Mode()&os.ModeSymlink != 0 {
+	if fInfo.Type()&os.ModeSymlink != 0 {
 		return true
 	}
 

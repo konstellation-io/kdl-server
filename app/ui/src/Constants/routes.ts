@@ -3,6 +3,7 @@ enum ROUTE {
   USERS = '/users',
   USER_SSH_KEY = '/user/ssh-key',
   USER_API_TOKENS = '/user/api-tokens',
+  USER_KUBECONFIG = '/user/kubeconfig',
   GENERATE_USER_API_TOKEN = '/user/api-tokens/new-token',
   PROJECTS = '/projects',
   PROJECT = '/projects/:projectId',

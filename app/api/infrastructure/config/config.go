@@ -38,7 +38,8 @@ type Config struct {
 		AdminPass   string `envconfig:"GITEA_ADMIN_PASSWORD"`
 	} `yaml:"gitea"`
 	Kubernetes struct {
-		Namespace string `envconfig:"POD_NAMESPACE"`
+		IsInsideCluster bool   `default:"true"`
+		Namespace       string `envconfig:"POD_NAMESPACE"`
 	} `yaml:"kubernetes"`
 	Minio struct {
 		Endpoint  string `envconfig:"MINIO_ENDPOINT"`
@@ -52,6 +53,7 @@ type Config struct {
 			Tag        string `envconfig:"JUPYTER_IMG_TAG"`
 			PullPolicy string `envconfig:"JUPYTER_IMG_PULLPOLICY"`
 		}
+		EnterpriseGatewayURL string `envconfig:"JUPYTER_ENTERPRISE_GATEWAY_URL"`
 	}
 	VSCode struct {
 		URL     string `envconfig:"USER_TOOLS_VSCODE_URL"`
@@ -133,6 +135,17 @@ type Config struct {
 			PullPolicy string `envconfig:"USER_TOOLS_OAUTH2_PROXY_IMG_PULLPOLICY"`
 		}
 	}
+	UserToolsKubeconfig struct {
+		Enabled           bool   `envconfig:"USER_TOOLS_KUBECONFIG_DOWNLOAD_ENABLED"`
+		ExternalServerURL string `envconfig:"USER_TOOLS_KUBECONFIG_EXTERNAL_SERVER_URL"`
+	}
+	UserToolsVsCodeRuntime struct {
+		Image struct {
+			Repository string `envconfig:"USER_TOOLS_VSCODE_RUNTIME_IMG_REPO"`
+			Tag        string `envconfig:"USER_TOOLS_VSCODE_RUNTIME_IMG_TAG"`
+			PullPolicy string `envconfig:"USER_TOOLS_VSCODE_RUNTIME_IMG_PULLPOLICY"`
+		}
+	}
 }
 
 // NewConfig will read the config.yml file and override values with env vars.
@@ -153,6 +166,10 @@ func NewConfig() Config {
 	err = envconfig.Process("", &cfg)
 	if err != nil {
 		panic(err)
+	}
+
+	if os.Getenv("KDL_ENV") == "dev" {
+		cfg.Kubernetes.IsInsideCluster = false
 	}
 
 	return cfg

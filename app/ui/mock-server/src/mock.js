@@ -1,11 +1,14 @@
 const casual = require('casual');
 const buildProject = require('./mocks/projectMock');
 const buildUser = require('./mocks/usersMock');
+const buildRuntime = require('./mocks/runtimeMock');
 const { buildMember, meAsMember } = require('./mocks/membersMock');
 const { meId, me } = require('./mocks/meMock');
+const kubeconfig = require('./mocks/kubeconfigMock');
 
 const projects = Array(8).fill(0).map(buildProject);
 const users = Array(casual.integer(20, 30)).fill(0).map(buildUser);
+const runtimes = Array(8).fill(0).map(buildRuntime);
 
 module.exports = {
   Query: () => ({
@@ -13,6 +16,9 @@ module.exports = {
     projects: () => projects,
     users: () => users,
     project: (_, { id }) => projects.find((project) => project.id === id),
+    runtimes: () => runtimes,
+    runningRuntime: () => runtimes[casual.integer(0, 7)],
+    kubeconfig: () => kubeconfig(),
   }),
   Mutation: () => ({
     updateProject: (_, { input: { id, name, description, archived } }) => {

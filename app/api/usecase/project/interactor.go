@@ -101,7 +101,7 @@ type interactor struct {
 	giteaService giteaservice.GiteaClient
 	minioService minioservice.MinioService
 	droneService droneservice.DroneService
-	k8sClient    k8s.K8sClient
+	k8sClient    k8s.Client
 	tmpl         templates.Templating
 }
 
@@ -113,7 +113,7 @@ type InteractorDeps struct {
 	GiteaService giteaservice.GiteaClient
 	MinioService minioservice.MinioService
 	DroneService droneservice.DroneService
-	K8sClient    k8s.K8sClient
+	K8sClient    k8s.Client
 	Tmpl         templates.Templating
 }
 

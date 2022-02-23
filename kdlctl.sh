@@ -36,6 +36,7 @@ MONGO_PASS=123456
 . ./scripts/kdlctl/cmd_microk8s.sh
 . ./scripts/kdlctl/cmd_dev.sh
 . ./scripts/kdlctl/cmd_build.sh
+. ./scripts/kdlctl/cmd_usertools.sh
 . ./scripts/kdlctl/cmd_deploy.sh
 . ./scripts/kdlctl/cmd_restart.sh
 . ./scripts/kdlctl/cmd_login.sh
@@ -115,6 +116,12 @@ case $COMMAND in
   deploy)
     cmd_deploy "$@"
     echo_done "Deploy done"
+    exit 0
+  ;;
+
+  usertools)
+    cmd_usertools "$@"
+    echo_done "Usertools done"
     exit 0
   ;;
 

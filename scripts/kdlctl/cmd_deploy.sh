@@ -140,14 +140,17 @@ deploy_helm_chart() {
     --set userToolsOperator.image.pullPolicy="Always" \
     --set userToolsOperator.image.repository="${IMAGE_REGISTRY}/konstellation/user-tools-operator" \
     --set userToolsOperator.jupyter.image.pullPolicy="Always" \
-    --set userToolsOperator.jupyter.image.repository="konstellation/jupyter-gpu" \
-    --set userToolsOperator.jupyter.image.tag="v0.14-alpha.8" \
-    --set userToolsOperator.jupyter.image.pullPolicy="IfNotPrensent" \
+    --set userToolsOperator.jupyter.image.repository="$IMAGE_REGISTRY/konstellation/jupyter-gpu" \
+    --set userToolsOperator.jupyter.image.tag="latest" \
+    --set enterprise-gateway.kernelspecs.imagePullPolicy="Always" \
+    --set enterprise-gateway.kernelspecs.image="$IMAGE_REGISTRY/konstellation/jupyter-kernelspecs:latest" \
     --set userToolsOperator.repoCloner.image.pullPolicy="Always" \
     --set userToolsOperator.repoCloner.image.repository="${IMAGE_REGISTRY}/konstellation/repo-cloner" \
     --set userToolsOperator.vscode.image.pullPolicy="Always" \
     --set userToolsOperator.vscode.image.repository="${IMAGE_REGISTRY}/konstellation/vscode" \
     --set userToolsOperator.storage.storageClassName="${STORAGE_CLASS_NAME}" \
+    --set userToolsOperator.kubeconfig.enabled="true" \
+    --set userToolsOperator.kubeconfig.externalServerUrl="https://192.168.0.21:16443" \
     --timeout 60m \
     --wait \
     helm/kdl-server

@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
@@ -14,33 +17,38 @@ import (
 )
 
 var (
-	ErrStartUserTools  = errors.New("cannot start running user tools")
 	ErrStopUserTools   = errors.New("cannot stop uninitialized user tools")
 	ErrUserToolsActive = errors.New("it is not possible to regenerate SSH keys with the usertools active")
 )
 
 type interactor struct {
 	logger       logging.Logger
+	cfg          config.Config
 	repo         Repository
+	repoRuntimes runtime.Repository
 	sshGenerator sshhelper.SSHKeyGenerator
 	clock        clock.Clock
 	giteaService giteaservice.GiteaClient
-	k8sClient    k8s.K8sClient
+	k8sClient    k8s.Client
 	scheduler    cron.Scheduler
 }
 
 // NewInteractor factory function.
 func NewInteractor(
 	logger logging.Logger,
+	cfg config.Config,
 	repo Repository,
+	repoRuntimes runtime.Repository,
 	sshGenerator sshhelper.SSHKeyGenerator,
 	c clock.Clock,
 	giteaService giteaservice.GiteaClient,
-	k8sClient k8s.K8sClient,
+	k8sClient k8s.Client,
 ) UseCase {
 	return &interactor{
 		logger:       logger,
+		cfg:          cfg,
 		repo:         repo,
+		repoRuntimes: repoRuntimes,
 		sshGenerator: sshGenerator,
 		clock:        c,
 		giteaService: giteaService,
@@ -126,7 +134,8 @@ func (i *interactor) GetByUsername(ctx context.Context, username string) (entity
 }
 
 // StartTools creates a user-tools CustomResource in K8s to initialize the VSCode and Jupyter for the given username.
-func (i *interactor) StartTools(ctx context.Context, username string) (entity.User, error) {
+// If there are already a user-tools for the user, they are replaced (stop + start new).
+func (i *interactor) StartTools(ctx context.Context, username string, runtimeID *string) (entity.User, error) {
 	user, err := i.repo.GetByUsername(ctx, username)
 	if err != nil {
 		return entity.User{}, err
@@ -139,12 +148,35 @@ func (i *interactor) StartTools(ctx context.Context, username string) (entity.Us
 	}
 
 	if running {
-		return entity.User{}, ErrStartUserTools
+		// ignore the user returned by the stop, as it the same as we already have
+		_, err := i.StopTools(ctx, username)
+		if err != nil {
+			return entity.User{}, err
+		}
+	}
+
+	var rID, rImage, rTag string
+
+	if runtimeID != nil {
+		r, err := i.repoRuntimes.Get(ctx, *runtimeID)
+		if err != nil {
+			return entity.User{}, err
+		}
+
+		rID = r.ID
+		rImage = r.DockerImage
+		rTag = r.DockerTag
+		i.logger.Debugf("Runtime id \"%s\" with docker image \"%s:%s\"", rID, rImage, rTag)
+	} else {
+		rID = "default"
+		rImage = i.cfg.UserToolsVsCodeRuntime.Image.Repository
+		rTag = i.cfg.UserToolsVsCodeRuntime.Image.Tag
+		i.logger.Debugf("Using default runtime image \"%s:%s\"", rImage, rTag)
 	}
 
 	i.logger.Infof("Creating user tools for user: \"%s\"", username)
 
-	err = i.k8sClient.CreateUserToolsCR(ctx, username)
+	err = i.k8sClient.CreateUserToolsCR(ctx, username, rID, rImage, rTag)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -182,6 +214,11 @@ func (i *interactor) StopTools(ctx context.Context, username string) (entity.Use
 // AreToolsRunning checks if the user tools are running for the given username.
 func (i *interactor) AreToolsRunning(ctx context.Context, username string) (bool, error) {
 	return i.k8sClient.IsUserToolPODRunning(ctx, username)
+}
+
+// IsKubeconfigActive checks if the kubeconfig is active.
+func (i *interactor) IsKubeconfigActive() bool {
+	return i.cfg.UserToolsKubeconfig.Enabled
 }
 
 // FindByIDs retrieves the users for the given identifiers.
@@ -291,4 +328,19 @@ func (i *interactor) CreateAdminUser(username, email string) error {
 	i.logger.Debugf("Admin user \"%s\" (%s) created correctly with id \"%s\"", user.Username, user.Email, user.ID)
 
 	return nil
+}
+
+// GetKubeconfig returns user kubeconfig.
+func (i *interactor) GetKubeconfig(ctx context.Context, username string) (string, error) {
+	running, err := i.k8sClient.IsUserToolPODRunning(ctx, username)
+
+	if err != nil {
+		return "", err
+	}
+
+	if !running {
+		return "", ErrStopUserTools
+	}
+
+	return i.k8sClient.GetUserKubeconfigSecret(ctx, username)
 }

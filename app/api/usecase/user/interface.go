@@ -31,12 +31,14 @@ type UseCase interface {
 	UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error)
 	FindAll(ctx context.Context) ([]entity.User, error)
 	GetByUsername(ctx context.Context, username string) (entity.User, error)
-	StartTools(ctx context.Context, username string) (entity.User, error)
+	StartTools(ctx context.Context, username string, runtimeID *string) (entity.User, error)
 	StopTools(ctx context.Context, username string) (entity.User, error)
 	AreToolsRunning(ctx context.Context, username string) (bool, error)
+	IsKubeconfigActive() bool
 	FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error)
 	GetByID(ctx context.Context, userID string) (entity.User, error)
 	RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error)
 	ScheduleUsersSyncJob(interval time.Duration) error
 	RunSyncUsersCronJob()
+	GetKubeconfig(ctx context.Context, username string) (string, error)
 }

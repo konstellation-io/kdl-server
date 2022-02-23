@@ -14,6 +14,7 @@ on:
     paths:
       - "project-operator/**/*"
 
+concurrency: build_component
 
 jobs:
   lint-dockerfile:

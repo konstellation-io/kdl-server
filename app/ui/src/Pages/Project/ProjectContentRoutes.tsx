@@ -1,16 +1,14 @@
 import ROUTE from 'Constants/routes';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
-import { GetMe } from 'Graphql/queries/types/GetMe';
 import Overview from './pages/Overview/Overview';
 import ProjectToolsRoutes from './components/ProjectToolsRoutes/ProjectToolsRoutes';
 import * as React from 'react';
-import { useQuery, useReactiveVar } from '@apollo/client';
+import { useReactiveVar } from '@apollo/client';
 
-import GetMeQuery from 'Graphql/queries/getMe';
 import { CONFIG } from 'index';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
-import { runningRuntime } from '../../Graphql/client/cache';
+import { loadingRuntime, runningRuntime } from '../../Graphql/client/cache';
 
 export interface ProjectRoute {
   openedProject: GetProjects_projects;
@@ -18,6 +16,7 @@ export interface ProjectRoute {
 
 function ProjectContentRoutes({ openedProject }: ProjectRoute) {
   const runtimeRunning = useReactiveVar(runningRuntime);
+  const runtimeLoading = useReactiveVar(loadingRuntime);
 
   function redirectIfArchived() {
     return openedProject.archived && <Redirect from={ROUTE.PROJECT} to={ROUTE.PROJECTS} />;
@@ -25,10 +24,11 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
 
   function redirectIfToolsActives() {
     return (
-      !runtimeRunning &&
-      [ROUTE.PROJECT_TOOL_JUPYTER, ROUTE.PROJECT_TOOL_VSCODE].map((r) => (
-        <Redirect key={r} from={r} to={ROUTE.PROJECT_OVERVIEW} />
-      ))
+      !runtimeRunning ||
+      (runtimeLoading !== '' &&
+        [ROUTE.PROJECT_TOOL_JUPYTER, ROUTE.PROJECT_TOOL_VSCODE].map((r) => (
+          <Redirect key={r} from={r} to={ROUTE.PROJECT_OVERVIEW} />
+        )))
     );
   }
 

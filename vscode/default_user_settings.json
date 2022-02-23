@@ -39,6 +39,22 @@
       "filenamePattern": "*.ipynb"
     }
   ],
+  "terminal.integrated.defaultProfile.linux": "Remote Runtime",
+  "terminal.integrated.profiles.linux": {
+    "Remote Runtime": {
+      "path": "bash",
+      "args": [
+        "-c",
+        "kubectl exec --stdin --tty ${HOSTNAME} -c user-tools-vscode-runtime -- /bin/bash"
+      ],
+      "icon": "remote-explorer",
+      "env": {
+        "KUBECONFIG": "/home/coder/.kube/config",
+        "HOSTNAME": "${env:HOSTNAME}"
+      },
+      "overrideName": true
+    }
+  },
   "terminal.integrated.env.linux": {
     "PYTHONPATH": "${workspaceFolder}/lab:${env:PYTHONPATH}"
   }

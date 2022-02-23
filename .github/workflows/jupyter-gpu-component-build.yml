@@ -14,6 +14,7 @@ on:
     paths:
       - "jupyter-gpu/**/*"
 
+concurrency: build_component
 
 jobs:
   lint-dockerfile:
@@ -34,4 +35,3 @@ jobs:
       pat: ${{ secrets.PATNAME }}
       docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
       docker_token: ${{ secrets.DOCKERHUB_TOKEN }}
-

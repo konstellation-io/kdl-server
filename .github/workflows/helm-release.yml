@@ -18,6 +18,7 @@ on:
     types:
       - completed
 
+concurrency: helm_release
 
 jobs:
   helm-release:

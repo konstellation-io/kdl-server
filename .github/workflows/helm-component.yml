@@ -18,6 +18,7 @@ on:
       - "!helm/kdl-server/Chart.yaml"
       - "!helm/kdl-server/values.yaml"
 
+concurrency: build_component
 
 jobs:
   helm-lint:

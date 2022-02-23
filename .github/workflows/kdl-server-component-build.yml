@@ -14,6 +14,7 @@ on:
     paths:
       - "app/**/*"
 
+concurrency: build_component
 
 jobs:
   lint-dockerfile:

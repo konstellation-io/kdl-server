@@ -29,7 +29,7 @@ RUN apt-get update && \
     python3-distutils-extra \
     wget \
     && \
-    wget -O ~/get-pip.py \
+    curl -L -o ~/get-pip.py \
     https://bootstrap.pypa.io/get-pip.py && \
     python3.9 ~/get-pip.py && \
     ln -s /usr/bin/python3.9 /usr/local/bin/python && \

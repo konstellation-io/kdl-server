@@ -2,4 +2,5 @@ chart-dirs:
   - helm/
 chart-repos:
   - minio=https://charts.min.io/
+  - enterprise-gateway=https://charts.spot.io/
 validate-maintainers: false

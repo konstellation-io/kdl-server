@@ -177,7 +177,7 @@ knowledgeGalaxy:
 kdlServer:
   image:
     repository: konstellation/kdl-server
-    tag: v0.18.0
+    tag: v0.19.0
     pullPolicy: IfNotPresent
   ingress:
     proxyReadTimeout: "3600"
@@ -350,16 +350,15 @@ userToolsOperator:
   ## the vscodeRuntime running inside KST.
   kubeconfig:
     enabled: false
-
     ## External cluster address to be able to connect to it from the outside.
     # enabled: true
     # externalServerUrl: https://192.168.0.21:16443
 
-  #giteaOauth2Setup:
-  #  image:
-  #    repository: konstellation/gitea-oauth2-setup
-  #    tag: "latest"
-  #    pullPolicy: IfNotPresent
+    #giteaOauth2Setup:
+    #  image:
+    #    repository: konstellation/gitea-oauth2-setup
+    #    tag: "latest"
+    #    pullPolicy: IfNotPresent
   oauth2Proxy:
     image:
       repository: quay.io/oauth2-proxy/oauth2-proxy

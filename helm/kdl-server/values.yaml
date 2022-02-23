@@ -127,7 +127,7 @@ enterprise-gateway:
 
   kernelspecs:
     # Optional custom data image containing kernelspecs to use.
-    image: "konstellation/jupyter-kernelspecs:latest"
+    image: "konstellation/jupyter-kernelspecs:v1.0.0"
     # Kernelspecs image pull policy.
     imagePullPolicy: IfNotPresent
 

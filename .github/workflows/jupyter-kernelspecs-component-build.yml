@@ -18,13 +18,13 @@ concurrency: build_component
 
 jobs:
   lint-dockerfile:
-    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.4.8
+    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.4.9
     with:
       component_path: jupyter-kernelspecs
 
   build:
     needs: lint-dockerfile
-    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.4.8
+    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.4.9
     with:
       component: jupyter-kernelspecs
       component_path: jupyter-kernelspecs

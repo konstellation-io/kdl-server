@@ -6,32 +6,30 @@
 
 .runtimesListPanel {
   height: 100%;
-}
 
-.runtimeContainer {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background-color: palette(base, 300);
-  padding: $grid-unit $grid-unit 7 * $grid-unit $grid-unit;
-}
+  .runtimeListCaption {
+    background-color: transparent;
+    @include font-small;
+    color: font-color(regular);
+    padding: 2 * $grid-unit;
+  }
+  .runtimeContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: palette(base, 300);
+    padding: $grid-unit $grid-unit 7 * $grid-unit $grid-unit;
 
-.wrapper {
-  padding-bottom: 2 * $grid-unit;
-  overflow: auto;
-  flex-grow: 1;
-}
-
-.runtimeListCaption {
-  background-color: transparent;
-  @include font-small;
-  color: font-color(regular);
-  padding: 2 * $grid-unit;
-}
-
-.runtimeListHeader {
-  @include font-caption;
-  font-weight: bold;
-  color: font-color(regular);
-  padding: $grid-unit;
+    .runtimeListHeader {
+      @include font-caption;
+      font-weight: bold;
+      color: font-color(regular);
+      padding: $grid-unit;
+    }
+    .wrapper {
+      padding-bottom: 2 * $grid-unit;
+      overflow: auto;
+      flex-grow: 1;
+    }
+  }
 }

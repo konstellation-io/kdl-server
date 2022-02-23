@@ -14,7 +14,7 @@ function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
   const activeRuntime = useReactiveVar(runningRuntime);
   const running = activeRuntime?.id === runtime.id;
   return (
-    <div className={styles.container}>
+    <div>
       <div className={styles.header}>
         <div data-testid="runtimesListPanel">
           <div className={styles.title}>
@@ -37,7 +37,7 @@ function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
         {running && isKubeconfigEnabled && (
           <div className={styles.dockerImage}>
             <h2>VSCode Runtime</h2>
-            <div className={styles.description}>
+            <div className={styles.runtimeHelp}>
               <p>
                 You can use the kubernetes extension in VSCode to attach a terminal to the runtime. To do so, open the
                 kubernetes extension and follow this steps:

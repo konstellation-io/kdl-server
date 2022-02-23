@@ -4,7 +4,6 @@
 @import 'Styles/shadows';
 
 .container {
-  //@include shadow(2);
   display: flex;
   flex-direction: column;
   background-color: palette(base);

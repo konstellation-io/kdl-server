@@ -11,8 +11,8 @@ const RuntimeSelector: FC<Props & BottomComponentProps> = ({ runtimes }) => (
   <div className={styles.container}>
     <ul>
       {runtimes.map((runtime: GetRuntimes_runtimes) => (
-        <li className={styles.projectName} key={runtime.id}>
-          <RuntimeItem runtime={runtime}></RuntimeItem>
+        <li key={runtime.id}>
+          <RuntimeItem runtime={runtime} />
         </li>
       ))}
     </ul>

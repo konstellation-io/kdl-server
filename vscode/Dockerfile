@@ -1,9 +1,10 @@
 FROM codercom/code-server:4.0.1
 
 # Maintainer of the Dockerfile
-LABEL maintainer "Intelygenz - Konstellation Team"
+LABEL maintainer="Intelygenz - Konstellation Team"
 
-ENV PIPENV_VENV_IN_PROJECT = 1 
+ENV PIPENV_VENV_IN_PROJECT = 1 \
+    KUBECONFIG="/home/coder/.kube/config"
 
 WORKDIR /tmp
 
@@ -39,6 +40,12 @@ RUN apt-get update && \
     apt-get clean && apt-get autoremove -y && \
         rm -rf /var/lib/{apt,dpkg,cache,log}/ && \
         rm -rf -- *
+
+# ==================================================================
+# Kubectl
+# ------------------------------------------------------------------
+RUN curl -o /usr/local/bin/kubectl -L "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
+    chmod +x /usr/local/bin/kubectl
 
 # Install python libraries
 COPY requirements.txt /tmp/

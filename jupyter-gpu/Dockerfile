@@ -67,12 +67,12 @@ RUN pip install --upgrade --no-cache-dir pip && \
 COPY jupyterlab_extensions.txt /tmp/
 
 RUN jupyter serverextension enable --py jupyterlab --sys-prefix && \
-    jupyter notebook --generate-config && \
-    xargs jupyter labextension install < jupyterlab_extensions.txt && \
-    jupyter serverextension enable --py jupyterlab_git && \
-    jupyter lab build && \
-    # Let Jupyterlab install extensions from the Web terminal
-    fix-permissions /opt/jupyter
+        jupyter notebook --generate-config && \
+        xargs jupyter labextension install < jupyterlab_extensions.txt && \
+        jupyter serverextension enable --py jupyterlab_git && \
+        jupyter lab build && \
+        # Let Jupyterlab install extensions from the Web terminal
+        fix-permissions /opt/jupyter
 
 # Clean up
 RUN rm --recursive --force -- /tmp/* && \

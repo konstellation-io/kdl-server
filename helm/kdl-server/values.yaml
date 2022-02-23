@@ -320,7 +320,7 @@ tls:
 userToolsOperator:
   image:
     repository: konstellation/user-tools-operator
-    tag: "v0.15.0"
+    tag: v0.15.0
     pullPolicy: IfNotPresent
   storage:
     size: 10Gi
@@ -328,17 +328,17 @@ userToolsOperator:
   jupyter:
     image:
       repository: konstellation/jupyter-gpu
-      tag: "v0.15.0"
+      tag: v0.15.0
       pullPolicy: IfNotPresent
   repoCloner:
     image:
       repository: konstellation/repo-cloner
-      tag: "v0.13.5"
+      tag: v0.13.5
       pullPolicy: IfNotPresent
   vscode:
     image:
       repository: konstellation/vscode
-      tag: "v0.15.0"
+      tag: v0.15.0
       pullPolicy: IfNotPresent
   vscodeRuntime:
     image:

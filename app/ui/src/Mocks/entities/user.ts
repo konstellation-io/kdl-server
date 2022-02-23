@@ -10,6 +10,7 @@ export const userMe = {
   lastActivity: '2020-02-01',
   accessLevel: AccessLevel.ADMIN,
   apiTokens: [apiToken1],
+  isKubeconfigEnabled: true,
 };
 
 export const user1 = {

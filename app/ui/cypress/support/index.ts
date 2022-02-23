@@ -1,9 +1,10 @@
 import Chainable = Cypress.Chainable;
 
-Cypress.Commands.add('kstInterceptor', (operation, responseObject): Chainable => {
+Cypress.Commands.add('kstInterceptor', (operation, responseObject, options): Chainable => {
   return cy.intercept('/api/query', (req) => {
     const { operationName } = req.body;
-    if (operationName === operation) req.reply(responseObject);
+    if (operationName === operation)
+      req.reply({ body: responseObject, ...(options?.delay ? { delay: options.delay } : {}) });
   });
 });
 
@@ -31,7 +32,7 @@ declare namespace Cypress {
      * Custom command to intercept GraphQl queries from the KDL.
      * @example cy.kstInterceptor('GetMe', {name: 'Jon Doe'})
      */
-    kstInterceptor(operation: string, responseObject: Object): Chainable;
+    kstInterceptor(operation: string, responseObject: Object, options?: { delay?: number }): Chainable;
 
     /**
      * Custom command to get element by data-testid

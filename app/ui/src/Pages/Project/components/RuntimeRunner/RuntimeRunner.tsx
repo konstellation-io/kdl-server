@@ -108,7 +108,7 @@ function RuntimeRunner() {
           blocking
         >
           <ModalLayoutInfo className={styles.runtimeModalInfo}>
-            <div>
+            <div data-testid="stopToolsModal">
               <p>You are going to stop your user tools, please confirm your choice.</p>
               {runtimeRunning && <Runtime runtime={runtimeRunning} runtimeActive={true} disabled={true} />}
             </div>

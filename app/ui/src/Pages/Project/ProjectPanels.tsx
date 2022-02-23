@@ -78,7 +78,7 @@ function ProjectPanels({ openedProject }: Props) {
           <ReactTooltip id="stopPanel" effect="solid" textColor="white" backgroundColor="#888" place="bottom">
             <span>Stop tools</span>
           </ReactTooltip>
-          <div data-tip={true} data-for="stopPanel">
+          <div data-tip={true} data-for="stopPanel" data-testid="panelStopRuntime">
             <Button label="" Icon={IconPause} onClick={pauseRuntime} />
           </div>
         </div>
@@ -89,7 +89,7 @@ function ProjectPanels({ openedProject }: Props) {
           <ReactTooltip id="startPanel" effect="solid" textColor="white" backgroundColor="#888" place="bottom">
             <span>Start tools</span>
           </ReactTooltip>
-          <div data-tip={true} data-for="startPanel">
+          <div data-tip={true} data-for="startPanel" data-testid="panelStartRuntime">
             <Button label="" Icon={IconPlay} onClick={runtimeStart} />
           </div>
         </div>

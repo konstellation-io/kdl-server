@@ -19,7 +19,11 @@ function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
         <div data-testid="runtimesListPanel">
           <div className={styles.title}>
             <h1 className={styles.headerName}>{runtime.name}</h1>
-            {running && <div className={styles.runningTag}>Running</div>}
+            {running && (
+              <div className={styles.runningTag} data-testid="statusTag">
+                Running
+              </div>
+            )}
           </div>
           <div className={styles.runtimeTags}>
             <LabelList runtime={runtime} />

@@ -47,13 +47,10 @@ function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
                 kubernetes extension and follow this steps:
                 <ol>
                   <li>
-                    Configure the kube config located in
-                    <span className={styles.highlight}> /home/coder/.kube/config</span>
+                    Configure the kube config located in{' '}
+                    <span className={styles.highlight}>/home/coder/.kube/config</span>
                   </li>
-                  <li>
-                    In the kubernetes extension, navigate to{' '}
-                    <span className={styles.highlight}>&ldquo;Workloads &gt; Pods&ldquo;</span>
-                  </li>
+                  <li>In the kubernetes extension, navigate to &ldquo;Workloads &gt; Pods&ldquo;</li>
                   <li>
                     Locate the runtime pod named <span className={styles.highlight}>{runtime.runtimePod}</span>, and
                     right click on it &gt; &ldquo;Terminal&ldquo;

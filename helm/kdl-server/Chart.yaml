@@ -4,7 +4,7 @@ description: KDL server
 
 type: application
 version: v1.0-rc.0
-appVersion: v0.22.0
+appVersion: kdl-app-v1.1.0
 dependencies:
   - name: minio
     version: "3.2.0"

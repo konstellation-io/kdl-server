@@ -47,8 +47,8 @@ function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
                 kubernetes extension and follow this steps:
                 <ol>
                   <li>
-                    Configure the kubeconfig located in <span className={styles.highlight}>/home/coder/kubeconfig</span>{' '}
-                    (You just need to this one time)
+                    Configure the kube config located in
+                    <span className={styles.highlight}> /home/coder/.kube/config</span>
                   </li>
                   <li>
                     In the kubernetes extension, navigate to{' '}
@@ -56,7 +56,7 @@ function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
                   </li>
                   <li>
                     Locate the runtime pod named <span className={styles.highlight}>{runtime.runtimePod}</span>, and
-                    right click &gt; &ldquo;Terminal&ldquo;
+                    right click on it &gt; &ldquo;Terminal&ldquo;
                   </li>
                   <li>
                     Then attach your terminal to the container named{' '}

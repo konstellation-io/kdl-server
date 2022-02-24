@@ -79,7 +79,7 @@ rules:
   verbs:
   - get
 - apiGroups:
-  - sci-toolkit.konstellation.io
+  - kdl.konstellation.io
   resources:
   - '*'
   verbs:

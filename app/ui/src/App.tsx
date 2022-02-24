@@ -39,8 +39,13 @@ function Routes() {
         <Redirect exact from={ROUTE.HOME} to={ROUTE.PROJECTS} />
 
         {canAccessUsers && <Route exact path={ROUTE.USERS} component={Users} />}
+        {data.me.isKubeconfigEnabled ? (
+          <Route exact path={ROUTE.USER_KUBECONFIG} component={UserKubeconfig} />
+        ) : (
+          <Redirect exact from={ROUTE.USER_KUBECONFIG} to={ROUTE.PROJECTS} />
+        )}
+
         <Route exact path={ROUTE.USER_SSH_KEY} component={UserSshKey} />
-        <Route exact path={ROUTE.USER_KUBECONFIG} component={UserKubeconfig} />
 
         <Route exact path={ROUTE.NEW_PROJECT} component={NewProject} />
         <Route exact path={ROUTE.PROJECT_CREATION} component={ProjectCreation} />

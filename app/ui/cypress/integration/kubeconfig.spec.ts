@@ -16,6 +16,14 @@ describe('Kubeconfig Pages Behavior', () => {
     cy.url().should('contain', '/kubeconfig');
   });
 
+  it('should redirect to projects if kubeconfig isnt enabled', () => {
+    cy.kstInterceptor('GetMe', { data: { me: { ...GetMeQuery.me, isKubeconfigEnabled: false } } });
+    cy.visit('http://localhost:3001/#/user/kubeconfig');
+
+    // Assert.
+    cy.url().should('contain', '/projects');
+  });
+
   it('should load kubeconfig', () => {
     // GIVEN there is a kubeconfig
     const kubeconfig = 'test kubeconfig';

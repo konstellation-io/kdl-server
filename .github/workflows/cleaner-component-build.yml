@@ -18,13 +18,13 @@ concurrency: build_component
 
 jobs:
   lint-dockerfile:
-    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.6.1
+    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.7.0
     with:
       component_path: cleaner
 
   build:
     needs: lint-dockerfile
-    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.6.1
+    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.7.0
     with:
       component: cleaner
       component_helm_tag: cleaner.image.tag

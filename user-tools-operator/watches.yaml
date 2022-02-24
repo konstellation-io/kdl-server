@@ -1,5 +1,5 @@
 ---
 - version: v1alpha1
-  group: sci-toolkit.konstellation.io
+  group: kdl.konstellation.io
   kind: UserTools
   chart: helm-charts/usertools

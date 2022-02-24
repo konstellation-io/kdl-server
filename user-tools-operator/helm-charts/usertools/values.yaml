@@ -1,4 +1,4 @@
-domain: toolkit.local
+domain: kdl.local
 
 giteaOauth2Setup:
   image:

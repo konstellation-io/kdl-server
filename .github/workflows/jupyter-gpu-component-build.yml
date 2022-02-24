@@ -18,13 +18,13 @@ concurrency: build_component
 
 jobs:
   lint-dockerfile:
-    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.4.7
+    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.6.1
     with:
       component_path: jupyter-gpu
 
   build:
     needs: lint-dockerfile
-    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.4.7
+    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.6.1
     with:
       component: jupyter-gpu
       component_helm_tag: userToolsOperator.jupyter.image.tag

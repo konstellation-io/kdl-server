@@ -4,7 +4,6 @@ export default gql`
   mutation SetActiveUserTools($input: SetActiveUserToolsInput!) {
     setActiveUserTools(input: $input) {
       id
-      areToolsActive
     }
   }
 `;

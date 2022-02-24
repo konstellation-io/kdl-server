@@ -6,7 +6,6 @@ const me = {
   id: meId,
   email: 'admin@intelygenz.com',
   username: 'admin',
-  areToolsActive: true,
   apiTokens: () => new MockList([4, 8]),
   accessLevel: 'ADMIN',
   isKubeconfigEnabled: true,

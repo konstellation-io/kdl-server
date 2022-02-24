@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	userToolsGroup      = "sci-toolkit.konstellation.io"
+	userToolsGroup      = "kdl.konstellation.io"
 	userToolsResource   = "usertools"
 	userToolsVersion    = "v1alpha1"
 	userToolsAPIVersion = userToolsGroup + "/" + userToolsVersion

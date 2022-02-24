@@ -25,6 +25,7 @@ function RuntimesCrumb() {
       crumbText={runtimeLastRan.name}
       isSelect={true}
       LeftIconComponent={<RuntimeIcon className="icon-regular" status={runtimeStatus} />}
+      dataTestId="runtimesCrumb"
     >
       {(props: BottomComponentProps) => <RuntimeSelector runtimes={data.runtimes} {...props} />}
     </Crumb>

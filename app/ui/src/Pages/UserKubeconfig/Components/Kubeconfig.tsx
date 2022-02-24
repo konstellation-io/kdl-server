@@ -23,9 +23,9 @@ function downloadFile(text: string) {
 function Kubeconfig({ kubeconfig }: Props) {
   console.log(kubeconfig);
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="kubeconfig">
       <div className={styles.kubeconfig}>{kubeconfig.trim()}</div>
-      <div className={styles.buttonsContainer}>
+      <div className={styles.buttonsContainer} data-testid="kubeconfigButtons">
         <Button Icon={IconFileCopy} label="" className={styles.button} onClick={() => copyAndToast(kubeconfig)} />
         <Button Icon={IconGetApp} label="" className={styles.button} onClick={() => downloadFile(kubeconfig)} />
       </div>

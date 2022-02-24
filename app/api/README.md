@@ -14,6 +14,7 @@ In order to develop in a local environment there are several things to consider:
 6. run `go run http/main.go` (or launch it from your preferred IDE)
 7. You can now access the graphQL playground at `http://localhost:3000/api/playground`
 
+
 ## Testing
 
 To create new tests install [GoMock](https://github.com/golang/mock). Mocks used on tests are generated with
@@ -24,7 +25,6 @@ To create new tests install [GoMock](https://github.com/golang/mock). Mocks used
 ```
 
 To generate the mocks execute:
-
 ```sh
 $ go generate ./...
 ```
@@ -40,11 +40,10 @@ go test ./...
 `golangci-lint` is a fast Go linters runner. It runs linters in parallel, uses caching, supports yaml config, has
 integrations with all major IDE and has dozens of linters included.
 
-As you can see in the `.golangci.yml` config file of this repo, we enable more linters than the default and have more
-strict settings.
+As you can see in the `.golangci.yml` config file of this repo, we enable more linters than the default and
+have more strict settings.
 
 To run `golangci-lint` execute:
-
 ```
 golangci-lint run
 ```

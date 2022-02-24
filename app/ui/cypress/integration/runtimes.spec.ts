@@ -2,6 +2,23 @@ import GetProjectsQuery from '../../src/Mocks/GetProjectsQuery';
 import GetMeQuery from '../../src/Mocks/GetMeQuery';
 import GetRunningRuntimeQuery from '../../src/Mocks/GetRunningRuntimeQuery';
 import GetRuntimesQuery from '../../src/Mocks/GetRuntimesQuery';
+import { runtime2 } from '../../src/Mocks/entities/runtime';
+
+const isRuntimeRunning = (runtimeName: string) => {
+  cy.getByTestId('openRuntimeSettings').click();
+  cy.getByTestId('runtimesList').contains(runtimeName).click();
+
+  cy.getByTestId('runtimeInfoPanel').should('contain', runtimeName);
+  cy.getByTestId('statusTag').should('contain', 'Running');
+};
+
+const isRuntimeStopped = (runtimeName: string) => {
+  cy.getByTestId('openRuntimeSettings').click();
+  cy.getByTestId('runtimesList').contains(runtimeName).click();
+
+  cy.getByTestId('runtimeInfoPanel').should('contain', runtimeName);
+  cy.getByTestId('statusTag').should('not.exist');
+};
 
 describe('Runtimes Behaviour', () => {
   beforeEach(() => {
@@ -28,18 +45,33 @@ describe('Runtimes Behaviour', () => {
       cy.getByTestId('runtimesListPanel').should('exist');
     });
 
-    it('should open a warning modal when the user try to stop the tools', () => {
+    it('should stop the runtime is the stop button is clicked and the action is confirmed', () => {
       // GIVEN there is a runtime started
       cy.kstInterceptor('GetRunningRuntime', { data: GetRunningRuntimeQuery });
 
       // WHEN the stop runtime button is clicked
       cy.getByTestId('stopTools').click();
+      // and the action is confirmed
+      cy.contains('Stop Tools').click();
 
-      // THEN the stop tools confirmation modal is opened
-      cy.getByTestId('stopToolsModal').should('exist');
+      // THEN the runtime is stopped
+      isRuntimeStopped(GetRunningRuntimeQuery.runningRuntime.name);
     });
 
-    // TODO: Test de arrancar ultimo runtime
+    it('should start last running runtime if its previously stopped', () => {
+      // GIVEN there is a runtime started
+      cy.kstInterceptor('GetRunningRuntime', { data: GetRunningRuntimeQuery });
+      cy.kstInterceptor('SetActiveUserTools', { data: { areToolsActive: true } });
+      // and the runtime is stopped
+      cy.getByTestId('stopTools').click();
+      cy.contains('Stop Tools').click();
+
+      // WHEN the start runtime button is clicked
+      cy.getByTestId('startTools').click();
+
+      // THEN the last runtime in execution is started
+      isRuntimeRunning(GetRunningRuntimeQuery.runningRuntime.name);
+    });
   });
 
   describe('Runtime Info Panel Behaviour', () => {
@@ -125,6 +157,43 @@ describe('Runtimes Behaviour', () => {
 
       // THEN should redirect to overview page
       cy.url().should('contain', '/overview');
+    });
+  });
+
+  describe('Runtimes Crumb Behaviour', () => {
+    it('should replace runtime from crumb list' + '', () => {
+      // GIVEN there is a runtime started
+      cy.kstInterceptor('GetRunningRuntime', { data: GetRunningRuntimeQuery });
+      cy.kstInterceptor('SetActiveUserTools', { data: { areToolsActive: true } });
+      // and another runtime to run
+      const runtimeName = runtime2.name;
+
+      // WHEN we click the runtime we want to run on the runtimes crumb
+      cy.getByTestId('runtimesCrumb').click();
+      cy.contains(runtimeName).click();
+      // and the action is confirmed
+      cy.contains('Replace Tools').click();
+
+      // THEN the runtime is replaced
+      isRuntimeRunning(runtimeName);
+    });
+
+    it('should allow start any runtime if there is one stopped', () => {
+      // GIVEN there is a runtime started
+      cy.kstInterceptor('GetRunningRuntime', { data: GetRunningRuntimeQuery });
+      cy.kstInterceptor('SetActiveUserTools', { data: { areToolsActive: true } });
+      // and another runtime to run
+      const runtimeName = runtime2.name;
+      // and we stop the actual runtime
+      cy.getByTestId('stopTools').click();
+      cy.contains('Stop Tools').click();
+
+      // WHEN we click the runtime we want to run on the runtimes crumb
+      cy.getByTestId('runtimesCrumb').click();
+      cy.contains(runtimeName).click();
+
+      // THEN the runtime is started
+      isRuntimeRunning(runtimeName);
     });
   });
 });

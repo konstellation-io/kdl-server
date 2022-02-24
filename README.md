@@ -39,6 +39,31 @@
 
 [app-ui-mr-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_ui&metric=Maintainability
 
+## KDL Server Chart
+
+### Upgrading Chart
+
+#### Upgrading an existing Release to a new major version
+
+A major chart version change (like v0.15.3 -> v1.0.0) indicates that there is an incompatible breaking change needing
+manual actions.
+
+#### From 0.X to 1.X
+
+This major version comes with the following breaking changes:
+
+- UserTools CRD metadata changes:
+    - `metadata.name` changed to `usertools.kdl.konstellation.io`
+    - `spec.groups` changed to `kdl.konstellation.io`
+- KDL Runtimes support
+
+Before applying the upgrade Delete all usertools from KDL and run these commands to update the CRDs before applying the
+upgrade.
+
+```bash
+kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-io/kdl-server/v1.0.0/helm/kdl-server/crds/user-tools-operator-crd.yaml
+```
+
 ## Development
 
 ### Dependencies
@@ -48,12 +73,12 @@
 The local version of Kubernetes to deploy KDL. The version required is **1.19**.
 
 Linux installation:
+
 ```
 snap install --channel=1.19/stable microk8s --classic
 ```
 
-In Mac, if the multipass vm doesn't exist the kdlctl.sh will create it automatically.
-You also can do it manually using:
+In Mac, if the multipass vm doesn't exist the kdlctl.sh will create it automatically. You also can do it manually using:
 
 ```
 source .kdlctl.conf
@@ -77,11 +102,13 @@ https://helm.sh/docs/intro/install/
 OS package to fill templates during deployment. Usually it is installed in Mac and Linux.
 
 Ubuntu:
+
 ```
 sudo apt-get install gettext
 ```
 
 Mac:
+
 ```
 brew install gettext
 ```
@@ -95,6 +122,7 @@ https://kubernetes.io/docs/tasks/tools/
 #### jq (Mac only)
 
 JSON processor to configre insecure-registries on Mac.
+
 ```
 brew install jq
 ```
@@ -130,8 +158,8 @@ Run help to get info for each command:
 
 ### IPV6
 
-As chrome is having some issues with IPV6 and docker (https://bugs.chromium.org/p/chromium/issues/detail?id=974711) 
-before you start microk8s you need to disable IPV6 in your local machine, so when microk8s is started it is configured 
+As chrome is having some issues with IPV6 and docker (https://bugs.chromium.org/p/chromium/issues/detail?id=974711)
+before you start microk8s you need to disable IPV6 in your local machine, so when microk8s is started it is configured
 without PIV6 capabilities.
 
 To disable IPV6:
@@ -140,7 +168,6 @@ To disable IPV6:
 sysctl -w net.ipv6.conf.all.disable_ipv6=1
 sysctl -w net.ipv6.conf.default.disable_ipv6=1
 ```
-
 
 ### Install local environment
 
@@ -180,25 +207,34 @@ $ ./kdlctl.sh uninstall
 
 ## Versioning lifecycle
 
-In the development lifecycle of KLI there are three main stages depend if we are going to add a new feature, release a new version with some features or apply a fix to a current release.
+In the development lifecycle of KLI there are three main stages depend if we are going to add a new feature, release a
+new version with some features or apply a fix to a current release.
 
 ### Alphas
 
-In order to add new features just create a feature branch from master, and after the merger the Pull Request a workflow will run the tests and if everything passes a new alpha tag will be created (like *v0.0-alpha.0*), and a new release will be generated with this tag.
+In order to add new features just create a feature branch from master, and after the merger the Pull Request a workflow
+will run the tests and if everything passes a new alpha tag will be created (like *v0.0-alpha.0*), and a new release
+will be generated with this tag.
 
 ### Releases
 
-After some alpha versions we can create what we call a release, and to do that we have to run manual the Release Action. This workflow will create a new release branch and a new tag like *v0.0.0*. With this tag, a new release will be generated.
+After some alpha versions we can create what we call a release, and to do that we have to run manual the Release Action.
+This workflow will create a new release branch and a new tag like *v0.0.0*. With this tag, a new release will be
+generated.
 
 ### Fixes
 
-If we find out a bug in a release, we can apply a bugfix just by creating a fixed branch from the specific release branch, and creating a Pull Request to the same release branch. When the Pull Request is merged, after passing the tests, a new fix tag will be created just by increasing the patch number of the version, and a new release will be build and released.
+If we find out a bug in a release, we can apply a bugfix just by creating a fixed branch from the specific release
+branch, and creating a Pull Request to the same release branch. When the Pull Request is merged, after passing the
+tests, a new fix tag will be created just by increasing the patch number of the version, and a new release will be build
+and released.
 
 ## Knowledge Galaxy
 
-This is an external tool for data scientist that can be integrated into KDL. You can read more info about this tool [here](https://github.com/konstellation-io/knowledge-galaxy)
+This is an external tool for data scientist that can be integrated into KDL. You can read more info about this
+tool [here](https://github.com/konstellation-io/knowledge-galaxy)
 
-To enable the integration follow these steps: 
+To enable the integration follow these steps:
 
 - Enable Knowledge Galaxy in `helm/values.yaml` with a config like this:
 
@@ -206,6 +242,7 @@ To enable the integration follow these steps:
     knowledgeGalaxy:
       enabled: true
 ```
+
 - Create a secret named `regcred` with the docker credential needed in order to download the private image:
 
 ```bash
@@ -215,7 +252,8 @@ kubectl create secret docker-registry regcred \
    --dry-run=client -o yaml | kubectl -n kdl apply -f -
 ```
 
-- Set the name imagePullSecret name in the `knowledgeGalaxy` config: 
+- Set the name imagePullSecret name in the `knowledgeGalaxy` config:
+
 ```yaml
     knowledgeGalaxy:
       enabled: true

@@ -37,6 +37,16 @@ describe('Kubeconfig Pages Behavior', () => {
     // GIVEN there is a kubeconfig
     const kubeconfig = 'test kubeconfig';
     cy.kstInterceptor('GetKubeconfig', { data: { kubeconfig } });
+    // and the browser has permissions to use the clipboard (requested in headless execution)
+    cy.wrap(
+      Cypress.automation('remote:debugger:protocol', {
+        command: 'Browser.grantPermissions',
+        params: {
+          permissions: ['clipboardReadWrite', 'clipboardSanitizedWrite'],
+          origin: window.location.origin,
+        },
+      }),
+    );
 
     // WHEN the copy button is clicked
     cy.getByTestId('kubeconfigButtons').children().first().click();
@@ -52,6 +62,7 @@ describe('Kubeconfig Pages Behavior', () => {
           console.log(error);
         });
     });
+
     cy.contains('Copied to clipboard').should('exist');
   });
 

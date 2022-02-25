@@ -3,7 +3,7 @@ name: kdl-server
 description: KDL server
 
 type: application
-version: 1.0-rc.2
+version: 1.0-rc.3
 appVersion: 1.2.0
 dependencies:
   - name: minio

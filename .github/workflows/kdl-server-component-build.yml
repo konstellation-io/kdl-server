@@ -56,7 +56,7 @@ jobs:
 
       - if: steps.changes.outputs.api == 'true'
         name: API Go Lint
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v3
         with:
           version: v1.44
           working-directory: ./app/api

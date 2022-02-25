@@ -27,7 +27,6 @@ export interface GetUserTools_project {
 export interface GetUserTools_me {
   __typename: "User";
   id: string;
-  areToolsActive: boolean;
 }
 
 export interface GetUserTools {

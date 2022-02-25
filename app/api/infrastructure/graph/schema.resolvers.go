@@ -316,12 +316,6 @@ func (r *userResolver) LastActivity(ctx context.Context, obj *entity.User) (*str
 	return &lastActivity, nil
 }
 
-func (r *userResolver) AreToolsActive(ctx context.Context, obj *entity.User) (bool, error) {
-	username := ctx.Value(middleware.LoggedUserNameKey).(string)
-
-	return r.users.AreToolsRunning(ctx, username)
-}
-
 func (r *userResolver) IsKubeconfigEnabled(ctx context.Context, obj *entity.User) (bool, error) {
 	return r.users.IsKubeconfigActive(), nil
 }

@@ -16,7 +16,6 @@ export default gql`
     }
     me {
       id
-      areToolsActive
     }
   }
 `;

@@ -85,7 +85,6 @@ function RuntimeRunner() {
     await updateProjectActiveTools(true, runtimeAction.runtime.id);
     updateRunningRuntime(runtimeAction.runtime);
     updateLastRanRuntime(runtimeAction.runtime);
-    // TODO: make the real call to start the tools
   }
 
   async function stopTools() {

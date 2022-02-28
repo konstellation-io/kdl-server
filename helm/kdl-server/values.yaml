@@ -177,7 +177,7 @@ knowledgeGalaxy:
 kdlServer:
   image:
     repository: konstellation/kdl-server
-    tag: undefined.undefined.NaN
+    tag: 1.4.1
     pullPolicy: IfNotPresent
   ingress:
     proxyReadTimeout: "3600"

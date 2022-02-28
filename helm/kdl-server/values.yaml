@@ -320,7 +320,7 @@ tls:
 userToolsOperator:
   image:
     repository: konstellation/user-tools-operator
-    tag: v0.16.0
+    tag: 0.16.1
     pullPolicy: IfNotPresent
   storage:
     size: 10Gi

@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gosimple/slug"
+
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 
@@ -557,14 +559,17 @@ func TestInteractor_GetKubeconfig(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const (
-		username       = "john"
+		username       = "john.doe"
 		areToolsActive = true
 	)
 
 	ctx := context.Background()
 	expectedKubeconfig := "Test Kubeconfig"
 
-	s.mocks.k8sClientMock.EXPECT().GetUserKubeconfigSecret(ctx, username).Return(expectedKubeconfig, nil)
+	// the secret must use the username slug instead of the username
+	usernameSlug := slug.Make(username)
+
+	s.mocks.k8sClientMock.EXPECT().GetUserKubeconfigSecret(ctx, usernameSlug).Return(expectedKubeconfig, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(areToolsActive, nil)
 
 	returnedKubeconfig, err := s.interactor.GetKubeconfig(ctx, username)

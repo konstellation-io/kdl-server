@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/gosimple/slug"
+
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 
@@ -342,5 +344,7 @@ func (i *interactor) GetKubeconfig(ctx context.Context, username string) (string
 		return "", ErrStopUserTools
 	}
 
-	return i.k8sClient.GetUserKubeconfigSecret(ctx, username)
+	usernameSlug := slug.Make(username)
+
+	return i.k8sClient.GetUserKubeconfigSecret(ctx, usernameSlug)
 }

@@ -10,10 +10,25 @@ backup:
     repository: konstellation/kdl-backup
     tag: v0.17.0
     pullPolicy: IfNotPresent
+
+  ## Sets the activeDeadlineSeconds param for the backup cronjob
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/controllers/job/#job-termination-and-cleanup
+  ##
+  activeDeadlineSeconds: 3600
+
+  ## Sets tge backoffLimit param for the backup cronjob
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy
+  ##
+  backoffLimit: 3
+
   s3:
     awsAccessKeyID: aws-access-key-id
     awsSecretAccessKey: aws-secret-access-key
     bucketName: s3-bucket-name
+
+  ## Resource requests and limits for backup container
+  ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  ##
   resources:
     requests:
       cpu: "100m"

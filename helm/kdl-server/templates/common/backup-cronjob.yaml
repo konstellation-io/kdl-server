@@ -52,21 +52,15 @@ spec:
               volumeMounts:
               - name: gitea-pvc
                 mountPath: "/data"
-          {{- if .Values.extraVolumeMounts }}
-{{ toYaml .Values.extraVolumeMounts | indent 12 }}
-          {{- end }}
-          {{- if .Values.imagePullSecrets }}
-          imagePullSecrets:
-          {{- range .Values.imagePullSecrets  }}
-          - name: {{ . }}
-          {{- end }}
-          {{- end }}
+            {{- with .Values.backup.extraVolumeMounts }}
+{{ toYaml . | indent 14 }}
+            {{- end }}
           volumes:
             - name: gitea-pvc
               persistentVolumeClaim:
                 claimName: gitea-pvc-gitea-0
-            {{- if .Values.extraVolumes }}
-{{ toYaml .Values.extraVolumes | indent 12 }}
-      {{- end }}
+            {{- with .Values.backup.extraVolumes }}
+{{ toYaml . | indent 12 }}
+            {{- end }}
           restartPolicy: OnFailure
 {{- end }}

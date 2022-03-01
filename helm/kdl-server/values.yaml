@@ -36,6 +36,7 @@ backup:
     limits:
       cpu: "100m"
       memory: "256Mi"
+
   extraVolumeMounts: []
   # extraVolumeMounts:
   #   - name: shared-storage

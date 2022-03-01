@@ -15,8 +15,8 @@ spec:
     metadata:
       name: {{ .Values.backup.name }}
     spec:
-      backoffLimit: 3
-      activeDeadlineSeconds: 60 # 1min
+      backoffLimit: {{ .Values.backup.backoffLimit }}
+      activeDeadlineSeconds: {{ .Values.backup.activeDeadlineSeconds }}
       template:
         spec:
           securityContext:

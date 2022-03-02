@@ -43,6 +43,15 @@ jobs:
           go-version: 1.16.x
 
       - if: steps.changes.outputs.api == 'true'
+        name: API Go Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.44
+          working-directory: ./app/api
+          args: --timeout 5m
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - if: steps.changes.outputs.api == 'true'
         name: API Test
         run: go test ./... -cover -v -coverprofile=coverage.out
         working-directory: ./app/api
@@ -53,15 +62,6 @@ jobs:
         with:
           name: coverage-report
           path: app/api/coverage.out
-
-      - if: steps.changes.outputs.api == 'true'
-        name: API Go Lint
-        uses: golangci/golangci-lint-action@v3
-        with:
-          version: v1.44
-          working-directory: ./app/api
-          args: --timeout 5m
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - if: steps.changes.outputs.ui == 'true'
         uses: actions/setup-node@v3.0.0

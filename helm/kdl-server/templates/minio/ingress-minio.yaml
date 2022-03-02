@@ -29,12 +29,12 @@ spec:
             path: "/"
             backend:
               service:
-                name: {{ .Release.Name }}-minio-console
+                name: {{ .Release.Name }}-minio
                 port:
-                  number: 9001
+                  number: 9000
           {{ else }}
           - path: /
             backend:
-              serviceName: {{ .Release.Name }}-minio-console
-              servicePort: 9001
+              serviceName: {{ .Release.Name }}-minio
+              servicePort: 9000
           {{ end }}

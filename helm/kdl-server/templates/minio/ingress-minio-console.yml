@@ -1,0 +1,40 @@
+{{ if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+apiVersion: networking.k8s.io/v1
+{{ else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1/Ingress" }}
+apiVersion: networking.k8s.io/v1beta1
+{{ else }}
+apiVersion: extensions/v1beta1
+{{ end }}
+kind: Ingress
+metadata:
+  name: minio-console
+  annotations:
+    {{ if eq .Values.ingress.type "nginx" }}
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+    {{ end }}
+spec:
+  {{ if .Values.tls.enabled -}}
+  tls:
+    - hosts:
+        - minio-console.{{ .Values.domain }}
+      secretName: {{ .Values.domain }}-tls-secret
+  {{- end }}
+  rules:
+    - host: minio-console.{{ .Values.domain }}
+      http:
+        paths:
+          {{ if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: {{ .Release.Name }}-minio-console
+                port:
+                  number: 9001
+          {{ else }}
+          - path: /
+            backend:
+              serviceName: {{ .Release.Name }}-minio-console
+              servicePort: 9001
+          {{ end }}

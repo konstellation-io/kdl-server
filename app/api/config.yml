@@ -5,7 +5,7 @@ mongodb:
   uri: "mongodb://admin:123456@mongodb:27017/admin"
   dbName: "kdl"
 gitea:
-  internal_url: "http://gitea:3000"
+  internal_url: "http://localhost:3000"
 scheduledJob:
   usersSync:
     interval: 10m

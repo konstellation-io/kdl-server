@@ -65,7 +65,7 @@ function RuntimeRunner() {
 
   //decide whether start the tools or show the replace modal
   function handleStartTools() {
-    if (runtimeAction?.runtime?.id === runtimeRunning?.id) return;
+    if (runtimeRunning && runtimeAction?.runtime?.id === runtimeRunning.id) return;
     if (!runtimeAction?.runtime) {
       // if starting the tools and runtime is NOT selected
       return openRuntimesList();

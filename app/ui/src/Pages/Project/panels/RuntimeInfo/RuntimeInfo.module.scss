@@ -30,6 +30,22 @@
       font-weight: bold;
       max-width: 13 *$grid-unit;
     }
+
+    .loadingTag {
+      @include font-small;
+      display: inline;
+      position: absolute;
+      margin-left: 2*$grid-unit;
+      justify-self: center;
+      margin-top: 0.75 * $grid-unit;
+      text-align: center;
+      padding: 0.4 * $grid-unit 3.5 * $grid-unit;
+      background-color: palette(feedback, 700);
+      border-radius: 2 * $grid-unit;
+      color: palette(base);
+      font-weight: bold;
+      max-width: 13 *$grid-unit;
+    }
   }
   .runtimeTags {
     display: flex;

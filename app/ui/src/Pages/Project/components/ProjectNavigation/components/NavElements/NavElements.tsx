@@ -18,6 +18,7 @@ import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
 import useRuntime from 'Graphql/client/hooks/useRuntime';
 import ReactTooltip from 'react-tooltip';
+import TooltipElement from './TooltipElement';
 
 type Props = {
   isOpened: boolean;
@@ -63,27 +64,13 @@ function NavElements({ isOpened }: Props) {
     if (isLoading) return Progress;
 
     return runtimeRunning ? (
-      <div>
-        <ReactTooltip id="stop" effect="solid" textColor="white" backgroundColor="#888" className={styles.toolsTip}>
-          <span>Stop tools</span>
-        </ReactTooltip>
-        <div data-tip data-for="stop">
-          <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStop} data-testid="stopTools" />
-        </div>
-      </div>
+      <TooltipElement cssId="stop" spanText="Stop tools">
+        <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStop} data-testid="stopTools" />
+      </TooltipElement>
     ) : (
-      <div>
-        <ReactTooltip id="start" effect="solid" textColor="white" backgroundColor="#888" className={styles.toolsTip}>
-          <span>Start tools</span>
-        </ReactTooltip>
-        <div data-tip data-for="start">
-          <IconPlay
-            className={cx(styles.usertoolsIcon, 'icon-small')}
-            onClick={runtimeStart}
-            data-testid="startTools"
-          />
-        </div>
-      </div>
+      <TooltipElement cssId="start" spanText="Start tools">
+        <IconPlay className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStart} data-testid="startTools" />
+      </TooltipElement>
     );
   }
 

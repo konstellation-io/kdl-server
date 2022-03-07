@@ -363,7 +363,6 @@ func (i *interactor) CreateAdminUser(username, email string) error {
 // GetKubeconfig returns user kubeconfig.
 func (i *interactor) GetKubeconfig(ctx context.Context, username string) (string, error) {
 	running, err := i.k8sClient.IsUserToolPODRunning(ctx, username)
-	i.logger.Debugf("User \"%s\" Tools active \"%s\"", running)
 
 	if err != nil {
 		return "", err

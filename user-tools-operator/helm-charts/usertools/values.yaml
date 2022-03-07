@@ -41,6 +41,9 @@ username: user.name
 
 usernameSlug: user-name
 
+## The service account for the user that owns the user-tools
+serviceAccountName: default
+
 ## If enabled, users will be able to download a kubeconfig file, so they can attach an external terminal/IDE to
 ## the vscodeRuntime running inside KST.
 kubeconfig:

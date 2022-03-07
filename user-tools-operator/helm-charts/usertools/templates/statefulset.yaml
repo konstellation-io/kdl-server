@@ -35,7 +35,7 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
-      serviceAccountName: "user-tools-{{ .Values.usernameSlug }}"
+      serviceAccountName: {{ .Values.userServiceAccountName }}
       securityContext:
         fsGroup: 1000
       initContainers:

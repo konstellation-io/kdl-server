@@ -263,6 +263,20 @@ func (mr *MockUseCaseMockRecorder) CreateAdminUser(username, email interface{}) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAdminUser", reflect.TypeOf((*MockUseCase)(nil).CreateAdminUser), username, email)
 }
 
+// CreateMissingServiceAccountsForUsers mocks base method.
+func (m *MockUseCase) CreateMissingServiceAccountsForUsers() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateMissingServiceAccountsForUsers")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateMissingServiceAccountsForUsers indicates an expected call of CreateMissingServiceAccountsForUsers.
+func (mr *MockUseCaseMockRecorder) CreateMissingServiceAccountsForUsers() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMissingServiceAccountsForUsers", reflect.TypeOf((*MockUseCase)(nil).CreateMissingServiceAccountsForUsers))
+}
+
 // FindAll mocks base method.
 func (m *MockUseCase) FindAll(ctx context.Context) ([]entity.User, error) {
 	m.ctrl.T.Helper()

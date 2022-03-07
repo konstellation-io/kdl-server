@@ -3,6 +3,8 @@ package k8s
 import (
 	"context"
 
+	v1 "k8s.io/api/core/v1"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 )
 
@@ -22,5 +24,7 @@ type Client interface {
 	UpdateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error
 	GetUserSSHKeySecret(ctx context.Context, usernameSlug string) ([]byte, error)
 	GetUserSSHKeyPublic(ctx context.Context, usernameSlug string) ([]byte, error)
-	GetUserKubeconfigSecret(ctx context.Context, usernameSlug string) (string, error)
+	CreateUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error)
+	GetUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error)
+	GetUserKubeconfig(ctx context.Context, usernameSlug string) ([]byte, error)
 }

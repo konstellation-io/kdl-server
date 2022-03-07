@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/gosimple/slug"
+	k8errors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
@@ -65,6 +66,7 @@ func NewInteractor(
 // - Adds the public SSH key to the user in Gitea.
 // - Stores the user and ssh keys into the DB.
 // - Creates a new secret in Kubernetes with the generated SSH keys.
+// - Created a service account for the user.
 func (i *interactor) Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error) {
 	i.logger.Infof("Creating user \"%s\" with email \"%s\"", username, email)
 
@@ -116,6 +118,12 @@ func (i *interactor) Create(ctx context.Context, email, username string, accessL
 	i.logger.Infof("The user \"%s\" (%s) was created with ID \"%s\"", user.Username, user.Email, insertedID)
 
 	err = i.k8sClient.CreateUserSSHKeySecret(ctx, user, keys.Public, keys.Private)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	// Created a service account for the user
+	_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -306,6 +314,26 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 	return i.repo.GetByUsername(ctx, user.Username)
 }
 
+// CreateMissingServiceAccountsForUsers ensures all users has their serviceAccount created.
+func (i *interactor) CreateMissingServiceAccountsForUsers() error {
+	ctx := context.Background()
+
+	users, err := i.repo.FindAll(ctx, false)
+	if err != nil {
+		return err
+	}
+
+	for _, user := range users {
+		_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
+
+		if err != nil && !k8errors.IsNotFound(err) {
+			i.logger.Infof("Error creating user serviceAccount for user %s %s", user.UsernameSlug(), err)
+		}
+	}
+
+	return nil
+}
+
 // CreateAdminUser creates the KDL admin user if not exists.
 func (i *interactor) CreateAdminUser(username, email string) error {
 	ctx := context.Background()
@@ -335,6 +363,7 @@ func (i *interactor) CreateAdminUser(username, email string) error {
 // GetKubeconfig returns user kubeconfig.
 func (i *interactor) GetKubeconfig(ctx context.Context, username string) (string, error) {
 	running, err := i.k8sClient.IsUserToolPODRunning(ctx, username)
+	i.logger.Debugf("User \"%s\" Tools active \"%s\"", running)
 
 	if err != nil {
 		return "", err
@@ -346,5 +375,12 @@ func (i *interactor) GetKubeconfig(ctx context.Context, username string) (string
 
 	usernameSlug := slug.Make(username)
 
-	return i.k8sClient.GetUserKubeconfigSecret(ctx, usernameSlug)
+	i.logger.Debugf("Getting kubeconfig for user \"%s\"", usernameSlug)
+
+	kubeconfig, err := i.k8sClient.GetUserKubeconfig(ctx, usernameSlug)
+	if err != nil {
+		return "", err
+	}
+
+	return string(kubeconfig), nil
 }

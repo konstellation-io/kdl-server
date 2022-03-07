@@ -4,6 +4,7 @@ import styles from './RuntimeInfo.module.scss';
 import LabelList from '../RuntimesList/components/LabelList';
 import { useReactiveVar } from '@apollo/client';
 import { loadingRuntime, runningRuntime } from 'Graphql/client/cache';
+import cx from 'classnames';
 
 type Props = {
   selectedRuntime: GetRuntimes_runtimes;
@@ -20,15 +21,15 @@ function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
         <div data-testid="runtimeInfoPanel">
           <div className={styles.title}>
             <h1 className={styles.headerName}>{runtime.name}</h1>
-            {running && !runtimeLoading ?
+            {running && !runtimeLoading ? (
               <div className={styles.runningTag} data-testid="statusTag">
                 Running
               </div>
-              :
-              <div className={styles.loadingTag} data-testid="statusTag">
+            ) : (
+              <div className={cx(styles.runningTag, styles.loadingTag)} data-testid="statusTag">
                 Loading
               </div>
-            }
+            )}
           </div>
           <div className={styles.runtimeTags}>
             <LabelList runtime={runtime} />

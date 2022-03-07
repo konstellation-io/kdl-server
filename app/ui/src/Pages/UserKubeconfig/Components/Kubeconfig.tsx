@@ -21,7 +21,6 @@ function downloadFile(text: string) {
 }
 
 function Kubeconfig({ kubeconfig }: Props) {
-  console.log(kubeconfig);
   return (
     <div className={styles.container} data-testid="kubeconfig">
       <div className={styles.kubeconfig}>{kubeconfig.trim()}</div>

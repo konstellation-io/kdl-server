@@ -7,12 +7,12 @@ import RuntimeItem from './RuntimeItem/RuntimeItem';
 type Props = {
   runtimes: GetRuntimes_runtimes[];
 };
-const RuntimeSelector: FC<Props & BottomComponentProps> = ({ runtimes }) => (
+const RuntimeSelector: FC<Props & BottomComponentProps> = ({ runtimes, ...props }) => (
   <div className={styles.container}>
     <ul>
       {runtimes.map((runtime: GetRuntimes_runtimes) => (
         <li key={runtime.id}>
-          <RuntimeItem runtime={runtime} />
+          <RuntimeItem runtime={runtime} {...props} />
         </li>
       ))}
     </ul>

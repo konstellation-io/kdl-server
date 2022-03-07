@@ -34,7 +34,7 @@ function RuntimesList() {
         <div className={styles.wrapper} data-testid="runtimesList">
           {[
             ...runtimes.map((runtime) => (
-              <Runtime key={runtime.id} runtime={runtime} runtimeActive={runtime.id === runtimeRunning?.id} />
+              <Runtime key={runtime.id} runtime={runtime} isRunning={runtime.id === runtimeRunning?.id} />
             )),
           ]}
         </div>

@@ -1,4 +1,5 @@
 import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
+import { GetRuntimes_runtimes } from '../../queries/types/GetRuntimes';
 
 export type PanelInfo = {
   id: PANEL_ID;
@@ -6,6 +7,7 @@ export type PanelInfo = {
   fixedWidth: boolean | null;
   theme: PANEL_THEME;
   size: PANEL_SIZE;
+  runtime?: GetRuntimes_runtimes;
 };
 
 export enum PANEL_ID {

@@ -48,6 +48,7 @@ describe('Runtimes Behaviour', () => {
     it('should stop the runtime is the stop button is clicked and the action is confirmed', () => {
       // GIVEN there is a runtime started
       cy.kstInterceptor('GetRunningRuntime', { data: GetRunningRuntimeQuery });
+      cy.kstInterceptor('SetActiveUserTools', { data: { areToolsActive: false } });
 
       // WHEN the stop runtime button is clicked
       cy.getByTestId('stopTools').click();

@@ -1,38 +1,63 @@
-import { lastRanRuntime, runningRuntime, actionRuntime, selectedRuntime } from '../cache';
-import { GetRuntimes_runtimes } from '../../queries/types/GetRuntimes';
-import { RuntimeActions } from '../models/RuntimeAction';
+import { useMutation, useReactiveVar } from '@apollo/client';
+import SetActiveProjectToolsMutation from 'Graphql/mutations/setActiveUserTools';
+import { SetActiveUserTools, SetActiveUserToolsVariables } from 'Graphql/mutations/types/SetActiveUserTools';
+import { GetRuntimes_runtimes } from 'Graphql/queries/types/GetRuntimes';
+import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
+import { mutationPayloadHelper } from 'Utils/formUtils';
+import { lastRanRuntime, runningRuntime } from '../cache';
+import useRuntimeLoading from './useRuntimeLoading';
+import usePanel, { PanelType } from './usePanel';
 
-function useRuntime() {
-  function updateRunningRuntime(runtime: GetRuntimes_runtimes | null) {
-    runningRuntime(runtime);
+function useRuntime(runtime?: GetRuntimes_runtimes) {
+  const [mutationSetActiveProjectTools] = useMutation<SetActiveUserTools, SetActiveUserToolsVariables>(
+    SetActiveProjectToolsMutation,
+    {
+      onCompleted: () => {
+        console.log(`Completed mutation: ${runtime?.id}`);
+        updateRunningRuntime(runtime);
+        setRuntimeLoading('');
+      },
+      onError: (e) => {
+        console.error(`setActiveProjectTools: ${e}`);
+        setRuntimeLoading('');
+      },
+    },
+  );
+
+  const { openPanel: openRuntimesList } = usePanel(PanelType.PRIMARY, USERTOOLS_PANEL_OPTIONS);
+
+  const runtimeRunning = useReactiveVar(runningRuntime);
+
+  const { setRuntimeLoading } = useRuntimeLoading();
+
+  function updateRunningRuntime(runtime?: GetRuntimes_runtimes) {
+    if (runtime) {
+      runningRuntime(runtime);
+      lastRanRuntime(runtime);
+      return;
+    }
+    runningRuntime(null);
   }
 
-  function updateSelectedRuntime(runtime: GetRuntimes_runtimes) {
-    selectedRuntime(runtime);
-  }
-
-  function updateLastRanRuntime(runtime: GetRuntimes_runtimes | null) {
-    lastRanRuntime(runtime);
-  }
-
-  function startRuntime(runtime: GetRuntimes_runtimes | null) {
-    actionRuntime({
-      action: RuntimeActions.START,
-      runtime: runtime,
-    });
+  async function startRuntime(runtime?: GetRuntimes_runtimes) {
+    if (!runtime) {
+      openRuntimesList();
+      return;
+    }
+    const areToolsActive = true;
+    setRuntimeLoading(runtime.id ?? '');
+    mutationSetActiveProjectTools(mutationPayloadHelper({ active: areToolsActive, runtimeId: runtime.id }));
   }
 
   function pauseRuntime() {
-    actionRuntime({
-      action: RuntimeActions.STOP,
-      runtime: null,
-    });
+    const areToolsActive = false;
+    const runtimeId = runtimeRunning?.id ?? '';
+    setRuntimeLoading(runtimeId);
+    mutationSetActiveProjectTools(mutationPayloadHelper({ active: areToolsActive, runtimeId }));
   }
 
   return {
     updateRunningRuntime,
-    updateSelectedRuntime,
-    updateLastRanRuntime,
     startRuntime,
     pauseRuntime,
   };

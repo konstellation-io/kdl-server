@@ -72,7 +72,7 @@ export const openedSettingTab = makeVar<SettingsTab>(SettingsTab.INFO);
 export const lastRanRuntime = makeVar<GetRuntimes_runtimes | null>(null);
 // the actual running runtime
 export const runningRuntime = makeVar<GetRuntimes_runtimes | null>(null);
-export const loadingRuntime = makeVar<string>('');
+export const loadingRuntime = makeVar<string | null>(null);
 
 const cache = new InMemoryCache({
   typePolicies: {

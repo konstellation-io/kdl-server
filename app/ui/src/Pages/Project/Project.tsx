@@ -47,7 +47,7 @@ function Project() {
   }, [data, projectId]);
 
   useEffect(() => {
-    setRuntimeLoading(runtimeLoading ? 'unknown' : '');
+    setRuntimeLoading(runtimeLoading ? 'unknown' : null);
     if (dataRuntimeRunning?.runningRuntime) {
       updateRunningRuntime(dataRuntimeRunning.runningRuntime);
     }

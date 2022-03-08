@@ -14,11 +14,11 @@ function useRuntime(runtime?: GetRuntimes_runtimes) {
     {
       onCompleted: () => {
         updateRunningRuntime(runtime);
-        setRuntimeLoading('');
+        setRuntimeLoading(null);
       },
       onError: (e) => {
         console.error(`setActiveProjectTools: ${e}`);
-        setRuntimeLoading('');
+        setRuntimeLoading(null);
       },
     },
   );

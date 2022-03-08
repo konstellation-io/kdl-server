@@ -580,6 +580,12 @@ func TestInteractor_GetKubeconfig(t *testing.T) {
 }
 
 func TestInteractor_CreateMissingServiceAccountsForUsers(t *testing.T) {
+	// GIVEN there are two active users
+	// WHEN the serviceAccounts for the users are called
+	// THEN deleted users are excluded
+	// AND k8client.CreateUserServiceAccount is called two times
+	// AND k8client.CreateUserServiceAccount is called with the usernameSlugs
+	// AND there are no errors
 	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
@@ -602,12 +608,6 @@ func TestInteractor_CreateMissingServiceAccountsForUsers(t *testing.T) {
 
 	users := []entity.User{targetUser, targetUser}
 
-	// GIVEN there are two active users
-	// WHEN the serviceAccounts for the users are called
-	// THEN deleted users are excluded
-	// AND k8client.CreateUserServiceAccount is called two times
-	// AND k8client.CreateUserServiceAccount is called with the usernameSlugs
-	// AND there are no errors
 	s.mocks.repo.EXPECT().FindAll(ctx, false).Return(users, nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, targetUser.UsernameSlug()).Return(nil, nil).Times(len(users))
 

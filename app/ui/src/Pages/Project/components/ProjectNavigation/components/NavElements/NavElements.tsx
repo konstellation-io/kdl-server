@@ -27,7 +27,7 @@ function NavElements({ isOpened }: Props) {
   const { projectId } = useParams<RouteProjectParams>();
   const { mainRoutes, userToolsRoutes, projectToolsRoutes } = useProjectNavigation(projectId);
   const runtimeLoading = useReactiveVar(loadingRuntime);
-  const isLoading = runtimeLoading !== '';
+  const isLoading = runtimeLoading !== null;
 
   const runtimeRunning = useReactiveVar(runningRuntime);
   const panelData = useReactiveVar(primaryPanel);

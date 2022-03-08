@@ -39,7 +39,7 @@ function ProjectPanels({ openedProject }: Props) {
   const runtimeLoading = useReactiveVar(loadingRuntime);
 
   const selectedRuntime = panel2Data?.runtime ?? null;
-  const isLoading = runtimeLoading !== '';
+  const isLoading = runtimeLoading !== null;
 
   const { closePanel: panel1Close } = usePanel(PanelType.PRIMARY);
   const { closePanel: panel2Close } = usePanel(PanelType.SECONDARY);

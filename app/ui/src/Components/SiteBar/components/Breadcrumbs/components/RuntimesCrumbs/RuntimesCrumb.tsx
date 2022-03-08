@@ -18,7 +18,7 @@ function RuntimesCrumb() {
 
   const executionStatus = runtimeRunning ? RUNTIME_STATUS.RUNNING : RUNTIME_STATUS.STOPPED;
 
-  const runtimeStatus = runtimeLoading !== '' ? RUNTIME_STATUS.LOADING : executionStatus;
+  const runtimeStatus = runtimeLoading !== null ? RUNTIME_STATUS.LOADING : executionStatus;
 
   return (
     <Crumb

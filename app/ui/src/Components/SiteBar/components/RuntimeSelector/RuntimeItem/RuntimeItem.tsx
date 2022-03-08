@@ -18,7 +18,7 @@ function RuntimeItem({ runtime }: Props) {
 
   const getRuntimeStatus = () => {
     const isRuntimeLoading = runtimeLoading === runtime?.id;
-    const isRuntimeRunningReplaced = isRuntimeRunning && runtimeLoading !== '';
+    const isRuntimeRunningReplaced = isRuntimeRunning && runtimeLoading !== null;
     const isLastRuntimeExecuted = lastRuntime?.id === runtime.id;
 
     if (isRuntimeLoading || isRuntimeRunningReplaced) return RUNTIME_STATUS.LOADING;
@@ -29,7 +29,7 @@ function RuntimeItem({ runtime }: Props) {
 
   return (
     <RuntimeRunner runtime={runtime} action={RuntimeAction.Start}>
-      <button className={styles.container} disabled={runtimeLoading !== '' || isRuntimeRunning}>
+      <button className={styles.container} disabled={runtimeLoading !== null || isRuntimeRunning}>
         <div className={styles.nameContainer}>
           <RuntimeIcon status={getRuntimeStatus()} className="icon-regular" />
           <div className={styles.name}>{runtime.name}</div>

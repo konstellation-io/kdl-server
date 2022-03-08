@@ -44,7 +44,7 @@ function Runtime({ runtime, isRunning, disabled }: Props) {
       data-testid="runtime"
       className={cx(styles.container, {
         [styles.active]: isRunning,
-        [styles.loading]: runtimeLoading === runtime.id || (isRunning && runtimeLoading !== ''),
+        [styles.loading]: runtimeLoading === runtime.id || (isRunning && runtimeLoading !== null),
         [styles.disabled]: disabled,
       })}
       onClick={toggleRuntimePanel}

@@ -17,7 +17,6 @@ import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
 import useRuntime from 'Graphql/client/hooks/useRuntime';
-import ReactTooltip, { Effect } from 'react-tooltip';
 import Tooltip from 'Components/Tooltip/Tooltip';
 
 type Props = {

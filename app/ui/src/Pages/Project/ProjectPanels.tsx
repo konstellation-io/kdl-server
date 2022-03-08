@@ -25,7 +25,6 @@ import IconPlay from '@material-ui/icons/PlayArrow';
 import IconPause from '@material-ui/icons/Pause';
 import useRuntime from 'Graphql/client/hooks/useRuntime';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import ReactTooltip from 'react-tooltip';
 import Tooltip from '../../Components/Tooltip/Tooltip';
 
 const defaultPanel = 'settings';

@@ -3,7 +3,9 @@
 exports[`When data is ready should render without crashing 1`] = `
 <body>
   <div>
-    <div>
+    <div
+      data-testid="settingsCrumb"
+    >
       <div
         class="settings _2rBeV _1z7Bn"
       >

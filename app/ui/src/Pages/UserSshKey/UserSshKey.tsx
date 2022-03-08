@@ -12,6 +12,8 @@ import useSSHKey from 'Graphql/hooks/useSSHKey';
 
 import GetSSHKeys from 'Graphql/queries/getSSHKey';
 import { runningRuntime } from '../../Graphql/client/cache';
+import { useHistory } from 'react-router-dom';
+import UserPageHeader from '../../Components/UserPageHeader/UserPageHeader';
 
 function UserSshKey() {
   const { data, loading, error } = useQuery<GetSSHKey>(GetSSHKeys);
@@ -112,7 +114,7 @@ function UserSshKey() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>SSH Key</h1>
+      <UserPageHeader title={'SSH Key'} />
       <h3 className={styles.subtitle}>
         This is your private SSH key, to grant access for your user to a project repository, copy the key and include it
         inside the SSH keys section of the repository settings page.

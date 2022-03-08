@@ -1,0 +1,28 @@
+@import 'Styles/variables';
+@import 'Styles/colors';
+
+.containerHeader {
+  display: flex;
+
+  .title {
+    color: font-color(lowlight);
+    line-height: 8 * $grid-unit;
+    text-align: left;
+
+    padding-left: 3 * $grid-unit;
+    background-color: palette(base, 600);
+    padding-left: 2 * $grid-unit;
+
+  }
+  .goBackButton {
+    color: font-color(lowlight);
+    height: 100%;
+    align-self: center;
+    margin-left: 2 * $grid-unit;
+    cursor: pointer;
+    &:hover,
+    &:focus {
+      color: white;
+    }
+  }
+}

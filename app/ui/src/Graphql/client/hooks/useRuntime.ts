@@ -13,7 +13,6 @@ function useRuntime(runtime?: GetRuntimes_runtimes) {
     SetActiveProjectToolsMutation,
     {
       onCompleted: () => {
-        console.log(`Completed mutation: ${runtime?.id}`);
         updateRunningRuntime(runtime);
         setRuntimeLoading('');
       },

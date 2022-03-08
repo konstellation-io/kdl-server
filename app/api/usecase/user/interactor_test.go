@@ -586,7 +586,6 @@ func TestInteractor_CreateMissingServiceAccountsForUsers(t *testing.T) {
 	// AND k8client.CreateUserServiceAccount is called two times
 	// AND k8client.CreateUserServiceAccount is called with the usernameSlugs
 	// AND there are no errors
-
 	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 

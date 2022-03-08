@@ -25,7 +25,7 @@ import IconPlay from '@material-ui/icons/PlayArrow';
 import IconPause from '@material-ui/icons/Pause';
 import useRuntime from 'Graphql/client/hooks/useRuntime';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Tooltip from '../../Components/Tooltip/Tooltip';
+import Tooltip from 'Components/Tooltip/Tooltip';
 
 const defaultPanel = 'settings';
 
@@ -81,7 +81,7 @@ function ProjectPanels({ openedProject }: Props) {
         );
 
       const pauseButtom = (
-        <Tooltip spanText="Stop tools" cssId="stopPanel" tooltipProps={tooltipProps}>
+        <Tooltip tooltipId="stopPanel" spanText="Stop tools" tooltipProps={tooltipProps}>
           <div data-tip={true} data-for="stopPanel" data-testid="panelStopRuntime">
             <Button label="" Icon={IconPause} onClick={pauseRuntime} />
           </div>
@@ -89,7 +89,7 @@ function ProjectPanels({ openedProject }: Props) {
       );
 
       const startButton = (
-        <Tooltip spanText="Start tools" cssId="startPanel" tooltipProps={tooltipProps}>
+        <Tooltip tooltipId="startPanel" spanText="Start tools" tooltipProps={tooltipProps}>
           <div data-tip={true} data-for="startPanel" data-testid="panelStartRuntime">
             <Button label="" Icon={IconPlay} onClick={runtimeStart} />
           </div>

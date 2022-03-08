@@ -70,11 +70,11 @@ function NavElements({ isOpened }: Props) {
     if (isLoading) return Progress;
 
     return runtimeRunning ? (
-      <Tooltip spanText="Stop tools" cssId="stop" tooltipProps={tooltipProps}>
+      <Tooltip tooltipId="stop" spanText="Stop tools" tooltipProps={tooltipProps}>
         <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStop} data-testid="stopTools" />
       </Tooltip>
     ) : (
-      <Tooltip spanText="Start tools" cssId="start" tooltipProps={tooltipProps}>
+      <Tooltip tooltipId="start" spanText="Start tools" tooltipProps={tooltipProps}>
         <IconPlay className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStart} data-testid="startTools" />
       </Tooltip>
     );
@@ -108,7 +108,7 @@ function NavElements({ isOpened }: Props) {
               className={cx(styles.usertoolsSettings, { [styles.opened]: isOpened })}
               data-testid="usertoolsSettings"
             >
-              <Tooltip spanText="Show available runtimes" cssId="settings" tooltipProps={tooltipProps}>
+              <Tooltip tooltipId="settings" spanText="Show available runtimes" tooltipProps={tooltipProps}>
                 <div data-tip data-for="settings" data-testid="openRuntimeSettings">
                   <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
                 </div>

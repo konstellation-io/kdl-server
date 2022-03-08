@@ -4,7 +4,7 @@ import * as React from 'react';
 
 type Props = {
   spanText: string;
-  cssId: string;
+  tooltipId: string;
   tooltipProps: {
     type?: string;
     effect?: string;
@@ -15,12 +15,12 @@ type Props = {
   children: JSX.Element;
 };
 
-const Tooltip: React.FC<Props> = ({ spanText, cssId, tooltipProps, children }: Props) => {
+const Tooltip: React.FC<Props> = ({ tooltipId, spanText, tooltipProps, children }: Props) => {
   const { type, effect, textColor, backgroundColor, place } = tooltipProps;
   return (
     <div>
       <ReactTooltip
-        id={cssId}
+        id={tooltipId}
         type={type as Type}
         effect={effect as Effect}
         textColor={textColor}
@@ -30,7 +30,7 @@ const Tooltip: React.FC<Props> = ({ spanText, cssId, tooltipProps, children }: P
       >
         <span>{spanText}</span>
       </ReactTooltip>
-      <div data-tip data-for={cssId}>
+      <div data-tip data-for={tooltipId}>
         {children}
       </div>
     </div>

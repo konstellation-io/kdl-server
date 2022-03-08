@@ -1,5 +1,5 @@
 import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
-import { GetRuntimes_runtimes } from '../../queries/types/GetRuntimes';
+import { GetRuntimes_runtimes } from 'Graphql/queries/types/GetRuntimes';
 
 export type PanelInfo = {
   id: PANEL_ID;

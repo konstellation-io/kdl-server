@@ -32,7 +32,8 @@
     }
 
     .loadingTag {
-      background-color: palette(feedback, 700);
+      @extend .runningTag;
+      background-color: palette(feedback);
     }
   }
   .runtimeTags {

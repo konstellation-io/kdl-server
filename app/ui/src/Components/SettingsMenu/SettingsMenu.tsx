@@ -70,7 +70,7 @@ function SettingsMenu() {
   };
 
   return (
-    <div>
+    <div data-testid="settingsCrumb">
       <Select
         label=""
         placeholder={data?.me?.email}

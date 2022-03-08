@@ -15,7 +15,7 @@ const UserPageHeader = ({ title }: Props) => {
   };
 
   return (
-    <div className={styles.containerHeader}>
+    <div className={styles.containerHeader} data-testid="userPageHeader">
       <ArrowBackIcon onClick={goBack} className={styles.goBackButton} fontSize="small" />
       <h1 className={styles.title}>{title}</h1>
     </div>

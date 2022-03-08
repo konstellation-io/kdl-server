@@ -26,6 +26,7 @@ import IconPause from '@material-ui/icons/Pause';
 import useRuntime from 'Graphql/client/hooks/useRuntime';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ReactTooltip from 'react-tooltip';
+import Tooltip from '../../Components/Tooltip/Tooltip';
 
 const defaultPanel = 'settings';
 
@@ -48,6 +49,13 @@ function ProjectPanels({ openedProject }: Props) {
   const { closePanel: panel1Close } = usePanel(PanelType.PRIMARY);
   const { closePanel: panel2Close } = usePanel(PanelType.SECONDARY);
   const { unselectMemberDetails } = useMemberDetails();
+
+  const tooltipProps = {
+    effect: 'solid',
+    textColor: 'white',
+    backgroundColor: '#888',
+    place: 'bottom',
+  };
 
   // Opening a level 1 panel closes previous level 2 panels
   useEffect(() => {
@@ -74,25 +82,19 @@ function ProjectPanels({ openedProject }: Props) {
         );
 
       const pauseButtom = (
-        <div>
-          <ReactTooltip id="stopPanel" effect="solid" textColor="white" backgroundColor="#888" place="bottom">
-            <span>Stop tools</span>
-          </ReactTooltip>
+        <Tooltip spanText="Stop tools" cssId="stopPanel" tooltipProps={tooltipProps}>
           <div data-tip={true} data-for="stopPanel" data-testid="panelStopRuntime">
             <Button label="" Icon={IconPause} onClick={pauseRuntime} />
           </div>
-        </div>
+        </Tooltip>
       );
 
       const startButton = (
-        <div>
-          <ReactTooltip id="startPanel" effect="solid" textColor="white" backgroundColor="#888" place="bottom">
-            <span>Start tools</span>
-          </ReactTooltip>
+        <Tooltip spanText="Start tools" cssId="startPanel" tooltipProps={tooltipProps}>
           <div data-tip={true} data-for="startPanel" data-testid="panelStartRuntime">
             <Button label="" Icon={IconPlay} onClick={runtimeStart} />
           </div>
-        </div>
+        </Tooltip>
       );
 
       return runtimeSelected?.id === runtimeRunning?.id ? pauseButtom : startButton;

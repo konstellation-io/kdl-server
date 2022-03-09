@@ -3,6 +3,7 @@ import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
 import { primaryPanel, secondaryPanel } from '../cache';
 
 import { useReactiveVar } from '@apollo/client';
+import { GetRuntimes_runtimes } from '../../queries/types/GetRuntimes';
 
 export enum PanelType {
   PRIMARY,
@@ -16,6 +17,7 @@ type UsePanelOptions = {
   size?: PANEL_SIZE;
   theme?: PANEL_THEME;
   fixedWidth?: boolean | null;
+  runtime?: GetRuntimes_runtimes;
 };
 function usePanel(
   type: PanelType,

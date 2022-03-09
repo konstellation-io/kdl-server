@@ -17,7 +17,10 @@ import useOpenedProject from 'Graphql/client/hooks/useOpenedProject';
 
 import { GetProjects } from 'Graphql/queries/types/GetProjects';
 import GetProjectsQuery from 'Graphql/queries/getProjects';
-import RuntimeRunner from './components/RuntimeRunner/RuntimeRunner';
+import useRuntime from 'Graphql/client/hooks/useRuntime';
+import { GetRunningRuntime } from 'Graphql/queries/types/GetRunningRuntime';
+import GetRunningRuntimeQuery from 'Graphql/queries/getRunningRuntime';
+import useRuntimeLoading from 'Graphql/client/hooks/useRuntimeLoading';
 
 function Project() {
   const { projectId } = useParams<RouteProjectParams>();
@@ -29,6 +32,10 @@ function Project() {
 
   const { updateOpenedProject } = useOpenedProject();
   const { resetTools } = useTools();
+  const { updateRunningRuntime } = useRuntime();
+
+  const { data: dataRuntimeRunning, loading: runtimeLoading } = useQuery<GetRunningRuntime>(GetRunningRuntimeQuery);
+  const { setRuntimeLoading } = useRuntimeLoading();
 
   useEffect(() => {
     const currentProject = data?.projects.find((p) => p.id === projectId);
@@ -38,6 +45,14 @@ function Project() {
     // updateOpenedProject does not change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, projectId]);
+
+  useEffect(() => {
+    setRuntimeLoading(runtimeLoading ? 'unknown' : null);
+    if (dataRuntimeRunning?.runningRuntime) {
+      updateRunningRuntime(dataRuntimeRunning.runningRuntime);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataRuntimeRunning, runtimeLoading]);
 
   useEffect(
     () => () => {
@@ -69,7 +84,6 @@ function Project() {
       <div className={styles.panelLayer}>
         <ProjectPanels openedProject={project} />
       </div>
-      <RuntimeRunner />
     </div>
   );
 }

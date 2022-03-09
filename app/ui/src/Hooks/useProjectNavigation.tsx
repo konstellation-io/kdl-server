@@ -101,7 +101,7 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
   );
 
   return useMemo(() => {
-    const disabled = !runtimeRunning || runtimeLoading !== '';
+    const disabled = !runtimeRunning || runtimeLoading !== null;
     const userToolsRoutesDisabled = userToolsRoutesConfig.map((route) => ({
       ...route,
       disabled,

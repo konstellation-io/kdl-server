@@ -1,7 +1,7 @@
 import { loadingRuntime } from '../cache';
 
 function useRuntimeLoading() {
-  function setRuntimeLoading(runtimeLoading: string) {
+  function setRuntimeLoading(runtimeLoading: string | null) {
     loadingRuntime(runtimeLoading);
   }
 

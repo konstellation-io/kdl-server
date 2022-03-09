@@ -12,11 +12,11 @@ import styles from './NavElements.module.scss';
 import { useParams } from 'react-router-dom';
 import useProjectNavigation from 'Hooks/useProjectNavigation';
 import { useReactiveVar } from '@apollo/client';
-import { loadingRuntime, lastRanRuntime, primaryPanel, runningRuntime } from 'Graphql/client/cache';
+import { lastRanRuntime, loadingRuntime, primaryPanel, runningRuntime } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
-import useRuntime from 'Graphql/client/hooks/useRuntime';
+import RuntimeRunner, { RuntimeAction } from 'Components/RuntimeRunner/RuntimeRunner';
 import Tooltip from 'Components/Tooltip/Tooltip';
 
 type Props = {
@@ -27,12 +27,11 @@ function NavElements({ isOpened }: Props) {
   const { projectId } = useParams<RouteProjectParams>();
   const { mainRoutes, userToolsRoutes, projectToolsRoutes } = useProjectNavigation(projectId);
   const runtimeLoading = useReactiveVar(loadingRuntime);
-  const isLoading = runtimeLoading !== '';
+  const isLoading = runtimeLoading !== null;
 
   const runtimeRunning = useReactiveVar(runningRuntime);
   const panelData = useReactiveVar(primaryPanel);
   const runtimeLastRun = useReactiveVar(lastRanRuntime);
-  const { startRuntime, pauseRuntime } = useRuntime();
 
   const { openPanel: openRuntimesList, closePanel: closeRuntimesList } = usePanel(
     PanelType.PRIMARY,
@@ -52,30 +51,25 @@ function NavElements({ isOpened }: Props) {
     else closeRuntimesList();
   }
 
-  function runtimeStart() {
-    startRuntime(runtimeLastRun);
-  }
-
-  function runtimeStop() {
-    pauseRuntime();
-  }
-
   function renderToggleToolsIcon() {
     const Progress = (
       <div className={styles.progressSpinnerContainer}>
         <CircularProgress color="inherit" className={styles.loadingTools} size={12} />{' '}
       </div>
     );
-
     if (isLoading) return Progress;
 
     return runtimeRunning ? (
       <Tooltip tooltipId="stop" spanText="Stop tools" tooltipProps={tooltipProps}>
-        <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStop} data-testid="stopTools" />
+        <RuntimeRunner action={RuntimeAction.Stop}>
+          <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} data-testid="stopTools" />
+        </RuntimeRunner>
       </Tooltip>
     ) : (
       <Tooltip tooltipId="start" spanText="Start tools" tooltipProps={tooltipProps}>
-        <IconPlay className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStart} data-testid="startTools" />
+        <RuntimeRunner action={RuntimeAction.Start} runtime={runtimeLastRun || undefined}>
+          <IconPlay className={cx(styles.usertoolsIcon, 'icon-small')} data-testid="startTools" />
+        </RuntimeRunner>
       </Tooltip>
     );
   }

@@ -343,10 +343,6 @@ mongodb:
   ##
   tolerations: []
 
-  ## This Chart feature is disabled because we have to deal with different Kubernetes API versions.
-  ## Please check the ingress template in Helm chart
-  ##
-
 oauth2Proxy:
   image:
     repository: quay.io/oauth2-proxy/oauth2-proxy
@@ -379,10 +375,6 @@ postgres:
   ##
   tolerations: []
 
-  ## This Chart feature is disabled because we have to deal with different Kubernetes API versions.
-  ## Please check the ingress template in Helm chart
-  ##
-
 projectOperator:
   ## Main container specs
   ##
@@ -410,6 +402,21 @@ projectOperator:
       repository: gcr.io/kubebuilder/kube-rbac-proxy
       tag: v0.8.0
       pullPolicy: IfNotPresent
+
+  ## Define which Nodes the Pods are scheduled on.
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Assign custom affinity rules
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  affinity: {}
+
+  ## If specified, the pod's tolerations.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
 
   ## The following components are managed by the manager container when kdlproject custom resources are detected
   ##

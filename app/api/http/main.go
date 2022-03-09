@@ -127,7 +127,7 @@ func initUserInteractor(userInteractor user.UseCase, cfg config.Config, logger l
 		return
 	}
 
-	err = userInteractor.CreateMissingServiceAccountsForUsers()
+	err = userInteractor.SynchronizeServiceAccountsForUsers()
 	if err != nil {
 		logger.Errorf("Unexpected error creating serviceAccount for users: %s", err)
 

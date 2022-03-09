@@ -34,6 +34,21 @@ func (k *k8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug s
 	return serviceAccount, nil
 }
 
+// DeleteUserServiceAccount delete a serviceAccount
+func (k *k8sClient) DeleteUserServiceAccount(ctx context.Context, usernameSlug string) error {
+	k.logger.Infof("Deleting service account for user \"%s\" in k8s...", usernameSlug)
+
+	saName := k.getUserServiceAccountName(usernameSlug)
+
+	err := k.clientset.CoreV1().ServiceAccounts(k.cfg.Kubernetes.Namespace).Delete(ctx, saName, metav1.DeleteOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
 // GetUserServiceAccount returns the serviceAccount for the given user.
 func (k *k8sClient) GetUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
 	serviceAccountName := k.getUserServiceAccountName(usernameSlug)

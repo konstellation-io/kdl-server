@@ -314,17 +314,24 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 	return i.repo.GetByUsername(ctx, user.Username)
 }
 
-// CreateMissingServiceAccountsForUsers ensures all users has their serviceAccount created.
-func (i *interactor) CreateMissingServiceAccountsForUsers() error {
+// SynchronizeServiceAccountsForUsers ensures all users has their serviceAccount created and delete it
+// - for users that has been removed
+func (i *interactor) SynchronizeServiceAccountsForUsers() error {
 	ctx := context.Background()
 
-	users, err := i.repo.FindAll(ctx, false)
+	users, err := i.repo.FindAll(ctx, true)
 	if err != nil {
 		return err
 	}
 
 	for _, user := range users {
-		_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
+
+		if user.Deleted {
+			err = i.k8sClient.DeleteUserServiceAccount(ctx, user.UsernameSlug())
+		} else {
+			_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
+
+		}
 
 		if err != nil && !k8errors.IsNotFound(err) {
 			i.logger.Infof("Error creating user serviceAccount for user %s %s", user.UsernameSlug(), err)

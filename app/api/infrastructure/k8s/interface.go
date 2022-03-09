@@ -25,6 +25,7 @@ type Client interface {
 	GetUserSSHKeySecret(ctx context.Context, usernameSlug string) ([]byte, error)
 	GetUserSSHKeyPublic(ctx context.Context, usernameSlug string) ([]byte, error)
 	CreateUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error)
+	DeleteUserServiceAccount(ctx context.Context, usernameSlug string) error
 	GetUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error)
 	GetUserKubeconfig(ctx context.Context, usernameSlug string) ([]byte, error)
 }

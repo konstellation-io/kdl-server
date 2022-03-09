@@ -263,20 +263,6 @@ func (mr *MockUseCaseMockRecorder) CreateAdminUser(username, email interface{}) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAdminUser", reflect.TypeOf((*MockUseCase)(nil).CreateAdminUser), username, email)
 }
 
-// CreateMissingServiceAccountsForUsers mocks base method.
-func (m *MockUseCase) CreateMissingServiceAccountsForUsers() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateMissingServiceAccountsForUsers")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CreateMissingServiceAccountsForUsers indicates an expected call of CreateMissingServiceAccountsForUsers.
-func (mr *MockUseCaseMockRecorder) CreateMissingServiceAccountsForUsers() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMissingServiceAccountsForUsers", reflect.TypeOf((*MockUseCase)(nil).CreateMissingServiceAccountsForUsers))
-}
-
 // FindAll mocks base method.
 func (m *MockUseCase) FindAll(ctx context.Context) ([]entity.User, error) {
 	m.ctrl.T.Helper()
@@ -435,6 +421,20 @@ func (m *MockUseCase) StopTools(ctx context.Context, username string) (entity.Us
 func (mr *MockUseCaseMockRecorder) StopTools(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopTools", reflect.TypeOf((*MockUseCase)(nil).StopTools), ctx, username)
+}
+
+// SynchronizeServiceAccountsForUsers mocks base method.
+func (m *MockUseCase) SynchronizeServiceAccountsForUsers() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SynchronizeServiceAccountsForUsers")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SynchronizeServiceAccountsForUsers indicates an expected call of SynchronizeServiceAccountsForUsers.
+func (mr *MockUseCaseMockRecorder) SynchronizeServiceAccountsForUsers() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SynchronizeServiceAccountsForUsers", reflect.TypeOf((*MockUseCase)(nil).SynchronizeServiceAccountsForUsers))
 }
 
 // UpdateAccessLevel mocks base method.

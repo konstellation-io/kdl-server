@@ -579,10 +579,9 @@ func TestInteractor_GetKubeconfig(t *testing.T) {
 	require.Equal(t, string(expectedKubeconfig), returnedKubeconfig)
 }
 
-func TestInteractor_CreateMissingServiceAccountsForUsers(t *testing.T) {
+func TestInteractor_SynchronizeServiceAccountsForUsers(t *testing.T) {
 	// GIVEN there are two active users
 	// WHEN the serviceAccounts for the users are called
-	// THEN deleted users are excluded
 	// AND k8client.CreateUserServiceAccount is called two times
 	// AND k8client.CreateUserServiceAccount is called with the usernameSlugs
 	// AND there are no errors
@@ -608,11 +607,11 @@ func TestInteractor_CreateMissingServiceAccountsForUsers(t *testing.T) {
 
 	users := []entity.User{targetUser, targetUser}
 
-	s.mocks.repo.EXPECT().FindAll(ctx, false).Return(users, nil)
+	s.mocks.repo.EXPECT().FindAll(ctx, true).Return(users, nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, targetUser.UsernameSlug()).Return(nil, nil).Times(len(users))
 
 	// WHEN the CreateMissingServiceAccountsForUsers is called
-	err := s.interactor.CreateMissingServiceAccountsForUsers()
+	err := s.interactor.SynchronizeServiceAccountsForUsers()
 
 	require.NoError(t, err)
 }

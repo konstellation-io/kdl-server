@@ -114,6 +114,21 @@ gitea:
     size: 10Gi
     storageClassName: standard
 
+  ## Define which Nodes the Pods are scheduled on.
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Assign custom affinity rules
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  affinity: {}
+
+  ## If specified, the pod's tolerations.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+
 giteaOauth2Setup:
   image:
     repository: konstellation/gitea-oauth2-setup

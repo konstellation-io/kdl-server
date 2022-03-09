@@ -1,22 +1,22 @@
 import AnimateHeight from 'react-animate-height';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import {NavButtonLink} from '../../ProjectNavigation';
+import { NavButtonLink } from '../../ProjectNavigation';
 import NavigationButton from '../NavigationButton/NavigationButton';
 import IconPause from '@material-ui/icons/Pause';
 import IconPlay from '@material-ui/icons/PlayArrow';
 import IconSettings from '@material-ui/icons/Settings';
 import * as React from 'react';
-import {RouteProjectParams} from 'Constants/routes';
+import { RouteProjectParams } from 'Constants/routes';
 import cx from 'classnames';
 import styles from './NavElements.module.scss';
-import {useParams} from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import useProjectNavigation from 'Hooks/useProjectNavigation';
-import {useReactiveVar} from '@apollo/client';
-import {lastRanRuntime, loadingRuntime, primaryPanel, runningRuntime} from 'Graphql/client/cache';
-import usePanel, {PanelType} from 'Graphql/client/hooks/usePanel';
-import {USERTOOLS_PANEL_OPTIONS} from 'Pages/Project/panelSettings';
-import {PANEL_ID} from 'Graphql/client/models/Panel';
-import RuntimeRunner, {RuntimeAction} from 'Components/RuntimeRunner/RuntimeRunner';
+import { useReactiveVar } from '@apollo/client';
+import { lastRanRuntime, loadingRuntime, primaryPanel, runningRuntime } from 'Graphql/client/cache';
+import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
+import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
+import { PANEL_ID } from 'Graphql/client/models/Panel';
+import RuntimeRunner, { RuntimeAction } from 'Components/RuntimeRunner/RuntimeRunner';
 import Tooltip from 'Components/Tooltip/Tooltip';
 
 type Props = {

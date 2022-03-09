@@ -1,10 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button } from 'kwc';
-import ReactTooltip from 'react-tooltip';
 import { useReactiveVar } from '@apollo/client';
-import IconPlay from '@material-ui/icons/PlayArrow';
-import IconPause from '@material-ui/icons/Pause';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { loadingRuntime, memberDetails, primaryPanel, runningRuntime, secondaryPanel } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';

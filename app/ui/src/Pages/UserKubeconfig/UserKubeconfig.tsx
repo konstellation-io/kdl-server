@@ -1,18 +1,14 @@
-import { Button, BUTTON_ALIGN, SpinnerCircular } from 'kwc';
+import { SpinnerCircular } from 'kwc';
 import * as React from 'react';
 import styles from './UserKubeconfig.module.scss';
 import { useQuery } from '@apollo/client';
 import getKubeconfig from 'Graphql/queries/getKubeconfig';
 import Kubeconfig from './Components/Kubeconfig';
 import { GetKubeconfig } from 'Graphql/queries/types/GetKubeconfig';
-import { useHistory } from 'react-router-dom';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import UserPageHeader from '../../Components/UserPageHeader/UserPageHeader';
+import UserPageHeader from 'Components/UserPageHeader/UserPageHeader';
 
 function UserKubeconfig() {
   const { data, loading } = useQuery<GetKubeconfig>(getKubeconfig);
-
-  const history = useHistory();
 
   function getContent() {
     if (loading) return <SpinnerCircular />;
@@ -24,18 +20,6 @@ function UserKubeconfig() {
 
   return (
     <div className={styles.container}>
-      {/*<div className={styles.containerHeader}>*/}
-      {/*<Button*/}
-      {/*  Icon={ArrowBackIcon}*/}
-      {/*  onClick={goBack}*/}
-      {/*  label=""*/}
-      {/*  iconSize={'icon-regular'}*/}
-      {/*  align={BUTTON_ALIGN.MIDDLE}*/}
-      {/*  className={styles.goBackButton}*/}
-      {/*/>*/}
-      {/*  <ArrowBackIcon onClick={goBack} className={styles.goBackButton} fontSize="small" />*/}
-      {/*  <h1 className={styles.title}>Kubeconfig</h1>*/}
-      {/*</div>*/}
       <UserPageHeader title={'Kubeconfig'} />
       <h3 className={styles.subtitle}>
         This is your private kubeconfig. You can use it to connect your local VSCode to the runtime via the Kubernetes

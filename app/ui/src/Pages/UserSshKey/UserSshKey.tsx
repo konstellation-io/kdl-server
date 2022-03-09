@@ -11,9 +11,8 @@ import { useQuery, useReactiveVar } from '@apollo/client';
 import useSSHKey from 'Graphql/hooks/useSSHKey';
 
 import GetSSHKeys from 'Graphql/queries/getSSHKey';
-import { runningRuntime } from '../../Graphql/client/cache';
-import { useHistory } from 'react-router-dom';
-import UserPageHeader from '../../Components/UserPageHeader/UserPageHeader';
+import { runningRuntime } from 'Graphql/client/cache';
+import UserPageHeader from 'Components/UserPageHeader/UserPageHeader';
 
 function UserSshKey() {
   const { data, loading, error } = useQuery<GetSSHKey>(GetSSHKeys);

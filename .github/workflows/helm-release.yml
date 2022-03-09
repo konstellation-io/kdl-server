@@ -28,6 +28,6 @@ jobs:
       chart_file: helm/kdl-server/Chart.yaml
       chart_path: helm
       chart_url: http://kdl.konstellation.io
-      current_major: 1
+      current_major: 2
     secrets:
       pat: ${{ secrets.PATNAME }}

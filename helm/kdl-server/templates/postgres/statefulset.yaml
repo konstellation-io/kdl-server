@@ -33,6 +33,18 @@ spec:
             subPath: data # to prevent warning: "initdb: directory "/var/lib/postgresql/data" exists but is not empty"
           - name: postgres-initdb
             mountPath: /docker-entrypoint-initdb.d/
+    {{- with .Values.postgres.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.postgres.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.postgres.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       volumes:
         - name: postgres-initdb
           configMap:

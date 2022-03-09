@@ -15,7 +15,7 @@ function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
   const runtimeLoading = useReactiveVar(loadingRuntime);
   const running = activeRuntime?.id === runtime.id;
   const checkReady = () => {
-    if (!running) return;
+    if (!running && !runtimeLoading) return;
     if (runtimeLoading) {
       return (
         <div className={styles.loadingTag} data-testid="statusTag">

@@ -30,6 +30,11 @@
       font-weight: bold;
       max-width: 13 *$grid-unit;
     }
+
+    .loadingTag {
+      @extend .runningTag;
+      background-color: palette(feedback);
+    }
   }
   .runtimeTags {
     display: flex;

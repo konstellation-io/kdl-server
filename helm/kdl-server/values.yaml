@@ -476,6 +476,24 @@ userToolsOperator:
   storage:
     size: 10Gi
     storageClassName: standard
+
+  ## Define which Nodes the Pods are scheduled on.
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Assign custom affinity rules
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  affinity: {}
+
+  ## If specified, the pod's tolerations.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+
+  ## The following components are managed by the manager container when `usertool` custom resources are detected
+  ##
   jupyter:
     image:
       repository: konstellation/jupyter-gpu

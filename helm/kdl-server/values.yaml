@@ -328,6 +328,25 @@ mongodb:
   host: "kdl-mongo-0"
   port: 27017
 
+  ## Define which Nodes the Pods are scheduled on.
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Assign custom affinity rules
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  affinity: {}
+
+  ## If specified, the pod's tolerations.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+
+  ## This Chart feature is disabled because we have to deal with different Kubernetes API versions.
+  ## Please check the ingress template in Helm chart
+  ##
+
 oauth2Proxy:
   image:
     repository: quay.io/oauth2-proxy/oauth2-proxy

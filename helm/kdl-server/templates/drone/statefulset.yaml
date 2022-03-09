@@ -66,6 +66,18 @@ spec:
               port: 80
             initialDelaySeconds: 30
             periodSeconds: 60
+    {{- with .Values.drone.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.drone.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.drone.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
   volumeClaimTemplates:
     - metadata:
         name: drone-pvc

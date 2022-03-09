@@ -167,7 +167,7 @@ describe('Runtimes Behaviour', () => {
       cy.url().should('contain', '/overview');
     });
 
-    it.only('should show the badged loading or running', () => {
+    it('should show the badged loading or running', () => {
       // GIVEN there is a runtime started
       cy.kstInterceptor('GetRunningRuntime', { data: { runningRuntime: null } });
 

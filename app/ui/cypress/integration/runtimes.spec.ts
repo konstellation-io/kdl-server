@@ -20,6 +20,14 @@ const isRuntimeStopped = (runtimeName: string) => {
   cy.getByTestId('statusTag').should('not.exist');
 };
 
+const isRuntimeLoading = (runtimeName: string) => {
+  cy.getByTestId('openRuntimeSettings').click();
+  cy.getByTestId('runtimesList').contains(runtimeName).click();
+
+  cy.getByTestId('runtimeInfoPanel').should('contain', runtimeName);
+  cy.getByTestId('statusTag').should('contain', 'Loading');
+};
+
 describe('Runtimes Behaviour', () => {
   beforeEach(() => {
     // There is a list of projects
@@ -146,7 +154,7 @@ describe('Runtimes Behaviour', () => {
       cy.kstInterceptor('GetRunningRuntime', { data: GetRunningRuntimeQuery });
 
       // and the runtime is being replaced with certain delay
-      cy.kstInterceptor('SetActiveUserTools', { data: { areToolsActive: true } }, { delay: 1000 });
+      cy.kstInterceptor('SetActiveUserTools', { data: { id: true } }, { delay: 1000 });
       cy.getByTestId('openRuntimeSettings').click();
       cy.getByTestId('runtimesList').children().last().click();
       cy.getByTestId('panelStartRuntime').click();
@@ -157,6 +165,22 @@ describe('Runtimes Behaviour', () => {
 
       // THEN should redirect to overview page
       cy.url().should('contain', '/overview');
+    });
+
+    it.only('should show the badged loading or running', () => {
+      // GIVEN there is a runtime started
+      cy.kstInterceptor('GetRunningRuntime', { data: { runningRuntime: null } });
+
+      // GIVEN the first runtime selected
+      cy.kstInterceptor('SetActiveUserTools', { data: { id: GetRuntimesQuery.runtimes[0].id } }, { delay: 1000 });
+
+      // When we start it
+      cy.getByTestId('openRuntimeSettings').click();
+      cy.getByTestId('runtimesList').children().first().click();
+      cy.getByTestId('panelStartRuntime').click();
+
+      // THEN should show loading badge
+      cy.getByTestId('statusTag').contains('Loading');
     });
   });
 

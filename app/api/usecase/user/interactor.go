@@ -327,7 +327,7 @@ func (i *interactor) SynchronizeServiceAccountsForUsers() error {
 		if user.Deleted {
 			// Delete service account
 			if err := i.k8sClient.DeleteUserServiceAccount(ctx, user.UsernameSlug()); err != nil {
-				i.logger.Errorf("Error deleting user service account for user %s %s", err)
+				i.logger.Errorf("Error deleting user service account for user %s %s", user.UsernameSlug(), err)
 			}
 		} else {
 			// Create service account

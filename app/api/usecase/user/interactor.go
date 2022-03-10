@@ -333,7 +333,7 @@ func (i *interactor) SynchronizeServiceAccountsForUsers() error {
 			// Create service account
 			_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
 			if err != nil && !k8errors.IsNotFound(err) {
-				i.logger.Infof("Error creating user serviceAccount for user %s %s", user.UsernameSlug(), err)
+				i.logger.Errorf("Error creating user serviceAccount for user %s %s", user.UsernameSlug(), err)
 			}
 		}
 	}

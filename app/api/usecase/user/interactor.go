@@ -3,9 +3,10 @@ package user
 import (
 	"context"
 	"errors"
-	k8errors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/gosimple/slug"
+	k8errors "k8s.io/apimachinery/pkg/api/errors"
+
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 

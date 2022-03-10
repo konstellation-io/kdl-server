@@ -3,10 +3,9 @@ package user
 import (
 	"context"
 	"errors"
-
-	"github.com/gosimple/slug"
 	k8errors "k8s.io/apimachinery/pkg/api/errors"
 
+	"github.com/gosimple/slug"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 
@@ -267,7 +266,7 @@ func (i *interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, le
 
 // RegenerateSSHKeys generate new SSH key pair for the given user.
 // - Check if user exists. (if no, returns ErrUserNotFound error)
-// - Check if userTools are Running. (if yes, returns ErrUserNotFound error
+// - Check if userTools are Running. (if yes, returns ErrUserNotFound error)
 // - Generate a new ssh key pair
 // - Check if k8s secret exists. If yes, update it. Else, create it.
 // - Update public key on Gitea
@@ -315,7 +314,7 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 }
 
 // SynchronizeServiceAccountsForUsers ensures all users has their serviceAccount created and delete it
-// - for users that has been removed
+// - for users that has been removed.
 func (i *interactor) SynchronizeServiceAccountsForUsers() error {
 	ctx := context.Background()
 
@@ -325,16 +324,17 @@ func (i *interactor) SynchronizeServiceAccountsForUsers() error {
 	}
 
 	for _, user := range users {
-
 		if user.Deleted {
-			err = i.k8sClient.DeleteUserServiceAccount(ctx, user.UsernameSlug())
+			// Delete service account
+			if err := i.k8sClient.DeleteUserServiceAccount(ctx, user.UsernameSlug()); err != nil {
+				i.logger.Errorf("Error deleting user service account for user %s %s", err)
+			}
 		} else {
+			// Create service account
 			_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
-
-		}
-
-		if err != nil && !k8errors.IsNotFound(err) {
-			i.logger.Infof("Error creating user serviceAccount for user %s %s", user.UsernameSlug(), err)
+			if err != nil && !k8errors.IsNotFound(err) {
+				i.logger.Infof("Error creating user serviceAccount for user %s %s", user.UsernameSlug(), err)
+			}
 		}
 	}
 

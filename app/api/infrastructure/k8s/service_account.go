@@ -34,7 +34,7 @@ func (k *k8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug s
 	return serviceAccount, nil
 }
 
-// DeleteUserServiceAccount delete a serviceAccount
+// DeleteUserServiceAccount delete a serviceAccount.
 func (k *k8sClient) DeleteUserServiceAccount(ctx context.Context, usernameSlug string) error {
 	k.logger.Infof("Deleting service account for user \"%s\" in k8s...", usernameSlug)
 
@@ -46,7 +46,6 @@ func (k *k8sClient) DeleteUserServiceAccount(ctx context.Context, usernameSlug s
 	}
 
 	return nil
-
 }
 
 // GetUserServiceAccount returns the serviceAccount for the given user.

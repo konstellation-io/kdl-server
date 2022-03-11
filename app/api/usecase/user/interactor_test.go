@@ -580,10 +580,10 @@ func TestInteractor_GetKubeconfig(t *testing.T) {
 }
 
 func TestInteractor_SynchronizeServiceAccountsForUsers(t *testing.T) {
-	// GIVEN there are two active users
+	// GIVEN there are two active users and one deleted user
 	// WHEN the serviceAccounts for the users are called
 	// AND k8client.CreateUserServiceAccount is called two times
-	// AND k8client.CreateUserServiceAccount is called with the usernameSlugs
+	// AND k8client.DeleteUserServiceAccount is called one time
 	// AND there are no errors
 	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
@@ -605,10 +605,22 @@ func TestInteractor_SynchronizeServiceAccountsForUsers(t *testing.T) {
 		Deleted:     false,
 	}
 
-	users := []entity.User{targetUser, targetUser}
+	deletedTargetUser := entity.User{
+		ID:          id,
+		Username:    "rick.sanchez",
+		Email:       email,
+		AccessLevel: accessLevel,
+		Deleted:     true,
+	}
+
+	users := []entity.User{targetUser, targetUser, deletedTargetUser}
+	toDeleteUsers := []entity.User{deletedTargetUser}
 
 	s.mocks.repo.EXPECT().FindAll(ctx, true).Return(users, nil)
-	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, targetUser.UsernameSlug()).Return(nil, nil).Times(len(users))
+	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(
+		ctx, targetUser.UsernameSlug()).Return(nil, nil).Times(len(users) - len(toDeleteUsers))
+	s.mocks.k8sClientMock.EXPECT().DeleteUserServiceAccount(
+		ctx, deletedTargetUser.UsernameSlug()).Return(nil).Times(len(toDeleteUsers))
 
 	// WHEN the CreateMissingServiceAccountsForUsers is called
 	err := s.interactor.SynchronizeServiceAccountsForUsers()

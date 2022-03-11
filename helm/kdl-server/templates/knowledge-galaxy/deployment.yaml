@@ -32,6 +32,18 @@ spec:
               subPath: config.json
           ports:
             - containerPort: 8080
+    {{- with .Values.knowledgeGalaxy.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.knowledgeGalaxy.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.knowledgeGalaxy.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       volumes:
         - name: config
           configMap:

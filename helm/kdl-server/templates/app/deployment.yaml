@@ -147,6 +147,18 @@ spec:
             - name: project-proxy-nginx-config
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
+    {{- with .Values.kdlServer.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.kdlServer.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.kdlServer.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       volumes:
         - name: oauth2-config
           configMap:

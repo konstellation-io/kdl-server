@@ -36,6 +36,18 @@ spec:
               mountPath: "/data/db"
             - name: init-scripts
               mountPath: /docker-entrypoint-initdb.d/
+    {{- with .Values.mongodb.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.mongodb.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.mongodb.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       volumes:
         - name: init-scripts
           configMap:

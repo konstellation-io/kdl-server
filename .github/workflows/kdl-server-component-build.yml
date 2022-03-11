@@ -82,6 +82,18 @@ jobs:
             ./app/ui/coverage
             ./app/ui/test-report.xml
 
+      - if: steps.changes.outputs.ui == 'true'
+        name: UI Run e2e tests
+        uses: cypress-io/github-action@v2
+        with:
+          install: true
+          working-directory: ./app/ui
+          start: npm start
+          browser: chrome
+          headless: true
+          wait-on: 'http://localhost:3001'
+          wait-on-timeout: 120
+
   build:
     needs: [ lint-dockerfile, quality-checks ]
     uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.7.2

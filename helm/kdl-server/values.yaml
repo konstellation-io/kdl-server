@@ -73,7 +73,7 @@ drone:
   runnerCapacity: 5
   ingress:
     proxyBodySize: 100m
-  
+
   ## Define which Nodes the Pods are scheduled on.
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
   ##
@@ -100,7 +100,7 @@ droneRunner:
     repository: drone/drone-runner-kube
     tag: 1.0.0-beta.6
     pullPolicy: IfNotPresent
-  
+
   ## Define which Nodes the Pods are scheduled on.
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
   ##
@@ -234,10 +234,10 @@ knowledgeGalaxy:
     ##
     imagePullSecrets: []
     # - name: regcred
-  
-  ## Define which Nodes the Pods are scheduled on.
-  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-  ##
+
+    ## Define which Nodes the Pods are scheduled on.
+    ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+    ##
   nodeSelector: {}
 
   ## Assign custom affinity rules
@@ -253,7 +253,7 @@ knowledgeGalaxy:
 kdlServer:
   image:
     repository: konstellation/kdl-server
-    tag: 1.8.0
+    tag: 1.9.0
     pullPolicy: IfNotPresent
   ingress:
     proxyReadTimeout: "3600"
@@ -292,7 +292,7 @@ minio:
     storageClass: standard
     existingClaim: received-data-claim
     accessMode: ReadWriteMany
-  
+
   ## Define which Nodes the Pods are scheduled on.
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
   ##
@@ -359,7 +359,7 @@ postgres:
   storage:
     size: 10Gi
     storageClassName: standard
-  
+
   ## Define which Nodes the Pods are scheduled on.
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
   ##

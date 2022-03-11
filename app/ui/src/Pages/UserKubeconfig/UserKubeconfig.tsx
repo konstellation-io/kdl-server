@@ -5,6 +5,7 @@ import { useQuery } from '@apollo/client';
 import getKubeconfig from 'Graphql/queries/getKubeconfig';
 import Kubeconfig from './Components/Kubeconfig';
 import { GetKubeconfig } from 'Graphql/queries/types/GetKubeconfig';
+import UserPageHeader from 'Components/UserPageHeader/UserPageHeader';
 
 function UserKubeconfig() {
   const { data, loading } = useQuery<GetKubeconfig>(getKubeconfig);
@@ -19,7 +20,7 @@ function UserKubeconfig() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Kubeconfig</h1>
+      <UserPageHeader title={'Kubeconfig'} />
       <h3 className={styles.subtitle}>
         This is your private kubeconfig. You can use it to connect your local VSCode to the runtime via the Kubernetes
         extension in VSCode.

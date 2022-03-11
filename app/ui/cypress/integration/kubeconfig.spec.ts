@@ -1,6 +1,8 @@
 import GetMeQuery from '../../src/Mocks/GetMeQuery';
 import GetRuntimesQuery from '../../src/Mocks/GetRuntimesQuery';
 import { join } from 'path';
+import GetProjectsQuery from '../../src/Mocks/GetProjectsQuery';
+import GetRunningRuntimeQuery from '../../src/Mocks/GetRunningRuntimeQuery';
 
 describe('Kubeconfig Pages Behavior', () => {
   beforeEach(() => {
@@ -77,5 +79,23 @@ describe('Kubeconfig Pages Behavior', () => {
     // THEN the kubeconfig should be downloaded
     const downloadFolder = Cypress.config('downloadsFolder');
     cy.readFile(join(downloadFolder, 'kubeconfig')).should('exist');
+  });
+
+  it('should go back when click on back arrow', () => {
+    // GIVEN there is a list of projects
+    cy.kstInterceptor('GetProjects', { data: GetProjectsQuery });
+    // and a runtime is running
+    cy.kstInterceptor('GetRunningRuntime', { data: GetRunningRuntimeQuery });
+    // and we navigate to kubeconfig from the settings crumb
+    cy.visit('http://localhost:3001');
+    cy.getByTestId('project').first().parent().click();
+    cy.getByTestId('settingsCrumb').click();
+    cy.contains('Kubeconfig').click();
+
+    // WHEN the arrow button in the left of the title is clicked
+    cy.getByTestId('userPageHeader').children().first().click();
+
+    // THEN it should navigate to the previous page
+    cy.url().should('contain', '/overview');
   });
 });

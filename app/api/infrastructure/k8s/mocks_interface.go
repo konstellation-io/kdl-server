@@ -107,6 +107,20 @@ func (mr *MockClientMockRecorder) CreateUserToolsCR(ctx, username, runtimeID, ru
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserToolsCR", reflect.TypeOf((*MockClient)(nil).CreateUserToolsCR), ctx, username, runtimeID, runtimeImage, runtimeTag)
 }
 
+// DeleteUserServiceAccount mocks base method.
+func (m *MockClient) DeleteUserServiceAccount(ctx context.Context, usernameSlug string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUserServiceAccount", ctx, usernameSlug)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteUserServiceAccount indicates an expected call of DeleteUserServiceAccount.
+func (mr *MockClientMockRecorder) DeleteUserServiceAccount(ctx, usernameSlug interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserServiceAccount", reflect.TypeOf((*MockClient)(nil).DeleteUserServiceAccount), ctx, usernameSlug)
+}
+
 // DeleteUserToolsCR mocks base method.
 func (m *MockClient) DeleteUserToolsCR(ctx context.Context, username string) error {
 	m.ctrl.T.Helper()

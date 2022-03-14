@@ -267,7 +267,7 @@ func (i *interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, le
 
 // RegenerateSSHKeys generate new SSH key pair for the given user.
 // - Check if user exists. (if no, returns ErrUserNotFound error)
-// - Check if userTools are Running. (if yes, returns ErrUserNotFound error
+// - Check if userTools are Running. (if yes, returns ErrUserNotFound error)
 // - Generate a new ssh key pair
 // - Check if k8s secret exists. If yes, update it. Else, create it.
 // - Update public key on Gitea
@@ -314,20 +314,26 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 	return i.repo.GetByUsername(ctx, user.Username)
 }
 
-// CreateMissingServiceAccountsForUsers ensures all users has their serviceAccount created.
-func (i *interactor) CreateMissingServiceAccountsForUsers() error {
+// SynchronizeServiceAccountsForUsers ensures all users has their serviceAccount created and delete it
+// - for users that has been removed.
+func (i *interactor) SynchronizeServiceAccountsForUsers() error {
 	ctx := context.Background()
 
-	users, err := i.repo.FindAll(ctx, false)
+	users, err := i.repo.FindAll(ctx, true)
 	if err != nil {
 		return err
 	}
 
 	for _, user := range users {
-		_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
-
-		if err != nil && !k8errors.IsNotFound(err) {
-			i.logger.Infof("Error creating user serviceAccount for user %s %s", user.UsernameSlug(), err)
+		if user.Deleted {
+			if err := i.k8sClient.DeleteUserServiceAccount(ctx, user.UsernameSlug()); err != nil {
+				i.logger.Errorf("Error deleting user service account for user %s %s", user.UsernameSlug(), err)
+			}
+		} else {
+			_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
+			if err != nil && !k8errors.IsNotFound(err) {
+				i.logger.Errorf("Error creating user serviceAccount for user %s %s", user.UsernameSlug(), err)
+			}
 		}
 	}
 

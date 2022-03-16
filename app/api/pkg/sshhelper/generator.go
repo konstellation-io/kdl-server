@@ -48,7 +48,7 @@ func (g *generator) generateKeyPair() (public, private []byte, err error) {
 	}
 
 	block := &pem.Block{
-		Type:  "PUBLIC KEY",
+		Type:  "ssh-ed25519",
 		Bytes: publicKeyBytes,
 	}
 	pub := pem.EncodeToMemory(block)

@@ -7,8 +7,11 @@ import (
 	"encoding/pem"
 	"time"
 
+	"golang.org/x/crypto/ssh"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
+	"github.com/mikesmitty/edkey"
 )
 
 type generator struct {
@@ -37,28 +40,23 @@ func (g *generator) NewKeys() (entity.SSHKey, error) {
 }
 
 func (g *generator) generateKeyPair() (public, private []byte, err error) {
-	publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader)
+	pubKey, privKey, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		return nil, nil, err
+	}
+	publicKey, err := ssh.NewPublicKey(pubKey)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	publicKeyBytes, err := x509.MarshalPKIXPublicKey(publicKey)
-	if err != nil {
-		return nil, nil, err
+	pemKey := &pem.Block{
+		Type:  "OPENSSH PRIVATE KEY",
+		Bytes: edkey.MarshalED25519PrivateKey(privKey),
 	}
+	privateKey := pem.EncodeToMemory(pemKey)
+	authorizedKey := ssh.MarshalAuthorizedKey(publicKey)
 
-	block := &pem.Block{
-		Type:  "ssh-ed25519",
-		Bytes: publicKeyBytes,
-	}
-	pub := pem.EncodeToMemory(block)
-
-	privatePem, err := g.encodePrivateKeyToPEM(privateKey)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return pub, privatePem, nil
+	return authorizedKey, privateKey, nil
 }
 
 // encodePrivateKeyToPEM encodes Private Key from RSA to PEM format.

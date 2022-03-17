@@ -48,6 +48,19 @@
 A major chart version change (like v0.15.3 -> v1.0.0) indicates that there is an incompatible breaking change needing
 manual actions.
 
+#### From 1.X to 2.X
+
+This major version comes with the following breaking changes:
+
+- This upgrades user-tools-operator to v0.17.0.
+    - users service accounts are now managed by `kdlServer` instead the `user-tools-operator` 
+
+Run these commands to update the CRDs before applying the upgrade.
+
+```bash
+kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-io/kdl-server/v1.0.0/helm/kdl-server/crds/user-tools-operator-crd.yaml
+```
+
 #### From 0.X to 1.X
 
 This major version comes with the following breaking changes:
@@ -57,8 +70,7 @@ This major version comes with the following breaking changes:
     - `spec.groups` changed to `kdl.konstellation.io`
 - KDL Runtimes support
 
-Before applying the upgrade Delete all usertools from KDL and run these commands to update the CRDs before applying the
-upgrade.
+Run these commands to update the CRDs before applying the upgrade.
 
 ```bash
 kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-io/kdl-server/v1.0.0/helm/kdl-server/crds/user-tools-operator-crd.yaml
@@ -213,7 +225,7 @@ new version with some features or apply a fix to a current release.
 ### Alphas
 
 In order to add new features just create a feature branch from master, and after the merger the Pull Request a workflow
-will run the tests and if everything passes a new alpha tag will be created (like *v0.0-alpha.0*), and a new release
+will run the tests and if everything passes a new alpha tag will be created (like *v0.0chore/new-relese-notes-alpha.0*), and a new release
 will be generated with this tag.
 
 ### Releases

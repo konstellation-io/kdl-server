@@ -12,6 +12,7 @@ require (
 	github.com/gosimple/slug v1.9.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/konstellation-io/kre/libs/simplelogger v0.0.0-20210127163202-65666c1e48f8
+	github.com/mikesmitty/edkey v0.0.0-20170222072505-3356ea4e686a
 	github.com/minio/minio-go/v7 v7.0.8
 	github.com/stretchr/testify v1.7.0
 	github.com/vektah/gqlparser/v2 v2.1.0

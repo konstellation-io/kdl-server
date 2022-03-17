@@ -23,13 +23,10 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
   }
 
   function redirectIfToolsActives() {
-    return (
-      !runtimeRunning ||
-      (runtimeLoading !== '' &&
-        [ROUTE.PROJECT_TOOL_JUPYTER, ROUTE.PROJECT_TOOL_VSCODE].map((r) => (
-          <Redirect key={r} from={r} to={ROUTE.PROJECT_OVERVIEW} />
-        )))
-    );
+    if (runtimeRunning && runtimeLoading === null) return;
+    return [ROUTE.PROJECT_TOOL_JUPYTER, ROUTE.PROJECT_TOOL_VSCODE].map((r) => (
+      <Redirect key={r} from={r} to={ROUTE.PROJECT_OVERVIEW} />
+    ));
   }
 
   function redirectDisabledKG() {

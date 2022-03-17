@@ -31,3 +31,15 @@ spec:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
               value: "user-tools-operator"
+    {{- with .Values.userToolsOperator.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.userToolsOperator.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.userToolsOperator.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

@@ -10,6 +10,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	entity "github.com/konstellation-io/kdl-server/app/api/entity"
+	v1 "k8s.io/api/core/v1"
 )
 
 // MockClient is a mock of Client interface.
@@ -77,6 +78,21 @@ func (mr *MockClientMockRecorder) CreateUserSSHKeySecret(ctx, user, public, priv
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserSSHKeySecret", reflect.TypeOf((*MockClient)(nil).CreateUserSSHKeySecret), ctx, user, public, private)
 }
 
+// CreateUserServiceAccount mocks base method.
+func (m *MockClient) CreateUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUserServiceAccount", ctx, usernameSlug)
+	ret0, _ := ret[0].(*v1.ServiceAccount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateUserServiceAccount indicates an expected call of CreateUserServiceAccount.
+func (mr *MockClientMockRecorder) CreateUserServiceAccount(ctx, usernameSlug interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserServiceAccount", reflect.TypeOf((*MockClient)(nil).CreateUserServiceAccount), ctx, usernameSlug)
+}
+
 // CreateUserToolsCR mocks base method.
 func (m *MockClient) CreateUserToolsCR(ctx context.Context, username, runtimeID, runtimeImage, runtimeTag string) error {
 	m.ctrl.T.Helper()
@@ -89,6 +105,20 @@ func (m *MockClient) CreateUserToolsCR(ctx context.Context, username, runtimeID,
 func (mr *MockClientMockRecorder) CreateUserToolsCR(ctx, username, runtimeID, runtimeImage, runtimeTag interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserToolsCR", reflect.TypeOf((*MockClient)(nil).CreateUserToolsCR), ctx, username, runtimeID, runtimeImage, runtimeTag)
+}
+
+// DeleteUserServiceAccount mocks base method.
+func (m *MockClient) DeleteUserServiceAccount(ctx context.Context, usernameSlug string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUserServiceAccount", ctx, usernameSlug)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteUserServiceAccount indicates an expected call of DeleteUserServiceAccount.
+func (mr *MockClientMockRecorder) DeleteUserServiceAccount(ctx, usernameSlug interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserServiceAccount", reflect.TypeOf((*MockClient)(nil).DeleteUserServiceAccount), ctx, usernameSlug)
 }
 
 // DeleteUserToolsCR mocks base method.
@@ -135,19 +165,19 @@ func (mr *MockClientMockRecorder) GetSecret(ctx, name interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecret", reflect.TypeOf((*MockClient)(nil).GetSecret), ctx, name)
 }
 
-// GetUserKubeconfigSecret mocks base method.
-func (m *MockClient) GetUserKubeconfigSecret(ctx context.Context, usernameSlug string) (string, error) {
+// GetUserKubeconfig mocks base method.
+func (m *MockClient) GetUserKubeconfig(ctx context.Context, usernameSlug string) ([]byte, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserKubeconfigSecret", ctx, usernameSlug)
-	ret0, _ := ret[0].(string)
+	ret := m.ctrl.Call(m, "GetUserKubeconfig", ctx, usernameSlug)
+	ret0, _ := ret[0].([]byte)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetUserKubeconfigSecret indicates an expected call of GetUserKubeconfigSecret.
-func (mr *MockClientMockRecorder) GetUserKubeconfigSecret(ctx, usernameSlug interface{}) *gomock.Call {
+// GetUserKubeconfig indicates an expected call of GetUserKubeconfig.
+func (mr *MockClientMockRecorder) GetUserKubeconfig(ctx, usernameSlug interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserKubeconfigSecret", reflect.TypeOf((*MockClient)(nil).GetUserKubeconfigSecret), ctx, usernameSlug)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserKubeconfig", reflect.TypeOf((*MockClient)(nil).GetUserKubeconfig), ctx, usernameSlug)
 }
 
 // GetUserSSHKeyPublic mocks base method.
@@ -178,6 +208,21 @@ func (m *MockClient) GetUserSSHKeySecret(ctx context.Context, usernameSlug strin
 func (mr *MockClientMockRecorder) GetUserSSHKeySecret(ctx, usernameSlug interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserSSHKeySecret", reflect.TypeOf((*MockClient)(nil).GetUserSSHKeySecret), ctx, usernameSlug)
+}
+
+// GetUserServiceAccount mocks base method.
+func (m *MockClient) GetUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserServiceAccount", ctx, usernameSlug)
+	ret0, _ := ret[0].(*v1.ServiceAccount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserServiceAccount indicates an expected call of GetUserServiceAccount.
+func (mr *MockClientMockRecorder) GetUserServiceAccount(ctx, usernameSlug interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserServiceAccount", reflect.TypeOf((*MockClient)(nil).GetUserServiceAccount), ctx, usernameSlug)
 }
 
 // IsUserToolPODRunning mocks base method.

@@ -10,10 +10,25 @@ backup:
     repository: konstellation/kdl-backup
     tag: v0.17.0
     pullPolicy: IfNotPresent
+
+  ## Sets the activeDeadlineSeconds param for the backup cronjob
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/controllers/job/#job-termination-and-cleanup
+  ##
+  activeDeadlineSeconds: 3600
+
+  ## Sets tge backoffLimit param for the backup cronjob
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy
+  ##
+  backoffLimit: 3
+
   s3:
     awsAccessKeyID: aws-access-key-id
     awsSecretAccessKey: aws-secret-access-key
     bucketName: s3-bucket-name
+
+  ## Resource requests and limits for backup container
+  ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  ##
   resources:
     requests:
       cpu: "100m"
@@ -21,6 +36,7 @@ backup:
     limits:
       cpu: "100m"
       memory: "256Mi"
+
   extraVolumeMounts: []
   # extraVolumeMounts:
   #   - name: shared-storage
@@ -58,6 +74,21 @@ drone:
   ingress:
     proxyBodySize: 100m
 
+  ## Define which Nodes the Pods are scheduled on.
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Assign custom affinity rules
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  affinity: {}
+
+  ## If specified, the pod's tolerations.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+
 droneAuthorizer:
   image:
     repository: konstellation/drone-authorizer
@@ -69,6 +100,21 @@ droneRunner:
     repository: drone/drone-runner-kube
     tag: 1.0.0-beta.6
     pullPolicy: IfNotPresent
+
+  ## Define which Nodes the Pods are scheduled on.
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Assign custom affinity rules
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  affinity: {}
+
+  ## If specified, the pod's tolerations.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
 
 gitea:
   admin:
@@ -82,6 +128,21 @@ gitea:
   storage:
     size: 10Gi
     storageClassName: standard
+
+  ## Define which Nodes the Pods are scheduled on.
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Assign custom affinity rules
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  affinity: {}
+
+  ## If specified, the pod's tolerations.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
 
 giteaOauth2Setup:
   image:
@@ -174,10 +235,25 @@ knowledgeGalaxy:
     imagePullSecrets: []
     # - name: regcred
 
+    ## Define which Nodes the Pods are scheduled on.
+    ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+    ##
+  nodeSelector: {}
+
+  ## Assign custom affinity rules
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  affinity: {}
+
+  ## If specified, the pod's tolerations.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+
 kdlServer:
   image:
     repository: konstellation/kdl-server
-    tag: v0.21.0
+    tag: 1.10.0
     pullPolicy: IfNotPresent
   ingress:
     proxyReadTimeout: "3600"
@@ -187,6 +263,21 @@ kdlServer:
     ## Large values are needed to serve big files from Filebrowser
     ##
     proxyBodySize: "1000000m"
+
+  ## Define which Nodes the Pods are scheduled on.
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Assign custom affinity rules
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  affinity: {}
+
+  ## If specified, the pod's tolerations.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
 
 minio:
   resources:
@@ -201,6 +292,21 @@ minio:
     storageClass: standard
     existingClaim: received-data-claim
     accessMode: ReadWriteMany
+
+  ## Define which Nodes the Pods are scheduled on.
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Assign custom affinity rules
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  affinity: {}
+
+  ## If specified, the pod's tolerations.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
 
   ## This Chart feature is disabled because we have to deal with different Kubernetes API versions.
   ## Please check the ingress template in Helm chart
@@ -222,6 +328,21 @@ mongodb:
   host: "kdl-mongo-0"
   port: 27017
 
+  ## Define which Nodes the Pods are scheduled on.
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Assign custom affinity rules
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  affinity: {}
+
+  ## If specified, the pod's tolerations.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+
 oauth2Proxy:
   image:
     repository: quay.io/oauth2-proxy/oauth2-proxy
@@ -238,6 +359,21 @@ postgres:
   storage:
     size: 10Gi
     storageClassName: standard
+
+  ## Define which Nodes the Pods are scheduled on.
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Assign custom affinity rules
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  affinity: {}
+
+  ## If specified, the pod's tolerations.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
 
 projectOperator:
   ## Main container specs
@@ -266,6 +402,21 @@ projectOperator:
       repository: gcr.io/kubebuilder/kube-rbac-proxy
       tag: v0.8.0
       pullPolicy: IfNotPresent
+
+  ## Define which Nodes the Pods are scheduled on.
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Assign custom affinity rules
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  affinity: {}
+
+  ## If specified, the pod's tolerations.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
 
   ## The following components are managed by the manager container when kdlproject custom resources are detected
   ##
@@ -320,11 +471,29 @@ tls:
 userToolsOperator:
   image:
     repository: konstellation/user-tools-operator
-    tag: v0.16.0
+    tag: 0.17.0
     pullPolicy: IfNotPresent
   storage:
     size: 10Gi
     storageClassName: standard
+
+  ## Define which Nodes the Pods are scheduled on.
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Assign custom affinity rules
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  ##
+  affinity: {}
+
+  ## If specified, the pod's tolerations.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+
+  ## The following components are managed by the manager container when `usertool` custom resources are detected
+  ##
   jupyter:
     image:
       repository: konstellation/jupyter-gpu

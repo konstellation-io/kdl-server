@@ -924,6 +924,9 @@ spec:
               usernameSlug:
                 description: username slug to create tools
                 type: string
+              serviceAccountName:
+                description: serviceAccount name to attach generated roles
+                type: string
               giteaOauth2Setup:
                 type: object
                 properties:

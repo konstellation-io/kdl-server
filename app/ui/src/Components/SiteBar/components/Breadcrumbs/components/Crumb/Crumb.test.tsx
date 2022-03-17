@@ -23,7 +23,7 @@ describe('Crumb component', () => {
   describe('behavior', () => {
     it('should open the menu on click', () => {
       // Arrange.
-      const container = component.find('.container');
+      const container = component.find('.crumbContainer');
       const wasComponentOpened = component.find(ExpandableMenu).props().opened;
       // Act.
 

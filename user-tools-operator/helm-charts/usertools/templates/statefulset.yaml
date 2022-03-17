@@ -35,7 +35,7 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
-      serviceAccountName: "user-tools-{{ .Values.usernameSlug }}"
+      serviceAccountName: {{ .Values.userServiceAccountName }}
       securityContext:
         fsGroup: 1000
       initContainers:
@@ -250,7 +250,7 @@ spec:
       volumes:
         - name: kubeconfig-tpl-configmap
           configMap:
-            name: kubeconfig-tpl-configmap
+            name: kubeconfig-{{ .Values.usernameSlug }}-tpl-configmap
         - name: oauth2-config
           configMap:
             name: {{ include "user-tools.fullname" . }}-oauth2-proxy

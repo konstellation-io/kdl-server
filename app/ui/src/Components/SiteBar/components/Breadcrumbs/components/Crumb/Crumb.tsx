@@ -20,12 +20,8 @@ function Crumb({ crumbText, LeftIconComponent, dataTestId, children, isSelect }:
   const { value: opened, toggle: toggleComponent, deactivate: hideComponent } = useBoolState(false);
 
   return (
-    <div
-      className={cx(styles.container, { [styles.select]: isSelect })}
-      onClick={toggleComponent}
-      data-testid={dataTestId}
-    >
-      <div className={cx(styles.crumbContainer, { [styles.select]: isSelect })}>
+    <div className={cx(styles.container, { [styles.select]: isSelect })} data-testid={dataTestId}>
+      <div className={cx(styles.crumbContainer, { [styles.select]: isSelect })} onClick={toggleComponent}>
         {LeftIconComponent}
         <span className={styles.crumbText}>{crumbText}</span>
         <ExpandMoreIcon

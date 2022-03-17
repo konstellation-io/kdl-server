@@ -4,12 +4,12 @@ import { AccessLevel } from '../../Graphql/types/globalTypes';
 export const userMe = {
   id: 'userMe',
   email: 'admin@konstellation.io',
-  areToolsActive: true,
   username: 'userMe',
   creationDate: '2020-02-01',
   lastActivity: '2020-02-01',
   accessLevel: AccessLevel.ADMIN,
   apiTokens: [apiToken1],
+  isKubeconfigEnabled: true,
 };
 
 export const user1 = {

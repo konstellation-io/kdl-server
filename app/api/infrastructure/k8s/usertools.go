@@ -175,8 +175,9 @@ func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName
 }
 
 // createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
-func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slugUsername, resName, runtimeID,
+func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, usernameSlug, resName, runtimeID,
 	runtimeImage, runtimeTag string) error {
+	serviceAccountName := k.getUserServiceAccountName(usernameSlug)
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",
@@ -194,7 +195,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 					"type": k.cfg.VSCode.Ingress.Type,
 				},
 				"username":     username,
-				"usernameSlug": slugUsername,
+				"usernameSlug": usernameSlug,
 				"storage": map[string]string{
 					"size":      k.cfg.Storage.Size,
 					"className": k.cfg.Storage.ClassName,
@@ -251,6 +252,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, slu
 						"pullPolicy": k.cfg.UserToolsVsCodeRuntime.Image.PullPolicy,
 					},
 				},
+				"serviceAccountName": serviceAccountName,
 			},
 		},
 	}

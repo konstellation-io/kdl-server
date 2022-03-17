@@ -1,31 +1,23 @@
 import React, { useEffect } from 'react';
-import {
-  loadingRuntime,
-  memberDetails,
-  primaryPanel,
-  runningRuntime,
-  secondaryPanel,
-  selectedRuntime,
-} from 'Graphql/client/cache';
+import { useReactiveVar } from '@apollo/client';
+import { loadingRuntime, memberDetails, primaryPanel, runningRuntime, secondaryPanel } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
-
-import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
-import MemberDetails from './panels/MemberDetails/MemberDetails';
+import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
+import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import Panel from 'Components/Layout/Panel/Panel';
+import RuntimeRunner, { RuntimeAction } from 'Components/RuntimeRunner/RuntimeRunner';
+import MemberDetails from './panels/MemberDetails/MemberDetails';
 import ProjectSettings from './panels/ProjectSettings/ProjectSettings';
 import UpdateProjectDescription from './panels/UpdateProjectDescription/UpdateProjectDescription';
-import styles from './Project.module.scss';
-import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
-import { useReactiveVar } from '@apollo/client';
 import RuntimesList from './panels/RuntimesList/RuntimesList';
 import RuntimeInfo from './panels/RuntimeInfo/RuntimeInfo';
 import { Button } from 'kwc';
 import IconPlay from '@material-ui/icons/PlayArrow';
 import IconPause from '@material-ui/icons/Pause';
-import useRuntime from 'Graphql/client/hooks/useRuntime';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import ReactTooltip from 'react-tooltip';
+import Tooltip from 'Components/Tooltip/Tooltip';
+import styles from './Project.module.scss';
 
 const defaultPanel = 'settings';
 
@@ -38,16 +30,22 @@ function ProjectPanels({ openedProject }: Props) {
   const panel2Data = useReactiveVar(secondaryPanel);
 
   const memberDetailsData = useReactiveVar(memberDetails);
-  const runtimeSelected = useReactiveVar(selectedRuntime);
   const runtimeRunning = useReactiveVar(runningRuntime);
   const runtimeLoading = useReactiveVar(loadingRuntime);
-  const isLoading = runtimeLoading !== '';
 
-  const { startRuntime, pauseRuntime } = useRuntime();
+  const selectedRuntime = panel2Data?.runtime ?? null;
+  const isLoading = runtimeLoading !== null;
 
   const { closePanel: panel1Close } = usePanel(PanelType.PRIMARY);
   const { closePanel: panel2Close } = usePanel(PanelType.SECONDARY);
   const { unselectMemberDetails } = useMemberDetails();
+
+  const tooltipProps = {
+    effect: 'solid',
+    textColor: 'white',
+    backgroundColor: '#888',
+    place: 'bottom',
+  };
 
   // Opening a level 1 panel closes previous level 2 panels
   useEffect(() => {
@@ -60,10 +58,6 @@ function ProjectPanels({ openedProject }: Props) {
     unselectMemberDetails();
   }
 
-  function runtimeStart() {
-    startRuntime(runtimeSelected);
-  }
-
   function extraPanelButton(panelId?: string) {
     if (panelId === PANEL_ID.RUNTIME_INFO) {
       if (isLoading)
@@ -74,28 +68,26 @@ function ProjectPanels({ openedProject }: Props) {
         );
 
       const pauseButtom = (
-        <div>
-          <ReactTooltip id="stopPanel" effect="solid" textColor="white" backgroundColor="#888" place="bottom">
-            <span>Stop tools</span>
-          </ReactTooltip>
-          <div data-tip={true} data-for="stopPanel">
-            <Button label="" Icon={IconPause} onClick={pauseRuntime} />
+        <Tooltip tooltipId="stopPanel" spanText="Stop tools" tooltipProps={tooltipProps}>
+          <div data-tip={true} data-for="stopPanel" data-testid="panelStopRuntime">
+            <RuntimeRunner action={RuntimeAction.Stop}>
+              <Button label="" Icon={IconPause} />
+            </RuntimeRunner>
           </div>
-        </div>
+        </Tooltip>
       );
 
       const startButton = (
-        <div>
-          <ReactTooltip id="startPanel" effect="solid" textColor="white" backgroundColor="#888" place="bottom">
-            <span>Start tools</span>
-          </ReactTooltip>
-          <div data-tip={true} data-for="startPanel">
-            <Button label="" Icon={IconPlay} onClick={runtimeStart} />
+        <Tooltip tooltipId="startPanel" spanText="Start tools" tooltipProps={tooltipProps}>
+          <div data-tip={true} data-for="startPanel" data-testid="panelStartRuntime">
+            <RuntimeRunner runtime={selectedRuntime ?? undefined} action={RuntimeAction.Start}>
+              <Button label="" Icon={IconPlay} />
+            </RuntimeRunner>
           </div>
-        </div>
+        </Tooltip>
       );
 
-      return runtimeSelected?.id === runtimeRunning?.id ? pauseButtom : startButton;
+      return selectedRuntime?.id === runtimeRunning?.id ? pauseButtom : startButton;
     }
 
     return null;
@@ -108,8 +100,8 @@ function ProjectPanels({ openedProject }: Props) {
       <MemberDetails member={memberDetailsData} close={closeMemberInfoPanel} projectId={openedProject.id} />
     ),
     [PANEL_ID.RUNTIMES_LIST]: <RuntimesList />,
-    [PANEL_ID.RUNTIME_INFO]: runtimeSelected && (
-      <RuntimeInfo selectedRuntime={runtimeSelected} isKubeconfigEnabled={true} />
+    [PANEL_ID.RUNTIME_INFO]: selectedRuntime && (
+      <RuntimeInfo selectedRuntime={selectedRuntime} isKubeconfigEnabled={true} />
     ),
   };
 

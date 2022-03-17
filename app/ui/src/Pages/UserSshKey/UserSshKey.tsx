@@ -1,22 +1,21 @@
 import { ErrorMessage, SpinnerCircular } from 'kwc';
 import FAQBox, { BOX_THEME } from './components/FAQBox/FAQBox';
 
-import { GetMe } from 'Graphql/queries/types/GetMe';
 import { GetSSHKey } from 'Graphql/queries/types/GetSSHKey';
 import * as React from 'react';
 import SSHKey from './components/SSHKey/SSHKey';
 import { copyAndToast } from 'Utils/clipboard';
 import styles from './UserSshKey.module.scss';
 import { toast } from 'react-toastify';
-import { useQuery } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
 import useSSHKey from 'Graphql/hooks/useSSHKey';
 
 import GetSSHKeys from 'Graphql/queries/getSSHKey';
-import GetMeQuery from 'Graphql/queries/getMe';
+import { runningRuntime } from 'Graphql/client/cache';
+import UserPageHeader from 'Components/UserPageHeader/UserPageHeader';
 
 function UserSshKey() {
   const { data, loading, error } = useQuery<GetSSHKey>(GetSSHKeys);
-  const { data: dataMe } = useQuery<GetMe>(GetMeQuery);
   const {
     regenerateSSHKey: { performMutation: regenerateSSHKey, loading: regenerateSSHKeyLoading },
   } = useSSHKey({
@@ -26,7 +25,7 @@ function UserSshKey() {
     },
   });
 
-  const userToolsRunning = !!dataMe?.me.areToolsActive;
+  const runtimeRunning = useReactiveVar(runningRuntime);
 
   function getContent() {
     if (loading) return <SpinnerCircular />;
@@ -75,7 +74,7 @@ function UserSshKey() {
                 action). You will not be able to access repositories with the old SSH Key, and you cannot recover previous
                 SSH keys, so be sure to update the key on all the services you will continue using."
               customAction={
-                userToolsRunning ? (
+                runtimeRunning ? (
                   <div className={styles.regenWarning}>
                     <div className={styles.regenWarningTag}>WARNING:</div>
                     <div className={styles.regenWarningText}>
@@ -114,7 +113,7 @@ function UserSshKey() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>SSH Key</h1>
+      <UserPageHeader title={'SSH Key'} />
       <h3 className={styles.subtitle}>
         This is your private SSH key, to grant access for your user to a project repository, copy the key and include it
         inside the SSH keys section of the repository settings page.

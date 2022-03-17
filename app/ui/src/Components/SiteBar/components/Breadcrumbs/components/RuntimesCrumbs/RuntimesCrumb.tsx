@@ -18,13 +18,14 @@ function RuntimesCrumb() {
 
   const executionStatus = runtimeRunning ? RUNTIME_STATUS.RUNNING : RUNTIME_STATUS.STOPPED;
 
-  const runtimeStatus = runtimeLoading !== '' ? RUNTIME_STATUS.LOADING : executionStatus;
+  const runtimeStatus = runtimeLoading !== null ? RUNTIME_STATUS.LOADING : executionStatus;
 
   return (
     <Crumb
       crumbText={runtimeLastRan.name}
       isSelect={true}
       LeftIconComponent={<RuntimeIcon className="icon-regular" status={runtimeStatus} />}
+      dataTestId="runtimesCrumb"
     >
       {(props: BottomComponentProps) => <RuntimeSelector runtimes={data.runtimes} {...props} />}
     </Crumb>

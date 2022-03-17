@@ -12,12 +12,12 @@ import styles from './NavElements.module.scss';
 import { useParams } from 'react-router-dom';
 import useProjectNavigation from 'Hooks/useProjectNavigation';
 import { useReactiveVar } from '@apollo/client';
-import { loadingRuntime, lastRanRuntime, primaryPanel, runningRuntime } from 'Graphql/client/cache';
+import { lastRanRuntime, loadingRuntime, primaryPanel, runningRuntime } from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
-import useRuntime from 'Graphql/client/hooks/useRuntime';
-import ReactTooltip from 'react-tooltip';
+import RuntimeRunner, { RuntimeAction } from 'Components/RuntimeRunner/RuntimeRunner';
+import Tooltip from 'Components/Tooltip/Tooltip';
 
 type Props = {
   isOpened: boolean;
@@ -27,31 +27,28 @@ function NavElements({ isOpened }: Props) {
   const { projectId } = useParams<RouteProjectParams>();
   const { mainRoutes, userToolsRoutes, projectToolsRoutes } = useProjectNavigation(projectId);
   const runtimeLoading = useReactiveVar(loadingRuntime);
-  const isLoading = runtimeLoading !== '';
+  const isLoading = runtimeLoading !== null;
 
   const runtimeRunning = useReactiveVar(runningRuntime);
   const panelData = useReactiveVar(primaryPanel);
   const runtimeLastRun = useReactiveVar(lastRanRuntime);
-  const { startRuntime, pauseRuntime } = useRuntime();
 
   const { openPanel: openRuntimesList, closePanel: closeRuntimesList } = usePanel(
     PanelType.PRIMARY,
     USERTOOLS_PANEL_OPTIONS,
   );
 
+  const tooltipProps = {
+    effect: 'solid',
+    textColor: 'white',
+    backgroundColor: '#888',
+  };
+
   function toggleUsertoolsPanel() {
     const shouldOpen = !panelData || panelData.id !== PANEL_ID.RUNTIMES_LIST;
 
     if (shouldOpen) openRuntimesList();
     else closeRuntimesList();
-  }
-
-  function runtimeStart() {
-    startRuntime(runtimeLastRun);
-  }
-
-  function runtimeStop() {
-    pauseRuntime();
   }
 
   function renderToggleToolsIcon() {
@@ -63,23 +60,17 @@ function NavElements({ isOpened }: Props) {
     if (isLoading) return Progress;
 
     return runtimeRunning ? (
-      <div>
-        <ReactTooltip id="stop" effect="solid" textColor="white" backgroundColor="#888" className={styles.toolsTip}>
-          <span>Stop tools</span>
-        </ReactTooltip>
-        <div data-tip data-for="stop">
-          <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStop} />
-        </div>
-      </div>
+      <Tooltip tooltipId="stop" spanText="Stop tools" tooltipProps={tooltipProps}>
+        <RuntimeRunner action={RuntimeAction.Stop}>
+          <IconPause className={cx(styles.usertoolsIcon, 'icon-small')} data-testid="stopTools" />
+        </RuntimeRunner>
+      </Tooltip>
     ) : (
-      <div>
-        <ReactTooltip id="start" effect="solid" textColor="white" backgroundColor="#888" className={styles.toolsTip}>
-          <span>Start tools</span>
-        </ReactTooltip>
-        <div data-tip data-for="start">
-          <IconPlay className={cx(styles.usertoolsIcon, 'icon-small')} onClick={runtimeStart} />
-        </div>
-      </div>
+      <Tooltip tooltipId="start" spanText="Start tools" tooltipProps={tooltipProps}>
+        <RuntimeRunner action={RuntimeAction.Start} runtime={runtimeLastRun || undefined}>
+          <IconPlay className={cx(styles.usertoolsIcon, 'icon-small')} data-testid="startTools" />
+        </RuntimeRunner>
+      </Tooltip>
     );
   }
 
@@ -111,18 +102,11 @@ function NavElements({ isOpened }: Props) {
               className={cx(styles.usertoolsSettings, { [styles.opened]: isOpened })}
               data-testid="usertoolsSettings"
             >
-              <ReactTooltip
-                id="settings"
-                effect="solid"
-                textColor="white"
-                backgroundColor="#888"
-                className={styles.toolsTip}
-              >
-                <span>Show available runtimes</span>
-              </ReactTooltip>
-              <div data-tip data-for="settings">
-                <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
-              </div>
+              <Tooltip tooltipId="settings" spanText="Show available runtimes" tooltipProps={tooltipProps}>
+                <div data-tip data-for="settings" data-testid="openRuntimeSettings">
+                  <IconSettings className={cx(styles.usertoolsIcon, 'icon-small')} onClick={toggleUsertoolsPanel} />
+                </div>
+              </Tooltip>
               {renderToggleToolsIcon()}
             </div>
           </div>

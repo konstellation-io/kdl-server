@@ -423,6 +423,20 @@ func (mr *MockUseCaseMockRecorder) StopTools(ctx, username interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopTools", reflect.TypeOf((*MockUseCase)(nil).StopTools), ctx, username)
 }
 
+// SynchronizeServiceAccountsForUsers mocks base method.
+func (m *MockUseCase) SynchronizeServiceAccountsForUsers() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SynchronizeServiceAccountsForUsers")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SynchronizeServiceAccountsForUsers indicates an expected call of SynchronizeServiceAccountsForUsers.
+func (mr *MockUseCaseMockRecorder) SynchronizeServiceAccountsForUsers() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SynchronizeServiceAccountsForUsers", reflect.TypeOf((*MockUseCase)(nil).SynchronizeServiceAccountsForUsers))
+}
+
 // UpdateAccessLevel mocks base method.
 func (m *MockUseCase) UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error) {
 	m.ctrl.T.Helper()

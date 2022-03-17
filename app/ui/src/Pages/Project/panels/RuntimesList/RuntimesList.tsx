@@ -31,10 +31,10 @@ function RuntimesList() {
       </div>
       <div className={styles.runtimeContainer}>
         <div className={styles.runtimeListHeader}>{runtimes.length} RUNTIMES SHOWN</div>
-        <div className={styles.wrapper}>
+        <div className={styles.wrapper} data-testid="runtimesList">
           {[
             ...runtimes.map((runtime) => (
-              <Runtime key={runtime.id} runtime={runtime} runtimeActive={runtime.id === runtimeRunning?.id} />
+              <Runtime key={runtime.id} runtime={runtime} isRunning={runtime.id === runtimeRunning?.id} />
             )),
           ]}
         </div>

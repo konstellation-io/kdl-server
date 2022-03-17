@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gosimple/slug"
+
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 
@@ -121,6 +123,7 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
 	s.mocks.giteaService.EXPECT().AddSSHKey(username, sshKey.Public).Return(nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
+	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
 
 	createdUser, err := s.interactor.Create(ctx, email, username, accessLevel)
 
@@ -557,18 +560,70 @@ func TestInteractor_GetKubeconfig(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const (
-		username       = "john"
+		username       = "john.doe"
 		areToolsActive = true
 	)
 
 	ctx := context.Background()
-	expectedKubeconfig := "Test Kubeconfig"
+	expectedKubeconfig := []byte("test kubeconfig")
 
-	s.mocks.k8sClientMock.EXPECT().GetUserKubeconfigSecret(ctx, username).Return(expectedKubeconfig, nil)
+	// the secret must use the username slug instead of the username
+	usernameSlug := slug.Make(username)
+
+	s.mocks.k8sClientMock.EXPECT().GetUserKubeconfig(ctx, usernameSlug).Return(expectedKubeconfig, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(areToolsActive, nil)
 
 	returnedKubeconfig, err := s.interactor.GetKubeconfig(ctx, username)
 
 	require.NoError(t, err)
-	require.Equal(t, expectedKubeconfig, returnedKubeconfig)
+	require.Equal(t, string(expectedKubeconfig), returnedKubeconfig)
+}
+
+func TestInteractor_SynchronizeServiceAccountsForUsers(t *testing.T) {
+	// GIVEN there are two active users and one deleted user
+	// WHEN the serviceAccounts for the users are called
+	// AND k8client.CreateUserServiceAccount is called two times
+	// AND k8client.DeleteUserServiceAccount is called one time
+	// AND there are no errors
+	s := newUserSuite(t, nil)
+	defer s.ctrl.Finish()
+
+	const (
+		id          = "user.1234"
+		username    = "john.doe"
+		email       = "john@doe.com"
+		accessLevel = entity.AccessLevelAdmin
+	)
+
+	ctx := context.Background()
+
+	targetUser := entity.User{
+		ID:          id,
+		Username:    username,
+		Email:       email,
+		AccessLevel: accessLevel,
+		Deleted:     false,
+	}
+
+	deletedTargetUser := entity.User{
+		ID:          id,
+		Username:    "rick.sanchez",
+		Email:       email,
+		AccessLevel: accessLevel,
+		Deleted:     true,
+	}
+
+	users := []entity.User{targetUser, targetUser, deletedTargetUser}
+	toDeleteUsers := []entity.User{deletedTargetUser}
+
+	s.mocks.repo.EXPECT().FindAll(ctx, true).Return(users, nil)
+	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(
+		ctx, targetUser.UsernameSlug()).Return(nil, nil).Times(len(users) - len(toDeleteUsers))
+	s.mocks.k8sClientMock.EXPECT().DeleteUserServiceAccount(
+		ctx, deletedTargetUser.UsernameSlug()).Return(nil).Times(len(toDeleteUsers))
+
+	// WHEN the CreateMissingServiceAccountsForUsers is called
+	err := s.interactor.SynchronizeServiceAccountsForUsers()
+
+	require.NoError(t, err)
 }

@@ -27,3 +27,4 @@ screenshots
 videos
 
 cypress/fixtures/example.json
+cypress/downloads/*

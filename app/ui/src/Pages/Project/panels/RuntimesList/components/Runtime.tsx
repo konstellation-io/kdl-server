@@ -5,36 +5,37 @@ import cx from 'classnames';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
-import useSelectedRuntime from 'Graphql/client/hooks/useSelectedRuntime';
 import { useReactiveVar } from '@apollo/client';
-import { loadingRuntime, selectedRuntime } from 'Graphql/client/cache';
+import { loadingRuntime } from 'Graphql/client/cache';
 import LabelList from './LabelList';
+import useRuntimeInfo from 'Hooks/useRuntimeInfo';
 
 type Props = {
   runtime: GetRuntimes_runtimes;
-  runtimeActive?: boolean;
+  isRunning?: boolean;
   disabled?: boolean;
 };
 
-function Runtime({ runtime, runtimeActive, disabled }: Props) {
+function Runtime({ runtime, isRunning, disabled }: Props) {
   const { openPanel, togglePanel } = usePanel(PanelType.SECONDARY, {
     id: PANEL_ID.RUNTIME_INFO,
     title: 'Detail',
     size: PANEL_SIZE.BIG,
     theme: PANEL_THEME.DEFAULT,
+    runtime,
   });
-  const { updateSelectedRuntime } = useSelectedRuntime();
-  const actualRuntime = useReactiveVar(selectedRuntime);
   const runtimeLoading = useReactiveVar(loadingRuntime);
+  const [openedRuntimeInfo, setOpenedRuntimeInfo] = useRuntimeInfo();
 
   function toggleRuntimePanel() {
     if (disabled) return;
 
-    if (runtime.id !== actualRuntime?.id) {
-      updateSelectedRuntime(runtime);
+    if (runtime.id !== openedRuntimeInfo) {
+      setOpenedRuntimeInfo(runtime.id);
       openPanel();
       return;
     }
+    setOpenedRuntimeInfo('');
     togglePanel();
   }
 
@@ -42,8 +43,8 @@ function Runtime({ runtime, runtimeActive, disabled }: Props) {
     <div
       data-testid="runtime"
       className={cx(styles.container, {
-        [styles.active]: runtimeActive,
-        [styles.loading]: runtimeLoading === runtime.id || (runtimeActive && runtimeLoading !== ''),
+        [styles.active]: isRunning,
+        [styles.loading]: runtimeLoading === runtime.id || (isRunning && runtimeLoading !== null),
         [styles.disabled]: disabled,
       })}
       onClick={toggleRuntimePanel}

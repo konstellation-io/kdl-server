@@ -58,6 +58,18 @@ spec:
               port: 3000
             initialDelaySeconds: 30
             periodSeconds: 60
+    {{- with .Values.gitea.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.gitea.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.gitea.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       volumes:
         - name: gitea-init
           configMap:

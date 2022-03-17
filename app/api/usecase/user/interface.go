@@ -41,4 +41,5 @@ type UseCase interface {
 	ScheduleUsersSyncJob(interval time.Duration) error
 	RunSyncUsersCronJob()
 	GetKubeconfig(ctx context.Context, username string) (string, error)
+	SynchronizeServiceAccountsForUsers() error
 }

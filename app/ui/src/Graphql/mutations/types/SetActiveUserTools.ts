@@ -12,7 +12,6 @@ import { SetActiveUserToolsInput } from "./../../types/globalTypes";
 export interface SetActiveUserTools_setActiveUserTools {
   __typename: "User";
   id: string;
-  areToolsActive: boolean;
 }
 
 export interface SetActiveUserTools {

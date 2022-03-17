@@ -35,6 +35,18 @@ spec:
         - mountPath: /etc/ssl/certs/ca-cert.pem
           name: ca-cert
           subPath: {{ .Values.tls.caSecret.certFilename }}
+    {{- with .Values.droneRunner.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.droneRunner.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.droneRunner.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       volumes:
       - name: ca-cert
         secret:

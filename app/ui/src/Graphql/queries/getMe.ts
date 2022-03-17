@@ -5,7 +5,6 @@ export default gql`
     me {
       id
       email
-      areToolsActive
       isKubeconfigEnabled
       accessLevel
       apiTokens {

@@ -135,6 +135,7 @@ deploy_helm_chart() {
     --set projectOperator.manager.image.tag="latest" \
     --set projectOperator.mlflow.image.pullPolicy="Always" \
     --set projectOperator.mlflow.image.repository="${IMAGE_REGISTRY}/konstellation/mlflow" \
+    --set projectOperator.mlflow.image.tag="latest" \
     --set projectOperator.mlflow.volume.storageClassName="${STORAGE_CLASS_NAME}" \
     --set tls.enabled="${ENABLE_TLS}" \
     --set tls.secretName="${DOMAIN}-tls-secret" \
@@ -150,8 +151,10 @@ deploy_helm_chart() {
     --set enterprise-gateway.kernelspecs.image="$IMAGE_REGISTRY/konstellation/jupyter-kernelspecs:latest" \
     --set userToolsOperator.repoCloner.image.pullPolicy="Always" \
     --set userToolsOperator.repoCloner.image.repository="${IMAGE_REGISTRY}/konstellation/repo-cloner" \
+    --set userToolsOperator.repoCloner.image.tag="latest" \
     --set userToolsOperator.vscode.image.pullPolicy="Always" \
     --set userToolsOperator.vscode.image.repository="${IMAGE_REGISTRY}/konstellation/vscode" \
+    --set userToolsOperator.vscode.image.tag="latest" \
     --set userToolsOperator.storage.storageClassName="${STORAGE_CLASS_NAME}" \
     --set userToolsOperator.kubeconfig.enabled="true" \
     --set userToolsOperator.kubeconfig.externalServerUrl="https://192.168.0.21:16443" \

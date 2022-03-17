@@ -7,10 +7,11 @@ import { GetMe } from 'Graphql/queries/types/GetMe';
 import KeyIcon from '@material-ui/icons/VpnKey';
 import DescriptionIcon from '@material-ui/icons/Description';
 import styles from './SettingsMenu.module.scss';
-import { useQuery } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
 import { CONFIG } from 'index';
 
 import GetMeQuery from 'Graphql/queries/getMe';
+import { runningRuntime } from 'Graphql/client/cache';
 
 const UserSettingsSeparator = ({ label }: CustomOptionProps) => (
   <div className={styles.separator}>{label.toUpperCase()}</div>
@@ -21,6 +22,7 @@ const ReleaseVersion = ({ label }: CustomOptionProps) => <div className={styles.
 function SettingsMenu() {
   const history = useHistory();
   const { data, loading } = useQuery<GetMe>(GetMeQuery);
+  const runtimeRunning = useReactiveVar(runningRuntime);
 
   if (loading) return <SpinnerCircular />;
 
@@ -46,7 +48,7 @@ function SettingsMenu() {
   }
 
   function kubeconfigButton() {
-    if (!data?.me.isKubeconfigEnabled) return <div />;
+    if (!data?.me.isKubeconfigEnabled || !runtimeRunning) return <div />;
 
     return (
       <Button
@@ -68,7 +70,7 @@ function SettingsMenu() {
   };
 
   return (
-    <div>
+    <div data-testid="settingsCrumb">
       <Select
         label=""
         placeholder={data?.me?.email}

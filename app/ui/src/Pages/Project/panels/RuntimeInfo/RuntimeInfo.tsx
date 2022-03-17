@@ -3,7 +3,7 @@ import { GetRuntimes_runtimes } from 'Graphql/queries/types/GetRuntimes';
 import styles from './RuntimeInfo.module.scss';
 import LabelList from '../RuntimesList/components/LabelList';
 import { useReactiveVar } from '@apollo/client';
-import { runningRuntime } from 'Graphql/client/cache';
+import { loadingRuntime, runningRuntime } from 'Graphql/client/cache';
 
 type Props = {
   selectedRuntime: GetRuntimes_runtimes;
@@ -12,14 +12,30 @@ type Props = {
 
 function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
   const activeRuntime = useReactiveVar(runningRuntime);
+  const runtimeLoading = useReactiveVar(loadingRuntime);
   const running = activeRuntime?.id === runtime.id;
+  const checkReady = () => {
+    if (!running && !runtimeLoading) return;
+    if (runtimeLoading) {
+      return (
+        <div className={styles.loadingTag} data-testid="statusTag">
+          Loading
+        </div>
+      );
+    }
+    return (
+      <div className={styles.runningTag} data-testid="statusTag">
+        Running
+      </div>
+    );
+  };
   return (
     <div>
       <div className={styles.header}>
-        <div data-testid="runtimesListPanel">
+        <div data-testid="runtimeInfoPanel">
           <div className={styles.title}>
             <h1 className={styles.headerName}>{runtime.name}</h1>
-            {running && <div className={styles.runningTag}>Running</div>}
+            {checkReady()}
           </div>
           <div className={styles.runtimeTags}>
             <LabelList runtime={runtime} />
@@ -43,16 +59,13 @@ function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
                 kubernetes extension and follow this steps:
                 <ol>
                   <li>
-                    Configure the kubeconfig located in <span className={styles.highlight}>/home/coder/kubeconfig</span>{' '}
-                    (You just need to this one time)
+                    Configure the kube config located in{' '}
+                    <span className={styles.highlight}>/home/coder/.kube/config</span>
                   </li>
-                  <li>
-                    In the kubernetes extension, navigate to{' '}
-                    <span className={styles.highlight}>&ldquo;Workloads &gt; Pods&ldquo;</span>
-                  </li>
+                  <li>In the kubernetes extension, navigate to &ldquo;Workloads &gt; Pods&ldquo;</li>
                   <li>
                     Locate the runtime pod named <span className={styles.highlight}>{runtime.runtimePod}</span>, and
-                    right click &gt; &ldquo;Terminal&ldquo;
+                    right click on it &gt; &ldquo;Terminal&ldquo;
                   </li>
                   <li>
                     Then attach your terminal to the container named{' '}

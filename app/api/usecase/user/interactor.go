@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 
+	"github.com/gosimple/slug"
+	k8errors "k8s.io/apimachinery/pkg/api/errors"
+
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 
@@ -63,6 +66,7 @@ func NewInteractor(
 // - Adds the public SSH key to the user in Gitea.
 // - Stores the user and ssh keys into the DB.
 // - Creates a new secret in Kubernetes with the generated SSH keys.
+// - Created a service account for the user.
 func (i *interactor) Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error) {
 	i.logger.Infof("Creating user \"%s\" with email \"%s\"", username, email)
 
@@ -114,6 +118,12 @@ func (i *interactor) Create(ctx context.Context, email, username string, accessL
 	i.logger.Infof("The user \"%s\" (%s) was created with ID \"%s\"", user.Username, user.Email, insertedID)
 
 	err = i.k8sClient.CreateUserSSHKeySecret(ctx, user, keys.Public, keys.Private)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	// Created a service account for the user
+	_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -257,7 +267,7 @@ func (i *interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, le
 
 // RegenerateSSHKeys generate new SSH key pair for the given user.
 // - Check if user exists. (if no, returns ErrUserNotFound error)
-// - Check if userTools are Running. (if yes, returns ErrUserNotFound error
+// - Check if userTools are Running. (if yes, returns ErrUserNotFound error)
 // - Generate a new ssh key pair
 // - Check if k8s secret exists. If yes, update it. Else, create it.
 // - Update public key on Gitea
@@ -304,6 +314,32 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 	return i.repo.GetByUsername(ctx, user.Username)
 }
 
+// SynchronizeServiceAccountsForUsers ensures all users has their serviceAccount created and delete it
+// - for users that has been removed.
+func (i *interactor) SynchronizeServiceAccountsForUsers() error {
+	ctx := context.Background()
+
+	users, err := i.repo.FindAll(ctx, true)
+	if err != nil {
+		return err
+	}
+
+	for _, user := range users {
+		if user.Deleted {
+			if err := i.k8sClient.DeleteUserServiceAccount(ctx, user.UsernameSlug()); err != nil {
+				i.logger.Errorf("Error deleting user service account for user %s %s", user.UsernameSlug(), err)
+			}
+		} else {
+			_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
+			if err != nil && !k8errors.IsNotFound(err) {
+				i.logger.Errorf("Error creating user serviceAccount for user %s %s", user.UsernameSlug(), err)
+			}
+		}
+	}
+
+	return nil
+}
+
 // CreateAdminUser creates the KDL admin user if not exists.
 func (i *interactor) CreateAdminUser(username, email string) error {
 	ctx := context.Background()
@@ -342,5 +378,14 @@ func (i *interactor) GetKubeconfig(ctx context.Context, username string) (string
 		return "", ErrStopUserTools
 	}
 
-	return i.k8sClient.GetUserKubeconfigSecret(ctx, username)
+	usernameSlug := slug.Make(username)
+
+	i.logger.Debugf("Getting kubeconfig for user \"%s\"", usernameSlug)
+
+	kubeconfig, err := i.k8sClient.GetUserKubeconfig(ctx, usernameSlug)
+	if err != nil {
+		return "", err
+	}
+
+	return string(kubeconfig), nil
 }

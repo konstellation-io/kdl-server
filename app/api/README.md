@@ -15,7 +15,7 @@ In order to develop in a local environment there are several things to consider:
 7. You can now access the graphQL playground at `http://localhost:3000/api/playground`
 
 ## Testing
-
+ 
 To create new tests install [GoMock](https://github.com/golang/mock). Mocks used on tests are generated with
 **mockgen**, when you need a new mock, add the following:
 

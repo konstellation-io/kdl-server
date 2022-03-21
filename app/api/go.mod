@@ -7,7 +7,6 @@ require (
 	github.com/99designs/gqlgen v0.13.0
 	github.com/Microsoft/go-winio v0.5.2 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20220113124808-70ae35bab23f // indirect
-	github.com/alcortesm/tgz v0.0.0-20161220082320-9c5fe88206d7 // indirect
 	github.com/drone/drone-go v1.5.0
 	github.com/go-co-op/gocron v1.1.0
 	github.com/go-git/go-git/v5 v5.4.2

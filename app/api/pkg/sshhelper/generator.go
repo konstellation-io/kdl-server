@@ -3,15 +3,15 @@ package sshhelper
 import (
 	"crypto/ed25519"
 	"crypto/rand"
+	"crypto/x509"
 	"encoding/pem"
 	"time"
-
-	"github.com/mikesmitty/edkey"
 
 	"golang.org/x/crypto/ssh"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
+	"github.com/mikesmitty/edkey"
 )
 
 type generator struct {
@@ -44,8 +44,7 @@ func (g *generator) generateKeyPair() (public, private []byte, err error) {
 	if err != nil {
 		return nil, nil, err
 	}
-
-	sshPubKey, err := ssh.NewPublicKey(pubKey)
+	publicKey, err := ssh.NewPublicKey(pubKey)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -55,7 +54,26 @@ func (g *generator) generateKeyPair() (public, private []byte, err error) {
 		Bytes: edkey.MarshalED25519PrivateKey(privKey),
 	}
 	privateKey := pem.EncodeToMemory(pemKey)
-	publicKey := ssh.MarshalAuthorizedKey(sshPubKey)
+	authorizedKey := ssh.MarshalAuthorizedKey(publicKey)
 
-	return publicKey, privateKey, nil
+	return authorizedKey, privateKey, nil
+}
+
+// encodePrivateKeyToPEM encodes Private Key from RSA to PEM format.
+func (g *generator) encodePrivateKeyToPEM(privateKey ed25519.PrivateKey) ([]byte, error) {
+	privateKeyBytes, err := x509.MarshalPKCS8PrivateKey(privateKey)
+	if err != nil {
+		return nil, err
+	}
+
+	// pem.Block
+	privBlock := pem.Block{
+		Type:  "EdDSA PRIVATE KEY",
+		Bytes: privateKeyBytes,
+	}
+
+	// Private key in PEM format
+	privatePEM := pem.EncodeToMemory(&privBlock)
+
+	return privatePEM, nil
 }

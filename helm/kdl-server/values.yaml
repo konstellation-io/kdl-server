@@ -502,7 +502,7 @@ userToolsOperator:
   repoCloner:
     image:
       repository: konstellation/repo-cloner
-      tag: v0.13.5
+      tag: 0.13.6
       pullPolicy: IfNotPresent
   vscode:
     image:

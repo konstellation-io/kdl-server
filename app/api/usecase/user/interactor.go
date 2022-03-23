@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/gosimple/slug"
 	k8errors "k8s.io/apimachinery/pkg/api/errors"
@@ -387,5 +388,8 @@ func (i *interactor) GetKubeconfig(ctx context.Context, username string) (string
 		return "", err
 	}
 
-	return string(kubeconfig), nil
+	kubeConfTxt := string(kubeconfig)
+	kubeConfTxt = strings.TrimPrefix(kubeConfTxt, "\n")
+
+	return kubeConfTxt, nil
 }

@@ -53,9 +53,6 @@ function Runtime({ runtime, isRunning, disabled }: Props) {
         <p className={styles.name} data-testid="runtimeName">
           {runtime.name}
         </p>
-        <p className={styles.desc} data-testid="runtimeDesc">
-          {runtime.desc}
-        </p>
         <LabelList runtime={runtime} />
       </div>
     </div>

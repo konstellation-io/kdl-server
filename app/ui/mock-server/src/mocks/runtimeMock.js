@@ -5,7 +5,7 @@ casual.define('html', function() {
   htmlStr += "<ul><li>TensorFlow 2.8.0</li><li>SpaCy 3.2.3</li>"
   htmlStr += "<li>SpaCy 3.2</li>"
   htmlStr += "<li>NLTK 3.7</li></ul>"
-  htmlStr += casual.sentences(150);
+  htmlStr += casual.sentences(10);
   return htmlStr;
 });
 

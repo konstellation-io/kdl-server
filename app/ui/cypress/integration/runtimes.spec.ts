@@ -221,4 +221,19 @@ describe('Runtimes Behaviour', () => {
       isRuntimeRunning(runtimeName);
     });
   });
+  describe('Runtimes Info-Panel Behaviour', () => {
+    it('There should be only safe tags on runtime description', () => {
+      // GIVEN there is a runtime started
+      cy.kstInterceptor('GetRunningRuntime', { data: GetRunningRuntimeQuery });
+
+      // WHEN runtime info panel is opened
+      cy.kstInterceptor('SetActiveUserTools', { data: { areToolsActive: false } });
+      cy.getByTestId('openRuntimeSettings').click();
+      cy.getByTestId('runtimesList').children().first().click();
+
+      // THEN the description should only contain safe tags
+      cy.getByTestId('runtimeDescriptionField').should('not.contain', '<script>');
+      cy.getByTestId('runtimeDescriptionField').get('ul').should('exist');
+    });
+  });
 });

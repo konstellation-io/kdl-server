@@ -1,0 +1,13 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.2.0  # Use the ref you want to point at
+  hooks:
+    - id: check-added-large-files
+    - id: trailing-whitespace
+    - id: check-merge-conflict
+    - id: check-symlinks
+    - id: end-of-file-fixer
+- repo: https://github.com/zricethezav/gitleaks
+  rev: v8.2.0
+  hooks:
+    - id: gitleaks

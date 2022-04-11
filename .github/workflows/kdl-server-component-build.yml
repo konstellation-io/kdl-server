@@ -49,7 +49,7 @@ jobs:
 
       - if: steps.changes.outputs.api == 'true'
         name: API Archive code coverage results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: coverage-report
           path: app/api/coverage.out
@@ -75,7 +75,7 @@ jobs:
 
       - if: steps.changes.outputs.ui == 'true'
         name: UI Archive code coverage results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: coverage-report
           path: |

@@ -166,8 +166,6 @@ spec:
               value: /bin/bash
             - name: KERNEL_USERNAME
               value: "{{ .Values.usernameSlug }}"
-            - name: KERNEL_SHARED_VOLUME_NAME
-              value: "{{ .Values.sharedVolume.name }}-claim"
           volumeMounts:
             - name: user-pvc
               mountPath: /home/coder

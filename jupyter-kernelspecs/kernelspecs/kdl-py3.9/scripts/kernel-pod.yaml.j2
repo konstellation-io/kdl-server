@@ -96,6 +96,7 @@ spec:
       name: "userclaim"
     - mountPath: /home/coder/shared-storage
       name: "shared-storage"
+      readOnly: true
     {% if kernel_volume_mounts is defined %}
       {% for volume_mount in kernel_volume_mounts %}
     - {{ volume_mount }}

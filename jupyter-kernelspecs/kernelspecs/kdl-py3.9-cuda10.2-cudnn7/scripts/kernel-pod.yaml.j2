@@ -92,11 +92,8 @@ spec:
     {% endif %}
     volumeMounts:
 # Define any "unconditional" mounts here, followed by "conditional" mounts that vary per client
-    - mountPath: /home/coder
+    - mountPath: /home/coder                                                                                  
       name: "userclaim"
-    - mountPath: /home/coder/shared-storage
-      name: "shared-storage"
-      readOnly: true
     {% if kernel_volume_mounts is defined %}
       {% for volume_mount in kernel_volume_mounts %}
     - {{ volume_mount }}
@@ -107,11 +104,9 @@ spec:
   - name: "userclaim"
     persistentVolumeClaim:
       claimName: "user-pvc-usertools-{{ kernel_username }}-user-tools-0"
-  - name: "shared-storage"
-    persistentVolumeClaim:
-      claimName: "{{ kernel_shared_volume_name }}"
-  {% if kernel_volumes is defined %}
+  {% if kernel_volumes is defined %}                                                                                                   
     {% for volume in kernel_volumes %}
   - {{ volume }}
     {% endfor %}
   {% endif %}
+  

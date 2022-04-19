@@ -188,7 +188,7 @@ enterprise-gateway:
 
   kernelspecs:
     # Optional custom data image containing kernelspecs to use.
-    image: "konstellation/jupyter-kernelspecs:v1.0.0"
+    image: "konstellation/jupyter-kernelspecs:1.1.0"
     # Kernelspecs image pull policy.
     imagePullPolicy: IfNotPresent
 
@@ -253,7 +253,7 @@ knowledgeGalaxy:
 kdlServer:
   image:
     repository: konstellation/kdl-server
-    tag: 1.10.1
+    tag: 1.13.0
     pullPolicy: IfNotPresent
   ingress:
     proxyReadTimeout: "3600"
@@ -471,7 +471,7 @@ tls:
 userToolsOperator:
   image:
     repository: konstellation/user-tools-operator
-    tag: 0.17.1
+    tag: 0.18.0
     pullPolicy: IfNotPresent
   storage:
     size: 10Gi

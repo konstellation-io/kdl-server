@@ -18,18 +18,20 @@ concurrency: build_component
 
 jobs:
   lint-dockerfile:
-    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.7.3
+    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.7.4
     with:
       component_path: jupyter-kernelspecs
 
   build:
     needs: lint-dockerfile
-    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.7.3
+    uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.7.4
     with:
       component: jupyter-kernelspecs
+      component_helm_tag: enterprise-gateway.kernelspecs.image
       component_path: jupyter-kernelspecs
       component_image: jupyter-kernelspecs
       not_change_file: true
+      values_file: helm/kdl-server/values.yaml
 
     secrets:
       pat: ${{ secrets.PATNAME }}

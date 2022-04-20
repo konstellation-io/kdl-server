@@ -24,7 +24,7 @@ concurrency: helm_release
 jobs:
   helm-release:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    uses: konstellation-io/github-workflows/.github/workflows/helm-release.yaml@v1.7.2
+    uses: konstellation-io/github-workflows/.github/workflows/helm-release.yaml@v1.7.3
     with:
       chart_file: helm/kdl-server/Chart.yaml
       chart_path: helm

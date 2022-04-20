@@ -22,4 +22,4 @@ concurrency: build_component
 
 jobs:
   helm-lint:
-    uses: konstellation-io/github-workflows/.github/workflows/helm-lint.yaml@v1.7.3
+    uses: konstellation-io/github-workflows/.github/workflows/helm-lint.yaml@v1.7.5

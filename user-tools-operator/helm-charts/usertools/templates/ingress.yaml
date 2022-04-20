@@ -17,7 +17,7 @@ metadata:
       more_set_headers "Content-Security-Policy: frame-ancestors 'self' {{ include "protocol" . }}://kdlapp.{{ .Values.domain}}";
     {{ end }}
 spec:
-  {{ if .Values.tls -}}
+  {{ if .Values.tls.enabled -}}
   tls:
     - hosts:
         - {{ .Values.usernameSlug }}-code.{{ .Values.domain }}

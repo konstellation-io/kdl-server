@@ -35,7 +35,16 @@ storage:
   size: 10Gi
   className: standard
 
-tls: false
+tls:
+  enabled: false
+
+  ## Custom TLS secret
+  ## Must be a valid wildcard certificate for the domain
+  ## declared in .Values.domain
+  ## Certificate name example:
+  ##   *.example.com
+  #
+  secretName: "kdl-server-tls"
 
 username: user.name
 

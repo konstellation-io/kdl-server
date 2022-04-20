@@ -59,5 +59,5 @@ Create the name of the service account to use
 Add the protocol part to the uri
 */}}
 {{- define "protocol" -}}
-{{ ternary "https" "http" .Values.tls }}
+{{ ternary "https" "http" .Values.tls.enabled }}
 {{- end -}}

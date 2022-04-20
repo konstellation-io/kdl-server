@@ -88,3 +88,6 @@ data:
   TOOLKIT_INGRESS_TYPE: {{ .Values.ingress.type }}
   TOOLKIT_SHARED_VOLUME: {{ .Values.sharedVolume.name }}
   TOOLKIT_TLS: "{{ .Values.tls.enabled }}"
+  {{- if and .Values.tls.enabled .Values.tls.secretName }}
+  TOOLKIT_TLS_SECRET_NAME: {{ include "tlsSecretName" . }}
+  {{- end }}

@@ -18,7 +18,7 @@ spec:
   tls:
     - hosts:
         - minio-console.{{ .Values.domain }}
-      secretName: {{ .Values.domain }}-tls-secret
+      secretName: {{ include "tlsSecretName" . }}
   {{- end }}
   rules:
     - host: minio-console.{{ .Values.domain }}

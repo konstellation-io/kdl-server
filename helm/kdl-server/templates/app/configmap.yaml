@@ -84,8 +84,11 @@ data:
   USER_TOOLS_STORAGE_SIZE: {{ .Values.userToolsOperator.storage.size }}
   USER_TOOLS_STORAGE_CLASSNAME: {{ .Values.userToolsOperator.storage.storageClassName }}
 
+  # Base64 encoded string of the user-tools ingress annotations
+  USER_TOOLS_ENCODED_INGRESS_ANNOTATIONS: |+
+    {{- toYaml .Values.userToolsOperator.ingress.annotations | b64enc | nindent 4 }}
+
   TOOLKIT_BASE_DOMAIN_NAME: {{ .Values.domain }}
-  TOOLKIT_INGRESS_TYPE: {{ .Values.ingress.type }}
   TOOLKIT_SHARED_VOLUME: {{ .Values.sharedVolume.name }}
   TOOLKIT_TLS: "{{ .Values.tls.enabled }}"
   {{- if and .Values.tls.enabled .Values.tls.secretName }}

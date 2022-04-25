@@ -15,8 +15,11 @@ type Config struct {
 	Port            string `yaml:"port" envconfig:"KDL_SERVER_PORT"`
 	StaticFilesPath string `yaml:"staticFilesPath" envconfig:"KDL_SERVER_STATIC_FILES_PATH"`
 	BaseDomainName  string `envconfig:"TOOLKIT_BASE_DOMAIN_NAME"`
-	TLS             bool   `envconfig:"TOOLKIT_TLS"`
-	Admin           struct {
+	TLS             struct {
+		Enabled    bool   `envconfig:"TOOLKIT_TLS"`
+		SecretName string `envconfig:"TOOLKIT_TLS_SECRET_NAME"`
+	}
+	Admin struct {
 		Username string `envconfig:"KDL_ADMIN_USERNAME"`
 		Email    string `envconfig:"KDL_ADMIN_EMAIL"`
 	}

@@ -1,40 +1,39 @@
-{{ if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1
-{{ else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1/Ingress" }}
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1beta1
-{{ else }}
+{{- else -}}
 apiVersion: extensions/v1beta1
-{{ end }}
+{{- end }}
 kind: Ingress
 metadata:
   name: minio-console
+  {{- with .Values.minio.ingress.annotations }}
   annotations:
-    {{ if eq .Values.ingress.type "nginx" }}
-    kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
-    {{ end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end}}
 spec:
-  {{ if .Values.tls.enabled -}}
+  {{- if .Values.tls.enabled }}
   tls:
     - hosts:
         - minio-console.{{ .Values.domain }}
-      secretName: {{ .Values.domain }}-tls-secret
+      secretName: {{ include "tlsSecretName" . }}
   {{- end }}
   rules:
     - host: minio-console.{{ .Values.domain }}
       http:
         paths:
-          {{ if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-          - pathType: Prefix
-            path: "/"
+          - path: "/"
+            {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
+            pathType: Prefix
+            {{- end }}
             backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
                 name: {{ .Release.Name }}-minio-console
                 port:
                   number: 9001
-          {{ else }}
-          - path: /
-            backend:
+              {{- else }}
               serviceName: {{ .Release.Name }}-minio-console
               servicePort: 9001
-          {{ end }}
+              {{- end }}

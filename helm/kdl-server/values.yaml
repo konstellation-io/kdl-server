@@ -72,7 +72,31 @@ drone:
   adminToken: 7GSipOV0wJZQioZNBxaw3AotHV1tA4K4
   runnerCapacity: 5
   ingress:
-    proxyBodySize: 100m
+    annotations:
+      ## This Chart has been developed using Nginx Ingress Controller by default.
+      ## Using the following default annotations ensures its correct operation.
+      ## Ref: https://kubernetes.github.io/ingress-nginx/
+      ##
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/proxy-body-size: 100m
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        more_set_headers "Content-Security-Policy: frame-ancestors 'self' *";
+
+      ## In case of additional security to be required set the previous annotation as follows
+      ##
+      # nginx.ingress.kubernetes.io/configuration-snippet: |
+      #   more_set_headers "Content-Security-Policy: frame-ancestors 'self' https://kdlapp.kdl.local";
+
+      ## If additional annotations are needed to configure it, provide an additional
+      ## file ensuring they are appended to the default ones.
+      ##
+      ## Example:
+      ##
+      # kubernetes.io/ingress.class: nginx
+      # nginx.ingress.kubernetes.io/proxy-body-size: 100m
+      # nginx.ingress.kubernetes.io/configuration-snippet: |
+      #   more_set_headers "Content-Security-Policy: frame-ancestors 'self' https://kdlapp.kdl.local";
+      # cert-manager.io/issuer: your-issuer
 
   ## Define which Nodes the Pods are scheduled on.
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -128,6 +152,20 @@ gitea:
   storage:
     size: 10Gi
     storageClassName: standard
+  ingress:
+    annotations:
+      ## This Chart has been developed using Nginx Ingress Controller by default.
+      ## Using the following default annotations ensures its correct operation.
+      ## Ref: https://kubernetes.github.io/ingress-nginx/
+      ##
+      kubernetes.io/ingress.class: "nginx"
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        more_set_headers "Content-Security-Policy: frame-ancestors 'self' *";
+
+      ## In case of additional security to be required set the previous annotation as follows
+      ##
+      # nginx.ingress.kubernetes.io/configuration-snippet: |
+      #   more_set_headers "Content-Security-Policy: frame-ancestors 'self' https://kdlapp.kdl.local";
 
   ## Define which Nodes the Pods are scheduled on.
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -149,9 +187,6 @@ giteaOauth2Setup:
     repository: konstellation/gitea-oauth2-setup
     tag: v0.13.5
     pullPolicy: IfNotPresent
-
-ingress:
-  type: nginx
 
 enterprise-gateway:
   image: elyra/enterprise-gateway:2.5.0
@@ -253,16 +288,34 @@ knowledgeGalaxy:
 kdlServer:
   image:
     repository: konstellation/kdl-server
-    tag: 1.14.0
+    tag: 1.15.0
     pullPolicy: IfNotPresent
   ingress:
-    proxyReadTimeout: "3600"
-    proxySendTimeout: "3600"
-    proxyConnectTimeout: "3600"
+    annotations:
+      ## This Chart has been developed using Nginx Ingress Controller by default.
+      ## Using the following default annotations ensures its correct operation.
+      ## Ref: https://kubernetes.github.io/ingress-nginx/
+      ##
+      kubernetes.io/ingress.class: "nginx"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
 
-    ## Large values are needed to serve big files from Filebrowser
-    ##
-    proxyBodySize: "1000000m"
+      ## Large values are needed here to serve big files from Filebrowser
+      ##
+      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+
+      ## If additional annotations are needed to configure it, provide an additional
+      ## file ensuring they are appended to the default ones.
+      ##
+      ## Example:
+      ##
+      # kubernetes.io/ingress.class: nginx
+      # nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      # nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      # nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
+      # nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+      # cert-manager.io/issuer: your-issuer
 
   ## Define which Nodes the Pods are scheduled on.
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -308,14 +361,12 @@ minio:
   ##
   tolerations: []
 
-  ## This Chart feature is disabled because we have to deal with different Kubernetes API versions.
-  ## Please check the ingress template in Helm chart
+  ## This Chart uses custom ingresses for MinIO and MinIO Console and not
+  ## the ones implemented by the official MinIO Chart which are disabled by default
   ##
   ingress:
-    enabled: false
-    hosts:
-      - minio.local
     annotations:
+      kubernetes.io/ingress.class: "nginx"
       nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
 
 mongodb:
@@ -514,6 +565,24 @@ userToolsOperator:
       repository: konstellation/kdl-py
       tag: "3.9"
       pullPolicy: IfNotPresent
+
+  ## Default ingress config for all deployed User Tools.
+  ##
+  ## This Chart has been developed using Nginx Ingress Controller by default.
+  ## Using the following default annotations ensures its correct operation.
+  ## Ref: https://kubernetes.github.io/ingress-nginx/
+  ##
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: "nginx"
+      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        more_set_headers "Content-Security-Policy: frame-ancestors 'self' *";
+
+      ## In case of additional security to be required set the previous annotation as follows
+      ##
+      # nginx.ingress.kubernetes.io/configuration-snippet: |
+      #   more_set_headers "Content-Security-Policy: frame-ancestors 'self' https://kdlapp.kdl.local";
 
   ## If enabled, users will be able to download a kubeconfig file, so they can attach an external terminal/IDE to
   ## the vscodeRuntime running inside KST.

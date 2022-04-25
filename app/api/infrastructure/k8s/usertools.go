@@ -156,7 +156,7 @@ func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName
 	oAuthName := fmt.Sprintf("%s-app-%s", toolName, slugUsername)
 
 	protocol := "http"
-	if k.cfg.TLS {
+	if k.cfg.TLS.Enabled {
 		protocol = "https"
 	}
 
@@ -203,7 +203,10 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 				"sharedVolume": map[string]string{
 					"name": k.cfg.SharedVolume.Name,
 				},
-				"tls": k.cfg.TLS,
+				"tls": map[string]interface{}{
+					"enabled":    k.cfg.TLS.Enabled,
+					"secretName": k.cfg.TLS.SecretName,
+				},
 				"jupyter": map[string]interface{}{
 					"image": map[string]string{
 						"repository": k.cfg.Jupyter.Image.Repository,

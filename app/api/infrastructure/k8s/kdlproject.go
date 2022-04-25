@@ -37,7 +37,8 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 					"name": k.cfg.SharedVolume.Name,
 				},
 				"tls": map[string]interface{}{
-					"enabled": k.cfg.TLS,
+					"enabled":    k.cfg.TLS.Enabled,
+					"secretName": k.cfg.TLS.SecretName,
 				},
 				"ingress": map[string]string{
 					"type": k.cfg.VSCode.Ingress.Type,

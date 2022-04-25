@@ -897,9 +897,11 @@ spec:
               ingress:
                 type: object
                 properties:
-                  type:
-                    description: ingress type
-                    type: string
+                  annotations:
+                    additionalProperties:
+                      type: string
+                    description: "Ingress annotations"
+                    type: object
               sharedVolume:
                 type: object
                 properties:
@@ -916,8 +918,14 @@ spec:
                     description: size of the storage
                     type: string
               tls:
-                description: enable or disable tls
-                type: boolean
+                type: object
+                properties:
+                  enabled:
+                    description: enable or disable tls
+                    type: boolean
+                  secretName:
+                    description: the tls secret name in which the certificate is stored
+                    type: string
               username:
                 description: username to create tools
                 type: string

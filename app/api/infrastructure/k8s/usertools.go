@@ -181,11 +181,14 @@ func (k *k8sClient) getIngressAnnotations() (map[string]interface{}, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error decoding ingress annotations: %w", err)
 	}
+
 	var ingressAnnotations map[string]interface{}
+
 	err = yaml.Unmarshal(decodedAnnotations, &ingressAnnotations)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling annotations: %w", err)
 	}
+
 	return ingressAnnotations, nil
 }
 
@@ -193,10 +196,12 @@ func (k *k8sClient) getIngressAnnotations() (map[string]interface{}, error) {
 func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, usernameSlug, resName, runtimeID,
 	runtimeImage, runtimeTag string) error {
 	serviceAccountName := k.getUserServiceAccountName(usernameSlug)
+
 	ingressAnnotations, err := k.getIngressAnnotations()
 	if err != nil {
 		return err
 	}
+
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",

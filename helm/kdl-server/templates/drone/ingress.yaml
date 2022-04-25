@@ -25,17 +25,17 @@ spec:
     - host: drone.{{ .Values.domain }}
       http:
         paths:
-        {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-          - pathType: Prefix
-            path: "/"
-            backend:
-              service:
-                name: drone
-                port:
-                  number: 80
-        {{- else }}
-          - path: /
-            backend:
-              serviceName: drone
-              servicePort: http
-        {{- end }}
+        - path: "/"
+          {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
+          pathType: Prefix
+          {{- end }}
+          backend:
+            {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+            service:
+              name: drone
+              port:
+                number: 80
+            {{- else }}
+            serviceName: drone
+            servicePort: http
+            {{- end }}

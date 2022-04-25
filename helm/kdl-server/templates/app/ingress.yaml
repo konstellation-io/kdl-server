@@ -20,20 +20,20 @@ spec:
       secretName: {{ include "tlsSecretName" . }}
   {{- end }}
   rules:
-    - host: kdlapp.{{ .Values.domain }}
-      http:
-        paths:
-        {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-          - pathType: Prefix
-            path: "/"
-            backend:
-              service:
-                name: kdl-server
-                port:
-                  name: oauth2-proxy
-        {{- else }}
-          - path: "/"
-            backend:
-              serviceName: kdl-server
-              servicePort: oauth2-proxy
-        {{- end }}
+  - host: kdlapp.{{ .Values.domain }}
+    http:  
+      paths:
+        - path: "/"
+          {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
+          pathType: Prefix
+          {{- end }}
+          backend:
+            {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+            service:
+              name: kdl-server
+              port:
+                number: 80
+            {{- else }}
+            serviceName: kdl-server
+            servicePort: oauth2-proxy
+            {{- end }}

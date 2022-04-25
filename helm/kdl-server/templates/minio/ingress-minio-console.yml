@@ -23,17 +23,17 @@ spec:
     - host: minio-console.{{ .Values.domain }}
       http:
         paths:
-          {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-          - pathType: Prefix
-            path: "/"
+          - path: "/"
+            {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
+            pathType: Prefix
+            {{- end }}
             backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
                 name: {{ .Release.Name }}-minio-console
                 port:
                   number: 9001
-          {{- else }}
-          - path: /
-            backend:
+              {{- else }}
               serviceName: {{ .Release.Name }}-minio-console
               servicePort: 9001
-          {{- end }}
+              {{- end }}

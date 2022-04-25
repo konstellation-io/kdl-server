@@ -40,9 +40,6 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 					"enabled":    k.cfg.TLS.Enabled,
 					"secretName": k.cfg.TLS.SecretName,
 				},
-				"ingress": map[string]string{
-					"type": k.cfg.VSCode.Ingress.Type,
-				},
 				"minio": map[string]string{
 					"accessKey": k.cfg.Minio.AccessKey,
 					"secretKey": k.cfg.Minio.SecretKey,

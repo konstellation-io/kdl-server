@@ -59,10 +59,7 @@ type Config struct {
 		EnterpriseGatewayURL string `envconfig:"JUPYTER_ENTERPRISE_GATEWAY_URL"`
 	}
 	VSCode struct {
-		URL     string `envconfig:"USER_TOOLS_VSCODE_URL"`
-		Ingress struct {
-			Type string `envconfig:"TOOLKIT_INGRESS_TYPE"`
-		}
+		URL   string `envconfig:"USER_TOOLS_VSCODE_URL"`
 		Image struct {
 			Repository string `envconfig:"VSCODE_IMG_REPO"`
 			Tag        string `envconfig:"VSCODE_IMG_TAG"`
@@ -148,6 +145,10 @@ type Config struct {
 			Tag        string `envconfig:"USER_TOOLS_VSCODE_RUNTIME_IMG_TAG"`
 			PullPolicy string `envconfig:"USER_TOOLS_VSCODE_RUNTIME_IMG_PULLPOLICY"`
 		}
+	}
+	UserToolsIngress struct {
+		// Base64 encoded string of the ingress annotations
+		Annotations string `envconfig:"USER_TOOLS_ENCODED_INGRESS_ANNOTATIONS"`
 	}
 }
 

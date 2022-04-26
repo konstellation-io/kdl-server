@@ -52,11 +52,16 @@ manual actions.
 
 This major version comes with the following breaking changes:
 
-- Upgrade user-tools-operator to v0.19.0.
-    - TLS secret name is now received from the operator values
+- Ingress configuration changed from *values.yaml* 
+    - removed `ingress.type`
+    - added `drone.ingress.annotations`, `kdlApp.ingress.annotations`, `gitea.ingress.annotations`, `minio.ingress.annotations`, `minio-console.ingress.annotations`, `userToolsOperator.ingress.annotations`
 
-- Upgrade app to 1.15.0
-    - pass the name of the TLS secret through `userTools` resources.
+- Upgrade user-tools-operator to v0.20.0.
+    - TLS secret name and Ingress annotations are now received from the operator values
+
+- Upgrade app to 1.16.0
+    - pass the name of the TLS secret and Ingress annotations through `userTools` resources.
+    - pass Ingress annotations through `userTools`.
 
 Run these commands to update the CRDs before applying the upgrade.
 

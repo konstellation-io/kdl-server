@@ -48,6 +48,27 @@
 A major chart version change (like v0.15.3 -> v1.0.0) indicates that there is an incompatible breaking change needing
 manual actions.
 
+#### From 2.X to 3.X
+
+This major version comes with the following breaking changes:
+
+- Ingress configuration changed from *values.yaml* 
+    - removed `ingress.type`
+    - added `drone.ingress.annotations`, `kdlApp.ingress.annotations`, `gitea.ingress.annotations`, `minio.ingress.annotations`, `minio-console.ingress.annotations`, `userToolsOperator.ingress.annotations`
+
+- Upgrade user-tools-operator to v0.20.0.
+    - TLS secret name and Ingress annotations are now received from the operator values
+
+- Upgrade app to 1.17.0
+    - pass the name of the TLS secret and Ingress annotations through `userTools` resources.
+    - pass Ingress annotations through `userTools`.
+
+Run these commands to update the CRDs before applying the upgrade.
+
+```bash
+kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-io/kdl-server/v3.0.0/helm/kdl-server/crds/user-tools-operator-crd.yaml
+```
+
 #### From 1.X to 2.X
 
 This major version comes with the following breaking changes:

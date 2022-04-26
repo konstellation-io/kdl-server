@@ -2,9 +2,11 @@ package k8s
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 
 	"github.com/gosimple/slug"
+	"gopkg.in/yaml.v3"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -174,10 +176,32 @@ func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName
 	return nil
 }
 
+func (k *k8sClient) getIngressAnnotations() (map[string]interface{}, error) {
+	decodedAnnotations, err := base64.StdEncoding.DecodeString(k.cfg.UserToolsIngress.Annotations)
+	if err != nil {
+		return nil, fmt.Errorf("error decoding ingress annotations: %w", err)
+	}
+
+	var ingressAnnotations map[string]interface{}
+
+	err = yaml.Unmarshal(decodedAnnotations, &ingressAnnotations)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling annotations: %w", err)
+	}
+
+	return ingressAnnotations, nil
+}
+
 // createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
 func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, usernameSlug, resName, runtimeID,
 	runtimeImage, runtimeTag string) error {
 	serviceAccountName := k.getUserServiceAccountName(usernameSlug)
+
+	ingressAnnotations, err := k.getIngressAnnotations()
+	if err != nil {
+		return err
+	}
+
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",
@@ -191,8 +215,8 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 			},
 			"spec": map[string]interface{}{
 				"domain": k.cfg.BaseDomainName,
-				"ingress": map[string]string{
-					"type": k.cfg.VSCode.Ingress.Type,
+				"ingress": map[string]interface{}{
+					"annotations": ingressAnnotations,
 				},
 				"username":     username,
 				"usernameSlug": usernameSlug,
@@ -261,7 +285,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 	}
 
 	k.logger.Infof("Creating users tools: %#v", definition.Object)
-	_, err := k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
+	_, err = k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
 
 	return err
 }

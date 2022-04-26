@@ -81,7 +81,6 @@ drone:
       nginx.ingress.kubernetes.io/proxy-body-size: 100m
       nginx.ingress.kubernetes.io/configuration-snippet: |
         more_set_headers "Content-Security-Policy: frame-ancestors 'self' *";
-
       ## In case of additional security to be required set the previous annotation as follows
       ##
       # nginx.ingress.kubernetes.io/configuration-snippet: |
@@ -98,9 +97,9 @@ drone:
       #   more_set_headers "Content-Security-Policy: frame-ancestors 'self' https://kdlapp.kdl.local";
       # cert-manager.io/issuer: your-issuer
 
-  ## Define which Nodes the Pods are scheduled on.
-  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-  ##
+      ## Define which Nodes the Pods are scheduled on.
+      ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+      ##
   nodeSelector: {}
 
   ## Assign custom affinity rules
@@ -161,15 +160,14 @@ gitea:
       kubernetes.io/ingress.class: "nginx"
       nginx.ingress.kubernetes.io/configuration-snippet: |
         more_set_headers "Content-Security-Policy: frame-ancestors 'self' *";
-
       ## In case of additional security to be required set the previous annotation as follows
       ##
       # nginx.ingress.kubernetes.io/configuration-snippet: |
       #   more_set_headers "Content-Security-Policy: frame-ancestors 'self' https://kdlapp.kdl.local";
 
-  ## Define which Nodes the Pods are scheduled on.
-  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-  ##
+      ## Define which Nodes the Pods are scheduled on.
+      ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+      ##
   nodeSelector: {}
 
   ## Assign custom affinity rules
@@ -288,7 +286,7 @@ knowledgeGalaxy:
 kdlServer:
   image:
     repository: konstellation/kdl-server
-    tag: 1.15.0
+    tag: 1.16.0
     pullPolicy: IfNotPresent
   ingress:
     annotations:
@@ -304,7 +302,6 @@ kdlServer:
       ## Large values are needed here to serve big files from Filebrowser
       ##
       nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
-
       ## If additional annotations are needed to configure it, provide an additional
       ## file ensuring they are appended to the default ones.
       ##
@@ -317,9 +314,9 @@ kdlServer:
       # nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
       # cert-manager.io/issuer: your-issuer
 
-  ## Define which Nodes the Pods are scheduled on.
-  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-  ##
+      ## Define which Nodes the Pods are scheduled on.
+      ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+      ##
   nodeSelector: {}
 
   ## Assign custom affinity rules
@@ -578,14 +575,13 @@ userToolsOperator:
       nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
       nginx.ingress.kubernetes.io/configuration-snippet: |
         more_set_headers "Content-Security-Policy: frame-ancestors 'self' *";
-
       ## In case of additional security to be required set the previous annotation as follows
       ##
       # nginx.ingress.kubernetes.io/configuration-snippet: |
       #   more_set_headers "Content-Security-Policy: frame-ancestors 'self' https://kdlapp.kdl.local";
 
-  ## If enabled, users will be able to download a kubeconfig file, so they can attach an external terminal/IDE to
-  ## the vscodeRuntime running inside KST.
+      ## If enabled, users will be able to download a kubeconfig file, so they can attach an external terminal/IDE to
+      ## the vscodeRuntime running inside KST.
   kubeconfig:
     enabled: false
     ## External cluster address to be able to connect to it from the outside.

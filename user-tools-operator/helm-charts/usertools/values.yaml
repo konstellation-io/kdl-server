@@ -7,7 +7,11 @@ giteaOauth2Setup:
     pullPolicy: IfNotPresent
 
 ingress:
-  type: "nginx"
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "Content-Security-Policy: frame-ancestors 'self' *";
 
 jupyter:
   image:

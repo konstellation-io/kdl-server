@@ -1,7 +1,7 @@
 kind: secret
 name: minio-key-id
 get:
-  path: mlflow-server-secret
+  path: {{ .ProjectID }}-mlflow-secret
   name: AWS_ACCESS_KEY_ID
 
 ---
@@ -9,7 +9,7 @@ get:
 kind: secret
 name: minio-secret
 get:
-  path: mlflow-server-secret
+  path: {{ .ProjectID }}-mlflow-secret
   name: AWS_SECRET_ACCESS_KEY
 
 ---

@@ -897,9 +897,11 @@ spec:
               ingress:
                 type: object
                 properties:
-                  type:
-                    description: ingress type
-                    type: string
+                  annotations:
+                    additionalProperties:
+                      type: string
+                    description: "Ingress annotations"
+                    type: object
               sharedVolume:
                 type: object
                 properties:

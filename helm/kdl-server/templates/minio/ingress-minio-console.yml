@@ -8,7 +8,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: minio-console
-  {{- with .Values.minio.ingress.annotations }}
+  {{- with .Values.minio.consoleIngress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end}}

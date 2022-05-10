@@ -2,5 +2,5 @@ chart-dirs:
   - helm/
 chart-repos:
   - minio=https://charts.min.io/
-  - enterprise-gateway=https://charts.spot.io/
+  - enterprise-gateway=https://konstellation-io.github.io/enterprise_gateway/   
 validate-maintainers: false

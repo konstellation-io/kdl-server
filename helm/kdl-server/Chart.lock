@@ -3,7 +3,7 @@ dependencies:
   repository: https://charts.min.io/
   version: 3.2.0
 - name: enterprise-gateway
-  repository: https://charts.spot.io
-  version: 2.5.0
-digest: sha256:5c7fa88597668a4b5192a6fa22143cf388990f34fd4789baa06d3c2e8ee2d161
-generated: "2021-12-13T15:58:50.642274791+01:00"
+  repository: https://konstellation-io.github.io/enterprise_gateway/
+  version: 2.6.0
+digest: sha256:b24dd765d669dfd29f0855375802028c14f453151a16087c1abcef6a917f8f7b
+generated: "2022-05-10T13:06:19.464523402+02:00"

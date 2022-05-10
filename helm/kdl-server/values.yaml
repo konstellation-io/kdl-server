@@ -163,7 +163,6 @@ enterprise-gateway:
   mirrorWorkingDirs: true
 
   # create and require a secret token, supplied by client in an "Authorization: token" header
-  authTokenEnabled: false
   affinity: {}
 
   kernel:

@@ -48,6 +48,18 @@
 A major chart version change (like v0.15.3 -> v1.0.0) indicates that there is an incompatible breaking change needing
 manual actions.
 
+#### From 3.X to 4.X
+
+This major version comes with the following breaking changes:
+
+- Fixed an issue with **usertools.kdl.konstellation.io** CRD that produced errors in **user-tools-operator** with *UserTools* resources during the reconciling process.
+
+Run these commands to update the CRDs before applying the upgrade.
+
+```bash
+kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-io/kdl-server/v4.0.0/helm/kdl-server/crds/user-tools-operator-crd.yaml
+```
+
 #### From 2.X to 3.X
 
 This major version comes with the following breaking changes:

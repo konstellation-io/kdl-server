@@ -53,6 +53,7 @@ manual actions.
 This major version comes with the following breaking changes:
 
 - Fixed an issue with **usertools.kdl.konstellation.io** CRD that produced errors in **user-tools-operator** with *UserTools* resources during the reconciling process.
+- Added `minio.consoleIngress.annotations` to *values.yaml*
 
 Run these commands to update the CRDs before applying the upgrade.
 
@@ -66,7 +67,7 @@ This major version comes with the following breaking changes:
 
 - Ingress configuration changed from *values.yaml* 
     - removed `ingress.type`
-    - added `drone.ingress.annotations`, `kdlApp.ingress.annotations`, `gitea.ingress.annotations`, `minio.ingress.annotations`, `minio-console.ingress.annotations`, `userToolsOperator.ingress.annotations`
+    - added `drone.ingress.annotations`, `kdlApp.ingress.annotations`, `gitea.ingress.annotations`, `minio.ingress.annotations`, `userToolsOperator.ingress.annotations`
 
 - Upgrade user-tools-operator to v0.20.0.
     - TLS secret name and Ingress annotations are now received from the operator values

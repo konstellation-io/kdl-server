@@ -8,7 +8,7 @@ spec:
     kind: UserTools
     listKind: UserToolsList
     plural: usertools
-    singular: usertools
+    singular: usertool
   scope: Namespaced
   versions:
   - name: v1alpha1

@@ -213,6 +213,7 @@ enterprise-gateway:
     whitelist:
       - kdl-py3.9
       - kdl-py3.9-cuda10.2-cudnn7
+      - kdl-py3.9-cuda11.6-cudnn8
     # Default kernel name should be something from the whitelist
     defaultKernelName: kdl-py3.9
     # kernel service account name

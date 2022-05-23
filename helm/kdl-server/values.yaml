@@ -285,7 +285,7 @@ knowledgeGalaxy:
 kdlServer:
   image:
     repository: konstellation/kdl-server
-    tag: 1.17.0
+    tag: 1.18.0
     pullPolicy: IfNotPresent
   ingress:
     annotations:
@@ -364,7 +364,7 @@ minio:
     annotations:
       kubernetes.io/ingress.class: "nginx"
       nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
-  
+
   consoleIngress:
     annotations:
       kubernetes.io/ingress.class: "nginx"

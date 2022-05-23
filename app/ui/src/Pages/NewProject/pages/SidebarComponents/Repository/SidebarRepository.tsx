@@ -9,9 +9,6 @@ const SidebarRepository = () => (
       <li>
         <strong>External repo:</strong> use a version-control system located outside the server.
       </li>
-      <li>
-        <strong>Internal repo:</strong> use a version-control system deployed inside the current server.
-      </li>
     </ol>
   </div>
 );

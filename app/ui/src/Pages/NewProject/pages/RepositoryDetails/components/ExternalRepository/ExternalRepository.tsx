@@ -26,7 +26,7 @@ function ExternalRepository({ showErrors }: Props) {
   return (
     <div className={styles.container}>
       <h3 className={styles.title}>Your external repository</h3>
-      <div className={styles.formContainer}>
+      <div className={styles.formContainer} data-testid={'externalRepositoryInputs'}>
         <TextInput
           label="url"
           onChange={(value: string) => {

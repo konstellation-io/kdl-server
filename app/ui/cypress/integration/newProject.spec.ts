@@ -74,10 +74,14 @@ const createProject = (name: string, id: string, customResponse?: Object) => {
   cy.getByTestId('nextButton').click();
 
   // Select the repo type
-  cy.getByTestId(RepositoryType.INTERNAL).click();
+  cy.getByTestId(RepositoryType.EXTERNAL).click();
 
   // Go to the next step
   cy.getByTestId('nextButton').click();
+
+  cy.getByTestId('externalRepositoryInputs').find('input').eq(0).type('http://test.com');
+  cy.getByTestId('externalRepositoryInputs').find('input').eq(1).type('username-test');
+  cy.getByTestId('externalRepositoryInputs').find('input').eq(2).type('token-test');
 
   // Go to the next step
   cy.getByTestId('nextButton').click();

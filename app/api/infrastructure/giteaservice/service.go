@@ -66,23 +66,6 @@ func (g *giteaService) UpdateSSHKey(username, publicSSHKey string) error {
 	return g.AddSSHKey(username, publicSSHKey)
 }
 
-// CreateRepo creates a repository in the KDL organization.
-func (g *giteaService) CreateRepo(name, ownerUsername string) error {
-	repo, _, err := g.client.AdminCreateRepo(kdlOrganization, gitea.CreateRepoOption{
-		Name:     name,
-		AutoInit: true,
-		Private:  true,
-	})
-
-	if err != nil {
-		return err
-	}
-
-	g.logger.Infof("Created repository \"%s\" in organization \"%s\" in Gitea with id \"%d\"", name, kdlOrganization, repo.ID)
-
-	return g.AddCollaborator(name, ownerUsername, entity.AccessLevelAdmin)
-}
-
 // MirrorRepo creates a mirror of an external repository in the KDL organization.
 func (g *giteaService) MirrorRepo(url, repoName, userName, userToken, ownerUsername string) error {
 	repo, _, err := g.client.MigrateRepo(gitea.MigrateRepoOption{

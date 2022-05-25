@@ -18,7 +18,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/repository"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/templates"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
@@ -72,8 +71,6 @@ func main() {
 	userRepo := repository.NewUserMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 	runtimeRepo := repository.NewRuntimeMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 
-	tmpl := templates.NewTemplating(cfg, logger, k8sClient)
-
 	err = userRepo.EnsureIndexes()
 	if err != nil {
 		logger.Errorf("Error creating indexes for users: %s", err)
@@ -90,7 +87,6 @@ func main() {
 		MinioService: minioService,
 		DroneService: droneService,
 		K8sClient:    k8sClient,
-		Tmpl:         tmpl,
 	}
 
 	projectInteractor := project.NewInteractor(projectDeps)

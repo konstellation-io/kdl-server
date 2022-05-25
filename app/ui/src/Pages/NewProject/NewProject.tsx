@@ -5,7 +5,6 @@ import useStepper, { ActionButton } from 'Hooks/useStepper/useStepper';
 import DefaultPage from 'Components/Layout/Page/DefaultPage/DefaultPage';
 import Information from './pages/Information/Information';
 import ROUTE from 'Constants/routes';
-import Repository from './pages/Repository/Repository';
 import RepositoryDetails from './pages/RepositoryDetails/RepositoryDetails';
 import { RepositoryType } from 'Graphql/types/globalTypes';
 import Stepper from 'Components/Stepper/Stepper';
@@ -44,10 +43,6 @@ const stepperSteps = [
     Component: Information,
   },
   {
-    id: StepNames.REPOSITORY,
-    Component: Repository,
-  },
-  {
     id: StepNames.DETAILS,
     Component: RepositoryDetails,
   },
@@ -75,8 +70,8 @@ function NewProject() {
 
   const type = data.repository.values.type;
 
-  const stepsWithData: (StepNames.INFORMATION | StepNames.REPOSITORY | StepNames.EXTERNAL)[] = useMemo(() => {
-    return [StepNames.INFORMATION, StepNames.REPOSITORY, repoTypeToStepName[type || '']];
+  const stepsWithData: (StepNames.INFORMATION | StepNames.EXTERNAL)[] = useMemo(() => {
+    return [StepNames.INFORMATION, repoTypeToStepName[type || '']];
   }, [type]);
 
   // We want to execute this on on component mount and unmount
@@ -171,8 +166,6 @@ function NewProject() {
     switch (step) {
       case StepNames.INFORMATION:
         return <SidebarInformation />;
-      case StepNames.REPOSITORY:
-        return <SidebarRepository />;
       case StepNames.EXTERNAL:
         return <SidebarExternalRepository />;
       default:

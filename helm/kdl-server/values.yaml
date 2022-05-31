@@ -364,7 +364,7 @@ minio:
     annotations:
       kubernetes.io/ingress.class: "nginx"
       nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
-  
+
   consoleIngress:
     annotations:
       kubernetes.io/ingress.class: "nginx"
@@ -523,7 +523,7 @@ tls:
 userToolsOperator:
   image:
     repository: konstellation/user-tools-operator
-    tag: 0.20.0
+    tag: 0.20.1
     pullPolicy: IfNotPresent
   storage:
     size: 10Gi

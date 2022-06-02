@@ -155,8 +155,7 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 	repoName := opt.ProjectID
 
 	// Create repository
-	switch opt.RepoType {
-	case entity.RepositoryTypeExternal:
+	if opt.RepoType == entity.RepositoryTypeExternal {
 		if err != nil {
 			return entity.Project{}, err
 		}

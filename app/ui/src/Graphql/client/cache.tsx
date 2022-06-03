@@ -9,7 +9,6 @@ import { NewProject } from './models/NewProject';
 import { PanelInfo } from './models/Panel';
 import { SettingsTab } from './models/SettingsTab';
 import { GetRuntimes_runtimes } from '../queries/types/GetRuntimes';
-import { RuntimeAction } from './models/RuntimeAction';
 
 type ToolName = keyof GetUserTools_project_toolUrls;
 
@@ -39,12 +38,14 @@ export const initialNewProject: NewProject = {
     values: {
       url: '',
       username: '',
-      token: '',
+      credential: '',
+      authMethod: null,
     },
     errors: {
       url: 'This field is mandatory',
-      token: 'This field is mandatory',
+      credential: 'This field is mandatory',
       username: 'This field is mandatory',
+      authMethod: 'This field is mandatory',
     },
   },
 };

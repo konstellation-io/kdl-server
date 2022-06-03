@@ -1071,14 +1071,19 @@ input RepositoryInput {
 input ExternalRepositoryInput {
   url: String!
   username: String!
-  token: String
-  password: String
+  credential: String!
+  authMethod: RepositoryAuthMethod!
 }
 
 type Repository {
   type: RepositoryType!
   url: String!
   error: String
+}
+
+enum RepositoryAuthMethod {
+  PASSWORD
+  TOKEN
 }
 
 enum RepositoryType {
@@ -7217,19 +7222,19 @@ func (ec *executionContext) unmarshalInputExternalRepositoryInput(ctx context.Co
 			if err != nil {
 				return it, err
 			}
-		case "token":
+		case "credential":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
-			it.Token, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("credential"))
+			it.Credential, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "password":
+		case "authMethod":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			it.Password, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authMethod"))
+			it.AuthMethod, err = ec.unmarshalNRepositoryAuthMethod2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepositoryAuthMethod(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9248,6 +9253,22 @@ func (ec *executionContext) unmarshalNRemoveMembersInput2githubᚗcomᚋkonstell
 func (ec *executionContext) unmarshalNRemoveUsersInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRemoveUsersInput(ctx context.Context, v interface{}) (model.RemoveUsersInput, error) {
 	res, err := ec.unmarshalInputRemoveUsersInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNRepositoryAuthMethod2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepositoryAuthMethod(ctx context.Context, v interface{}) (entity.RepositoryAuthMethod, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := entity.RepositoryAuthMethod(tmp)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRepositoryAuthMethod2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepositoryAuthMethod(ctx context.Context, sel ast.SelectionSet, v entity.RepositoryAuthMethod) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalNRepositoryInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRepositoryInput(ctx context.Context, v interface{}) (*model.RepositoryInput, error) {

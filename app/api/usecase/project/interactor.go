@@ -28,15 +28,15 @@ var (
 
 // CreateProjectOption options when creating project.
 type CreateProjectOption struct {
-	ProjectID            string
-	Name                 string
-	Description          string
-	RepoType             entity.RepositoryType
-	ExternalRepoURL      *string
-	ExternalRepoUsername *string
-	ExternalRepoToken    *string
-	ExternalRepoPassword *string
-	Owner                entity.User
+	ProjectID              string
+	Name                   string
+	Description            string
+	RepoType               entity.RepositoryType
+	ExternalRepoURL        *string
+	ExternalRepoUsername   *string
+	ExternalRepoCredential string
+	ExternalRepoAuthMethod entity.RepositoryAuthMethod
+	Owner                  entity.User
 }
 
 // Validate check that the CreateProjectOption properties are valid.
@@ -86,7 +86,11 @@ func (c CreateProjectOption) Validate() error {
 			return fmt.Errorf("%w: external repository username cannot be null", ErrCreateProjectValidation)
 		}
 
-		if kdlutil.IsNilOrEmpty(c.ExternalRepoToken) {
+		if !c.ExternalRepoAuthMethod.IsValid() {
+			return fmt.Errorf("%w: invalid repository authentication method", ErrCreateProjectValidation)
+		}
+
+		if c.ExternalRepoCredential == "" {
 			return fmt.Errorf("%w: external repository token cannot be null", ErrCreateProjectValidation)
 		}
 	}
@@ -183,7 +187,7 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 			return entity.Project{}, err
 		}
 
-		err := i.giteaService.MirrorRepo(*opt.ExternalRepoURL, repoName, *opt.ExternalRepoUsername, opt.Owner.Username, opt.ExternalRepoToken, opt.ExternalRepoPassword)
+		err := i.giteaService.MirrorRepo(*opt.ExternalRepoURL, repoName, *opt.ExternalRepoUsername, opt.Owner.Username, opt.ExternalRepoAuthMethod, opt.ExternalRepoCredential)
 		if err != nil {
 			return entity.Project{}, err
 		}

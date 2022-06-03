@@ -84,7 +84,7 @@ func (g *giteaService) CreateRepo(name, ownerUsername string) error {
 }
 
 // MirrorRepo creates a mirror of an external repository in the KDL organization.
-func (g *giteaService) MirrorRepo(url, repoName, userName, ownerUsername string, userToken, userPassword *string) error {
+func (g *giteaService) MirrorRepo(url, repoName, userName, ownerUsername string, authMethod entity.RepositoryAuthMethod, userCredential string) error {
 	migrateOpts := gitea.MigrateRepoOption{
 		RepoOwner:    kdlOrganization,
 		RepoName:     repoName,
@@ -95,10 +95,10 @@ func (g *giteaService) MirrorRepo(url, repoName, userName, ownerUsername string,
 	}
 
 	// set authToken or authPassword depending on the received params
-	if userToken != nil {
-		migrateOpts.AuthToken = *userToken
+	if authMethod == entity.RepositoryAuthToken {
+		migrateOpts.AuthToken = userCredential
 	} else {
-		migrateOpts.AuthPassword = *userPassword
+		migrateOpts.AuthPassword = userCredential
 	}
 
 	repo, _, err := g.client.MigrateRepo(migrateOpts)

@@ -180,7 +180,8 @@ input RepositoryInput {
 input ExternalRepositoryInput {
   url: String!
   username: String!
-  token: String!
+  token: String
+  password: String
 }
 
 type Repository {

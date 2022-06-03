@@ -31,9 +31,10 @@ type CreateProjectInput struct {
 }
 
 type ExternalRepositoryInput struct {
-	URL      string `json:"url"`
-	Username string `json:"username"`
-	Token    string `json:"token"`
+	URL      string  `json:"url"`
+	Username string  `json:"username"`
+	Token    *string `json:"token"`
+	Password *string `json:"password"`
 }
 
 type QualityProjectDesc struct {

@@ -35,6 +35,7 @@ type CreateProjectOption struct {
 	ExternalRepoURL      *string
 	ExternalRepoUsername *string
 	ExternalRepoToken    *string
+	ExternalRepoPassword *string
 	Owner                entity.User
 }
 
@@ -182,7 +183,7 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 			return entity.Project{}, err
 		}
 
-		err := i.giteaService.MirrorRepo(*opt.ExternalRepoURL, repoName, *opt.ExternalRepoUsername, *opt.ExternalRepoToken, opt.Owner.Username)
+		err := i.giteaService.MirrorRepo(*opt.ExternalRepoURL, repoName, *opt.ExternalRepoUsername, opt.Owner.Username, opt.ExternalRepoToken, opt.ExternalRepoPassword)
 		if err != nil {
 			return entity.Project{}, err
 		}

@@ -77,6 +77,7 @@ function ExternalRepository({ showErrors }: Props) {
           className={styles.authMethod}
           error={showErrors ? authMethodError : ''}
         />
+
         {authMethod && (
           <TextInput
             label={authMethod}

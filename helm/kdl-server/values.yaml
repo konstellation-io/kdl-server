@@ -286,7 +286,7 @@ knowledgeGalaxy:
 kdlServer:
   image:
     repository: konstellation/kdl-server
-    tag: 1.18.0
+    tag: 1.19.0
     pullPolicy: IfNotPresent
   ingress:
     annotations:

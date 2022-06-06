@@ -42,6 +42,7 @@ func (e RepositoryAuthMethod) IsValid() bool {
 	if e == RepositoryAuthPassword || e == RepositoryAuthToken {
 		return true
 	}
+
 	return false
 }
 

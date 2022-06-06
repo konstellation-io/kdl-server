@@ -187,7 +187,8 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 			return entity.Project{}, err
 		}
 
-		err := i.giteaService.MirrorRepo(*opt.ExternalRepoURL, repoName, *opt.ExternalRepoUsername, opt.Owner.Username, opt.ExternalRepoAuthMethod, opt.ExternalRepoCredential)
+		err := i.giteaService.MirrorRepo(*opt.ExternalRepoURL, repoName, *opt.ExternalRepoUsername, opt.Owner.Username,
+			opt.ExternalRepoAuthMethod, opt.ExternalRepoCredential)
 		if err != nil {
 			return entity.Project{}, err
 		}

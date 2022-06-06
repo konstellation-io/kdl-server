@@ -180,13 +180,19 @@ input RepositoryInput {
 input ExternalRepositoryInput {
   url: String!
   username: String!
-  token: String!
+  credential: String!
+  authMethod: RepositoryAuthMethod!
 }
 
 type Repository {
   type: RepositoryType!
   url: String!
   error: String
+}
+
+enum RepositoryAuthMethod {
+  PASSWORD
+  TOKEN
 }
 
 enum RepositoryType {

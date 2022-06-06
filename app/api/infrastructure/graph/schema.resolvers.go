@@ -67,7 +67,8 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 	if input.Repository.External != nil {
 		opts.ExternalRepoURL = &input.Repository.External.URL
 		opts.ExternalRepoUsername = &input.Repository.External.Username
-		opts.ExternalRepoToken = &input.Repository.External.Token
+		opts.ExternalRepoCredential = input.Repository.External.Credential
+		opts.ExternalRepoAuthMethod = input.Repository.External.AuthMethod
 	}
 
 	createdProject, err := r.projects.Create(ctx, opts)

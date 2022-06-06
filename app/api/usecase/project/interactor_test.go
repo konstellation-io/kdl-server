@@ -133,14 +133,14 @@ func TestInteractor_CreateInternal(t *testing.T) {
 	s.mocks.templating.EXPECT().GenerateInitialProjectContent(ctx, createProject, owner)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
-		ProjectID:            someProjectID,
-		Name:                 projectName,
-		Description:          projectDesc,
-		RepoType:             entity.RepositoryTypeInternal,
-		ExternalRepoURL:      nil,
-		ExternalRepoUsername: nil,
-		ExternalRepoToken:    nil,
-		Owner:                owner,
+		ProjectID:              someProjectID,
+		Name:                   projectName,
+		Description:            projectDesc,
+		RepoType:               entity.RepositoryTypeInternal,
+		ExternalRepoURL:        nil,
+		ExternalRepoCredential: "test-token",
+		ExternalRepoAuthMethod: entity.RepositoryAuthToken,
+		Owner:                  owner,
 	})
 
 	require.NoError(t, err)
@@ -161,6 +161,7 @@ func TestInteractor_CreateExternal(t *testing.T) {
 	externalRepoURL := "https://github.com/org/repo.git"
 	externalRepoUsername := "username"
 	externalRepoToken := "token"
+	externalAuthMethod := entity.RepositoryAuthToken
 
 	ctx := context.Background()
 	now := time.Now().UTC()
@@ -193,7 +194,7 @@ func TestInteractor_CreateExternal(t *testing.T) {
 	}
 
 	s.mocks.giteaService.EXPECT().
-		MirrorRepo(externalRepoURL, someProjectID, externalRepoUsername, externalRepoToken, ownerUsername).
+		MirrorRepo(externalRepoURL, someProjectID, externalRepoUsername, ownerUsername, externalAuthMethod, externalRepoToken).
 		Return(nil)
 	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, someProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().CreateBucket(ctx, someProjectID).Return(nil)
@@ -204,14 +205,15 @@ func TestInteractor_CreateExternal(t *testing.T) {
 	s.mocks.repo.EXPECT().Get(ctx, someProjectID).Return(expectedProject, nil)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
-		ProjectID:            someProjectID,
-		Name:                 projectName,
-		Description:          projectDesc,
-		RepoType:             entity.RepositoryTypeExternal,
-		ExternalRepoURL:      &externalRepoURL,
-		ExternalRepoUsername: &externalRepoUsername,
-		ExternalRepoToken:    &externalRepoToken,
-		Owner:                entity.User{ID: ownerUserID, Username: ownerUsername},
+		ProjectID:              someProjectID,
+		Name:                   projectName,
+		Description:            projectDesc,
+		RepoType:               entity.RepositoryTypeExternal,
+		ExternalRepoURL:        &externalRepoURL,
+		ExternalRepoUsername:   &externalRepoUsername,
+		ExternalRepoCredential: externalRepoToken,
+		ExternalRepoAuthMethod: externalAuthMethod,
+		Owner:                  entity.User{ID: ownerUserID, Username: ownerUsername},
 	})
 
 	require.NoError(t, err)

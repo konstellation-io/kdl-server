@@ -124,6 +124,16 @@ droneRunner:
     tag: 1.0.0-beta.6
     pullPolicy: IfNotPresent
 
+  ## Service Account to use to run in drone jobs (If you want to use IRSA or Workload Identity)
+  ## 
+  serviceAccountJob:
+    enabled: false
+    create: false
+    name: drone-runner-job
+    #annotations:
+    #  eks.amazonaws.com/role-arn: "arn:aws:iam::1234567890:role/myrole"
+
+
   ## Define which Nodes the Pods are scheduled on.
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
   ##

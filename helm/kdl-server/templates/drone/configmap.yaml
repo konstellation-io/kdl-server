@@ -29,3 +29,6 @@ data:
   {{- if and (and .Values.tls.enabled (not .Values.tls.certManager.enabled)) .Values.tls.caSecret }}
   DRONE_RUNNER_ENVIRON: GIT_SSL_NO_VERIFY:true
   {{- end }}
+  {{- if .Values.droneRunner.serviceAccountJob.enabled }}
+  DRONE_SERVICE_ACCOUNT_DEFAULT: {{ .Values.droneRunner.serviceAccountJob.name }}
+  {{- end }}

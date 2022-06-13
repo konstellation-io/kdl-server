@@ -7,6 +7,5 @@
   "compilerOptions": {
     "noEmit": false,
     "isolatedModules": false,
-    "types": ["cypress"]
   }
 }

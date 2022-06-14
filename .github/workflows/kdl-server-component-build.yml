@@ -84,7 +84,7 @@ jobs:
 
       - if: steps.changes.outputs.ui == 'true'
         name: UI Run e2e tests
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v4
         with:
           install: true
           working-directory: ./app/ui

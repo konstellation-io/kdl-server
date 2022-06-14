@@ -35,6 +35,7 @@ spec:
         - mountPath: /etc/ssl/certs/ca-cert.pem
           name: ca-cert
           subPath: {{ .Values.tls.caSecret.certFilename }}
+      {{- end }}
     {{- with .Values.droneRunner.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
@@ -47,8 +48,9 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
+    {{- if and (and .Values.tls.enabled (not .Values.tls.certManager.enabled)) .Values.tls.caSecret }}
       volumes:
       - name: ca-cert
         secret:
           secretName: {{ .Values.tls.caSecret.name }}
-      {{- end }}
+    {{- end }}

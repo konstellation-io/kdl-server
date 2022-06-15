@@ -134,9 +134,9 @@ droneRunner:
     #  eks.amazonaws.com/role-arn: "arn:aws:iam::1234567890:role/myrole"
 
 
-  ## Define which Nodes the Pods are scheduled on.
-  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-  ##
+    ## Define which Nodes the Pods are scheduled on.
+    ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+    ##
   nodeSelector: {}
 
   ## Assign custom affinity rules
@@ -296,7 +296,7 @@ knowledgeGalaxy:
 kdlServer:
   image:
     repository: konstellation/kdl-server
-    tag: 1.19.0
+    tag: 1.19.1
     pullPolicy: IfNotPresent
   ingress:
     annotations:

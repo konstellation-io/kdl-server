@@ -93,4 +93,7 @@ data:
   TOOLKIT_TLS: "{{ .Values.tls.enabled }}"
   {{- if and .Values.tls.enabled .Values.tls.secretName }}
   TOOLKIT_TLS_SECRET_NAME: {{ include "tlsSecretName" . }}
+
+  # Labels
+  LABELS_COMMON_RELEASE: {{ .Values.kdlServer.image.tag }}
   {{- end }}

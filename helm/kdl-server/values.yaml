@@ -56,7 +56,7 @@ cleaner:
   threshold: 5 # minimun age of files to be removed
   image:
     repository: konstellation/cleaner
-    tag: v0.13.5
+    tag: 0.15.0
     pullPolicy: IfNotPresent
 
 drone:

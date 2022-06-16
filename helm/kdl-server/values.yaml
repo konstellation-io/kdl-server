@@ -134,9 +134,9 @@ droneRunner:
     #  eks.amazonaws.com/role-arn: "arn:aws:iam::1234567890:role/myrole"
 
 
-  ## Define which Nodes the Pods are scheduled on.
-  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-  ##
+    ## Define which Nodes the Pods are scheduled on.
+    ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+    ##
   nodeSelector: {}
 
   ## Assign custom affinity rules
@@ -565,7 +565,7 @@ userToolsOperator:
   repoCloner:
     image:
       repository: konstellation/repo-cloner
-      tag: v0.13.5
+      tag: 0.15.0
       pullPolicy: IfNotPresent
   vscode:
     image:

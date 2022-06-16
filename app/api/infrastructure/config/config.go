@@ -150,6 +150,11 @@ type Config struct {
 		// Base64 encoded string of the ingress annotations
 		Annotations string `envconfig:"USER_TOOLS_ENCODED_INGRESS_ANNOTATIONS"`
 	}
+	Labels struct {
+		Common struct {
+			Release string `envconfig:"LABELS_COMMON_RELEASE"`
+		}
+	}
 }
 
 // NewConfig will read the config.yml file and override values with env vars.

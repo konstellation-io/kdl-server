@@ -1,6 +1,6 @@
 module github.com/konstellation-io/kdl-server/app/api
 
-go 1.17
+go 1.18
 
 require (
 	code.gitea.io/sdk/gitea v0.14.1
@@ -11,13 +11,13 @@ require (
 	github.com/golang/mock v1.5.0
 	github.com/gosimple/slug v1.9.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/konstellation-io/kre/libs/simplelogger v0.0.0-20210127163202-65666c1e48f8
+	github.com/konstellation-io/kre/libs/simplelogger v0.0.0-20210210145319-3480f96217e8
 	github.com/minio/minio-go/v7 v7.0.8
 	github.com/stretchr/testify v1.7.1
 	github.com/vektah/gqlparser/v2 v2.4.4
-	go.mongodb.org/mongo-driver v1.4.5
+	go.mongodb.org/mongo-driver v1.4.6
 	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd
-	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
+	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	k8s.io/api v0.18.18
 	k8s.io/apimachinery v0.18.18
@@ -71,7 +71,7 @@ require (
 	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
+	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	google.golang.org/appengine v1.5.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect

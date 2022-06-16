@@ -10,7 +10,16 @@ import (
 
 // newServiceAccount conform a new k8s serviceAccount.
 func (k *k8sClient) newServiceAccount(usernameSlug string) *v1.ServiceAccount {
-	return &v1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: k.getUserServiceAccountName(usernameSlug)}}
+	return &v1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: k.getUserServiceAccountName(usernameSlug),
+			Labels: map[string]string{
+				"username":            usernameSlug,
+				"deployed-with":       "kdl-api",
+				"kdl-release-version": k.cfg.Labels.Common.Release,
+			},
+		},
+	}
 }
 
 // getUserServiceAccountName returns the name of the service account for a given user.

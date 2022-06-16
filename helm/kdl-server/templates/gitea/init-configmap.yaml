@@ -101,6 +101,9 @@ data:
     [cron.sync_external_users]
     SCHEDULE: @every 10m
     UPDATE_EXISTING: true
+
+    [migrations]
+    ALLOW_LOCALNETWORKS: true
   
   create-admin.sh: |+
     #!/bin/sh

@@ -20,14 +20,6 @@ const isRuntimeStopped = (runtimeName: string) => {
   cy.getByTestId('statusTag').should('not.exist');
 };
 
-const isRuntimeLoading = (runtimeName: string) => {
-  cy.getByTestId('openRuntimeSettings').click();
-  cy.getByTestId('runtimesList').contains(runtimeName).click();
-
-  cy.getByTestId('runtimeInfoPanel').should('contain', runtimeName);
-  cy.getByTestId('statusTag').should('contain', 'Loading');
-};
-
 describe('Runtimes Behaviour', () => {
   beforeEach(() => {
     // There is a list of projects

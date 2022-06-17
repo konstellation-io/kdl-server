@@ -14,9 +14,10 @@ func (k *k8sClient) newServiceAccount(usernameSlug string) *v1.ServiceAccount {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: k.getUserServiceAccountName(usernameSlug),
 			Labels: map[string]string{
-				"username":            usernameSlug,
-				"deployed-with":       "kdl-api",
-				"kdl-release-version": k.cfg.Labels.Common.Release,
+				"konstellation.io/username":      usernameSlug,
+				"konstellation.io/deployed-by":   "kdlapp",
+				"konstellation.io/app-release":   k.cfg.Labels.Common.AppRelease,
+				"konstellation.io/chart-release": k.cfg.Labels.Common.ChartRelease,
 			},
 		},
 	}

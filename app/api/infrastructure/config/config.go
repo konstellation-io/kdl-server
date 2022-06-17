@@ -152,7 +152,8 @@ type Config struct {
 	}
 	Labels struct {
 		Common struct {
-			Release string `envconfig:"LABELS_COMMON_RELEASE"`
+			AppRelease   string `envconfig:"LABELS_COMMON_APP_RELEASE"`
+			ChartRelease string `envconfig:"LABELS_COMMON_CHART_RELEASE"`
 		}
 	}
 }

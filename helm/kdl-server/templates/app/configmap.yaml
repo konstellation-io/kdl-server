@@ -94,3 +94,7 @@ data:
   {{- if and .Values.tls.enabled .Values.tls.secretName }}
   TOOLKIT_TLS_SECRET_NAME: {{ include "tlsSecretName" . }}
   {{- end }}
+
+  # Labels
+  LABELS_COMMON_APP_RELEASE: {{ .Values.kdlServer.image.tag }}
+  LABELS_COMMON_CHART_RELEASE: {{ .Chart.Version }}

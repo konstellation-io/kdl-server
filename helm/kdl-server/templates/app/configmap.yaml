@@ -97,4 +97,4 @@ data:
 
   # Labels
   LABELS_COMMON_APP_RELEASE: {{ .Values.kdlServer.image.tag }}
-  LABELS_COMMON_CHART_RELEASE: {{ .Chart.Release }}
+  LABELS_COMMON_CHART_RELEASE: {{ .Chart.Version }}

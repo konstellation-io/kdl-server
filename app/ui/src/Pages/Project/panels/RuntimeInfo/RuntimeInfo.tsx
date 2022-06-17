@@ -45,7 +45,11 @@ function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
         </div>
       </div>
       <div className={styles.body}>
-        <div data-testid="runtimeDescriptionField" className={styles.runtimeDescription} dangerouslySetInnerHTML={{ __html: runtimeSafeDesc }} />
+        <div
+          data-testid="runtimeDescriptionField"
+          className={styles.runtimeDescription}
+          dangerouslySetInnerHTML={{ __html: runtimeSafeDesc }}
+        />
         <div className={styles.dockerImage}>
           <h2>Docker image</h2>
           <p>

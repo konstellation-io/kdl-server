@@ -58,7 +58,7 @@ jobs:
         name: API Go Lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.46.2
+          version: v1.45.0
           working-directory: ./app/api
           args: --timeout 5m
           github-token: ${{ secrets.GITHUB_TOKEN }}

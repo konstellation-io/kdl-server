@@ -9,7 +9,10 @@ mkdir -p /backup/{gitea,mongodb,mlflow,kubernetes}
 function gitea_backup (){
     echo "${DB_HOST}:${POSTGRES_DB}:${DB_USER}:${POSTGRES_PASSWORD}" > ~/.pgpass
     chmod 600 ~/.pgpass
-    tar zcvf /backup/gitea/data.tar.gz --directory '/data' --exclude './gitea/indexers' --exclude './ssh' .
+    tar zcvf /backup/gitea/data.tar.gz --directory '/data' \
+        --exclude './gitea/indexers' \
+        --exclude './ssh' \
+        --exclude './lost+found' .
     pg_dump -h "$(echo ${DB_HOST} | cut -f 1 -d ":" )" -p "$(echo ${DB_HOST} | cut -f 2 -d ":" )" -U "${DB_USER}" -v -F c -f /backup/gitea/postgres_gitea.dump "${POSTGRES_DB}"
 }
 # MongoDB backup
@@ -28,7 +31,7 @@ function kubernetes_backup (){
     kubectl --token "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" get secrets -n kdl | \
         awk '/ssh-keys/{print $1}' | \
         xargs kubectl --token "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" get secrets -n kdl -o yaml > /backup/kubernetes/ssh-secrets.yaml
-    kubectl --token "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" get kdlprojects -n kdl -o yaml > /backup/kubernetes/crds.yaml 
+    kubectl --token "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" get kdlprojects -n kdl -o yaml > /backup/kubernetes/crds.yaml
 }
 
 echo "Performing GITEA backup..."
@@ -48,5 +51,5 @@ kubernetes_backup
 # Compress and send to AWS
 echo "Compressing backup..."
 tar zcvf "${HOME}/backup.tar.gz" /backup
-echo "Sending backup..."    
+echo "Sending backup..."
 aws s3 cp "${HOME}/backup.tar.gz" "s3://${BUCKET_NAME}/backup_${DATE}.tar.gz"

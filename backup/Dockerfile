@@ -22,6 +22,7 @@ RUN curl -o mongo-tools.rpm https://repo.mongodb.org/yum/amazon/2/mongodb-org/4.
     yum install -y --setopt=tsflags=nodocs \
         gzip \
         mongo-tools.rpm \
+        rsync \
         shadow-utils \
         tar && \
     amazon-linux-extras install -y \

@@ -4,16 +4,21 @@ set -xeou pipefail
 
 DATE=$(date +%Y%m%d)
 mkdir -p /backup/{gitea,mongodb,mlflow,kubernetes}
+mkdir -p /backup/gitea/data
 
 # Gitea backup
 function gitea_backup (){
+    # Backup postgresql database
     echo "${DB_HOST}:${POSTGRES_DB}:${DB_USER}:${POSTGRES_PASSWORD}" > ~/.pgpass
+    echo "${DB_HOST}:drone:${DB_USER}:${POSTGRES_PASSWORD}" >> ~/.pgpass
     chmod 600 ~/.pgpass
-    tar zcvf /backup/gitea/data.tar.gz --directory '/data' \
-        --exclude './gitea/indexers' \
-        --exclude './ssh' \
-        --exclude './lost+found' .
-    pg_dump -h "$(echo ${DB_HOST} | cut -f 1 -d ":" )" -p "$(echo ${DB_HOST} | cut -f 2 -d ":" )" -U "${DB_USER}" -v -F c -f /backup/gitea/postgres_gitea.dump "${POSTGRES_DB}"
+    pg_dump -h "$(echo ${DB_HOST} | cut -f 1 -d ":" )" -p "$(echo "${DB_HOST}" | cut -f 2 -d ":" )" -U "${DB_USER}" -v -F c -f /backup/gitea/postgres_gitea.dump "${POSTGRES_DB}"
+    pg_dump -h "$(echo ${DB_HOST} | cut -f 1 -d ":" )" -p "$(echo "${DB_HOST}" | cut -f 2 -d ":" )" -U "${DB_USER}" -v -F c -f /backup/gitea/postgres_drone.dump drone
+
+    # Backup gitea data
+    rsync -a --progress /data/ /backup/gitea/data/ \
+        --exclude 'gitea/indexers' \
+        --exclude 'ssh' --exclude 'lost+found'
 }
 # MongoDB backup
 function mongobackup () {
@@ -31,7 +36,7 @@ function kubernetes_backup (){
     kubectl --token "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" get secrets -n kdl | \
         awk '/ssh-keys/{print $1}' | \
         xargs kubectl --token "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" get secrets -n kdl -o yaml > /backup/kubernetes/ssh-secrets.yaml
-    kubectl --token "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" get kdlprojects -n kdl -o yaml > /backup/kubernetes/crds.yaml
+    kubectl --token "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" get kdlprojects -n kdl -o yaml > /backup/kubernetes/kdlprojects.yaml
 }
 
 echo "Performing GITEA backup..."
@@ -40,7 +45,7 @@ gitea_backup
 echo "Performing MONGO backup..."
 mongobackup
 
-if [ -d "/shared-storage/" ]; then
+if [ -d "/shared-volume/" ]; then
     echo "Performing MLFLOW backup..."
     mlflow_backup
 fi

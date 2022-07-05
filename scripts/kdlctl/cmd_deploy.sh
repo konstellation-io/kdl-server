@@ -114,6 +114,7 @@ deploy_helm_chart() {
     --set droneAuthorizer.image.pullPolicy="Always" \
     --set droneAuthorizer.image.repository="${IMAGE_REGISTRY}/konstellation/drone-authorizer" \
     --set droneAuthorizer.image.tag="latest" \
+    --set droneRunner.droneRunnerEnviron="GIT_SSL_NO_VERIFY:true" \
     --set gitea.admin.password="${GITEA_ADMIN_PASSWORD}" \
     --set gitea.admin.username="${GITEA_ADMIN_USER}" \
     --set gitea.storage.storageClassName="${STORAGE_CLASS_NAME}" \

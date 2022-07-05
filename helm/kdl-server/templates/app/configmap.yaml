@@ -91,7 +91,7 @@ data:
   TOOLKIT_BASE_DOMAIN_NAME: {{ .Values.domain }}
   TOOLKIT_SHARED_VOLUME: {{ .Values.sharedVolume.name }}
   TOOLKIT_TLS: "{{ .Values.tls.enabled }}"
-  {{- if and .Values.tls.enabled .Values.tls.secretName }}
+  {{- if and .Values.tls.enabled }}
   TOOLKIT_TLS_SECRET_NAME: {{ include "tlsSecretName" . }}
   {{- end }}
 

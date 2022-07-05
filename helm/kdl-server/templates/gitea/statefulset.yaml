@@ -1,8 +1,4 @@
-{{ if .Capabilities.APIVersions.Has "apps/v1" }}
 apiVersion: apps/v1
-{{ else if .Capabilities.APIVersions.Has "apps/v1beta1" }}
-apiVersion: apps/v1beta1
-{{ end }}
 kind: StatefulSet
 metadata:
   name: gitea
@@ -47,7 +43,7 @@ spec:
             - name: gitea-init
               mountPath: /usr/local/bin/create-admin.sh
               subPath: create-admin.sh
-            {{- if and (and .Values.tls.enabled (not .Values.tls.certManager.enabled)) .Values.tls.caSecret }}
+            {{- if and .Values.tls.enabled .Values.tls.caSecret }}
             - mountPath: /etc/ssl/certs/ca-cert.pem
               name: ca-cert
               subPath: {{ .Values.tls.caSecret.certFilename }}
@@ -75,10 +71,10 @@ spec:
           configMap:
             name: gitea-init
             defaultMode: 0777
-        {{- if and (and .Values.tls.enabled (not .Values.tls.certManager.enabled)) .Values.tls.caSecret }}
+        {{- if and .Values.tls.enabled .Values.tls.caSecret }}
         - name: ca-cert
           secret:
-            secretName: {{ .Values.tls.caSecret.name }}
+            secretName: {{ include "tlsSecretName" . }}
         {{- end }}
   volumeClaimTemplates:
     - metadata:

@@ -26,8 +26,8 @@ data:
   DRONE_SECRET_PLUGIN_TOKEN: {{ .Values.drone.pluginSecret }}
   DRONE_TOKEN: {{ .Values.drone.adminToken }}
   DRONE_INTERNAL_URL: "http://drone"
-  {{- if and (and .Values.tls.enabled (not .Values.tls.certManager.enabled)) .Values.tls.caSecret }}
-  DRONE_RUNNER_ENVIRON: GIT_SSL_NO_VERIFY:true
+  {{- if .Values.droneRunner.droneRunnerEnviron }}
+  DRONE_RUNNER_ENVIRON: "{{ .Values.droneRunner.droneRunnerEnviron }}"
   {{- end }}
   {{- if .Values.droneRunner.serviceAccountJob.enabled }}
   DRONE_SERVICE_ACCOUNT_DEFAULT: {{ .Values.droneRunner.serviceAccountJob.name }}

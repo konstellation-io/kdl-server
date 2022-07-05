@@ -124,6 +124,12 @@ droneRunner:
     tag: 1.0.0-beta.6
     pullPolicy: IfNotPresent
 
+  ## Configures the DRONE_RUNNER_ENVIRON environment variable
+  ## Ref: https://docs.drone.io/runner/kubernetes/configuration/reference/drone-runner-environ/
+  ##
+  droneRunnerEnviron: ""
+  # droneRunnerEnviron: "GIT_SSL_NO_VERIFY:true"
+
   ## Service Account to use to run in drone jobs (If you want to use IRSA or Workload Identity)
   ## 
   serviceAccountJob:
@@ -511,18 +517,14 @@ sharedVolume:
 ##
 tls:
   enabled: true
-  certManager:
-    enabled: false
-    acme:
-      server: https://acme-v02.api.letsencrypt.org/directory
-      email: user@email.com
+
   ## Custom TLS secret
   ## Must be a valid wildcard certificate for the domain
   ## declared in .Values.domain
   ## Certificate name example:
   ##   *.example.com
   #
-  # secretName: kdl-server-tls
+  secretName: ""
 
   ## A secret containing the the CA cert is needed
   ## in order to use a self-signed certificate

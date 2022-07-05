@@ -23,9 +23,9 @@ Create MongoDB URI.
 Create tls secret name
 */}}
 {{- define "tlsSecretName" -}}
-{{- if .Values.tls.certManager.enabled -}}
-  {{- printf "%s-tls-secret" $.Values.domain -}}
-{{- else -}}
+{{- if .Values.tls.secretName -}}
   {{- .Values.tls.secretName -}}
+{{- else -}}
+  {{- printf "%s-tls" $.Values.domain -}}
 {{- end -}}
 {{- end -}}

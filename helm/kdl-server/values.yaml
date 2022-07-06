@@ -72,6 +72,9 @@ drone:
   adminToken: 7GSipOV0wJZQioZNBxaw3AotHV1tA4K4
   runnerCapacity: 5
   ingress:
+    # -- Specify here the value for the ingress TLS `secretName` here. Example `drone.ingress.tls.secretName: "drone-tls`
+    # @default -- An auto-generated secret name based on the application domain will be used
+    tls: {}
     annotations:
       ## This Chart has been developed using Nginx Ingress Controller by default.
       ## Using the following default annotations ensures its correct operation.
@@ -168,6 +171,9 @@ gitea:
     size: 10Gi
     storageClassName: standard
   ingress:
+    # -- Specify here the value for the ingress TLS `secretName` here. Example `gitea.ingress.tls.secretName: "gitea-tls`
+    # @default -- An auto-generated secret name based on the application domain will be used
+    tls: {}
     annotations:
       ## This Chart has been developed using Nginx Ingress Controller by default.
       ## Using the following default annotations ensures its correct operation.
@@ -305,6 +311,10 @@ kdlServer:
     tag: 1.22.0
     pullPolicy: IfNotPresent
   ingress:
+    # -- Specify here the value for the ingress TLS `secretName` here. Example `kdlServer.ingress.tls.secretName: "kdl-server-tls`
+    # @default -- An auto-generated secret name based on the application domain will be used
+    tls: {}
+      # secretName: "kdl-server-tls"
     annotations:
       ## This Chart has been developed using Nginx Ingress Controller by default.
       ## Using the following default annotations ensures its correct operation.
@@ -378,11 +388,17 @@ minio:
   ## the ones implemented by the official MinIO Chart which are disabled by default
   ##
   ingress:
+    # -- Specify here the value for the ingress TLS `secretName` here. Example `minio.ingress.tls.secretName: "minio-tls`
+    # @default -- An auto-generated secret name based on the application domain will be used
+    tls: {}
     annotations:
       kubernetes.io/ingress.class: "nginx"
       nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
 
   consoleIngress:
+    # -- Specify here the value for the ingress TLS `secretName` here. Example `minio.consoleIngress.tls.secretName: "minio-tls`
+    # @default -- An auto-generated secret name based on the application domain will be used
+    tls: {}
     annotations:
       kubernetes.io/ingress.class: "nginx"
       nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
@@ -518,14 +534,6 @@ sharedVolume:
 tls:
   enabled: true
 
-  ## Custom TLS secret
-  ## Must be a valid wildcard certificate for the domain
-  ## declared in .Values.domain
-  ## Certificate name example:
-  ##   *.example.com
-  #
-  secretName: ""
-
   ## A secret containing the the CA cert is needed
   ## in order to use a self-signed certificate
   ##
@@ -587,6 +595,9 @@ userToolsOperator:
   ## Ref: https://kubernetes.github.io/ingress-nginx/
   ##
   ingress:
+    # -- Specify here the value for the ingress TLS `secretName` here. Example `userToolsOperator.ingress.tls.secretName: "user-tools-tls`
+    # @default -- An auto-generated secret name based on the application domain will be used
+    tls: {}
     annotations:
       kubernetes.io/ingress.class: "nginx"
       nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"

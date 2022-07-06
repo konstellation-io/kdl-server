@@ -17,7 +17,7 @@ spec:
   tls:
     - hosts:
         - gitea.{{ .Values.domain }}
-      secretName: {{ include "tlsSecretName" . }}
+      secretName: {{ include "gitea.tlsSecretName" . }}
   {{- end }}
   rules:
     - host: gitea.{{ .Values.domain }}

@@ -19,7 +19,7 @@ spec:
   tls:
     - hosts:
         - drone.{{ .Values.domain }}
-      secretName: {{ include "tlsSecretName" . }}
+      secretName: {{ include "drone.tlsSecretName" . }}
   {{- end }}
   rules:
     - host: drone.{{ .Values.domain }}

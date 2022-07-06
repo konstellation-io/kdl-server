@@ -111,6 +111,7 @@ deploy_helm_chart() {
     --set backup.image.tag="latest" \
     --set domain="${DOMAIN}" \
     --set drone.storage.storageClassName="${STORAGE_CLASS_NAME}" \
+    --set drone.ingress.tls.secretName="$DOMAIN-tls-secret" \
     --set droneAuthorizer.image.pullPolicy="Always" \
     --set droneAuthorizer.image.repository="${IMAGE_REGISTRY}/konstellation/drone-authorizer" \
     --set droneAuthorizer.image.tag="latest" \
@@ -118,16 +119,20 @@ deploy_helm_chart() {
     --set gitea.admin.password="${GITEA_ADMIN_PASSWORD}" \
     --set gitea.admin.username="${GITEA_ADMIN_USER}" \
     --set gitea.storage.storageClassName="${STORAGE_CLASS_NAME}" \
+    --set gitea.ingress.tls.secretName="$DOMAIN-tls-secret" \
     --set giteaOauth2Setup.image.pullPolicy="Always" \
     --set giteaOauth2Setup.image.repository="${IMAGE_REGISTRY}/konstellation/gitea-oauth2-setup" \
     --set giteaOauth2Setup.image.tag="latest" \
     --set kdlServer.image.pullPolicy="Always" \
     --set kdlServer.image.tag="latest" \
     --set kdlServer.image.repository="${IMAGE_REGISTRY}/konstellation/kdl-server" \
+    --set kdlServer.ingress.tls.secretName="$DOMAIN-tls-secret" \
     --set knowledgeGalaxy.image.pullPolicy="Always" \
     --set knowledgeGalaxy.image.repository="${KNOWLEDGE_GALAXY_IMAGE_REPOSITORY}" \
     "${SET_KNOWLEDGE_GALAXY_IMAGE_TAG}" \
     --set minio.securityContext.runAsUser=0 \
+    --set minio.ingress.tls.secretName="$DOMAIN-tls-secret" \
+    --set minio.consoleIngress.tls.secretName="$DOMAIN-tls-secret" \
     --set mongodb.persistentVolume.storageClassName="${STORAGE_CLASS_NAME}" \
     --set sharedVolume.storageClassName="${STORAGE_CLASS_NAME}" \
     --set postgres.storage.storageClassName="${STORAGE_CLASS_NAME}" \
@@ -145,6 +150,7 @@ deploy_helm_chart() {
     --set userToolsOperator.image.pullPolicy="Always" \
     --set userToolsOperator.image.repository="${IMAGE_REGISTRY}/konstellation/user-tools-operator" \
     --set userToolsOperator.image.tag="latest" \
+    --set userToolsOperator.ingress.tls.secretName="$DOMAIN-tls-secret" \
     --set userToolsOperator.jupyter.image.pullPolicy="Always" \
     --set userToolsOperator.jupyter.image.repository="$IMAGE_REGISTRY/konstellation/jupyter-gpu" \
     --set userToolsOperator.jupyter.image.tag="latest" \

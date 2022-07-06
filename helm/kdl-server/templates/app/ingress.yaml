@@ -17,7 +17,7 @@ spec:
   tls:
     - hosts:
         - kdlapp.{{ .Values.domain }}
-      secretName: {{ include "tlsSecretName" . }}
+      secretName: {{ include "kdlServer.tlsSecretName" . }}
   {{- end }}
   rules:
   - host: kdlapp.{{ .Values.domain }}

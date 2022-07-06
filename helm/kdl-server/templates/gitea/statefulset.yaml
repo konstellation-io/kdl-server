@@ -74,7 +74,7 @@ spec:
         {{- if and .Values.tls.enabled .Values.tls.caSecret }}
         - name: ca-cert
           secret:
-            secretName: {{ include "tlsSecretName" . }}
+            secretName: {{ .Values.tls.caSecret.name }}
         {{- end }}
   volumeClaimTemplates:
     - metadata:

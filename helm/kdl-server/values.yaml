@@ -1,6 +1,17 @@
-domain: kdl.local
+global:
+  serverName: "local-server"
+  domain: kdl.local
+  ingress:
+    tls:
+      enabled: true
+      #secretName: ""
 
-serverName: Local Server
+      ## A secret containing the the CA cert is needed
+      ## in order to use a self-signed certificate
+      ##
+      # caSecret:
+      #   name: kdl-ca-cert
+      #   certFilename: ca.crt
 
 backup:
   enabled: false
@@ -523,23 +534,6 @@ sharedVolume:
   name: received-data
   storageClassName: standard
   size: 10Gi
-
-## TLS configuration for Ingresses, Gitea and Drone.
-## If tls.certManager.enabled=true, Cert Manager
-## certificates will be used.
-##
-## Alternatively a tls secret can be used. In that
-## case the secret must be manually created in the namespace
-##
-tls:
-  enabled: true
-
-  ## A secret containing the the CA cert is needed
-  ## in order to use a self-signed certificate
-  ##
-  # caSecret:
-  #   name: kdl-ca-cert
-  #   certFilename: ca.crt
 
 userToolsOperator:
   image:

@@ -21,15 +21,15 @@ data:
 
     [server]
     APP_DATA_PATH    = /data/gitea
-    SSH_DOMAIN       = gitea.{{ .Values.domain }}
+    SSH_DOMAIN       = gitea.{{ .Values.global.domain }}
     HTTP_PORT        = 3000
-    ROOT_URL         = http://gitea.{{ .Values.domain }}/
+    ROOT_URL         = http://gitea.{{ .Values.global.domain }}/
     DISABLE_SSH      = false
     SSH_PORT         = 22
     SSH_LISTEN_PORT  = 22
     LFS_START_SERVER = true
     LFS_CONTENT_PATH = /data/git/lfs
-    DOMAIN           = gitea.{{ .Values.domain }}
+    DOMAIN           = gitea.{{ .Values.global.domain }}
     LFS_JWT_SECRET   = dJd7zxw11VRhqCighcaeLvUbxlDC45IK2VNc4TCsZc8
     OFFLINE_MODE     = false
 

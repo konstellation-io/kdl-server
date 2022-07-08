@@ -13,14 +13,14 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if .Values.tls.enabled }}
+  {{- if .Values.global.ingress.tls.enabled }}
   tls:
     - hosts:
-        - kdlapp.{{ .Values.domain }}
+        - kdlapp.{{ .Values.global.domain }}
       secretName: {{ include "kdlServer.tlsSecretName" . }}
   {{- end }}
   rules:
-  - host: kdlapp.{{ .Values.domain }}
+  - host: kdlapp.{{ .Values.global.domain }}
     http:  
       paths:
         - path: "/"

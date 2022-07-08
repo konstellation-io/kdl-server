@@ -15,14 +15,14 @@ metadata:
   labels:
     app:  drone
 spec:
-  {{- if .Values.tls.enabled }}
+  {{- if .Values.global.ingress.tls.enabled }}
   tls:
     - hosts:
-        - drone.{{ .Values.domain }}
+        - drone.{{ .Values.global.domain }}
       secretName: {{ include "drone.tlsSecretName" . }}
   {{- end }}
   rules:
-    - host: drone.{{ .Values.domain }}
+    - host: drone.{{ .Values.global.domain }}
       http:
         paths:
         - path: "/"

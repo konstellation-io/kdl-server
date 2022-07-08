@@ -13,14 +13,14 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end}}
 spec:
-  {{- if .Values.tls.enabled }}
+  {{- if .Values.global.ingress.tls.enabled }}
   tls:
     - hosts:
-        - minio-console.{{ .Values.domain }}
+        - minio-console.{{ .Values.global.domain }}
       secretName: {{ include "minioConsole.tlsSecretName" . }}
   {{- end }}
   rules:
-    - host: minio-console.{{ .Values.domain }}
+    - host: minio-console.{{ .Values.global.domain }}
       http:
         paths:
           - path: "/"

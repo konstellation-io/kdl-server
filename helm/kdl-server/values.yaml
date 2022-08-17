@@ -8,7 +8,7 @@ backup:
   name: backup-gitea
   image:
     repository: konstellation/kdl-backup
-    tag: 0.19.0
+    tag: 0.20.0
     pullPolicy: IfNotPresent
 
   ## Sets the activeDeadlineSeconds param for the backup cronjob
@@ -525,7 +525,6 @@ tls:
   ##   *.example.com
   #
   secretName: ""
-
   ## A secret containing the the CA cert is needed
   ## in order to use a self-signed certificate
   ##

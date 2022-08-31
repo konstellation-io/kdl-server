@@ -58,3 +58,7 @@ echo "Compressing backup..."
 tar zcvf "${HOME}/backup.tar.gz" /backup
 echo "Sending backup..."
 aws s3 cp "${HOME}/backup.tar.gz" "s3://${BUCKET_NAME}/backup_${DATE}.tar.gz"
+
+# Cleanup
+echo "Cleaning up..."
+rm -rf /backup/*

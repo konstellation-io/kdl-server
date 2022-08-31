@@ -48,6 +48,14 @@
 A major chart version change (like v0.15.3 -> v1.0.0) indicates that there is an incompatible breaking change needing
 manual actions.
 
+#### From 4.X to 5.X
+
+Changes in values:
+- `domain` moved to `global.domain`
+- `serverName` moved to `global.serverName`
+- `tls` moved to `global.ingress.tls`
+- Added `drone.ingress.tls`, `gitea.ingress.tls`, `kdlServer.ingress.tls`, `minio.ingress.tls`, `minio.consoleIngress.tls` and `userToolsOperator.ingress.tls` for individual tls config. These values take precedence over `global.ingress.tls`.
+
 #### From 3.X to 4.X
 
 This major version comes with the following breaking changes:

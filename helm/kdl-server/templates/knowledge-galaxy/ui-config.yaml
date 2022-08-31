@@ -9,7 +9,7 @@ data:
   config.json: |+
     {
       "SERVER_NAME": "{{ .Values.global.serverName }}",
-      "SERVER_URL": "{{ include "http.scheme" . }}://kdlapp.{{ .Values.global.domain }}/kg",
+      "SERVER_URL": "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}/kg",
       "MODE": "iframe",
       "BASENAME": "/kg/",
       "DESCRIPTION_MIN_WORDS": {{ default "50" .Values.knowledgeGalaxy.config.descriptionMinWords }}

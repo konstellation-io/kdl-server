@@ -1,7 +1,7 @@
 {{/*
 Add the protocol part to the uri
 */}}
-{{- define "http.scheme" -}}
+{{- define "http.protocol" -}}
   {{ ternary "https" "http" .Values.global.ingress.tls.enabled }}
 {{- end -}}
 

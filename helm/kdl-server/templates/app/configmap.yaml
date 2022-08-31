@@ -8,21 +8,21 @@ data:
   KDL_SERVER_PORT: '8080'
 
   # URL Setup
-  PROJECT_FILEBROWSER_URL: "{{ include "http.scheme" . }}://kdlapp.{{ .Values.global.domain }}/filebrowser/PROJECT_ID/"
+  PROJECT_FILEBROWSER_URL: "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}/filebrowser/PROJECT_ID/"
   MINIO_ENDPOINT: "{{ .Release.Name }}-minio:9000"
-  USER_TOOLS_JUPYTER_URL: "{{ include "http.scheme" . }}://USERNAME-jupyter.{{ .Values.global.domain }}/lab/workspaces/REPO_FOLDER/tree/repos/REPO_FOLDER"
-  USER_TOOLS_VSCODE_URL: "{{ include "http.scheme" . }}://USERNAME-code.{{ .Values.global.domain }}/?folder=/home/coder/repos/REPO_FOLDER"
-  DRONE_URL: "{{ include "http.scheme" . }}://drone.{{ .Values.global.domain }}"
-  PROJECT_MLFLOW_URL: "{{ include "http.scheme" . }}://kdlapp.{{ .Values.global.domain }}/mlflow/PROJECT_ID/"
-  KNOWLEDGE_GALAXY_URL: "{{ include "http.scheme" . }}://kdlapp.{{ .Values.global.domain }}/kg/projects/PROJECT_ID/"
+  USER_TOOLS_JUPYTER_URL: "{{ include "http.protocol" . }}://USERNAME-jupyter.{{ .Values.global.domain }}/lab/workspaces/REPO_FOLDER/tree/repos/REPO_FOLDER"
+  USER_TOOLS_VSCODE_URL: "{{ include "http.protocol" . }}://USERNAME-code.{{ .Values.global.domain }}/?folder=/home/coder/repos/REPO_FOLDER"
+  DRONE_URL: "{{ include "http.protocol" . }}://drone.{{ .Values.global.domain }}"
+  PROJECT_MLFLOW_URL: "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}/mlflow/PROJECT_ID/"
+  KNOWLEDGE_GALAXY_URL: "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}/kg/projects/PROJECT_ID/"
 
   config.json: |+
     {
       "SERVER_NAME": "{{ .Values.global.serverName }}",
-      "SERVER_URL": "{{ include "http.scheme" . }}://kdlapp.{{ .Values.global.domain }}",
+      "SERVER_URL": "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}",
       "KNOWLEDGE_GALAXY_ENABLED": {{ .Values.knowledgeGalaxy.enabled }},
-      "KG_SERVER_URL": "{{ include "http.scheme" . }}://kdlapp.{{ .Values.global.domain }}/kg",
-      "GITEA_URL": "{{ include "http.scheme" . }}://gitea.{{ .Values.global.domain }}",
+      "KG_SERVER_URL": "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}/kg",
+      "GITEA_URL": "{{ include "http.protocol" . }}://gitea.{{ .Values.global.domain }}",
       "RELEASE_VERSION": "{{ .Chart.AppVersion }}",
       "DESCRIPTION_MIN_WORDS": {{ default "50" .Values.knowledgeGalaxy.config.descriptionMinWords }}
     }

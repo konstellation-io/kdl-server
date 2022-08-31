@@ -25,7 +25,7 @@
     "is-electron": "2.2.1",
     "kwc": "1.16.2",
     "lodash.capitalize": "4.2.1",
-    "moment-timezone": "0.5.34",
+    "moment-timezone": "0.5.35",
     "node-sass": "6.0.1",
     "react": "17.0.2",
     "react-animate-height": "3.0.3",

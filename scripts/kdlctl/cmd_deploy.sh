@@ -109,7 +109,6 @@ deploy_helm_chart() {
     --set backup.image.pullPolicy="Always" \
     --set backup.image.repository="${IMAGE_REGISTRY}/konstellation/kdl-backup" \
     --set backup.image.tag="latest" \
-    --set domain="${DOMAIN}" \
     --set drone.storage.storageClassName="${STORAGE_CLASS_NAME}" \
     --set droneAuthorizer.image.pullPolicy="Always" \
     --set droneAuthorizer.image.repository="${IMAGE_REGISTRY}/konstellation/drone-authorizer" \
@@ -121,6 +120,11 @@ deploy_helm_chart() {
     --set giteaOauth2Setup.image.pullPolicy="Always" \
     --set giteaOauth2Setup.image.repository="${IMAGE_REGISTRY}/konstellation/gitea-oauth2-setup" \
     --set giteaOauth2Setup.image.tag="latest" \
+    --set global.domain="${DOMAIN}" \
+    --set global.ingress.tls.enabled="true" \
+    --set global.ingress.tls.secretName="$DOMAIN-tls-secret" \
+    --set global.ingress.tls.caSecret.name=mkcert-ca \
+    --set global.ingress.tls.caSecret.certFilename=mkcert-ca.crt \
     --set kdlServer.image.pullPolicy="Always" \
     --set kdlServer.image.tag="latest" \
     --set kdlServer.image.repository="${IMAGE_REGISTRY}/konstellation/kdl-server" \
@@ -138,10 +142,6 @@ deploy_helm_chart() {
     --set projectOperator.mlflow.image.repository="${IMAGE_REGISTRY}/konstellation/mlflow" \
     --set projectOperator.mlflow.image.tag="latest" \
     --set projectOperator.mlflow.volume.storageClassName="${STORAGE_CLASS_NAME}" \
-    --set tls.enabled="${ENABLE_TLS}" \
-    --set tls.secretName="${DOMAIN}-tls-secret" \
-    --set tls.caSecret.name=mkcert-ca \
-    --set tls.caSecret.certFilename=mkcert-ca.crt \
     --set userToolsOperator.image.pullPolicy="Always" \
     --set userToolsOperator.image.repository="${IMAGE_REGISTRY}/konstellation/user-tools-operator" \
     --set userToolsOperator.image.tag="latest" \
@@ -150,6 +150,7 @@ deploy_helm_chart() {
     --set userToolsOperator.jupyter.image.tag="latest" \
     --set enterprise-gateway.kernelspecs.imagePullPolicy="Always" \
     --set enterprise-gateway.kernelspecs.image="$IMAGE_REGISTRY/konstellation/jupyter-kernelspecs:latest" \
+    --set userToolsOperator.ingress.tls.secretName="$DOMAIN-tls-secret" \
     --set userToolsOperator.repoCloner.image.pullPolicy="Always" \
     --set userToolsOperator.repoCloner.image.repository="${IMAGE_REGISTRY}/konstellation/repo-cloner" \
     --set userToolsOperator.repoCloner.image.tag="latest" \

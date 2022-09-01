@@ -8,8 +8,8 @@ metadata:
 data:
   config.json: |+
     {
-      "SERVER_NAME": "{{ .Values.serverName }}",
-      "SERVER_URL": "{{ include "protocol" . }}://kdlapp.{{ .Values.domain }}/kg",
+      "SERVER_NAME": "{{ .Values.global.serverName }}",
+      "SERVER_URL": "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}/kg",
       "MODE": "iframe",
       "BASENAME": "/kg/",
       "DESCRIPTION_MIN_WORDS": {{ default "50" .Values.knowledgeGalaxy.config.descriptionMinWords }}

@@ -36,7 +36,7 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: DRONE_URL
-              value: {{ include "protocol" . }}://drone.{{ .Values.domain }}
+              value: {{ include "http.protocol" . }}://drone.{{ .Values.global.domain }}
             - name: DRONE_INTERNAL_URL
               valueFrom:
                 configMapKeyRef:

@@ -5,13 +5,13 @@ metadata:
 data:
   oauth2_proxy.cfg: |+
     provider="github"
-    redirect_url="{{ printf "%s://kdlapp.%s/oauth2/callback" ( include "protocol" . ) .Values.domain }}"
-    login_url="{{ printf "%s://gitea.%s/login/oauth/authorize" ( include "protocol" . ) .Values.domain }}"
-    redeem_url="{{ printf "%s://gitea.%s/login/oauth/access_token" ( include "protocol" . ) .Values.domain }}"
-    validate_url="{{ printf "%s://gitea.%s/api/v1" ( include "protocol" . ) .Values.domain }}"
-    profile_url="{{ printf "%s://gitea.%s/api/v1/user" ( include "protocol" . ) .Values.domain }}"
+    redirect_url="{{ printf "%s://kdlapp.%s/oauth2/callback" ( include "http.protocol" . ) .Values.global.domain }}"
+    login_url="{{ printf "%s://gitea.%s/login/oauth/authorize" ( include "http.protocol" . ) .Values.global.domain }}"
+    redeem_url="{{ printf "%s://gitea.%s/login/oauth/access_token" ( include "http.protocol" . ) .Values.global.domain }}"
+    validate_url="{{ printf "%s://gitea.%s/api/v1" ( include "http.protocol" . ) .Values.global.domain }}"
+    profile_url="{{ printf "%s://gitea.%s/api/v1/user" ( include "http.protocol" . ) .Values.global.domain }}"
     cookie_secret="{{ randAlphaNum 16 }}"
-    cookie_secure={{ ternary "true" "false" .Values.tls.enabled }}
-    cookie_samesite="{{ ternary "none" "lax" .Values.tls.enabled }}"
+    cookie_secure={{ ternary "true" "false" .Values.global.ingress.tls.enabled }}
+    cookie_samesite="{{ ternary "none" "lax" .Values.global.ingress.tls.enabled }}"
     ssl_insecure_skip_verify=true
     ssl_upstream_insecure_skip_verify=true

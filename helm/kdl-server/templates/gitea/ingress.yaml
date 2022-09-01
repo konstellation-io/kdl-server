@@ -13,14 +13,14 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if .Values.tls.enabled }}
+  {{- if .Values.global.ingress.tls.enabled }}
   tls:
     - hosts:
-        - gitea.{{ .Values.domain }}
-      secretName: {{ include "tlsSecretName" . }}
+        - gitea.{{ .Values.global.domain }}
+      secretName: {{ include "gitea.tlsSecretName" . }}
   {{- end }}
   rules:
-    - host: gitea.{{ .Values.domain }}
+    - host: gitea.{{ .Values.global.domain }}
       http:
         paths:
           - path: "/"

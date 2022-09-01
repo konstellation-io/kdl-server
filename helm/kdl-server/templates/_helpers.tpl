@@ -94,9 +94,10 @@ Create gitea tls secret name
 Create user-tools tls secret name
 */}}
 {{- define "userTools.tlsSecretName" -}}
-{{- if .Values.userToolsOperator.ingress.tls.secretName -}}
+{{- if hasKey .Values.userToolsOperator.ingress.tls "secretName" -}}
   {{- .Values.userToolsOperator.ingress.tls.secretName -}}
 {{- else -}}
-  {{- fail "`userToolsOperator.ingress.tls.secretName` is mandatory" -}}
+  {{- $_ := set $ "appName" "user-tools" }}
+  {{- include "global.tlsSecretName" . -}}
 {{- end -}}
 {{- end -}}

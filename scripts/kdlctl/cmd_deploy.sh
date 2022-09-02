@@ -150,7 +150,6 @@ deploy_helm_chart() {
     --set userToolsOperator.jupyter.image.tag="latest" \
     --set enterprise-gateway.kernelspecs.imagePullPolicy="Always" \
     --set enterprise-gateway.kernelspecs.image="$IMAGE_REGISTRY/konstellation/jupyter-kernelspecs:latest" \
-    --set userToolsOperator.ingress.tls.secretName="$DOMAIN-tls-secret" \
     --set userToolsOperator.repoCloner.image.pullPolicy="Always" \
     --set userToolsOperator.repoCloner.image.repository="${IMAGE_REGISTRY}/konstellation/repo-cloner" \
     --set userToolsOperator.repoCloner.image.tag="latest" \

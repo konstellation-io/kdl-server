@@ -91,8 +91,8 @@ data:
   TOOLKIT_BASE_DOMAIN_NAME: {{ .Values.global.domain }}
   TOOLKIT_SHARED_VOLUME: {{ .Values.sharedVolume.name }}
   TOOLKIT_TLS: "{{ .Values.global.ingress.tls.enabled }}"
-  {{- if .Values.global.ingress.tls.enabled }}
-  TOOLKIT_TLS_SECRET_NAME: {{ include "userTools.tlsSecretName" . }}
+  {{- if and .Values.global.ingress.tls.enabled ( or (hasKey .Values.userToolsOperator.ingress.tls "secretName") (hasKey .Values.global.ingress.tls "secretName")) }}
+  TOOLKIT_TLS_SECRET_NAME: "{{ include "userTools.tlsSecretName" . }}"
   {{- end }}
 
   # Labels

@@ -15,6 +15,9 @@ metadata:
   labels:
     app:  drone
 spec:
+  {{- if .Values.drone.ingress.className }}
+  ingressClassName: {{ .Values.drone.ingress.className }}
+  {{- end }}
   {{- if .Values.global.ingress.tls.enabled }}
   tls:
     - hosts:

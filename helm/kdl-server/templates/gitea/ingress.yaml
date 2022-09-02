@@ -13,6 +13,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  {{- if .Values.gitea.ingress.className }}
+  ingressClassName: {{ .Values.gitea.ingress.className }}
+  {{- end }}
   {{- if .Values.global.ingress.tls.enabled }}
   tls:
     - hosts:

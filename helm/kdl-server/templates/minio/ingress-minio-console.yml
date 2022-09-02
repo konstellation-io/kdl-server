@@ -13,6 +13,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end}}
 spec:
+  {{- if .Values.minio.consoleIngress.className }}
+  ingressClassName: {{ .Values.minio.consoleIngress.className }}
+  {{- end }}
   {{- if .Values.global.ingress.tls.enabled }}
   tls:
     - hosts:

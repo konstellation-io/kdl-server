@@ -228,8 +228,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 					"name": k.cfg.SharedVolume.Name,
 				},
 				"tls": map[string]interface{}{
-					"enabled":    k.cfg.TLS.Enabled,
-					"secretName": k.cfg.TLS.SecretName,
+					"enabled": k.cfg.TLS.Enabled,
 				},
 				"jupyter": map[string]interface{}{
 					"image": map[string]string{
@@ -282,6 +281,13 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 				"serviceAccountName": serviceAccountName,
 			},
 		},
+	}
+
+	// Set spec.tls.secretName if TOOLKIT_TLS_SECRET_NAME env variable is defined
+	if k.cfg.TLS.SecretName != nil {
+		spec := definition.Object["spec"].(map[string]interface{})
+		tls := spec["tls"].(map[string]interface{})
+		tls["secretName"] = &k.cfg.TLS.SecretName
 	}
 
 	k.logger.Infof("Creating users tools: %#v", definition.Object)

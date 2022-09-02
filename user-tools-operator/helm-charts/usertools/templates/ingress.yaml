@@ -20,7 +20,7 @@ spec:
     - hosts:
         - {{ .Values.usernameSlug }}-code.{{ .Values.domain }}
         - {{ .Values.usernameSlug }}-jupyter.{{ .Values.domain }}
-      secretName: {{ .Values.tls.secretName }}
+      secretName: {{ include "user-tools.tlsSecretName" . }}
   {{- end }}
   rules:
     - host: {{ .Values.usernameSlug }}-code.{{ .Values.domain }}

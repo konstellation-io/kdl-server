@@ -217,6 +217,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 				"domain": k.cfg.BaseDomainName,
 				"ingress": map[string]interface{}{
 					"annotations": ingressAnnotations,
+					"className":   k.cfg.UserToolsIngress.ClassName,
 				},
 				"username":     username,
 				"usernameSlug": usernameSlug,

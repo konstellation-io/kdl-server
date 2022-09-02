@@ -317,6 +317,7 @@ func (k *k8sClient) getUserToolsDefinition(
 		tls := spec["tls"].(map[string]interface{})
 		tls["secretName"] = &k.cfg.TLS.SecretName
 	}
+
 	return definition
 }
 

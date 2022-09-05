@@ -202,6 +202,34 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 		return err
 	}
 
+	// Set spec.tls.secretName if TOOLKIT_TLS_SECRET_NAME env variable is defined
+	definition := k.getUserToolsDefinition(
+		ingressAnnotations,
+		resName,
+		username,
+		usernameSlug,
+		runtimeID,
+		runtimeImage,
+		runtimeTag,
+		serviceAccountName,
+	)
+
+	k.logger.Infof("Creating users tools: %#v", definition.Object)
+	_, err = k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
+
+	return err
+}
+
+func (k *k8sClient) getUserToolsDefinition(
+	ingressAnnotations map[string]interface{},
+	resName,
+	username,
+	usernameSlug,
+	runtimeID,
+	runtimeImage,
+	runtimeTag,
+	serviceAccountName string,
+) *unstructured.Unstructured {
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",
@@ -217,6 +245,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 				"domain": k.cfg.BaseDomainName,
 				"ingress": map[string]interface{}{
 					"annotations": ingressAnnotations,
+					"className":   k.cfg.UserToolsIngress.ClassName,
 				},
 				"username":     username,
 				"usernameSlug": usernameSlug,
@@ -283,17 +312,13 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 		},
 	}
 
-	// Set spec.tls.secretName if TOOLKIT_TLS_SECRET_NAME env variable is defined
 	if k.cfg.TLS.SecretName != nil {
 		spec := definition.Object["spec"].(map[string]interface{})
 		tls := spec["tls"].(map[string]interface{})
 		tls["secretName"] = &k.cfg.TLS.SecretName
 	}
 
-	k.logger.Infof("Creating users tools: %#v", definition.Object)
-	_, err = k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
-
-	return err
+	return definition
 }
 
 // Returns a watcher for the UserTools.

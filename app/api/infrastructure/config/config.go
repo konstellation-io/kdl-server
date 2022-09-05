@@ -149,6 +149,7 @@ type Config struct {
 	UserToolsIngress struct {
 		// Base64 encoded string of the ingress annotations
 		Annotations string `envconfig:"USER_TOOLS_ENCODED_INGRESS_ANNOTATIONS"`
+		ClassName   string `envconfig:"USER_TOOLS_INGRESS_CLASS_NAME"`
 	}
 	Labels struct {
 		Common struct {

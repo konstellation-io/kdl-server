@@ -539,7 +539,7 @@ sharedVolume:
 userToolsOperator:
   image:
     repository: konstellation/user-tools-operator
-    tag: 0.22.0
+    tag: 0.23.0
     pullPolicy: IfNotPresent
   storage:
     size: 10Gi

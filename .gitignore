@@ -7,3 +7,4 @@ helm/kdl-server/charts/
 node_modules
 backup/backup-pod.yaml
 main
+deprecations

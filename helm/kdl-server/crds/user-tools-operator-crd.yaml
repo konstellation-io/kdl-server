@@ -911,6 +911,9 @@ spec:
               ingress:
                 type: object
                 properties:
+                  className:
+                    description: "The name of the IngressClass cluster resource. The associated IngressClass defines which controller will implement the resource."
+                    type: string
                   annotations:
                     additionalProperties:
                       type: string

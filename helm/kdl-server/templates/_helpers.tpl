@@ -101,3 +101,15 @@ Create user-tools tls secret name
   {{- include "global.tlsSecretName" . -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Create projectOperator mlflow tls secret name
+*/}}
+{{- define "projectOperator.mlflow.tlsSecretName" -}}
+{{- if hasKey .Values.projectOperator.mlflow.ingress.tls "secretName" -}}
+  {{- .Values.projectOperator.mlflow.ingress.tls.secretName -}}
+{{- else -}}
+  {{- $_ := set $ "appName" "project-operator" }}
+  {{- include "global.tlsSecretName" . -}}
+{{- end -}}
+{{- end -}}

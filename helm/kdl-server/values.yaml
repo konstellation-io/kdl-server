@@ -523,6 +523,10 @@ projectOperator:
     volume:
       storageClassName: standard
       size: 1Gi
+    ingress:
+      tls: {}
+      className: "nginx"
+      annotations: {}
   filebrowser:
     image:
       repository: filebrowser/filebrowser

@@ -67,3 +67,14 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create project mlflow tls secret name
+*/}}
+{{- define "kdlproject.mlflow.tlsSecretName" -}}
+{{- if hasKey .Values.mlflow.ingress.tls "secretName" -}}
+  {{- .Values.mlflow.ingress.tls.secretName -}}
+{{- else -}}
+  {{- printf "%s-mlflow-tls" .Values.projectId -}}
+{{- end -}}
+{{- end -}}

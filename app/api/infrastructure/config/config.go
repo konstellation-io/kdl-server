@@ -14,10 +14,9 @@ type Config struct {
 	LogLevel        string `yaml:"logLevel" envconfig:"KDL_SERVER_LOG_LEVEL"`
 	Port            string `yaml:"port" envconfig:"KDL_SERVER_PORT"`
 	StaticFilesPath string `yaml:"staticFilesPath" envconfig:"KDL_SERVER_STATIC_FILES_PATH"`
-	BaseDomainName  string `envconfig:"TOOLKIT_BASE_DOMAIN_NAME"`
+	BaseDomainName  string `envconfig:"BASE_DOMAIN_NAME"`
 	TLS             struct {
-		Enabled    bool    `envconfig:"TOOLKIT_TLS"`
-		SecretName *string `envconfig:"TOOLKIT_TLS_SECRET_NAME"`
+		Enabled bool `envconfig:"TLS_ENABLED"`
 	}
 	Admin struct {
 		Username string `envconfig:"KDL_ADMIN_USERNAME"`
@@ -28,7 +27,7 @@ type Config struct {
 		ClassName string `envconfig:"USER_TOOLS_STORAGE_CLASSNAME"`
 	}
 	SharedVolume struct {
-		Name string `envconfig:"TOOLKIT_SHARED_VOLUME"`
+		Name string `envconfig:"SHARED_VOLUME"`
 	}
 	MongoDB struct {
 		URI    string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
@@ -77,6 +76,13 @@ type Config struct {
 			Repository string `envconfig:"PROJECT_MLFLOW_IMG_REPO"`
 			Tag        string `envconfig:"PROJECT_MLFLOW_IMG_TAG"`
 			PullPolicy string `envconfig:"PROJECT_MLFLOW_IMG_PULLPOLICY"`
+		}
+		Ingress struct {
+			ClassName   string `envconfig:"PROJECT_MLFLOW_INGRESS_CLASS_NAME"`
+			Annotations string `envconfig:"PROJECT_MLFLOW_ENCODED_INGRESS_ANNOTATIONS"`
+			TLS         struct {
+				SecretName *string `envconfig:"PROJECT_MLFLOW_INGRESS_TLS_SECRET_NAME"`
+			}
 		}
 		Volume struct {
 			StorageClassName string `envconfig:"PROJECT_MLFLOW_STORAGE_CLASS_NAME"`
@@ -150,6 +156,9 @@ type Config struct {
 		// Base64 encoded string of the ingress annotations
 		Annotations string `envconfig:"USER_TOOLS_ENCODED_INGRESS_ANNOTATIONS"`
 		ClassName   string `envconfig:"USER_TOOLS_INGRESS_CLASS_NAME"`
+		TLS         struct {
+			SecretName *string `envconfig:"USER_TOOLS_TLS_SECRET_NAME"`
+		}
 	}
 	Labels struct {
 		Common struct {

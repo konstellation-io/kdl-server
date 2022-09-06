@@ -2,11 +2,9 @@ package k8s
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 
 	"github.com/gosimple/slug"
-	"gopkg.in/yaml.v3"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -176,33 +174,16 @@ func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName
 	return nil
 }
 
-func (k *k8sClient) getIngressAnnotations() (map[string]interface{}, error) {
-	decodedAnnotations, err := base64.StdEncoding.DecodeString(k.cfg.UserToolsIngress.Annotations)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding ingress annotations: %w", err)
-	}
-
-	var ingressAnnotations map[string]interface{}
-
-	err = yaml.Unmarshal(decodedAnnotations, &ingressAnnotations)
-	if err != nil {
-		return nil, fmt.Errorf("error unmarshaling annotations: %w", err)
-	}
-
-	return ingressAnnotations, nil
-}
-
 // createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
 func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, usernameSlug, resName, runtimeID,
 	runtimeImage, runtimeTag string) error {
 	serviceAccountName := k.getUserServiceAccountName(usernameSlug)
 
-	ingressAnnotations, err := k.getIngressAnnotations()
+	ingressAnnotations, err := k.getIngressAnnotations(k.cfg.UserToolsIngress.Annotations)
 	if err != nil {
 		return err
 	}
 
-	// Set spec.tls.secretName if TOOLKIT_TLS_SECRET_NAME env variable is defined
 	definition := k.getUserToolsDefinition(
 		ingressAnnotations,
 		resName,
@@ -230,6 +211,15 @@ func (k *k8sClient) getUserToolsDefinition(
 	runtimeTag,
 	serviceAccountName string,
 ) *unstructured.Unstructured {
+
+	tlsConfig := map[string]interface{}{
+		"enabled": k.cfg.TLS.Enabled,
+	}
+
+	if k.cfg.UserToolsIngress.TLS.SecretName != nil {
+		tlsConfig["secretName"] = &k.cfg.UserToolsIngress.TLS.SecretName
+	}
+
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",
@@ -256,9 +246,7 @@ func (k *k8sClient) getUserToolsDefinition(
 				"sharedVolume": map[string]string{
 					"name": k.cfg.SharedVolume.Name,
 				},
-				"tls": map[string]interface{}{
-					"enabled": k.cfg.TLS.Enabled,
-				},
+				"tls": tlsConfig,
 				"jupyter": map[string]interface{}{
 					"image": map[string]string{
 						"repository": k.cfg.Jupyter.Image.Repository,
@@ -310,12 +298,6 @@ func (k *k8sClient) getUserToolsDefinition(
 				"serviceAccountName": serviceAccountName,
 			},
 		},
-	}
-
-	if k.cfg.TLS.SecretName != nil {
-		spec := definition.Object["spec"].(map[string]interface{})
-		tls := spec["tls"].(map[string]interface{})
-		tls["secretName"] = &k.cfg.TLS.SecretName
 	}
 
 	return definition

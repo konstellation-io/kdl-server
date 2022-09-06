@@ -19,6 +19,19 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 
 	resName := fmt.Sprintf("kdlproject-%s", projectID)
 
+	tlsConfig := map[string]interface{}{
+		"enabled": k.cfg.TLS.Enabled,
+	}
+
+	if k.cfg.ProjectMLFlow.Ingress.TLS.SecretName != nil {
+		tlsConfig["secretName"] = &k.cfg.ProjectMLFlow.Ingress.TLS.SecretName
+	}
+
+	ingressAnnotations, err := k.getIngressAnnotations(k.cfg.ProjectMLFlow.Ingress.Annotations)
+	if err != nil {
+		return err
+	}
+
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": kdlprojectAPIVersion,
@@ -35,10 +48,6 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 				"domain":    k.cfg.BaseDomainName,
 				"sharedVolume": map[string]interface{}{
 					"name": k.cfg.SharedVolume.Name,
-				},
-				"tls": map[string]interface{}{
-					"enabled":    k.cfg.TLS.Enabled,
-					"secretName": k.cfg.TLS.SecretName,
 				},
 				"minio": map[string]string{
 					"accessKey": k.cfg.Minio.AccessKey,
@@ -69,9 +78,13 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 						"storageClassName": k.cfg.ProjectMLFlow.Volume.StorageClassName,
 						"size":             k.cfg.ProjectMLFlow.Volume.Size,
 					},
-
 					"s3": map[string]string{
 						"bucket": fmt.Sprintf("%s/mlflow-artifacts", projectID),
+					},
+					"ingress": map[string]interface{}{
+						"tls":         tlsConfig,
+						"className":   k.cfg.ProjectMLFlow.Ingress.ClassName,
+						"annotations": ingressAnnotations,
 					},
 				},
 				"filebrowser": map[string]interface{}{

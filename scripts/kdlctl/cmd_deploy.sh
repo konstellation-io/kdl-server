@@ -39,6 +39,7 @@ deploy() {
   if [ "$ENABLE_TLS" != "false" ]; then
     ./scripts/create_self_signed_cert.sh $NAMESPACE $DOMAIN $OS
   fi
+  ./scripts/create_nginx_ingress_configmap.sh
 
   deploy_helm_chart
 }
@@ -110,12 +111,14 @@ deploy_helm_chart() {
     --set backup.image.repository="${IMAGE_REGISTRY}/konstellation/kdl-backup" \
     --set backup.image.tag="latest" \
     --set drone.storage.storageClassName="${STORAGE_CLASS_NAME}" \
+    --set drone.ingress.className="public" \
     --set droneAuthorizer.image.pullPolicy="Always" \
     --set droneAuthorizer.image.repository="${IMAGE_REGISTRY}/konstellation/drone-authorizer" \
     --set droneAuthorizer.image.tag="latest" \
     --set droneRunner.droneRunnerEnviron="GIT_SSL_NO_VERIFY:true" \
     --set gitea.admin.password="${GITEA_ADMIN_PASSWORD}" \
     --set gitea.admin.username="${GITEA_ADMIN_USER}" \
+    --set gitea.ingress.className="public" \
     --set gitea.storage.storageClassName="${STORAGE_CLASS_NAME}" \
     --set giteaOauth2Setup.image.pullPolicy="Always" \
     --set giteaOauth2Setup.image.repository="${IMAGE_REGISTRY}/konstellation/gitea-oauth2-setup" \
@@ -128,10 +131,13 @@ deploy_helm_chart() {
     --set kdlServer.image.pullPolicy="Always" \
     --set kdlServer.image.tag="latest" \
     --set kdlServer.image.repository="${IMAGE_REGISTRY}/konstellation/kdl-server" \
+    --set kdlServer.ingress.className="public" \
     --set knowledgeGalaxy.image.pullPolicy="Always" \
     --set knowledgeGalaxy.image.repository="${KNOWLEDGE_GALAXY_IMAGE_REPOSITORY}" \
     "${SET_KNOWLEDGE_GALAXY_IMAGE_TAG}" \
     --set minio.securityContext.runAsUser=0 \
+    --set minio.ingress.className="public" \
+    --set minio.consoleIngress.className="public" \
     --set mongodb.persistentVolume.storageClassName="${STORAGE_CLASS_NAME}" \
     --set sharedVolume.storageClassName="${STORAGE_CLASS_NAME}" \
     --set postgres.storage.storageClassName="${STORAGE_CLASS_NAME}" \
@@ -145,6 +151,7 @@ deploy_helm_chart() {
     --set userToolsOperator.image.pullPolicy="Always" \
     --set userToolsOperator.image.repository="${IMAGE_REGISTRY}/konstellation/user-tools-operator" \
     --set userToolsOperator.image.tag="latest" \
+    --set userToolsOperator.ingress.className="public" \
     --set userToolsOperator.jupyter.image.pullPolicy="Always" \
     --set userToolsOperator.jupyter.image.repository="$IMAGE_REGISTRY/konstellation/jupyter-gpu" \
     --set userToolsOperator.jupyter.image.tag="latest" \

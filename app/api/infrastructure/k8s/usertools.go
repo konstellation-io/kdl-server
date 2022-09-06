@@ -211,7 +211,6 @@ func (k *k8sClient) getUserToolsDefinition(
 	runtimeTag,
 	serviceAccountName string,
 ) *unstructured.Unstructured {
-
 	tlsConfig := map[string]interface{}{
 		"enabled": k.cfg.TLS.Enabled,
 	}

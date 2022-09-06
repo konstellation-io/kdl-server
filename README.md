@@ -54,6 +54,7 @@ Changes in values:
 - `domain` moved to `global.domain`
 - `serverName` moved to `global.serverName`
 - `tls` moved to `global.ingress.tls`
+- `cert-manager` has been removed. TLS certificate management has been lend to users own management. Use `global.tls.secretName` or `<component>.tls.secretName` to set the secret name containing the TLS certificate.
 - Added `drone.ingress.tls`, `gitea.ingress.tls`, `kdlServer.ingress.tls`, `minio.ingress.tls`, `minio.consoleIngress.tls` and `userToolsOperator.ingress.tls` for individual tls config. These values take precedence over `global.ingress.tls`.
 - `drone.ingress.annotations.kubernetes.io/ingress.class: "nginx"` removed in favour of `drone.ingress.className: "nginx"`
 - `gitea.ingress.annotations.kubernetes.io/ingress.class: "nginx"` removed in favour of `gitea.ingress.className: "nginx"`
@@ -65,7 +66,7 @@ Changes in values:
 Run these commands to update the CRDs before applying the upgrade.
 
 ```bash
-kubectl apply --server-side --force-conflicts -f helm/kdl-server/crds/user-tools-operator-crd.yaml
+kubectl apply --server-side --force-conflicts -f https://raw.githubusercontent.com/konstellation-io/kdl-server/v5.0.0/helm/kdl-server/crds/user-tools-operator-crd.yaml
 ```
 
 #### From 3.X to 4.X

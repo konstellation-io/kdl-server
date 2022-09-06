@@ -33,7 +33,6 @@ deploy() {
     build_docker_images
   fi
 
-  replace_env_vars
   create_namespace
 
   if [ "$ENABLE_TLS" != "false" ]; then
@@ -147,6 +146,7 @@ deploy_helm_chart() {
     --set projectOperator.mlflow.image.pullPolicy="Always" \
     --set projectOperator.mlflow.image.repository="${IMAGE_REGISTRY}/konstellation/mlflow" \
     --set projectOperator.mlflow.image.tag="latest" \
+    --set projectOperator.mlflow.ingress.className="public" \
     --set projectOperator.mlflow.volume.storageClassName="${STORAGE_CLASS_NAME}" \
     --set userToolsOperator.image.pullPolicy="Always" \
     --set userToolsOperator.image.repository="${IMAGE_REGISTRY}/konstellation/user-tools-operator" \

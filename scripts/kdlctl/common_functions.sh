@@ -4,11 +4,6 @@
 # shellcheck disable=SC2028 # https://github.com/koalaman/shellcheck/wiki/SC2028
 # shellcheck disable=SC2034 # https://github.com/koalaman/shellcheck/wiki/SC2034
 
-replace_env_vars() {
-  echo_wait "replacing env vars"
-  ./scripts/replace_env_path.sh > /dev/null 2>&1
-}
-
 run() {
   set -e
   # shellcheck disable=SC2048

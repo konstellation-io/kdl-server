@@ -38,7 +38,7 @@ mlflow:
     annotations: {}
     tls:
       enabled: false
-      # secretName: tls-secret-name
+      secretName: null
 
 filebrowser:
   image:

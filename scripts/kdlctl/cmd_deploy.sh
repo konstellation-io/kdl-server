@@ -123,7 +123,7 @@ deploy_helm_chart() {
     --set giteaOauth2Setup.image.repository="${IMAGE_REGISTRY}/konstellation/gitea-oauth2-setup" \
     --set giteaOauth2Setup.image.tag="latest" \
     --set global.domain="${DOMAIN}" \
-    --set global.ingress.tls.enabled="true" \
+    --set global.ingress.tls.enabled="${ENABLE_TLS}" \
     --set global.ingress.tls.secretName="$DOMAIN-tls-secret" \
     --set global.ingress.tls.caSecret.name=mkcert-ca \
     --set global.ingress.tls.caSecret.certFilename=mkcert-ca.crt \

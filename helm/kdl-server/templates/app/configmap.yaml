@@ -49,7 +49,7 @@ data:
   PROJECT_MLFLOW_INGRESS_CLASS_NAME: {{ .Values.projectOperator.mlflow.ingress.className }}
   PROJECT_MLFLOW_ENCODED_INGRESS_ANNOTATIONS: |+
     {{- toYaml .Values.projectOperator.mlflow.ingress.annotations | b64enc | nindent 4 }}
-  {{- if and .Values.global.ingress.tls.enabled ( or (hasKey .Values.projectOperator.mlflow.ingress.tls "secretName") (hasKey .Values.global.ingress.tls "secretName")) }}
+  {{- if and .Values.global.ingress.tls.enabled (or (not (kindIs "invalid" .Values.projectOperator.mlflow.ingress.tls.secretName )) (not (kindIs "invalid" .Values.global.ingress.tls.secretName ))) }}
   PROJECT_MLFLOW_INGRESS_TLS_SECRET_NAME: "{{ include "projectOperator.mlflow.tlsSecretName" . }}"
   {{- end }}
 
@@ -99,7 +99,7 @@ data:
   # Base64 encoded string of the user-tools ingress annotations
   USER_TOOLS_ENCODED_INGRESS_ANNOTATIONS: |+
     {{- toYaml .Values.userToolsOperator.ingress.annotations | b64enc | nindent 4 }}
-  {{- if and .Values.global.ingress.tls.enabled ( or (hasKey .Values.userToolsOperator.ingress.tls "secretName") (hasKey .Values.global.ingress.tls "secretName")) }}
+  {{- if and .Values.global.ingress.tls.enabled (or (not (kindIs "invalid" .Values.userToolsOperator.ingress.tls.secretName )) (not (kindIs "invalid" .Values.global.ingress.tls.secretName ))) }}
   USER_TOOLS_TLS_SECRET_NAME: "{{ include "userTools.tlsSecretName" . }}"
   {{- end }}
 

@@ -4,7 +4,7 @@ global:
   ingress:
     tls:
       enabled: true
-      secretName: ""
+      secretName: null
 
       ## A secret containing the the CA cert is needed
       ## in order to use a self-signed certificate

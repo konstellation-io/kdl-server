@@ -49,9 +49,8 @@ data:
   PROJECT_MLFLOW_INGRESS_CLASS_NAME: {{ .Values.projectOperator.mlflow.ingress.className }}
   PROJECT_MLFLOW_ENCODED_INGRESS_ANNOTATIONS: |+
     {{- toYaml .Values.projectOperator.mlflow.ingress.annotations | b64enc | nindent 4 }}
-  PROJECT_MLFLOW_INGRESS_TLS: {{ .Values.global.ingress.tls }}
   {{- if and .Values.global.ingress.tls.enabled ( or (hasKey .Values.projectOperator.mlflow.ingress.tls "secretName") (hasKey .Values.global.ingress.tls "secretName")) }}
-  PROJECT_MLFLOW_INGRESS_TLS_SECRET_NAME: "{{ include "userTools.tlsSecretName" . }}"
+  PROJECT_MLFLOW_INGRESS_TLS_SECRET_NAME: "{{ include "projectOperator.mlflow.tlsSecretName" . }}"
   {{- end }}
 
   PROJECT_FILEBROWSER_IMG_REPO: "{{ .Values.projectOperator.filebrowser.image.repository }}"

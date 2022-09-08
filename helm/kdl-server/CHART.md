@@ -87,7 +87,7 @@
 | kdlServer.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | kdlServer.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | kdlServer.image.repository | string | `"konstellation/kdl-server"` | The image repository |
-| kdlServer.image.tag | string | `"1.24.0"` | The image tag |
+| kdlServer.image.tag | string | `"1.25.0"` | The image tag |
 | kdlServer.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-body-size":"1000000m","nginx.ingress.kubernetes.io/proxy-connect-timeout":"3600","nginx.ingress.kubernetes.io/proxy-read-timeout":"3600","nginx.ingress.kubernetes.io/proxy-send-timeout":"3600"}` | Ingress annotations |
 | kdlServer.ingress.className | string | `"nginx"` | The ingress class name |
 | kdlServer.ingress.tls.secretName | string | `nil` | The TLS secret name that will be used. It takes precedence over `.Values.global.ingress.tls.secretName`. |
@@ -148,7 +148,7 @@
 | projectOperator.kubeRbacProxy.image.tag | string | `"v0.8.0"` | Image tag |
 | projectOperator.manager.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | projectOperator.manager.image.repository | string | `"konstellation/project-operator"` | The image repository |
-| projectOperator.manager.image.tag | string | `"v0.13.5"` | The image tag |
+| projectOperator.manager.image.tag | string | `"0.15.0"` | The image tag |
 | projectOperator.manager.resources | object | `{}` | Resource requests and limits for primary projectOperator container. Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/ |
 | projectOperator.mlflow.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | projectOperator.mlflow.image.repository | string | `"konstellation/mlflow"` | The image repository |

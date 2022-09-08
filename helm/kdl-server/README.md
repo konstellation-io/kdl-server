@@ -61,6 +61,33 @@ kubectl apply --server-side --force-conflicts -f https://raw.githubusercontent.c
 kubectl apply --server-side --force-conflicts -f https://raw.githubusercontent.com/konstellation-io/kdl-server/v5.0.0/helm/kdl-server/crds/project-operator-crd.yaml
 ```
 
+Existing `KDLProject` resources won't be updated with the new fields after upgrading the chart.
+
+Run the following script to patch all existing `KDLProject` resources with the same ingress and TLS configuration for Mlflow that was defined in your release *values* (change variables values and set your custom annotations as convenience):
+
+```bash
+#!/bin/bash
+NAMESPACE=<release_namespace>
+INGRESS_CLASS=<ingress_class_name>
+TLS_ENABLED=<true|false>
+TLS_SECRET_NAME=<secret_name>
+
+cat << EOF > patch-file.yaml
+spec:
+  mlflow:
+    ingress:
+      className: "${INGRESS_CLASS}"
+      tls:
+        enabled: ${TLS_ENABLED}
+        secretName: "${TLS_SECRET_NAME}"
+      annotations:
+        # place your custom annotations here
+EOF
+
+for project in $(kubectl -n ${NAMESPACE} get kdlprojects.project.konstellation.io -o name); do kubectl -n ${NAMESPACE} patch ${project} --type merge --patch-file patch-file.yaml; done
+rm -f patch-file.yaml
+```
+
 ### From 3.X to 4.X
 
 This major version comes with the following breaking changes:
@@ -78,7 +105,7 @@ kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-i
 
 This major version comes with the following breaking changes:
 
-- Ingress configuration changed from *values.yaml* 
+- Ingress configuration changed from *values.yaml*
     - removed `ingress.type`
     - added `drone.ingress.annotations`, `kdlApp.ingress.annotations`, `gitea.ingress.annotations`, `minio.ingress.annotations`, `userToolsOperator.ingress.annotations`
 
@@ -100,7 +127,7 @@ kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-i
 This major version comes with the following breaking changes:
 
 - This upgrades user-tools-operator to v0.17.0.
-    - users service accounts are now managed by `kdlServer` instead the `user-tools-operator` 
+    - users service accounts are now managed by `kdlServer` instead the `user-tools-operator`
 
 Run these commands to update the CRDs before applying the upgrade.
 

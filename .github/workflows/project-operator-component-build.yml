@@ -27,7 +27,7 @@ jobs:
     uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.7.5
     with:
       component: project-operator
-      component_helm_tag: projectOperator.image.tag
+      component_helm_tag: projectOperator.manager.image.tag
       component_path: project-operator
       component_image: project-operator
       values_file: helm/kdl-server/values.yaml
@@ -35,4 +35,3 @@ jobs:
       pat: ${{ secrets.PATNAME }}
       docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
       docker_token: ${{ secrets.DOCKERHUB_TOKEN }}
-

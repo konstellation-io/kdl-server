@@ -33,7 +33,6 @@ deploy() {
     build_docker_images
   fi
 
-  replace_env_vars
   create_namespace
 
   if [ "$ENABLE_TLS" != "false" ]; then
@@ -124,7 +123,7 @@ deploy_helm_chart() {
     --set giteaOauth2Setup.image.repository="${IMAGE_REGISTRY}/konstellation/gitea-oauth2-setup" \
     --set giteaOauth2Setup.image.tag="latest" \
     --set global.domain="${DOMAIN}" \
-    --set global.ingress.tls.enabled="true" \
+    --set global.ingress.tls.enabled="${ENABLE_TLS}" \
     --set global.ingress.tls.secretName="$DOMAIN-tls-secret" \
     --set global.ingress.tls.caSecret.name=mkcert-ca \
     --set global.ingress.tls.caSecret.certFilename=mkcert-ca.crt \
@@ -147,6 +146,7 @@ deploy_helm_chart() {
     --set projectOperator.mlflow.image.pullPolicy="Always" \
     --set projectOperator.mlflow.image.repository="${IMAGE_REGISTRY}/konstellation/mlflow" \
     --set projectOperator.mlflow.image.tag="latest" \
+    --set projectOperator.mlflow.ingress.className="public" \
     --set projectOperator.mlflow.volume.storageClassName="${STORAGE_CLASS_NAME}" \
     --set userToolsOperator.image.pullPolicy="Always" \
     --set userToolsOperator.image.repository="${IMAGE_REGISTRY}/konstellation/user-tools-operator" \

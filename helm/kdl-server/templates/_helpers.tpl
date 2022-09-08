@@ -23,10 +23,10 @@ Create MongoDB URI.
 Global tls secret name
 */}}
 {{- define "global.tlsSecretName" -}}
-{{-  if hasKey .Values.global.ingress.tls "secretName" -}}
-  {{- .Values.global.ingress.tls.secretName -}}
-{{- else -}}
+{{-  if kindIs "invalid" .Values.global.ingress.tls.secretName -}}
   {{- printf "%s-%s-tls" $.Values.global.domain $.appName -}}
+{{- else -}}
+  {{- .Values.global.ingress.tls.secretName -}}
 {{- end -}}
 {{- end -}}
 
@@ -34,11 +34,11 @@ Global tls secret name
 Create minio tls secret name
 */}}
 {{- define "minio.tlsSecretName" -}}
-{{- if hasKey .Values.minio.ingress.tls "secretName" -}}
-  {{- .Values.minio.ingress.tls.secretName -}}
-{{- else -}}
+{{- if kindIs "invalid" .Values.minio.ingress.tls.secretName -}}
   {{- $_ := set $ "appName" "minio" }}
   {{- include "global.tlsSecretName" . -}}
+{{- else -}}
+  {{- .Values.minio.ingress.tls.secretName -}}
 {{- end -}}
 {{- end -}}
 
@@ -46,11 +46,11 @@ Create minio tls secret name
 Create minio tls secret name
 */}}
 {{- define "minioConsole.tlsSecretName" -}}
-{{- if hasKey .Values.minio.consoleIngress.tls "secretName" -}}
-  {{- .Values.minio.consoleIngress.tls.secretName -}}
-{{- else -}}
+{{- if kindIs "invalid" .Values.minio.consoleIngress.tls.secretName -}}
   {{- $_ := set $ "appName" "minio-console" }}
   {{- include "global.tlsSecretName" . -}}
+{{- else -}}
+  {{- .Values.minio.consoleIngress.tls.secretName -}}
 {{- end -}}
 {{- end -}}
 
@@ -58,11 +58,11 @@ Create minio tls secret name
 Create kdlServer tls secret name
 */}}
 {{- define "kdlServer.tlsSecretName" -}}
-{{- if hasKey .Values.kdlServer.ingress.tls "secretName" -}}
-  {{- .Values.kdlServer.ingress.tls.secretName -}}
-{{- else -}}
+{{- if kindIs "invalid" .Values.kdlServer.ingress.tls.secretName -}}
   {{- $_ := set $ "appName" "kdlapp" }}
   {{- include "global.tlsSecretName" . -}}
+{{- else -}}
+  {{- .Values.kdlServer.ingress.tls.secretName -}}
 {{- end -}}
 {{- end -}}
 
@@ -70,11 +70,11 @@ Create kdlServer tls secret name
 Create drone tls secret name
 */}}
 {{- define "drone.tlsSecretName" -}}
-{{- if hasKey .Values.drone.ingress.tls "secretName" -}}
-  {{- .Values.drone.ingress.tls.secretName -}}
-{{- else -}}
+{{- if kindIs "invalid" .Values.drone.ingress.tls.secretName -}}
   {{- $_ := set $ "appName" "drone" }}
   {{- include "global.tlsSecretName" . -}}
+{{- else -}}
+  {{- .Values.drone.ingress.tls.secretName -}}
 {{- end -}}
 {{- end -}}
 
@@ -82,11 +82,11 @@ Create drone tls secret name
 Create gitea tls secret name
 */}}
 {{- define "gitea.tlsSecretName" -}}
-{{- if hasKey .Values.gitea.ingress.tls "secretName" -}}
-  {{- .Values.gitea.ingress.tls.secretName -}}
-{{- else -}}
+{{- if kindIs "invalid" .Values.gitea.ingress.tls.secretName -}}
   {{- $_ := set $ "appName" "gitea" }}
   {{- include "global.tlsSecretName" . -}}
+{{- else -}}
+  {{- .Values.gitea.ingress.tls.secretName -}}
 {{- end -}}
 {{- end -}}
 
@@ -94,10 +94,20 @@ Create gitea tls secret name
 Create user-tools tls secret name
 */}}
 {{- define "userTools.tlsSecretName" -}}
-{{- if hasKey .Values.userToolsOperator.ingress.tls "secretName" -}}
-  {{- .Values.userToolsOperator.ingress.tls.secretName -}}
+{{- if kindIs "invalid" .Values.userToolsOperator.ingress.tls.secretName -}}
+  {{- .Values.global.ingress.tls.secretName -}}
 {{- else -}}
-  {{- $_ := set $ "appName" "user-tools" }}
-  {{- include "global.tlsSecretName" . -}}
+  {{- .Values.userToolsOperator.ingress.tls.secretName -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create projectOperator mlflow tls secret name
+*/}}
+{{- define "projectOperator.mlflow.tlsSecretName" -}}
+{{- if kindIs "invalid" .Values.projectOperator.mlflow.ingress.tls.secretName -}}
+  {{- .Values.global.ingress.tls.secretName -}}
+{{- else -}}
+  {{- .Values.projectOperator.mlflow.ingress.tls.secretName -}}
 {{- end -}}
 {{- end -}}

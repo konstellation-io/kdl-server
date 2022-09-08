@@ -6,13 +6,13 @@ metadata:
   labels:
     app:  knowledge-galaxy
 data:
-  WORKERS: "{{ default "1" .Values.knowledgeGalaxy.config.workers }}" # Number of threads for the server defaults to 1
+  WORKERS: "{{ .Values.knowledgeGalaxy.config.workers }}"
   HOST: "0.0.0.0"
   SERVER_PORT: "8080"
   # Recommender Settings
-  N_HITS: "{{ default "1000" .Values.knowledgeGalaxy.config.numberOfOutputs }}" # Number of outputs that the recommender outputs, defaults to 1000
-  DESCRIPTION_MIN_WORDS: "{{ default "50" .Values.knowledgeGalaxy.config.descriptionMinWords }}" # Number of words to use for project description, defaults to 50
+  N_HITS: "{{ .Values.knowledgeGalaxy.config.numberOfOutputs }}"
+  DESCRIPTION_MIN_WORDS: "{{ .Values.knowledgeGalaxy.config.descriptionMinWords }}" 
   # Log file
-  LOG_LEVEL: "{{ default "INFO" .Values.knowledgeGalaxy.config.logLevel }}" # Log level defaults to info
+  LOG_LEVEL: "{{ .Values.knowledgeGalaxy.config.logLevel }}"
   STANDALONE_MODE: "false"
 {{ end }}

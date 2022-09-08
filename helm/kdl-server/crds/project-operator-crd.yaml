@@ -53,12 +53,6 @@ spec:
                       pullPolicy:
                         description: image pull policy
                         type: string
-              ingress:
-                type: object
-                properties:
-                  type:
-                    description: ingress type
-                    type: string
               minio:
                 type: object
                 properties:
@@ -98,6 +92,26 @@ spec:
                       storageClassName:
                         description: minio storage class
                         type: string
+                  ingress:
+                    type: object
+                    properties:
+                      className:
+                        description: "The name of the IngressClass cluster resource. The associated IngressClass defines which controller will implement the resource."
+                        type: string
+                      annotations:
+                        additionalProperties:
+                          type: string
+                        description: "Ingress annotations"
+                        type: object
+                      tls:
+                        type: object
+                        properties:
+                          enabled:
+                            description: enable or disable tls
+                            type: boolean
+                          secretName:
+                            description: the tls secret name in which the certificate is stored
+                            type: string
               oauth2Proxy:
                 type: object
                 properties:
@@ -125,12 +139,6 @@ spec:
                   name:
                     description: ingress type
                     type: string
-              tls:
-                type: object
-                properties:
-                  enabled:
-                    description: Boolean to specify if TLS is enabled
-                    type: boolean
           status:
             description: Status defines the observed state of KDLProject
             type: object

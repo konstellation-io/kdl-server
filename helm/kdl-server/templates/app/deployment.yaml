@@ -87,11 +87,15 @@ spec:
                 configMapKeyRef:
                   key: DRONE_TOKEN
                   name: drone-config
+            - name: KDL_SERVER_MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  ## This secret name is generated when templates/mongo/mongodb.yaml is reconciled by its operator
+                  name: {{ .Release.Name }}-mongodb-admin-admin
+                  key: connectionString.standardSrv
           envFrom:
             - configMapRef:
                 name: kdl-server-configmap
-            - secretRef:
-                name: kdl-server-secrets
             - configMapRef:
                 name: gitea-configmap
             - secretRef:

@@ -6,6 +6,7 @@
 |------------|------|---------|
 | https://charts.min.io/ | minio | 3.2.0 |
 | https://konstellation-io.github.io/enterprise_gateway/ | enterprise-gateway | 2.6.0 |
+| https://mongodb.github.io/helm-charts | mongodbOperator(community-operator) | 0.7.6 |
 
 ## Values
 
@@ -125,7 +126,10 @@
 | mongodb.persistentVolume.size | string | `"5Gi"` | Size of the persistent volume claim used for persistence |
 | mongodb.persistentVolume.storageClassName | string | `"standard"` | Storage class to use for persistence |
 | mongodb.port | int | `27017` | MongoDB port number. Used by backup to connect the MongoDB instance |
+| mongodb.replicaset.members | int | `1` |  |
 | mongodb.tolerations | list | `[]` | If specified, the pod's tolerations. Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
+| mongodb.version | string | `"4.2.8"` |  |
+| mongodbOperator.community-operator-crds.enabled | bool | `false` |  |
 | oauth2Proxy.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | oauth2Proxy.image.repository | string | `"quay.io/oauth2-proxy/oauth2-proxy"` | The image repository |
 | oauth2Proxy.image.tag | string | `"v7.0.1-amd64"` | The image tag |

@@ -444,7 +444,16 @@ minio:
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
 
+
+mongodbOperator:
+  community-operator-crds:
+    enabled: false
+
+
 mongodb:
+  version: "4.2.8"
+  replicaset:
+    members: 1
   auth:
     # -- admin username
     adminUser: "admin"

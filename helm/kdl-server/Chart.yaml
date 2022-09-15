@@ -12,3 +12,7 @@ dependencies:
   - name: enterprise-gateway
     version: "2.6.0"
     repository: "https://konstellation-io.github.io/enterprise_gateway/"
+  - name: community-operator
+    alias: mongodbOperator
+    version: 0.7.6
+    repository: https://mongodb.github.io/helm-charts

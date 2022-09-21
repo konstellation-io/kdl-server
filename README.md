@@ -100,10 +100,18 @@ https://kubernetes.io/docs/tasks/tools/
 
 #### jq (Mac only)
 
-JSON processor to configre insecure-registries on Mac.
+JSON processor to configure insecure-registries on Mac.
 
 ```
 brew install jq
+```
+
+#### yq
+
+YAML processor to configure .
+
+```
+brew install yq
 ```
 
 ## Local Environment
@@ -225,7 +233,7 @@ To enable the integration follow these steps:
 - Create a secret named `regcred` with the docker credential needed in order to download the private image:
 
 ```bash
-kubectl create secret docker-registry regcred \ 
+kubectl create secret docker-registry regcred \
   --docker-username=$DOCKER_USERNAME \
   --docker-password=$DOCKER_AUTH_TOKEN \
    --dry-run=client -o yaml | kubectl -n kdl apply -f -

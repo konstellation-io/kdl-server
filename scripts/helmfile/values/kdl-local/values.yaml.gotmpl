@@ -121,5 +121,5 @@ userToolsOperator:
   ingress:
     className: "public"
   kubeconfig:
-    enabled: true
-    externalServerUrl: "https://192.168.0.21:16443"
+    enabled: {{ requiredEnv "KUBECONFIG_ENABLED" }}
+    externalServerUrl: {{ env "EXTERNAL_SERVER_URL" | quote }}

@@ -1,0 +1,125 @@
+global:
+  serverName: "local-server"
+  domain: {{ requiredEnv "DOMAIN" | }}
+  ingress:
+    tls:
+      enabled: {{ requiredEnv "ENABLE_TLS" }}
+      secretName: {{ requiredEnv "DOMAIN" }}-tls-secret
+      caSecret:
+        name: mkcert-ca
+        certFilename: mkcert-ca.crt
+  mongodb:
+    connectionString:
+      # Check spec.users[0].connectionStringSecretName in scripts/helmfile/helm/default/mongodb-database/values.yaml.gotmpl
+      secretName: "mongodb-database-admin-connection-string"
+      secretKey: "connectionString.standardSrv"
+
+drone:
+  storage:
+    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+  ingress:
+    className: "public"
+
+droneAuthorizer:
+  image:
+    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/drone-authorizer
+    tag: latest
+    pullPolicy: Always
+
+droneRunner:
+  droneRunnerEnviron: "GIT_SSL_NO_VERIFY:true"
+
+gitea:
+  admin:
+    username: {{ requiredEnv "GITEA_ADMIN_USER" | quote }}
+    password: {{ requiredEnv "GITEA_ADMIN_PASSWORD" | quote }}
+  storage:
+    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+  ingress:
+    className: "public"
+
+giteaOauth2Setup:
+  image:
+    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/gitea-oauth2-setup
+    tag: latest
+    pullPolicy: Always
+
+enterprise-gateway:
+  kernelspecs:
+    imagePullPolicy: Always
+    image: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/jupyter-kernelspecs:latest
+
+knowledgeGalaxy:
+  image:
+    repository: {{ requiredEnv "KNOWLEDGE_GALAXY_IMAGE_REPOSITORY" |quote }}
+    tag: {{ requiredEnv "KNOWLEDGE_GALAXY_IMAGE_TAG" | quote }}
+
+kdlServer:
+  image:
+    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-server
+    tag: latest
+    pullPolicy: Always
+  ingress:
+    className: "public"
+
+minio:
+  securityContext:
+    runAsUser: 0
+  ingress:
+    className: "public"
+  consoleIngress:
+    className: "public"
+
+mongodb:
+  connectionString: "mongodb+srv://admin:123456@kdl-local-mongodb-svc.kdl.svc.cluster.local/admin?replicaSet=kdl-local-mongodb&ssl=false"
+
+postgres:
+  storage:
+    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+
+projectOperator:
+  manager:
+    image:
+      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/project-operator
+      tag: latest
+      pullPolicy: Always
+  mlflow:
+    image:
+      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/mlflow
+      tag: latest
+      pullPolicy: Always
+    volume:
+      storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+    ingress:
+      className: "public"
+
+sharedVolume:
+  storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+
+userToolsOperator:
+  image:
+    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/user-tools-operator
+    tag: latest
+    pullPolicy: Always
+  storage:
+    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+  jupyter:
+    image:
+      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/jupyter-gpu
+      tag: latest
+      pullPolicy: Always
+  repoCloner:
+    image:
+      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/repo-cloner
+      tag: latest
+      pullPolicy: Always
+  vscode:
+    image:
+      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/vscode
+      tag: latest
+      pullPolicy: Always
+  ingress:
+    className: "public"
+  kubeconfig:
+    enabled: true
+    externalServerUrl: "https://192.168.0.21:16443"

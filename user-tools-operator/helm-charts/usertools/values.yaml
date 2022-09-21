@@ -31,6 +31,7 @@ repoCloner:
     repository: konstellation/repo-cloner
     tag: "latest"
     pullPolicy: IfNotPresent
+  mongodbURI: ""
 
 sharedVolume:
   name: ""

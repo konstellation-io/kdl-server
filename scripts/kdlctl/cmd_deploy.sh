@@ -93,7 +93,6 @@ create_namespace() {
 deploy_helm_chart() {
 
   export KNOWLEDGE_GALAXY_IMAGE_REPOSITORY="konstellation/knowledge-galaxy"
-  export KNOWLEDGE_GALAXY_IMAGE_TAG="1"
   if [ "$KNOWLEDGE_GALAXY_LOCAL" = "true"  ]; then
     export KNOWLEDGE_GALAXY_IMAGE_REPOSITORY="$IMAGE_REGISTRY/konstellation/knowledge-galaxy"
     export KNOWLEDGE_GALAXY_IMAGE_TAG="latest"

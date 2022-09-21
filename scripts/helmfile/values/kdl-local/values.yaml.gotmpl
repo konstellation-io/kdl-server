@@ -1,6 +1,6 @@
 global:
   serverName: "local-server"
-  domain: {{ requiredEnv "DOMAIN" | }}
+  domain: {{ requiredEnv "DOMAIN" | quote }}
   ingress:
     tls:
       enabled: {{ requiredEnv "ENABLE_TLS" }}
@@ -51,8 +51,8 @@ enterprise-gateway:
 
 knowledgeGalaxy:
   image:
-    repository: {{ requiredEnv "KNOWLEDGE_GALAXY_IMAGE_REPOSITORY" |quote }}
-    tag: {{ requiredEnv "KNOWLEDGE_GALAXY_IMAGE_TAG" | quote }}
+    repository: {{ requiredEnv "KNOWLEDGE_GALAXY_IMAGE_REPOSITORY" | quote }}
+    tag: {{ env "KNOWLEDGE_GALAXY_IMAGE_TAG" | quote }}
 
 kdlServer:
   image:

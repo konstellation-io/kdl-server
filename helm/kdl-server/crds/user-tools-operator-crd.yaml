@@ -925,6 +925,8 @@ spec:
                   name:
                     description: name of shared volume
                     type: string
+                required:
+                - name
               storage:
                 type: object
                 properties:
@@ -1015,6 +1017,10 @@ spec:
                       pullPolicy:
                         description: image pull policy
                         type: string
+                  mongodbURI:
+                    type: string
+                required:
+                - mongodbURI
               oauth2Proxy:
                 type: object
                 properties:
@@ -1057,6 +1063,8 @@ spec:
                       pullPolicy:
                         description: image pull policy
                         type: string
+            required:
+            - sharedVolume
           status:
             description: Status defines the observed state of UserTools
             type: object

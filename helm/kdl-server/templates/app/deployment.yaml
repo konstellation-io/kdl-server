@@ -87,11 +87,18 @@ spec:
                 configMapKeyRef:
                   key: DRONE_TOKEN
                   name: drone-config
+            - name: KDL_SERVER_MONGODB_URI
+              {{- if .Values.global.mongodb.connectionString.secretName }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.mongodb.connectionString.secretName }}
+                  key: {{ .Values.global.mongodb.connectionString.secretKey }}
+              {{- else }}
+              value: {{ .Values.global.mongodb.connectionString.uri }}
+              {{- end }}
           envFrom:
             - configMapRef:
                 name: kdl-server-configmap
-            - secretRef:
-                name: kdl-server-secrets
             - configMapRef:
                 name: gitea-configmap
             - secretRef:

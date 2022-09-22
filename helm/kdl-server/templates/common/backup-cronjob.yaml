@@ -42,13 +42,16 @@ spec:
                     name: postgres
                 - secretRef:
                     name: backup-secrets
-                - secretRef:
-                    name: kdl-mongo-secret
               env:
-                - name: MONGO_HOST
-                  value: {{ .Values.mongodb.host }}
-                - name: MONGO_PORT
-                  value: {{ .Values.mongodb.port | quote }}
+                - name: MONGO_URI
+                  {{- if .Values.global.mongodb.connectionString.secretName }}
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .Values.global.mongodb.connectionString.secretName }}
+                      key: {{ .Values.global.mongodb.connectionString.secretKey }}
+                  {{- else }}
+                  value: {{ .Values.global.mongodb.connectionString.uri }}
+                  {{- end }}
               volumeMounts:
               - name: gitea-pvc
                 mountPath: "/data"

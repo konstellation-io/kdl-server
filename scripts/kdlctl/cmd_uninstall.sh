@@ -8,7 +8,7 @@ cmd_uninstall() {
     case $yn in
     [Yy]*)
       echo_info "Deleting \"$RELEASE_NAME\" helm release..."
-      helm delete "$RELEASE_NAME" -n $NAMESPACE
+      helmfile -f scripts/helmfile/helmfile.yaml delete
 
       echo_info "Deleting usertools in \"$NAMESPACE\" k8s namespace..."
       USERTOOL_NAMES=$(kubectl get usertools -n kdl | tail -n +2 | awk '{print $1}')

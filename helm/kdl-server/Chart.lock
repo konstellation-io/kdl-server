@@ -6,4 +6,4 @@ dependencies:
   repository: https://konstellation-io.github.io/enterprise_gateway/
   version: 2.6.0
 digest: sha256:b24dd765d669dfd29f0855375802028c14f453151a16087c1abcef6a917f8f7b
-generated: "2022-05-10T13:06:19.464523402+02:00"
+generated: "2022-09-20T16:58:08.611923987+02:00"

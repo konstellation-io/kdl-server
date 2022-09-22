@@ -16,6 +16,14 @@ global:
       # caSecret:
       #   name: kdl-ca-cert
       #   certFilename: ca.crt
+  mongodb:
+    connectionString:
+      # -- MongoDB connection uri. This takes precedence over secretName and secretKey. `global.mongodb.secretName` in combination with `global.mongodb.secretKey` have precedence over this.
+      uri: "mongodb+srv://admin:123456@example.com/admin?replicaSet=kdl-mongodb&ssl=false"
+      # -- If specified, the name of the secret that contains a key with the MongoDB connection string.
+      secretName: ""
+      # -- If specfied in combination with `global.mongodb.secretName`, the name of the secret key that contains the MongoDB connection string.
+      secretKey: ""
 
 backup:
   # -- Whether to enable backup
@@ -443,31 +451,6 @@ minio:
     # -- Ingress annotations
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
-
-mongodb:
-  auth:
-    # -- admin username
-    adminUser: "admin"
-    # -- admin password
-    adminPassword: "123456"
-  persistentVolume:
-    # -- Storage class to use for persistence
-    storageClassName: standard
-    # -- Size of the persistent volume claim used for persistence
-    size: 5Gi
-  # -- MongoDB hostname. Used by backup to connect the MongoDB instance
-  host: "kdl-mongo-0"
-  # -- MongoDB port number. Used by backup to connect the MongoDB instance
-  port: 27017
-
-  # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
-  nodeSelector: {}
-
-  # -- Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  affinity: {}
-
-  # -- If specified, the pod's tolerations. Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-  tolerations: []
 
 oauth2Proxy:
   image:

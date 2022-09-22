@@ -5,6 +5,7 @@ Installs KDL Server kubernetes manifests.
 ## Prerequisites
 
 * Nginx ingress controller. See [Ingress Controller](#ingress-controller).
+* MongoDB v4.2 database.
 * Helm 3+
 
 ## Install chart
@@ -37,6 +38,21 @@ This removes all the Kubernetes components associated with the chart and deletes
 
 A major chart version change (like v0.15.3 -> v1.0.0) indicates that there is an incompatible breaking change needing
 manual actions.
+
+### From 5.X to 6.X
+New requirements:
+- An existing running MongoDB database must be accessible as internal MongoDB database has been removed. Check [MongoDB](#mongodb)
+
+Changes in values:
+- `mongodb` has been removed
+- `global.mongodb.connectionString.uri`, `global.mongodb.connectionString.secretName` and `global.mongodb.connectionString.secretKey`
+
+Execute the following actions to update the CRDs before applying the upgrade.
+- Remove all `UserTools` resources from your cluster.
+- Run the following command to update CRDs
+```bash
+kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-io/kdl-server/v6.0.0/helm/kdl-server/crds/user-tools-operator-crd.yaml
+```
 
 ### From 4.X to 5.X
 
@@ -162,3 +178,118 @@ This Chart has been developed using **Nginx Ingress Controller**. So using the d
 However, users could use any other ingress controller (for example, [Traefik](https://doc.traefik.io/traefik/providers/kubernetes-ingress/)). In that case, ingress configurations equivalent to the default ones must be povided.
 
 Notice that even using equivalent ingress configurations the correct operation of the appliance is not guaranteed.
+
+## MongoDB
+
+To store existing **users**, **projects**, and **runtimes** data the KDL Server application needs and accessible MongoDB v4.2 database.
+
+### Initial MongoDB configuration:
+
+For a correct operation of the application the following MongoDB resources are required:
+
+- `readWriteMinusDropRole` with the following configuration:
+  - Allowed actions:
+    - collStats
+    - dbHash
+    - dbStats
+    - find
+    - killCursors
+    - listIndexes
+    - listCollections
+    - convertToCapped
+    - createCollection
+    - createIndex
+    - dropIndex
+    - insert
+    - remove
+    - renameCollectionSameDB
+    - update
+  - Allowed resources:
+    - db: `kdl`
+    - collection: `""`
+- A user with the `root` and `readWriteMinusDropRole` roles associated.
+
+Bellow we provide a JS script to easily setup the initial database configuration:
+
+```js
+conn = new Mongo();
+db = conn.getDB("kdl");
+try {
+    db.createRole({
+    role: "readWriteMinusDropRole",
+    privileges: [
+    {
+        resource: { db: "kdl", collection: ""},
+        actions: [ "collStats", "dbHash", "dbStats", "find", "killCursors", "listIndexes", "listCollections", "convertToCapped", "createCollection", "createIndex", "dropIndex", "insert", "remove", "renameCollectionSameDB", "update"]} ],
+        roles: []
+    }
+    );
+} catch (e) {
+    print("Role for readWriteMinusDropRole for 'kdl' already exists")
+}
+try {
+    db.createUser({user: "<username>", pwd: "<password>", roles: [{role: 'readWriteMinusDropRole', db: "kdl"}]})
+} catch (e) {
+    print("User <username> admin for 'kdl' database already exists")
+}
+```
+
+Alternatively the following manifest can be used in case the [MongoDB Community Kubernetes Operator](https://github.com/mongodb/mongodb-kubernetes-operator) were installed in your Kubernetes cluster:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-admin-password
+type: Opaque
+data:
+  adminPassword: {{ "123456" | b64enc | quote }}
+---
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: mongodb-database
+spec:
+  members: 1
+  type: ReplicaSet
+  version: "4.2.8"
+  security:
+    authentication:
+      modes: ["SCRAM"]
+    roles:
+    - role: readWriteMinusDropRole
+      db: kdl
+      privileges:
+      - resource:
+          db: kdl
+          collection: ""
+        actions:
+        - collStats
+        - dbHash
+        - dbStats
+        - find
+        - killCursors
+        - listIndexes
+        - listCollections
+        - convertToCapped
+        - createCollection
+        - createIndex
+        - dropIndex
+        - insert
+        - remove
+        - renameCollectionSameDB
+        - update
+      roles: []
+  users:
+  - name: admin
+    db: admin
+    passwordSecretRef:
+      name: mongodb-admin-password
+      key: adminPassword
+    roles:
+    - name: root
+      db: admin
+    - name: readWriteMinusDropRole
+      db: kdl
+    scramCredentialsSecretName: mongodb-admin
+```

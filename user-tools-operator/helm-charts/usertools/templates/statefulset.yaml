@@ -101,11 +101,11 @@ spec:
           env:
             - name: KDL_USER_NAME
               value: "{{ .Values.username }}"
+            - name: KDL_SERVER_MONGODB_URI
+              value: "{{ .Values.repoCloner.mongodbURI }}"
           envFrom:
           - secretRef:
               name: tools-secret
-          - secretRef:
-              name: kdl-server-secrets
           volumeMounts:
             - name: user-pvc
               mountPath: /home/kdl

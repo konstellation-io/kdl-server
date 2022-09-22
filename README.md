@@ -108,7 +108,7 @@ brew install jq
 
 #### yq
 
-YAML processor to configure .
+YAML processor to configure KDL Remote developement.
 
 ```
 brew install yq

@@ -41,7 +41,7 @@ manual actions.
 
 ### From 5.X to 6.X
 New requirements:
-- An existing running MongoDB database must be accessible as internal MongoDB database has been removed. Check MongoDB
+- An existing running MongoDB database must be accessible as internal MongoDB database has been removed. Check [MongoDB](#mongodb)
 
 Changes in values:
 - `mongodb` has been removed

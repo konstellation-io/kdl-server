@@ -267,6 +267,7 @@ func (k *k8sClient) getUserToolsDefinition(
 						"tag":        k.cfg.RepoCloner.Image.Tag,
 						"pullPolicy": k.cfg.RepoCloner.Image.PullPolicy,
 					},
+					"mongodbURI": k.cfg.MongoDB.URI,
 				},
 				"giteaOauth2Setup": map[string]interface{}{
 					"image": map[string]string{

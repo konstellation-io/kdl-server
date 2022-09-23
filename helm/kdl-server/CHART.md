@@ -18,7 +18,7 @@
 | backup.extraVolumes | list | `[]` | Extra volumes for backup pods |
 | backup.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | backup.image.repository | string | `"konstellation/kdl-backup"` | Image repository |
-| backup.image.tag | string | `"0.21.0"` | Image tag |
+| backup.image.tag | string | `"0.22.0"` | Image tag |
 | backup.name | string | `"backup-gitea"` | Name of the backup cronjob |
 | backup.resources | object | `{"limits":{"cpu":"100m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"100Mi"}}` | Resource requests and limits for backup container. Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/ |
 | backup.s3.awsAccessKeyID | string | `"aws-access-key-id"` | AWS Access Key ID for acceding backup bucket |
@@ -90,7 +90,7 @@
 | kdlServer.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | kdlServer.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | kdlServer.image.repository | string | `"konstellation/kdl-server"` | The image repository |
-| kdlServer.image.tag | string | `"1.25.0"` | The image tag |
+| kdlServer.image.tag | string | `"1.26.0"` | The image tag |
 | kdlServer.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-body-size":"1000000m","nginx.ingress.kubernetes.io/proxy-connect-timeout":"3600","nginx.ingress.kubernetes.io/proxy-read-timeout":"3600","nginx.ingress.kubernetes.io/proxy-send-timeout":"3600"}` | Ingress annotations |
 | kdlServer.ingress.className | string | `"nginx"` | The ingress class name |
 | kdlServer.ingress.tls.secretName | string | `nil` | The TLS secret name that will be used. It takes precedence over `.Values.global.ingress.tls.secretName`. |
@@ -160,7 +160,7 @@
 | userToolsOperator.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | userToolsOperator.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | userToolsOperator.image.repository | string | `"konstellation/user-tools-operator"` | The image repository |
-| userToolsOperator.image.tag | string | `"0.23.0"` | The image tag |
+| userToolsOperator.image.tag | string | `"0.24.0"` | The image tag |
 | userToolsOperator.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/configuration-snippet":"more_set_headers \"Content-Security-Policy: frame-ancestors 'self' *\";\n","nginx.ingress.kubernetes.io/proxy-body-size":"1000000m"}` | Ingress annotations |
 | userToolsOperator.ingress.className | string | `"nginx"` | The ingress class name |
 | userToolsOperator.ingress.tls.secretName | string | `nil` | The TLS secret name that will be used. It takes precedence over `.Values.global.ingress.tls.secretName`. |

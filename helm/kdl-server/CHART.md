@@ -40,7 +40,7 @@
 | drone.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/configuration-snippet":"more_set_headers \"Content-Security-Policy: frame-ancestors 'self' *\";\n","nginx.ingress.kubernetes.io/proxy-body-size":"100m"}` | Ingress annotations |
 | drone.ingress.className | string | `"nginx"` | The ingress class name |
 | drone.ingress.tls.secretName | string | `nil` | The TLS secret name that will be used. It takes precedence over `.Values.global.ingress.tls.secretName`. |
-| drone.nodeSelector | object | `{}` |  |
+| drone.nodeSelector | object | `{}` | Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | drone.pluginSecret | string | `"d97d8ee407af1002fa2449f578bb47a9"` | Provides the secret token used to authenticate http requests to the plugin endpoint |
 | drone.rpcSecret | string | `"runner-shared-secret"` | Drone RPC secret for allowing Drone runners to authentiticate the RPC connection to the server |
 | drone.runnerCapacity | int | `5` | The max number of concurrent jobs that a Drone runner can run |
@@ -55,7 +55,7 @@
 | droneRunner.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | droneRunner.image.repository | string | `"drone/drone-runner-kube"` | The image repository |
 | droneRunner.image.tag | string | `"1.0.0-beta.6"` | The image tag |
-| droneRunner.nodeSelector | object | `{}` |  |
+| droneRunner.nodeSelector | object | `{}` | Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | droneRunner.serviceAccountJob.annotations | object | `{}` | If `.Values.droneRunner.serviceAccountJob.create` is set to `true`, sets annotations to the service account |
 | droneRunner.serviceAccountJob.create | bool | `false` | If `.Values.droneRunner.serviceAccountJob.enabled` is set to `true`, creates the service account |
 | droneRunner.serviceAccountJob.enabled | bool | `false` | Whether to enable the service account for Drone job pods |
@@ -72,7 +72,7 @@
 | gitea.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/configuration-snippet":"more_set_headers \"Content-Security-Policy: frame-ancestors 'self' *\";\n"}` | Ingress annotations |
 | gitea.ingress.className | string | `"nginx"` | The ingress class name |
 | gitea.ingress.tls.secretName | string | `nil` | The TLS secret name that will be used. It takes precedence over `.Values.global.ingress.tls.secretName`. |
-| gitea.nodeSelector | object | `{}` |  |
+| gitea.nodeSelector | object | `{}` | Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | gitea.storage.size | string | `"10Gi"` | Storage size |
 | gitea.storage.storageClassName | string | `"standard"` | Storage class name |
 | gitea.tolerations | list | `[]` | If specified, the pod's tolerations. Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
@@ -94,7 +94,7 @@
 | kdlServer.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-body-size":"1000000m","nginx.ingress.kubernetes.io/proxy-connect-timeout":"3600","nginx.ingress.kubernetes.io/proxy-read-timeout":"3600","nginx.ingress.kubernetes.io/proxy-send-timeout":"3600"}` | Ingress annotations |
 | kdlServer.ingress.className | string | `"nginx"` | The ingress class name |
 | kdlServer.ingress.tls.secretName | string | `nil` | The TLS secret name that will be used. It takes precedence over `.Values.global.ingress.tls.secretName`. |
-| kdlServer.nodeSelector | object | `{}` |  |
+| kdlServer.nodeSelector | object | `{}` | Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | kdlServer.tolerations | list | `[]` | If specified, the pod's tolerations. Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | knowledgeGalaxy.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | knowledgeGalaxy.config.descriptionMinWords | int | `50` | Minimum number of words to use for project description |
@@ -105,7 +105,7 @@
 | knowledgeGalaxy.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | knowledgeGalaxy.image.repository | string | `"konstellation/knowledge-galaxy"` | The image repository |
 | knowledgeGalaxy.image.tag | string | `"v1.2.1"` | The image tag |
-| knowledgeGalaxy.nodeSelector | object | `{}` |  |
+| knowledgeGalaxy.nodeSelector | object | `{}` | Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
 | knowledgeGalaxy.serviceaccount.annotations | object | `{}` | The service account annotations |
 | knowledgeGalaxy.serviceaccount.enabled | bool | `true` | Whether to create a service account |
 | knowledgeGalaxy.serviceaccount.imagePullSecrets | list | `[]` | Reference to one or more secrets to be used when pulling images. Ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/ |

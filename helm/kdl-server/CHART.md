@@ -18,7 +18,7 @@
 | backup.extraVolumes | list | `[]` | Extra volumes for backup pods |
 | backup.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | backup.image.repository | string | `"konstellation/kdl-backup"` | Image repository |
-| backup.image.tag | string | `"0.21.0"` | Image tag |
+| backup.image.tag | string | `"0.22.0"` | Image tag |
 | backup.name | string | `"backup-gitea"` | Name of the backup cronjob |
 | backup.resources | object | `{"limits":{"cpu":"100m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"100Mi"}}` | Resource requests and limits for backup container. Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/ |
 | backup.s3.awsAccessKeyID | string | `"aws-access-key-id"` | AWS Access Key ID for acceding backup bucket |

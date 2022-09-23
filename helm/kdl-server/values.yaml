@@ -36,7 +36,7 @@ backup:
     # -- Image repository
     repository: konstellation/kdl-backup
     # -- Image tag
-    tag: 0.21.0
+    tag: 0.22.0
     # -- Image pull policy
     pullPolicy: IfNotPresent
 

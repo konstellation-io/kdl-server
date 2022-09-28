@@ -10,8 +10,7 @@ global:
         certFilename: mkcert-ca.crt
   mongodb:
     connectionString:
-      # Check spec.users[0].connectionStringSecretName in scripts/helmfile/helm/default/mongodb-database/values.yaml.gotmpl
-      secretName: "mongodb-database-admin-connection-string"
+      secretName: "mongodb-database-kdl-connection-string"
       secretKey: "connectionString.standardSrv"
 
 drone:

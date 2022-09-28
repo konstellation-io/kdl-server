@@ -26,30 +26,6 @@ resources:
     security:
       authentication:
         modes: ["SCRAM"]
-      roles:
-      - role: readWriteMinusDropRole
-        db: kdl
-        privileges:
-        - resource:
-            db: kdl
-            collection: ""
-          actions:
-          - collStats
-          - dbHash
-          - dbStats
-          - find
-          - killCursors
-          - listIndexes
-          - listCollections
-          - convertToCapped
-          - createCollection
-          - createIndex
-          - dropIndex
-          - insert
-          - remove
-          - renameCollectionSameDB
-          - update
-        roles: []
     users:
     - name: admin
       db: admin
@@ -67,7 +43,7 @@ resources:
         name: {{ .Release.Name }}-kdl-password
         key: password
       roles:
-      - name: readWriteMinusDropRole
+      - name: readWrite
         db: kdl
       scramCredentialsSecretName: {{ .Release.Name }}-kdl
       connectionStringSecretName: {{ .Release.Name}}-kdl-connection-string

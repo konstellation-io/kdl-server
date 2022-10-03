@@ -13,7 +13,7 @@ data:
 
   # URL Setup
   PROJECT_FILEBROWSER_URL: "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}/filebrowser/PROJECT_ID/"
-  MINIO_ENDPOINT: "{{ .Release.Name }}-minio:9000"
+  MINIO_ENDPOINT: "http://{{ .Release.Name }}-minio:9000"
   USER_TOOLS_JUPYTER_URL: "{{ include "http.protocol" . }}://USERNAME-jupyter.{{ .Values.global.domain }}/lab/workspaces/REPO_FOLDER/tree/repos/REPO_FOLDER"
   USER_TOOLS_VSCODE_URL: "{{ include "http.protocol" . }}://USERNAME-code.{{ .Values.global.domain }}/?folder=/home/coder/repos/REPO_FOLDER"
   DRONE_URL: "{{ include "http.protocol" . }}://drone.{{ .Values.global.domain }}"

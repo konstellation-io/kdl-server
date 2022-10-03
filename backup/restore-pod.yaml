@@ -4,7 +4,7 @@ metadata:
   name: restore
   labels:
     name: restore
-  namespace: kdl
+  namespace: kre
 spec:
   containers:
     - name: restore
@@ -17,29 +17,31 @@ spec:
       - /bin/sh
       - "-c"
       - "sleep 180m"
-      envFrom:
-        - configMapRef:
-            name: gitea-config
-        - secretRef:
-            name: postgres
-        - secretRef:
-            name: backup-secrets
+      # envFrom:
+      #   - configMapRef:
+      #       name: gitea-config
+      #   - secretRef:
+      #       name: postgres
+      #   - secretRef:
+      #       name: backup-secrets
       volumeMounts:
-      - name: gitea-pvc
-        mountPath: "/data"
-      - name: shared-storage
-        mountPath: /shared-volume
-        readOnly: false
+      # - name: gitea-pvc
+      #   mountPath: "/data"
+      # - name: shared-storage
+      #   mountPath: /shared-volume
+      #   readOnly: false
+        - name: mongo-backup
+          mountPath: /mongo-backup
+          readOnly: false
       resources:
         limits:
           memory: "512Mi"
           cpu: "1000m"
   volumes:
-    - name: gitea-pvc
+    # - name: gitea-pvc
+    #   persistentVolumeClaim:
+    #     claimName: gitea-pvc-gitea-0
+    - name: mongo-backup
       persistentVolumeClaim:
-        claimName: gitea-pvc-gitea-0
-    - name: shared-storage
-      hostPath:
-        path: /var/snap/microk8s/common/default-storage
-        type: Directory
+        claimName: backup-mongo
   restartPolicy: OnFailure

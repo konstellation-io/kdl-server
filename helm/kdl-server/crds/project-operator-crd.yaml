@@ -62,6 +62,9 @@ spec:
                   secretKey:
                     description: minio credentials
                     type: string
+                  endpointURL:
+                    description: minio endpoint url
+                    type: string
               mlflow:
                 type: object
                 properties:

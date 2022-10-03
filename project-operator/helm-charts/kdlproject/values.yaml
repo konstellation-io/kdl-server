@@ -9,6 +9,7 @@ sharedVolume:
 minio:
   accessKey: minio
   secretKey: minio123
+  endpointURL: "http://kdl-server-minio:9000"
 
 giteaOauth2Setup:
   image:

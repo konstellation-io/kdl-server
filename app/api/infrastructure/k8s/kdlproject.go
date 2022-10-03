@@ -52,7 +52,7 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 				"minio": map[string]string{
 					"accessKey":   k.cfg.Minio.AccessKey,
 					"secretKey":   k.cfg.Minio.SecretKey,
-					"endpointURL": k.cfg.Minio.Endpoint,
+					"endpointURL": fmt.Sprintf("http://%s", k.cfg.Minio.Endpoint),
 				},
 				"giteaOauth2Setup": map[string]interface{}{
 					"image": map[string]string{

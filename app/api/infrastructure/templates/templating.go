@@ -86,7 +86,7 @@ func (t *templating) GenerateInitialProjectContent(ctx context.Context, project 
 	data := TemplateData{
 		ProjectID:   project.ID,
 		ProjectName: project.Name,
-		MinioURL:    t.cfg.Minio.Endpoint,
+		MinioURL:    fmt.Sprintf("http://%s", t.cfg.Minio.Endpoint),
 		MLFlowURL:   fmt.Sprintf("http://%s-mlflow:5000", project.ID),
 		SharedPVC:   fmt.Sprintf("%s-claim", t.cfg.SharedVolume.Name),
 	}

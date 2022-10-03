@@ -50,8 +50,9 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 					"name": k.cfg.SharedVolume.Name,
 				},
 				"minio": map[string]string{
-					"accessKey": k.cfg.Minio.AccessKey,
-					"secretKey": k.cfg.Minio.SecretKey,
+					"accessKey":   k.cfg.Minio.AccessKey,
+					"secretKey":   k.cfg.Minio.SecretKey,
+					"endpointURL": k.cfg.Minio.Endpoint,
 				},
 				"giteaOauth2Setup": map[string]interface{}{
 					"image": map[string]string{

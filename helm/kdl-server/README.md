@@ -100,7 +100,7 @@ kubectl apply --server-side --force-conflicts -f https://raw.githubusercontent.c
 
 Existing `KDLProject` resources won't be updated with the new fields after upgrading the chart.
 
-Run the following script to patch all existing `KDLProject` resources with the same ingress and TLS configuration for Mlflow that was defined in your release *values* (change variables values and set your custom annotations as convenience):
+Run the following script to patch all existing `KDLProject` resources:
 
 ```bash
 #!/bin/bash

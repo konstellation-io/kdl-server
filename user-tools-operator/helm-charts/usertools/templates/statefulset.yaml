@@ -103,9 +103,6 @@ spec:
               value: "{{ .Values.username }}"
             - name: KDL_SERVER_MONGODB_URI
               value: "{{ .Values.repoCloner.mongodbURI }}"
-          envFrom:
-          - secretRef:
-              name: tools-secret
           volumeMounts:
             - name: user-pvc
               mountPath: /home/kdl
@@ -116,9 +113,6 @@ spec:
         - name: {{ .Chart.Name }}-vscode
           image: {{ .Values.vscode.image.repository }}:{{ .Values.vscode.image.tag }}
           imagePullPolicy: {{ .Values.vscode.image.pullPolicy }}
-          envFrom:
-          - secretRef:
-              name: tools-secret
           volumeMounts:
             - name: user-pvc
               mountPath: /home/coder
@@ -154,9 +148,6 @@ spec:
         - name: {{ .Chart.Name }}-jupyter
           image: {{ .Values.jupyter.image.repository }}:{{ .Values.jupyter.image.tag }}
           imagePullPolicy: {{ .Values.jupyter.image.pullPolicy }}
-          envFrom:
-          - secretRef:
-              name: tools-secret
           env:
             - name: JUPYTER_GATEWAY_URL
               value: "{{ .Values.jupyter.enterpriseGatewayUrl }}"

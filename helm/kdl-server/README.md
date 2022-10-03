@@ -49,9 +49,30 @@ Changes in values:
 
 Execute the following actions to update the CRDs before applying the upgrade.
 - Remove all `UserTools` resources from your cluster.
-- Run the following command to update CRDs
+- Run the following script to update CRDs:
+
 ```bash
 kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-io/kdl-server/v6.0.0/helm/kdl-server/crds/user-tools-operator-crd.yaml
+kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-io/kdl-server/v6.0.0/helm/kdl-server/crds/project-operator-crd.yaml
+```
+
+Existing `KDLProject` resources won't be updated with the new fields after upgrading the chart.
+
+Run the following script to patch all existing `KDLProject` resources with the same ingress and TLS configuration for Mlflow that was defined in your release *values* (change variables values and set your custom annotations as convenience):
+
+```bash
+#!/bin/bash
+NAMESPACE=<release_namespace>
+RELEASE_NAME=<release_name>
+
+cat << EOF > patch-file.yaml
+spec:
+  minio:
+    endpointURL: http://${RELEASE_NAME}-minio:9000
+EOF
+
+for project in $(kubectl -n ${NAMESPACE} get kdlprojects.project.konstellation.io -o name); do kubectl -n ${NAMESPACE} patch ${project} --type merge --patch-file patch-file.yaml; done
+rm -f patch-file.yaml
 ```
 
 ### From 4.X to 5.X
@@ -187,109 +208,17 @@ To store existing **users**, **projects**, and **runtimes** data the KDL Server 
 
 For a correct operation of the application the following MongoDB resources are required:
 
-- `readWriteMinusDropRole` with the following configuration:
-  - Allowed actions:
-    - collStats
-    - dbHash
-    - dbStats
-    - find
-    - killCursors
-    - listIndexes
-    - listCollections
-    - convertToCapped
-    - createCollection
-    - createIndex
-    - dropIndex
-    - insert
-    - remove
-    - renameCollectionSameDB
-    - update
-  - Allowed resources:
-    - db: `kdl`
-    - collection: `""`
-- A user with the `root` and `readWriteMinusDropRole` roles associated.
+- A user with the `readWrite` role associated.
 
 Bellow we provide a JS script to easily setup the initial database configuration:
 
 ```js
 conn = new Mongo();
 db = conn.getDB("kdl");
-try {
-    db.createRole({
-    role: "readWriteMinusDropRole",
-    privileges: [
-    {
-        resource: { db: "kdl", collection: ""},
-        actions: [ "collStats", "dbHash", "dbStats", "find", "killCursors", "listIndexes", "listCollections", "convertToCapped", "createCollection", "createIndex", "dropIndex", "insert", "remove", "renameCollectionSameDB", "update"]} ],
-        roles: []
-    }
-    );
-} catch (e) {
-    print("Role for readWriteMinusDropRole for 'kdl' already exists")
-}
-try {
-    db.createUser({user: "<username>", pwd: "<password>", roles: [{role: 'readWriteMinusDropRole', db: "kdl"}]})
-} catch (e) {
-    print("User <username> admin for 'kdl' database already exists")
-}
-```
 
-Alternatively the following manifest can be used in case the [MongoDB Community Kubernetes Operator](https://github.com/mongodb/mongodb-kubernetes-operator) were installed in your Kubernetes cluster:
-
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: mongodb-admin-password
-type: Opaque
-data:
-  adminPassword: {{ "123456" | b64enc | quote }}
----
-apiVersion: mongodbcommunity.mongodb.com/v1
-kind: MongoDBCommunity
-metadata:
-  name: mongodb-database
-spec:
-  members: 1
-  type: ReplicaSet
-  version: "4.2.8"
-  security:
-    authentication:
-      modes: ["SCRAM"]
-    roles:
-    - role: readWriteMinusDropRole
-      db: kdl
-      privileges:
-      - resource:
-          db: kdl
-          collection: ""
-        actions:
-        - collStats
-        - dbHash
-        - dbStats
-        - find
-        - killCursors
-        - listIndexes
-        - listCollections
-        - convertToCapped
-        - createCollection
-        - createIndex
-        - dropIndex
-        - insert
-        - remove
-        - renameCollectionSameDB
-        - update
-      roles: []
-  users:
-  - name: admin
-    db: admin
-    passwordSecretRef:
-      name: mongodb-admin-password
-      key: adminPassword
-    roles:
-    - name: root
-      db: admin
-    - name: readWriteMinusDropRole
-      db: kdl
-    scramCredentialsSecretName: mongodb-admin
+try {
+    db.createUser({user: "<username>", pwd: "<password>", roles: [{role: 'readWrite', db: "kdl"}]})
+} catch (e) {
+    print("User <username> for 'kdl' database already exists")
+}
 ```

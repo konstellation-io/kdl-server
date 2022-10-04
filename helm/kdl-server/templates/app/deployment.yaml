@@ -31,6 +31,8 @@ spec:
                 name: gitea-configmap
             - configMapRef:
                 name: kdl-server-configmap
+            - secretRef:
+                name: kdl-server
         - name: drone-authorizer
           image: {{ .Values.droneAuthorizer.image.repository }}:{{ .Values.droneAuthorizer.image.tag }}
           imagePullPolicy: IfNotPresent
@@ -67,16 +69,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-            - name: MINIO_SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: rootPassword
-                  name: {{ .Release.Name }}-minio
-            - name: MINIO_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: rootUser
-                  name: {{ .Release.Name }}-minio
             - name: DRONE_INTERNAL_URL
               valueFrom:
                 configMapKeyRef:

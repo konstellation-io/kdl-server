@@ -31,8 +31,6 @@ spec:
                 name: gitea-configmap
             - configMapRef:
                 name: kdl-server-configmap
-            - secretRef:
-                name: kdl-server
         - name: drone-authorizer
           image: {{ .Values.droneAuthorizer.image.repository }}:{{ .Values.droneAuthorizer.image.tag }}
           imagePullPolicy: IfNotPresent
@@ -95,6 +93,8 @@ spec:
                 name: gitea-configmap
             - secretRef:
                 name: gitea-admin-secrets
+            - secretRef:
+                name: kdl-server
           volumeMounts:
             - name: kdl-server-configmap
               mountPath: /public/config.json

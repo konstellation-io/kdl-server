@@ -10,7 +10,7 @@ data:
     redeem_url="{{ printf "%s://gitea.%s/login/oauth/access_token" ( include "http.protocol" . ) .Values.global.domain }}"
     validate_url="{{ printf "%s://gitea.%s/api/v1" ( include "http.protocol" . ) .Values.global.domain }}"
     profile_url="{{ printf "%s://gitea.%s/api/v1/user" ( include "http.protocol" . ) .Values.global.domain }}"
-    cookie_secret="{{ randAlphaNum 16 }}"
+    cookie_secret="{{ .Values.oauth2Proxy.config.cookieSecret }}"
     cookie_secure={{ ternary "true" "false" .Values.global.ingress.tls.enabled }}
     cookie_samesite="{{ ternary "none" "lax" .Values.global.ingress.tls.enabled }}"
     ssl_insecure_skip_verify=true

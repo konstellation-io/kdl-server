@@ -36,8 +36,6 @@ spec:
                   memory: {{ .Values.backup.resources.requests.memory }}
                   cpu: {{ .Values.backup.resources.requests.cpu }}
               envFrom:
-                - configMapRef:
-                    name: gitea-config
                 - secretRef:
                     name: postgres
                 - secretRef:

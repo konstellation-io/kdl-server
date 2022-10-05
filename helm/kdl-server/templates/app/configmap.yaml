@@ -11,25 +11,18 @@ data:
   SHARED_VOLUME: {{ .Values.sharedVolume.name }}
   TLS_ENABLED: "{{ .Values.global.ingress.tls.enabled }}"
 
+  KDL_ADMIN_USERNAME: {{ .Values.gitea.admin.username }}
+  KDL_ADMIN_EMAIL: {{ .Values.gitea.admin.email }}
+
   # URL Setup
   PROJECT_FILEBROWSER_URL: "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}/filebrowser/PROJECT_ID/"
   MINIO_ENDPOINT: "{{ .Release.Name }}-minio:9000"
   USER_TOOLS_JUPYTER_URL: "{{ include "http.protocol" . }}://USERNAME-jupyter.{{ .Values.global.domain }}/lab/workspaces/REPO_FOLDER/tree/repos/REPO_FOLDER"
   USER_TOOLS_VSCODE_URL: "{{ include "http.protocol" . }}://USERNAME-code.{{ .Values.global.domain }}/?folder=/home/coder/repos/REPO_FOLDER"
-  DRONE_URL: "{{ include "http.protocol" . }}://drone.{{ .Values.global.domain }}"
+  DRONE_URL: "{{ printf "%s://drone.%s" (include "http.protocol" . ) .Values.global.domain }}"
+  DRONE_INTERNAL_URL: "http://drone"
   PROJECT_MLFLOW_URL: "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}/mlflow/PROJECT_ID/"
   KNOWLEDGE_GALAXY_URL: "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}/kg/projects/PROJECT_ID/"
-
-  config.json: |+
-    {
-      "SERVER_NAME": "{{ .Values.global.serverName }}",
-      "SERVER_URL": "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}",
-      "KNOWLEDGE_GALAXY_ENABLED": {{ .Values.knowledgeGalaxy.enabled }},
-      "KG_SERVER_URL": "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}/kg",
-      "GITEA_URL": "{{ include "http.protocol" . }}://gitea.{{ .Values.global.domain }}",
-      "RELEASE_VERSION": "{{ .Chart.AppVersion }}",
-      "DESCRIPTION_MIN_WORDS": {{ default "50" .Values.knowledgeGalaxy.config.descriptionMinWords }}
-    }
 
   OAUTH2_PROXY_IMG_REPO: "{{ .Values.oauth2Proxy.image.repository }}"
   OAUTH2_PROXY_IMG_TAG: "{{ .Values.oauth2Proxy.image.tag }}"
@@ -106,3 +99,15 @@ data:
   # Labels
   LABELS_COMMON_APP_RELEASE: {{ .Values.kdlServer.image.tag }}
   LABELS_COMMON_CHART_RELEASE: {{ .Chart.Version }}
+
+  # KDL APP config file
+  config.json: |+
+    {
+      "SERVER_NAME": "{{ .Values.global.serverName }}",
+      "SERVER_URL": "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}",
+      "KNOWLEDGE_GALAXY_ENABLED": {{ .Values.knowledgeGalaxy.enabled }},
+      "KG_SERVER_URL": "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}/kg",
+      "GITEA_URL": "{{ include "http.protocol" . }}://gitea.{{ .Values.global.domain }}",
+      "RELEASE_VERSION": "{{ .Chart.AppVersion }}",
+      "DESCRIPTION_MIN_WORDS": {{ default "50" .Values.knowledgeGalaxy.config.descriptionMinWords }}
+    }

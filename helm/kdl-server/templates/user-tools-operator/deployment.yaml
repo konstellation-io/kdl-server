@@ -11,8 +11,6 @@ spec:
     metadata:
       labels:
         name: user-tools-operator
-      annotations:
-        helm.sh/restart-deployment: {{ randAlphaNum 5 | quote }}
     spec:
       serviceAccountName: user-tools-operator
       containers:

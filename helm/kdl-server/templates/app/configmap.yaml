@@ -31,6 +31,8 @@ data:
   GITEA_OAUTH2_SETUP_IMG_REPO: "{{ .Values.giteaOauth2Setup.image.repository }}"
   GITEA_OAUTH2_SETUP_IMG_TAG: "{{ .Values.giteaOauth2Setup.image.tag }}"
   GITEA_OAUTH2_SETUP_IMG_PULLPOLICY: "{{ .Values.giteaOauth2Setup.image.pullPolicy }}"
+  GITEA_OAUTH2_SETUP_ADMIN_SECRETS: gitea-admin-secrets
+  GITEA_OAUTH2_SETUP_CONFIGMAP: gitea-oauth2-configmap
 
   KNOWLEDGE_GALAXY_ENABLED: "{{ .Values.knowledgeGalaxy.enabled }}"
 

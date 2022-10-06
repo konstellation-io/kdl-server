@@ -218,7 +218,6 @@ func (k *k8sClient) getUserToolsDefinition(
 	if k.cfg.UserToolsIngress.TLS.SecretName != nil {
 		tlsConfig["secretName"] = &k.cfg.UserToolsIngress.TLS.SecretName
 	}
-
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",

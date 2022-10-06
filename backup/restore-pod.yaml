@@ -18,8 +18,6 @@ spec:
       - "-c"
       - "sleep 180m"
       envFrom:
-        - configMapRef:
-            name: gitea-config
         - secretRef:
             name: postgres
         - secretRef:

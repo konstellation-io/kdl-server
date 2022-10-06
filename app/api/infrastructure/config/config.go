@@ -133,6 +133,8 @@ type Config struct {
 			Tag        string `envconfig:"USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_TAG"`
 			PullPolicy string `envconfig:"USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_PULLPOLICY"`
 		}
+		GiteaAdminSecret     string `envconfig:"GITEA_OAUTH2_SETUP_ADMIN_SECRETS"`
+		GiteaOauth2Configmap string `envconfig:"GITEA_OAUTH2_SETUP_CONFIGMAP"`
 	}
 	UserToolsOAuth2Proxy struct {
 		Image struct {

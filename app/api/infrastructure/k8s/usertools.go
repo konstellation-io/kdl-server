@@ -275,6 +275,8 @@ func (k *k8sClient) getUserToolsDefinition(
 						"tag":        k.cfg.UserToolsGiteaOAuth2Setup.Image.Tag,
 						"pullPolicy": k.cfg.UserToolsGiteaOAuth2Setup.Image.PullPolicy,
 					},
+					"giteaAdminSecret":     k.cfg.UserToolsGiteaOAuth2Setup.GiteaAdminSecret,
+					"giteaOauth2Configmap": k.cfg.UserToolsGiteaOAuth2Setup.GiteaOauth2Configmap,
 				},
 				"oauth2Proxy": map[string]interface{}{
 					"image": map[string]string{

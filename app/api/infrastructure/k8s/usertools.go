@@ -203,13 +203,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 
 func (k *k8sClient) getUserToolsDefinition(
 	ingressAnnotations map[string]interface{},
-	resName,
-	username,
-	usernameSlug,
-	runtimeID,
-	runtimeImage,
-	runtimeTag,
-	serviceAccountName string,
+	resName, username, usernameSlug, runtimeID, runtimeImage, runtimeTag, serviceAccountName string,
 ) *unstructured.Unstructured {
 	tlsConfig := map[string]interface{}{
 		"enabled": k.cfg.TLS.Enabled,
@@ -218,6 +212,7 @@ func (k *k8sClient) getUserToolsDefinition(
 	if k.cfg.UserToolsIngress.TLS.SecretName != nil {
 		tlsConfig["secretName"] = &k.cfg.UserToolsIngress.TLS.SecretName
 	}
+
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",

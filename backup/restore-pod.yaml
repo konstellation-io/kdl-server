@@ -18,12 +18,10 @@ spec:
       - "-c"
       - "sleep 180m"
       envFrom:
-        - configMapRef:
-            name: gitea-config
         - secretRef:
             name: postgres
         - secretRef:
-            name: backup-secrets
+            name: backup
       volumeMounts:
       - name: gitea-pvc
         mountPath: "/data"

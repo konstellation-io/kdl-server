@@ -21,9 +21,9 @@ Also, it's important to note that MLFlow stores its data in a hostPath, so if yo
 The main files/folders used are:
 
 - `backup/Dockerfile`: the OCI image that will run the workload
-- `helm/kdl-server/templates/common/backup-cronjob.yaml`: the Cronjob manifest
+- `helm/kdl-server/templates/backup/cronjob.yaml`: the Cronjob manifest
 - `helm/kdl-server/values.yaml`: please edit this file to suit your preferences for Helm deployment.
-- `helm/kdl-server/templates/common/backup-secrets.yaml`: you will need an AWS S3 bucket and AWS key pairs to upload the backup
+- `helm/kdl-server/templates/backup/secret.yaml`: you will need an AWS S3 bucket and AWS key pairs to upload the backup
 
 ## Configurable options
 

@@ -171,6 +171,11 @@ droneRunner:
     # -- The image pull policy
     pullPolicy: IfNotPresent
 
+  # -- Sets DRONE_DEBUG environment variable
+  debug: "true"
+  # -- Sets DRONE_TRACE environment variable
+  trace: "true"
+
   # -- Configures the DRONE_RUNNER_ENVIRON environment variable. Ref: https://docs.drone.io/runner/kubernetes/configuration/reference/drone-runner-environ/
   droneRunnerEnviron: ""
   # droneRunnerEnviron: "GIT_SSL_NO_VERIFY:true"

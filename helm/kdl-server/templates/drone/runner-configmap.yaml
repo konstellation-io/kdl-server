@@ -9,8 +9,8 @@ data:
   DRONE_RPC_HOST: drone.{{ .Values.global.domain }}
   DRONE_RPC_PROTO: {{ printf "%s" ( include "http.protocol" . ) }}
   DRONE_NAMESPACE_DEFAULT: {{ .Release.Namespace }}
-  DRONE_DEBUG: "true"
-  DRONE_TRACE: "true"
+  DRONE_DEBUG: {{ .Values.droneRunner.debug | quote }}
+  DRONE_TRACE: {{ .Values.droneRunner.trace | quote }}
   DRONE_SECRET_PLUGIN_ENDPOINT: http://localhost:3000
   {{- if .Values.droneRunner.droneRunnerEnviron }}
   DRONE_RUNNER_ENVIRON: "{{ .Values.droneRunner.droneRunnerEnviron }}"

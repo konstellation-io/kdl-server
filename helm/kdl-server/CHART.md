@@ -51,6 +51,7 @@
 | droneAuthorizer.image.repository | string | `"konstellation/drone-authorizer"` | The image repository |
 | droneAuthorizer.image.tag | string | `"v0.13.5"` | The image tag |
 | droneRunner.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
+| droneRunner.debug | string | `"true"` | Sets DRONE_DEBUG environment variable |
 | droneRunner.droneRunnerEnviron | string | `""` | Configures the DRONE_RUNNER_ENVIRON environment variable. Ref: https://docs.drone.io/runner/kubernetes/configuration/reference/drone-runner-environ/ |
 | droneRunner.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | droneRunner.image.repository | string | `"drone/drone-runner-kube"` | The image repository |
@@ -61,6 +62,7 @@
 | droneRunner.serviceAccountJob.enabled | bool | `false` | Whether to enable the service account for Drone job pods |
 | droneRunner.serviceAccountJob.name | string | `"drone-runner-job"` | The name of the Drone job service account |
 | droneRunner.tolerations | list | `[]` | If specified, the pod's tolerations. Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
+| droneRunner.trace | string | `"true"` | Sets DRONE_TRACE environment variable |
 | enterprise-gateway | object | Check [values.yaml](./values.yaml) | Jupyter Enterprise Gateway chart values. Check chart's [values.yaml](https://github.com/konstellation-io/enterprise_gateway/blob/main/etc/kubernetes/helm/enterprise-gateway/values.yaml) for a complete list of values |
 | gitea.admin.email | string | `"test@test.com"` | Admin user email |
 | gitea.admin.password | string | `"123456"` | Admin password |

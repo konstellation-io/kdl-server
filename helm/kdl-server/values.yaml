@@ -254,7 +254,7 @@ giteaOauth2Setup:
     # -- The image repository
     repository: konstellation/gitea-oauth2-setup
     # -- The image tag
-    tag: 0.15.0
+    tag: 0.16.0
     # -- The image pull policy
     pullPolicy: IfNotPresent
 

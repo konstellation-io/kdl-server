@@ -575,7 +575,7 @@ userToolsOperator:
     # -- The image repository
     repository: konstellation/user-tools-operator
     # -- The image tag
-    tag: 0.25.0
+    tag: 0.26.0
     # -- The image pull policy
     pullPolicy: IfNotPresent
   storage:

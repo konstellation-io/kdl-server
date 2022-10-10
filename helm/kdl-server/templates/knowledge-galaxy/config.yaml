@@ -2,10 +2,20 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: knowledge-galaxy-ui
+  name: knowledge-galaxy
   labels:
     app:  knowledge-galaxy
 data:
+  WORKERS: "{{ .Values.knowledgeGalaxy.config.workers }}"
+  HOST: "0.0.0.0"
+  SERVER_PORT: "8080"
+  # Recommender Settings
+  N_HITS: "{{ .Values.knowledgeGalaxy.config.numberOfOutputs }}"
+  DESCRIPTION_MIN_WORDS: "{{ .Values.knowledgeGalaxy.config.descriptionMinWords }}"
+  # Log file
+  LOG_LEVEL: "{{ .Values.knowledgeGalaxy.config.logLevel }}"
+  STANDALONE_MODE: "false"
+  # UI Config file
   config.json: |+
     {
       "SERVER_NAME": "{{ .Values.global.serverName }}",

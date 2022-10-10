@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: kdl-server-configmap
+  name: kdl-server
   labels:
-    app: kdl-server-configmap
+    app: kdl-server
 data:
   KDL_SERVER_PORT: '8080'
 
@@ -31,8 +31,8 @@ data:
   GITEA_OAUTH2_SETUP_IMG_REPO: "{{ .Values.giteaOauth2Setup.image.repository }}"
   GITEA_OAUTH2_SETUP_IMG_TAG: "{{ .Values.giteaOauth2Setup.image.tag }}"
   GITEA_OAUTH2_SETUP_IMG_PULLPOLICY: "{{ .Values.giteaOauth2Setup.image.pullPolicy }}"
-  GITEA_OAUTH2_SETUP_ADMIN_SECRETS: gitea-admin-secrets
-  GITEA_OAUTH2_SETUP_CONFIGMAP: gitea-oauth2-configmap
+  GITEA_OAUTH2_SETUP_ADMIN_SECRETS: gitea-admin
+  GITEA_OAUTH2_SETUP_CONFIGMAP: gitea-oauth2
 
   KNOWLEDGE_GALAXY_ENABLED: "{{ .Values.knowledgeGalaxy.enabled }}"
 

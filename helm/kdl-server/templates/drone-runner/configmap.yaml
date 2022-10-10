@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: drone-runner-config
+  name: drone-runner
   labels:
-    app:  drone-runner-config
+    app:  drone-runner
 data:
   DRONE_RUNNER_CAPACITY: "{{ .Values.drone.runnerCapacity }}"
   DRONE_RPC_HOST: drone.{{ .Values.global.domain }}

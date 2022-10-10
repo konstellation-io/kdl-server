@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: drone-config
+  name: drone
   labels:
-    app:  drone-config
+    app:  drone
 data:
   DRONE_GITEA_SKIP_VERIFY: "true"
   DRONE_GITEA_SERVER: {{ printf "%s://gitea.%s" ( include "http.protocol" . ) .Values.global.domain }}

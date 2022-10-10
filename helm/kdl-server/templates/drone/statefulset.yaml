@@ -17,9 +17,9 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/drone/configmap.yaml") . | sha256sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/drone/secret.yaml") . | sha256sum }}
-        checksum/oauth2-secret: {{ include (print $.Template.BasePath "/drone/oauth2-secrets.yaml") . | sha256sum }}
+        checksum/oauth2-secret: {{ include (print $.Template.BasePath "/drone/oauth2-secret.yaml") . | sha256sum }}
         checksum/gitea-oauth2-config: {{ include (print $.Template.BasePath "/common/gitea-oauth2-configmap.yaml") . | sha256sum }}
-        checksum/gitea-admin-secrets: {{ include (print $.Template.BasePath "/common/gitea-admin-secrets.yaml") . | sha256sum }}
+        checksum/gitea-admin-secret: {{ include (print $.Template.BasePath "/common/gitea-admin-secret.yaml") . | sha256sum }}
     spec:
       initContainers:
         - name: gitea-oauth2-setup
@@ -32,11 +32,11 @@ spec:
                 fieldPath: metadata.namespace
           envFrom:
             - secretRef:
-                name: gitea-admin-secrets
+                name: gitea-admin
             - secretRef:
-                name: drone-oauth2-secrets
+                name: drone-oauth2
             - configMapRef:
-                name: gitea-oauth2-configmap
+                name: gitea-oauth2
       containers:
         - name: drone
           image: {{ .Values.drone.image.repository }}:{{ .Values.drone.image.tag }}
@@ -56,9 +56,9 @@ spec:
                   key: OAUTH2_CLIENT_SECRET
           envFrom:
             - configMapRef:
-                name: drone-config
+                name: drone
             - secretRef:
-                name: drone-secret
+                name: drone
           volumeMounts:
             - name: drone-pvc
               mountPath: /data

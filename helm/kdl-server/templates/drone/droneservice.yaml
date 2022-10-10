@@ -12,11 +12,12 @@ spec:
       port: 3000
       targetPort: 3000
       protocol: TCP
-    # drone-runner container
+    # drone-server container
     - name: http
       port: 80
       targetPort: 80
       protocol: TCP
+    # drone-runner container
     - name: runner
       port: 9000
       targetPort: 9000

@@ -12,8 +12,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/drone/runner-configmap.yaml") . | sha256sum }}
-        checksum/secret: {{ include (print $.Template.BasePath "/drone/runner-secret.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/drone-runner/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/drone-runner/secret.yaml") . | sha256sum }}
       labels:
         run: drone-runner
     spec:
@@ -33,9 +33,9 @@ spec:
         name: drone-runner
         envFrom:
           - configMapRef:
-              name: drone-runner-config
+              name: drone-runner
           - secretRef:
-              name: drone-runner-secret
+              name: drone-runner
       {{- if and .Values.global.ingress.tls.enabled .Values.global.ingress.tls.caSecret }}
         volumeMounts:
         - mountPath: /etc/ssl/certs/ca-cert.pem

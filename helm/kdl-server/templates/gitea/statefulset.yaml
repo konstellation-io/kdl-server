@@ -67,7 +67,7 @@ spec:
       volumes:
         - name: gitea-config
           secret:
-            secretName: gitea-config
+            secretName: gitea
             defaultMode: 0777
         {{- if and .Values.global.ingress.tls.enabled .Values.global.ingress.tls.caSecret }}
         - name: ca-cert

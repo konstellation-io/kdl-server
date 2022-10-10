@@ -14,10 +14,10 @@ spec:
         checksum/kdl-config: {{ include (print $.Template.BasePath "/app/configmap.yaml") . | sha256sum }}
         checksum/kdl-secret: {{ include (print $.Template.BasePath "/app/secret.yaml") . | sha256sum }}
         checksum/oauth2-config: {{ include (print $.Template.BasePath "/app/oauth2-proxy-configmap.yaml") . | sha256sum }}
-        checksum/oauth2-secret: {{ include (print $.Template.BasePath "/app/oauth2-secrets.yaml") . | sha256sum }}
+        checksum/oauth2-secret: {{ include (print $.Template.BasePath "/app/oauth2-secret.yaml") . | sha256sum }}
         checksum/project-proxy-config: {{ include (print $.Template.BasePath "/app/project-proxy-nginx-config.yaml") . | sha256sum }}
         checksum/gitea-oauth2-config: {{ include (print $.Template.BasePath "/common/gitea-oauth2-configmap.yaml") . | sha256sum }}
-        checksum/gitea-admin-secrets: {{ include (print $.Template.BasePath "/common/gitea-admin-secrets.yaml") . | sha256sum }}
+        checksum/gitea-admin-secret: {{ include (print $.Template.BasePath "/common/gitea-admin-secret.yaml") . | sha256sum }}
     spec:
       initContainers:
         - name: gitea-oauth2-setup
@@ -30,13 +30,13 @@ spec:
                   fieldPath: metadata.namespace
           envFrom:
             - secretRef:
-                name: gitea-admin-secrets
+                name: gitea-admin
             - secretRef:
-                name: kdl-server-oauth2-secrets
+                name: kdl-server-oauth2
             - configMapRef:
-                name: gitea-oauth2-configmap
+                name: gitea-oauth2
             - configMapRef:
-                name: kdl-server-configmap
+                name: kdl-server
         - name: drone-authorizer
           image: {{ .Values.droneAuthorizer.image.repository }}:{{ .Values.droneAuthorizer.image.tag }}
           imagePullPolicy: IfNotPresent
@@ -45,15 +45,15 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   key: DRONE_URL
-                  name: kdl-server-configmap
+                  name: kdl-server
             - name: DRONE_INTERNAL_URL
               valueFrom:
                 configMapKeyRef:
                   key: DRONE_INTERNAL_URL
-                  name: kdl-server-configmap
+                  name: kdl-server
           envFrom:
             - secretRef:
-                name: gitea-admin-secrets
+                name: gitea-admin
       containers:
         - name: kdl-app
           image: {{ .Values.kdlServer.image.repository }}:{{ .Values.kdlServer.image.tag }}
@@ -79,15 +79,15 @@ spec:
                   key: {{ .Values.global.mongodb.connectionString.secretKey }}
           envFrom:
             - configMapRef:
-                name: kdl-server-configmap
+                name: kdl-server
             - configMapRef:
-                name: gitea-oauth2-configmap
+                name: gitea-oauth2
             - secretRef:
-                name: gitea-admin-secrets
+                name: gitea-admin
             - secretRef:
                 name: kdl-server
           volumeMounts:
-            - name: kdl-server-configmap
+            - name: kdl-server
               mountPath: /public/config.json
               subPath: config.json
           ports:
@@ -155,9 +155,9 @@ spec:
         - name: oauth2-config
           configMap:
             name: kdl-server-oauth2-proxy
-        - name: kdl-server-configmap
+        - name: kdl-server
           configMap:
-            name: kdl-server-configmap
+            name: kdl-server
         - name: project-proxy-nginx-config
           configMap:
             name: project-proxy-nginx-config

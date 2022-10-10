@@ -12,8 +12,7 @@ spec:
       labels:
         app: knowledge-galaxy
       annotations:
-        checksum/env-config: {{ include (print $.Template.BasePath "/knowledge-galaxy/env-config.yaml") . | sha256sum }}
-        checksum/ui-config: {{ include (print $.Template.BasePath "/knowledge-galaxy/env-config.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/knowledge-galaxy/config.yaml") . | sha256sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/knowledge-galaxy/secret.yaml") . | sha256sum }}
     spec:
       {{- if .Values.knowledgeGalaxy.serviceaccount.enabled }}
@@ -31,9 +30,9 @@ spec:
                   key: {{ .Values.global.mongodb.connectionString.secretKey }}
           envFrom:
             - configMapRef:
-                name: knowledge-galaxy-env
+                name: knowledge-galaxy
           volumeMounts:
-            - name: config
+            - name: ui-config
               mountPath: /kg/public/config.json
               subPath: config.json
           ports:
@@ -51,7 +50,7 @@ spec:
 {{ toYaml . | indent 8 }}
     {{- end }}
       volumes:
-        - name: config
+        - name: ui-config
           configMap:
-            name: knowledge-galaxy-ui
+            name: knowledge-galaxy
 {{ end }}

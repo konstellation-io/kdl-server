@@ -5,6 +5,8 @@ giteaOauth2Setup:
     repository: konstellation/gitea-oauth2-setup
     tag: "latest"
     pullPolicy: IfNotPresent
+  giteaAdminSecret: gitea-admin
+  giteaOauth2Configmap: gitea-oauth2
 
 ingress:
   className: "nginx"

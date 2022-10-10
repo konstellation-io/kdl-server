@@ -42,7 +42,7 @@ spec:
             backend:
               serviceName: {{ include "user-tools.fullname" . }}-code
               servicePort: http
-          {{- end }} 
+          {{- end }}
     - host: {{ .Values.usernameSlug }}-jupyter.{{ .Values.domain }}
       http:
         paths:
@@ -59,4 +59,4 @@ spec:
             backend:
               serviceName: {{ include "user-tools.fullname" . }}-jupyter
               servicePort: http
-          {{- end }} 
+          {{- end }}

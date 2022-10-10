@@ -14,14 +14,14 @@ rules:
   - ""
   resources:
   - pods/exec
-  resourceNames: 
+  resourceNames:
   - "{{ include "user-tools.fullname" . }}-0"
   verbs:
   - create
 - apiGroups:
   - ""
   resources:
-  - secrets 
+  - secrets
   verbs:
   - get
   - list

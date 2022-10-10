@@ -108,8 +108,6 @@ drone:
     storageClassName: standard
   # -- Drone RPC secret for allowing Drone runners to authentiticate the RPC connection to the server
   rpcSecret: runner-shared-secret
-  # -- Provides the secret token used to authenticate http requests to the plugin endpoint
-  pluginSecret: d97d8ee407af1002fa2449f578bb47a9
   # -- Drone Server admin token
   adminToken: 7GSipOV0wJZQioZNBxaw3AotHV1tA4K4
   # -- The max number of concurrent jobs that a Drone runner can run
@@ -175,6 +173,9 @@ droneRunner:
   debug: "true"
   # -- Sets DRONE_TRACE environment variable
   trace: "true"
+
+  # -- Provides the secret token used to authenticate http requests to the Kubernetes Secrets Extension endpoint
+  pluginSecret: "my-secret"
 
   # -- Configures the DRONE_RUNNER_ENVIRON environment variable. Ref: https://docs.drone.io/runner/kubernetes/configuration/reference/drone-runner-environ/
   droneRunnerEnviron: ""

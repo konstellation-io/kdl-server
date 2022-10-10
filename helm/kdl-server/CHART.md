@@ -41,7 +41,6 @@
 | drone.ingress.className | string | `"nginx"` | The ingress class name |
 | drone.ingress.tls.secretName | string | `nil` | The TLS secret name that will be used. It takes precedence over `.Values.global.ingress.tls.secretName`. |
 | drone.nodeSelector | object | `{}` |  |
-| drone.pluginSecret | string | `"d97d8ee407af1002fa2449f578bb47a9"` | Provides the secret token used to authenticate http requests to the plugin endpoint |
 | drone.rpcSecret | string | `"runner-shared-secret"` | Drone RPC secret for allowing Drone runners to authentiticate the RPC connection to the server |
 | drone.runnerCapacity | int | `5` | The max number of concurrent jobs that a Drone runner can run |
 | drone.storage.size | string | `"10Gi"` | Storage size |
@@ -57,6 +56,7 @@
 | droneRunner.image.repository | string | `"drone/drone-runner-kube"` | The image repository |
 | droneRunner.image.tag | string | `"1.0.0-beta.6"` | The image tag |
 | droneRunner.nodeSelector | object | `{}` |  |
+| droneRunner.pluginSecret | string | `"my-secret"` | Provides the secret token used to authenticate http requests to the Kubernetes Secrets Extension endpoint |
 | droneRunner.serviceAccountJob.annotations | object | `{}` | If `.Values.droneRunner.serviceAccountJob.create` is set to `true`, sets annotations to the service account |
 | droneRunner.serviceAccountJob.create | bool | `false` | If `.Values.droneRunner.serviceAccountJob.enabled` is set to `true`, creates the service account |
 | droneRunner.serviceAccountJob.enabled | bool | `false` | Whether to enable the service account for Drone job pods |

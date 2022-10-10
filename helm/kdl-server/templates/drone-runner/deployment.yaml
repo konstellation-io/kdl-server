@@ -25,7 +25,10 @@ spec:
         - containerPort: 3000
         env:
         - name: SECRET_KEY
-          value: {{ .Values.drone.pluginSecret }}
+          valueFrom:
+            secretKeyRef:
+              name: drone-runner
+              key: DRONE_SECRET_PLUGIN_TOKEN
         - name: KUBERNETES_NAMESPACE
           value: {{ .Release.Namespace }}
       - name: runner

@@ -39,7 +39,7 @@ spec:
                 - secretRef:
                     name: postgres
                 - secretRef:
-                    name: backup-secrets
+                    name: backup
               env:
                 - name: MONGO_URI
                   valueFrom:

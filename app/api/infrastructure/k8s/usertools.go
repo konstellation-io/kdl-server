@@ -203,13 +203,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 
 func (k *k8sClient) getUserToolsDefinition(
 	ingressAnnotations map[string]interface{},
-	resName,
-	username,
-	usernameSlug,
-	runtimeID,
-	runtimeImage,
-	runtimeTag,
-	serviceAccountName string,
+	resName, username, usernameSlug, runtimeID, runtimeImage, runtimeTag, serviceAccountName string,
 ) *unstructured.Unstructured {
 	tlsConfig := map[string]interface{}{
 		"enabled": k.cfg.TLS.Enabled,
@@ -275,6 +269,8 @@ func (k *k8sClient) getUserToolsDefinition(
 						"tag":        k.cfg.UserToolsGiteaOAuth2Setup.Image.Tag,
 						"pullPolicy": k.cfg.UserToolsGiteaOAuth2Setup.Image.PullPolicy,
 					},
+					"giteaAdminSecret":     k.cfg.UserToolsGiteaOAuth2Setup.GiteaAdminSecret,
+					"giteaOauth2Configmap": k.cfg.UserToolsGiteaOAuth2Setup.GiteaOauth2Configmap,
 				},
 				"oauth2Proxy": map[string]interface{}{
 					"image": map[string]string{

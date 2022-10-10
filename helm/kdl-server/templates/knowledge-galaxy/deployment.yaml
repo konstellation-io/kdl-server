@@ -23,19 +23,15 @@ spec:
         - name: knowledge-galaxy
           image: {{ .Values.knowledgeGalaxy.image.repository }}:{{ .Values.knowledgeGalaxy.image.tag }}
           imagePullPolicy: {{ .Values.knowledgeGalaxy.image.pullPolicy }}
-          {{- if .Values.global.mongodb.connectionString.secretName }}
           env:
             - name: SERVER_MONGODB_URI
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.global.mongodb.connectionString.secretName }}
                   key: {{ .Values.global.mongodb.connectionString.secretKey }}
-          {{- end }}
           envFrom:
             - configMapRef:
                 name: knowledge-galaxy-env
-            - secretRef:
-                name: knowledge-galaxy
           volumeMounts:
             - name: config
               mountPath: /kg/public/config.json

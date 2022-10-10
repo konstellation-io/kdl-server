@@ -72,13 +72,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-            {{- if .Values.global.mongodb.connectionString.secretName }}
             - name: KDL_SERVER_MONGODB_URI
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.global.mongodb.connectionString.secretName }}
                   key: {{ .Values.global.mongodb.connectionString.secretKey }}
-            {{- end }}
           envFrom:
             - configMapRef:
                 name: kdl-server-configmap

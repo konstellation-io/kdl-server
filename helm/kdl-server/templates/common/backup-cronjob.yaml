@@ -42,14 +42,10 @@ spec:
                     name: backup-secrets
               env:
                 - name: MONGO_URI
-                  {{- if .Values.global.mongodb.connectionString.secretName }}
                   valueFrom:
                     secretKeyRef:
                       name: {{ .Values.global.mongodb.connectionString.secretName }}
                       key: {{ .Values.global.mongodb.connectionString.secretKey }}
-                  {{- else }}
-                  value: {{ .Values.global.mongodb.connectionString.uri }}
-                  {{- end }}
               volumeMounts:
               - name: gitea-pvc
                 mountPath: "/data"

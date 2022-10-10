@@ -18,12 +18,9 @@ global:
       #   certFilename: ca.crt
   mongodb:
     connectionString:
-      # -- MongoDB connection uri. This takes precedence over secretName and secretKey. `global.mongodb.secretName` in combination with `global.mongodb.secretKey` have precedence over this.
-      uri: "mongodb+srv://admin:123456@example.com/admin?replicaSet=kdl-mongodb&ssl=f\
-        alse"
-      # -- If specified, the name of the secret that contains a key with the MongoDB connection string.
+      # -- The name of the secret that contains a key with the MongoDB connection string.
       secretName: ""
-      # -- If specfied in combination with `global.mongodb.secretName`, the name of the secret key that contains the MongoDB connection string.
+      # -- The name of the secret key that contains the MongoDB connection string.
       secretKey: ""
 
 backup:
@@ -396,7 +393,7 @@ kdlServer:
       # nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
       # cert-manager.io/issuer: your-issuer
 
-      # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
   # -- Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/

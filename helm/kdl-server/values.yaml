@@ -18,12 +18,9 @@ global:
       #   certFilename: ca.crt
   mongodb:
     connectionString:
-      # -- MongoDB connection uri. This takes precedence over secretName and secretKey. `global.mongodb.secretName` in combination with `global.mongodb.secretKey` have precedence over this.
-      uri: "mongodb+srv://admin:123456@example.com/admin?replicaSet=kdl-mongodb&ssl=f\
-        alse"
-      # -- If specified, the name of the secret that contains a key with the MongoDB connection string.
+      # -- The name of the secret that contains a key with the MongoDB connection string.
       secretName: ""
-      # -- If specfied in combination with `global.mongodb.secretName`, the name of the secret key that contains the MongoDB connection string.
+      # -- The name of the secret key that contains the MongoDB connection string.
       secretKey: ""
 
 backup:
@@ -111,8 +108,6 @@ drone:
     storageClassName: standard
   # -- Drone RPC secret for allowing Drone runners to authentiticate the RPC connection to the server
   rpcSecret: runner-shared-secret
-  # -- Provides the secret token used to authenticate http requests to the plugin endpoint
-  pluginSecret: d97d8ee407af1002fa2449f578bb47a9
   # -- Drone Server admin token
   adminToken: 7GSipOV0wJZQioZNBxaw3AotHV1tA4K4
   # -- The max number of concurrent jobs that a Drone runner can run
@@ -147,7 +142,7 @@ drone:
       #   more_set_headers "Content-Security-Policy: frame-ancestors 'self' https://kdlapp.kdl.local";
       # cert-manager.io/issuer: your-issuer
 
-      # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
   # -- Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -174,6 +169,14 @@ droneRunner:
     # -- The image pull policy
     pullPolicy: IfNotPresent
 
+  # -- Sets DRONE_DEBUG environment variable
+  debug: "true"
+  # -- Sets DRONE_TRACE environment variable
+  trace: "true"
+
+  # -- Provides the secret token used to authenticate http requests to the Kubernetes Secrets Extension endpoint
+  pluginSecret: "my-secret"
+
   # -- Configures the DRONE_RUNNER_ENVIRON environment variable. Ref: https://docs.drone.io/runner/kubernetes/configuration/reference/drone-runner-environ/
   droneRunnerEnviron: ""
   # droneRunnerEnviron: "GIT_SSL_NO_VERIFY:true"
@@ -191,7 +194,7 @@ droneRunner:
     annotations: {}
     #  eks.amazonaws.com/role-arn: "arn:aws:iam::1234567890:role/myrole"
 
-    # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
   # -- Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -240,7 +243,7 @@ gitea:
       # nginx.ingress.kubernetes.io/configuration-snippet: |
       #   more_set_headers "Content-Security-Policy: frame-ancestors 'self' https://kdlapp.kdl.local";
 
-      # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
   # -- Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -349,7 +352,7 @@ knowledgeGalaxy:
     imagePullSecrets: []
     # - name: regcred
 
-    # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
   # -- Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -396,7 +399,7 @@ kdlServer:
       # nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
       # cert-manager.io/issuer: your-issuer
 
-      # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
   # -- Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -461,6 +464,9 @@ oauth2Proxy:
     tag: v7.0.1-amd64
     # -- The image pull policy
     pullPolicy: IfNotPresent
+  config:
+    # -- The seed string for secure cookies. Ref: https://oauth2-proxy.github.io/oauth2-proxy/docs/configuration/overview
+    cookieSecret: "mycookiesecret16"
 
 postgres:
   image:

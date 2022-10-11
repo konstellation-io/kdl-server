@@ -36,22 +36,16 @@ spec:
                   memory: {{ .Values.backup.resources.requests.memory }}
                   cpu: {{ .Values.backup.resources.requests.cpu }}
               envFrom:
-                - configMapRef:
-                    name: gitea-config
                 - secretRef:
                     name: postgres
                 - secretRef:
-                    name: backup-secrets
+                    name: backup
               env:
                 - name: MONGO_URI
-                  {{- if .Values.global.mongodb.connectionString.secretName }}
                   valueFrom:
                     secretKeyRef:
                       name: {{ .Values.global.mongodb.connectionString.secretName }}
                       key: {{ .Values.global.mongodb.connectionString.secretKey }}
-                  {{- else }}
-                  value: {{ .Values.global.mongodb.connectionString.uri }}
-                  {{- end }}
               volumeMounts:
               - name: gitea-pvc
                 mountPath: "/data"

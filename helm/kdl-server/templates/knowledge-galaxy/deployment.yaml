@@ -12,7 +12,8 @@ spec:
       labels:
         app: knowledge-galaxy
       annotations:
-        helm.sh/restart-deployment: {{ randAlphaNum 5 | quote }}
+        checksum/config: {{ include (print $.Template.BasePath "/knowledge-galaxy/config.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/knowledge-galaxy/secret.yaml") . | sha256sum }}
     spec:
       {{- if .Values.knowledgeGalaxy.serviceaccount.enabled }}
       serviceAccountName:  {{ template "knowledgeGalaxy.serviceAccountName" . }}
@@ -21,13 +22,17 @@ spec:
         - name: knowledge-galaxy
           image: {{ .Values.knowledgeGalaxy.image.repository }}:{{ .Values.knowledgeGalaxy.image.tag }}
           imagePullPolicy: {{ .Values.knowledgeGalaxy.image.pullPolicy }}
+          env:
+            - name: SERVER_MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.mongodb.connectionString.secretName }}
+                  key: {{ .Values.global.mongodb.connectionString.secretKey }}
           envFrom:
             - configMapRef:
-                name: knowledge-galaxy-env
-            - secretRef:
                 name: knowledge-galaxy
           volumeMounts:
-            - name: config
+            - name: ui-config
               mountPath: /kg/public/config.json
               subPath: config.json
           ports:
@@ -45,7 +50,7 @@ spec:
 {{ toYaml . | indent 8 }}
     {{- end }}
       volumes:
-        - name: config
+        - name: ui-config
           configMap:
-            name: knowledge-galaxy-ui
+            name: knowledge-galaxy
 {{ end }}

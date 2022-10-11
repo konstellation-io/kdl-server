@@ -969,6 +969,12 @@ spec:
                       pullPolicy:
                         description: image pull policy
                         type: string
+                  giteaAdminSecret:
+                    description: the secret containing gitea admin user and password
+                    type: string
+                  giteaOauth2Configmap:
+                    description: the configmap containing the oauth2 config
+                    type: string
               jupyter:
                 type: object
                 properties:

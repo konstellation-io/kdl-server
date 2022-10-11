@@ -16,7 +16,9 @@ spec:
       app: postgres
   template:
     metadata:
-      creationTimestamp: null
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/postgres/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/postgres/secret.yaml") . | sha256sum }}
       labels:
         app: postgres
     spec:

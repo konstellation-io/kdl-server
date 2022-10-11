@@ -1,34 +1,15 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: drone-config
+  name: drone
   labels:
-    app:  drone-config
+    app:  drone
 data:
   DRONE_GITEA_SKIP_VERIFY: "true"
   DRONE_GITEA_SERVER: {{ printf "%s://gitea.%s" ( include "http.protocol" . ) .Values.global.domain }}
   DRONE_GIT_ALWAYS_AUTH: "true"
-  DRONE_RUNNER_CAPACITY: "{{ .Values.drone.runnerCapacity }}"
   DRONE_SERVER_PROTO: {{ printf "%s" ( include "http.protocol" . ) }}
   DRONE_SERVER_HOST: drone.{{ .Values.global.domain }}
   DRONE_TLS_AUTOCERT: "false"
-  DRONE_RPC_HOST: drone.{{ .Values.global.domain }}
-  DRONE_RPC_PROTO: {{ printf "%s" ( include "http.protocol" . ) }}
-  DRONE_RPC_SECRET: {{ .Values.drone.rpcSecret }}
-  DRONE_NAMESPACE_DEFAULT: {{ .Release.Namespace }}
   DRONE_LOGS_DEBUG: "true"
-  DRONE_DEBUG: "true"
-  DRONE_TRACE: "true"
   DRONE_DATABASE_DRIVER: postgres
-  DRONE_DATABASE_DATASOURCE: postgres://postgres:{{ .Values.postgres.dbPassword }}@postgres:5432/drone?sslmode=disable
-  DRONE_USER_CREATE: username:{{ .Values.gitea.admin.username }},admin:true,token:{{ .Values.drone.adminToken }}
-  DRONE_SECRET_PLUGIN_ENDPOINT: http://localhost:3000
-  DRONE_SECRET_PLUGIN_TOKEN: {{ .Values.drone.pluginSecret }}
-  DRONE_TOKEN: {{ .Values.drone.adminToken }}
-  DRONE_INTERNAL_URL: "http://drone"
-  {{- if .Values.droneRunner.droneRunnerEnviron }}
-  DRONE_RUNNER_ENVIRON: "{{ .Values.droneRunner.droneRunnerEnviron }}"
-  {{- end }}
-  {{- if .Values.droneRunner.serviceAccountJob.enabled }}
-  DRONE_SERVICE_ACCOUNT_DEFAULT: {{ .Values.droneRunner.serviceAccountJob.name }}
-  {{- end }}

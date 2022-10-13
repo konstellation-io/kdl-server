@@ -98,8 +98,8 @@ deploy_helm_chart() {
     export KNOWLEDGE_GALAXY_IMAGE_TAG="latest"
     echo_info "LOCAL KG"
   fi
-  if [ "$KUBECONFIG_ENABLED" = "true" ]; then
-    export EXTERNAL_SERVER_URL=$(cat ${KUBECONFIG} | yq '.clusters[] | select (.name == "microk8s-cluster") | .cluster.server')
+  if [ "$KUBECONFIG_ENABLED" = "true" ] || [ ! -z "$KUBECONFIG" ]; then
+    export EXTERNAL_SERVER_URL=$(yq '.clusters[] | select (.name == "microk8s-cluster") | .cluster.server' ${KUBECONFIG})
     echo_info "KDL Remote Development enabled"
   fi
   echo_info "📦 Applying helm chart..."

@@ -40,6 +40,7 @@ MONGO_PASS=123456
 . ./scripts/kdlctl/cmd_deploy.sh
 . ./scripts/kdlctl/cmd_restart.sh
 . ./scripts/kdlctl/cmd_login.sh
+. ./scripts/kdlctl/cmd_refresh_certs.sh
 . ./scripts/kdlctl/cmd_uninstall.sh
 
 # Variables depending on SO
@@ -128,6 +129,12 @@ case $COMMAND in
   build)
     cmd_build "$@"
     echo_done "Build done"
+    exit 0
+  ;;
+
+  refresh-certs)
+    refresh_certs
+    echo_done "Refresh done"
     exit 0
   ;;
 

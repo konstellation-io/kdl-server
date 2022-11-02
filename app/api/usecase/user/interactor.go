@@ -185,9 +185,11 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeID 
 		i.logger.Debugf("Using default runtime image \"%s:%s\"", rImage, rTag)
 	}
 
+	capabilities := entity.MockCapabilities() // mock mongoDB get
+
 	i.logger.Infof("Creating user tools for user: \"%s\"", username)
 
-	err = i.k8sClient.CreateUserToolsCR(ctx, username, rID, rImage, rTag)
+	err = i.k8sClient.CreateUserToolsCR(ctx, username, rID, rImage, rTag, capabilities)
 	if err != nil {
 		return entity.User{}, err
 	}

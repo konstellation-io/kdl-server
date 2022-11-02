@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/gosimple/slug"
+	"github.com/konstellation-io/kdl-server/app/api/entity"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -44,7 +45,8 @@ func (k *k8sClient) DeleteUserToolsCR(ctx context.Context, username string) erro
 }
 
 // CreateUserToolsCR creates the user tools Custom Resource in Kubernetes.
-func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeID, runtimeImage, runtimeTag string) error {
+func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeID, runtimeImage, runtimeTag string,
+	capabilities entity.Capabilities) error {
 	slugUsername := k.getSlugUsername(username)
 	resName := fmt.Sprintf("usertools-%s", slugUsername)
 
@@ -55,7 +57,7 @@ func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeID, 
 
 	k.logger.Info("UserTools secrets created")
 
-	err = k.createUserToolsDefinition(ctx, username, slugUsername, resName, runtimeID, runtimeImage, runtimeTag)
+	err = k.createUserToolsDefinition(ctx, username, slugUsername, resName, runtimeID, runtimeImage, runtimeTag, capabilities)
 	if err != nil {
 		return err
 	}
@@ -176,7 +178,7 @@ func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName
 
 // createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
 func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, usernameSlug, resName, runtimeID,
-	runtimeImage, runtimeTag string) error {
+	runtimeImage, runtimeTag string, capabilities entity.Capabilities) error {
 	serviceAccountName := k.getUserServiceAccountName(usernameSlug)
 
 	ingressAnnotations, err := k.getIngressAnnotations(k.cfg.UserToolsIngress.Annotations)
@@ -193,6 +195,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 		runtimeImage,
 		runtimeTag,
 		serviceAccountName,
+		capabilities,
 	)
 
 	k.logger.Infof("Creating users tools: %#v", definition.Object)
@@ -203,7 +206,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 
 func (k *k8sClient) getUserToolsDefinition(
 	ingressAnnotations map[string]interface{},
-	resName, username, usernameSlug, runtimeID, runtimeImage, runtimeTag, serviceAccountName string,
+	resName, username, usernameSlug, runtimeID, runtimeImage, runtimeTag, serviceAccountName string, capabilities entity.Capabilities,
 ) *unstructured.Unstructured {
 	tlsConfig := map[string]interface{}{
 		"enabled": k.cfg.TLS.Enabled,
@@ -225,6 +228,9 @@ func (k *k8sClient) getUserToolsDefinition(
 				},
 			},
 			"spec": map[string]interface{}{
+				"nodeSelector": capabilities.GetNodeSelectors(),
+				//"affinity": capabilities.GetAffinities(),
+				//"tolerations": capabilities.GetTolerations(),
 				"domain": k.cfg.BaseDomainName,
 				"ingress": map[string]interface{}{
 					"annotations": ingressAnnotations,

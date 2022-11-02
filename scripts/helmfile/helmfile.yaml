@@ -24,6 +24,8 @@ repositories:
     url: https://bedag.github.io/helm-charts/
   - name: enterprise-gateway
     url: https://konstellation-io.github.io/enterprise_gateway/
+  - name: minio
+    url: https://charts.min.io/
 
 releases:
   - name: "mongodb-operator"

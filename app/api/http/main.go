@@ -71,6 +71,7 @@ func main() {
 	projectRepo := repository.NewProjectMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 	userRepo := repository.NewUserMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 	runtimeRepo := repository.NewRuntimeMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
+	capabilitiesRepo := repository.NewCapabilitiesMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 
 	tmpl := templates.NewTemplating(cfg, logger, k8sClient)
 
@@ -79,7 +80,7 @@ func main() {
 		logger.Errorf("Error creating indexes for users: %s", err)
 	}
 
-	userInteractor := user.NewInteractor(logger, cfg, userRepo, runtimeRepo, sshHelper, realClock, giteaService, k8sClient)
+	userInteractor := user.NewInteractor(logger, cfg, userRepo, runtimeRepo, capabilitiesRepo, sshHelper, realClock, giteaService, k8sClient)
 	initUserInteractor(userInteractor, cfg, logger)
 
 	projectDeps := &project.InteractorDeps{

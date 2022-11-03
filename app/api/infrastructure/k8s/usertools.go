@@ -198,6 +198,8 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 		capabilities,
 	)
 
+	k.logger.Infof("Ey this is the get definition: %w", definition)
+
 	k.logger.Infof("Creating users tools: %#v", definition.Object)
 	_, err = k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
 
@@ -229,8 +231,8 @@ func (k *k8sClient) getUserToolsDefinition(
 			},
 			"spec": map[string]interface{}{
 				"nodeSelector": capabilities.GetNodeSelectors(),
-				//"affinity": capabilities.GetAffinities(),
-				//"tolerations": capabilities.GetTolerations(),
+				//"affinity": capabilities.GetAffinities(), // TODO add affinity to specs
+				//"tolerations": capabilities.GetTolerations(), // TODO add tolerations to specs
 				"domain": k.cfg.BaseDomainName,
 				"ingress": map[string]interface{}{
 					"annotations": ingressAnnotations,

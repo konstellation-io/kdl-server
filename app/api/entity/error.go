@@ -26,4 +26,7 @@ var (
 
 	// ErrNoRunningRuntime error definition.
 	ErrNoRunningRuntime = fmt.Errorf("no running runtime")
+
+	// ErrCapabilitiesNotFound error definition.
+	ErrCapabilitiesNotFound = errors.New("capabilities not found")
 )

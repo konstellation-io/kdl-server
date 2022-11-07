@@ -198,8 +198,6 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 		capabilities,
 	)
 
-	k.logger.Infof("Ey this is the get definition: %w", definition)
-
 	k.logger.Infof("Creating users tools: %#v", definition.Object)
 	_, err = k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
 

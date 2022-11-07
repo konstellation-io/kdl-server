@@ -191,12 +191,12 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeID 
 
 	// TODO replace with capabilities retrieved from the mongo repository
 	capabilities, err := i.repoCapabilities.Get(ctx, "test_id")
-	i.logger.Infof("Ey this is the get error: %s", err.Error())
 	if err != nil {
+		i.logger.Infof("Ey this is the get error: %s", err.Error())
 		return entity.User{}, err
 	}
-	// capabilities := entity.MockCapabilities() // mock mongoDB get
 
+	i.logger.Debugf("------------------ %+v", capabilities)
 	i.logger.Infof("Creating user tools for user: \"%s\"", username)
 
 	err = i.k8sClient.CreateUserToolsCR(ctx, username, rID, rImage, rTag, capabilities)

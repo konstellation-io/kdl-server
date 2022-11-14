@@ -142,7 +142,7 @@ drone:
       #   more_set_headers "Content-Security-Policy: frame-ancestors 'self' https://kdlapp.kdl.local";
       # cert-manager.io/issuer: your-issuer
 
-  # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+      # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
   # -- Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -194,7 +194,7 @@ droneRunner:
     annotations: {}
     #  eks.amazonaws.com/role-arn: "arn:aws:iam::1234567890:role/myrole"
 
-  # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+    # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
   # -- Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -243,7 +243,7 @@ gitea:
       # nginx.ingress.kubernetes.io/configuration-snippet: |
       #   more_set_headers "Content-Security-Policy: frame-ancestors 'self' https://kdlapp.kdl.local";
 
-  # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+      # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
   # -- Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -352,7 +352,7 @@ knowledgeGalaxy:
     imagePullSecrets: []
     # - name: regcred
 
-  # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+    # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
   # -- Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -399,7 +399,7 @@ kdlServer:
       # nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
       # cert-manager.io/issuer: your-issuer
 
-  # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+      # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
 
   # -- Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -503,7 +503,7 @@ projectOperator:
       # -- The image repository
       repository: konstellation/project-operator
       # -- The image tag
-      tag: 0.16.0
+      tag: 0.17.0
       # -- The image pull policy
       pullPolicy: IfNotPresent
 

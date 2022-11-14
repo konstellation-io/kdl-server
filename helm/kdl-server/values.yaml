@@ -503,7 +503,7 @@ projectOperator:
       # -- The image repository
       repository: konstellation/project-operator
       # -- The image tag
-      tag: 0.17.0
+      tag: 0.18.0
       # -- The image pull policy
       pullPolicy: IfNotPresent
 

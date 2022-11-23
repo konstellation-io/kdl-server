@@ -3,7 +3,7 @@ import styles from './RuntimeItem.module.scss';
 import { GetRuntimes_runtimes } from 'Graphql/queries/types/GetRuntimes';
 import RuntimeIcon, { RUNTIME_STATUS } from 'Components/Icons/RuntimeIcon/RuntimeIcon';
 import { useReactiveVar } from '@apollo/client';
-import { lastRanRuntime, loadingRuntime, runningRuntime } from 'Graphql/client/cache';
+import { lastRanRuntime, loadingRuntime, runningRuntime, selectedCapabilities } from 'Graphql/client/cache';
 import RuntimeRunner, { RuntimeAction } from 'Components/RuntimeRunner/RuntimeRunner';
 
 type Props = {
@@ -14,6 +14,7 @@ function RuntimeItem({ runtime }: Props) {
   const runtimeRunning = useReactiveVar(runningRuntime);
   const runtimeLoading = useReactiveVar(loadingRuntime);
   const lastRuntime = useReactiveVar(lastRanRuntime);
+  const selectedCapability = useReactiveVar(selectedCapabilities);
   const isRuntimeRunning = runtimeRunning?.id === runtime.id;
 
   const getRuntimeStatus = () => {
@@ -28,7 +29,7 @@ function RuntimeItem({ runtime }: Props) {
   };
 
   return (
-    <RuntimeRunner runtime={runtime} action={RuntimeAction.Start}>
+    <RuntimeRunner runtime={runtime} capability={selectedCapability? selectedCapability : undefined} action={RuntimeAction.Start}>
       <button className={styles.container} disabled={runtimeLoading !== null || isRuntimeRunning}>
         <div className={styles.nameContainer}>
           <RuntimeIcon status={getRuntimeStatus()} className="icon-regular" />

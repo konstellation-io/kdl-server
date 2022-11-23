@@ -23,6 +23,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
@@ -98,12 +99,15 @@ func main() {
 
 	runtimeInteractor := runtime.NewInteractor(logger, k8sClient, runtimeRepo)
 
+	capabilitiesInteractor := capabilities.NewInteractor(logger, cfg, capabilitiesRepo, k8sClient)
+
 	resolvers := graph.NewResolver(
 		logger,
 		cfg,
 		projectInteractor,
 		userInteractor,
 		runtimeInteractor,
+		capabilitiesInteractor,
 	)
 
 	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, cfg.Kubernetes.IsInsideCluster, resolvers, userRepo, projectRepo)

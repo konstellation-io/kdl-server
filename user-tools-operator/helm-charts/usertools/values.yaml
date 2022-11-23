@@ -77,6 +77,7 @@ vscode:
 
 vscodeRuntime:
   runtimeId: "61383716a8c1d7ce4764f411"
+  capabilityId: "capability_id_1"
   image:
     repository: konstellation/kdl-py
     tag: "3.9"

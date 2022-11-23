@@ -9,6 +9,7 @@ import (
 	"github.com/gosimple/slug"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 
 	"github.com/golang/mock/gomock"
@@ -32,14 +33,15 @@ type userSuite struct {
 }
 
 type userMocks struct {
-	logger        *logging.MockLogger
-	cfg           config.Config
-	repo          *user.MockRepository
-	runtimeRepo   *runtime.MockRepository
-	sshGenerator  *sshhelper.MockSSHKeyGenerator
-	clock         *clock.MockClock
-	giteaService  *giteaservice.MockGiteaClient
-	k8sClientMock *k8s.MockClient
+	logger           *logging.MockLogger
+	cfg              config.Config
+	repo             *user.MockRepository
+	runtimeRepo      *runtime.MockRepository
+	capabilitiesRepo *capabilities.MockRepository
+	sshGenerator     *sshhelper.MockSSHKeyGenerator
+	clock            *clock.MockClock
+	giteaService     *giteaservice.MockGiteaClient
+	k8sClientMock    *k8s.MockClient
 }
 
 func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
@@ -47,6 +49,7 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	logger := logging.NewMockLogger(ctrl)
 	repo := user.NewMockRepository(ctrl)
 	repoRuntimes := runtime.NewMockRepository(ctrl)
+	repoCapabilities := capabilities.NewMockRepository(ctrl)
 	clockMock := clock.NewMockClock(ctrl)
 	sshGenerator := sshhelper.NewMockSSHKeyGenerator(ctrl)
 	giteaServiceMock := giteaservice.NewMockGiteaClient(ctrl)
@@ -58,20 +61,21 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 		cfg = &config.Config{}
 	}
 
-	interactor := user.NewInteractor(logger, *cfg, repo, repoRuntimes, sshGenerator, clockMock, giteaServiceMock, k8sClientMock)
+	interactor := user.NewInteractor(logger, *cfg, repo, repoRuntimes, repoCapabilities, sshGenerator, clockMock, giteaServiceMock, k8sClientMock)
 
 	return &userSuite{
 		ctrl:       ctrl,
 		interactor: interactor,
 		mocks: userMocks{
-			logger:        logger,
-			cfg:           *cfg,
-			repo:          repo,
-			runtimeRepo:   repoRuntimes,
-			sshGenerator:  sshGenerator,
-			clock:         clockMock,
-			giteaService:  giteaServiceMock,
-			k8sClientMock: k8sClientMock,
+			logger:           logger,
+			cfg:              *cfg,
+			repo:             repo,
+			runtimeRepo:      repoRuntimes,
+			capabilitiesRepo: repoCapabilities,
+			sshGenerator:     sshGenerator,
+			clock:            clockMock,
+			giteaService:     giteaServiceMock,
+			k8sClientMock:    k8sClientMock,
 		},
 	}
 }
@@ -244,6 +248,16 @@ func TestInteractor_StartTools(t *testing.T) {
 		runtimeTag   = "3.9"
 	)
 
+	capabilities := entity.Capabilities{
+		ID:   "test_id",
+		Name: "Test capability",
+		NodeSelectors: map[string]string{
+			"test1": "value1",
+		},
+		Affinities: []string{},
+		Taints:     []string{},
+	}
+
 	runtimeID := "12345"
 
 	ctx := context.Background()
@@ -252,10 +266,10 @@ func TestInteractor_StartTools(t *testing.T) {
 
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
 	s.mocks.runtimeRepo.EXPECT().Get(ctx, runtimeID).Return(expectedRuntime, nil)
+	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capabilities.ID).Return(capabilities, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
-	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeID, runtimeImage, runtimeTag).Return(nil)
-
-	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeID)
+	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeID, runtimeImage, runtimeTag, capabilities).Return(nil)
+	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeID, &capabilities.ID)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, returnedUser)
@@ -276,6 +290,16 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 		runtimeID    = "default"
 	)
 
+	capabilities := entity.Capabilities{
+		ID:   "test_id",
+		Name: "Test capability",
+		NodeSelectors: map[string]string{
+			"test1": "value1",
+		},
+		Affinities: []string{},
+		Taints:     []string{},
+	}
+
 	ctx := context.Background()
 	expectedUser := entity.User{Username: username}
 
@@ -283,12 +307,14 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
 	// AND the usertools for the user was not running
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
+
+	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capabilities.ID).Return(capabilities, nil)
 	// AND the CR creation does not return any error
 	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeID,
-		cfg.UserToolsVsCodeRuntime.Image.Repository, cfg.UserToolsVsCodeRuntime.Image.Tag).Return(nil)
+		cfg.UserToolsVsCodeRuntime.Image.Repository, cfg.UserToolsVsCodeRuntime.Image.Tag, capabilities).Return(nil)
 
 	// WHEN the tools are started
-	returnedUser, err := s.interactor.StartTools(ctx, username, nil)
+	returnedUser, err := s.interactor.StartTools(ctx, username, nil, &capabilities.ID)
 
 	// THEN
 	// There are no errors
@@ -317,6 +343,16 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 	expectedRuntime := entity.Runtime{ID: runtimeID, DockerImage: dockerImage, DockerTag: dockerTag}
 	expectedUser := entity.User{Username: username}
 
+	capabilities := entity.Capabilities{
+		ID:   "test_id",
+		Name: "Test capability",
+		NodeSelectors: map[string]string{
+			"test1": "value1",
+		},
+		Affinities: []string{},
+		Taints:     []string{},
+	}
+
 	ctx := context.Background()
 
 	// AND the user is the in repo
@@ -327,11 +363,13 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).AnyTimes().Return(toolsRunning, nil)
 	// AND the CR deletion does not return any error
 	s.mocks.k8sClientMock.EXPECT().DeleteUserToolsCR(ctx, username).Return(nil)
+
+	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capabilities.ID).Return(capabilities, nil)
 	// AND the CR creation does not return any error
-	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeID, dockerImage, dockerTag).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeID, dockerImage, dockerTag, capabilities).Return(nil)
 
 	// WHEN the tools are started
-	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeID)
+	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeID, &capabilities.ID)
 
 	// THEN there are no errors
 	require.NoError(t, err)

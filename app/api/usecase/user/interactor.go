@@ -150,7 +150,7 @@ func (i *interactor) GetByUsername(ctx context.Context, username string) (entity
 
 // StartTools creates a user-tools CustomResource in K8s to initialize the VSCode and Jupyter for the given username.
 // If there are already a user-tools for the user, they are replaced (stop + start new).
-func (i *interactor) StartTools(ctx context.Context, username string, runtimeID *string /*TODO modify this in GraphQL to add the capabilitiesID to the call, capabilitiesId *string*/) (entity.User, error) {
+func (i *interactor) StartTools(ctx context.Context, username string, runtimeID *string, capabilitiesId *string) (entity.User, error) {
 	user, err := i.repo.GetByUsername(ctx, username)
 	if err != nil {
 		return entity.User{}, err
@@ -166,6 +166,7 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeID 
 		// ignore the user returned by the stop, as it the same as we already have
 		_, err := i.StopTools(ctx, username)
 		if err != nil {
+			i.logger.Errorf("Error stoping user tools: %w", err)
 			return entity.User{}, err
 		}
 	}
@@ -175,6 +176,7 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeID 
 	if runtimeID != nil {
 		r, err := i.repoRuntimes.Get(ctx, *runtimeID)
 		if err != nil {
+			i.logger.Errorf("Error retrieving runtime with id %s: %w", *runtimeID, err)
 			return entity.User{}, err
 		}
 
@@ -189,10 +191,9 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeID 
 		i.logger.Debugf("Using default runtime image \"%s:%s\"", rImage, rTag)
 	}
 
-	// TODO replace with capabilities retrieved from the mongo repository
-	capabilities, err := i.repoCapabilities.Get(ctx, "test_id")
+	capabilities, err := i.repoCapabilities.Get(ctx, *capabilitiesId)
 	if err != nil {
-		i.logger.Infof("Ey this is the get error: %s", err.Error())
+		i.logger.Errorf("Error retrieving capabilities: %w", err)
 		return entity.User{}, err
 	}
 

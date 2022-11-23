@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
 )
 
 // Repository interface to retrieve and persists projects.
@@ -16,6 +17,6 @@ type Repository interface {
 
 // UseCase interface to manage all operations related with projects.
 type UseCase interface {
-	FindAll(ctx context.Context) ([]entity.Project, error)
-	GetByID(ctx context.Context, id string) (entity.Project, error)
+	GetCapabilities(ctx context.Context) ([]model.Capability, error)
+	GetRunningCapability(ctx context.Context, username string) (*model.Capability, error)
 }

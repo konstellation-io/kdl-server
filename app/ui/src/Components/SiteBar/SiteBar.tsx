@@ -7,6 +7,7 @@ import SettingsMenu from '../SettingsMenu/SettingsMenu';
 import styles from './SiteBar.module.scss';
 import isElectron from 'is-electron';
 import RuntimesCrumb from './components/Breadcrumbs/components/RuntimesCrumbs/RuntimesCrumb';
+import CapabilitiesCrumb from './components/Breadcrumbs/components/CapabilitiesCrumbs/CapabilitiesCrumb';
 
 const SiteBar = () => (
   <div className={styles.container}>
@@ -17,7 +18,8 @@ const SiteBar = () => (
       </>
     </Left>
     <Right className={styles.right}>
-      <RuntimesCrumb />
+      <RuntimesCrumb title={"Runtimes"} />
+      <CapabilitiesCrumb title={"Capabilities"} />
       <SettingsMenu />
     </Right>
   </div>

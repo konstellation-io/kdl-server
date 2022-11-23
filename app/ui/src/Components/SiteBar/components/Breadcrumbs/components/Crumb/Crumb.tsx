@@ -4,6 +4,7 @@ import cx from 'classnames';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import useBoolState from 'Hooks/useBoolState';
 import { ExpandableMenu } from 'kwc';
+import { relative } from 'path';
 
 export interface BottomComponentProps {
   closeComponent: () => void;
@@ -13,14 +14,17 @@ export type CrumbProps = {
   crumbText: string;
   LeftIconComponent: React.ReactElement;
   children: (props: BottomComponentProps) => JSX.Element;
+  title?: string;
   isSelect?: boolean;
+  show?: boolean;
 };
 
-function Crumb({ crumbText, LeftIconComponent, dataTestId, children, isSelect }: CrumbProps) {
+function Crumb({ crumbText, LeftIconComponent, dataTestId, children, title, isSelect, show =  true }: CrumbProps) {
   const { value: opened, toggle: toggleComponent, deactivate: hideComponent } = useBoolState(false);
 
   return (
-    <div className={cx(styles.container, { [styles.select]: isSelect })} data-testid={dataTestId}>
+    <div className={cx(styles.container, { [styles.select]: isSelect, [styles.hidden]: !show })} data-testid={dataTestId}>
+      {title && <span className={styles.crumbTitle2}>{title}</span>}
       <div className={cx(styles.crumbContainer, { [styles.select]: isSelect })} onClick={toggleComponent}>
         {LeftIconComponent}
         <span className={styles.crumbText}>{crumbText}</span>

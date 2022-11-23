@@ -6,8 +6,10 @@ import Runtime from 'Pages/Project/panels/RuntimesList/components/Runtime';
 import useBoolState from 'Hooks/useBoolState';
 import useRuntime from 'Graphql/client/hooks/useRuntime';
 import { GetRuntimes_runtimes } from 'Graphql/queries/types/GetRuntimes';
-import { runningRuntime } from 'Graphql/client/cache';
+import { runningRuntime, selectedCapabilities, lastSelectedCapability } from 'Graphql/client/cache';
 import styles from './RuntimeRunner.module.scss';
+import { GetCapabilities_capabilities } from 'Graphql/queries/types/GetCapabilities';
+import Capability from 'Components/Capability/Capability';
 
 export enum RuntimeAction {
   Start,
@@ -17,11 +19,14 @@ export enum RuntimeAction {
 type Props = {
   action: RuntimeAction;
   runtime?: GetRuntimes_runtimes;
+  capability?: GetCapabilities_capabilities;
   children: JSX.Element;
 };
 
-const RuntimeRunner = ({ action, runtime, children }: Props) => {
+const RuntimeRunner = ({ action, runtime, capability, children }: Props) => {
   const { startRuntime, pauseRuntime } = useRuntime(runtime);
+  const selectedCapability = useReactiveVar(selectedCapabilities);
+  const { activate: showErrorModal, deactivate: closeErrorModal, value: isErrorModalVisible } = useBoolState();
   const {
     activate: showPauseRuntimeModal,
     deactivate: closePauseRuntimeModal,
@@ -36,29 +41,53 @@ const RuntimeRunner = ({ action, runtime, children }: Props) => {
 
   const handlePauseRuntime = () => {
     pauseRuntime();
+    selectedCapabilities(null);
   };
 
   const handleReplaceRuntime = () => {
-    startRuntime(runtime);
+    if (capability != null) {
+      startRuntime(runtime, capability?.id);
+      selectedCapabilities(capability);
+      lastSelectedCapability(capability);
+    }
     closeReplaceRuntimeModal();
   };
 
   const handleClick = () => {
+    if (action === RuntimeAction.Stop) {
+      showPauseRuntimeModal();
+      return;
+    }
     if (action === RuntimeAction.Start) {
       if (!runtimeRunning) {
-        startRuntime(runtime);
+        startRuntime(runtime, selectedCapability?.id);
         return;
       }
       showReplaceRuntimeModal();
-    }
-    if (action === RuntimeAction.Stop) {
-      showPauseRuntimeModal();
     }
   };
   return (
     <div>
       {React.cloneElement(children, { onClick: handleClick })}
       <div>
+        {isErrorModalVisible && (
+          <ModalContainer
+            title="CANNOT START TOOLS"
+            onAccept={closeErrorModal}
+            onCancel={closeErrorModal}
+            actionButtonLabel="Accept"
+            actionButtonCancel="Cancel"
+            className={cx(styles.runtimeModal, styles.close)}
+            error
+            blocking
+          >
+            <ModalLayoutInfo className={styles.runtimeModalInfo}>
+              <div data-testid="errorToolsModal">
+                <p>Please select a capability before starting the User Tools.</p>
+              </div>
+            </ModalLayoutInfo>
+          </ModalContainer>
+        )}
         {isPauseRuntimeModalVisible && (
           <ModalContainer
             title="STOP YOUR TOOLS"
@@ -73,7 +102,18 @@ const RuntimeRunner = ({ action, runtime, children }: Props) => {
             <ModalLayoutInfo className={styles.runtimeModalInfo}>
               <div data-testid="stopToolsModal">
                 <p>You are going to stop your user tools, please confirm your choice.</p>
-                {runtimeRunning && <Runtime runtime={runtimeRunning} isRunning={true} disabled={true} />}
+                {runtimeRunning &&
+                  <div>
+                    <p className={styles.title}>Runtime</p>
+                    <Runtime runtime={runtimeRunning} isRunning={true} disabled={true} />
+                  </div>
+                }
+                {selectedCapability &&
+                  <div>
+                    <p className={styles.title}>Capabilities</p>
+                    <Capability capabilityId={selectedCapability.id} capabilityName={selectedCapability.name} disabled={true} />
+                  </div>
+                }
               </div>
             </ModalLayoutInfo>
           </ModalContainer>
@@ -92,13 +132,35 @@ const RuntimeRunner = ({ action, runtime, children }: Props) => {
             <ModalLayoutInfo className={styles.runtimeModalInfo}>
               <div>
                 <p>You are about to stop this active Runtime. ¿Are you sure?</p>
-                {runtimeRunning && <Runtime runtime={runtimeRunning} isRunning={true} disabled={true} />}
+                {runtimeRunning &&
+                  <div>
+                    <p className={styles.title}>Runtime</p>
+                    <Runtime runtime={runtimeRunning} isRunning={true} disabled={true} />
+                  </div>
+                }
+                {selectedCapability &&
+                  <div>
+                    <p className={styles.title}>Capabilities</p>
+                    <Capability capabilityId={selectedCapability.id} capabilityName={selectedCapability.name} disabled={true} />
+                  </div>
+                }
               </div>
             </ModalLayoutInfo>
             <ModalLayoutInfo className={styles.runtimeModalInfo}>
               <div>
                 <p>And this Runtime will activate instead</p>
-                {runtime && <Runtime runtime={runtime} disabled={true} />}
+                {runtime &&
+                  <div>
+                    <p className={styles.title}>Runtime</p>
+                    <Runtime runtime={runtime} isRunning={false} disabled={true} />
+                  </div>
+                }
+                {capability &&
+                  <div>
+                    <p className={styles.title}>Capabilities</p>
+                    <Capability capabilityId={capability?.id} capabilityName={capability?.name} disabled={true} />
+                  </div>
+                }
               </div>
             </ModalLayoutInfo>
           </ModalContainer>

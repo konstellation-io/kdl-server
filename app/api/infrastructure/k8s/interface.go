@@ -19,6 +19,7 @@ type Client interface {
 	DeleteUserToolsCR(ctx context.Context, username string) error
 	IsUserToolPODRunning(ctx context.Context, username string) (bool, error)
 	GetRuntimeIDFromUserTools(ctx context.Context, username string) (string, error)
+	GetCapabilitiesIDFromUserTools(ctx context.Context, username string) (string, error)
 	CreateKDLProjectCR(ctx context.Context, projectID string) error
 	CreateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error
 	UpdateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error

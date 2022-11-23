@@ -9,6 +9,7 @@ import { NewProject } from './models/NewProject';
 import { PanelInfo } from './models/Panel';
 import { SettingsTab } from './models/SettingsTab';
 import { GetRuntimes_runtimes } from '../queries/types/GetRuntimes';
+import { GetCapabilities_capabilities } from '../queries/types/GetCapabilities';
 
 type ToolName = keyof GetUserTools_project_toolUrls;
 
@@ -74,6 +75,8 @@ export const lastRanRuntime = makeVar<GetRuntimes_runtimes | null>(null);
 // the actual running runtime
 export const runningRuntime = makeVar<GetRuntimes_runtimes | null>(null);
 export const loadingRuntime = makeVar<string | null>(null);
+export const selectedCapabilities = makeVar<GetCapabilities_capabilities | null>(null);
+export const lastSelectedCapability = makeVar<GetCapabilities_capabilities | null>(null);
 
 const cache = new InMemoryCache({
   typePolicies: {

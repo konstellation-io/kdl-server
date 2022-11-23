@@ -5,6 +5,7 @@
 .container {
   position: relative;
   display: flex;
+  flex-direction: row;
   align-items: center;
   height: 100%;
   cursor: pointer;
@@ -13,6 +14,25 @@
 
   &:not(&.select):hover {
     background-color: palette(base, 400);
+  }
+
+
+  &.hidden {
+    display: none;
+  }
+
+  .crumbTitle {
+    color: font-color(light);
+    font-size: small;
+    margin-right: 5px;
+  }
+
+  .crumbTitle2 {
+    position: absolute;
+    margin-bottom: 3 * $grid-unit;
+    color: palette(highlight);
+    font-size: smaller;
+    font-weight: bold;
   }
 
   .crumbContainer {

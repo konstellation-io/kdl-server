@@ -164,12 +164,17 @@ func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.S
 	username := ctx.Value(middleware.LoggedUserNameKey).(string)
 
 	if input.Active {
-		u, err := r.users.StartTools(ctx, username, input.RuntimeID)
+		u, err := r.users.StartTools(ctx, username, input.RuntimeID, input.CapabilitiesID)
+		if err != nil {
+			r.logger.Errorf("Error on StartTools: %w", err)
+		}
 		return &u, err
 	}
 
 	u, err := r.users.StopTools(ctx, username)
-
+	if err != nil {
+		r.logger.Errorf("Error on StartTools: %w", err)
+	}
 	return &u, err
 }
 
@@ -269,6 +274,15 @@ func (r *queryResolver) Runtimes(ctx context.Context) ([]entity.Runtime, error) 
 func (r *queryResolver) RunningRuntime(ctx context.Context) (*entity.Runtime, error) {
 	runtime, err := r.runtimes.GetRunningRuntime(ctx, ctx.Value(middleware.LoggedUserNameKey).(string))
 	return runtime, err
+}
+
+func (r *queryResolver) Capabilities(ctx context.Context) ([]model.Capability, error) {
+	return r.capabilities.GetCapabilities(ctx)
+}
+
+func (r *queryResolver) RunningCapability(ctx context.Context) (*model.Capability, error) {
+	capabilities, err := r.capabilities.GetRunningCapability(ctx, ctx.Value(middleware.LoggedUserNameKey).(string))
+	return capabilities, err
 }
 
 func (r *queryResolver) Kubeconfig(ctx context.Context) (string, error) {

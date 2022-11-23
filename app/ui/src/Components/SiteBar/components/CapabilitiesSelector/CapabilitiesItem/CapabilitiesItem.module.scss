@@ -1,0 +1,50 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: palette(base);
+  padding: $grid-unit;
+  @include font-small;
+  color: font-color(lowlight);
+  width: 100%;
+  transition:
+    background-color ease 0.3s,
+    color ease 0.2s, opacity ease 0.3s;
+
+  &:hover {
+    background-color: palette(base, 300);
+  }
+
+  .nameContainer {
+    margin-left: $grid-unit;
+    display: flex;
+
+    .name {
+      display: flex;
+      margin-left: $grid-unit;
+    }
+  }
+
+  .labels {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 0.5 * $grid-unit;
+    margin-top: 1.1 * $grid-unit;
+    margin-left: 4 * $grid-unit;
+
+    .label {
+      position: relative;
+      float: left;
+      margin: 0 1.5 * $grid-unit 0 0;
+      padding: 0.4 * $grid-unit 1.5 * $grid-unit;
+      background-color: palette(tag);
+      border-radius: 0.5 * $grid-unit;
+      @include font-small;
+      color: font-color(regular);
+    }
+  }
+}

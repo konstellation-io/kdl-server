@@ -28,6 +28,7 @@ func (k *k8sClient) DeleteUserToolsCR(ctx context.Context, username string) erro
 	})
 
 	if err != nil {
+		k.logger.Errorf("Error deleting user tools: %w", err)
 		return err
 	}
 
@@ -103,6 +104,21 @@ func (k k8sClient) GetRuntimeIDFromUserTools(ctx context.Context, username strin
 	labels := pod.GetLabels()
 	if runtimeID, found := labels["runtimeId"]; found {
 		return runtimeID, nil
+	}
+
+	return "", nil
+}
+
+// GetCapabilitiesIDFromUserTools returns the runtimeId that the user tools runtime POD is using.
+func (k k8sClient) GetCapabilitiesIDFromUserTools(ctx context.Context, username string) (string, error) {
+	pod, err := k.getUserToolsPod(ctx, username)
+	if err != nil {
+		return "", nil
+	}
+
+	labels := pod.GetLabels()
+	if capability, found := labels["capabilityId"]; found {
+		return capability, nil
 	}
 
 	return "", nil
@@ -290,7 +306,8 @@ func (k *k8sClient) getUserToolsDefinition(
 					"externalServerUrl": k.cfg.UserToolsKubeconfig.ExternalServerURL,
 				},
 				"vscodeRuntime": map[string]interface{}{
-					"runtimeId": runtimeID,
+					"runtimeId":    runtimeID,
+					"capabilityId": capabilities.ID,
 					"image": map[string]string{
 						"repository": runtimeImage,
 						"tag":        runtimeTag,

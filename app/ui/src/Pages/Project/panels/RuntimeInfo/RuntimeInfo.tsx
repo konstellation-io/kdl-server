@@ -3,7 +3,7 @@ import { GetRuntimes_runtimes } from 'Graphql/queries/types/GetRuntimes';
 import styles from './RuntimeInfo.module.scss';
 import LabelList from '../RuntimesList/components/LabelList';
 import { useReactiveVar } from '@apollo/client';
-import { loadingRuntime, runningRuntime } from 'Graphql/client/cache';
+import { loadingRuntime, runningRuntime, selectedCapabilities } from 'Graphql/client/cache';
 import DOMPurify from 'dompurify';
 
 type Props = {
@@ -14,6 +14,7 @@ type Props = {
 function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
   const activeRuntime = useReactiveVar(runningRuntime);
   const runtimeLoading = useReactiveVar(loadingRuntime);
+  const selectedCapability = useReactiveVar(selectedCapabilities)
   const running = activeRuntime?.id === runtime.id;
   const runtimeSafeDesc = DOMPurify.sanitize(runtime.desc, { USE_PROFILES: { html: true } });
   const checkReady = () => {
@@ -37,7 +38,12 @@ function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
         <div data-testid="runtimeInfoPanel">
           <div className={styles.title}>
             <h1 className={styles.headerName}>{runtime.name}</h1>
+          </div>
+          <div className={styles.runtimeLabels}>
             {checkReady()}
+            <div className={styles.capabilitiesTag} data-testid="capabilitiesTag">
+              {selectedCapability?.name}
+            </div>
           </div>
           <div className={styles.runtimeTags}>
             <LabelList runtime={runtime} />

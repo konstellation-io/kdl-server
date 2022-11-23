@@ -9,16 +9,10 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 const capabilitiesCollName = "capabilities"
-
-type capabilityDTO struct {
-	ID         primitive.ObjectID  `bson:"_id"`
-	Capability entity.Capabilities `bson:"capabilities"`
-}
 
 type capabilitiesMongoDBRepo struct {
 	logger     logging.Logger
@@ -50,7 +44,7 @@ func (m *capabilitiesMongoDBRepo) Get(ctx context.Context, id string) (entity.Ca
 	return cap, nil
 }
 
-// FindAll retrieves all capabilities.
+// Find all the capabilities in the database.
 func (m *capabilitiesMongoDBRepo) FindAll(ctx context.Context) ([]entity.Capabilities, error) {
 	caps := []entity.Capabilities{}
 
@@ -61,7 +55,7 @@ func (m *capabilitiesMongoDBRepo) FindAll(ctx context.Context) ([]entity.Capabil
 		return caps, err
 	}
 
-	err = response.Decode(&caps)
+	err = response.All(ctx, &caps)
 	if response.Err() != nil {
 		return caps, err
 	}

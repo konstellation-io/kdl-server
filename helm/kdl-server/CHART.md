@@ -18,7 +18,7 @@
 | backup.extraVolumes | list | `[]` | Extra volumes for backup pods |
 | backup.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | backup.image.repository | string | `"konstellation/kdl-backup"` | Image repository |
-| backup.image.tag | string | `"0.22.0"` | Image tag |
+| backup.image.tag | string | `"0.23.0"` | Image tag |
 | backup.name | string | `"backup-gitea"` | Name of the backup cronjob |
 | backup.resources | object | `{"limits":{"cpu":"100m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"100Mi"}}` | Resource requests and limits for backup container. Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/ |
 | backup.s3.awsAccessKeyID | string | `"aws-access-key-id"` | AWS Access Key ID for acceding backup bucket |
@@ -80,7 +80,7 @@
 | gitea.tolerations | list | `[]` | If specified, the pod's tolerations. Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | giteaOauth2Setup.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | giteaOauth2Setup.image.repository | string | `"konstellation/gitea-oauth2-setup"` | The image repository |
-| giteaOauth2Setup.image.tag | string | `"0.15.0"` | The image tag |
+| giteaOauth2Setup.image.tag | string | `"0.16.0"` | The image tag |
 | global.domain | string | `"kdl.local"` | The DNS domain name that will serve the application |
 | global.ingress.tls.caSecret | object | `{}` | A secret containing the the CA cert is needed in order to use a self-signed certificate. Check [values.yaml](./values.yaml) for usage details. |
 | global.ingress.tls.enabled | bool | `true` | Whether to enable TLS |
@@ -91,7 +91,7 @@
 | kdlServer.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | kdlServer.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | kdlServer.image.repository | string | `"konstellation/kdl-server"` | The image repository |
-| kdlServer.image.tag | string | `"1.27.0"` | The image tag |
+| kdlServer.image.tag | string | `"1.28.0"` | The image tag |
 | kdlServer.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-body-size":"1000000m","nginx.ingress.kubernetes.io/proxy-connect-timeout":"3600","nginx.ingress.kubernetes.io/proxy-read-timeout":"3600","nginx.ingress.kubernetes.io/proxy-send-timeout":"3600"}` | Ingress annotations |
 | kdlServer.ingress.className | string | `"nginx"` | The ingress class name |
 | kdlServer.ingress.tls.secretName | string | `nil` | The TLS secret name that will be used. It takes precedence over `.Values.global.ingress.tls.secretName`. |
@@ -136,22 +136,28 @@
 | postgres.storage.storageClassName | string | `"standard"` | Storage class to use for persistence |
 | postgres.tolerations | list | `[]` | If specified, the pod's tolerations. Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | projectOperator.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
+| projectOperator.filebrowser.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | projectOperator.filebrowser.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | projectOperator.filebrowser.image.repository | string | `"filebrowser/filebrowser"` | The image repository |
 | projectOperator.filebrowser.image.tag | string | `"v2"` | The image tag |
+| projectOperator.filebrowser.nodeSelector | object | `{}` | Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
+| projectOperator.filebrowser.tolerations | list | `[]` | If specified, the pod's tolerations. Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | projectOperator.kubeRbacProxy.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | projectOperator.kubeRbacProxy.image.repository | string | `"gcr.io/kubebuilder/kube-rbac-proxy"` | Image repository |
 | projectOperator.kubeRbacProxy.image.tag | string | `"v0.8.0"` | Image tag |
 | projectOperator.manager.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | projectOperator.manager.image.repository | string | `"konstellation/project-operator"` | The image repository |
-| projectOperator.manager.image.tag | string | `"0.16.0"` | The image tag |
+| projectOperator.manager.image.tag | string | `"0.18.0"` | The image tag |
 | projectOperator.manager.resources | object | `{}` | Resource requests and limits for primary projectOperator container. Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/ |
+| projectOperator.mlflow.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | projectOperator.mlflow.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | projectOperator.mlflow.image.repository | string | `"konstellation/mlflow"` | The image repository |
 | projectOperator.mlflow.image.tag | string | `"v0.13.5"` | The image tag |
 | projectOperator.mlflow.ingress.annotations | object | `{}` | Ingress annotations |
 | projectOperator.mlflow.ingress.className | string | `"nginx"` | The ingress class name |
 | projectOperator.mlflow.ingress.tls.secretName | string | `nil` | The TLS secret name that will be used. It takes precedence over `.Values.global.ingress.tls.secretName`. |
+| projectOperator.mlflow.nodeSelector | object | `{}` | Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
+| projectOperator.mlflow.tolerations | list | `[]` | If specified, the pod's tolerations. Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | projectOperator.mlflow.volume.size | string | `"1Gi"` | The storage size for the persistent volume claim |
 | projectOperator.mlflow.volume.storageClassName | string | `"standard"` | Storage class to use for persistence |
 | projectOperator.nodeSelector | object | `{}` | Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |
@@ -162,7 +168,7 @@
 | userToolsOperator.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | userToolsOperator.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | userToolsOperator.image.repository | string | `"konstellation/user-tools-operator"` | The image repository |
-| userToolsOperator.image.tag | string | `"0.25.0"` | The image tag |
+| userToolsOperator.image.tag | string | `"0.26.0"` | The image tag |
 | userToolsOperator.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/configuration-snippet":"more_set_headers \"Content-Security-Policy: frame-ancestors 'self' *\";\n","nginx.ingress.kubernetes.io/proxy-body-size":"1000000m"}` | Ingress annotations |
 | userToolsOperator.ingress.className | string | `"nginx"` | The ingress class name |
 | userToolsOperator.ingress.tls.secretName | string | `nil` | The TLS secret name that will be used. It takes precedence over `.Values.global.ingress.tls.secretName`. |

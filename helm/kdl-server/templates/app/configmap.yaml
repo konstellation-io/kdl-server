@@ -47,10 +47,22 @@ data:
   {{- if and .Values.global.ingress.tls.enabled (or (not (kindIs "invalid" .Values.projectOperator.mlflow.ingress.tls.secretName )) (not (kindIs "invalid" .Values.global.ingress.tls.secretName ))) }}
   PROJECT_MLFLOW_INGRESS_TLS_SECRET_NAME: "{{ include "projectOperator.mlflow.tlsSecretName" . }}"
   {{- end }}
+  PROJECT_MLFLOW_NODESELECTOR: |+
+    {{- toYaml .Values.projectOperator.mlflow.nodeSelector | b64enc | nindent 4 }}
+  ROJECT_MLFLOW_AFFINITY: |+
+    {{- toYaml .Values.projectOperator.mlflow.affinity | b64enc | nindent 4 }}
+  ROJECT_MLFLOW_TOLERATIONS: |+
+    {{- toYaml .Values.projectOperator.mlflow.tolerations | b64enc | nindent 4 }}
 
   PROJECT_FILEBROWSER_IMG_REPO: "{{ .Values.projectOperator.filebrowser.image.repository }}"
   PROJECT_FILEBROWSER_IMG_TAG: "{{ .Values.projectOperator.filebrowser.image.tag }}"
   PROJECT_FILEBROWSER_IMG_PULLPOLICY: "{{ .Values.projectOperator.filebrowser.image.pullPolicy }}"
+  PROJECT_FILEBROWSER_NODESELECTOR: |+
+    {{- toYaml .Values.projectOperator.filebrowser.nodeSelector | b64enc | nindent 4 }}
+  PROJECT_FILEBROWSER_AFFINITY: |+
+    {{- toYaml .Values.projectOperator.filebrowser.affinity | b64enc | nindent 4 }}
+  PROJECT_FILEBROWSER_TOLERATIONS: |+
+    {{- toYaml .Values.projectOperator.filebrowser.tolerations | b64enc | nindent 4 }}
 
   VSCODE_IMG_REPO: "{{ .Values.userToolsOperator.vscode.image.repository }}"
   VSCODE_IMG_TAG: "{{ .Values.userToolsOperator.vscode.image.tag }}"

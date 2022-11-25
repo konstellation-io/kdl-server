@@ -18,6 +18,18 @@ spec:
       labels:
         app: {{ .Values.projectId }}-mlflow
     spec:
+    {{- with .Values.mlflow.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.mlflow.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.mlflow.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       containers:
         - name: mlflow
           image: {{ .Values.mlflow.image.repository }}:{{ .Values.mlflow.image.tag }}

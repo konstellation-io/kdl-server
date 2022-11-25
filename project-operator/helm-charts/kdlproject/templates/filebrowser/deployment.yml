@@ -18,10 +18,22 @@ spec:
       labels:
         app: {{ .Values.projectId }}-filebrowser
     spec:
+    {{- with .Values.filebrowser.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.filebrowser.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.filebrowser.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       containers:
         - name: filebrowser
           image: {{ .Values.filebrowser.image.repository }}:{{ .Values.filebrowser.image.tag }}
-          imagePullPolicy: {{ .Values.mlflow.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.filebrowser.image.pullPolicy }}
           command:
             - /bin/sh
           args:

@@ -40,9 +40,15 @@ mlflow:
     tls:
       enabled: false
       # secretName: tls-secret-name
+  nodeSelector: {}
+  affinity: {}
+  tolerations: {}
 
 filebrowser:
   image:
     repository: filebrowser/filebrowser
     tag: v2
     pullPolicy: IfNotPresent
+  nodeSelector: {}
+  affinity: {}
+  tolerations: {}

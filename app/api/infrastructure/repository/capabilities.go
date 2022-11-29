@@ -27,21 +27,21 @@ func NewCapabilitiesMongoDBRepo(logger logging.Logger, client *mongo.Client, dbN
 
 // Get retrieves a capabilities struct using an identifier.
 func (m *capabilitiesMongoDBRepo) Get(ctx context.Context, id string) (entity.Capabilities, error) {
-	cap := entity.Capabilities{}
+	capability := entity.Capabilities{}
 
 	response := m.collection.FindOne(ctx, bson.M{"_id": id})
 	if err := response.Err(); errors.Is(err, mongo.ErrNoDocuments) {
-		return cap, entity.ErrCapabilitiesNotFound
+		return capability, entity.ErrCapabilitiesNotFound
 	} else if err != nil {
-		return cap, err
+		return capability, err
 	}
 
-	err := response.Decode(&cap)
+	err := response.Decode(&capability)
 	if response.Err() != nil {
-		return cap, err
+		return capability, err
 	}
 
-	return cap, nil
+	return capability, nil
 }
 
 // Find all the capabilities in the database.

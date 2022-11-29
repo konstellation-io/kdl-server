@@ -49,7 +49,8 @@ func (i *interactor) GetCapabilities(ctx context.Context) ([]model.Capability, e
 
 	i.logger.Infof("Retrieved capabilities: %w", capabilities)
 
-	capabilitiesList := make([]model.Capability, len(capabilities))
+	//nolint:prealloc // No need to preallocate.
+	var capabilitiesList []model.Capability
 	for _, element := range capabilities {
 		capabilitiesList = append(capabilitiesList, model.Capability{ID: element.ID, Name: element.Name, Default: element.Default})
 	}

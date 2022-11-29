@@ -169,6 +169,7 @@ func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.S
 	}
 
 	u, err := r.users.StopTools(ctx, username)
+
 	return &u, err
 }
 

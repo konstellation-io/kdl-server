@@ -8,7 +8,7 @@ import (
 )
 
 func TestCapabilitiesNodeSelector(t *testing.T) {
-	cap := &entity.Capabilities{
+	capability := &entity.Capabilities{
 		ID:      "test_id",
 		Name:    "Test capability",
 		Default: false,
@@ -19,7 +19,7 @@ func TestCapabilitiesNodeSelector(t *testing.T) {
 		Taints:     []string{},
 	}
 
-	nodeSelectors := cap.GetNodeSelectors()
+	nodeSelectors := capability.GetNodeSelectors()
 
 	if !reflect.DeepEqual(nodeSelectors, map[string]string{"test1": "value1"}) {
 		t.Errorf("The NodeSelector has not the expected values")

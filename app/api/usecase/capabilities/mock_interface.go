@@ -78,6 +78,7 @@ type MockUseCaseMockRecorder struct {
 func NewMockUseCase(ctrl *gomock.Controller) *MockUseCase {
 	mock := &MockUseCase{ctrl: ctrl}
 	mock.recorder = &MockUseCaseMockRecorder{mock}
+
 	return mock
 }
 
@@ -92,6 +93,7 @@ func (m *MockUseCase) GetCapabilities(ctx context.Context) ([]entity.Capabilitie
 	ret := m.ctrl.Call(m, "GetCapabilities", ctx)
 	ret0, _ := ret[0].([]entity.Capabilities)
 	ret1, _ := ret[1].(error)
+
 	return ret0, ret1
 }
 

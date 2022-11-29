@@ -9,7 +9,7 @@ import (
 	"github.com/gosimple/slug"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/capability"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 
 	"github.com/golang/mock/gomock"
@@ -37,7 +37,7 @@ type userMocks struct {
 	cfg              config.Config
 	repo             *user.MockRepository
 	runtimeRepo      *runtime.MockRepository
-	capabilitiesRepo *capability.MockRepository
+	capabilitiesRepo *capabilities.MockRepository
 	sshGenerator     *sshhelper.MockSSHKeyGenerator
 	clock            *clock.MockClock
 	giteaService     *giteaservice.MockGiteaClient
@@ -49,7 +49,7 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	logger := logging.NewMockLogger(ctrl)
 	repo := user.NewMockRepository(ctrl)
 	repoRuntimes := runtime.NewMockRepository(ctrl)
-	repoCapabilities := capability.NewMockRepository(ctrl)
+	repoCapabilities := capabilities.NewMockRepository(ctrl)
 	clockMock := clock.NewMockClock(ctrl)
 	sshGenerator := sshhelper.NewMockSSHKeyGenerator(ctrl)
 	giteaServiceMock := giteaservice.NewMockGiteaClient(ctrl)

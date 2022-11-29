@@ -49,7 +49,7 @@ func (i *interactor) GetCapabilities(ctx context.Context) ([]model.Capability, e
 
 	i.logger.Infof("Retrieved capabilities: %w", capabilities)
 
-	var capabilitiesList []model.Capability
+	capabilitiesList := make([]model.Capability, len(capabilities))
 	for _, element := range capabilities {
 		capabilitiesList = append(capabilitiesList, model.Capability{ID: element.ID, Name: element.Name, Default: element.Default})
 	}
@@ -57,17 +57,17 @@ func (i *interactor) GetCapabilities(ctx context.Context) ([]model.Capability, e
 	return capabilitiesList, err
 }
 
-// Retrieve the running capability
+// Retrieve the running capability.
 func (i *interactor) GetRunningCapability(ctx context.Context, username string) (*model.Capability, error) {
-	capabilityId, err := i.k8sClient.GetCapabilitiesIDFromUserTools(ctx, username)
+	capabilityID, err := i.k8sClient.GetCapabilitiesIDFromUserTools(ctx, username)
 	if err != nil {
 		return nil, err
 	}
 
-	if capabilityId != "" {
-		i.logger.Infof("Capability in runtime POD: %w", capabilityId)
+	if capabilityID != "" {
+		i.logger.Infof("Capability in runtime POD: %w", capabilityID)
 
-		capability, err := i.repo.Get(ctx, capabilityId)
+		capability, err := i.repo.Get(ctx, capabilityID)
 		if err != nil {
 			return nil, err
 		}

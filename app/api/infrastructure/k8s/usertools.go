@@ -245,8 +245,8 @@ func (k *k8sClient) getUserToolsDefinition(
 			},
 			"spec": map[string]interface{}{
 				"nodeSelector": capabilities.GetNodeSelectors(),
-				//"affinity": capabilities.GetAffinities(), // TODO add affinity to specs
-				//"tolerations": capabilities.GetTolerations(), // TODO add tolerations to specs
+				// "affinity": capabilities.GetAffinities(), // TODO add affinity to specs
+				// "tolerations": capabilities.GetTolerations(), // TODO add tolerations to specs
 				"domain": k.cfg.BaseDomainName,
 				"ingress": map[string]interface{}{
 					"annotations": ingressAnnotations,

@@ -9,7 +9,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
 )
 
-// Repository interface to retrieve and persists capabilites.
+// Repository interface to retrieve and persists capabilities.
 type Repository interface {
 	Get(ctx context.Context, id string) (entity.Capabilities, error)
 	FindAll(ctx context.Context) ([]entity.Capabilities, error)

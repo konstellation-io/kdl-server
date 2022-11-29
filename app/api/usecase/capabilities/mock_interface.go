@@ -22,6 +22,7 @@ type MockRepositoryMockRecorder struct {
 func NewMockRepository(ctrl *gomock.Controller) *MockRepository {
 	mock := &MockRepository{ctrl: ctrl}
 	mock.recorder = &MockRepositoryMockRecorder{mock}
+
 	return mock
 }
 
@@ -36,6 +37,7 @@ func (m *MockRepository) FindAll(ctx context.Context) ([]entity.Capabilities, er
 	ret := m.ctrl.Call(m, "FindAll", ctx)
 	ret0, _ := ret[0].([]entity.Capabilities)
 	ret1, _ := ret[1].(error)
+
 	return ret0, ret1
 }
 
@@ -51,6 +53,7 @@ func (m *MockRepository) Get(ctx context.Context, id string) (entity.Capabilitie
 	ret := m.ctrl.Call(m, "Get", ctx, id)
 	ret0, _ := ret[0].(entity.Capabilities)
 	ret1, _ := ret[1].(error)
+
 	return ret0, ret1
 }
 

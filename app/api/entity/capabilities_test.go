@@ -9,8 +9,8 @@ import (
 
 func TestCapabilitiesNodeSelector(t *testing.T) {
 	cap := &entity.Capabilities{
-		ID:   "test_id",
-		Name: "Test capability",
+		ID:      "test_id",
+		Name:    "Test capability",
 		Default: false,
 		NodeSelectors: map[string]string{
 			"test1": "value1",

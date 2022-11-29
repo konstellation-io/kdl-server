@@ -150,7 +150,7 @@ func (i *interactor) GetByUsername(ctx context.Context, username string) (entity
 
 // StartTools creates a user-tools CustomResource in K8s to initialize the VSCode and Jupyter for the given username.
 // If there are already a user-tools for the user, they are replaced (stop + start new).
-func (i *interactor) StartTools(ctx context.Context, username string, runtimeID *string, capabilitiesId *string) (entity.User, error) {
+func (i *interactor) StartTools(ctx context.Context, username string, runtimeID, capabilitiesID *string) (entity.User, error) {
 	user, err := i.repo.GetByUsername(ctx, username)
 	if err != nil {
 		return entity.User{}, err
@@ -189,15 +189,15 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeID 
 		i.logger.Debugf("Using default runtime image \"%s:%s\"", rImage, rTag)
 	}
 
-	capabilities, err := i.repoCapabilities.Get(ctx, *capabilitiesId)
+	capability, err := i.repoCapabilities.Get(ctx, *capabilitiesID)
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	i.logger.Debugf("------------------ %+v", capabilities)
+	i.logger.Debugf("------------------ %+v", capability)
 	i.logger.Infof("Creating user tools for user: \"%s\"", username)
 
-	err = i.k8sClient.CreateUserToolsCR(ctx, username, rID, rImage, rTag, capabilities)
+	err = i.k8sClient.CreateUserToolsCR(ctx, username, rID, rImage, rTag, capability)
 	if err != nil {
 		return entity.User{}, err
 	}

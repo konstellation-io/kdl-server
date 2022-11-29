@@ -34,7 +34,6 @@ type runtimeMongoDBRepo struct {
 func (m *runtimeMongoDBRepo) Get(ctx context.Context, id string) (entity.Runtime, error) {
 	idFromHex, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		m.logger.Errorf("Error writting primitive: %w", err)
 		return entity.Runtime{}, err
 	}
 

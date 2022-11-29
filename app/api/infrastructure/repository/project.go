@@ -187,7 +187,7 @@ func (m *projectMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entit
 
 	dto := projectDTO{}
 
-	err := m.collection.FindOne(ctx, filters).Decode(&dto) // TODO fix gestion errores
+	err := m.collection.FindOne(ctx, filters).Decode(&dto)
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		return entity.Project{}, entity.ErrProjectNotFound
 	}

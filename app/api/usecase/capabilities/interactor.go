@@ -57,6 +57,7 @@ func (i *interactor) GetCapabilities(ctx context.Context) ([]model.Capability, e
 	return capabilitiesList, err
 }
 
+// Retrieve the running capability
 func (i *interactor) GetRunningCapability(ctx context.Context, username string) (*model.Capability, error) {
 	capabilityId, err := i.k8sClient.GetCapabilitiesIDFromUserTools(ctx, username)
 	if err != nil {
@@ -64,7 +65,7 @@ func (i *interactor) GetRunningCapability(ctx context.Context, username string) 
 	}
 
 	if capabilityId != "" {
-		i.logger.Infof("Capability in runtime POD " + capabilityId)
+		i.logger.Infof("Capability in runtime POD: %w", capabilityId)
 
 		capability, err := i.repo.Get(ctx, capabilityId)
 		if err != nil {

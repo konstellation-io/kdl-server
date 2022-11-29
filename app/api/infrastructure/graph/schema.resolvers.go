@@ -165,16 +165,10 @@ func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.S
 
 	if input.Active {
 		u, err := r.users.StartTools(ctx, username, input.RuntimeID, input.CapabilitiesID)
-		if err != nil {
-			r.logger.Errorf("Error on StartTools: %w", err)
-		}
 		return &u, err
 	}
 
 	u, err := r.users.StopTools(ctx, username)
-	if err != nil {
-		r.logger.Errorf("Error on StartTools: %w", err)
-	}
 	return &u, err
 }
 

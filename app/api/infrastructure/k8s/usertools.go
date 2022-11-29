@@ -109,7 +109,7 @@ func (k k8sClient) GetRuntimeIDFromUserTools(ctx context.Context, username strin
 	return "", nil
 }
 
-// GetCapabilitiesIDFromUserTools returns the runtimeId that the user tools runtime POD is using.
+// GetCapabilitiesIDFromUserTools returns the capabilityId that the user tools runtime POD is using.
 func (k k8sClient) GetCapabilitiesIDFromUserTools(ctx context.Context, username string) (string, error) {
 	pod, err := k.getUserToolsPod(ctx, username)
 	if err != nil {

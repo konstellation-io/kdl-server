@@ -11,10 +11,6 @@ type Props = {
 };
 
 function sortCapability(capability1: GetCapabilities_capabilities, capability2: GetCapabilities_capabilities, selectedCapabilityId: string | null) {
-  /*if (selectedCapabilityId) {
-    return capability1.id === selectedCapabilityId ? 2 : capability1.default ? 1 : -1;
-  }*/
-
   return capability1.default? 1 : -1;
 }
 

@@ -9,13 +9,13 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
 )
 
-// Repository interface to retrieve and persists projects.
+// Repository interface to retrieve and persists capabilites.
 type Repository interface {
 	Get(ctx context.Context, id string) (entity.Capabilities, error)
 	FindAll(ctx context.Context) ([]entity.Capabilities, error)
 }
 
-// UseCase interface to manage all operations related with projects.
+// UseCase interface to manage all operations related with capabilities.
 type UseCase interface {
 	GetCapabilities(ctx context.Context) ([]model.Capability, error)
 	GetRunningCapability(ctx context.Context, username string) (*model.Capability, error)

@@ -150,6 +150,19 @@ func (mr *MockClientMockRecorder) GetRuntimeIDFromUserTools(ctx, username interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRuntimeIDFromUserTools", reflect.TypeOf((*MockClient)(nil).GetRuntimeIDFromUserTools), ctx, username)
 }
 
+func (m *MockClient) GetCapabilitiesIDFromUserTools(ctx context.Context, username string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCapabilitiesIDFromUserTools", ctx, username)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (mr *MockClientMockRecorder) GetCapabilitiesIDFromUserTools(ctx context.Context, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCapabilitiesIDFromUserTools", reflect.TypeOf((*MockClient)(nil).GetCapabilitiesIDFromUserTools), ctx, username)
+}
+
 // GetSecret mocks base method.
 func (m *MockClient) GetSecret(ctx context.Context, name string) (map[string][]byte, error) {
 	m.ctrl.T.Helper()

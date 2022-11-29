@@ -166,7 +166,6 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeID 
 		// ignore the user returned by the stop, as it the same as we already have
 		_, err := i.StopTools(ctx, username)
 		if err != nil {
-			i.logger.Errorf("Error stoping user tools: %w", err)
 			return entity.User{}, err
 		}
 	}
@@ -176,7 +175,6 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeID 
 	if runtimeID != nil {
 		r, err := i.repoRuntimes.Get(ctx, *runtimeID)
 		if err != nil {
-			i.logger.Errorf("Error retrieving runtime with id %s: %w", *runtimeID, err)
 			return entity.User{}, err
 		}
 
@@ -193,7 +191,6 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeID 
 
 	capabilities, err := i.repoCapabilities.Get(ctx, *capabilitiesId)
 	if err != nil {
-		i.logger.Errorf("Error retrieving capabilities: %w", err)
 		return entity.User{}, err
 	}
 

@@ -52,7 +52,7 @@ function Runtime({ runtime, isRunning, disabled }: Props) {
         [styles.loading]: runtimeLoading === runtime.id || (isRunning && runtimeLoading !== null),
         [styles.disabled]: disabled || selectedCapability === null,
       })}
-      onClick={() => !disabled && selectedCapability !== null && toggleRuntimePanel()}
+      onClick={() => !disabled && selectedCapability && toggleRuntimePanel()}
     >
       <div className={styles.content}>
         <p className={styles.name} data-testid="runtimeName">

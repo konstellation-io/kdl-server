@@ -76,7 +76,6 @@ export const lastRanRuntime = makeVar<GetRuntimes_runtimes | null>(null);
 export const runningRuntime = makeVar<GetRuntimes_runtimes | null>(null);
 export const loadingRuntime = makeVar<string | null>(null);
 export const selectedCapabilities = makeVar<GetCapabilities_capabilities | null>(null);
-export const lastSelectedCapability = makeVar<GetCapabilities_capabilities | null>(null);
 
 const cache = new InMemoryCache({
   typePolicies: {

@@ -16,18 +16,19 @@ function CapabilitiesItem({ capability }: Props) {
   const isCapabilitySelected = selectedCapability?.id === capability.id;
 
   const getRuntimeStatus = () => {
-
-    // TODO change enum
     if (isCapabilitySelected) return RUNTIME_STATUS.RUNNING;
     return RUNTIME_STATUS.NOT_SELECTED;
   };
 
   return (
-    <RuntimeRunner runtime={runtimeRunning?runtimeRunning : undefined} capability={capability} action={RuntimeAction.Start}>
+    <RuntimeRunner
+      runtime={runtimeRunning ? runtimeRunning : undefined}
+      capability={capability}
+      action={RuntimeAction.ReplaceCapability}>
       <button className={styles.container} disabled={isCapabilitySelected}>
         <div className={styles.nameContainer}>
           <RuntimeIcon status={getRuntimeStatus()} className="icon-regular" />
-          <div className={styles.name}>{capability.name} - { capability.default? "True" : "False" }</div>
+          <div className={styles.name}>{capability.name}</div>
         </div>
       </button>
     </RuntimeRunner>

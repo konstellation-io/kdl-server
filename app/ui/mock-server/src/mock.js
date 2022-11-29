@@ -20,7 +20,7 @@ module.exports = {
     project: (_, { id }) => projects.find((project) => project.id === id),
     runtimes: () => runtimes,
     capabilities: () => capabilities,
-    runningCapabilities: () => null/*capabilities[casual.integer(0, 4)]*/,
+    runningCapability: () => capabilities[casual.integer(0, 4)],
     runningRuntime: () => runtimes[casual.integer(0, 7)],
     kubeconfig: () => kubeconfig(),
   }),

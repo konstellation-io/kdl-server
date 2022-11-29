@@ -25,7 +25,7 @@ function Capability({ capabilityId, capabilityName, disabled = false }: Props) {
         if (selectedCapability?.id === capabilityId) {
           selectedCapabilities(null);
         } else {
-          selectedCapabilities({ __typename: "Capability", id: capabilityId, name: capabilityName, default: false});
+          selectedCapabilities({ __typename: 'Capability', id: capabilityId, name: capabilityName, default: false });
         }
       }}
     >

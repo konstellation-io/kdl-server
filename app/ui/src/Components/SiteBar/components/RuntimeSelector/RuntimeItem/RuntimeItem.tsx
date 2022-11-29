@@ -32,7 +32,8 @@ function RuntimeItem({ runtime }: Props) {
     <RuntimeRunner
       runtime={runtime}
       capability={selectedCapability ? selectedCapability : undefined}
-      action={RuntimeAction.Start}>
+      action={RuntimeAction.Start}
+    >
       <button className={styles.container} disabled={runtimeLoading !== null || isRuntimeRunning}>
         <div className={styles.nameContainer}>
           <RuntimeIcon status={getRuntimeStatus()} className="icon-regular" />

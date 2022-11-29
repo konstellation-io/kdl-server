@@ -1,5 +1,4 @@
 import { GetCapabilities_capabilities } from 'Graphql/queries/types/GetCapabilities';
-import { GetRunningRuntime_runningRuntime } from '../../Graphql/queries/types/GetRunningRuntime';
 
 export const capability: GetCapabilities_capabilities = {
   __typename: 'Capability',

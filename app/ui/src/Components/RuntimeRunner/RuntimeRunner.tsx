@@ -14,7 +14,7 @@ import Capability from 'Components/Capability/Capability';
 export enum RuntimeAction {
   Start,
   Stop,
-  ReplaceCapability
+  ReplaceCapability,
 }
 
 type Props = {
@@ -57,7 +57,7 @@ const RuntimeRunner = ({ action, runtime, capability, children }: Props) => {
     closeReplaceRuntimeModal();
   };
 
-   const handleReplaceCapability = () => {
+  const handleReplaceCapability = () => {
     if (capability != null) {
       selectedCapabilities(capability);
       if (runtime != null) {
@@ -125,18 +125,22 @@ const RuntimeRunner = ({ action, runtime, capability, children }: Props) => {
             <ModalLayoutInfo className={styles.runtimeModalInfo}>
               <div data-testid="stopToolsModal">
                 <p>You are going to stop your user tools, please confirm your choice.</p>
-                {runtimeRunning &&
+                {runtimeRunning && (
                   <div>
                     <p className={styles.title}>Runtime</p>
                     <Runtime runtime={runtimeRunning} isRunning={true} disabled={true} />
                   </div>
-                }
-                {selectedCapability &&
+                )}
+                {selectedCapability && (
                   <div>
                     <p className={styles.title}>Capabilities</p>
-                    <Capability capabilityId={selectedCapability.id} capabilityName={selectedCapability.name} disabled={true} />
+                    <Capability
+                      capabilityId={selectedCapability.id}
+                      capabilityName={selectedCapability.name}
+                      disabled={true}
+                    />
                   </div>
-                }
+                )}
               </div>
             </ModalLayoutInfo>
           </ModalContainer>
@@ -155,35 +159,39 @@ const RuntimeRunner = ({ action, runtime, capability, children }: Props) => {
             <ModalLayoutInfo className={styles.runtimeModalInfo}>
               <div>
                 <p>You are about to stop this active Runtime. ¿Are you sure?</p>
-                {runtimeRunning &&
+                {runtimeRunning && (
                   <div>
                     <p className={styles.title}>Runtime</p>
                     <Runtime runtime={runtimeRunning} isRunning={true} disabled={true} />
                   </div>
-                }
-                {selectedCapability &&
+                )}
+                {selectedCapability && (
                   <div>
                     <p className={styles.title}>Capabilities</p>
-                    <Capability capabilityId={selectedCapability.id} capabilityName={selectedCapability.name} disabled={true} />
+                    <Capability
+                      capabilityId={selectedCapability.id}
+                      capabilityName={selectedCapability.name}
+                      disabled={true}
+                    />
                   </div>
-                }
+                )}
               </div>
             </ModalLayoutInfo>
             <ModalLayoutInfo className={styles.runtimeModalInfo}>
               <div>
                 <p>And this Runtime will activate instead</p>
-                {runtime &&
+                {runtime && (
                   <div>
                     <p className={styles.title}>Runtime</p>
                     <Runtime runtime={runtime} isRunning={false} disabled={true} />
                   </div>
-                }
-                {capability &&
+                )}
+                {capability && (
                   <div>
                     <p className={styles.title}>Capabilities</p>
                     <Capability capabilityId={capability?.id} capabilityName={capability?.name} disabled={true} />
                   </div>
-                }
+                )}
               </div>
             </ModalLayoutInfo>
           </ModalContainer>
@@ -202,35 +210,39 @@ const RuntimeRunner = ({ action, runtime, capability, children }: Props) => {
             <ModalLayoutInfo className={styles.runtimeModalInfo}>
               <div>
                 <p>You are about to stop this active Runtime. ¿Are you sure?</p>
-                {runtimeRunning &&
+                {runtimeRunning && (
                   <div>
                     <p className={styles.title}>Runtime</p>
                     <Runtime runtime={runtimeRunning} isRunning={true} disabled={true} />
                   </div>
-                }
-                {selectedCapability &&
+                )}
+                {selectedCapability && (
                   <div>
                     <p className={styles.title}>Capabilities</p>
-                    <Capability capabilityId={selectedCapability.id} capabilityName={selectedCapability.name} disabled={true} />
+                    <Capability
+                      capabilityId={selectedCapability.id}
+                      capabilityName={selectedCapability.name}
+                      disabled={true}
+                    />
                   </div>
-                }
+                )}
               </div>
             </ModalLayoutInfo>
             <ModalLayoutInfo className={styles.runtimeModalInfo}>
               <div>
                 <p>And this Runtime will activate instead</p>
-                {runtime &&
+                {runtime && (
                   <div>
                     <p className={styles.title}>Runtime</p>
                     <Runtime runtime={runtime} isRunning={false} disabled={true} />
                   </div>
-                }
-                {capability &&
+                )}
+                {capability && (
                   <div>
                     <p className={styles.title}>Capabilities</p>
                     <Capability capabilityId={capability?.id} capabilityName={capability?.name} disabled={true} />
                   </div>
-                }
+                )}
               </div>
             </ModalLayoutInfo>
           </ModalContainer>

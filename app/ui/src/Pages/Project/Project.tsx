@@ -69,14 +69,14 @@ function Project() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataCapabilitiesRunning]);
 
-   useEffect(() => {
-     if (!dataCapabilitiesRunning?.runningCapability && dataCapabilities?.capabilities) {
-       setRunningCapabilities(
-         dataCapabilities.capabilities
+  useEffect(() => {
+    if (!dataCapabilitiesRunning?.runningCapability && dataCapabilities?.capabilities) {
+      setRunningCapabilities(
+        dataCapabilities.capabilities
           .slice()
-          .sort((a,b) => a.default? 1 : -1)
-          .reverse()[0]
-       );
+          .sort((a, b) => (a.default ? 1 : -1))
+          .reverse()[0],
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataCapabilities]);

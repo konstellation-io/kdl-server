@@ -13,11 +13,11 @@ export type Props = {
   title?: string;
 };
 
-function CapabilitiesCrumb({title }: Props) {
+function CapabilitiesCrumb({ title }: Props) {
   const { data, error } = useQuery<GetCapabilities>(GetCapabilitiesQuery);
   const isProjectRoute = useRouteMatch(ROUTE.PROJECT);
   const selectedCapability = useReactiveVar(selectedCapabilities);
-  const runtimeRunning = useReactiveVar(runningRuntime)
+  const runtimeRunning = useReactiveVar(runningRuntime);
   const runtimeLoading = useReactiveVar(loadingRuntime);
 
   if (!data || !isProjectRoute) return null;
@@ -29,7 +29,7 @@ function CapabilitiesCrumb({title }: Props) {
 
   return (
     <Crumb
-      crumbText={selectedCapability? selectedCapability.name : ""}
+      crumbText={selectedCapability ? selectedCapability.name : ''}
       isSelect={true}
       LeftIconComponent={<RuntimeIcon className="icon-regular" status={runtimeStatus} />}
       dataTestId="capabilitiesCrumb"

@@ -8,22 +8,6 @@ import GetRunningCapabilities2Query from '../../src/Mocks/GetRunningCapabilities
 import GetRunningRuntimeQuery from '../../src/Mocks/GetRunningRuntimeQuery';
 import { capability, capability2 } from '../../src/Mocks/entities/capabilities';
 
-const isRuntimeRunning = (runtimeName: string) => {
-  cy.getByTestId('openRuntimeSettings').click();
-  cy.getByTestId('runtimesList').contains(runtimeName).click();
-
-  cy.getByTestId('runtimeInfoPanel').should('contain', runtimeName);
-  cy.getByTestId('statusTag').should('contain', 'Running');
-};
-
-const isRuntimeStopped = (runtimeName: string) => {
-  cy.getByTestId('openRuntimeSettings').click();
-  cy.getByTestId('runtimesList').contains(runtimeName).click();
-
-  cy.getByTestId('runtimeInfoPanel').should('contain', runtimeName);
-  cy.getByTestId('statusTag').should('not.exist');
-};
-
 describe('Capabilities Behaviour', () => {
   beforeEach(() => {
     // There is a list of projects
@@ -50,7 +34,7 @@ describe('Capabilities Behaviour', () => {
       cy.getByTestId('runtimesList').children().last().click();
 
       // THEN check the default capability is selected
-      cy.getByTestId('capabilitiesTag').should('not.exist')
+      cy.getByTestId('capabilitiesTag').should('not.exist');
       cy.getByTestId('capabilitiesCrumb').should('not.exist');
     });
 
@@ -69,7 +53,7 @@ describe('Capabilities Behaviour', () => {
       cy.getByTestId('runtimesList').children().last().click();
 
       // THEN check the default capability is selected
-      cy.getByTestId('capabilitiesTag').contains(capability.name)
+      cy.getByTestId('capabilitiesTag').contains(capability.name);
       cy.getByTestId('capabilitiesCrumb').should('be.hidden');
     });
 

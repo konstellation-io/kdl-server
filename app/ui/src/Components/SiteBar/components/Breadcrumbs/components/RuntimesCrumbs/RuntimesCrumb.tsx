@@ -11,7 +11,7 @@ export type Props = {
   title?: string;
 };
 
-function RuntimesCrumb({title }: Props) {
+function RuntimesCrumb({ title }: Props) {
   const { data, loading, error } = useQuery<GetRuntimes>(GetRuntimesQuery);
   const runtimeLastRan = useReactiveVar(lastRanRuntime);
   const runtimeRunning = useReactiveVar(runningRuntime);

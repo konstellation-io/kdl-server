@@ -1,4 +1,4 @@
-import { capability, capability2 } from './entities/capabilities';
+import { capability } from './entities/capabilities';
 
 export default {
   capabilities: [capability],

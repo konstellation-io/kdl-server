@@ -1,10 +1,9 @@
-import * as React from 'react';
+import React from 'react';
 import styles from './Crumb.module.scss';
 import cx from 'classnames';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import useBoolState from 'Hooks/useBoolState';
 import { ExpandableMenu } from 'kwc';
-import { relative } from 'path';
 
 export interface BottomComponentProps {
   closeComponent: () => void;
@@ -19,11 +18,14 @@ export type CrumbProps = {
   show?: boolean;
 };
 
-function Crumb({ crumbText, LeftIconComponent, dataTestId, children, title, isSelect, show =  true }: CrumbProps) {
+function Crumb({ crumbText, LeftIconComponent, dataTestId, children, title, isSelect, show = true }: CrumbProps) {
   const { value: opened, toggle: toggleComponent, deactivate: hideComponent } = useBoolState(false);
 
   return (
-    <div className={cx(styles.container, { [styles.select]: isSelect, [styles.hidden]: !show })} data-testid={dataTestId}>
+    <div
+      className={cx(styles.container, { [styles.select]: isSelect, [styles.hidden]: !show })}
+      data-testid={dataTestId}
+    >
       {title && <span className={styles.crumbTitle2}>{title}</span>}
       <div className={cx(styles.crumbContainer, { [styles.select]: isSelect })} onClick={toggleComponent}>
         {LeftIconComponent}

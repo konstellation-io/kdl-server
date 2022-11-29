@@ -12,7 +12,7 @@ type Props = {
 
 function CapabilitiesItem({ capability }: Props) {
   const selectedCapability = useReactiveVar(selectedCapabilities);
-  const runtimeRunning = useReactiveVar(runningRuntime)
+  const runtimeRunning = useReactiveVar(runningRuntime);
   const isCapabilitySelected = selectedCapability?.id === capability.id;
 
   const getRuntimeStatus = () => {
@@ -24,7 +24,8 @@ function CapabilitiesItem({ capability }: Props) {
     <RuntimeRunner
       runtime={runtimeRunning ? runtimeRunning : undefined}
       capability={capability}
-      action={RuntimeAction.ReplaceCapability}>
+      action={RuntimeAction.ReplaceCapability}
+    >
       <button className={styles.container} disabled={isCapabilitySelected}>
         <div className={styles.nameContainer}>
           <RuntimeIcon status={getRuntimeStatus()} className="icon-regular" />

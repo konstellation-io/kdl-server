@@ -14,7 +14,7 @@ type Props = {
 function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
   const activeRuntime = useReactiveVar(runningRuntime);
   const runtimeLoading = useReactiveVar(loadingRuntime);
-  const selectedCapability = useReactiveVar(selectedCapabilities)
+  const selectedCapability = useReactiveVar(selectedCapabilities);
   const running = activeRuntime?.id === runtime.id;
   const runtimeSafeDesc = DOMPurify.sanitize(runtime.desc, { USE_PROFILES: { html: true } });
   const checkReady = () => {

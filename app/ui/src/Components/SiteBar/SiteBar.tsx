@@ -18,8 +18,8 @@ const SiteBar = () => (
       </>
     </Left>
     <Right className={styles.right}>
-      <RuntimesCrumb title={"Runtimes"} />
-      <CapabilitiesCrumb title={"Capabilities"} />
+      <RuntimesCrumb title={'Runtimes'} />
+      <CapabilitiesCrumb title={'Capabilities'} />
       <SettingsMenu />
     </Right>
   </div>

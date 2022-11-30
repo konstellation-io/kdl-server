@@ -6,7 +6,7 @@ import GetSingleCapabilityQuery from '../../src/Mocks/GetSingleCapabilityQuery';
 import GetRunningCapabilitiesQuery from '../../src/Mocks/GetRunningCapabilitiesQuery';
 import GetRunningCapabilities2Query from '../../src/Mocks/GetRunningCapabilities2Query';
 import GetRunningRuntimeQuery from '../../src/Mocks/GetRunningRuntimeQuery';
-import { capability, capability2 } from '../../src/Mocks/entities/capabilities';
+import { capability, capability2, capability3 } from '../../src/Mocks/entities/capabilities';
 
 describe('Capabilities Behaviour', () => {
   beforeEach(() => {
@@ -16,6 +16,107 @@ describe('Capabilities Behaviour', () => {
     cy.kstInterceptor('GetMe', { data: GetMeQuery });
     // and a list of available runtimes
     cy.kstInterceptor('GetRuntimes', { data: GetRuntimesQuery });
+  });
+
+  describe('Sorting behaviour', () => {
+
+    it('should sort the capabilities by the default values first', () => {
+      // GIVEN there is no capabilities
+      cy.kstInterceptor('GetCapabilities', { data: GetCapabilitiesQuery });
+      // and there is not running capability
+      cy.kstInterceptor('GetRunningCapabilities', { data: null });
+
+      // WHEN the start runtime button on the left sidebar is clicked
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // THEN check the order of the capabilities is the expected
+      cy.getByTestId('capabilitiesCrumb').should('be.visible');
+      cy.getByTestId('capabilitiesCrumb').contains('Capability Name 2');
+    });
+
+    it('should sort the capabilities by the selected first then the default values', () => {
+      // GIVEN there is no capabilities
+      cy.kstInterceptor('GetCapabilities', { data: GetCapabilitiesQuery });
+      // and there is not running capability
+      cy.kstInterceptor('GetRunningCapabilities', { data: GetRunningCapabilitiesQuery });
+
+      // WHEN the start runtime button on the left sidebar is clicked
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // THEN check the order of the capabilities is the expected
+      cy.getByTestId('capabilitiesCrumb').should('be.visible');
+      cy.getByTestId('capabilitiesCrumb').click();
+      cy.getByTestId('capabilitiesCrumb').contains('Capability Name 1');
+    });
+
+  });
+
+    describe('Default value selection behaviour', () => {
+
+    it('should select the default capability from the list of possible capabilities when there is more than one default capability by selecting the first value between the defaults', () => {
+      // GIVEN there is no capabilities
+      cy.kstInterceptor('GetCapabilities', { data: {capabilities: [capability, capability3, capability2]}, });
+      // and there is not running capability
+      cy.kstInterceptor('GetRunningCapabilities', { data: null });
+
+      // WHEN the start runtime button on the left sidebar is clicked
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // THEN check the selected capability is the expected
+      cy.getByTestId('capabilitiesCrumb').should('be.visible');
+      cy.getByTestId('capabilitiesCrumb').contains('Capability Name 2');
+    });
+
+    it('should select the default capability from the list of possible capabilities when there is just one default capability on the list', () => {
+      // GIVEN there is no capabilities
+      cy.kstInterceptor('GetCapabilities', { data: GetCapabilitiesQuery });
+      // and there is not running capability
+      cy.kstInterceptor('GetRunningCapabilities', { data: null });
+
+      // WHEN the start runtime button on the left sidebar is clicked
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // THEN check the selected capability is the expected
+      cy.getByTestId('capabilitiesCrumb').should('be.visible');
+      cy.getByTestId('capabilitiesCrumb').contains('Capability Name 2');
+    });
+
+    it('should select the only capability available as default capability and not show the selector component', () => {
+      // GIVEN there is no capabilities
+      cy.kstInterceptor('GetCapabilities', { data: GetSingleCapabilityQuery });
+      // and there is not running capability
+      cy.kstInterceptor('GetRunningCapabilities', { data: null });
+
+      // WHEN the start runtime button on the left sidebar is clicked
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // THEN check the selected capability is the expected and the crumb is hidden
+      cy.getByTestId('capabilitiesCrumb').should('be.hidden');
+      cy.getByTestId('capabilitiesCrumb').contains('Capability Name 1');
+    });
+
+    it('should not show the component and have no default value selected', () => {
+      // GIVEN there is no capabilities
+      cy.kstInterceptor('GetCapabilities', { data: null });
+      // and there is not running capability
+      cy.kstInterceptor('GetRunningCapabilities', { data: null });
+
+      // WHEN the start runtime button on the left sidebar is clicked
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // and open the details page
+      cy.getByTestId('openRuntimeSettings').click();
+      cy.getByTestId('runtimesList').children().last().click();
+
+      // THEN check the select component does not exist
+      cy.getByTestId('capabilitiesCrumb').should('not.exist');
+    });
   });
 
   describe('Top bar selector behaviour', () => {

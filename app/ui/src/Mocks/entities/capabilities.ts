@@ -13,3 +13,10 @@ export const capability2: GetCapabilities_capabilities = {
   name: 'Capability Name 2',
   default: true,
 };
+
+export const capability3: GetCapabilities_capabilities = {
+  __typename: 'Capability',
+  id: 'capability3',
+  name: 'Capability Name 3',
+  default: true,
+};

@@ -137,6 +137,7 @@ const RuntimeRunner = ({ action, runtime, capability, children }: Props) => {
                     <Capability
                       capabilityId={selectedCapability.id}
                       capabilityName={selectedCapability.name}
+                      isRunning={true}
                       disabled={true}
                     />
                   </div>
@@ -171,6 +172,7 @@ const RuntimeRunner = ({ action, runtime, capability, children }: Props) => {
                     <Capability
                       capabilityId={selectedCapability.id}
                       capabilityName={selectedCapability.name}
+                      isRunning={true}
                       disabled={true}
                     />
                   </div>
@@ -222,6 +224,7 @@ const RuntimeRunner = ({ action, runtime, capability, children }: Props) => {
                     <Capability
                       capabilityId={selectedCapability.id}
                       capabilityName={selectedCapability.name}
+                      isRunning={true}
                       disabled={true}
                     />
                   </div>

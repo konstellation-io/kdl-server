@@ -14,12 +14,9 @@
     padding: 2 * $grid-unit;
   }
   .runtimeContainer {
-    height: 70%;
+    height: 100%;
   }
-  .capabilitiesContainer {
-    height: 30%;
-  }
-  .runtimeContainer, .capabilitiesContainer {
+  .runtimeContainer {
     display: flex;
     flex-direction: column;
     //height: 100%;

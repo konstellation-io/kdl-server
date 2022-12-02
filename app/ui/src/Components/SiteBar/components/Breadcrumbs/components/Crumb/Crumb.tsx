@@ -26,7 +26,7 @@ function Crumb({ crumbText, LeftIconComponent, dataTestId, children, title, isSe
       className={cx(styles.container, { [styles.select]: isSelect, [styles.hidden]: !show })}
       data-testid={dataTestId}
     >
-      {title && <span className={styles.crumbTitle2}>{title}</span>}
+      {title && <span className={styles.crumbTitle}>{title}</span>}
       <div className={cx(styles.crumbContainer, { [styles.select]: isSelect })} onClick={toggleComponent}>
         {LeftIconComponent}
         <span className={styles.crumbText}>{crumbText}</span>

@@ -27,14 +27,6 @@
     margin-right: 5px;
   }
 
-  .crumbTitle2 {
-    position: absolute;
-    margin-bottom: 3 * $grid-unit;
-    color: palette(highlight);
-    font-size: smaller;
-    font-weight: bold;
-  }
-
   .crumbContainer {
     display: flex;
     align-items: center;

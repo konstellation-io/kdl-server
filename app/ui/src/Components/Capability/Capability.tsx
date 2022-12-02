@@ -7,17 +7,18 @@ import { useReactiveVar } from '@apollo/client';
 type Props = {
   capabilityName: string;
   capabilityId: string;
+  isRunning?: boolean;
   disabled?: boolean;
 };
 
-function Capability({ capabilityId, capabilityName, disabled = false }: Props) {
+function Capability({ capabilityId, capabilityName, isRunning = false, disabled = false }: Props) {
   const selectedCapability = useReactiveVar(selectedCapabilities);
 
   return (
     <div
       data-testid="capability"
       className={cx(styles.container, {
-        [styles.active]: selectedCapability?.id === capabilityId,
+        [styles.active]: isRunning,
         [styles.disabled]: disabled,
       })}
       onClick={() => {

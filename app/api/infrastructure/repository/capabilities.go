@@ -29,6 +29,10 @@ func NewCapabilitiesMongoDBRepo(logger logging.Logger, client *mongo.Client, dbN
 func (m *capabilitiesMongoDBRepo) Get(ctx context.Context, id string) (entity.Capabilities, error) {
 	capability := entity.Capabilities{}
 
+	if &id == nil {
+		return capability, entity.ErrCapabilitiesNotFound
+	}
+
 	response := m.collection.FindOne(ctx, bson.M{"_id": id})
 	if err := response.Err(); errors.Is(err, mongo.ErrNoDocuments) {
 		return capability, entity.ErrCapabilitiesNotFound

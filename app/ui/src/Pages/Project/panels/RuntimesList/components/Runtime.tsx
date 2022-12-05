@@ -50,9 +50,9 @@ function Runtime({ runtime, isRunning, disabled }: Props) {
       className={cx(styles.container, {
         [styles.active]: isRunning,
         [styles.loading]: runtimeLoading === runtime.id || (isRunning && runtimeLoading !== null),
-        [styles.disabled]: disabled || selectedCapability === null,
+        [styles.disabled]: disabled,
       })}
-      onClick={() => !disabled && selectedCapability && toggleRuntimePanel()}
+      onClick={() => !disabled && toggleRuntimePanel()}
     >
       <div className={styles.content}>
         <p className={styles.name} data-testid="runtimeName">

@@ -232,6 +232,86 @@ func (k *k8sClient) getUserToolsDefinition(
 		tlsConfig["secretName"] = &k.cfg.UserToolsIngress.TLS.SecretName
 	}
 
+	vscodeRuntime := map[string]interface{}{
+		"runtimeId": runtimeID,
+		"image": map[string]string{
+			"repository": runtimeImage,
+			"tag":        runtimeTag,
+			"pullPolicy": k.cfg.UserToolsVsCodeRuntime.Image.PullPolicy,
+		},
+	}
+
+	spec := map[string]interface{}{
+		"domain": k.cfg.BaseDomainName,
+		"ingress": map[string]interface{}{
+			"annotations": ingressAnnotations,
+			"className":   k.cfg.UserToolsIngress.ClassName,
+		},
+		"username":     username,
+		"usernameSlug": usernameSlug,
+		"storage": map[string]string{
+			"size":      k.cfg.Storage.Size,
+			"className": k.cfg.Storage.ClassName,
+		},
+		"sharedVolume": map[string]string{
+			"name": k.cfg.SharedVolume.Name,
+		},
+		"tls": tlsConfig,
+		"jupyter": map[string]interface{}{
+			"image": map[string]string{
+				"repository": k.cfg.Jupyter.Image.Repository,
+				"tag":        k.cfg.Jupyter.Image.Tag,
+				"pullPolicy": k.cfg.Jupyter.Image.PullPolicy,
+			},
+			"enterpriseGatewayUrl": k.cfg.Jupyter.EnterpriseGatewayURL,
+		},
+		"vscode": map[string]interface{}{
+			"image": map[string]string{
+				"repository": k.cfg.VSCode.Image.Repository,
+				"tag":        k.cfg.VSCode.Image.Tag,
+				"pullPolicy": k.cfg.VSCode.Image.PullPolicy,
+			},
+		},
+		"repoCloner": map[string]interface{}{
+			"image": map[string]string{
+				"repository": k.cfg.RepoCloner.Image.Repository,
+				"tag":        k.cfg.RepoCloner.Image.Tag,
+				"pullPolicy": k.cfg.RepoCloner.Image.PullPolicy,
+			},
+			"mongodbURI": k.cfg.MongoDB.URI,
+		},
+		"giteaOauth2Setup": map[string]interface{}{
+			"image": map[string]string{
+				"repository": k.cfg.UserToolsGiteaOAuth2Setup.Image.Repository,
+				"tag":        k.cfg.UserToolsGiteaOAuth2Setup.Image.Tag,
+				"pullPolicy": k.cfg.UserToolsGiteaOAuth2Setup.Image.PullPolicy,
+			},
+			"giteaAdminSecret":     k.cfg.UserToolsGiteaOAuth2Setup.GiteaAdminSecret,
+			"giteaOauth2Configmap": k.cfg.UserToolsGiteaOAuth2Setup.GiteaOauth2Configmap,
+		},
+		"oauth2Proxy": map[string]interface{}{
+			"image": map[string]string{
+				"repository": k.cfg.UserToolsOAuth2Proxy.Image.Repository,
+				"tag":        k.cfg.UserToolsOAuth2Proxy.Image.Tag,
+				"pullPolicy": k.cfg.UserToolsOAuth2Proxy.Image.PullPolicy,
+			},
+		},
+		"kubeconfig": map[string]interface{}{
+			"enabled":           k.cfg.UserToolsKubeconfig.Enabled,
+			"externalServerUrl": k.cfg.UserToolsKubeconfig.ExternalServerURL,
+		},
+		"serviceAccountName": serviceAccountName,
+	}
+
+	if capabilities.ID != "" {
+		spec["nodeSelector"] = capabilities.GetNodeSelectors()
+		// definition["spec"]["affinity"] = capabilities.GetNodeSelectors();
+		// definition["spec"]["tolerations"] = capabilities.GetNodeSelectors();
+		vscodeRuntime["capabilityId"] = capabilities.ID
+	}
+
+	spec["vscodeRuntime"] = vscodeRuntime
+
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"kind":       "UserTools",
@@ -243,79 +323,7 @@ func (k *k8sClient) getUserToolsDefinition(
 					"app": resName,
 				},
 			},
-			"spec": map[string]interface{}{
-				"nodeSelector": capabilities.GetNodeSelectors(),
-				// "affinity": capabilities.GetAffinities(), // TODO add affinity to specs
-				// "tolerations": capabilities.GetTolerations(), // TODO add tolerations to specs
-				"domain": k.cfg.BaseDomainName,
-				"ingress": map[string]interface{}{
-					"annotations": ingressAnnotations,
-					"className":   k.cfg.UserToolsIngress.ClassName,
-				},
-				"username":     username,
-				"usernameSlug": usernameSlug,
-				"storage": map[string]string{
-					"size":      k.cfg.Storage.Size,
-					"className": k.cfg.Storage.ClassName,
-				},
-				"sharedVolume": map[string]string{
-					"name": k.cfg.SharedVolume.Name,
-				},
-				"tls": tlsConfig,
-				"jupyter": map[string]interface{}{
-					"image": map[string]string{
-						"repository": k.cfg.Jupyter.Image.Repository,
-						"tag":        k.cfg.Jupyter.Image.Tag,
-						"pullPolicy": k.cfg.Jupyter.Image.PullPolicy,
-					},
-					"enterpriseGatewayUrl": k.cfg.Jupyter.EnterpriseGatewayURL,
-				},
-				"vscode": map[string]interface{}{
-					"image": map[string]string{
-						"repository": k.cfg.VSCode.Image.Repository,
-						"tag":        k.cfg.VSCode.Image.Tag,
-						"pullPolicy": k.cfg.VSCode.Image.PullPolicy,
-					},
-				},
-				"repoCloner": map[string]interface{}{
-					"image": map[string]string{
-						"repository": k.cfg.RepoCloner.Image.Repository,
-						"tag":        k.cfg.RepoCloner.Image.Tag,
-						"pullPolicy": k.cfg.RepoCloner.Image.PullPolicy,
-					},
-					"mongodbURI": k.cfg.MongoDB.URI,
-				},
-				"giteaOauth2Setup": map[string]interface{}{
-					"image": map[string]string{
-						"repository": k.cfg.UserToolsGiteaOAuth2Setup.Image.Repository,
-						"tag":        k.cfg.UserToolsGiteaOAuth2Setup.Image.Tag,
-						"pullPolicy": k.cfg.UserToolsGiteaOAuth2Setup.Image.PullPolicy,
-					},
-					"giteaAdminSecret":     k.cfg.UserToolsGiteaOAuth2Setup.GiteaAdminSecret,
-					"giteaOauth2Configmap": k.cfg.UserToolsGiteaOAuth2Setup.GiteaOauth2Configmap,
-				},
-				"oauth2Proxy": map[string]interface{}{
-					"image": map[string]string{
-						"repository": k.cfg.UserToolsOAuth2Proxy.Image.Repository,
-						"tag":        k.cfg.UserToolsOAuth2Proxy.Image.Tag,
-						"pullPolicy": k.cfg.UserToolsOAuth2Proxy.Image.PullPolicy,
-					},
-				},
-				"kubeconfig": map[string]interface{}{
-					"enabled":           k.cfg.UserToolsKubeconfig.Enabled,
-					"externalServerUrl": k.cfg.UserToolsKubeconfig.ExternalServerURL,
-				},
-				"vscodeRuntime": map[string]interface{}{
-					"runtimeId":    runtimeID,
-					"capabilityId": capabilities.ID,
-					"image": map[string]string{
-						"repository": runtimeImage,
-						"tag":        runtimeTag,
-						"pullPolicy": k.cfg.UserToolsVsCodeRuntime.Image.PullPolicy,
-					},
-				},
-				"serviceAccountName": serviceAccountName,
-			},
+			"spec": spec,
 		},
 	}
 

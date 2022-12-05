@@ -27,7 +27,6 @@ type Props = {
 const RuntimeRunner = ({ action, runtime, capability, children }: Props) => {
   const { startRuntime, pauseRuntime } = useRuntime(runtime);
   const selectedCapability = useReactiveVar(selectedCapabilities);
-  const { activate: showErrorModal, deactivate: closeErrorModal, value: isErrorModalVisible } = useBoolState();
   const {
     activate: showPauseRuntimeModal,
     deactivate: closePauseRuntimeModal,
@@ -69,10 +68,6 @@ const RuntimeRunner = ({ action, runtime, capability, children }: Props) => {
 
   const handleClick = () => {
     if (action === RuntimeAction.Start) {
-      if (!selectedCapability) {
-        showErrorModal();
-        return;
-      }
       if (!runtimeRunning) {
         startRuntime(runtime, selectedCapability?.id);
         return;
@@ -93,24 +88,6 @@ const RuntimeRunner = ({ action, runtime, capability, children }: Props) => {
     <div>
       {React.cloneElement(children, { onClick: handleClick })}
       <div>
-        {isErrorModalVisible && (
-          <ModalContainer
-            title="CANNOT START TOOLS"
-            onAccept={closeErrorModal}
-            onCancel={closeErrorModal}
-            actionButtonLabel="Accept"
-            actionButtonCancel="Cancel"
-            className={cx(styles.runtimeModal, styles.close)}
-            error
-            blocking
-          >
-            <ModalLayoutInfo className={styles.runtimeModalInfo}>
-              <div data-testid="errorToolsModal">
-                <p>Please select a capability before starting the User Tools.</p>
-              </div>
-            </ModalLayoutInfo>
-          </ModalContainer>
-        )}
         {isPauseRuntimeModalVisible && (
           <ModalContainer
             title="STOP YOUR TOOLS"

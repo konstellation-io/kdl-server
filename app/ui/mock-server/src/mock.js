@@ -10,7 +10,7 @@ const kubeconfig = require('./mocks/kubeconfigMock');
 const projects = Array(8).fill(0).map(buildProject);
 const users = Array(casual.integer(20, 30)).fill(0).map(buildUser);
 const runtimes = Array(8).fill(0).map(buildRuntime);
-const capabilities = Array(2).fill(0).map(buildCapabilities);
+const capabilities = Array(0).fill(0).map(buildCapabilities);
 
 module.exports = {
   Query: () => ({

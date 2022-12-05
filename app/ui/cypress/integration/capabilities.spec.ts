@@ -305,7 +305,7 @@ describe('Capabilities Behaviour', () => {
       cy.getByTestId('capabilitiesTag').contains(capability.name);
     });
 
-    it('should show error message on capability not selected', () => {
+    it('should run as normal on capability not selected (for retrocompatibility)', () => {
       // GIVEN there is a runtime started
       cy.kstInterceptor('GetRunningRuntime', { data: GetRunningRuntimeQuery });
       // and the user tools are not started
@@ -326,11 +326,14 @@ describe('Capabilities Behaviour', () => {
       // and the runtime us started
       cy.getByTestId('startTools').click();
 
-      // THEN the runtime is running
+      // and the runtimes panels is opened
+      cy.getByTestId('openRuntimeSettings').click();
+      cy.getByTestId('runtimesList').children().first().click();
+
       // THEN the runtime is running
       cy.getByTestId('capabilitiesCrumb').should('not.exist');
-      cy.getByTestId('runtimeInfoPanel').should('not.exist');
-      cy.contains('CANNOT START TOOLS').should('exist');
+      cy.getByTestId('statusTag').contains('Running');
+      cy.getByTestId('capabilitiesTag').should('not.exist');
     });
   });
 

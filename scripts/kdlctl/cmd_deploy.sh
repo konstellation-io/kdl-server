@@ -103,5 +103,6 @@ deploy_helm_chart() {
     echo_info "KDL Remote Development enabled"
   fi
   echo_info "📦 Applying helm chart..."
+  helmfile -f scripts/helmfile/helmfile.yaml deps
   helmfile -f scripts/helmfile/helmfile.yaml apply
 }

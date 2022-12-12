@@ -975,24 +975,6 @@ spec:
                   giteaOauth2Configmap:
                     description: the configmap containing the oauth2 config
                     type: string
-              jupyter:
-                type: object
-                properties:
-                  image:
-                    type: object
-                    properties:
-                      repository:
-                        description: image repository
-                        type: string
-                      tag:
-                        description: image tag
-                        type: string
-                      pullPolicy:
-                        description: image pull policy
-                        type: string
-                  enterpriseGatewayUrl:
-                    description: enterprise gateway url
-                    type: string
               vscode:
                 type: object
                 properties:
@@ -1024,6 +1006,7 @@ spec:
                         description: image pull policy
                         type: string
                   mongodbURI:
+                    description: MongoDB URI
                     type: string
                 required:
                 - mongodbURI

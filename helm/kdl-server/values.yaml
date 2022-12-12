@@ -261,61 +261,6 @@ giteaOauth2Setup:
     # -- The image pull policy
     pullPolicy: IfNotPresent
 
-# -- Jupyter Enterprise Gateway chart values. Check chart's [values.yaml](https://github.com/konstellation-io/enterprise_gateway/blob/main/etc/kubernetes/helm/enterprise-gateway/values.yaml) for a complete list of values
-# @default -- Check [values.yaml](./values.yaml)
-enterprise-gateway:
-  image: elyra/enterprise-gateway:2.5.0
-  imagePullPolicy: IfNotPresent
-  # The primary port on which Enterprise Gateway is servicing requests.
-  port: 8888
-  replicas: 1
-  logLevel: DEBUG
-  mirrorWorkingDirs: true
-
-  # create and require a secret token, supplied by client in an "Authorization: token" header
-  affinity: {}
-
-  kernel:
-    # Kernel cluster role created by this chart.
-    clusterRole: kernel-controller
-    # Will start kernels in the same namespace as EG if True.
-    shareGatewayNamespace: true
-    # ignored if shareGatewayNamespace
-    # kernelNamespace: jupyter-notebooks
-    # Timeout for kernel launching in seconds.
-    launchTimeout: 60
-    # Timeout for an idle kernel before its culled in seconds. Default is 1 hour.
-    cullIdleTimeout: 3600
-    # List of kernel names that are available for use.
-    whitelist:
-      - kdl-py3.9
-      - kdl-py3.9-cuda10.2-cudnn7
-      - kdl-py3.9-cuda11.6-cudnn8
-    # Default kernel name should be something from the whitelist
-    defaultKernelName: kdl-py3.9
-    # kernel service account name
-    serviceAccount: kernel-sa
-
-  kernelspecs:
-    # Optional custom data image containing kernelspecs to use.
-    image: "konstellation/jupyter-kernelspecs:1.1.0"
-    # Kernelspecs image pull policy.
-    imagePullPolicy: IfNotPresent
-
-  # Kernel Image Puller (daemonset)
-  kip:
-    enabled: true
-    # Kernel Image Puller image name and tag to use.
-    image: elyra/kernel-image-puller:2.5.0
-    # Kernel Image Puller image pull policy.
-    imagePullPolicy: IfNotPresent
-    # Determines whether the Kernel Image Puller will pull kernel images it has
-    # previously pulled
-    pullPolicy: Always
-    # The interval (in seconds) at which the Kernel Image Puller fetches
-    # kernelspecs to pull kernel images.
-    interval: 300
-
 knowledgeGalaxy:
   # -- Whether to enable Knowledge Galaxy
   enabled: false
@@ -620,14 +565,6 @@ userToolsOperator:
 
   ## The following components are managed by the manager container when `usertool` custom resources are detected
   ##
-  jupyter:
-    image:
-      # -- The image repository
-      repository: konstellation/jupyter-gpu
-      # -- The image tag
-      tag: v0.15.0
-      # -- The image pull policy
-      pullPolicy: IfNotPresent
   repoCloner:
     image:
       # -- The image repository

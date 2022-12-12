@@ -20,7 +20,6 @@ $ helm install [RELEASE_NAME] konstellation-io/kdl-server
 ## Dependencies
 
 * [MinIO](https://github.com/minio/minio/tree/master/helm/minio)
-* [Jupyter Jupyter Enterprise Gateway](https://github.com/konstellation-io/enterprise_gateway)
 
 ## Uninstall chart
 

@@ -5,7 +5,6 @@
 | Repository | Name | Version |
 |------------|------|---------|
 | https://charts.min.io/ | minio | 3.2.0 |
-| https://konstellation-io.github.io/enterprise_gateway/ | enterprise-gateway | 2.6.0 |
 
 ## Values
 
@@ -63,7 +62,6 @@
 | droneRunner.serviceAccountJob.name | string | `"drone-runner-job"` | The name of the Drone job service account |
 | droneRunner.tolerations | list | `[]` | If specified, the pod's tolerations. Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | droneRunner.trace | string | `"true"` | Sets DRONE_TRACE environment variable |
-| enterprise-gateway | object | Check [values.yaml](./values.yaml) | Jupyter Enterprise Gateway chart values. Check chart's [values.yaml](https://github.com/konstellation-io/enterprise_gateway/blob/main/etc/kubernetes/helm/enterprise-gateway/values.yaml) for a complete list of values |
 | gitea.admin.email | string | `"test@test.com"` | Admin user email |
 | gitea.admin.password | string | `"123456"` | Admin password |
 | gitea.admin.username | string | `"kdladmin"` | Admin username |
@@ -91,7 +89,7 @@
 | kdlServer.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | kdlServer.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | kdlServer.image.repository | string | `"konstellation/kdl-server"` | The image repository |
-| kdlServer.image.tag | string | `"1.28.0"` | The image tag |
+| kdlServer.image.tag | string | `"1.29.0"` | The image tag |
 | kdlServer.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-body-size":"1000000m","nginx.ingress.kubernetes.io/proxy-connect-timeout":"3600","nginx.ingress.kubernetes.io/proxy-read-timeout":"3600","nginx.ingress.kubernetes.io/proxy-send-timeout":"3600"}` | Ingress annotations |
 | kdlServer.ingress.className | string | `"nginx"` | The ingress class name |
 | kdlServer.ingress.tls.secretName | string | `nil` | The TLS secret name that will be used. It takes precedence over `.Values.global.ingress.tls.secretName`. |
@@ -147,7 +145,7 @@
 | projectOperator.kubeRbacProxy.image.tag | string | `"v0.8.0"` | Image tag |
 | projectOperator.manager.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | projectOperator.manager.image.repository | string | `"konstellation/project-operator"` | The image repository |
-| projectOperator.manager.image.tag | string | `"0.18.0"` | The image tag |
+| projectOperator.manager.image.tag | string | `"0.19.0"` | The image tag |
 | projectOperator.manager.resources | object | `{}` | Resource requests and limits for primary projectOperator container. Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/ |
 | projectOperator.mlflow.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | projectOperator.mlflow.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
@@ -172,9 +170,6 @@
 | userToolsOperator.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/configuration-snippet":"more_set_headers \"Content-Security-Policy: frame-ancestors 'self' *\";\n","nginx.ingress.kubernetes.io/proxy-body-size":"1000000m"}` | Ingress annotations |
 | userToolsOperator.ingress.className | string | `"nginx"` | The ingress class name |
 | userToolsOperator.ingress.tls.secretName | string | `nil` | The TLS secret name that will be used. It takes precedence over `.Values.global.ingress.tls.secretName`. |
-| userToolsOperator.jupyter.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
-| userToolsOperator.jupyter.image.repository | string | `"konstellation/jupyter-gpu"` | The image repository |
-| userToolsOperator.jupyter.image.tag | string | `"v0.15.0"` | The image tag |
 | userToolsOperator.kubeconfig.enabled | bool | `false` | Whether to enable kubeconfig for using with VSCode remote development. Ref: https://code.visualstudio.com/docs/remote/remote-overview |
 | userToolsOperator.kubeconfig.externalServerUrl | string | `""` | The Kube API Server URL for using with VSCode remote development |
 | userToolsOperator.nodeSelector | object | `{}` | Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/ |

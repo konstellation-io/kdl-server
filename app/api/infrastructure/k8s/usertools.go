@@ -132,7 +132,6 @@ func (k *k8sClient) userToolsPODLabelSelector(resName string) string {
 
 // checkOrCreateToolsSecrets set ClientID and ClientSecret on Kubernetes secret objects.
 func (k *k8sClient) checkOrCreateToolsSecrets(ctx context.Context, slugUsername string) error {
-
 	secretName := fmt.Sprintf("codeserver-oauth2-secrets-%s", slugUsername)
 	credentialsSecretName := fmt.Sprintf("codeserver-oauth2-credentials-%s", slugUsername)
 

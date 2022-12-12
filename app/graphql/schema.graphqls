@@ -80,7 +80,6 @@ type ToolUrls {
   knowledgeGalaxy: String!
   gitea: String!
   filebrowser: String!
-  jupyter: String!
   vscode: String!
   drone: String!
   mlflow: String!

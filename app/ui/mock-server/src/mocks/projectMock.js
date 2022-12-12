@@ -20,7 +20,6 @@ function buildProject(_, index) {
       knowledgeGalaxy: 'https://filebrowser.org/',
       gitea: 'https://gitea.io/en-us/',
       filebrowser: 'https://filebrowser.org/',
-      jupyter: 'https://jupyter.org/',
       vscode: 'https://code.visualstudio.com/',
       drone: 'https://www.drone.io/',
       mlflow: 'https://mlflow.org/',

@@ -78,7 +78,7 @@ function UserSshKey() {
                   <div className={styles.regenWarning}>
                     <div className={styles.regenWarningTag}>WARNING:</div>
                     <div className={styles.regenWarningText}>
-                      User tools (Jupyter and VSCode) are running, you need to stop them in order to regenerate the SSH
+                      User tools are running, you need to stop them in order to regenerate the SSH
                       Key.
                     </div>
                   </div>

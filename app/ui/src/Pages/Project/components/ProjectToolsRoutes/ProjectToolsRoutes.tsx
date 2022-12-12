@@ -9,7 +9,6 @@ const toolsRoutes: [ROUTE, keyof GetUserTools_project_toolUrls][] = [
   [ROUTE.PROJECT_TOOL_KG, 'knowledgeGalaxy'],
   [ROUTE.PROJECT_TOOL_GITEA, 'gitea'],
   [ROUTE.PROJECT_TOOL_DRONE, 'drone'],
-  [ROUTE.PROJECT_TOOL_JUPYTER, 'jupyter'],
   [ROUTE.PROJECT_TOOL_FILEBROWSER, 'filebrowser'],
   [ROUTE.PROJECT_TOOL_MLFLOW, 'mlflow'],
   [ROUTE.PROJECT_TOOL_VSCODE, 'vscode'],

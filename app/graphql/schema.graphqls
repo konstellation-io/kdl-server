@@ -6,6 +6,8 @@ type Query {
   qualityProjectDesc(description: String!): QualityProjectDesc!
   runtimes: [Runtime!]!
   runningRuntime: Runtime
+  capabilities: [Capability!]!
+  runningCapability: Capability
   kubeconfig: String!
 }
 
@@ -36,6 +38,12 @@ type Runtime {
   dockerImage: String!
   dockerTag: String!
   runtimePod: String!
+}
+
+type Capability {
+  id: ID!
+  name: String!
+  default: Boolean!
 }
 
 type Topic {
@@ -155,6 +163,7 @@ input SetBoolFieldInput {
 input SetActiveUserToolsInput {
   active: Boolean!,
   runtimeId: String,
+  capabilitiesId: String
 }
 
 type Project {

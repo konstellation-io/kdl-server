@@ -6,7 +6,7 @@ import { PANEL_ID } from 'Graphql/client/models/Panel';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
 import { useReactiveVar } from '@apollo/client';
-import { loadingRuntime } from 'Graphql/client/cache';
+import { loadingRuntime, selectedCapabilities } from 'Graphql/client/cache';
 import LabelList from './LabelList';
 import useRuntimeInfo from 'Hooks/useRuntimeInfo';
 
@@ -17,15 +17,20 @@ type Props = {
 };
 
 function Runtime({ runtime, isRunning, disabled }: Props) {
-  const { openPanel, togglePanel } = usePanel(PanelType.SECONDARY, {
+  const runtimeLoading = useReactiveVar(loadingRuntime);
+  const selectedCapability = useReactiveVar(selectedCapabilities);
+  const [openedRuntimeInfo, setOpenedRuntimeInfo] = useRuntimeInfo();
+  const { openPanel, togglePanel, closePanel } = usePanel(PanelType.SECONDARY, {
     id: PANEL_ID.RUNTIME_INFO,
     title: 'Detail',
     size: PANEL_SIZE.BIG,
     theme: PANEL_THEME.DEFAULT,
     runtime,
   });
-  const runtimeLoading = useReactiveVar(loadingRuntime);
-  const [openedRuntimeInfo, setOpenedRuntimeInfo] = useRuntimeInfo();
+
+  if (selectedCapability === null) {
+    closePanel();
+  }
 
   function toggleRuntimePanel() {
     if (disabled) return;
@@ -47,7 +52,7 @@ function Runtime({ runtime, isRunning, disabled }: Props) {
         [styles.loading]: runtimeLoading === runtime.id || (isRunning && runtimeLoading !== null),
         [styles.disabled]: disabled,
       })}
-      onClick={toggleRuntimePanel}
+      onClick={() => !disabled && toggleRuntimePanel()}
     >
       <div className={styles.content}>
         <p className={styles.name} data-testid="runtimeName">

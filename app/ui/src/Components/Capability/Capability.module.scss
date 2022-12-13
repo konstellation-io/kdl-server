@@ -1,0 +1,46 @@
+@import 'Styles/colors';
+@import 'Styles/mixins';
+@import 'Styles/variables';
+@import 'Styles/borders';
+@import 'Styles/shadows';
+
+$shape-height: 30 * $grid-unit;
+$desc-height: 5 * $grid-unit;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: $grid-unit;
+  position: relative;
+  margin-top: 0.4 * $grid-unit;
+  flex-shrink: 0;
+  width: 100%;
+  background-color: palette(base, 400);
+  border-radius: $grid-unit;
+  border-left: 3px solid palette(base);
+  cursor: pointer;
+
+  &.active {
+    border-left: 3px solid palette(success);
+  }
+  &.loading {
+    border-left: 3px solid palette(feedback);
+  }
+  &:hover:not(.disabled) {
+    background-color: palette(base, 800);
+  }
+  .content {
+    width: 100%;
+
+    .name {
+      @include font-caption;
+      font-weight: bold;
+    }
+    .desc {
+      @include font-small;
+      color: font-color(regular);
+      max-height: 15px;
+      overflow: hidden;
+    }
+  }
+}

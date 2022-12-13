@@ -107,7 +107,7 @@ function ProjectCreation() {
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
-        <h1>Your project is creating now</h1>
+        <h1>Your project is being created now</h1>
         <div className={styles.animation}>
           <StatusCircle {...getCircleProps()} />
         </div>

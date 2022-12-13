@@ -136,14 +136,17 @@ func NewInteractor(deps *InteractorDeps) UseCase {
 	}
 }
 
-// Create stores into the DB a new project.
-// Depending on the repository type:
-//  - For internal repositories creates a repository in Gitea.
-//  - For external repositories, mirrors the external repository in Gitea.
-//  - Create a k8s KDLProject containing a MLFLow instance
-//  - Create Minio bucket
-//  - Create Minio folders
-//  - Activate Drone.io repo
+/*
+Create stores into the DB a new project.
+Depending on the repository type:
+
+  - For internal repositories creates a repository in Gitea.
+  - For external repositories, mirrors the external repository in Gitea.
+  - Create a k8s KDLProject containing a MLFLow instance
+  - Create Minio bucket
+  - Create Minio folders
+  - Activate Drone.io repo.
+*/
 func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
 	// Validate the creation input
 	err := opt.Validate()

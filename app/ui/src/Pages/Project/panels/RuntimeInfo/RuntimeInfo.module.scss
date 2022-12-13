@@ -5,6 +5,9 @@
 
 .header {
   padding: 2 * $grid-unit;
+  display: flex;
+  flex-direction: column;
+
   .title {
     margin-bottom: $grid-unit;
 
@@ -15,26 +18,36 @@
       text-align: left;
       @include font-headline;
     }
-    .runningTag {
-      @include font-small;
-      display: inline;
-      position: absolute;
-      margin-left: 2*$grid-unit;
-      justify-self: center;
-      margin-top: 0.75 * $grid-unit;
-      text-align: center;
-      padding: 0.4 * $grid-unit 3.5 * $grid-unit;
-      background-color: palette(success, 700);
-      border-radius: 2 * $grid-unit;
-      color: palette(base);
-      font-weight: bold;
-      max-width: 13 *$grid-unit;
-    }
+  }
+  .runtimeLabels{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: $grid-unit;
 
-    .loadingTag {
-      @extend .runningTag;
-      background-color: palette(feedback);
-    }
+    .runningTag {
+        @include font-small;
+        position: relative;
+        float: left;
+        margin: 0 1.5 * $grid-unit 1.1 * $grid-unit 0;
+        padding: 0.4 * $grid-unit 1.5 * $grid-unit;
+        margin-top: 0.75 * $grid-unit;
+        text-align: center;
+        background-color: palette(success, 700);
+        border-radius: 2 * $grid-unit;
+        color: palette(base);
+        font-weight: bold;
+        width: fit-content
+      }
+
+      .loadingTag {
+        @extend .runningTag;
+        background-color: palette(feedback);
+      }
+
+      .capabilitiesTag {
+        @extend .runningTag;
+        background-color: palette(starred);
+      }
   }
   .runtimeTags {
     display: flex;

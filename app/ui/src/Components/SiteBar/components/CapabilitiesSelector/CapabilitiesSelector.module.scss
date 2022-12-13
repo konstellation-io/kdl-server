@@ -1,0 +1,21 @@
+@import 'Styles/variables';
+@import 'Styles/mixins';
+@import 'Styles/colors';
+@import 'Styles/shadows';
+
+$shape-height: 65 * $grid-unit;
+
+.container {
+  @include shadow(2);
+  overflow: auto;
+  width: 40 * $grid-unit;
+  max-height: $shape-height;
+  min-height: 100%;
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    background-color: palette(lowlight, 900);
+  }
+}

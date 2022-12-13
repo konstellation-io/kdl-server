@@ -94,6 +94,8 @@ jobs:
           browser: chrome
           wait-on: 'http://localhost:3001'
           wait-on-timeout: 120
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
 
   build:
     needs: [ lint-dockerfile, quality-checks ]

@@ -1057,6 +1057,9 @@ spec:
                   runtimeId:
                     type: string
                     description: runtime identifier
+                  capabilityId:
+                    type: string
+                    description: capability identifier
                   image:
                     type: object
                     properties:

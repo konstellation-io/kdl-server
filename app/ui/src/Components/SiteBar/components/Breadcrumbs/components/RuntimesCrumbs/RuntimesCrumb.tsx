@@ -7,7 +7,11 @@ import { GetRuntimes } from 'Graphql/queries/types/GetRuntimes';
 import RuntimeSelector from 'Components/SiteBar/components/RuntimeSelector/RuntimeSelector';
 import RuntimeIcon, { RUNTIME_STATUS } from 'Components/Icons/RuntimeIcon/RuntimeIcon';
 
-function RuntimesCrumb() {
+export type Props = {
+  title?: string;
+};
+
+function RuntimesCrumb({ title }: Props) {
   const { data, loading, error } = useQuery<GetRuntimes>(GetRuntimesQuery);
   const runtimeLastRan = useReactiveVar(lastRanRuntime);
   const runtimeRunning = useReactiveVar(runningRuntime);
@@ -26,6 +30,7 @@ function RuntimesCrumb() {
       isSelect={true}
       LeftIconComponent={<RuntimeIcon className="icon-regular" status={runtimeStatus} />}
       dataTestId="runtimesCrumb"
+      title={title}
     >
       {(props: BottomComponentProps) => <RuntimeSelector runtimes={data.runtimes} {...props} />}
     </Crumb>

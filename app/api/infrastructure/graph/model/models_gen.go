@@ -23,6 +23,12 @@ type APITokenInput struct {
 	Name   *string `json:"name"`
 }
 
+type Capability struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Default bool   `json:"default"`
+}
+
 type CreateProjectInput struct {
 	ID          string           `json:"id"`
 	Name        string           `json:"name"`
@@ -60,8 +66,9 @@ type RepositoryInput struct {
 }
 
 type SetActiveUserToolsInput struct {
-	Active    bool    `json:"active"`
-	RuntimeID *string `json:"runtimeId"`
+	Active         bool    `json:"active"`
+	RuntimeID      *string `json:"runtimeId"`
+	CapabilitiesID *string `json:"capabilitiesId"`
 }
 
 type SetBoolFieldInput struct {

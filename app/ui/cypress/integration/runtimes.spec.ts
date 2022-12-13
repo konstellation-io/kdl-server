@@ -1,7 +1,9 @@
 import GetProjectsQuery from '../../src/Mocks/GetProjectsQuery';
 import GetMeQuery from '../../src/Mocks/GetMeQuery';
 import GetRunningRuntimeQuery from '../../src/Mocks/GetRunningRuntimeQuery';
+import GetRunningCapabilitiesQuery from '../../src/Mocks/GetRunningCapabilitiesQuery';
 import GetRuntimesQuery from '../../src/Mocks/GetRuntimesQuery';
+import GetCapabilitiesQuery from '../../src/Mocks/GetCapabilitiesQuery';
 import { runtime2 } from '../../src/Mocks/entities/runtime';
 
 const isRuntimeRunning = (runtimeName: string) => {
@@ -28,17 +30,22 @@ describe('Runtimes Behaviour', () => {
     cy.kstInterceptor('GetMe', { data: GetMeQuery });
     // and a list of available runtimes
     cy.kstInterceptor('GetRuntimes', { data: GetRuntimesQuery });
-
-    cy.visit('http://localhost:3001');
-    cy.getByTestId('project').first().parent().click();
+    // and a list of available capabilities
+    cy.kstInterceptor('GetCapabilities', { data: GetCapabilitiesQuery });
+    // and a default running capability
+    cy.kstInterceptor('GetRunningCapabilities', { data: GetRunningCapabilitiesQuery });
   });
 
   describe('Left Sidebar Buttons Behaviour', () => {
-    it('should open runtimes panels is there is no runtime selected when start tools', () => {
+    it('should open runtimes panels if there is no runtime selected when start tools', () => {
       // GIVEN there is no runtime started
       cy.kstInterceptor('GetRunningRuntime', { data: null });
 
       // WHEN the start runtime button on the left sidebar is clicked
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // and the runtime us started
       cy.getByTestId('startTools').click();
 
       // THEN the runtime list panel is opened
@@ -51,7 +58,12 @@ describe('Runtimes Behaviour', () => {
       cy.kstInterceptor('SetActiveUserTools', { data: { areToolsActive: false } });
 
       // WHEN the stop runtime button is clicked
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // and the runtime is stopped
       cy.getByTestId('stopTools').click();
+
       // and the action is confirmed
       cy.contains('Stop Tools').click();
 
@@ -63,11 +75,16 @@ describe('Runtimes Behaviour', () => {
       // GIVEN there is a runtime started
       cy.kstInterceptor('GetRunningRuntime', { data: GetRunningRuntimeQuery });
       cy.kstInterceptor('SetActiveUserTools', { data: { areToolsActive: true } });
+
+      // WHEN the start runtime button is clicked
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
       // and the runtime is stopped
       cy.getByTestId('stopTools').click();
       cy.contains('Stop Tools').click();
 
-      // WHEN the start runtime button is clicked
+      // and the runtime is started
       cy.getByTestId('startTools').click();
 
       // THEN the last runtime in execution is started
@@ -81,6 +98,12 @@ describe('Runtimes Behaviour', () => {
       cy.kstInterceptor('GetRunningRuntime', { data: null });
 
       cy.kstInterceptor('SetActiveUserTools', { data: { areToolsActive: true } });
+
+      // WHEN visiting the project
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // and the runtimes panels is opened
       cy.getByTestId('openRuntimeSettings').click();
       cy.getByTestId('runtimesList').children().first().click();
       cy.getByTestId('panelStartRuntime').click();
@@ -92,11 +115,17 @@ describe('Runtimes Behaviour', () => {
     it('should stop tools with runtime info stop button', () => {
       // GIVEN there is a runtime started
       cy.kstInterceptor('GetRunningRuntime', { data: GetRunningRuntimeQuery });
-
-      // WHEN runtime is stopped from runtime info panel
       cy.kstInterceptor('SetActiveUserTools', { data: { areToolsActive: false } });
+
+      // WHEN the project page is visited
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // and the runtimes panel is opened
       cy.getByTestId('openRuntimeSettings').click();
       cy.getByTestId('runtimesList').children().first().click();
+
+      // and the runtime is stopped
       cy.getByTestId('panelStopRuntime').click();
       cy.contains('Stop Tools').click();
 
@@ -107,11 +136,18 @@ describe('Runtimes Behaviour', () => {
     it('should replace runtime if there is a runtime running but another is started', () => {
       // GIVEN there is no runtime started
       cy.kstInterceptor('GetRunningRuntime', { data: GetRunningRuntimeQuery });
-
       cy.kstInterceptor('SetActiveUserTools', { data: { areToolsActive: true } });
+
+      // WHEN the project page is visited
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // and the runtimes panel is opened
       cy.getByTestId('openRuntimeSettings').click();
       cy.getByTestId('runtimesList').children().last().click();
       cy.getByTestId('panelStartRuntime').click();
+
+      // and the replace tools panel is opened
       cy.contains('Replace Tools').click();
 
       // THEN the runtime is running
@@ -124,7 +160,11 @@ describe('Runtimes Behaviour', () => {
       // GIVEN there is no runtime started
       cy.kstInterceptor('GetRunningRuntime', { data: null });
 
-      // WHEN a tool is opened
+      // WHEN the project page is visited
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // and a tool is opened
       cy.contains('Vscode').click({ force: true });
 
       // THEN the navigation is redirected to overview page
@@ -135,7 +175,11 @@ describe('Runtimes Behaviour', () => {
       // GIVEN there is a runtime started
       cy.kstInterceptor('GetRunningRuntime', { data: GetRunningRuntimeQuery });
 
-      // WHEN a tool is opened
+      // WHEN the project page is visited
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // and a tool is opened
       cy.contains('Vscode').click();
 
       // THEN the tools is open
@@ -148,9 +192,17 @@ describe('Runtimes Behaviour', () => {
 
       // and the runtime is being replaced with certain delay
       cy.kstInterceptor('SetActiveUserTools', { data: { id: true } }, { delay: 1000 });
+
+      // WHEN the project page is visited
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // and the runtimes panel is opened
       cy.getByTestId('openRuntimeSettings').click();
       cy.getByTestId('runtimesList').children().last().click();
       cy.getByTestId('panelStartRuntime').click();
+
+      // and the replace runtime panel is opened
       cy.contains('Replace Tools').click();
 
       // WHEN try to open a user tool while request is pending
@@ -164,10 +216,14 @@ describe('Runtimes Behaviour', () => {
       // GIVEN there is a runtime started
       cy.kstInterceptor('GetRunningRuntime', { data: { runningRuntime: null } });
 
-      // GIVEN the first runtime selected
+      // and the first runtime selected
       cy.kstInterceptor('SetActiveUserTools', { data: { id: GetRuntimesQuery.runtimes[0].id } }, { delay: 1000 });
 
-      // When we start it
+      // When the project page is visited
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      //and we start it
       cy.getByTestId('openRuntimeSettings').click();
       cy.getByTestId('runtimesList').children().first().click();
       cy.getByTestId('panelStartRuntime').click();
@@ -185,9 +241,14 @@ describe('Runtimes Behaviour', () => {
       // and another runtime to run
       const runtimeName = runtime2.name;
 
-      // WHEN we click the runtime we want to run on the runtimes crumb
+      // WHEN the project page is visited
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // and we click the runtime we want to run on the runtimes crumb
       cy.getByTestId('runtimesCrumb').click();
       cy.contains(runtimeName).click();
+
       // and the action is confirmed
       cy.contains('Replace Tools').click();
 
@@ -201,6 +262,11 @@ describe('Runtimes Behaviour', () => {
       cy.kstInterceptor('SetActiveUserTools', { data: { areToolsActive: true } });
       // and another runtime to run
       const runtimeName = runtime2.name;
+
+      // WHEN the project page is visited
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
       // and we stop the actual runtime
       cy.getByTestId('stopTools').click();
       cy.contains('Stop Tools').click();
@@ -217,9 +283,13 @@ describe('Runtimes Behaviour', () => {
     it('There should be only safe tags on runtime description', () => {
       // GIVEN there is a runtime started
       cy.kstInterceptor('GetRunningRuntime', { data: GetRunningRuntimeQuery });
-
-      // WHEN runtime info panel is opened
       cy.kstInterceptor('SetActiveUserTools', { data: { areToolsActive: false } });
+
+      // WHEN the project page is visited
+      cy.visit('http://localhost:3001');
+      cy.getByTestId('project').first().parent().click();
+
+      // and runtime info panel is opened
       cy.getByTestId('openRuntimeSettings').click();
       cy.getByTestId('runtimesList').children().first().click();
 

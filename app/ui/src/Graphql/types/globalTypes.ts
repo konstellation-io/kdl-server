@@ -64,6 +64,7 @@ export interface RepositoryInput {
 export interface SetActiveUserToolsInput {
   active: boolean;
   runtimeId?: string | null;
+  capabilitiesId?: string | null;
 }
 
 export interface UpdateAccessLevelInput {

@@ -84,7 +84,10 @@ type Config struct {
 				SecretName *string `envconfig:"PROJECT_MLFLOW_INGRESS_TLS_SECRET_NAME"`
 			}
 		}
-		Volume struct {
+		NodeSelector string `envconfig:"PROJECT_MLFLOW_NODESELECTOR"`
+		Affinity     string `envconfig:"PROJECT_MLFLOW_AFFINITY"`
+		Tolerations  string `envconfig:"PROJECT_MLFLOW_TOLERATIONS"`
+		Volume       struct {
 			StorageClassName string `envconfig:"PROJECT_MLFLOW_STORAGE_CLASS_NAME"`
 			Size             string `envconfig:"PROJECT_MLFLOW_STORAGE_SIZE"`
 		}
@@ -96,6 +99,9 @@ type Config struct {
 			Tag        string `envconfig:"PROJECT_FILEBROWSER_IMG_TAG"`
 			PullPolicy string `envconfig:"PROJECT_FILEBROWSER_IMG_PULLPOLICY"`
 		}
+		NodeSelector string `envconfig:"PROJECT_FILEBROWSER_NODESELECTOR"`
+		Affinity     string `envconfig:"PROJECT_FILEBROWSER_AFFINITY"`
+		Tolerations  string `envconfig:"PROJECT_FILEBROWSER_TOLERATIONS"`
 	}
 	Kg struct {
 		Enabled bool   `envconfig:"KNOWLEDGE_GALAXY_ENABLED"`

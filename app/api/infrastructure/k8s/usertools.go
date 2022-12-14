@@ -197,9 +197,9 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 	runtimeImage, runtimeTag string, capabilities entity.Capabilities) error {
 	serviceAccountName := k.getUserServiceAccountName(usernameSlug)
 
-	ingressAnnotations, err := k.getIngressAnnotations(k.cfg.UserToolsIngress.Annotations)
+	ingressAnnotations, err := k.getK8sMap(k.cfg.UserToolsIngress.Annotations)
 	if err != nil {
-		return err
+		return fmt.Errorf("error getting ingress annotations: %w", err)
 	}
 
 	definition := k.getUserToolsDefinition(

@@ -27,9 +27,39 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 		tlsConfig["secretName"] = &k.cfg.ProjectMLFlow.Ingress.TLS.SecretName
 	}
 
-	ingressAnnotations, err := k.getIngressAnnotations(k.cfg.ProjectMLFlow.Ingress.Annotations)
+	mlflowIngressAnnotations, err := k.getK8sMap(k.cfg.ProjectMLFlow.Ingress.Annotations)
 	if err != nil {
-		return err
+		return fmt.Errorf("error getting mlflow ingress annotations: %w", err)
+	}
+
+	mlflowNodeSelector, err := k.getK8sMap(k.cfg.ProjectMLFlow.NodeSelector)
+	if err != nil {
+		return fmt.Errorf("error getting mlflow nodeSelector: %w", err)
+	}
+
+	mlflowAffinity, err := k.getK8sMap(k.cfg.ProjectMLFlow.Affinity)
+	if err != nil {
+		return fmt.Errorf("error getting mlflow affinity: %w", err)
+	}
+
+	mlflowTolerations, err := k.getK8sList(k.cfg.ProjectMLFlow.Tolerations)
+	if err != nil {
+		return fmt.Errorf("error getting mlflow tolerations: %w", err)
+	}
+
+	filebrowserNodeSelector, err := k.getK8sMap(k.cfg.ProjectFilebrowser.NodeSelector)
+	if err != nil {
+		return fmt.Errorf("error getting filebrowser nodeSelector: %w", err)
+	}
+
+	filebrowserAffinity, err := k.getK8sMap(k.cfg.ProjectFilebrowser.Affinity)
+	if err != nil {
+		return fmt.Errorf("error getting filebrowser affinity: %w", err)
+	}
+
+	filebrowserTolerations, err := k.getK8sList(k.cfg.ProjectFilebrowser.Tolerations)
+	if err != nil {
+		return fmt.Errorf("error getting filebrowser tolerations: %w", err)
 	}
 
 	definition := &unstructured.Unstructured{
@@ -85,8 +115,11 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 					"ingress": map[string]interface{}{
 						"tls":         tlsConfig,
 						"className":   k.cfg.ProjectMLFlow.Ingress.ClassName,
-						"annotations": ingressAnnotations,
+						"annotations": mlflowIngressAnnotations,
 					},
+					"nodeSelector": mlflowNodeSelector,
+					"affinity":     mlflowAffinity,
+					"tolerations":  mlflowTolerations,
 				},
 				"filebrowser": map[string]interface{}{
 					"image": map[string]string{
@@ -94,6 +127,9 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 						"tag":        k.cfg.ProjectFilebrowser.Image.Tag,
 						"pullPolicy": k.cfg.ProjectFilebrowser.Image.PullPolicy,
 					},
+					"nodeSelector": filebrowserNodeSelector,
+					"affinity":     filebrowserAffinity,
+					"tolerations":  filebrowserTolerations,
 				},
 			},
 		},

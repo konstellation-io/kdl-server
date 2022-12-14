@@ -150,35 +150,26 @@ func (k *k8sClient) userToolsPODLabelSelector(resName string) string {
 
 // checkOrCreateToolsSecrets set ClientID and ClientSecret on Kubernetes secret objects.
 func (k *k8sClient) checkOrCreateToolsSecrets(ctx context.Context, slugUsername string) error {
-	err := k.createToolSecret(ctx, slugUsername, "codeserver", "code")
-	if err != nil {
-		return err
-	}
-
-	return k.createToolSecret(ctx, slugUsername, "jupyter", "jupyter")
-}
-
-func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName, toolURLName string) error {
-	secretName := fmt.Sprintf("%s-oauth2-secrets-%s", toolName, slugUsername)
-	credentialsSecretName := fmt.Sprintf("%s-oauth2-credentials-%s", toolName, slugUsername)
+	secretName := fmt.Sprintf("codeserver-oauth2-secrets-%s", slugUsername)
+	credentialsSecretName := fmt.Sprintf("codeserver-oauth2-credentials-%s", slugUsername)
 
 	exist, err := k.isSecretPresent(ctx, secretName)
 	if err != nil {
-		return fmt.Errorf("check %s tool secret: %w", toolName, err)
+		return fmt.Errorf("check codeserver tool secret: %w", err)
 	}
 
 	if exist {
 		return nil
 	}
 
-	oAuthName := fmt.Sprintf("%s-app-%s", toolName, slugUsername)
+	oAuthName := fmt.Sprintf("codeserver-app-%s", slugUsername)
 
 	protocol := "http"
 	if k.cfg.TLS.Enabled {
 		protocol = "https"
 	}
 
-	callbackURL := fmt.Sprintf("%s://%s-%s.%s/oauth2/callback", protocol, slugUsername, toolURLName, k.cfg.BaseDomainName)
+	callbackURL := fmt.Sprintf("%s://%s-code.%s/oauth2/callback", protocol, slugUsername, k.cfg.BaseDomainName)
 	data := map[string]string{}
 	data["DEPLOYMENT_SECRET_NAME"] = credentialsSecretName
 	data["GITEA_REDIRECT_URIS"] = callbackURL
@@ -186,7 +177,7 @@ func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName
 
 	err = k.CreateSecret(ctx, secretName, data)
 	if err != nil {
-		return fmt.Errorf("creating %s tool secrets: %w", toolName, err)
+		return fmt.Errorf("creating codeserver tool secrets: %w", err)
 	}
 
 	return nil
@@ -258,14 +249,6 @@ func (k *k8sClient) getUserToolsDefinition(
 			"name": k.cfg.SharedVolume.Name,
 		},
 		"tls": tlsConfig,
-		"jupyter": map[string]interface{}{
-			"image": map[string]string{
-				"repository": k.cfg.Jupyter.Image.Repository,
-				"tag":        k.cfg.Jupyter.Image.Tag,
-				"pullPolicy": k.cfg.Jupyter.Image.PullPolicy,
-			},
-			"enterpriseGatewayUrl": k.cfg.Jupyter.EnterpriseGatewayURL,
-		},
 		"vscode": map[string]interface{}{
 			"image": map[string]string{
 				"repository": k.cfg.VSCode.Image.Repository,

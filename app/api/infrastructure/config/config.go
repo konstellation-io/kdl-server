@@ -48,15 +48,6 @@ type Config struct {
 		AccessKey string `envconfig:"MINIO_ACCESS_KEY"`
 		SecretKey string `envconfig:"MINIO_SECRET_KEY"`
 	}
-	Jupyter struct {
-		URL   string `envconfig:"USER_TOOLS_JUPYTER_URL"`
-		Image struct {
-			Repository string `envconfig:"JUPYTER_IMG_REPO"`
-			Tag        string `envconfig:"JUPYTER_IMG_TAG"`
-			PullPolicy string `envconfig:"JUPYTER_IMG_PULLPOLICY"`
-		}
-		EnterpriseGatewayURL string `envconfig:"JUPYTER_ENTERPRISE_GATEWAY_URL"`
-	}
 	VSCode struct {
 		URL   string `envconfig:"USER_TOOLS_VSCODE_URL"`
 		Image struct {

@@ -5,7 +5,6 @@ const toolUrls = {
   knowledgeGalaxy: 'https://knowledgeGalaxy',
   drone: 'https://drone',
   gitea: 'https://gitea',
-  jupyter: 'https://jupyter',
   filebrowser: 'https://filebrowser',
   mlflow: 'https://mlflow',
   vscode: 'https://vscode',

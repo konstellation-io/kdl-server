@@ -8,7 +8,6 @@ export default gql`
         knowledgeGalaxy
         gitea
         filebrowser
-        jupyter
         vscode
         drone
         mlflow

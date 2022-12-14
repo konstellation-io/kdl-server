@@ -148,7 +148,7 @@ func (i *interactor) GetByUsername(ctx context.Context, username string) (entity
 	return i.repo.GetByUsername(ctx, username)
 }
 
-// StartTools creates a user-tools CustomResource in K8s to initialize the VSCode and Jupyter for the given username.
+// StartTools creates a user-tools CustomResource in K8s to initialize the VSCode for the given username.
 // If there are already a user-tools for the user, they are replaced (stop + start new).
 func (i *interactor) StartTools(ctx context.Context, username string, runtimeID, capabilitiesID *string) (entity.User, error) {
 	user, err := i.repo.GetByUsername(ctx, username)

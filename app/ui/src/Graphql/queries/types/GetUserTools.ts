@@ -12,7 +12,6 @@ export interface GetUserTools_project_toolUrls {
   knowledgeGalaxy: string;
   gitea: string;
   filebrowser: string;
-  jupyter: string;
   vscode: string;
   drone: string;
   mlflow: string;

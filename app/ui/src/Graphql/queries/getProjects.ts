@@ -23,7 +23,6 @@ export default gql`
         knowledgeGalaxy
         drone
         gitea
-        jupyter
         filebrowser
         mlflow
         vscode

@@ -17,7 +17,6 @@ data:
   # URL Setup
   PROJECT_FILEBROWSER_URL: "{{ include "http.protocol" . }}://kdlapp.{{ .Values.global.domain }}/filebrowser/PROJECT_ID/"
   MINIO_ENDPOINT: "{{ .Release.Name }}-minio:9000"
-  USER_TOOLS_JUPYTER_URL: "{{ include "http.protocol" . }}://USERNAME-jupyter.{{ .Values.global.domain }}/lab/workspaces/REPO_FOLDER/tree/repos/REPO_FOLDER"
   USER_TOOLS_VSCODE_URL: "{{ include "http.protocol" . }}://USERNAME-code.{{ .Values.global.domain }}/?folder=/home/coder/repos/REPO_FOLDER"
   DRONE_URL: "{{ printf "%s://drone.%s" (include "http.protocol" . ) .Values.global.domain }}"
   DRONE_INTERNAL_URL: "http://drone"
@@ -67,11 +66,6 @@ data:
   VSCODE_IMG_REPO: "{{ .Values.userToolsOperator.vscode.image.repository }}"
   VSCODE_IMG_TAG: "{{ .Values.userToolsOperator.vscode.image.tag }}"
   VSCODE_IMG_PULLPOLICY: "{{ .Values.userToolsOperator.vscode.image.pullPolicy }}"
-
-  JUPYTER_IMG_REPO: "{{ .Values.userToolsOperator.jupyter.image.repository }}"
-  JUPYTER_IMG_TAG: "{{ .Values.userToolsOperator.jupyter.image.tag }}"
-  JUPYTER_IMG_PULLPOLICY: "{{ .Values.userToolsOperator.jupyter.image.pullPolicy }}"
-  JUPYTER_ENTERPRISE_GATEWAY_URL: http://enterprise-gateway:{{ index .Values "enterprise-gateway" "port" }}
 
   REPO_CLONER_IMG_REPO: "{{ .Values.userToolsOperator.repoCloner.image.repository }}"
   REPO_CLONER_IMG_TAG: "{{ .Values.userToolsOperator.repoCloner.image.tag }}"

@@ -2,8 +2,5 @@ dependencies:
 - name: minio
   repository: https://charts.min.io/
   version: 3.2.0
-- name: enterprise-gateway
-  repository: https://konstellation-io.github.io/enterprise_gateway/
-  version: 2.6.0
-digest: sha256:b24dd765d669dfd29f0855375802028c14f453151a16087c1abcef6a917f8f7b
-generated: "2022-09-20T16:58:08.611923987+02:00"
+digest: sha256:45484fc0179c8dd999a8dd794f59914a9e5b0c0ae2fc3b6088db7154c3a87bb0
+generated: "2022-12-09T14:25:03.048733915+01:00"

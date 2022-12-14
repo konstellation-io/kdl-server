@@ -222,7 +222,8 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 
 func (k *k8sClient) getUserToolsDefinition(
 	ingressAnnotations map[string]interface{},
-	resName, username, usernameSlug, runtimeID, runtimeImage, runtimeTag, serviceAccountName string, capabilities entity.Capabilities,
+	resName, username, usernameSlug, runtimeID, runtimeImage, runtimeTag, serviceAccountName string,
+	capabilities entity.Capabilities,
 ) *unstructured.Unstructured {
 	tlsConfig := map[string]interface{}{
 		"enabled": k.cfg.TLS.Enabled,
@@ -303,6 +304,7 @@ func (k *k8sClient) getUserToolsDefinition(
 		"serviceAccountName": serviceAccountName,
 	}
 
+	//nolint:gocritic // This code will be implemented in the next iteration
 	if capabilities.ID != "" {
 		spec["nodeSelector"] = capabilities.GetNodeSelectors()
 		// definition["spec"]["affinity"] = capabilities.GetNodeSelectors();

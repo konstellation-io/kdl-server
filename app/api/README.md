@@ -48,4 +48,3 @@ To run `golangci-lint` execute:
 ```
 golangci-lint run
 ```
-

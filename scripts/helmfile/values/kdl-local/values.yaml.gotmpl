@@ -43,11 +43,6 @@ giteaOauth2Setup:
     tag: latest
     pullPolicy: Always
 
-enterprise-gateway:
-  kernelspecs:
-    imagePullPolicy: Always
-    image: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/jupyter-kernelspecs:latest
-
 knowledgeGalaxy:
   image:
     repository: {{ requiredEnv "KNOWLEDGE_GALAXY_IMAGE_REPOSITORY" | quote }}
@@ -102,11 +97,6 @@ userToolsOperator:
     pullPolicy: Always
   storage:
     storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-  jupyter:
-    image:
-      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/jupyter-gpu
-      tag: latest
-      pullPolicy: Always
   repoCloner:
     image:
       repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/repo-cloner

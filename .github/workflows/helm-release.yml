@@ -7,8 +7,6 @@ on:
       - "Cleaner Component Build"
       - "Drone Authorizer Component Build"
       - "Gitea Oauth2 Setup Component Build"
-      - "Jupyter GPU Component Build"
-      - "Jupyter Kernelspecs Component Build"
       - "Mlflow Component Build"
       - "Project Operator Component Build"
       - "RepoCloner Component Build"

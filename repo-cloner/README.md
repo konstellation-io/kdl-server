@@ -1,7 +1,7 @@
 # User Repo Cloner
 
 This module is responsible for automatically cloning the internal and external repositories of the projects in which the
-user participates. This way they are available for other tools, such as Jupyter and VSCode to be able to work with them.
+user participates. This way they are available for code-server to be able to work with it.
 
 To do this, it checks periodically the projects collection in the database, to locate the ones that the user is
 included in. So, those who do not have a folder with the code, try to clone the repository. For this it is necessary
@@ -23,4 +23,3 @@ that cloning through ssh is possible.
 | DB_NAME                   | (optional) KDL database name.                                             |
 | PROJECT_COLL_NAME         | (optional) projects collection name.                                      |
 | USER_COLL_NAME            | (optional) user collection name.                                          |
-

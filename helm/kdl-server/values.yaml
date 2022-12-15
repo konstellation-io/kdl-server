@@ -311,7 +311,7 @@ kdlServer:
     # -- The image repository
     repository: konstellation/kdl-server
     # -- The image tag
-    tag: 1.31.0
+    tag: 1.32.0
     # -- The image pull policy
     pullPolicy: IfNotPresent
   ingress:

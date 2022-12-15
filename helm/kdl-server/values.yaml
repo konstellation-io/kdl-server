@@ -156,7 +156,7 @@ droneAuthorizer:
     # -- The image repository
     repository: konstellation/drone-authorizer
     # -- The image tag
-    tag: v0.13.5
+    tag: 0.15.0
     # -- The image pull policy
     pullPolicy: IfNotPresent
 

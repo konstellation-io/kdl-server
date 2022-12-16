@@ -20,15 +20,15 @@ RUN apt-get update && \
     wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' && \
     apt-get update && \
-    apt-get install -yq --no-install-recommends google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 && \
+    apt-get install -yq --no-install-recommends google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 libxshmfence1 libglu1 && \
     apt-get clean && apt-get autoremove -y && \
     rm -rf /var/lib/{apt,dpkg,cache,log,lists}/*
 
 WORKDIR /usr/src/app
 
 # This layer is not going to be replaced if changes are made in index.js
-COPY --chown=node:node package.json package-lock.json /usr/src/app/
-RUN npm ci --only=production
+COPY --chown=node:node package.json .puppeteerrc.cjs package-lock.json /usr/src/app/
+RUN npm ci --omit=dev
 
 # This layer is separated away from the package* files because is more likely to be edited
 COPY --chown=node:node index.js /usr/src/app/

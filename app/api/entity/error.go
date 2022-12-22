@@ -29,4 +29,11 @@ var (
 
 	// ErrCapabilitiesNotFound error definition.
 	ErrCapabilitiesNotFound = errors.New("capabilities not found")
+
+	// ErrCapabilitiesNotValid error definition.
+	ErrCapabilitiesNotValid = errors.New("capabilities not valid")
 )
+
+func wrapCapabilitiesNotValidErr(err error) error {
+	return fmt.Errorf("%w: %s", ErrCapabilitiesNotValid, err.Error())
+}

@@ -47,7 +47,7 @@ func (i *interactor) GetCapabilities(ctx context.Context) ([]model.Capability, e
 		return []model.Capability{}, err
 	}
 
-	i.logger.Infof("Retrieved capabilities: %w", capabilities)
+	i.logger.Infof("Retrieved capabilities: %v", capabilities)
 
 	//nolint:prealloc // No need to preallocate.
 	var capabilitiesList []model.Capability
@@ -66,7 +66,7 @@ func (i *interactor) GetRunningCapability(ctx context.Context, username string) 
 	}
 
 	if capabilityID != "" {
-		i.logger.Infof("Capability in runtime POD: %w", capabilityID)
+		i.logger.Infof("Capability in runtime POD: %s", capabilityID)
 
 		capability, err := i.repo.Get(ctx, capabilityID)
 		if err != nil {

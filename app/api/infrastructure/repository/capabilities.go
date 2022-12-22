@@ -53,14 +53,12 @@ func (m *capabilitiesMongoDBRepo) FindAll(ctx context.Context) ([]entity.Capabil
 	caps := []entity.Capabilities{}
 
 	response, err := m.collection.Find(ctx, bson.M{})
-	if errors.Is(err, mongo.ErrNoDocuments) {
-		return caps, entity.ErrCapabilitiesNotFound
-	} else if err != nil {
+	if err != nil {
 		return caps, err
 	}
 
-	err = response.All(ctx, &caps)
-	if response.Err() != nil {
+	if err = response.All(ctx, &caps); err != nil {
+		m.logger.Errorf("Error a capability could not be decoded: %s", err.Error())
 		return caps, err
 	}
 

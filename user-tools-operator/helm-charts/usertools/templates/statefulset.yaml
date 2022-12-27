@@ -119,6 +119,24 @@ spec:
           args:
             - "-c"
             - "trap : TERM INT; sleep infinity & wait"
+          env:
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: kdl-server
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: kdl-server
+                  key: MINIO_SECRET_KEY
+            - name: MINIO_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: kdl-server
+                  key: MINIO_ENDPOINT
+            - name: MC_HOST_dell
+              value: "http://$(MINIO_ACCESS_KEY):$(MINIO_SECRET_KEY)@$(MINIO_ENDPOINT)"
           volumeMounts:
             - name: user-pvc
               mountPath: /home/coder

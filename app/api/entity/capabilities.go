@@ -41,7 +41,7 @@ type Capabilities struct {
 }
 
 func (c Capabilities) DeepCopy() Capabilities {
-	copy := Capabilities{
+	capabilityCopy := Capabilities{
 		ID:            c.ID,
 		Name:          c.Name,
 		Default:       c.Default,
@@ -51,23 +51,23 @@ func (c Capabilities) DeepCopy() Capabilities {
 	}
 	if !c.IsNodeSelectorsEmpty() {
 		for key, value := range c.NodeSelectors {
-			copy.NodeSelectors[key] = value
+			capabilityCopy.NodeSelectors[key] = value
 		}
 	}
 	if !c.IsTolerationsEmpty() {
 		for idx := range c.Tolerations {
-			copy.Tolerations[idx] = make(map[string]interface{})
+			capabilityCopy.Tolerations[idx] = make(map[string]interface{})
 			for key, value := range c.Tolerations[idx] {
-				copy.Tolerations[idx][key] = value
+				capabilityCopy.Tolerations[idx][key] = value
 			}
 		}
 	}
 	if !c.IsAffinitiesEmpty() {
 		for key, value := range c.Affinities {
-			copy.Affinities[key] = value
+			capabilityCopy.Affinities[key] = value
 		}
 	}
-	return copy
+	return capabilityCopy
 }
 
 func (c Capabilities) Validate() error {

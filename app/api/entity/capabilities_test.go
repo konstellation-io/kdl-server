@@ -18,6 +18,7 @@ func TestContextMeasurementTestSuite(t *testing.T) {
 	suite.Run(t, new(CapabilitiesTestSuite))
 }
 
+//go:embed
 var testCapability = entity.Capabilities{
 	ID:      "test_id",
 	Name:    "Test capability",
@@ -37,6 +38,7 @@ var testCapability = entity.Capabilities{
 	Affinities: map[string]interface{}{},
 }
 
+//go:embed
 var testCapability2 = entity.Capabilities{
 	ID:      "test_id2",
 	Name:    "Test capability 2",

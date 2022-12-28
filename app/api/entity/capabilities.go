@@ -4,30 +4,38 @@ import (
 	"fmt"
 )
 
-type tolerationOperator string
+type TolerationOperator string
 
 const (
-	TolerationOpExists tolerationOperator = "Exists"
-	TolerationOpEqual  tolerationOperator = "Equal"
+	TolerationOpExists TolerationOperator = "Exists"
+	TolerationOpEqual  TolerationOperator = "Equal"
 )
 
-var _isTolerationOperator = map[string]bool{
-	string(TolerationOpExists): true,
-	string(TolerationOpEqual):  true,
+func IsTolerationOperator(operator string) bool {
+	var mapOfOperators = map[string]bool{
+		string(TolerationOpExists): true,
+		string(TolerationOpEqual):  true,
+	}
+
+	return mapOfOperators[operator]
 }
 
-type taintEffect string
+type TaintEffect string
 
 const (
-	TaintEffectNoSchedule       taintEffect = "NoSchedule"
-	TaintEffectPreferNoSchedule taintEffect = "PreferNoSchedule"
-	TaintEffectNoExecute        taintEffect = "NoExecute"
+	TaintEffectNoSchedule       TaintEffect = "NoSchedule"
+	TaintEffectPreferNoSchedule TaintEffect = "PreferNoSchedule"
+	TaintEffectNoExecute        TaintEffect = "NoExecute"
 )
 
-var _isTaintEffect = map[string]bool{
-	string(TaintEffectNoSchedule):       true,
-	string(TaintEffectPreferNoSchedule): true,
-	string(TaintEffectNoExecute):        true,
+func IsTolerationEffect(effect string) bool {
+	var mapOfEffects = map[string]bool{
+		string(TaintEffectNoSchedule):       true,
+		string(TaintEffectPreferNoSchedule): true,
+		string(TaintEffectNoExecute):        true,
+	}
+
+	return mapOfEffects[effect]
 }
 
 // Capabilities entity definition.
@@ -38,40 +46,6 @@ type Capabilities struct {
 	NodeSelectors map[string]string        `bson:"node_selectors"`
 	Tolerations   []map[string]interface{} `bson:"tolerations"`
 	Affinities    map[string]interface{}   `bson:"affinities"`
-}
-
-func (c Capabilities) DeepCopy() Capabilities {
-	capabilityCopy := Capabilities{
-		ID:            c.ID,
-		Name:          c.Name,
-		Default:       c.Default,
-		NodeSelectors: make(map[string]string),
-		Tolerations:   make([]map[string]interface{}, len(c.Tolerations)),
-		Affinities:    make(map[string]interface{}),
-	}
-
-	if !c.IsNodeSelectorsEmpty() {
-		for key, value := range c.NodeSelectors {
-			capabilityCopy.NodeSelectors[key] = value
-		}
-	}
-
-	if !c.IsTolerationsEmpty() {
-		for idx := range c.Tolerations {
-			capabilityCopy.Tolerations[idx] = make(map[string]interface{})
-			for key, value := range c.Tolerations[idx] {
-				capabilityCopy.Tolerations[idx][key] = value
-			}
-		}
-	}
-
-	if !c.IsAffinitiesEmpty() {
-		for key, value := range c.Affinities {
-			capabilityCopy.Affinities[key] = value
-		}
-	}
-
-	return capabilityCopy
 }
 
 func (c Capabilities) Validate() error {
@@ -144,7 +118,7 @@ func checkTolerationOperator(toleration map[string]interface{}) (string, error) 
 
 	if !ok || operator == "" {
 		return "", fmt.Errorf("toleration has no operator assigned")
-	} else if !_isTolerationOperator[operator] {
+	} else if !IsTolerationOperator(operator) {
 		return "", fmt.Errorf("toleration operator '%s' is not a valid operator", operator)
 	}
 
@@ -170,7 +144,7 @@ func checkTolerationEffect(toleration map[string]interface{}) error {
 
 	if !ok || effect == "" {
 		return fmt.Errorf("toleration has no effect assigned")
-	} else if !_isTaintEffect[effect] {
+	} else if !IsTolerationEffect(effect) {
 		return fmt.Errorf("toleration effect '%s' is not a valid effect", effect)
 	}
 

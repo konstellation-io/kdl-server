@@ -131,46 +131,33 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoParameters() {
 	testSuite.Equal("capabilities not valid: capabilities must contain one of these values: nodeSelector, toleration, affinities", err.Error())
 }
 
-func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationKey() {
-	// GIVEN an incorrect capability with empty key in tolerations
+func (testSuite *CapabilitiesTestSuite) checkNoAttribute(attribute string) {
+	// GIVEN an incorrect capability with empty 'attribute' in tolerations
 	wrongCapability := getTestCapability()
-	wrongCapability.Tolerations[0]["key"] = ""
+	wrongCapability.Tolerations[0][attribute] = ""
 	// WHEN validated
 	err := wrongCapability.Validate()
 	// THEN an error promts
 	testSuite.Require().Error(err)
 	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: toleration has no key assigned", err.Error())
+	testSuite.Equal("capabilities not valid: toleration has no "+attribute+" assigned", err.Error())
 
-	// GIVEN an incorrect capability with no key in tolerations
-	delete(wrongCapability.Tolerations[0], "key")
+	// GIVEN an incorrect capability with no 'attribute' in tolerations
+	delete(wrongCapability.Tolerations[0], attribute)
 	// WHEN validated
 	err = wrongCapability.Validate()
 	// THEN an error promts
 	testSuite.Require().Error(err)
 	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: toleration has no key assigned", err.Error())
+	testSuite.Equal("capabilities not valid: toleration has no "+attribute+" assigned", err.Error())
+}
+
+func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationKey() {
+	testSuite.checkNoAttribute("key")
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationOperator() {
-	// GIVEN an incorrect capability with empty operator in tolerations
-	wrongCapability := getTestCapability()
-	wrongCapability.Tolerations[0]["operator"] = ""
-	// WHEN validated
-	err := wrongCapability.Validate()
-	// THEN an error promts
-	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: toleration has no operator assigned", err.Error())
-
-	// GIVEN an incorrect capability with no operator in tolerations
-	delete(wrongCapability.Tolerations[0], "operator")
-	// WHEN validated
-	err = wrongCapability.Validate()
-	// THEN an error promts
-	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: toleration has no operator assigned", err.Error())
+	testSuite.checkNoAttribute("operator")
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidTolerationOperator() {
@@ -221,24 +208,7 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateTolerationValueF
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationEffect() {
-	// GIVEN an incorrect capability with empty effect in tolerations
-	wrongCapability := getTestCapability()
-	wrongCapability.Tolerations[0]["effect"] = ""
-	// WHEN validated
-	err := wrongCapability.Validate()
-	// THEN an error promts
-	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: toleration has no effect assigned", err.Error())
-
-	// GIVEN an incorrect capability with no effect in tolerations
-	delete(wrongCapability.Tolerations[0], "effect")
-	// WHEN validated
-	err = wrongCapability.Validate()
-	// THEN an error promts
-	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: toleration has no effect assigned", err.Error())
+	testSuite.checkNoAttribute("operator")
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidTolerationEffeect() {

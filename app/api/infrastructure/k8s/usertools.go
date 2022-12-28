@@ -301,15 +301,19 @@ func (k *k8sClient) getUserToolsDefinition(
 		if err := capabilities.Validate(); err != nil {
 			return nil, err
 		}
+
 		if !capabilities.IsNodeSelectorsEmpty() {
 			spec["nodeSelector"] = capabilities.GetNodeSelectors()
 		}
+
 		if !capabilities.IsTolerationsEmpty() {
 			spec["tolerations"] = capabilities.GetTolerations()
 		}
+
 		if !capabilities.IsAffinitiesEmpty() {
 			spec["affinity"] = capabilities.GetAffinities()
 		}
+
 		vscodeRuntime["capabilityId"] = capabilities.ID
 	}
 

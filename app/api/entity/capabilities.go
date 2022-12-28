@@ -130,53 +130,63 @@ func checkToleration(toleration map[string]interface{}) error {
 func checkTolerationKey(toleration map[string]interface{}) error {
 	keyRaw, ok := toleration["key"]
 	key := fmt.Sprintf("%v", keyRaw)
+
 	if !ok || key == "" {
 		return fmt.Errorf("toleration has no key assigned")
 	}
+
 	return nil
 }
 
 func checkTolerationOperator(toleration map[string]interface{}) (string, error) {
 	operatorRaw, ok := toleration["operator"]
 	operator := fmt.Sprintf("%v", operatorRaw)
+
 	if !ok || operator == "" {
 		return "", fmt.Errorf("toleration has no operator assigned")
 	} else if !_isTolerationOperator[operator] {
 		return "", fmt.Errorf("toleration operator '%s' is not a valid operator", operator)
 	}
+
 	return operator, nil
 }
 
 func checkTolerationValue(toleration map[string]interface{}, operator string) error {
 	valueRaw, ok := toleration["value"]
 	value := fmt.Sprintf("%v", valueRaw)
+
 	if operator == string(TolerationOpEqual) && (!ok || value == "") {
 		return fmt.Errorf("toleration has no value assigned while operator being 'equal'")
 	} else if operator == string(TolerationOpExists) && ok && value != "" {
 		return fmt.Errorf("toleration has a value assigned while operator being 'exists'")
 	}
+
 	return nil
 }
 
 func checkTolerationEffect(toleration map[string]interface{}) error {
 	effectRaw, ok := toleration["effect"]
 	effect := fmt.Sprintf("%v", effectRaw)
+
 	if !ok || effect == "" {
 		return fmt.Errorf("toleration has no effect assigned")
 	} else if !_isTaintEffect[effect] {
 		return fmt.Errorf("toleration effect '%s' is not a valid effect", effect)
 	}
+
 	return nil
 }
 
 func checkTolerationSeconds(toleration map[string]interface{}) error {
 	seconds, ok := toleration["tolerationSeconds"] // optional
+
 	if ok {
 		_, isNumber := seconds.(int64)
 		if !isNumber {
 			return fmt.Errorf("toleration field 'tolerationSeconds' '%v' is not a valid number", seconds)
 		}
 	}
+
 	return nil
 }
 

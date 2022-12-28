@@ -54,6 +54,8 @@ var testCapability2 = entity.Capabilities{
 	Affinities: map[string]interface{}{},
 }
 
+const WrongExample = "Wrong"
+
 func (suite *CapabilitiesTestSuite) TestCapabilitiesNodeSelector() {
 	// GIVEN a capability
 	capability := testCapability.DeepCopy()
@@ -170,7 +172,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationOperator
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidTolerationOperator() {
 	// GIVEN an incorrect capability with wrong operator in tolerations
 	wrongCapability := testCapability.DeepCopy()
-	wrongCapability.Tolerations[0]["operator"] = "Wrong"
+	wrongCapability.Tolerations[0]["operator"] = WrongExample
 	// WHEN validated
 	err := wrongCapability.Validate()
 	// THEN an error promts
@@ -205,7 +207,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateTolerationValueForEx
 	// GIVEN an incorrect capability with a value and "Exists" operator in tolerations
 	wrongCapability := testCapability.DeepCopy()
 	wrongCapability.Tolerations[0]["operator"] = "Exists"
-	wrongCapability.Tolerations[0]["value"] = "Wrong"
+	wrongCapability.Tolerations[0]["value"] = WrongExample
 	// WHEN validated
 	err := wrongCapability.Validate()
 	// THEN an error promts
@@ -238,7 +240,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationEffect()
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidTolerationEffeect() {
 	// GIVEN an incorrect capability with wrong effect in tolerations
 	wrongCapability := testCapability.DeepCopy()
-	wrongCapability.Tolerations[0]["effect"] = "Wrong"
+	wrongCapability.Tolerations[0]["effect"] = WrongExample
 	// WHEN validated
 	err := wrongCapability.Validate()
 	// THEN an error promts

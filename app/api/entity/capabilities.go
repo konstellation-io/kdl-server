@@ -4,27 +4,27 @@ import (
 	"fmt"
 )
 
-type TolerationOperator string
+type tolerationOperator string
 
 const (
-	TolerationOpExists TolerationOperator = "Exists"
-	TolerationOpEqual  TolerationOperator = "Equal"
+	TolerationOpExists tolerationOperator = "Exists"
+	TolerationOpEqual  tolerationOperator = "Equal"
 )
 
-var IsTolerationOperator = map[string]bool{
+var isTolerationOperator = map[string]bool{
 	string(TolerationOpExists): true,
 	string(TolerationOpEqual):  true,
 }
 
-type TaintEffect string
+type taintEffect string
 
 const (
-	TaintEffectNoSchedule       TaintEffect = "NoSchedule"
-	TaintEffectPreferNoSchedule TaintEffect = "PreferNoSchedule"
-	TaintEffectNoExecute        TaintEffect = "NoExecute"
+	TaintEffectNoSchedule       taintEffect = "NoSchedule"
+	TaintEffectPreferNoSchedule taintEffect = "PreferNoSchedule"
+	TaintEffectNoExecute        taintEffect = "NoExecute"
 )
 
-var IsTaintEffect = map[string]bool{
+var isTaintEffect = map[string]bool{
 	string(TaintEffectNoSchedule):       true,
 	string(TaintEffectPreferNoSchedule): true,
 	string(TaintEffectNoExecute):        true,
@@ -143,7 +143,7 @@ func checkTolerationOperator(toleration map[string]interface{}) (string, error) 
 	if !ok || operator == "" {
 		return "", fmt.Errorf("toleration has no operator assigned")
 	} else {
-		if !IsTolerationOperator[operator] {
+		if !isTolerationOperator[operator] {
 			return "", fmt.Errorf("toleration operator '%s' is not a valid operator", operator)
 		}
 	}
@@ -167,7 +167,7 @@ func checkTolerationEffect(toleration map[string]interface{}) error {
 	if !ok || effect == "" {
 		return fmt.Errorf("toleration has no effect assigned")
 	} else {
-		if !IsTaintEffect[effect] {
+		if !isTaintEffect[effect] {
 			return fmt.Errorf("toleration effect '%s' is not a valid effect", effect)
 		}
 	}

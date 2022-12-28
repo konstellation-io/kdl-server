@@ -49,11 +49,13 @@ func (c Capabilities) DeepCopy() Capabilities {
 		Tolerations:   make([]map[string]interface{}, len(c.Tolerations)),
 		Affinities:    make(map[string]interface{}),
 	}
+
 	if !c.IsNodeSelectorsEmpty() {
 		for key, value := range c.NodeSelectors {
 			capabilityCopy.NodeSelectors[key] = value
 		}
 	}
+
 	if !c.IsTolerationsEmpty() {
 		for idx := range c.Tolerations {
 			capabilityCopy.Tolerations[idx] = make(map[string]interface{})
@@ -62,11 +64,13 @@ func (c Capabilities) DeepCopy() Capabilities {
 			}
 		}
 	}
+
 	if !c.IsAffinitiesEmpty() {
 		for key, value := range c.Affinities {
 			capabilityCopy.Affinities[key] = value
 		}
 	}
+
 	return capabilityCopy
 }
 

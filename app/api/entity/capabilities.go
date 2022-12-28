@@ -108,15 +108,15 @@ func checkToleration(toleration map[string]interface{}) error {
 		return err
 	}
 
-	if err = checkTolerationValue(toleration, operator); err != nil {
+	if err := checkTolerationValue(toleration, operator); err != nil {
 		return err
 	}
 
-	if err = checkTolerationEffect(toleration); err != nil {
+	if err := checkTolerationEffect(toleration); err != nil {
 		return err
 	}
 
-	if err = checkTolerationSeconds(toleration); err != nil {
+	if err := checkTolerationSeconds(toleration); err != nil {
 		return err
 	}
 

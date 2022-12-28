@@ -18,8 +18,7 @@ func TestContextMeasurementTestSuite(t *testing.T) {
 	suite.Run(t, new(CapabilitiesTestSuite))
 }
 
-//go:embed
-var testCapability = entity.Capabilities{
+var _testCapability = entity.Capabilities{
 	ID:      "test_id",
 	Name:    "Test capability",
 	Default: false,
@@ -38,8 +37,7 @@ var testCapability = entity.Capabilities{
 	Affinities: map[string]interface{}{},
 }
 
-//go:embed
-var testCapability2 = entity.Capabilities{
+var _testCapability2 = entity.Capabilities{
 	ID:      "test_id2",
 	Name:    "Test capability 2",
 	Default: false,
@@ -60,7 +58,7 @@ const WrongExample = "Wrong"
 
 func (suite *CapabilitiesTestSuite) TestCapabilitiesNodeSelector() {
 	// GIVEN a capability
-	capability := testCapability.DeepCopy()
+	capability := _testCapability.DeepCopy()
 
 	// WHEN the capability is retrieved
 	nodeSelectors := capability.GetNodeSelectors()
@@ -71,7 +69,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesNodeSelector() {
 
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateCorrect() {
 	// GIVEN a correct capability
-	capability := testCapability.DeepCopy()
+	capability := _testCapability.DeepCopy()
 
 	// WHEN validated
 	err := capability.Validate()
@@ -82,7 +80,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateCorrect() {
 
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateCorrect2() {
 	// GIVEN a correct capability
-	capability := testCapability2.DeepCopy()
+	capability := _testCapability2.DeepCopy()
 
 	// WHEN validated
 	err := capability.Validate()
@@ -93,7 +91,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateCorrect2() {
 
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateCorrectValueEmptyWhenExists() {
 	// GIVEN a correct capability
-	capability := testCapability2.DeepCopy()
+	capability := _testCapability2.DeepCopy()
 	capability.Tolerations[0]["value"] = ""
 
 	// WHEN validated
@@ -105,7 +103,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateCorrectValueEmptyWhe
 
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateNoName() {
 	// GIVEN an incorrect capability with no name
-	wrongCapability := testCapability.DeepCopy()
+	wrongCapability := _testCapability.DeepCopy()
 	wrongCapability.Name = ""
 	// WHEN validated
 	err := wrongCapability.Validate()
@@ -117,7 +115,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateNoName() {
 
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateNoParameters() {
 	// GIVEN an incorrect capability with no parameters
-	wrongCapability := testCapability.DeepCopy()
+	wrongCapability := _testCapability.DeepCopy()
 	wrongCapability.NodeSelectors = map[string]string{}
 	wrongCapability.Tolerations = []map[string]interface{}{}
 	wrongCapability.Affinities = map[string]interface{}{}
@@ -131,7 +129,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateNoParameters() {
 
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationKey() {
 	// GIVEN an incorrect capability with empty key in tolerations
-	wrongCapability := testCapability.DeepCopy()
+	wrongCapability := _testCapability.DeepCopy()
 	wrongCapability.Tolerations[0]["key"] = ""
 	// WHEN validated
 	err := wrongCapability.Validate()
@@ -152,7 +150,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationKey() {
 
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationOperator() {
 	// GIVEN an incorrect capability with empty operator in tolerations
-	wrongCapability := testCapability.DeepCopy()
+	wrongCapability := _testCapability.DeepCopy()
 	wrongCapability.Tolerations[0]["operator"] = ""
 	// WHEN validated
 	err := wrongCapability.Validate()
@@ -173,7 +171,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationOperator
 
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidTolerationOperator() {
 	// GIVEN an incorrect capability with wrong operator in tolerations
-	wrongCapability := testCapability.DeepCopy()
+	wrongCapability := _testCapability.DeepCopy()
 	wrongCapability.Tolerations[0]["operator"] = WrongExample
 	// WHEN validated
 	err := wrongCapability.Validate()
@@ -185,7 +183,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidTolerationOpe
 
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationValueForEquals() {
 	// GIVEN an incorrect capability with empty value and "Equal" operator in tolerations
-	wrongCapability := testCapability.DeepCopy()
+	wrongCapability := _testCapability.DeepCopy()
 	wrongCapability.Tolerations[0]["operator"] = "Equal"
 	wrongCapability.Tolerations[0]["value"] = ""
 	// WHEN validated
@@ -207,7 +205,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationValueFor
 
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateTolerationValueForExist() {
 	// GIVEN an incorrect capability with a value and "Exists" operator in tolerations
-	wrongCapability := testCapability.DeepCopy()
+	wrongCapability := _testCapability.DeepCopy()
 	wrongCapability.Tolerations[0]["operator"] = "Exists"
 	wrongCapability.Tolerations[0]["value"] = WrongExample
 	// WHEN validated
@@ -220,7 +218,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateTolerationValueForEx
 
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationEffect() {
 	// GIVEN an incorrect capability with empty effect in tolerations
-	wrongCapability := testCapability.DeepCopy()
+	wrongCapability := _testCapability.DeepCopy()
 	wrongCapability.Tolerations[0]["effect"] = ""
 	// WHEN validated
 	err := wrongCapability.Validate()
@@ -241,7 +239,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationEffect()
 
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidTolerationEffeect() {
 	// GIVEN an incorrect capability with wrong effect in tolerations
-	wrongCapability := testCapability.DeepCopy()
+	wrongCapability := _testCapability.DeepCopy()
 	wrongCapability.Tolerations[0]["effect"] = WrongExample
 	// WHEN validated
 	err := wrongCapability.Validate()
@@ -253,7 +251,7 @@ func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidTolerationEff
 
 func (suite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidTolerationSeconds() {
 	// GIVEN an incorrect capability with wrong toleration seconds in tolerations
-	wrongCapability := testCapability.DeepCopy()
+	wrongCapability := _testCapability.DeepCopy()
 	wrongCapability.Tolerations[0]["tolerationSeconds"] = "Wrong"
 	// WHEN validated
 	err := wrongCapability.Validate()

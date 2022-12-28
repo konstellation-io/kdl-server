@@ -11,8 +11,7 @@ const (
 	TolerationOpEqual  tolerationOperator = "Equal"
 )
 
-//go:embed
-var isTolerationOperator = map[string]bool{
+var _isTolerationOperator = map[string]bool{
 	string(TolerationOpExists): true,
 	string(TolerationOpEqual):  true,
 }
@@ -25,8 +24,7 @@ const (
 	TaintEffectNoExecute        taintEffect = "NoExecute"
 )
 
-//go:embed
-var isTaintEffect = map[string]bool{
+var _isTaintEffect = map[string]bool{
 	string(TaintEffectNoSchedule):       true,
 	string(TaintEffectPreferNoSchedule): true,
 	string(TaintEffectNoExecute):        true,
@@ -139,7 +137,7 @@ func checkTolerationOperator(toleration map[string]interface{}) (string, error) 
 	operator := fmt.Sprintf("%v", operatorRaw)
 	if !ok || operator == "" {
 		return "", fmt.Errorf("toleration has no operator assigned")
-	} else if !isTolerationOperator[operator] {
+	} else if !_isTolerationOperator[operator] {
 		return "", fmt.Errorf("toleration operator '%s' is not a valid operator", operator)
 	}
 	return operator, nil
@@ -161,7 +159,7 @@ func checkTolerationEffect(toleration map[string]interface{}) error {
 	effect := fmt.Sprintf("%v", effectRaw)
 	if !ok || effect == "" {
 		return fmt.Errorf("toleration has no effect assigned")
-	} else if !isTaintEffect[effect] {
+	} else if !_isTaintEffect[effect] {
 		return fmt.Errorf("toleration effect '%s' is not a valid effect", effect)
 	}
 	return nil

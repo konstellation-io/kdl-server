@@ -113,8 +113,7 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoName() {
 	err := wrongCapability.Validate()
 	// THEN an error promts
 	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: capabilities must have a name", err.Error())
+	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNoName))
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoParameters() {
@@ -127,11 +126,10 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoParameters() {
 	err := wrongCapability.Validate()
 	// THEN an error promts
 	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: capabilities must contain one of these values: nodeSelector, toleration, affinities", err.Error())
+	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNoParameters))
 }
 
-func (testSuite *CapabilitiesTestSuite) checkNoAttribute(attribute string) {
+func (testSuite *CapabilitiesTestSuite) checkNoAttribute(attribute string, expectedErr error) {
 	// GIVEN an incorrect capability with empty 'attribute' in tolerations
 	wrongCapability := getTestCapability()
 	wrongCapability.Tolerations[0][attribute] = ""
@@ -139,8 +137,7 @@ func (testSuite *CapabilitiesTestSuite) checkNoAttribute(attribute string) {
 	err := wrongCapability.Validate()
 	// THEN an error promts
 	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: toleration has no "+attribute+" assigned", err.Error())
+	testSuite.True(errors.Is(err, expectedErr))
 
 	// GIVEN an incorrect capability with no 'attribute' in tolerations
 	delete(wrongCapability.Tolerations[0], attribute)
@@ -148,16 +145,15 @@ func (testSuite *CapabilitiesTestSuite) checkNoAttribute(attribute string) {
 	err = wrongCapability.Validate()
 	// THEN an error promts
 	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: toleration has no "+attribute+" assigned", err.Error())
+	testSuite.True(errors.Is(err, expectedErr))
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationKey() {
-	testSuite.checkNoAttribute("key")
+	testSuite.checkNoAttribute("key", entity.ErrCapabilitiesNoKey)
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationOperator() {
-	testSuite.checkNoAttribute("operator")
+	testSuite.checkNoAttribute("operator", entity.ErrCapabilitiesNoOperator)
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidTolerationOperator() {
@@ -168,8 +164,7 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidToleratio
 	err := wrongCapability.Validate()
 	// THEN an error promts
 	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: toleration operator 'Wrong' is not a valid operator", err.Error())
+	testSuite.True(errors.Is(err, entity.ErrCapabilitiesInvalidOperator))
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationValueForEquals() {
@@ -181,8 +176,7 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationValu
 	err := wrongCapability.Validate()
 	// THEN an error promts
 	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: toleration has no value assigned while operator being 'equal'", err.Error())
+	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNoValue))
 
 	// GIVEN an incorrect capability with no value and "Equal" operator in tolerations
 	delete(wrongCapability.Tolerations[0], "value")
@@ -190,8 +184,7 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationValu
 	err = wrongCapability.Validate()
 	// THEN an error promts
 	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: toleration has no value assigned while operator being 'equal'", err.Error())
+	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNoValue))
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateTolerationValueForExist() {
@@ -203,12 +196,11 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateTolerationValueF
 	err := wrongCapability.Validate()
 	// THEN an error promts
 	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: toleration has a value assigned while operator being 'exists'", err.Error())
+	testSuite.True(errors.Is(err, entity.ErrCapabilitiesHasValue))
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationEffect() {
-	testSuite.checkNoAttribute("operator")
+	testSuite.checkNoAttribute("operator", entity.ErrCapabilitiesNoOperator)
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidTolerationEffeect() {
@@ -219,8 +211,7 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidToleratio
 	err := wrongCapability.Validate()
 	// THEN an error promts
 	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: toleration effect 'Wrong' is not a valid effect", err.Error())
+	testSuite.True(errors.Is(err, entity.ErrCapabilitiesInvalidOperator))
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidTolerationSeconds() {
@@ -231,6 +222,5 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidToleratio
 	err := wrongCapability.Validate()
 	// THEN an error promts
 	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNotValid))
-	testSuite.Equal("capabilities not valid: toleration field 'tolerationSeconds' 'Wrong' is not a valid number", err.Error())
+	testSuite.True(errors.Is(err, entity.ErrCapabilitiesInvalidSeconds))
 }

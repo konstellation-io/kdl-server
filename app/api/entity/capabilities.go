@@ -54,15 +54,11 @@ func (c Capabilities) Validate() error {
 	affinitiesIsEmpty := c.IsAffinitiesEmpty()
 
 	if nodeSelectorsIsEmpty && tolerationsIsEmpty && affinitiesIsEmpty {
-		return wrapCapabilitiesNotValidErr(
-			fmt.Errorf("capabilities must contain one of these values: nodeSelector, toleration, affinities"),
-		)
+		return wrapCapabilitiesNotValidErr(ErrCapabilitiesNoParameters)
 	}
 
 	if c.Name == "" {
-		return wrapCapabilitiesNotValidErr(
-			fmt.Errorf("capabilities must have a name"),
-		)
+		return wrapCapabilitiesNotValidErr(ErrCapabilitiesNoName)
 	}
 
 	if !tolerationsIsEmpty {
@@ -106,7 +102,7 @@ func checkTolerationKey(toleration map[string]interface{}) error {
 	key := fmt.Sprintf("%v", keyRaw)
 
 	if !ok || key == "" {
-		return fmt.Errorf("toleration has no key assigned")
+		return ErrCapabilitiesNoKey
 	}
 
 	return nil
@@ -117,9 +113,9 @@ func checkTolerationOperator(toleration map[string]interface{}) (string, error) 
 	operator := fmt.Sprintf("%v", operatorRaw)
 
 	if !ok || operator == "" {
-		return "", fmt.Errorf("toleration has no operator assigned")
+		return "", ErrCapabilitiesNoOperator
 	} else if !IsTolerationOperator(operator) {
-		return "", fmt.Errorf("toleration operator '%s' is not a valid operator", operator)
+		return "", wrapErrWithValue(ErrCapabilitiesInvalidOperator, operator)
 	}
 
 	return operator, nil
@@ -130,9 +126,9 @@ func checkTolerationValue(toleration map[string]interface{}, operator string) er
 	value := fmt.Sprintf("%v", valueRaw)
 
 	if operator == string(TolerationOpEqual) && (!ok || value == "") {
-		return fmt.Errorf("toleration has no value assigned while operator being 'equal'")
+		return ErrCapabilitiesNoValue
 	} else if operator == string(TolerationOpExists) && ok && value != "" {
-		return fmt.Errorf("toleration has a value assigned while operator being 'exists'")
+		return ErrCapabilitiesHasValue
 	}
 
 	return nil
@@ -143,9 +139,9 @@ func checkTolerationEffect(toleration map[string]interface{}) error {
 	effect := fmt.Sprintf("%v", effectRaw)
 
 	if !ok || effect == "" {
-		return fmt.Errorf("toleration has no effect assigned")
+		return ErrCapabilitiesNoEffect
 	} else if !IsTolerationEffect(effect) {
-		return fmt.Errorf("toleration effect '%s' is not a valid effect", effect)
+		return wrapErrWithValue(ErrCapabilitiesInvalidOperator, effect)
 	}
 
 	return nil
@@ -157,7 +153,7 @@ func checkTolerationSeconds(toleration map[string]interface{}) error {
 	if ok {
 		_, isNumber := seconds.(int64)
 		if !isNumber {
-			return fmt.Errorf("toleration field 'tolerationSeconds' '%v' is not a valid number", seconds)
+			return wrapErrWithValue(ErrCapabilitiesInvalidSeconds, fmt.Sprintf("%v", seconds))
 		}
 	}
 

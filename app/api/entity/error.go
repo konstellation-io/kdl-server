@@ -6,34 +6,49 @@ import (
 )
 
 var (
-	// ErrProjectNotFound error definition.
 	ErrProjectNotFound = errors.New("project not found")
 
-	// ErrUserNotFound error definition.
 	ErrUserNotFound = errors.New("user not found")
 
-	// ErrDuplicatedUser error definition.
 	ErrDuplicatedUser = errors.New("user is duplicated")
 
-	// ErrNotImplemented error definition.
 	ErrNotImplemented = fmt.Errorf("not implemented")
 
-	// ErrInvalidRepoType error definition.
 	ErrInvalidRepoType = fmt.Errorf("invalid repo type")
 
-	// ErrRuntimeNotFound error definition.
 	ErrRuntimeNotFound = fmt.Errorf("runtime not found")
 
-	// ErrNoRunningRuntime error definition.
 	ErrNoRunningRuntime = fmt.Errorf("no running runtime")
 
-	// ErrCapabilitiesNotFound error definition.
 	ErrCapabilitiesNotFound = errors.New("capabilities not found")
 
-	// ErrCapabilitiesNotValid error definition.
 	ErrCapabilitiesNotValid = errors.New("capabilities not valid")
+
+	ErrCapabilitiesNoParameters = errors.New("capabilities must contain one of these values: nodeSelector, toleration, affinities")
+
+	ErrCapabilitiesNoName = errors.New("capabilities must have a name")
+
+	ErrCapabilitiesNoKey = errors.New("toleration has no key assigned")
+
+	ErrCapabilitiesNoOperator = errors.New("toleration has no operator assigned")
+
+	ErrCapabilitiesInvalidOperator = errors.New("the following value is not a valid toleration operator")
+
+	ErrCapabilitiesNoValue = errors.New("toleration has no value assigned while operator being 'equal'")
+
+	ErrCapabilitiesHasValue = errors.New("toleration has a value assigned while operator being 'exists'")
+
+	ErrCapabilitiesNoEffect = errors.New("toleration has no effect assigned")
+
+	ErrCapabilitiesInvalidEffect = errors.New("the following value is not a valid toleration effect")
+
+	ErrCapabilitiesInvalidSeconds = errors.New("the following value is not a valid duration for toleration seconds")
 )
 
 func wrapCapabilitiesNotValidErr(err error) error {
-	return fmt.Errorf("%w: %s", ErrCapabilitiesNotValid, err.Error())
+	return fmt.Errorf("%s: %w", ErrCapabilitiesNotValid, err)
+}
+
+func wrapErrWithValue(err error, value string) error {
+	return fmt.Errorf("%w: %s", err, value)
 }

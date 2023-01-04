@@ -77,12 +77,12 @@ func checkToleration(toleration map[string]interface{}) error {
 		return err
 	}
 
-	operator, err := checkTolerationOperator(toleration)
+	err := checkTolerationOperator(toleration)
 	if err != nil {
 		return err
 	}
 
-	if err := checkTolerationValue(toleration, operator); err != nil {
+	if err := checkTolerationValue(toleration); err != nil {
 		return err
 	}
 
@@ -108,26 +108,32 @@ func checkTolerationKey(toleration map[string]interface{}) error {
 	return nil
 }
 
-func checkTolerationOperator(toleration map[string]interface{}) (string, error) {
+func checkTolerationOperator(toleration map[string]interface{}) error {
 	operatorRaw, ok := toleration["operator"]
 	operator := fmt.Sprintf("%v", operatorRaw)
 
 	if !ok || operator == "" {
-		return "", ErrCapabilitiesNoOperator
+		return ErrCapabilitiesNoOperator
 	} else if !IsTolerationOperator(operator) {
-		return "", wrapErrWithValue(ErrCapabilitiesInvalidOperator, operator)
+		return wrapErrWithValue(ErrCapabilitiesInvalidOperator, operator)
 	}
 
-	return operator, nil
+	return nil
 }
 
-func checkTolerationValue(toleration map[string]interface{}, operator string) error {
-	valueRaw, ok := toleration["value"]
+func checkTolerationValue(toleration map[string]interface{}) error {
+	valueRaw, okValue := toleration["value"]
+	operatorRaw, okOperator := toleration["operator"]
 	value := fmt.Sprintf("%v", valueRaw)
+	operator := fmt.Sprintf("%v", operatorRaw)
 
-	if operator == string(TolerationOpEqual) && (!ok || value == "") {
+	if !okOperator {
+		return ErrCapabilitiesNoOperator
+	}
+
+	if operator == string(TolerationOpEqual) && (!okValue || value == "") {
 		return ErrCapabilitiesNoValue
-	} else if operator == string(TolerationOpExists) && ok && value != "" {
+	} else if operator == string(TolerationOpExists) && okValue && value != "" {
 		return ErrCapabilitiesHasValue
 	}
 

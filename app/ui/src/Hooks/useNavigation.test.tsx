@@ -23,7 +23,7 @@ describe('useNavigation hook - loop', () => {
   // @ts-ignore
   const getHook = () => wrapper.find('div').props().hook;
 
-  it('shows right initial state', () => {
+  it('shows right initial state as expected', () => {
     // Arrange.
     // Act.
     // Assert.

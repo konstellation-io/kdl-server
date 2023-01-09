@@ -114,6 +114,13 @@ YAML processor to configure KDL Remote developement.
 brew install yq
 ```
 
+#### trufflehog
+Secret scanning tool for pre-commit-hooks.
+
+For installation instructions go to their [official repository](https://github.com/trufflesecurity/trufflehog#installation).
+
+
+
 ## Local Environment
 
 This repo contains a tool called `./kdlctl.sh` to handle common actions you need during development.

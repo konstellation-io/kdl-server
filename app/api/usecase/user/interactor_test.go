@@ -255,8 +255,8 @@ func TestInteractor_StartTools(t *testing.T) {
 		NodeSelectors: map[string]string{
 			"test1": "value1",
 		},
-		Affinities: []string{},
-		Taints:     []string{},
+		Tolerations: []map[string]interface{}{},
+		Affinities:  map[string]interface{}{},
 	}
 
 	runtimeID := "12345"
@@ -297,8 +297,8 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 		NodeSelectors: map[string]string{
 			"test1": "value1",
 		},
-		Affinities: []string{},
-		Taints:     []string{},
+		Tolerations: []map[string]interface{}{},
+		Affinities:  map[string]interface{}{},
 	}
 
 	ctx := context.Background()
@@ -350,8 +350,8 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 		NodeSelectors: map[string]string{
 			"test1": "value1",
 		},
-		Affinities: []string{},
-		Taints:     []string{},
+		Tolerations: []map[string]interface{}{},
+		Affinities:  map[string]interface{}{},
 	}
 
 	ctx := context.Background()

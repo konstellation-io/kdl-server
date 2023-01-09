@@ -193,7 +193,7 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 		return fmt.Errorf("error getting ingress annotations: %w", err)
 	}
 
-	definition := k.getUserToolsDefinition(
+	definition, err := k.getUserToolsDefinition(
 		ingressAnnotations,
 		resName,
 		username,
@@ -205,17 +205,27 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 		capabilities,
 	)
 
+	if err != nil {
+		k.logger.Errorf("Error building tools: %s", err.Error())
+		return err
+	}
+
 	k.logger.Infof("Creating users tools: %#v", definition.Object)
 	_, err = k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
 
-	return err
+	if err != nil {
+		k.logger.Errorf("Error creating user tools: %s", err.Error())
+		return err
+	}
+
+	return nil
 }
 
 func (k *k8sClient) getUserToolsDefinition(
 	ingressAnnotations map[string]interface{},
 	resName, username, usernameSlug, runtimeID, runtimeImage, runtimeTag, serviceAccountName string,
 	capabilities entity.Capabilities,
-) *unstructured.Unstructured {
+) (*unstructured.Unstructured, error) {
 	tlsConfig := map[string]interface{}{
 		"enabled": k.cfg.TLS.Enabled,
 	}
@@ -287,11 +297,23 @@ func (k *k8sClient) getUserToolsDefinition(
 		"serviceAccountName": serviceAccountName,
 	}
 
-	//nolint:gocritic // This code will be implemented in the next iteration
 	if capabilities.ID != "" {
-		spec["nodeSelector"] = capabilities.GetNodeSelectors()
-		// definition["spec"]["affinity"] = capabilities.GetNodeSelectors();
-		// definition["spec"]["tolerations"] = capabilities.GetNodeSelectors();
+		if err := capabilities.Validate(); err != nil {
+			return nil, err
+		}
+
+		if !capabilities.IsNodeSelectorsEmpty() {
+			spec["nodeSelector"] = capabilities.GetNodeSelectors()
+		}
+
+		if !capabilities.IsTolerationsEmpty() {
+			spec["tolerations"] = capabilities.GetTolerations()
+		}
+
+		if !capabilities.IsAffinitiesEmpty() {
+			spec["affinity"] = capabilities.GetAffinities()
+		}
+
 		vscodeRuntime["capabilityId"] = capabilities.ID
 	}
 
@@ -312,7 +334,7 @@ func (k *k8sClient) getUserToolsDefinition(
 		},
 	}
 
-	return definition
+	return definition, nil
 }
 
 // Returns a watcher for the UserTools.

@@ -189,20 +189,17 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeID,
 		i.logger.Debugf("Using default runtime image \"%s:%s\"", rImage, rTag)
 	}
 
-	capability := entity.Capabilities{}
-
+	retrievedCapabilities := entity.Capabilities{}
 	if capabilitiesID != nil {
-		retrievedCapabilities, err := i.repoCapabilities.Get(ctx, *capabilitiesID)
+		retrievedCapabilities, err = i.repoCapabilities.Get(ctx, *capabilitiesID)
 		if err != nil {
 			return entity.User{}, err
 		}
-
-		capability = retrievedCapabilities
 	}
 
 	i.logger.Infof("Creating user tools for user: \"%s\"", username)
 
-	err = i.k8sClient.CreateUserToolsCR(ctx, username, rID, rImage, rTag, capability)
+	err = i.k8sClient.CreateUserToolsCR(ctx, username, rID, rImage, rTag, retrievedCapabilities)
 	if err != nil {
 		return entity.User{}, err
 	}

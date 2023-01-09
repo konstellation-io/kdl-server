@@ -67,16 +67,16 @@ func TestInteractor_GetAllCapabilities(t *testing.T) {
 	nodeSelectors := map[string]string{
 		"key1": "value1",
 	}
-	affinities := []string{}
-	taints := []string{}
+	tolerations := []map[string]interface{}{}
+	affinities := map[string]interface{}{}
 	ctx := context.Background()
 
 	returnedCapabilities := entity.Capabilities{
 		ID:            capabilitiesID,
 		Name:          capabilitiesName,
 		NodeSelectors: nodeSelectors,
+		Tolerations:   tolerations,
 		Affinities:    affinities,
-		Taints:        taints,
 	}
 	expectedCapabilities := model.Capability{
 		ID:   capabilitiesID,

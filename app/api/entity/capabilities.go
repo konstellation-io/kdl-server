@@ -77,8 +77,7 @@ func checkToleration(toleration map[string]interface{}) error {
 		return err
 	}
 
-	err := checkTolerationOperator(toleration)
-	if err != nil {
+	if err := checkTolerationOperator(toleration); err != nil {
 		return err
 	}
 

@@ -14,10 +14,9 @@ type Config struct {
 	LogLevel        string `yaml:"logLevel" envconfig:"KDL_SERVER_LOG_LEVEL"`
 	Port            string `yaml:"port" envconfig:"KDL_SERVER_PORT"`
 	StaticFilesPath string `yaml:"staticFilesPath" envconfig:"KDL_SERVER_STATIC_FILES_PATH"`
-	BaseDomainName  string `envconfig:"TOOLKIT_BASE_DOMAIN_NAME"`
+	BaseDomainName  string `envconfig:"BASE_DOMAIN_NAME"`
 	TLS             struct {
-		Enabled    bool   `envconfig:"TOOLKIT_TLS"`
-		SecretName string `envconfig:"TOOLKIT_TLS_SECRET_NAME"`
+		Enabled bool `envconfig:"TLS_ENABLED"`
 	}
 	Admin struct {
 		Username string `envconfig:"KDL_ADMIN_USERNAME"`
@@ -28,7 +27,7 @@ type Config struct {
 		ClassName string `envconfig:"USER_TOOLS_STORAGE_CLASSNAME"`
 	}
 	SharedVolume struct {
-		Name string `envconfig:"TOOLKIT_SHARED_VOLUME"`
+		Name string `envconfig:"SHARED_VOLUME"`
 	}
 	MongoDB struct {
 		URI    string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
@@ -48,15 +47,6 @@ type Config struct {
 		Endpoint  string `envconfig:"MINIO_ENDPOINT"`
 		AccessKey string `envconfig:"MINIO_ACCESS_KEY"`
 		SecretKey string `envconfig:"MINIO_SECRET_KEY"`
-	}
-	Jupyter struct {
-		URL   string `envconfig:"USER_TOOLS_JUPYTER_URL"`
-		Image struct {
-			Repository string `envconfig:"JUPYTER_IMG_REPO"`
-			Tag        string `envconfig:"JUPYTER_IMG_TAG"`
-			PullPolicy string `envconfig:"JUPYTER_IMG_PULLPOLICY"`
-		}
-		EnterpriseGatewayURL string `envconfig:"JUPYTER_ENTERPRISE_GATEWAY_URL"`
 	}
 	VSCode struct {
 		URL   string `envconfig:"USER_TOOLS_VSCODE_URL"`
@@ -78,7 +68,17 @@ type Config struct {
 			Tag        string `envconfig:"PROJECT_MLFLOW_IMG_TAG"`
 			PullPolicy string `envconfig:"PROJECT_MLFLOW_IMG_PULLPOLICY"`
 		}
-		Volume struct {
+		Ingress struct {
+			ClassName   string `envconfig:"PROJECT_MLFLOW_INGRESS_CLASS_NAME"`
+			Annotations string `envconfig:"PROJECT_MLFLOW_ENCODED_INGRESS_ANNOTATIONS"`
+			TLS         struct {
+				SecretName *string `envconfig:"PROJECT_MLFLOW_INGRESS_TLS_SECRET_NAME"`
+			}
+		}
+		NodeSelector string `envconfig:"PROJECT_MLFLOW_NODESELECTOR"`
+		Affinity     string `envconfig:"PROJECT_MLFLOW_AFFINITY"`
+		Tolerations  string `envconfig:"PROJECT_MLFLOW_TOLERATIONS"`
+		Volume       struct {
 			StorageClassName string `envconfig:"PROJECT_MLFLOW_STORAGE_CLASS_NAME"`
 			Size             string `envconfig:"PROJECT_MLFLOW_STORAGE_SIZE"`
 		}
@@ -90,6 +90,9 @@ type Config struct {
 			Tag        string `envconfig:"PROJECT_FILEBROWSER_IMG_TAG"`
 			PullPolicy string `envconfig:"PROJECT_FILEBROWSER_IMG_PULLPOLICY"`
 		}
+		NodeSelector string `envconfig:"PROJECT_FILEBROWSER_NODESELECTOR"`
+		Affinity     string `envconfig:"PROJECT_FILEBROWSER_AFFINITY"`
+		Tolerations  string `envconfig:"PROJECT_FILEBROWSER_TOLERATIONS"`
 	}
 	Kg struct {
 		Enabled bool   `envconfig:"KNOWLEDGE_GALAXY_ENABLED"`
@@ -127,6 +130,8 @@ type Config struct {
 			Tag        string `envconfig:"USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_TAG"`
 			PullPolicy string `envconfig:"USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_PULLPOLICY"`
 		}
+		GiteaAdminSecret     string `envconfig:"GITEA_OAUTH2_SETUP_ADMIN_SECRETS"`
+		GiteaOauth2Configmap string `envconfig:"GITEA_OAUTH2_SETUP_CONFIGMAP"`
 	}
 	UserToolsOAuth2Proxy struct {
 		Image struct {
@@ -149,6 +154,16 @@ type Config struct {
 	UserToolsIngress struct {
 		// Base64 encoded string of the ingress annotations
 		Annotations string `envconfig:"USER_TOOLS_ENCODED_INGRESS_ANNOTATIONS"`
+		ClassName   string `envconfig:"USER_TOOLS_INGRESS_CLASS_NAME"`
+		TLS         struct {
+			SecretName *string `envconfig:"USER_TOOLS_TLS_SECRET_NAME"`
+		}
+	}
+	Labels struct {
+		Common struct {
+			AppRelease   string `envconfig:"LABELS_COMMON_APP_RELEASE"`
+			ChartRelease string `envconfig:"LABELS_COMMON_CHART_RELEASE"`
+		}
 	}
 }
 

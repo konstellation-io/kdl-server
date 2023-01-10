@@ -22,6 +22,7 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         app: user-tools-{{ .Values.usernameSlug }}
         runtimeId: {{ .Values.vscodeRuntime.runtimeId }}
+        capabilityId: {{ .Values.vscodeRuntime.capabilityId }}
     spec:
     {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -74,26 +75,11 @@ spec:
                   fieldPath: metadata.namespace
           envFrom:
             - secretRef:
-                name: gitea-admin-secrets
+                name: {{ .Values.giteaOauth2Setup.giteaAdminSecret }}
             - secretRef:
                 name: codeserver-oauth2-secrets-{{ .Values.usernameSlug }}
             - configMapRef:
-                name: gitea-configmap
-        - name: jupyter-gitea-oauth2-setup
-          image: {{ .Values.giteaOauth2Setup.image.repository }}:{{ .Values.giteaOauth2Setup.image.tag }}
-          imagePullPolicy: {{ .Values.giteaOauth2Setup.image.pullPolicy }}
-          env:
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          envFrom:
-            - secretRef:
-                name: gitea-admin-secrets
-            - secretRef:
-                name: jupyter-oauth2-secrets-{{ .Values.usernameSlug }}
-            - configMapRef:
-                name: gitea-configmap
+                name: {{ .Values.giteaOauth2Setup.giteaOauth2Configmap }}
       containers:
         - name: {{ .Chart.Name }}-repo-cloner
           image: {{ .Values.repoCloner.image.repository }}:{{ .Values.repoCloner.image.tag }}
@@ -101,11 +87,8 @@ spec:
           env:
             - name: KDL_USER_NAME
               value: "{{ .Values.username }}"
-          envFrom:
-          - secretRef:
-              name: tools-secret
-          - secretRef:
-              name: kdl-server-secrets
+            - name: KDL_SERVER_MONGODB_URI
+              value: "{{ .Values.repoCloner.mongodbURI }}"
           volumeMounts:
             - name: user-pvc
               mountPath: /home/kdl
@@ -116,9 +99,6 @@ spec:
         - name: {{ .Chart.Name }}-vscode
           image: {{ .Values.vscode.image.repository }}:{{ .Values.vscode.image.tag }}
           imagePullPolicy: {{ .Values.vscode.image.pullPolicy }}
-          envFrom:
-          - secretRef:
-              name: tools-secret
           volumeMounts:
             - name: user-pvc
               mountPath: /home/coder
@@ -139,6 +119,24 @@ spec:
           args:
             - "-c"
             - "trap : TERM INT; sleep infinity & wait"
+          env:
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: kdl-server
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: kdl-server
+                  key: MINIO_SECRET_KEY
+            - name: MINIO_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: kdl-server
+                  key: MINIO_ENDPOINT
+            - name: MC_HOST_dell
+              value: "http://$(MINIO_ACCESS_KEY):$(MINIO_SECRET_KEY)@$(MINIO_ENDPOINT)"
           volumeMounts:
             - name: user-pvc
               mountPath: /home/coder
@@ -147,35 +145,6 @@ spec:
               mountPath: /home/coder/shared-storage
               readOnly: true
             {{- end }}
-            - name: {{ .Values.usernameSlug }}-ssh-keys-vol
-              mountPath: /home/coder/.ssh/id_rsa
-              subPath: id_rsa
-              readOnly: true
-        - name: {{ .Chart.Name }}-jupyter
-          image: {{ .Values.jupyter.image.repository }}:{{ .Values.jupyter.image.tag }}
-          imagePullPolicy: {{ .Values.jupyter.image.pullPolicy }}
-          envFrom:
-          - secretRef:
-              name: tools-secret
-          env:
-            - name: JUPYTER_GATEWAY_URL
-              value: "{{ .Values.jupyter.enterpriseGatewayUrl }}"
-            - name: JUPYTER_ENABLE_LAB
-              value: "yes"
-            - name: SHELL
-              value: /bin/bash
-            - name: KERNEL_USERNAME
-              value: "{{ .Values.usernameSlug }}"
-            - name: KERNEL_SHARED_VOLUME_NAME
-              value: "{{ .Values.sharedVolume.name }}-claim"
-          volumeMounts:
-            - name: user-pvc
-              mountPath: /home/coder
-          {{- if .Values.sharedVolume.name }}
-            - name: {{ .Values.sharedVolume.name }}
-              mountPath: /home/coder/shared-storage
-              readOnly: true
-          {{- end }}
             - name: {{ .Values.usernameSlug }}-ssh-keys-vol
               mountPath: /home/coder/.ssh/id_rsa
               subPath: id_rsa
@@ -213,41 +182,6 @@ spec:
           ports:
             - name: http
               containerPort: 4180
-              protocol: TCP
-        - name: {{ .Chart.Name }}-jupyter-proxy
-          image: {{ .Values.oauth2Proxy.image.repository }}:{{ .Values.oauth2Proxy.image.tag }}
-          imagePullPolicy: {{ .Values.oauth2Proxy.image.pullPolicy }}
-          args:
-            - "--config=/etc/oauth2_proxy.cfg"
-            - "--email-domain=*"
-            - "--redirect-url={{ printf "%s://%s-jupyter.%s/oauth2/callback" ( include "protocol" . ) .Values.usernameSlug .Values.domain }}"
-            - "--upstream=http://127.0.0.1:8888/"
-            - "--pass-user-headers=true"
-            - "--set-xauthrequest=true"
-            - "--skip-provider-button"
-            - "--http-address=0.0.0.0:4181"
-          env:
-            - name: OAUTH2_PROXY_GITEA_USER
-              value: "{{ .Values.username }}"
-            - name: OAUTH2_PROXY_HTTP_ADDRESS
-              value: "0.0.0.0:4181"
-            - name: OAUTH2_PROXY_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: jupyter-oauth2-credentials-{{ .Values.usernameSlug }}
-                  key: OAUTH2_CLIENT_ID
-            - name: OAUTH2_PROXY_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: jupyter-oauth2-credentials-{{ .Values.usernameSlug }}
-                  key: OAUTH2_CLIENT_SECRET
-          volumeMounts:
-            - name: oauth2-config
-              mountPath: /etc/oauth2_proxy.cfg
-              subPath: oauth2_proxy.cfg
-          ports:
-            - name: http
-              containerPort: 4181
               protocol: TCP
       volumes:
         - name: kubeconfig-tpl-configmap

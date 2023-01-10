@@ -23,6 +23,12 @@ type APITokenInput struct {
 	Name   *string `json:"name"`
 }
 
+type Capability struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Default bool   `json:"default"`
+}
+
 type CreateProjectInput struct {
 	ID          string           `json:"id"`
 	Name        string           `json:"name"`
@@ -31,9 +37,10 @@ type CreateProjectInput struct {
 }
 
 type ExternalRepositoryInput struct {
-	URL      string `json:"url"`
-	Username string `json:"username"`
-	Token    string `json:"token"`
+	URL        string                      `json:"url"`
+	Username   string                      `json:"username"`
+	Credential string                      `json:"credential"`
+	AuthMethod entity.RepositoryAuthMethod `json:"authMethod"`
 }
 
 type QualityProjectDesc struct {
@@ -59,8 +66,9 @@ type RepositoryInput struct {
 }
 
 type SetActiveUserToolsInput struct {
-	Active    bool    `json:"active"`
-	RuntimeID *string `json:"runtimeId"`
+	Active         bool    `json:"active"`
+	RuntimeID      *string `json:"runtimeId"`
+	CapabilitiesID *string `json:"capabilitiesId"`
 }
 
 type SetBoolFieldInput struct {

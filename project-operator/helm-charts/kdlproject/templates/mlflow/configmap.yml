@@ -6,3 +6,4 @@ metadata:
     app:  {{ .Values.projectId }}-mlflow-config
 data:
   ARTIFACTS_BUCKET: {{ .Values.mlflow.s3.bucket }}
+  MLFLOW_S3_ENDPOINT_URL: {{ .Values.minio.endpointURL }}

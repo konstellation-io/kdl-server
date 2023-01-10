@@ -1,5 +1,6 @@
 # Build API.
-FROM golang:1.16.14-alpine3.15 as api-builder
+FROM golang:1.18.3-alpine3.16 as api-builder
+# 1.18
 
 # Pass Hadolint
 LABEL maintainer="Builder"
@@ -37,7 +38,7 @@ COPY ui/ .
 RUN yarn build
 
 # Create APP image
-FROM alpine:3.13.6
+FROM alpine:3.15
 
 # Maintainer of the Dockerfile
 LABEL maintainer="Intelygenz - Konstellation Team"

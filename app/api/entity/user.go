@@ -37,5 +37,9 @@ type User struct {
 }
 
 func (u User) UsernameSlug() string {
+	slug.CustomSub = map[string]string{
+		"_": "-",
+	}
+
 	return slug.Make(u.Username)
 }

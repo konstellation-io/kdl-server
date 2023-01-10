@@ -67,7 +67,8 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 	if input.Repository.External != nil {
 		opts.ExternalRepoURL = &input.Repository.External.URL
 		opts.ExternalRepoUsername = &input.Repository.External.Username
-		opts.ExternalRepoToken = &input.Repository.External.Token
+		opts.ExternalRepoCredential = input.Repository.External.Credential
+		opts.ExternalRepoAuthMethod = input.Repository.External.AuthMethod
 	}
 
 	createdProject, err := r.projects.Create(ctx, opts)
@@ -163,7 +164,7 @@ func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.S
 	username := ctx.Value(middleware.LoggedUserNameKey).(string)
 
 	if input.Active {
-		u, err := r.users.StartTools(ctx, username, input.RuntimeID)
+		u, err := r.users.StartTools(ctx, username, input.RuntimeID, input.CapabilitiesID)
 		return &u, err
 	}
 
@@ -193,8 +194,6 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 		return &entity.ToolUrls{}, err
 	}
 
-	jupyterWithUsername := strings.Replace(r.cfg.Jupyter.URL, "USERNAME", slugUserName, 1)
-	jupyterWithUsernameAndFolder := strings.Replace(jupyterWithUsername, "REPO_FOLDER", folderName, 2)
 	vscodeWithUsername := strings.Replace(r.cfg.VSCode.URL, "USERNAME", slugUserName, 1)
 	vscodeWithUsernameAndFolder := strings.Replace(vscodeWithUsername, "REPO_FOLDER", folderName, 1)
 	mlflowWithProject := strings.Replace(r.cfg.ProjectMLFlow.URL, "PROJECT_ID", obj.ID, 1)
@@ -209,7 +208,6 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 		KnowledgeGalaxy: kgWithProject,
 		Gitea:           giteaWithFolder,
 		Filebrowser:     filebrowserWithProject,
-		Jupyter:         jupyterWithUsernameAndFolder,
 		VSCode:          vscodeWithUsernameAndFolder,
 		Drone:           r.cfg.Drone.URL,
 		MLFlow:          mlflowWithProject,
@@ -268,6 +266,15 @@ func (r *queryResolver) Runtimes(ctx context.Context) ([]entity.Runtime, error) 
 func (r *queryResolver) RunningRuntime(ctx context.Context) (*entity.Runtime, error) {
 	runtime, err := r.runtimes.GetRunningRuntime(ctx, ctx.Value(middleware.LoggedUserNameKey).(string))
 	return runtime, err
+}
+
+func (r *queryResolver) Capabilities(ctx context.Context) ([]model.Capability, error) {
+	return r.capabilities.GetCapabilities(ctx)
+}
+
+func (r *queryResolver) RunningCapability(ctx context.Context) (*model.Capability, error) {
+	capabilities, err := r.capabilities.GetRunningCapability(ctx, ctx.Value(middleware.LoggedUserNameKey).(string))
+	return capabilities, err
 }
 
 func (r *queryResolver) Kubeconfig(ctx context.Context) (string, error) {

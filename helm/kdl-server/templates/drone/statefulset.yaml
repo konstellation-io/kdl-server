@@ -1,8 +1,4 @@
-{{ if .Capabilities.APIVersions.Has "apps/v1" }}
 apiVersion: apps/v1
-{{ else if .Capabilities.APIVersions.Has "apps/v1beta1" }}
-apiVersion: apps/v1beta1
-{{ end }}
 kind: StatefulSet
 metadata:
   name: drone
@@ -19,7 +15,11 @@ spec:
       labels:
         app: drone
       annotations:
-        helm.sh/restart-deployment: {{ randAlphaNum 5 | quote }} # TODO
+        checksum/config: {{ include (print $.Template.BasePath "/drone/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/drone/secret.yaml") . | sha256sum }}
+        checksum/oauth2-secret: {{ include (print $.Template.BasePath "/drone/oauth2-secret.yaml") . | sha256sum }}
+        checksum/gitea-oauth2-config: {{ include (print $.Template.BasePath "/common/gitea-oauth2-configmap.yaml") . | sha256sum }}
+        checksum/gitea-admin-secret: {{ include (print $.Template.BasePath "/common/gitea-admin-secret.yaml") . | sha256sum }}
     spec:
       initContainers:
         - name: gitea-oauth2-setup
@@ -32,11 +32,11 @@ spec:
                 fieldPath: metadata.namespace
           envFrom:
             - secretRef:
-                name: gitea-admin-secrets
+                name: gitea-admin
             - secretRef:
-                name: drone-oauth2-secrets
+                name: drone-oauth2
             - configMapRef:
-                name: gitea-configmap
+                name: gitea-oauth2
       containers:
         - name: drone
           image: {{ .Values.drone.image.repository }}:{{ .Values.drone.image.tag }}
@@ -45,18 +45,20 @@ spec:
             - name: DRONE_GITEA_CLIENT_ID
               valueFrom:
                 secretKeyRef:
+                  # App generated secret
                   name: drone-oauth2-credentials
                   key: OAUTH2_CLIENT_ID
             - name: DRONE_GITEA_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
+                  # App generated secret
                   name: drone-oauth2-credentials
                   key: OAUTH2_CLIENT_SECRET
           envFrom:
             - configMapRef:
-                name: drone-config
+                name: drone
             - secretRef:
-                name: drone-oauth2-secrets
+                name: drone
           volumeMounts:
             - name: drone-pvc
               mountPath: /data

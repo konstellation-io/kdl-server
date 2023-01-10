@@ -11,7 +11,6 @@ enum ROUTE {
   PROJECT_TOOL = '/projects/:projectId/tool',
   PROJECT_TOOL_GITEA = '/projects/:projectId/tool/gitea',
   PROJECT_TOOL_DRONE = '/projects/:projectId/tool/drone',
-  PROJECT_TOOL_JUPYTER = '/projects/:projectId/tool/jupyter',
   PROJECT_TOOL_FILEBROWSER = '/projects/:projectId/tool/filebrowser',
   PROJECT_TOOL_MLFLOW = '/projects/:projectId/tool/mlflow',
   PROJECT_TOOL_VSCODE = '/projects/:projectId/tool/vscode',

@@ -29,7 +29,8 @@ The oAuth2 proxy sets the following headers:
 
 Use LoggedUserNameKey and LoggedUserEmailKey to retrieve this values from the context.
 Example:
-	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
+
+	email := ctx.Value(middleware.LoggedUserEmailKey).(string).
 */
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

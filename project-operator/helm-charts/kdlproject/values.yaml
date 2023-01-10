@@ -6,15 +6,10 @@ domain: kdl.local
 sharedVolume:
   name: received-data
 
-tls:
-  enabled: false
-
-ingress:
-  type: nginx
-
 minio:
   accessKey: minio
   secretKey: minio123
+  endpointURL: "http://kdl-server-minio:9000"
 
 giteaOauth2Setup:
   image:
@@ -39,9 +34,21 @@ mlflow:
     storageClassName: standard
   s3:
     bucket: mlflow-artifacts
+  ingress:
+    className: "nginx"
+    annotations: {}
+    tls:
+      enabled: false
+      # secretName: tls-secret-name
+  nodeSelector: {}
+  affinity: {}
+  tolerations: {}
 
 filebrowser:
   image:
     repository: filebrowser/filebrowser
     tag: v2
     pullPolicy: IfNotPresent
+  nodeSelector: {}
+  affinity: {}
+  tolerations: {}

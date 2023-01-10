@@ -2,7 +2,7 @@ linters-settings:
   dupl:
     threshold: 100
   funlen:
-    lines: 100
+    lines: 200
     statements: 50
   gci:
     local-prefixes: github.com/golangci/golangci-lint
@@ -133,6 +133,9 @@ issues:
     - Potential file inclusion via variable
     # EXC0011 stylecheck: Annoying issue about not having a comment. The rare codebase has such comments
     - (comment on exported (method|function|type|const)|should have( a package)? comment|comment should be of the form)
+    # EXC0012 gosec: Use of net/http's ListenAndServe function has no support for setting timeouts
+    - Use of net/http serve function that has no support for setting timeouts
+
 run:
   skip-dirs:
     - test_krt

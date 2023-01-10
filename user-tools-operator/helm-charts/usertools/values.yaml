@@ -5,20 +5,15 @@ giteaOauth2Setup:
     repository: konstellation/gitea-oauth2-setup
     tag: "latest"
     pullPolicy: IfNotPresent
+  giteaAdminSecret: gitea-admin
+  giteaOauth2Configmap: gitea-oauth2
 
 ingress:
+  className: "nginx"
   annotations:
-    kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
     nginx.ingress.kubernetes.io/configuration-snippet: |
       more_set_headers "Content-Security-Policy: frame-ancestors 'self' *";
-
-jupyter:
-  image:
-    repository: konstellation/jupyter-gpu
-    tag: "latest"
-    pullPolicy: IfNotPresent
-  enterpriseGatewayUrl: http://enterprise-gateway:8888
 
 oauth2Proxy:
   image:
@@ -31,6 +26,7 @@ repoCloner:
     repository: konstellation/repo-cloner
     tag: "latest"
     pullPolicy: IfNotPresent
+  mongodbURI: ""
 
 sharedVolume:
   name: ""
@@ -48,7 +44,7 @@ tls:
   ## Certificate name example:
   ##   *.example.com
   #
-  secretName: "kdl-server-tls"
+  # secretName: ""
 
 username: user.name
 
@@ -74,6 +70,7 @@ vscode:
 
 vscodeRuntime:
   runtimeId: "61383716a8c1d7ce4764f411"
+  capabilityId: "capability_id_1"
   image:
     repository: konstellation/kdl-py
     tag: "3.9"

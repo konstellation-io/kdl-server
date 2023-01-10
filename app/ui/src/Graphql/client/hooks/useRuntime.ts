@@ -38,14 +38,16 @@ function useRuntime(runtime?: GetRuntimes_runtimes) {
     runningRuntime(null);
   }
 
-  async function startRuntime(runtime?: GetRuntimes_runtimes) {
+  async function startRuntime(runtime?: GetRuntimes_runtimes, capabilitiesId?: string | null) {
     if (!runtime) {
       openRuntimesList();
       return;
     }
     const areToolsActive = true;
     setRuntimeLoading(runtime.id ?? '');
-    mutationSetActiveProjectTools(mutationPayloadHelper({ active: areToolsActive, runtimeId: runtime.id }));
+    mutationSetActiveProjectTools(
+      mutationPayloadHelper({ active: areToolsActive, runtimeId: runtime.id, capabilitiesId: capabilitiesId }),
+    );
   }
 
   function pauseRuntime() {

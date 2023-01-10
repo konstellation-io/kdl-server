@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 	"path/filepath"
@@ -65,10 +66,10 @@ func newKubernetesConfig(config *Config) *rest.Config {
 }
 
 // IsSecretPresent checks if there is a secret with the given name
-func (k *K8s) IsSecretPresent(name string) (bool, error) {
+func (k *K8s) IsSecretPresent(ctx context.Context, name string) (bool, error) {
 	log.Printf("Checking if secret \"%s\" is present\n", name)
 
-	_, err := k.client.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Get(name, metav1.GetOptions{})
+	_, err := k.client.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Get(ctx, name, metav1.GetOptions{})
 	if err != nil && !k8s_errors.IsNotFound(err) {
 		return false, err
 	}
@@ -77,7 +78,7 @@ func (k *K8s) IsSecretPresent(name string) (bool, error) {
 }
 
 // CreateSecret creates a secret on kubernetes with the given data
-func (k *K8s) CreateSecret(name string, input map[string]string) error {
+func (k *K8s) CreateSecret(ctx context.Context, name string, input map[string]string) error {
 	log.Printf("Creating secret \"%s\"...\n", name)
 
 	data := map[string][]byte{}
@@ -85,7 +86,7 @@ func (k *K8s) CreateSecret(name string, input map[string]string) error {
 		data[key] = []byte(v)
 	}
 
-	_, err := k.client.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Create(&v1.Secret{
+	_, err := k.client.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Create(ctx, &v1.Secret{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Secret",
 			APIVersion: "apps/v1beta1",
@@ -96,7 +97,7 @@ func (k *K8s) CreateSecret(name string, input map[string]string) error {
 		},
 		Data: data,
 		Type: "Opaque",
-	})
+	}, metav1.CreateOptions{})
 
 	return err
 }

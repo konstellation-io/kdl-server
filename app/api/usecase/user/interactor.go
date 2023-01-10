@@ -9,6 +9,7 @@ import (
 	k8errors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
@@ -26,15 +27,16 @@ var (
 )
 
 type interactor struct {
-	logger       logging.Logger
-	cfg          config.Config
-	repo         Repository
-	repoRuntimes runtime.Repository
-	sshGenerator sshhelper.SSHKeyGenerator
-	clock        clock.Clock
-	giteaService giteaservice.GiteaClient
-	k8sClient    k8s.Client
-	scheduler    cron.Scheduler
+	logger           logging.Logger
+	cfg              config.Config
+	repo             Repository
+	repoRuntimes     runtime.Repository
+	repoCapabilities capabilities.Repository
+	sshGenerator     sshhelper.SSHKeyGenerator
+	clock            clock.Clock
+	giteaService     giteaservice.GiteaClient
+	k8sClient        k8s.Client
+	scheduler        cron.Scheduler
 }
 
 // NewInteractor factory function.
@@ -43,21 +45,23 @@ func NewInteractor(
 	cfg config.Config,
 	repo Repository,
 	repoRuntimes runtime.Repository,
+	repoCapabilities capabilities.Repository,
 	sshGenerator sshhelper.SSHKeyGenerator,
 	c clock.Clock,
 	giteaService giteaservice.GiteaClient,
 	k8sClient k8s.Client,
 ) UseCase {
 	return &interactor{
-		logger:       logger,
-		cfg:          cfg,
-		repo:         repo,
-		repoRuntimes: repoRuntimes,
-		sshGenerator: sshGenerator,
-		clock:        c,
-		giteaService: giteaService,
-		k8sClient:    k8sClient,
-		scheduler:    cron.NewScheduler(logger),
+		logger:           logger,
+		cfg:              cfg,
+		repo:             repo,
+		repoRuntimes:     repoRuntimes,
+		repoCapabilities: repoCapabilities,
+		sshGenerator:     sshGenerator,
+		clock:            c,
+		giteaService:     giteaService,
+		k8sClient:        k8sClient,
+		scheduler:        cron.NewScheduler(logger),
 	}
 }
 
@@ -144,9 +148,9 @@ func (i *interactor) GetByUsername(ctx context.Context, username string) (entity
 	return i.repo.GetByUsername(ctx, username)
 }
 
-// StartTools creates a user-tools CustomResource in K8s to initialize the VSCode and Jupyter for the given username.
+// StartTools creates a user-tools CustomResource in K8s to initialize the VSCode for the given username.
 // If there are already a user-tools for the user, they are replaced (stop + start new).
-func (i *interactor) StartTools(ctx context.Context, username string, runtimeID *string) (entity.User, error) {
+func (i *interactor) StartTools(ctx context.Context, username string, runtimeID, capabilitiesID *string) (entity.User, error) {
 	user, err := i.repo.GetByUsername(ctx, username)
 	if err != nil {
 		return entity.User{}, err
@@ -185,9 +189,17 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeID 
 		i.logger.Debugf("Using default runtime image \"%s:%s\"", rImage, rTag)
 	}
 
+	retrievedCapabilities := entity.Capabilities{}
+	if capabilitiesID != nil {
+		retrievedCapabilities, err = i.repoCapabilities.Get(ctx, *capabilitiesID)
+		if err != nil {
+			return entity.User{}, err
+		}
+	}
+
 	i.logger.Infof("Creating user tools for user: \"%s\"", username)
 
-	err = i.k8sClient.CreateUserToolsCR(ctx, username, rID, rImage, rTag)
+	err = i.k8sClient.CreateUserToolsCR(ctx, username, rID, rImage, rTag, retrievedCapabilities)
 	if err != nil {
 		return entity.User{}, err
 	}

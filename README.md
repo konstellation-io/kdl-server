@@ -15,10 +15,6 @@
 
 [app-api-bugs-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_api&metric=Reliability
 
-[app-api-loc]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_api&metric=ncloc
-
-[app-api-loc-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_api&metric=Coverage
-
 [app-api-mr]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_api&metric=sqale_rating
 
 [app-api-mr-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_api&metric=Maintainability
@@ -31,84 +27,13 @@
 
 [app-ui-bugs-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_ui&metric=Reliability
 
-[app-ui-loc]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_ui&metric=ncloc
-
-[app-ui-loc-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_ui&metric=Coverage
-
 [app-ui-mr]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_ui&metric=sqale_rating
 
 [app-ui-mr-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_ui&metric=Maintainability
 
-## KDL Server Chart
+## Helm Chart
 
-### Upgrading Chart
-
-#### Upgrading an existing Release to a new major version
-
-A major chart version change (like v0.15.3 -> v1.0.0) indicates that there is an incompatible breaking change needing
-manual actions.
-
-#### From 3.X to 4.X
-
-This major version comes with the following breaking changes:
-
-- Fixed an issue with **usertools.kdl.konstellation.io** CRD that produced errors in **user-tools-operator** with *UserTools* resources during the reconciling process.
-- Added `minio.consoleIngress.annotations` to *values.yaml*
-
-Run these commands to update the CRDs before applying the upgrade.
-
-```bash
-kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-io/kdl-server/v4.0.0/helm/kdl-server/crds/user-tools-operator-crd.yaml
-```
-
-#### From 2.X to 3.X
-
-This major version comes with the following breaking changes:
-
-- Ingress configuration changed from *values.yaml* 
-    - removed `ingress.type`
-    - added `drone.ingress.annotations`, `kdlApp.ingress.annotations`, `gitea.ingress.annotations`, `minio.ingress.annotations`, `userToolsOperator.ingress.annotations`
-
-- Upgrade user-tools-operator to v0.20.0.
-    - TLS secret name and Ingress annotations are now received from the operator values
-
-- Upgrade app to 1.17.0
-    - pass the name of the TLS secret and Ingress annotations through `userTools` resources.
-    - pass Ingress annotations through `userTools`.
-
-Run these commands to update the CRDs before applying the upgrade.
-
-```bash
-kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-io/kdl-server/v3.0.0/helm/kdl-server/crds/user-tools-operator-crd.yaml
-```
-
-#### From 1.X to 2.X
-
-This major version comes with the following breaking changes:
-
-- This upgrades user-tools-operator to v0.17.0.
-    - users service accounts are now managed by `kdlServer` instead the `user-tools-operator` 
-
-Run these commands to update the CRDs before applying the upgrade.
-
-```bash
-kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-io/kdl-server/v2.0.0/helm/kdl-server/crds/user-tools-operator-crd.yaml
-```
-
-#### From 0.X to 1.X
-
-This major version comes with the following breaking changes:
-
-- UserTools CRD metadata changes:
-    - `metadata.name` changed to `usertools.kdl.konstellation.io`
-    - `spec.groups` changed to `kdl.konstellation.io`
-- KDL Runtimes support
-
-Run these commands to update the CRDs before applying the upgrade.
-
-```bash
-kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-io/kdl-server/v1.0.0/helm/kdl-server/crds/user-tools-operator-crd.yaml
-```
+Refer to chart's [README](helm/kdl-server/README.md).
 
 ## Development
 
@@ -116,7 +41,7 @@ kubectl apply --server-side -f https://raw.githubusercontent.com/konstellation-i
 
 #### Microk8s
 
-The local version of Kubernetes to deploy KDL. The version required is **1.19**.
+The local version of Kubernetes to deploy KDL. The version required is **1.23**.
 
 Linux installation:
 
@@ -135,13 +60,13 @@ microk8s install --cpu ${MICROK8S_CPUS} --mem ${MICROK8S_MEMORY} --disk ${MICROK
 
 Needed to build the KDL images. Installation:
 
-https://docs.docker.com/get-docker/
+<https://docs.docker.com/get-docker/>
 
 #### Helm
 
 K8s package manager. Make sure you have v3+. Installation:
 
-https://helm.sh/docs/intro/install/
+<https://helm.sh/docs/intro/install/>
 
 #### gettext
 
@@ -163,14 +88,22 @@ brew install gettext
 
 The Kubernetes command-line tool is useful to run commands against Kubernetes clusters.
 
-https://kubernetes.io/docs/tasks/tools/
+<https://kubernetes.io/docs/tasks/tools/>
 
 #### jq (Mac only)
 
-JSON processor to configre insecure-registries on Mac.
+JSON processor to configure insecure-registries on Mac.
 
 ```
 brew install jq
+```
+
+#### yq
+
+YAML processor to configure KDL Remote developement.
+
+```
+brew install yq
 ```
 
 ## Local Environment
@@ -204,7 +137,7 @@ Run help to get info for each command:
 
 ### IPV6
 
-As chrome is having some issues with IPV6 and docker (https://bugs.chromium.org/p/chromium/issues/detail?id=974711)
+As chrome is having some issues with IPV6 and docker (<https://bugs.chromium.org/p/chromium/issues/detail?id=974711>)
 before you start microk8s you need to disable IPV6 in your local machine, so when microk8s is started it is configured
 without PIV6 capabilities.
 
@@ -220,7 +153,7 @@ sysctl -w net.ipv6.conf.default.disable_ipv6=1
 To install KDL in your local environment:
 
 ```
-$ ./kdlctl.sh dev
+./kdlctl.sh dev
 ```
 
 It will install everything in the namespace specified in your development `.kdlconf` file.
@@ -230,7 +163,7 @@ It will install everything in the namespace specified in your development `.kdlc
 In order to access the admin app, the login process can be done automatically using this script:
 
 ```
-$ ./kdlctl.sh login
+./kdlctl.sh login
 ```
 
 You will see an output like this:
@@ -248,7 +181,7 @@ You can find the admin credentials `GITEA_ADMIN_USER` and `GITEA_ADMIN_PASSWORD`
 If you want to delete all resources generated into your microk8s run the following command:
 
 ```
-$ ./kdlctl.sh uninstall
+./kdlctl.sh uninstall
 ```
 
 ## Versioning lifecycle
@@ -292,7 +225,7 @@ To enable the integration follow these steps:
 - Create a secret named `regcred` with the docker credential needed in order to download the private image:
 
 ```bash
-kubectl create secret docker-registry regcred \ 
+kubectl create secret docker-registry regcred \
   --docker-username=$DOCKER_USERNAME \
   --docker-password=$DOCKER_AUTH_TOKEN \
    --dry-run=client -o yaml | kubectl -n kdl apply -f -
@@ -320,3 +253,134 @@ export KNOWLEDGE_GALAXY_PATH=<path/to/local/knowledge-galaxy>
 ```
 
 This will trigger a build whenever you use `kdlctl.sh` script.
+
+## Capabilities
+
+Capabilities feature allows to select the rules to be matched by the Kubernetes scheduler when deploying the userTools on a pod.
+
+There are multiple scenarios for the capabilities based on the configuration stored on the MongoDB database:
+
+1. There are no capabilities stored
+
+- In the case where there are no capabilities stored on the database, the behavior would be the same as it is now, the Kubernetes scheduler will select the node where the userTools will be deployed.
+- The UI won't show the capabilities selector
+
+2. There is just one capability stored
+
+- In case there is just one capability on the database, the stored capability will be selected by default, and the contained rules of the capability will determine the node where the userTools would be deployed.
+- No selector will be shown on the UI.
+
+3. There are two or more capabilities stored
+
+- When there are two or more capabilities stored, the capabilities will be sorted by the `default` field, and the first capability from the list will be selected as the default capability.
+- The UI will show a selector with all the capabilities to allow the user to choose between them.
+
+The capabilities object contains three different ways of configuring the rules for deploying the userTools, allowing to do multiple combinations of different rule sets.
+
+1. NodeSelectors
+
+- A list of key-pair objects like in the example below:
+  
+    ```json
+    {
+      "_id": "test_id",
+      "name": "test",
+      "node_selectors": {
+        "selector1": "value1",
+        "selector2": "value2"
+      },
+      "tolerations": [],
+      "affinities": {}
+    }
+    ```
+
+2. Tolerations
+
+- Unlike NodeSelectors, tolerations allow adding more complex rules.
+- It consists of a list of `key`<`operator`>`value`:`effect` rule set like in the example below:
+
+    ```json
+    {
+      "_id": "test_id",
+      "name": "test",
+      "node_selectors": {},
+      "tolerations": [
+        {
+          "key": "key1",
+          "operator": "Equal",
+          "value": "value1",
+          "effect": "NoExecute",
+          "tolerationSeconds": 120
+        }
+      ],
+      "affinities": {}
+    }
+    ```
+
+3. Affinities
+
+- Still in development...
+
+    ```json
+    {
+      "_id": "test_id",
+      "name": "test",
+      "node_selectors": {},
+      "tolerations": [],
+      "affinities": {}
+    }
+    ```
+
+### Adding capabilites to the MongoDB
+
+To add capabilites to the mongodb, you should follow the next steps:
+
+- Add port-forwardding from the mongodb pod
+
+  ```bash
+  kubectl port-forward mongo-.... 27017:27017
+  ```
+  
+- Connect to the mongodb instance
+
+  ```bash
+  mongosh --port 27017 --username <username> --authenticationDatabase admin --password <password>
+  ```
+
+- Use the `KDL` database, and the `capabilities` collection
+
+  ```bash
+  use KDL
+  ```
+
+- Add the needed capabilites
+
+  ```bash
+  db.capabilities.insertOne([
+    {
+      "_id": "test_id1",
+      "name": "test 1",
+      "node_selectors": {
+        "selector1": "value1",
+        "selector2": "value2"
+      },
+      "tolerations": [],
+      "affinities": {}
+    },
+    {
+      "_id": "test_id2",
+      "name": "test 2",
+      "node_selectors": {},
+      "tolerations": [
+        {
+          "key": "key1",
+          "operator": "Equal",
+          "value": "value1",
+          "effect": "NoExecute",
+          "tolerationSeconds": 120
+        }
+      ],
+      "affinities": {}
+    }
+  ])
+  ```

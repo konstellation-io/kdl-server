@@ -21,9 +21,9 @@ Also, it's important to note that MLFlow stores its data in a hostPath, so if yo
 The main files/folders used are:
 
 - `backup/Dockerfile`: the OCI image that will run the workload
-- `helm/kdl-server/templates/common/backup-cronjob.yaml`: the Cronjob manifest
-- `helm/kdl-server/values.yaml`: please edit this file to suit your preferences for Helm deployment. 
-- `helm/kdl-server/templates/common/backup-secrets.yaml`: you will need an AWS S3 bucket and AWS key pairs to upload the backup
+- `helm/kdl-server/templates/backup/cronjob.yaml`: the Cronjob manifest
+- `helm/kdl-server/values.yaml`: please edit this file to suit your preferences for Helm deployment.
+- `helm/kdl-server/templates/backup/secret.yaml`: you will need an AWS S3 bucket and AWS key pairs to upload the backup
 
 ## Configurable options
 
@@ -32,7 +32,7 @@ backup:
   enabled: false
   schedule: "0 1 * * 0" # every sunday at 1:00 AM
   name: backup-gitea
-  image: 
+  image:
     repository: konstellation/kdl-backup
     tag: latest
     pullPolicy: IfNotPresent
@@ -97,7 +97,7 @@ These files and folders must be replaced in the fresh installation.
 
 ### Backup User Tools - Current state not necessary
 
-It has been discussed to backup user custom plugins that are installed after user-tools	operator is run, and we have agreed that it's users duty to keep this kind of customization backed up. 
+It has been discussed to backup user custom plugins that are installed after user-tools	operator is run, and we have agreed that it's users duty to keep this kind of customization backed up.
 
 There are plugins available to synchronize user customizations in VSCode, like [Settings sync](https://code.visualstudio.com/docs/editor/settings-sync)
 
@@ -128,14 +128,14 @@ $ dropdb -h postgres -U postgres gitea
 [...]
 
 $ psql -h postgres -U postgres
-Password for user postgres: 
+Password for user postgres:
 psql (12.2, server 12.1 (Debian 12.1-1.pgdg100+1))
 Type "help" for help.
 
 postgres=# CREATE DATABASE gitea;
 [...]
 
-$ pg_restore -h postgres -U postgres -v -d gitea ./postgres_gitea.dump
+$ pg_restore -h postgres -U postgres -v -d gitea ./postgres_gitea.dump -c
 ```
 
 - Redeploy kdl-server to create Gitea installation `helm upgrade --install kdl-server --namespace kdl konstellation/kdl-server`

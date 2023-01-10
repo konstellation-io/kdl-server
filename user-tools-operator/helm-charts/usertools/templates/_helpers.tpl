@@ -61,3 +61,14 @@ Add the protocol part to the uri
 {{- define "protocol" -}}
 {{ ternary "https" "http" .Values.tls.enabled }}
 {{- end -}}
+
+{{/*
+Create user-tools tls secret name
+*/}}
+{{- define "user-tools.tlsSecretName" -}}
+{{- if hasKey .Values.tls "secretName" -}}
+  {{- .Values.tls.secretName -}}
+{{- else -}}
+  {{- printf "%s-tls" (include "user-tools.fullname" .) -}}
+{{- end -}}
+{{- end -}}

@@ -5,7 +5,6 @@ import DroneIcon from 'Components/Icons/DroneIcon/DroneIcon';
 import GiteaIcon from 'Components/Icons/GiteaIcon/GiteaIcon';
 import IconHome from '@material-ui/icons/Dashboard';
 import IconKG from '@material-ui/icons/EmojiObjects';
-import JupyterIcon from 'Components/Icons/JupyterIcon/JupyterIcon';
 import MlFlowIcon from 'Components/Icons/MlFlowIcon/MlFlowIcon';
 import FolderIcon from '@material-ui/icons/Folder';
 import { OverridableComponent } from '@material-ui/core/OverridableComponent';
@@ -66,12 +65,6 @@ export const projectToolsRoutesConfig: RouteConfiguration[] = [
 ];
 
 export const userToolsRoutesConfig: RouteConfiguration[] = [
-  {
-    id: 'jupyter',
-    route: ROUTE.PROJECT_TOOL_JUPYTER,
-    label: 'Jupyter',
-    Icon: JupyterIcon,
-  },
   {
     id: 'vscode',
     route: ROUTE.PROJECT_TOOL_VSCODE,

@@ -18,6 +18,10 @@
     color: font-color(lowlight);
   }
 
+  .authMethod {
+    width: 21 * $grid-unit;
+  }
+
   .formContainer {
     margin-top: 3.75 * $grid-unit;
     display: flex;

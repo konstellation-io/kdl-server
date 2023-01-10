@@ -6,6 +6,8 @@ type Query {
   qualityProjectDesc(description: String!): QualityProjectDesc!
   runtimes: [Runtime!]!
   runningRuntime: Runtime
+  capabilities: [Capability!]!
+  runningCapability: Capability
   kubeconfig: String!
 }
 
@@ -36,6 +38,12 @@ type Runtime {
   dockerImage: String!
   dockerTag: String!
   runtimePod: String!
+}
+
+type Capability {
+  id: ID!
+  name: String!
+  default: Boolean!
 }
 
 type Topic {
@@ -80,7 +88,6 @@ type ToolUrls {
   knowledgeGalaxy: String!
   gitea: String!
   filebrowser: String!
-  jupyter: String!
   vscode: String!
   drone: String!
   mlflow: String!
@@ -155,6 +162,7 @@ input SetBoolFieldInput {
 input SetActiveUserToolsInput {
   active: Boolean!,
   runtimeId: String,
+  capabilitiesId: String
 }
 
 type Project {
@@ -180,13 +188,19 @@ input RepositoryInput {
 input ExternalRepositoryInput {
   url: String!
   username: String!
-  token: String!
+  credential: String!
+  authMethod: RepositoryAuthMethod!
 }
 
 type Repository {
   type: RepositoryType!
   url: String!
   error: String
+}
+
+enum RepositoryAuthMethod {
+  PASSWORD
+  TOKEN
 }
 
 enum RepositoryType {

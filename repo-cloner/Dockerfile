@@ -1,4 +1,4 @@
-FROM golang:1.14 as builder
+FROM golang:1.18.3-alpine3.16 as builder
 
 LABEL maintainer="Builder"
 
@@ -32,7 +32,7 @@ RUN adduser \
 # Install openssh client
     apk add --no-cache git openssh-client
 
-# Copy build from previous stage 
+# Copy build from previous stage
 COPY --from=builder --chown=${USER}:0 /app/repo-cloner /app/config.yml ./
 
 USER ${USER}

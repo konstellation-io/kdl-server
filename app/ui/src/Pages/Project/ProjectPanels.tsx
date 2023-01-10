@@ -1,6 +1,13 @@
 import React, { useEffect } from 'react';
 import { useReactiveVar } from '@apollo/client';
-import { loadingRuntime, memberDetails, primaryPanel, runningRuntime, secondaryPanel } from 'Graphql/client/cache';
+import {
+  loadingRuntime,
+  memberDetails,
+  primaryPanel,
+  runningRuntime,
+  secondaryPanel,
+  selectedCapabilities,
+} from 'Graphql/client/cache';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 import useMemberDetails from 'Graphql/client/hooks/useMemberDetails';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
@@ -31,6 +38,7 @@ function ProjectPanels({ openedProject }: Props) {
 
   const memberDetailsData = useReactiveVar(memberDetails);
   const runtimeRunning = useReactiveVar(runningRuntime);
+  const selectedCapability = useReactiveVar(selectedCapabilities);
   const runtimeLoading = useReactiveVar(loadingRuntime);
 
   const selectedRuntime = panel2Data?.runtime ?? null;
@@ -80,7 +88,11 @@ function ProjectPanels({ openedProject }: Props) {
       const startButton = (
         <Tooltip tooltipId="startPanel" spanText="Start tools" tooltipProps={tooltipProps}>
           <div data-tip={true} data-for="startPanel" data-testid="panelStartRuntime">
-            <RuntimeRunner runtime={selectedRuntime ?? undefined} action={RuntimeAction.Start}>
+            <RuntimeRunner
+              runtime={selectedRuntime ?? undefined}
+              capability={selectedCapability ?? undefined}
+              action={RuntimeAction.Start}
+            >
               <Button label="" Icon={IconPlay} />
             </RuntimeRunner>
           </div>

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 )
@@ -13,8 +14,10 @@ func main() {
 
 	k8s := NewK8s(cfg)
 
+	ctx := context.Background()
+
 	// Check if the application already exists
-	exists, err := k8s.IsSecretPresent(cfg.Credentials.SecretName)
+	exists, err := k8s.IsSecretPresent(ctx, cfg.Credentials.SecretName)
 	if err != nil {
 		log.Fatalf("Error checking secret credentials: %s", err)
 	}
@@ -41,7 +44,7 @@ func main() {
 		"OAUTH2_CLIENT_ID":     credentials.ClientID,
 		"OAUTH2_CLIENT_SECRET": credentials.ClientSecret,
 	}
-	err = k8s.CreateSecret(cfg.Credentials.SecretName, secretValues)
+	err = k8s.CreateSecret(ctx, cfg.Credentials.SecretName, secretValues)
 	if err != nil {
 		log.Fatalf("Error creating \"%s\" k8s secret credentials: %s\n", cfg.Credentials.SecretName, err)
 	}

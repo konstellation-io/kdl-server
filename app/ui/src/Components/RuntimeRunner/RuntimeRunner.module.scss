@@ -5,6 +5,9 @@
 
 .runtimeModal {
   width: 75 * $grid-unit;
+  .title {
+    font-weight: bold;
+  }
   .runtimeModalInfo {
     margin-top: 0;
     margin-bottom: 2 * $grid-unit;
@@ -15,12 +18,12 @@
 
   &.close {
     border-left-color: palette(highlight);
-    div + div {
+    div + div + div {
       &:last-of-type {
         div > div {
           padding: $grid-unit / 2 $grid-unit * 2;
           height: auto!important;
-          &:first-of-type {
+          &:first-of-type:not(.content) {
             background: palette(highlight);
             margin: 0;
             &:active,

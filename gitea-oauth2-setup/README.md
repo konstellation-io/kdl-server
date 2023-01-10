@@ -2,9 +2,9 @@
 
 This Docker image has been intended to run as an `initContainer` within a Kubernetes POD.
 In the start-up this container connects to Gitea server and creates an oAuth2 application.
-The created oAuth2 application credentials are stored in a k8s secret in order to avoid recreating them each time the POD is restarted. 
+The created oAuth2 application credentials are stored in a k8s secret in order to avoid recreating them each time the POD is restarted.
 
-This component is part of a toolkit used to simplify the data scientists daily work. 
+This component is part of a toolkit used to simplify the data scientists daily work.
 For more details check out the [KDL documentation](https://konstellation-io.github.io/science-toolkit/)
 
 
@@ -37,11 +37,11 @@ spec:
                   fieldPath: metadata.namespace
           envFrom:
             - secretRef:
-                name: gitea-admin-secrets
+                name: gitea-admin
             - secretRef:
                 name: my-app-oauth2-secrets
             - configMapRef:
-                name: gitea-configmap
+                name: gitea-oauth2
             - configMapRef:
                 name: my-app-configmap
       containers:

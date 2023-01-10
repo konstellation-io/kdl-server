@@ -26,19 +26,19 @@ show_deploy_help() {
 
 deploy() {
   export DOMAIN=kdl.$HOST_IP.nip.io
-  
+
   prepare_helm
 
   if [ "$BUILD_DOCKER_IMAGES" = "1" ]; then
     build_docker_images
   fi
 
-  replace_env_vars
   create_namespace
 
   if [ "$ENABLE_TLS" != "false" ]; then
     ./scripts/create_self_signed_cert.sh $NAMESPACE $DOMAIN $OS
   fi
+  ./scripts/create_nginx_ingress_configmap.sh
 
   deploy_helm_chart
 }
@@ -92,73 +92,17 @@ create_namespace() {
 
 deploy_helm_chart() {
 
-  KNOWLEDGE_GALAXY_IMAGE_REPOSITORY="konstellation/knowledge-galaxy"
-  SET_KNOWLEDGE_GALAXY_IMAGE_TAG=""
+  export KNOWLEDGE_GALAXY_IMAGE_REPOSITORY="konstellation/knowledge-galaxy"
   if [ "$KNOWLEDGE_GALAXY_LOCAL" = "true"  ]; then
-    KNOWLEDGE_GALAXY_IMAGE_REPOSITORY="$IMAGE_REGISTRY/konstellation/knowledge-galaxy"
-    SET_KNOWLEDGE_GALAXY_IMAGE_TAG="--set knowledgeGalaxy.image.tag=latest"
+    export KNOWLEDGE_GALAXY_IMAGE_REPOSITORY="$IMAGE_REGISTRY/konstellation/knowledge-galaxy"
+    export KNOWLEDGE_GALAXY_IMAGE_TAG="latest"
     echo_info "LOCAL KG"
   fi
-
+  if [ "$KUBECONFIG_ENABLED" = "true" ] || [ ! -z "$KUBECONFIG" ]; then
+    export EXTERNAL_SERVER_URL=$(yq '.clusters[] | select (.name == "microk8s-cluster") | .cluster.server' ${KUBECONFIG})
+    echo_info "KDL Remote Development enabled"
+  fi
   echo_info "📦 Applying helm chart..."
-  run helm dep update helm/kdl-server
-  run helm upgrade \
-    --install "${RELEASE_NAME}" \
-    --namespace "${NAMESPACE}" \
-    --set backup.enabled="false" \
-    --set backup.image.pullPolicy="Always" \
-    --set backup.image.repository="${IMAGE_REGISTRY}/konstellation/kdl-backup" \
-    --set backup.image.tag="latest" \
-    --set domain="${DOMAIN}" \
-    --set drone.storage.storageClassName="${STORAGE_CLASS_NAME}" \
-    --set droneAuthorizer.image.pullPolicy="Always" \
-    --set droneAuthorizer.image.repository="${IMAGE_REGISTRY}/konstellation/drone-authorizer" \
-    --set droneAuthorizer.image.tag="latest" \
-    --set gitea.admin.password="${GITEA_ADMIN_PASSWORD}" \
-    --set gitea.admin.username="${GITEA_ADMIN_USER}" \
-    --set gitea.storage.storageClassName="${STORAGE_CLASS_NAME}" \
-    --set giteaOauth2Setup.image.pullPolicy="Always" \
-    --set giteaOauth2Setup.image.repository="${IMAGE_REGISTRY}/konstellation/gitea-oauth2-setup" \
-    --set giteaOauth2Setup.image.tag="latest" \
-    --set kdlServer.image.pullPolicy="Always" \
-    --set kdlServer.image.tag="latest" \
-    --set kdlServer.image.repository="${IMAGE_REGISTRY}/konstellation/kdl-server" \
-    --set knowledgeGalaxy.image.pullPolicy="Always" \
-    --set knowledgeGalaxy.image.repository="${KNOWLEDGE_GALAXY_IMAGE_REPOSITORY}" \
-    "${SET_KNOWLEDGE_GALAXY_IMAGE_TAG}" \
-    --set minio.securityContext.runAsUser=0 \
-    --set mongodb.persistentVolume.storageClassName="${STORAGE_CLASS_NAME}" \
-    --set sharedVolume.storageClassName="${STORAGE_CLASS_NAME}" \
-    --set postgres.storage.storageClassName="${STORAGE_CLASS_NAME}" \
-    --set projectOperator.manager.image.pullPolicy="Always" \
-    --set projectOperator.manager.image.repository="${IMAGE_REGISTRY}/konstellation/project-operator" \
-    --set projectOperator.manager.image.tag="latest" \
-    --set projectOperator.mlflow.image.pullPolicy="Always" \
-    --set projectOperator.mlflow.image.repository="${IMAGE_REGISTRY}/konstellation/mlflow" \
-    --set projectOperator.mlflow.image.tag="latest" \
-    --set projectOperator.mlflow.volume.storageClassName="${STORAGE_CLASS_NAME}" \
-    --set tls.enabled="${ENABLE_TLS}" \
-    --set tls.secretName="${DOMAIN}-tls-secret" \
-    --set tls.caSecret.name=mkcert-ca \
-    --set tls.caSecret.certFilename=mkcert-ca.crt \
-    --set userToolsOperator.image.pullPolicy="Always" \
-    --set userToolsOperator.image.repository="${IMAGE_REGISTRY}/konstellation/user-tools-operator" \
-    --set userToolsOperator.image.tag="latest" \
-    --set userToolsOperator.jupyter.image.pullPolicy="Always" \
-    --set userToolsOperator.jupyter.image.repository="$IMAGE_REGISTRY/konstellation/jupyter-gpu" \
-    --set userToolsOperator.jupyter.image.tag="latest" \
-    --set enterprise-gateway.kernelspecs.imagePullPolicy="Always" \
-    --set enterprise-gateway.kernelspecs.image="$IMAGE_REGISTRY/konstellation/jupyter-kernelspecs:latest" \
-    --set userToolsOperator.repoCloner.image.pullPolicy="Always" \
-    --set userToolsOperator.repoCloner.image.repository="${IMAGE_REGISTRY}/konstellation/repo-cloner" \
-    --set userToolsOperator.repoCloner.image.tag="latest" \
-    --set userToolsOperator.vscode.image.pullPolicy="Always" \
-    --set userToolsOperator.vscode.image.repository="${IMAGE_REGISTRY}/konstellation/vscode" \
-    --set userToolsOperator.vscode.image.tag="latest" \
-    --set userToolsOperator.storage.storageClassName="${STORAGE_CLASS_NAME}" \
-    --set userToolsOperator.kubeconfig.enabled="true" \
-    --set userToolsOperator.kubeconfig.externalServerUrl="https://192.168.0.21:16443" \
-    --timeout 60m \
-    --wait \
-    helm/kdl-server
+  helmfile -f scripts/helmfile/helmfile.yaml deps
+  helmfile -f scripts/helmfile/helmfile.yaml apply
 }

@@ -13,8 +13,6 @@ spec:
     metadata:
       labels:
         control-plane: controller-manager
-      annotations:
-        helm.sh/restart-deployment: {{ randAlphaNum 5 | quote }}
     spec:
     {{- with .Values.projectOperator.nodeSelector }}
       nodeSelector:

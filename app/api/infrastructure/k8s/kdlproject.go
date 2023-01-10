@@ -19,6 +19,49 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 
 	resName := fmt.Sprintf("kdlproject-%s", projectID)
 
+	tlsConfig := map[string]interface{}{
+		"enabled": k.cfg.TLS.Enabled,
+	}
+
+	if k.cfg.ProjectMLFlow.Ingress.TLS.SecretName != nil {
+		tlsConfig["secretName"] = &k.cfg.ProjectMLFlow.Ingress.TLS.SecretName
+	}
+
+	mlflowIngressAnnotations, err := k.getK8sMap(k.cfg.ProjectMLFlow.Ingress.Annotations)
+	if err != nil {
+		return fmt.Errorf("error getting mlflow ingress annotations: %w", err)
+	}
+
+	mlflowNodeSelector, err := k.getK8sMap(k.cfg.ProjectMLFlow.NodeSelector)
+	if err != nil {
+		return fmt.Errorf("error getting mlflow nodeSelector: %w", err)
+	}
+
+	mlflowAffinity, err := k.getK8sMap(k.cfg.ProjectMLFlow.Affinity)
+	if err != nil {
+		return fmt.Errorf("error getting mlflow affinity: %w", err)
+	}
+
+	mlflowTolerations, err := k.getK8sList(k.cfg.ProjectMLFlow.Tolerations)
+	if err != nil {
+		return fmt.Errorf("error getting mlflow tolerations: %w", err)
+	}
+
+	filebrowserNodeSelector, err := k.getK8sMap(k.cfg.ProjectFilebrowser.NodeSelector)
+	if err != nil {
+		return fmt.Errorf("error getting filebrowser nodeSelector: %w", err)
+	}
+
+	filebrowserAffinity, err := k.getK8sMap(k.cfg.ProjectFilebrowser.Affinity)
+	if err != nil {
+		return fmt.Errorf("error getting filebrowser affinity: %w", err)
+	}
+
+	filebrowserTolerations, err := k.getK8sList(k.cfg.ProjectFilebrowser.Tolerations)
+	if err != nil {
+		return fmt.Errorf("error getting filebrowser tolerations: %w", err)
+	}
+
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": kdlprojectAPIVersion,
@@ -36,13 +79,10 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 				"sharedVolume": map[string]interface{}{
 					"name": k.cfg.SharedVolume.Name,
 				},
-				"tls": map[string]interface{}{
-					"enabled":    k.cfg.TLS.Enabled,
-					"secretName": k.cfg.TLS.SecretName,
-				},
 				"minio": map[string]string{
-					"accessKey": k.cfg.Minio.AccessKey,
-					"secretKey": k.cfg.Minio.SecretKey,
+					"accessKey":   k.cfg.Minio.AccessKey,
+					"secretKey":   k.cfg.Minio.SecretKey,
+					"endpointURL": fmt.Sprintf("http://%s", k.cfg.Minio.Endpoint),
 				},
 				"giteaOauth2Setup": map[string]interface{}{
 					"image": map[string]string{
@@ -69,10 +109,17 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 						"storageClassName": k.cfg.ProjectMLFlow.Volume.StorageClassName,
 						"size":             k.cfg.ProjectMLFlow.Volume.Size,
 					},
-
 					"s3": map[string]string{
 						"bucket": fmt.Sprintf("%s/mlflow-artifacts", projectID),
 					},
+					"ingress": map[string]interface{}{
+						"tls":         tlsConfig,
+						"className":   k.cfg.ProjectMLFlow.Ingress.ClassName,
+						"annotations": mlflowIngressAnnotations,
+					},
+					"nodeSelector": mlflowNodeSelector,
+					"affinity":     mlflowAffinity,
+					"tolerations":  mlflowTolerations,
 				},
 				"filebrowser": map[string]interface{}{
 					"image": map[string]string{
@@ -80,6 +127,9 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 						"tag":        k.cfg.ProjectFilebrowser.Image.Tag,
 						"pullPolicy": k.cfg.ProjectFilebrowser.Image.PullPolicy,
 					},
+					"nodeSelector": filebrowserNodeSelector,
+					"affinity":     filebrowserAffinity,
+					"tolerations":  filebrowserTolerations,
 				},
 			},
 		},

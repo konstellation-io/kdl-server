@@ -911,6 +911,9 @@ spec:
               ingress:
                 type: object
                 properties:
+                  className:
+                    description: "The name of the IngressClass cluster resource. The associated IngressClass defines which controller will implement the resource."
+                    type: string
                   annotations:
                     additionalProperties:
                       type: string
@@ -922,6 +925,8 @@ spec:
                   name:
                     description: name of shared volume
                     type: string
+                required:
+                - name
               storage:
                 type: object
                 properties:
@@ -964,23 +969,11 @@ spec:
                       pullPolicy:
                         description: image pull policy
                         type: string
-              jupyter:
-                type: object
-                properties:
-                  image:
-                    type: object
-                    properties:
-                      repository:
-                        description: image repository
-                        type: string
-                      tag:
-                        description: image tag
-                        type: string
-                      pullPolicy:
-                        description: image pull policy
-                        type: string
-                  enterpriseGatewayUrl:
-                    description: enterprise gateway url
+                  giteaAdminSecret:
+                    description: the secret containing gitea admin user and password
+                    type: string
+                  giteaOauth2Configmap:
+                    description: the configmap containing the oauth2 config
                     type: string
               vscode:
                 type: object
@@ -1012,6 +1005,11 @@ spec:
                       pullPolicy:
                         description: image pull policy
                         type: string
+                  mongodbURI:
+                    description: MongoDB URI
+                    type: string
+                required:
+                - mongodbURI
               oauth2Proxy:
                 type: object
                 properties:
@@ -1042,6 +1040,9 @@ spec:
                   runtimeId:
                     type: string
                     description: runtime identifier
+                  capabilityId:
+                    type: string
+                    description: capability identifier
                   image:
                     type: object
                     properties:
@@ -1054,6 +1055,8 @@ spec:
                       pullPolicy:
                         description: image pull policy
                         type: string
+            required:
+            - sharedVolume
           status:
             description: Status defines the observed state of UserTools
             type: object

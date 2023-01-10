@@ -1,4 +1,4 @@
-import { SpinnerCircular, TextInput } from 'kwc';
+import { SpinnerCircular, TextInput, Select } from 'kwc';
 import * as React from 'react';
 import IconLink from '@material-ui/icons/Link';
 import styles from './ExternalRepository.module.scss';
@@ -7,10 +7,13 @@ import { useReactiveVar } from '@apollo/client';
 import { newProject } from 'Graphql/client/cache';
 import { validateMandatoryField, validateUrl } from './ExternalRepositoryUtils';
 import { getErrorMsg } from 'Utils/string';
+import { RepositoryAuthMethod } from 'Graphql/types/globalTypes';
 
 type Props = {
   showErrors: boolean;
 };
+
+const authMethods = [RepositoryAuthMethod.PASSWORD, RepositoryAuthMethod.TOKEN];
 
 function ExternalRepository({ showErrors }: Props) {
   const project = useReactiveVar(newProject);
@@ -19,8 +22,8 @@ function ExternalRepository({ showErrors }: Props) {
   if (!project) return <SpinnerCircular />;
 
   const {
-    values: { url, token, username },
-    errors: { url: urlError, token: tokenError, username: usernameError },
+    values: { url, credential, username, authMethod },
+    errors: { url: urlError, credential: credentialError, username: usernameError, authMethod: authMethodError },
   } = project.externalRepository;
 
   return (
@@ -59,21 +62,39 @@ function ExternalRepository({ showErrors }: Props) {
           formValue={username}
           showClearButton
         />
-        <TextInput
-          label="token"
+        <Select
+          label={'Authentication method'}
+          placeholder="Select one"
+          options={authMethods}
+          whiteColor={false}
+          showSelectAllOption={false}
+          shouldSort={true}
           onChange={(value: string) => {
-            updateValue('token', value);
-            clearError('token');
+            updateValue('authMethod', value);
+            clearError('authMethod');
           }}
-          onBlur={() => {
-            const isValidToken = validateMandatoryField(token);
-            updateError('token', getErrorMsg(isValidToken));
-          }}
-          error={showErrors ? tokenError : ''}
-          customClassname={styles.form}
-          formValue={token}
-          hidden
+          formSelectedOption={authMethod ?? undefined}
+          className={styles.authMethod}
+          error={showErrors ? authMethodError : ''}
         />
+
+        {authMethod && (
+          <TextInput
+            label={authMethod}
+            onChange={(value: string) => {
+              updateValue('credential', value);
+              clearError('credential');
+            }}
+            onBlur={() => {
+              const isValidCredential = validateMandatoryField(credential ?? '');
+              updateError('credential', getErrorMsg(isValidCredential));
+            }}
+            error={showErrors ? credentialError : ''}
+            customClassname={styles.form}
+            formValue={credential}
+            hidden
+          />
+        )}
       </div>
     </div>
   );

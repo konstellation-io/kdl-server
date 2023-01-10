@@ -2,11 +2,10 @@ package k8s
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 
 	"github.com/gosimple/slug"
-	"gopkg.in/yaml.v3"
+	"github.com/konstellation-io/kdl-server/app/api/entity"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -29,6 +28,7 @@ func (k *k8sClient) DeleteUserToolsCR(ctx context.Context, username string) erro
 	})
 
 	if err != nil {
+		k.logger.Errorf("Error deleting user tools: %w", err)
 		return err
 	}
 
@@ -46,7 +46,8 @@ func (k *k8sClient) DeleteUserToolsCR(ctx context.Context, username string) erro
 }
 
 // CreateUserToolsCR creates the user tools Custom Resource in Kubernetes.
-func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeID, runtimeImage, runtimeTag string) error {
+func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeID, runtimeImage, runtimeTag string,
+	capabilities entity.Capabilities) error {
 	slugUsername := k.getSlugUsername(username)
 	resName := fmt.Sprintf("usertools-%s", slugUsername)
 
@@ -57,7 +58,7 @@ func (k *k8sClient) CreateUserToolsCR(ctx context.Context, username, runtimeID, 
 
 	k.logger.Info("UserTools secrets created")
 
-	err = k.createUserToolsDefinition(ctx, username, slugUsername, resName, runtimeID, runtimeImage, runtimeTag)
+	err = k.createUserToolsDefinition(ctx, username, slugUsername, resName, runtimeID, runtimeImage, runtimeTag, capabilities)
 	if err != nil {
 		return err
 	}
@@ -108,6 +109,21 @@ func (k k8sClient) GetRuntimeIDFromUserTools(ctx context.Context, username strin
 	return "", nil
 }
 
+// GetCapabilitiesIDFromUserTools returns the capabilityId that the user tools runtime POD is using.
+func (k k8sClient) GetCapabilitiesIDFromUserTools(ctx context.Context, username string) (string, error) {
+	pod, err := k.getUserToolsPod(ctx, username)
+	if err != nil {
+		return "", nil
+	}
+
+	labels := pod.GetLabels()
+	if capability, found := labels["capabilityId"]; found {
+		return capability, nil
+	}
+
+	return "", nil
+}
+
 func (k *k8sClient) getPodListForUser(ctx context.Context, labelSelector string) (*v1.PodList, error) {
 	list, err := k.clientset.CoreV1().Pods(k.cfg.Kubernetes.Namespace).List(ctx, metav1.ListOptions{
 		LabelSelector: labelSelector,
@@ -134,35 +150,26 @@ func (k *k8sClient) userToolsPODLabelSelector(resName string) string {
 
 // checkOrCreateToolsSecrets set ClientID and ClientSecret on Kubernetes secret objects.
 func (k *k8sClient) checkOrCreateToolsSecrets(ctx context.Context, slugUsername string) error {
-	err := k.createToolSecret(ctx, slugUsername, "codeserver", "code")
-	if err != nil {
-		return err
-	}
-
-	return k.createToolSecret(ctx, slugUsername, "jupyter", "jupyter")
-}
-
-func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName, toolURLName string) error {
-	secretName := fmt.Sprintf("%s-oauth2-secrets-%s", toolName, slugUsername)
-	credentialsSecretName := fmt.Sprintf("%s-oauth2-credentials-%s", toolName, slugUsername)
+	secretName := fmt.Sprintf("codeserver-oauth2-secrets-%s", slugUsername)
+	credentialsSecretName := fmt.Sprintf("codeserver-oauth2-credentials-%s", slugUsername)
 
 	exist, err := k.isSecretPresent(ctx, secretName)
 	if err != nil {
-		return fmt.Errorf("check %s tool secret: %w", toolName, err)
+		return fmt.Errorf("check codeserver tool secret: %w", err)
 	}
 
 	if exist {
 		return nil
 	}
 
-	oAuthName := fmt.Sprintf("%s-app-%s", toolName, slugUsername)
+	oAuthName := fmt.Sprintf("codeserver-app-%s", slugUsername)
 
 	protocol := "http"
 	if k.cfg.TLS.Enabled {
 		protocol = "https"
 	}
 
-	callbackURL := fmt.Sprintf("%s://%s-%s.%s/oauth2/callback", protocol, slugUsername, toolURLName, k.cfg.BaseDomainName)
+	callbackURL := fmt.Sprintf("%s://%s-code.%s/oauth2/callback", protocol, slugUsername, k.cfg.BaseDomainName)
 	data := map[string]string{}
 	data["DEPLOYMENT_SECRET_NAME"] = credentialsSecretName
 	data["GITEA_REDIRECT_URIS"] = callbackURL
@@ -170,37 +177,147 @@ func (k *k8sClient) createToolSecret(ctx context.Context, slugUsername, toolName
 
 	err = k.CreateSecret(ctx, secretName, data)
 	if err != nil {
-		return fmt.Errorf("creating %s tool secrets: %w", toolName, err)
+		return fmt.Errorf("creating codeserver tool secrets: %w", err)
 	}
 
 	return nil
 }
 
-func (k *k8sClient) getIngressAnnotations() (map[string]interface{}, error) {
-	decodedAnnotations, err := base64.StdEncoding.DecodeString(k.cfg.UserToolsIngress.Annotations)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding ingress annotations: %w", err)
-	}
-
-	var ingressAnnotations map[string]interface{}
-
-	err = yaml.Unmarshal(decodedAnnotations, &ingressAnnotations)
-	if err != nil {
-		return nil, fmt.Errorf("error unmarshaling annotations: %w", err)
-	}
-
-	return ingressAnnotations, nil
-}
-
 // createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
 func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, usernameSlug, resName, runtimeID,
-	runtimeImage, runtimeTag string) error {
+	runtimeImage, runtimeTag string, capabilities entity.Capabilities) error {
 	serviceAccountName := k.getUserServiceAccountName(usernameSlug)
 
-	ingressAnnotations, err := k.getIngressAnnotations()
+	ingressAnnotations, err := k.getK8sMap(k.cfg.UserToolsIngress.Annotations)
 	if err != nil {
+		return fmt.Errorf("error getting ingress annotations: %w", err)
+	}
+
+	definition, err := k.getUserToolsDefinition(
+		ingressAnnotations,
+		resName,
+		username,
+		usernameSlug,
+		runtimeID,
+		runtimeImage,
+		runtimeTag,
+		serviceAccountName,
+		capabilities,
+	)
+
+	if err != nil {
+		k.logger.Errorf("Error building tools: %s", err.Error())
 		return err
 	}
+
+	k.logger.Infof("Creating users tools: %#v", definition.Object)
+	_, err = k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
+
+	if err != nil {
+		k.logger.Errorf("Error creating user tools: %s", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (k *k8sClient) getUserToolsDefinition(
+	ingressAnnotations map[string]interface{},
+	resName, username, usernameSlug, runtimeID, runtimeImage, runtimeTag, serviceAccountName string,
+	capabilities entity.Capabilities,
+) (*unstructured.Unstructured, error) {
+	tlsConfig := map[string]interface{}{
+		"enabled": k.cfg.TLS.Enabled,
+	}
+
+	if k.cfg.UserToolsIngress.TLS.SecretName != nil {
+		tlsConfig["secretName"] = &k.cfg.UserToolsIngress.TLS.SecretName
+	}
+
+	vscodeRuntime := map[string]interface{}{
+		"runtimeId": runtimeID,
+		"image": map[string]string{
+			"repository": runtimeImage,
+			"tag":        runtimeTag,
+			"pullPolicy": k.cfg.UserToolsVsCodeRuntime.Image.PullPolicy,
+		},
+	}
+
+	spec := map[string]interface{}{
+		"domain": k.cfg.BaseDomainName,
+		"ingress": map[string]interface{}{
+			"annotations": ingressAnnotations,
+			"className":   k.cfg.UserToolsIngress.ClassName,
+		},
+		"username":     username,
+		"usernameSlug": usernameSlug,
+		"storage": map[string]string{
+			"size":      k.cfg.Storage.Size,
+			"className": k.cfg.Storage.ClassName,
+		},
+		"sharedVolume": map[string]string{
+			"name": k.cfg.SharedVolume.Name,
+		},
+		"tls": tlsConfig,
+		"vscode": map[string]interface{}{
+			"image": map[string]string{
+				"repository": k.cfg.VSCode.Image.Repository,
+				"tag":        k.cfg.VSCode.Image.Tag,
+				"pullPolicy": k.cfg.VSCode.Image.PullPolicy,
+			},
+		},
+		"repoCloner": map[string]interface{}{
+			"image": map[string]string{
+				"repository": k.cfg.RepoCloner.Image.Repository,
+				"tag":        k.cfg.RepoCloner.Image.Tag,
+				"pullPolicy": k.cfg.RepoCloner.Image.PullPolicy,
+			},
+			"mongodbURI": k.cfg.MongoDB.URI,
+		},
+		"giteaOauth2Setup": map[string]interface{}{
+			"image": map[string]string{
+				"repository": k.cfg.UserToolsGiteaOAuth2Setup.Image.Repository,
+				"tag":        k.cfg.UserToolsGiteaOAuth2Setup.Image.Tag,
+				"pullPolicy": k.cfg.UserToolsGiteaOAuth2Setup.Image.PullPolicy,
+			},
+			"giteaAdminSecret":     k.cfg.UserToolsGiteaOAuth2Setup.GiteaAdminSecret,
+			"giteaOauth2Configmap": k.cfg.UserToolsGiteaOAuth2Setup.GiteaOauth2Configmap,
+		},
+		"oauth2Proxy": map[string]interface{}{
+			"image": map[string]string{
+				"repository": k.cfg.UserToolsOAuth2Proxy.Image.Repository,
+				"tag":        k.cfg.UserToolsOAuth2Proxy.Image.Tag,
+				"pullPolicy": k.cfg.UserToolsOAuth2Proxy.Image.PullPolicy,
+			},
+		},
+		"kubeconfig": map[string]interface{}{
+			"enabled":           k.cfg.UserToolsKubeconfig.Enabled,
+			"externalServerUrl": k.cfg.UserToolsKubeconfig.ExternalServerURL,
+		},
+		"serviceAccountName": serviceAccountName,
+	}
+
+	if capabilities.ID != "" {
+		if err := capabilities.Validate(); err != nil {
+			return nil, err
+		}
+
+		if !capabilities.IsNodeSelectorsEmpty() {
+			spec["nodeSelector"] = capabilities.GetNodeSelectors()
+		}
+
+		if !capabilities.IsTolerationsEmpty() {
+			spec["tolerations"] = capabilities.GetTolerations()
+		}
+
+		if !capabilities.IsAffinitiesEmpty() {
+			spec["affinity"] = capabilities.GetAffinities()
+		}
+
+		vscodeRuntime["capabilityId"] = capabilities.ID
+	}
+
+	spec["vscodeRuntime"] = vscodeRuntime
 
 	definition := &unstructured.Unstructured{
 		Object: map[string]interface{}{
@@ -213,81 +330,11 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 					"app": resName,
 				},
 			},
-			"spec": map[string]interface{}{
-				"domain": k.cfg.BaseDomainName,
-				"ingress": map[string]interface{}{
-					"annotations": ingressAnnotations,
-				},
-				"username":     username,
-				"usernameSlug": usernameSlug,
-				"storage": map[string]string{
-					"size":      k.cfg.Storage.Size,
-					"className": k.cfg.Storage.ClassName,
-				},
-				"sharedVolume": map[string]string{
-					"name": k.cfg.SharedVolume.Name,
-				},
-				"tls": map[string]interface{}{
-					"enabled":    k.cfg.TLS.Enabled,
-					"secretName": k.cfg.TLS.SecretName,
-				},
-				"jupyter": map[string]interface{}{
-					"image": map[string]string{
-						"repository": k.cfg.Jupyter.Image.Repository,
-						"tag":        k.cfg.Jupyter.Image.Tag,
-						"pullPolicy": k.cfg.Jupyter.Image.PullPolicy,
-					},
-					"enterpriseGatewayUrl": k.cfg.Jupyter.EnterpriseGatewayURL,
-				},
-				"vscode": map[string]interface{}{
-					"image": map[string]string{
-						"repository": k.cfg.VSCode.Image.Repository,
-						"tag":        k.cfg.VSCode.Image.Tag,
-						"pullPolicy": k.cfg.VSCode.Image.PullPolicy,
-					},
-				},
-				"repoCloner": map[string]interface{}{
-					"image": map[string]string{
-						"repository": k.cfg.RepoCloner.Image.Repository,
-						"tag":        k.cfg.RepoCloner.Image.Tag,
-						"pullPolicy": k.cfg.RepoCloner.Image.PullPolicy,
-					},
-				},
-				"giteaOauth2Setup": map[string]interface{}{
-					"image": map[string]string{
-						"repository": k.cfg.UserToolsGiteaOAuth2Setup.Image.Repository,
-						"tag":        k.cfg.UserToolsGiteaOAuth2Setup.Image.Tag,
-						"pullPolicy": k.cfg.UserToolsGiteaOAuth2Setup.Image.PullPolicy,
-					},
-				},
-				"oauth2Proxy": map[string]interface{}{
-					"image": map[string]string{
-						"repository": k.cfg.UserToolsOAuth2Proxy.Image.Repository,
-						"tag":        k.cfg.UserToolsOAuth2Proxy.Image.Tag,
-						"pullPolicy": k.cfg.UserToolsOAuth2Proxy.Image.PullPolicy,
-					},
-				},
-				"kubeconfig": map[string]interface{}{
-					"enabled":           k.cfg.UserToolsKubeconfig.Enabled,
-					"externalServerUrl": k.cfg.UserToolsKubeconfig.ExternalServerURL,
-				},
-				"vscodeRuntime": map[string]interface{}{
-					"runtimeId": runtimeID,
-					"image": map[string]string{
-						"repository": runtimeImage,
-						"tag":        runtimeTag,
-						"pullPolicy": k.cfg.UserToolsVsCodeRuntime.Image.PullPolicy,
-					},
-				},
-				"serviceAccountName": serviceAccountName,
-			},
+			"spec": spec,
 		},
 	}
 
-	k.logger.Infof("Creating users tools: %#v", definition.Object)
-	_, err = k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
-
-	return err
+	return definition, nil
 }
 
 // Returns a watcher for the UserTools.

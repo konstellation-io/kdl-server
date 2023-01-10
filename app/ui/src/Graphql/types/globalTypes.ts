@@ -13,6 +13,11 @@ export enum AccessLevel {
   VIEWER = "VIEWER",
 }
 
+export enum RepositoryAuthMethod {
+  PASSWORD = "PASSWORD",
+  TOKEN = "TOKEN",
+}
+
 export enum RepositoryType {
   EXTERNAL = "EXTERNAL",
   INTERNAL = "INTERNAL",
@@ -38,7 +43,8 @@ export interface CreateProjectInput {
 export interface ExternalRepositoryInput {
   url: string;
   username: string;
-  token: string;
+  credential: string;
+  authMethod: RepositoryAuthMethod | null;
 }
 
 export interface RemoveApiTokenInput {
@@ -58,6 +64,7 @@ export interface RepositoryInput {
 export interface SetActiveUserToolsInput {
   active: boolean;
   runtimeId?: string | null;
+  capabilitiesId?: string | null;
 }
 
 export interface UpdateAccessLevelInput {

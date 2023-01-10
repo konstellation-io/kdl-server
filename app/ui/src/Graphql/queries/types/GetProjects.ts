@@ -21,7 +21,6 @@ export interface GetProjects_projects_toolUrls {
   knowledgeGalaxy: string;
   drone: string;
   gitea: string;
-  jupyter: string;
   filebrowser: string;
   mlflow: string;
   vscode: string;

@@ -74,46 +74,6 @@ func newProjectSuite(t *testing.T) *projectSuite {
 			k8sClient:    k8sClient,
 		},
 	}
-	createProject.Repository = entity.Repository{
-		Type:     entity.RepositoryTypeInternal,
-		RepoName: someProjectID,
-	}
-
-	expectedProject := entity.Project{
-		ID:           someProjectID,
-		Name:         projectName,
-		Description:  projectDesc,
-		CreationDate: now,
-		Repository: entity.Repository{
-			Type: entity.RepositoryTypeInternal,
-		},
-	}
-
-	owner := entity.User{ID: ownerUserID, Username: ownerUsername}
-
-	s.mocks.giteaService.EXPECT().CreateRepo(someProjectID, ownerUsername).Return(nil)
-	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, someProjectID).Return(nil)
-	s.mocks.minioService.EXPECT().CreateBucket(ctx, someProjectID).Return(nil)
-	s.mocks.minioService.EXPECT().CreateProjectDirs(ctx, someProjectID).Return(nil)
-	s.mocks.droneService.EXPECT().ActivateRepository(someProjectID).Return(nil)
-	s.mocks.clock.EXPECT().Now().Return(now)
-	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(someProjectID, nil)
-	s.mocks.repo.EXPECT().Get(ctx, someProjectID).Return(expectedProject, nil)
-	s.mocks.templating.EXPECT().GenerateInitialProjectContent(ctx, createProject, owner)
-
-	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
-		ProjectID:              someProjectID,
-		Name:                   projectName,
-		Description:            projectDesc,
-		RepoType:               entity.RepositoryTypeInternal,
-		ExternalRepoURL:        nil,
-		ExternalRepoCredential: "test-token",
-		ExternalRepoAuthMethod: entity.RepositoryAuthToken,
-		Owner:                  owner,
-	})
-
-	require.NoError(t, err)
-	require.Equal(t, expectedProject, createdProject)
 }
 
 func TestInteractor_CreateExternal(t *testing.T) {

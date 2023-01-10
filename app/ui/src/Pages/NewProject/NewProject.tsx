@@ -5,7 +5,6 @@ import useStepper, { ActionButton } from 'Hooks/useStepper/useStepper';
 import DefaultPage from 'Components/Layout/Page/DefaultPage/DefaultPage';
 import Information from './pages/Information/Information';
 import ROUTE from 'Constants/routes';
-import Repository from './pages/Repository/Repository';
 import RepositoryDetails from './pages/RepositoryDetails/RepositoryDetails';
 import { RepositoryType } from 'Graphql/types/globalTypes';
 import Stepper from 'Components/Stepper/Stepper';
@@ -18,20 +17,17 @@ import useUnloadPrompt from 'Hooks/useUnloadPrompt/useUnloadPrompt';
 import { newProject } from 'Graphql/client/cache';
 import SidebarTop from 'Components/Layout/Page/DefaultPage/SidebarTop';
 import SidebarInformation from './pages/SidebarComponents/Information/SidebarInformation';
-import SidebarRepository from './pages/SidebarComponents/Repository/SidebarRepository';
 import SidebarExternalRepository from './pages/SidebarComponents/SidebarExternalRepository/SidebarExternalRepository';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 
 enum Steps {
   INFORMATION,
-  REPOSITORY,
   REPOSITORY_DETAILS,
   SUMMARY,
 }
 
 enum StepNames {
   INFORMATION = 'information',
-  REPOSITORY = 'repository',
   DETAILS = 'repository details',
   EXTERNAL = 'externalRepository',
   INTERNAL = 'internalRepository',
@@ -42,10 +38,6 @@ const stepperSteps = [
   {
     id: StepNames.INFORMATION,
     Component: Information,
-  },
-  {
-    id: StepNames.REPOSITORY,
-    Component: Repository,
   },
   {
     id: StepNames.DETAILS,
@@ -75,8 +67,8 @@ function NewProject() {
 
   const type = data.repository.values.type;
 
-  const stepsWithData: (StepNames.INFORMATION | StepNames.REPOSITORY | StepNames.EXTERNAL)[] = useMemo(() => {
-    return [StepNames.INFORMATION, StepNames.REPOSITORY, repoTypeToStepName[type || '']];
+  const stepsWithData: (StepNames.INFORMATION | StepNames.EXTERNAL)[] = useMemo(() => {
+    return [StepNames.INFORMATION, repoTypeToStepName[type || '']];
   }, [type]);
 
   // We want to execute this on on component mount and unmount
@@ -171,8 +163,6 @@ function NewProject() {
     switch (step) {
       case StepNames.INFORMATION:
         return <SidebarInformation />;
-      case StepNames.REPOSITORY:
-        return <SidebarRepository />;
       case StepNames.EXTERNAL:
         return <SidebarExternalRepository />;
       default:

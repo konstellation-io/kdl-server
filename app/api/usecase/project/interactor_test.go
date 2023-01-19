@@ -5,8 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/templates"
-
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 
@@ -38,7 +36,6 @@ type projectMocks struct {
 	minioService *minioservice.MockMinioService
 	droneService *droneservice.MockDroneService
 	k8sClient    *k8s.MockClient
-	templating   *templates.MockTemplating
 }
 
 func newProjectSuite(t *testing.T) *projectSuite {
@@ -50,7 +47,6 @@ func newProjectSuite(t *testing.T) *projectSuite {
 	minioService := minioservice.NewMockMinioService(ctrl)
 	droneService := droneservice.NewMockDroneService(ctrl)
 	k8sClient := k8s.NewMockClient(ctrl)
-	templating := templates.NewMockTemplating(ctrl)
 
 	logging.AddLoggerExpects(logger)
 
@@ -62,7 +58,6 @@ func newProjectSuite(t *testing.T) *projectSuite {
 		MinioService: minioService,
 		DroneService: droneService,
 		K8sClient:    k8sClient,
-		Tmpl:         templating,
 	}
 	interactor := project.NewInteractor(deps)
 
@@ -77,74 +72,8 @@ func newProjectSuite(t *testing.T) *projectSuite {
 			minioService: minioService,
 			droneService: droneService,
 			k8sClient:    k8sClient,
-			templating:   templating,
 		},
 	}
-}
-
-func TestInteractor_CreateInternal(t *testing.T) {
-	s := newProjectSuite(t)
-	defer s.ctrl.Finish()
-
-	const (
-		projectName   = "The Project X"
-		projectDesc   = "The Project X Description"
-		ownerUserID   = "user.1234"
-		ownerUsername = "john"
-	)
-
-	ctx := context.Background()
-	now := time.Now().UTC()
-
-	createProject := entity.NewProject(someProjectID, projectName, projectDesc)
-	createProject.CreationDate = now
-	createProject.Members = []entity.Member{
-		{
-			UserID:      ownerUserID,
-			AccessLevel: entity.AccessLevelAdmin,
-			AddedDate:   now,
-		},
-	}
-	createProject.Repository = entity.Repository{
-		Type:     entity.RepositoryTypeInternal,
-		RepoName: someProjectID,
-	}
-
-	expectedProject := entity.Project{
-		ID:           someProjectID,
-		Name:         projectName,
-		Description:  projectDesc,
-		CreationDate: now,
-		Repository: entity.Repository{
-			Type: entity.RepositoryTypeInternal,
-		},
-	}
-
-	owner := entity.User{ID: ownerUserID, Username: ownerUsername}
-
-	s.mocks.giteaService.EXPECT().CreateRepo(someProjectID, ownerUsername).Return(nil)
-	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, someProjectID).Return(nil)
-	s.mocks.minioService.EXPECT().CreateBucket(ctx, someProjectID).Return(nil)
-	s.mocks.minioService.EXPECT().CreateProjectDirs(ctx, someProjectID).Return(nil)
-	s.mocks.droneService.EXPECT().ActivateRepository(someProjectID).Return(nil)
-	s.mocks.clock.EXPECT().Now().Return(now)
-	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(someProjectID, nil)
-	s.mocks.repo.EXPECT().Get(ctx, someProjectID).Return(expectedProject, nil)
-	s.mocks.templating.EXPECT().GenerateInitialProjectContent(ctx, createProject, owner)
-
-	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
-		ProjectID:              someProjectID,
-		Name:                   projectName,
-		Description:            projectDesc,
-		RepoType:               entity.RepositoryTypeInternal,
-		ExternalRepoURL:        nil,
-		ExternalRepoCredential: "test-token",
-		ExternalRepoAuthMethod: entity.RepositoryAuthToken,
-		Owner:                  owner,
-	})
-
-	require.NoError(t, err)
-	require.Equal(t, expectedProject, createdProject)
 }
 
 func TestInteractor_CreateExternal(t *testing.T) {

@@ -6,12 +6,10 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/templates"
-
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
@@ -107,7 +105,6 @@ type interactor struct {
 	minioService minioservice.MinioService
 	droneService droneservice.DroneService
 	k8sClient    k8s.Client
-	tmpl         templates.Templating
 }
 
 // InteractorDeps encapsulates all project interactor dependencies.
@@ -119,7 +116,6 @@ type InteractorDeps struct {
 	MinioService minioservice.MinioService
 	DroneService droneservice.DroneService
 	K8sClient    k8s.Client
-	Tmpl         templates.Templating
 }
 
 // NewInteractor is a constructor function.
@@ -132,7 +128,6 @@ func NewInteractor(deps *InteractorDeps) UseCase {
 		minioService: deps.MinioService,
 		droneService: deps.DroneService,
 		k8sClient:    deps.K8sClient,
-		tmpl:         deps.Tmpl,
 	}
 }
 
@@ -168,24 +163,7 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 	repoName := opt.ProjectID
 
 	// Create repository
-	switch opt.RepoType {
-	case entity.RepositoryTypeInternal:
-		err := i.giteaService.CreateRepo(repoName, opt.Owner.Username)
-		if err != nil {
-			return entity.Project{}, err
-		}
-
-		project.Repository = entity.Repository{
-			Type:     entity.RepositoryTypeInternal,
-			RepoName: repoName,
-		}
-
-		err = i.tmpl.GenerateInitialProjectContent(ctx, project, opt.Owner)
-		if err != nil {
-			return entity.Project{}, err
-		}
-
-	case entity.RepositoryTypeExternal:
+	if opt.RepoType == entity.RepositoryTypeExternal {
 		if err != nil {
 			return entity.Project{}, err
 		}

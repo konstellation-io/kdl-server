@@ -62,20 +62,6 @@ func (mr *MockGiteaClientMockRecorder) AddSSHKey(username, publicSSHKey interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddSSHKey", reflect.TypeOf((*MockGiteaClient)(nil).AddSSHKey), username, publicSSHKey)
 }
 
-// CreateRepo mocks base method.
-func (m *MockGiteaClient) CreateRepo(name, ownerUsername string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateRepo", name, ownerUsername)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CreateRepo indicates an expected call of CreateRepo.
-func (mr *MockGiteaClientMockRecorder) CreateRepo(name, ownerUsername interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRepo", reflect.TypeOf((*MockGiteaClient)(nil).CreateRepo), name, ownerUsername)
-}
-
 // FindAllUsers mocks base method.
 func (m *MockGiteaClient) FindAllUsers() ([]entity.User, error) {
 	m.ctrl.T.Helper()

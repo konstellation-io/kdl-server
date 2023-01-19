@@ -73,12 +73,6 @@ const createProject = (name: string, id: string, customResponse?: Object) => {
   // Go to the next step
   cy.getByTestId('nextButton').click();
 
-  // Select the repo type
-  cy.getByTestId(RepositoryType.EXTERNAL).click();
-
-  // Go to the next step
-  cy.getByTestId('nextButton').click();
-
   cy.getByTestId('externalRepositoryInputs').find('input').eq(0).type('http://test.com');
   cy.getByTestId('externalRepositoryInputs').find('input').eq(1).type('username-test');
   cy.contains('Select one').click();

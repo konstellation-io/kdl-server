@@ -182,6 +182,19 @@ func (mr *MockRepositoryMockRecorder) UpdateEmail(ctx, userID, email interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEmail", reflect.TypeOf((*MockRepository)(nil).UpdateEmail), ctx, userID, email)
 }
 
+
+func (m *MockRepository) UpdateUsername(ctx context.Context, userID, email string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUsername", ctx, email, userID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockRepositoryMockRecorder) UpdateUsername(ctx, email, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUsername", reflect.TypeOf((*MockRepository)(nil).UpdateUsername), ctx, email, userID)
+}
+
 // UpdateSSHKey mocks base method.
 func (m *MockRepository) UpdateSSHKey(ctx context.Context, username string, SSHKey entity.SSHKey) error {
 	m.ctrl.T.Helper()

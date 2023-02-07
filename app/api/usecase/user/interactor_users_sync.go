@@ -123,6 +123,7 @@ func (i *interactor) syncGiteaUsersToUpdate(users, giteaUsers []entity.User) (us
 			usernamesToUpd = append(usernamesToUpd, giteaUser)
 		}
 	}
+
 	return usersToAdd, usersToRestore, usersEmailsToUpd, usernamesToUpd
 }
 

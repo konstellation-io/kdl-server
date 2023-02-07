@@ -40,63 +40,33 @@ func (i *interactor) syncUsers() {
 		return
 	}
 
-	usersMap := i.userListToMap(users)
-	emailsMap := i.userEmailListToMap(users)
-
 	giteaUsers, err := i.giteaService.FindAllUsers()
 	if err != nil {
 		i.logger.Errorf("Error getting users from Gitea: %s", err)
 		return
 	}
 
-	//nolint:prealloc // the final slice length is unknown
-	var (
-		usersEmailsToUpd []entity.User
-		usernamesToUpd   []entity.User
-		usersToAdd       []entity.User
-		usersToDel       []entity.User
-		usersToRestore   []entity.User
-	)
+	usersToAdd, usersToRestore, usersEmailsToUpd, usernamesToUpd := i.syncGiteaUsersToUpdate(users, giteaUsers)
 
-	// Get the users to update or to add
-	for _, giteaUser := range giteaUsers {
-		u, userFound := usersMap[giteaUser.Username]
-		_, emailFound := emailsMap[giteaUser.Email]
+	usersToDel := i.syncGiteaUsersToDelete(giteaUsers, users)
 
-		toBeCreated := !userFound && !emailFound
+	var wg sync.WaitGroup
 
-		// When a username is modified in Gitea, the user is internally deleted an
-		// recreated with the new username, that's why the !emailFound check is done
-		toBeDeleted := !toBeCreated && u.Deleted && !emailFound
+	i.syncDelUsers(ctx, usersToDel, &wg)
+	i.syncRestoreUsers(ctx, usersToRestore, &wg)
+	i.syncUpdateUserEmails(ctx, usersEmailsToUpd, &wg)
+	i.syncUpdateUsernames(ctx, usernamesToUpd, &wg)
+	i.syncAddUsers(ctx, usersToAdd, &wg)
 
-		toBeUpdated := !toBeDeleted && (!userFound || !emailFound)
+	wg.Wait()
 
-		switch {
-		case toBeCreated:
-			i.logger.Debugf("The gitea user %q with email %q is a new user", giteaUser.Username, giteaUser.Email)
+	i.logger.Debug("User synchronization finished correctly")
+}
 
-			usersToAdd = append(usersToAdd, giteaUser)
-
-		case toBeDeleted:
-			i.logger.Debugf("The gitea user \"%s\" has been restored", u.Username)
-
-			usersToRestore = append(usersToRestore, giteaUser)
-
-		case toBeUpdated:
-			i.logger.Debugf("The gitea user \"%s\" has changed their email", u.Username)
-
-			if userFound {
-				usersEmailsToUpd = append(usersEmailsToUpd, giteaUser)
-			} else {
-				usernamesToUpd = append(usernamesToUpd, giteaUser)
-			}
-		}
-	}
-
+func (i *interactor) syncGiteaUsersToDelete(giteaUsers, users []entity.User) (usersToDel []entity.User) {
 	giteaUsersMap := i.userListToMap(giteaUsers)
 	giteaEmailsMap := i.userEmailListToMap(giteaUsers)
 
-	// Get the users to delete
 	for _, u := range users {
 		if u.Deleted {
 			continue
@@ -113,17 +83,47 @@ func (i *interactor) syncUsers() {
 		usersToDel = append(usersToDel, u)
 	}
 
-	var wg sync.WaitGroup
+	return usersToDel
+}
 
-	i.syncDelUsers(ctx, usersToDel, &wg)
-	i.syncRestoreUsers(ctx, usersToRestore, &wg)
-	i.syncUpdateUserEmails(ctx, usersEmailsToUpd, &wg)
-	i.syncUpdateUsernames(ctx, usernamesToUpd, &wg)
-	i.syncAddUsers(ctx, usersToAdd, &wg)
+func (i *interactor) syncGiteaUsersToUpdate(users, giteaUsers []entity.User) (usersToAdd,
+	usersToRestore, usersEmailsToUpd, usernamesToUpd []entity.User) {
+	usersMap := i.userListToMap(users)
+	emailsMap := i.userEmailListToMap(users)
 
-	wg.Wait()
+	for _, giteaUser := range giteaUsers {
+		u, userFound := usersMap[giteaUser.Username]
+		_, emailFound := emailsMap[giteaUser.Email]
 
-	i.logger.Debug("User synchronization finished correctly")
+		toBeCreated := !userFound && !emailFound
+
+		toBeUpdated := !toBeCreated
+
+		toBeRestored := toBeUpdated && u.Deleted
+
+		switch {
+		case toBeCreated:
+			i.logger.Debugf("The gitea user %q with email %q is a new user", giteaUser.Username, giteaUser.Email)
+
+			usersToAdd = append(usersToAdd, giteaUser)
+
+		case toBeRestored:
+			i.logger.Debugf("The gitea user %q has been restored", u.Username)
+
+			usersToRestore = append(usersToRestore, giteaUser)
+
+		case toBeUpdated && userFound:
+			i.logger.Debugf("The gitea user %q has changed their email", u.Username)
+
+			usersEmailsToUpd = append(usersEmailsToUpd, giteaUser)
+
+		case toBeUpdated && !userFound:
+			i.logger.Debugf("The gitea user with email %q has changed their username", u.Email)
+
+			usernamesToUpd = append(usernamesToUpd, giteaUser)
+		}
+	}
+	return usersToAdd, usersToRestore, usersEmailsToUpd, usernamesToUpd
 }
 
 func (i *interactor) syncAddUsers(ctx context.Context, users []entity.User, wg *sync.WaitGroup) {

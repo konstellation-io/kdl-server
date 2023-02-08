@@ -178,7 +178,7 @@ func (m *userMongoDBRepo) UpdateEmail(ctx context.Context, username, email strin
 }
 
 func (m *userMongoDBRepo) UpdateUsername(ctx context.Context, email, username string) error {
-	m.logger.Debugf("Updating user \"%s\" with \"%#v\"...", email)
+	m.logger.Debugf("Updating user %q with email %q ...", username, email)
 
 	filter := bson.M{"email": email}
 

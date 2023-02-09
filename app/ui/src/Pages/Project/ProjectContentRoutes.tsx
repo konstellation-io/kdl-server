@@ -24,9 +24,7 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
 
   function redirectIfToolsActives() {
     if (runtimeRunning && runtimeLoading === null) return;
-    return [ROUTE.PROJECT_TOOL_VSCODE].map((r) => (
-      <Redirect key={r} from={r} to={ROUTE.PROJECT_OVERVIEW} />
-    ));
+    return [ROUTE.PROJECT_TOOL_VSCODE].map((r) => <Redirect key={r} from={r} to={ROUTE.PROJECT_OVERVIEW} />);
   }
 
   function redirectDisabledKG() {

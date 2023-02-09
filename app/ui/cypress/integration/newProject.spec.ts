@@ -1,4 +1,3 @@
-import { RepositoryType } from '../../src/Graphql/types/globalTypes';
 import GetProjectsQuery from '../../src/Mocks/GetProjectsQuery';
 import { project1 } from '../../src/Mocks/entities/project';
 import { generateSlug } from '../../src/Utils/string';

@@ -25,10 +25,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "14"
-      - name: UI Linter
-        uses: stefanoeb/eslint-action@1.0.2
-        with:
-          files: app/ui/
+          cache: 'yarn'
+          cache-dependency-path: app/ui/yarn.lock
+      - name: Install modules
+        run: yarn install
+      - name: UI ESLinter
+        run: yarn run lint
+
       - name: UI Run tests
         run: yarn install && yarn run test:cov:sonar
         working-directory: ./app/ui

@@ -4,13 +4,10 @@ package entity
 type AccessLevel string
 
 const (
-	// AccessLevelViewer access level.
 	AccessLevelViewer AccessLevel = "VIEWER"
 
-	// AccessLevelManager access level.
 	AccessLevelManager AccessLevel = "MANAGER"
 
-	// AccessLevelAdmin access level.
 	AccessLevelAdmin AccessLevel = "ADMIN"
 )
 

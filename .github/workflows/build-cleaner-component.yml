@@ -1,4 +1,4 @@
-name: Gitea Oauth2 Setup Component Build
+name: Cleaner Component Build
 
 on:
   pull_request:
@@ -6,13 +6,13 @@ on:
       - main
       - "release/v*"
     paths:
-      - "gitea-oauth2-setup/**/*"
+      - "cleaner/**/*"
   push:
     branches:
       - main
       - "release/v*"
     paths:
-      - "gitea-oauth2-setup/**/*"
+      - "cleaner/**/*"
 
 concurrency: build_component
 
@@ -20,19 +20,18 @@ jobs:
   lint-dockerfile:
     uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.7.6
     with:
-      component_path: gitea-oauth2-setup
+      component_path: cleaner
 
   build:
     needs: lint-dockerfile
     uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.7.6
     with:
-      component: gitea-oauth2-setup
-      component_helm_tag: giteaOauth2Setup.image.tag
-      component_path: gitea-oauth2-setup
-      component_image: gitea-oauth2-setup
+      component: cleaner
+      component_helm_tag: cleaner.image.tag
+      component_path: cleaner
+      component_image: cleaner
       values_file: helm/kdl-server/values.yaml
     secrets:
       pat: ${{ secrets.PATNAME }}
       docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
       docker_token: ${{ secrets.DOCKERHUB_TOKEN }}
-

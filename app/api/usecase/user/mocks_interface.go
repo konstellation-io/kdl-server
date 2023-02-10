@@ -182,7 +182,6 @@ func (mr *MockRepositoryMockRecorder) UpdateEmail(ctx, userID, email interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEmail", reflect.TypeOf((*MockRepository)(nil).UpdateEmail), ctx, userID, email)
 }
 
-
 func (m *MockRepository) UpdateUsername(ctx context.Context, userID, email string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateUsername", ctx, email, userID)

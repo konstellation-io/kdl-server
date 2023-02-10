@@ -7,29 +7,31 @@
 |  App API  | [![coverage][app-api-coverage]][app-api-coverage-link] | [![bugs][app-api-bugs]][app-api-bugs-link] | [![mr][app-api-mr]][app-api-mr-link] |
 |  App UI  | [![coverage][app-ui-coverage]][app-ui-coverage-link] | [![bugs][app-ui-bugs]][app-ui-bugs-link] | [![mr][app-ui-mr]][app-ui-mr-link] |
 
-[app-api-coverage]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_api&metric=coverage
+[app-api-coverage]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab-app-api&metric=coverage
 
-[app-api-coverage-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_api&metric=Coverage
+[app-api-coverage-link]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab-app-api&metric=coverage
 
-[app-api-bugs]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_api&metric=bugs
+[app-api-bugs]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab-app-api&metric=bugs
 
-[app-api-bugs-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_api&metric=Reliability
+[app-api-bugs-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab-app-api&metric=Reliability
 
-[app-api-mr]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_api&metric=sqale_rating
+[app-api-mr]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab-app-api&metric=sqale_rating
 
-[app-api-mr-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_api&metric=Maintainability
+[app-api-mr-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab-app-api&metric=Maintainability
 
-[app-ui-coverage]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_ui&metric=coverage
+[app-ui-coverage]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab_app_ui&metric=coverage
 
-[app-ui-coverage-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_ui&metric=Coverage
+[app-ui-coverage-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab_app_ui&metric=Coverage
 
-[app-ui-bugs]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_ui&metric=bugs
+[app-ui-bugs]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab_app_ui&metric=bugs
 
-[app-ui-bugs-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_ui&metric=Reliability
+[app-ui-bugs-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab_app_ui&metric=Reliability
 
-[app-ui-mr]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_ui&metric=sqale_rating
+[app-ui-mr]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab_app_ui&metric=sqale_rating
 
-[app-ui-mr-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_ui&metric=Maintainability
+[app-ui-mr-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab_app_ui&metric=Maintainability
+
+---
 
 ## Helm Chart
 

@@ -2,10 +2,14 @@
 
 ## App
 
-|  Component  | Coverage  |  Bugs  |  Maintainability Rating  |
-| :---------: | :-----:   |  :---: |  :--------------------:  |
-|  App API  | [![coverage][app-api-coverage]][app-api-coverage-link] | [![bugs][app-api-bugs]][app-api-bugs-link] | [![mr][app-api-mr]][app-api-mr-link] |
-|  App UI  | [![coverage][app-ui-coverage]][app-ui-coverage-link] | [![bugs][app-ui-bugs]][app-ui-bugs-link] | [![mr][app-ui-mr]][app-ui-mr-link] |
+|  Component  | Coverage  |  Bugs  |  Maintainability Rating  |  Go report  |
+| :---------: | :-----:   |  :---: |  :--------------------:  |  :---: |
+|  App API  | [![coverage][app-api-coverage]][app-api-coverage-link] | [![bugs][app-api-bugs]][app-api-bugs-link] | [![mr][app-api-mr]][app-api-mr-link] | [![go-report][report-badge]][report-link] |
+|  App UI  | [![coverage][app-ui-coverage]][app-ui-coverage-link] | [![bugs][app-ui-bugs]][app-ui-bugs-link] | [![mr][app-ui-mr]][app-ui-mr-link] | - |
+
+[report-badge]: https://goreportcard.com/badge/github.com/konstellation-io/kdl-server/app/api
+
+[report-link]: https://goreportcard.com/report/github.com/konstellation-io/kdl-server/app/api
 
 [app-api-coverage]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab-app-api&metric=coverage
 

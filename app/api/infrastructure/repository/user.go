@@ -177,6 +177,20 @@ func (m *userMongoDBRepo) UpdateEmail(ctx context.Context, username, email strin
 	return m.updateUserFields(ctx, username, bson.M{"email": email})
 }
 
+func (m *userMongoDBRepo) UpdateUsername(ctx context.Context, email, username string) error {
+	m.logger.Debugf("Updating user %q with email %q ...", username, email)
+
+	filter := bson.M{"email": email}
+
+	fields := bson.M{"username": username, "deleted": false}
+
+	_, err := m.collection.UpdateOne(ctx, filter, bson.M{
+		"$set": fields,
+	})
+
+	return err
+}
+
 func (m *userMongoDBRepo) UpdateDeleted(ctx context.Context, username string, deleted bool) error {
 	return m.updateUserFields(ctx, username, bson.M{"deleted": deleted})
 }

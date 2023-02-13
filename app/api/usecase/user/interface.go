@@ -21,6 +21,7 @@ type Repository interface {
 	FindAll(ctx context.Context, includeDeleted bool) ([]entity.User, error)
 	FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error)
 	UpdateEmail(ctx context.Context, userID, email string) error
+	UpdateUsername(ctx context.Context, email, userID string) error
 	UpdateDeleted(ctx context.Context, userID string, deleted bool) error
 }
 

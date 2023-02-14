@@ -17,7 +17,7 @@ type Mutation {
   regenerateSSHKey: User!
   createProject(input: CreateProjectInput!): Project!
   updateProject(input: UpdateProjectInput!): Project!
-  deleteProject(input: DeleteProjectInput!)
+  deleteProject(input: DeleteProjectInput!): Boolean
   addMembers(input: AddMembersInput!): Project!
   removeMembers(input: RemoveMembersInput!): Project!
   updateMembers(input: UpdateMembersInput!): Project!

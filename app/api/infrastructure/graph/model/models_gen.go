@@ -36,6 +36,10 @@ type CreateProjectInput struct {
 	Repository  *RepositoryInput `json:"repository"`
 }
 
+type DeleteProjectInput struct {
+	ID string `json:"id"`
+}
+
 type ExternalRepositoryInput struct {
 	URL        string                      `json:"url"`
 	Username   string                      `json:"username"`

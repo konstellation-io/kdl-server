@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -168,6 +169,21 @@ func (m *projectMongoDBRepo) UpdateDescription(ctx context.Context, projectID, d
 // UpdateArchived changes the archived field for the given project.
 func (m *projectMongoDBRepo) UpdateArchived(ctx context.Context, projectID string, archived bool) error {
 	return m.updateProjectFields(ctx, projectID, bson.M{"archived": archived})
+}
+
+func (m *projectMongoDBRepo) DeleteOne(ctx context.Context, projectID string) error {
+
+	filter := bson.M{
+		"_id": projectID,
+	}
+
+	res, err := m.collection.DeleteOne(ctx, filter)
+
+	if res.DeletedCount != 1 {
+		return fmt.Errorf("number of projects deleted is not 1: %d", res.DeletedCount)
+	}
+
+	return err
 }
 
 func (m *projectMongoDBRepo) updateProjectFields(ctx context.Context, projectID string, fields bson.M) error {

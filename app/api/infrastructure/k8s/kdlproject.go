@@ -9,6 +9,10 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
+func (k *k8sClient) getProjectName(projectID string) string {
+	return fmt.Sprintf("kdlproject-%s", projectID)
+}
+
 func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) error {
 	const oAuth2ProxyCookieSecretLen = 16
 
@@ -17,7 +21,7 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 		return err
 	}
 
-	resName := fmt.Sprintf("kdlproject-%s", projectID)
+	resName := k.getProjectName(projectID)
 
 	tlsConfig := map[string]interface{}{
 		"enabled": k.cfg.TLS.Enabled,
@@ -140,6 +144,19 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 
 	if err == nil {
 		k.logger.Infof("The kdl project \"%s\" was created correctly in k8s", resName)
+	}
+
+	return err
+}
+
+func (k *k8sClient) DeleteKDLProjectCR(ctx context.Context, projectID string) error {
+	resName := k.getProjectName(projectID)
+
+	k.logger.Infof("Attempting to delete KDL Project CR with name \"%s\"", resName)
+
+	err := k.kdlprojectRes.Namespace(k.cfg.Kubernetes.Namespace).Delete(ctx, resName, *metav1.NewDeleteOptions(0))
+	if err == nil {
+		k.logger.Infof("The KDL Project CR with name \"%s\" was deleted correctly in k8s", resName)
 	}
 
 	return err

@@ -2,16 +2,19 @@ import { ApolloCache, FetchResult, useMutation } from '@apollo/client';
 import { CreateProject, CreateProjectVariables } from 'Graphql/mutations/types/CreateProject';
 import { GetProjects, GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { UpdateProject, UpdateProjectVariables } from '../mutations/types/UpdateProject';
+import { DeleteProject, DeleteProjectVariables } from '../mutations/types/DeleteProject';
 
-import { CreateProjectInput } from '../types/globalTypes';
+import { CreateProjectInput, DeleteProjectInput } from '../types/globalTypes';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 
 import GetProjectsQuery from 'Graphql/queries/getProjects';
 import CreateProjectMutation from 'Graphql/mutations/createProject';
 import UpdateProjectMutation from 'Graphql/mutations/updateProject';
+import DeleteProjectMutation from 'Graphql/mutations/deleteProject';
 
 type UseProjectParams = {
   onUpdateCompleted?: () => void;
+  onDeleteCompleted?: () => void;
 };
 export default function useProject(options?: UseProjectParams) {
   const [mutationCreateProject, { data, error }] = useMutation<CreateProject, CreateProjectVariables>(
@@ -27,6 +30,14 @@ export default function useProject(options?: UseProjectParams) {
     {
       onError: (e) => console.error(`updateProject: ${e}`),
       onCompleted: options?.onUpdateCompleted,
+    },
+  );
+
+  const [mutationDeleteProject, { loading: deleteLoading }] = useMutation<DeleteProject, DeleteProjectVariables>(
+    DeleteProjectMutation,
+    {
+      onError: (e) => console.error(`deleteProject: ${e}`),
+      onCompleted: options?.onDeleteCompleted,
     },
   );
 
@@ -69,6 +80,10 @@ export default function useProject(options?: UseProjectParams) {
     mutationUpdateProject(mutationPayloadHelper({ id, archived }));
   }
 
+  function deleteProject(id: string) {
+    mutationDeleteProject(mutationPayloadHelper({ id }));
+  }
+
   return {
     addNewProject,
     updateProjectName,
@@ -76,6 +91,10 @@ export default function useProject(options?: UseProjectParams) {
     archiveProjectAction: {
       updateProjectArchived,
       loading,
+    },
+    deleteProjectAction: {
+      deleteProject,
+      loading: deleteLoading,
     },
     create: { data, error },
   };

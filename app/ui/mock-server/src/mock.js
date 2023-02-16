@@ -58,6 +58,12 @@ module.exports = {
 
       return project;
     },
+    deleteProject:(_, { input: { id }}) => {
+      console.log(id);
+      return {
+        id
+      }
+    },
     removeApiToken: (_, { input: { apiTokenId } }) => ({
       id: apiTokenId,
     }),

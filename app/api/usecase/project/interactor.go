@@ -256,6 +256,9 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 
 func (i *interactor) Delete(ctx context.Context, projectID string) (entity.Project, error) {
 	p, err := i.repo.Get(ctx, projectID)
+	if err != nil {
+		return entity.Project{}, err
+	}
 
 	i.logger.Infof("Deleting project with id \"%s\"", projectID)
 

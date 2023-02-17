@@ -183,7 +183,7 @@ type MutationResolver interface {
 	RegenerateSSHKey(ctx context.Context) (*entity.User, error)
 	CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error)
 	UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error)
-	DeleteProject(ctx context.Context, input model.DeleteProjectInput) (*bool, error)
+	DeleteProject(ctx context.Context, input model.DeleteProjectInput) (*entity.Project, error)
 	AddMembers(ctx context.Context, input model.AddMembersInput) (*entity.Project, error)
 	RemoveMembers(ctx context.Context, input model.RemoveMembersInput) (*entity.Project, error)
 	UpdateMembers(ctx context.Context, input model.UpdateMembersInput) (*entity.Project, error)
@@ -960,7 +960,7 @@ type Mutation {
   regenerateSSHKey: User!
   createProject(input: CreateProjectInput!): Project!
   updateProject(input: UpdateProjectInput!): Project!
-  deleteProject(input: DeleteProjectInput!): Boolean
+  deleteProject(input: DeleteProjectInput!): Project
   addMembers(input: AddMembersInput!): Project!
   removeMembers(input: RemoveMembersInput!): Project!
   updateMembers(input: UpdateMembersInput!): Project!
@@ -2318,9 +2318,9 @@ func (ec *executionContext) _Mutation_deleteProject(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(*entity.Project)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalOProject2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteProject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2330,7 +2330,33 @@ func (ec *executionContext) fieldContext_Mutation_deleteProject(ctx context.Cont
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Project_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Project_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Project_description(ctx, field)
+			case "favorite":
+				return ec.fieldContext_Project_favorite(ctx, field)
+			case "repository":
+				return ec.fieldContext_Project_repository(ctx, field)
+			case "creationDate":
+				return ec.fieldContext_Project_creationDate(ctx, field)
+			case "lastActivationDate":
+				return ec.fieldContext_Project_lastActivationDate(ctx, field)
+			case "error":
+				return ec.fieldContext_Project_error(ctx, field)
+			case "members":
+				return ec.fieldContext_Project_members(ctx, field)
+			case "toolUrls":
+				return ec.fieldContext_Project_toolUrls(ctx, field)
+			case "needAccess":
+				return ec.fieldContext_Project_needAccess(ctx, field)
+			case "archived":
+				return ec.fieldContext_Project_archived(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
 	}
 	defer func() {
@@ -10259,6 +10285,13 @@ func (ec *executionContext) unmarshalOExternalRepositoryInput2ᚖgithubᚗcomᚋ
 	}
 	res, err := ec.unmarshalInputExternalRepositoryInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOProject2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx context.Context, sel ast.SelectionSet, v *entity.Project) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Project(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalORemoveApiTokenInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRemoveAPITokenInput(ctx context.Context, v interface{}) (*model.RemoveAPITokenInput, error) {

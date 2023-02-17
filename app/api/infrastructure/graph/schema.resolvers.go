@@ -91,12 +91,9 @@ func (r *mutationResolver) UpdateProject(ctx context.Context, input model.Update
 	return &p, err
 }
 
-func (r *mutationResolver) DeleteProject(ctx context.Context, input model.DeleteProjectInput) (*bool, error) {
-	err := r.projects.Delete(ctx, input.ID)
-
-	res := err == nil
-
-	return &res, err
+func (r *mutationResolver) DeleteProject(ctx context.Context, input model.DeleteProjectInput) (*entity.Project, error) {
+	p, err := r.projects.Delete(ctx, input.ID)
+	return &p, err
 }
 
 func (r *mutationResolver) AddMembers(ctx context.Context, input model.AddMembersInput) (*entity.Project, error) {

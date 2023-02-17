@@ -31,5 +31,5 @@ type UseCase interface {
 	RemoveMembers(ctx context.Context, opt RemoveMembersOption) (entity.Project, error)
 	UpdateMembers(ctx context.Context, opt UpdateMembersOption) (entity.Project, error)
 	Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error)
-	Delete(ctx context.Context, projectID string) error
+	Delete(ctx context.Context, projectID string) (entity.Project, error)
 }

@@ -254,19 +254,21 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 	return i.repo.Get(ctx, opt.ProjectID)
 }
 
-func (i *interactor) Delete(ctx context.Context, projectID string) error {
+func (i *interactor) Delete(ctx context.Context, projectID string) (entity.Project, error) {
+	p, err := i.repo.Get(ctx, projectID)
+
 	i.logger.Infof("Deleting project with id \"%s\"", projectID)
 
 	// Delete k8s KDLProjectCR containing a MLFLow instance
-	err := i.k8sClient.DeleteKDLProjectCR(ctx, projectID)
+	err = i.k8sClient.DeleteKDLProjectCR(ctx, projectID)
 	if err != nil {
-		return err
+		return entity.Project{}, err
 	}
 
 	err = i.repo.DeleteOne(ctx, projectID)
 	if err != nil {
-		return err
+		return entity.Project{}, err
 	}
 
-	return nil
+	return p, nil
 }

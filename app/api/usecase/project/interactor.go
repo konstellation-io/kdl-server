@@ -260,7 +260,12 @@ func (i *interactor) Delete(ctx context.Context, projectID string) (entity.Proje
 		return entity.Project{}, err
 	}
 
-	i.logger.Infof("Deleting project with id \"%s\"", projectID)
+	i.logger.Infof("Attempting to delete project with id \"%s\"", projectID)
+
+	err = i.giteaService.DeleteRepo(p.ID)
+	if err != nil {
+		return entity.Project{}, err
+	}
 
 	// Delete k8s KDLProjectCR containing a MLFLow instance
 	err = i.k8sClient.DeleteKDLProjectCR(ctx, projectID)
@@ -272,6 +277,8 @@ func (i *interactor) Delete(ctx context.Context, projectID string) (entity.Proje
 	if err != nil {
 		return entity.Project{}, err
 	}
+
+	i.logger.Infof("Project with id \"%s\" successfully deleted", projectID)
 
 	return p, nil
 }

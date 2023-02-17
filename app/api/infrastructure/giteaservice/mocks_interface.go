@@ -62,6 +62,20 @@ func (mr *MockGiteaClientMockRecorder) AddSSHKey(username, publicSSHKey interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddSSHKey", reflect.TypeOf((*MockGiteaClient)(nil).AddSSHKey), username, publicSSHKey)
 }
 
+// DeleteRepo mocks base method.
+func (m *MockGiteaClient) DeleteRepo(repoName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteRepo", repoName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteRepo indicates an expected call of DeleteRepo.
+func (mr *MockGiteaClientMockRecorder) DeleteRepo(repoName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRepo", reflect.TypeOf((*MockGiteaClient)(nil).DeleteRepo), repoName)
+}
+
 // FindAllUsers mocks base method.
 func (m *MockGiteaClient) FindAllUsers() ([]entity.User, error) {
 	m.ctrl.T.Helper()

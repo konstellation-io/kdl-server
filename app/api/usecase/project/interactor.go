@@ -262,6 +262,9 @@ func (i *interactor) Delete(ctx context.Context, projectID string) (entity.Proje
 
 	i.logger.Infof("Attempting to delete project with id \"%s\"", projectID)
 
+	// Minio buckets are not desired to be erased
+
+	// Delete repo from Gitea
 	err = i.giteaService.DeleteRepo(p.ID)
 	if err != nil {
 		return entity.Project{}, err
@@ -273,6 +276,7 @@ func (i *interactor) Delete(ctx context.Context, projectID string) (entity.Proje
 		return entity.Project{}, err
 	}
 
+	// Delete info about the project from the MongoDB
 	err = i.repo.DeleteOne(ctx, projectID)
 	if err != nil {
 		return entity.Project{}, err

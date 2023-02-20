@@ -452,3 +452,39 @@ func TestInteractor_Update(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, expectedProject, result)
 }
+
+func TestInteractor_Delete(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+	now := time.Now().UTC()
+
+	const (
+		projectName     = "The Project Y"
+		projectDesc     = "The Project Y Description"
+		externalRepoURL = "https://github.com/org/repo.git"
+	)
+
+	expectedProject := entity.Project{
+		ID:           someProjectID,
+		Name:         projectName,
+		Description:  projectDesc,
+		CreationDate: now,
+		Repository: entity.Repository{
+			Type:            entity.RepositoryTypeExternal,
+			ExternalRepoURL: externalRepoURL,
+			RepoName:        someProjectID,
+		},
+	}
+
+	s.mocks.repo.EXPECT().Get(ctx, someProjectID).Return(expectedProject, nil)
+	s.mocks.giteaService.EXPECT().DeleteRepo(someProjectID).Return(nil)
+	s.mocks.k8sClient.EXPECT().DeleteKDLProjectCR(ctx, someProjectID).Return(nil)
+	s.mocks.repo.EXPECT().DeleteOne(ctx, someProjectID).Return(nil)
+
+	result, err := s.interactor.Delete(ctx, someProjectID)
+	require.NoError(t, err)
+
+	require.Equal(t, expectedProject, result)
+}

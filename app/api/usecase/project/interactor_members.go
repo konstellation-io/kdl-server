@@ -49,7 +49,7 @@ var (
 )
 
 // AddMembers adds new users to the given project. These members will have the lowest access level.
-func (i interactor) AddMembers(ctx context.Context, opt AddMembersOption) (entity.Project, error) {
+func (i *interactor) AddMembers(ctx context.Context, opt AddMembersOption) (entity.Project, error) {
 	p, err := i.repo.Get(ctx, opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err
@@ -98,7 +98,7 @@ func (i interactor) AddMembers(ctx context.Context, opt AddMembersOption) (entit
 }
 
 // RemoveMembers removes a user from the given project.
-func (i interactor) RemoveMembers(ctx context.Context, opt RemoveMembersOption) (entity.Project, error) {
+func (i *interactor) RemoveMembers(ctx context.Context, opt RemoveMembersOption) (entity.Project, error) {
 	p, err := i.repo.Get(ctx, opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err
@@ -141,7 +141,7 @@ func (i interactor) RemoveMembers(ctx context.Context, opt RemoveMembersOption) 
 }
 
 // UpdateMembers changes the access level for the given member.
-func (i interactor) UpdateMembers(ctx context.Context, opt UpdateMembersOption) (entity.Project, error) {
+func (i *interactor) UpdateMembers(ctx context.Context, opt UpdateMembersOption) (entity.Project, error) {
 	p, err := i.repo.Get(ctx, opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err
@@ -186,7 +186,7 @@ func (i interactor) UpdateMembers(ctx context.Context, opt UpdateMembersOption) 
 }
 
 // getMemberAccessLevel returns the member access level for the given user.
-func (i interactor) getMemberAccessLevel(userID string, members []entity.Member) entity.AccessLevel {
+func (i *interactor) getMemberAccessLevel(userID string, members []entity.Member) entity.AccessLevel {
 	var memberAccessLevel entity.AccessLevel
 
 	if ok, m := i.getMember(userID, members); ok {
@@ -197,7 +197,7 @@ func (i interactor) getMemberAccessLevel(userID string, members []entity.Member)
 }
 
 // getMember returns the desired member.
-func (i interactor) getMember(userID string, members []entity.Member) (bool, entity.Member) {
+func (i *interactor) getMember(userID string, members []entity.Member) (bool, entity.Member) {
 	for _, m := range members {
 		if userID == m.UserID {
 			return true, m
@@ -208,7 +208,7 @@ func (i interactor) getMember(userID string, members []entity.Member) (bool, ent
 }
 
 // checkAtLeastOneAdmin indicates if there is at least one admin inside the members ignoring the given users.
-func (i interactor) checkAtLeastOneAdmin(skipUsers []entity.User, members []entity.Member) bool {
+func (i *interactor) checkAtLeastOneAdmin(skipUsers []entity.User, members []entity.Member) bool {
 	skipUsersMap := make(map[string]struct{}, len(skipUsers))
 	for _, u := range skipUsers {
 		skipUsersMap[u.ID] = struct{}{}

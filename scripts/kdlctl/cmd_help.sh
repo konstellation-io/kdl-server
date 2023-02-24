@@ -63,7 +63,7 @@ show_root_help() {
                     (ca.cert, server.crt, front-proxy-client.crt)
                     after this operation you must execute kdlctl.sh deploy.
 
-      uninstall     remove all resources form microk8s.
+      uninstall     remove all resources from microk8s.
 
     $(help_global_options)
 "

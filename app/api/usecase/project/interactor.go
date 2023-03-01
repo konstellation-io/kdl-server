@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"regexp"
-
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
@@ -14,6 +12,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
+	"regexp"
 )
 
 const (
@@ -35,6 +34,12 @@ type CreateProjectOption struct {
 	ExternalRepoCredential string
 	ExternalRepoAuthMethod entity.RepositoryAuthMethod
 	Owner                  entity.User
+}
+
+// DeleteProjectOption options when deleting a project.
+type DeleteProjectOption struct {
+	LoggedUser entity.User
+	ProjectID  string
 }
 
 // Validate check that the CreateProjectOption properties are valid.
@@ -98,36 +103,39 @@ func (c CreateProjectOption) Validate() error {
 
 // interactor implements the UseCase interface.
 type interactor struct {
-	logger       logging.Logger
-	repo         Repository
-	clock        clock.Clock
-	giteaService giteaservice.GiteaClient
-	minioService minioservice.MinioService
-	droneService droneservice.DroneService
-	k8sClient    k8s.Client
+	logger           logging.Logger
+	projectRepo      Repository
+	userActivityRepo UserActivityRepo
+	clock            clock.Clock
+	giteaService     giteaservice.GiteaClient
+	minioService     minioservice.MinioService
+	droneService     droneservice.DroneService
+	k8sClient        k8s.Client
 }
 
 // InteractorDeps encapsulates all project interactor dependencies.
 type InteractorDeps struct {
-	Logger       logging.Logger
-	Repo         Repository
-	Clock        clock.Clock
-	GiteaService giteaservice.GiteaClient
-	MinioService minioservice.MinioService
-	DroneService droneservice.DroneService
-	K8sClient    k8s.Client
+	Logger           logging.Logger
+	Repo             Repository
+	UserActivityRepo UserActivityRepo
+	Clock            clock.Clock
+	GiteaService     giteaservice.GiteaClient
+	MinioService     minioservice.MinioService
+	DroneService     droneservice.DroneService
+	K8sClient        k8s.Client
 }
 
 // NewInteractor is a constructor function.
 func NewInteractor(deps *InteractorDeps) UseCase {
 	return &interactor{
-		logger:       deps.Logger,
-		repo:         deps.Repo,
-		clock:        deps.Clock,
-		giteaService: deps.GiteaService,
-		minioService: deps.MinioService,
-		droneService: deps.DroneService,
-		k8sClient:    deps.K8sClient,
+		logger:           deps.Logger,
+		projectRepo:      deps.Repo,
+		userActivityRepo: deps.UserActivityRepo,
+		clock:            deps.Clock,
+		giteaService:     deps.GiteaService,
+		minioService:     deps.MinioService,
+		droneService:     deps.DroneService,
+		k8sClient:        deps.K8sClient,
 	}
 }
 
@@ -140,7 +148,7 @@ Depending on the repository type:
   - Create a k8s KDLProject containing a MLFLow instance
   - Create Minio bucket
   - Create Minio folders
-  - Activate Drone.io repo.
+  - Activate Drone.io projectRepo.
 */
 func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
 	// Validate the creation input
@@ -199,90 +207,114 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		return entity.Project{}, err
 	}
 
-	// Activate Drone.io repo
+	// Activate Drone.io projectRepo
 	err = i.droneService.ActivateRepository(opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err
 	}
 
 	// Store the project into the database
-	insertedID, err := i.repo.Create(ctx, project)
+	insertedID, err := i.projectRepo.Create(ctx, project)
 	if err != nil {
 		return entity.Project{}, err
 	}
 
 	i.logger.Infof("Created a new project \"%s\" with ID \"%s\"", project.Name, insertedID)
 
-	return i.repo.Get(ctx, insertedID)
+	return i.projectRepo.Get(ctx, insertedID)
 }
 
 // FindAll returns all the projects.
 func (i *interactor) FindAll(ctx context.Context) ([]entity.Project, error) {
 	i.logger.Info("Finding all projects")
-	return i.repo.FindAll(ctx)
+	return i.projectRepo.FindAll(ctx)
 }
 
 // GetByID returns the project with the desired identifier.
 func (i *interactor) GetByID(ctx context.Context, id string) (entity.Project, error) {
 	i.logger.Infof("Getting project with id \"%s\"", id)
-	return i.repo.Get(ctx, id)
+	return i.projectRepo.Get(ctx, id)
 }
 
 // Update changes the desired information about a project.
 func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
 	if !kdlutil.IsNilOrEmpty(opt.Name) {
-		err := i.repo.UpdateName(ctx, opt.ProjectID, *opt.Name)
+		err := i.projectRepo.UpdateName(ctx, opt.ProjectID, *opt.Name)
 		if err != nil {
 			return entity.Project{}, err
 		}
 	}
 
 	if !kdlutil.IsNilOrEmpty(opt.Description) {
-		err := i.repo.UpdateDescription(ctx, opt.ProjectID, *opt.Description)
+		err := i.projectRepo.UpdateDescription(ctx, opt.ProjectID, *opt.Description)
 		if err != nil {
 			return entity.Project{}, err
 		}
 	}
 
 	if opt.Archived != nil {
-		err := i.repo.UpdateArchived(ctx, opt.ProjectID, *opt.Archived)
+		err := i.projectRepo.UpdateArchived(ctx, opt.ProjectID, *opt.Archived)
 		if err != nil {
 			return entity.Project{}, err
 		}
 	}
 
-	return i.repo.Get(ctx, opt.ProjectID)
+	return i.projectRepo.Get(ctx, opt.ProjectID)
 }
 
-func (i *interactor) Delete(ctx context.Context, projectID string) (entity.Project, error) {
-	p, err := i.repo.Get(ctx, projectID)
+func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*entity.Project, error) {
+	projectID := opt.ProjectID
+
+	p, err := i.projectRepo.Get(ctx, projectID)
 	if err != nil {
-		return entity.Project{}, err
+		return nil, err
 	}
 
-	i.logger.Infof("Attempting to delete project with id \"%s\"", projectID)
+	i.logger.Infof("Attempting to delete project with id %q", projectID)
 
-	// Minio buckets are not desired to be erased
+	accessLevel := i.getMemberAccessLevel(opt.LoggedUser.ID, p.Members)
+	if accessLevel != entity.AccessLevelAdmin {
+		return nil, errors.New("only admin users can delete projects")
+	}
 
-	// Delete repo from Gitea
+	minioBackup, err := i.minioService.DeleteBucket(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
+
 	err = i.giteaService.DeleteRepo(p.ID)
 	if err != nil {
-		return entity.Project{}, err
+		return nil, err
 	}
 
-	// Delete k8s KDLProjectCR containing a MLFLow instance
 	err = i.k8sClient.DeleteKDLProjectCR(ctx, projectID)
 	if err != nil {
-		return entity.Project{}, err
+		return nil, err
 	}
 
-	// Delete info about the project from the MongoDB
-	err = i.repo.DeleteOne(ctx, projectID)
+	err = i.droneService.DeleteRepository(projectID)
 	if err != nil {
-		return entity.Project{}, err
+		return nil, err
 	}
 
-	i.logger.Infof("Project with id \"%s\" successfully deleted", projectID)
+	err = i.projectRepo.DeleteOne(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
 
-	return p, nil
+	deleteRepoActVars := entity.NewActivityVarsDeleteRepo(projectID, minioBackup)
+	deleteRepoUserAct := entity.UserActivity{
+		UserID: opt.LoggedUser.ID,
+		Type:   entity.UserActivityTypeDeleteProject,
+		Vars:   deleteRepoActVars,
+	}
+
+	err = i.userActivityRepo.Create(deleteRepoUserAct)
+	if err != nil {
+		return nil, err
+	}
+
+	i.logger.Infof("Project with id %q successfully deleted", projectID)
+
+	return &p, nil
 }

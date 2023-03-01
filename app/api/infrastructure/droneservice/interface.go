@@ -5,4 +5,5 @@ package droneservice
 // DroneService defines all Drone operations.
 type DroneService interface {
 	ActivateRepository(repoName string) error
+	DeleteRepository(repoName string) error
 }

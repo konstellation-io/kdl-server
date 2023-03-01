@@ -1937,7 +1937,6 @@ func (ec *executionContext) _Mutation_removeUsers(ctx context.Context, field gra
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -2012,7 +2011,6 @@ func (ec *executionContext) _Mutation_updateAccessLevel(ctx context.Context, fie
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -2087,7 +2085,6 @@ func (ec *executionContext) _Mutation_regenerateSSHKey(ctx context.Context, fiel
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -2151,7 +2148,6 @@ func (ec *executionContext) _Mutation_createProject(ctx context.Context, field g
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -2232,7 +2228,6 @@ func (ec *executionContext) _Mutation_updateProject(ctx context.Context, field g
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -2313,7 +2308,6 @@ func (ec *executionContext) _Mutation_deleteProject(ctx context.Context, field g
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		return graphql.Null
@@ -2391,7 +2385,6 @@ func (ec *executionContext) _Mutation_addMembers(ctx context.Context, field grap
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -2472,7 +2465,6 @@ func (ec *executionContext) _Mutation_removeMembers(ctx context.Context, field g
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -2553,7 +2545,6 @@ func (ec *executionContext) _Mutation_updateMembers(ctx context.Context, field g
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -2634,7 +2625,6 @@ func (ec *executionContext) _Mutation_addApiToken(ctx context.Context, field gra
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		return graphql.Null
@@ -2698,7 +2688,6 @@ func (ec *executionContext) _Mutation_removeApiToken(ctx context.Context, field 
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -2765,7 +2754,6 @@ func (ec *executionContext) _Mutation_setActiveUserTools(ctx context.Context, fi
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -2840,7 +2828,6 @@ func (ec *executionContext) _Mutation_syncUsers(ctx context.Context, field graph
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -3484,7 +3471,6 @@ func (ec *executionContext) _Query_me(ctx context.Context, field graphql.Collect
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -3548,7 +3534,6 @@ func (ec *executionContext) _Query_projects(ctx context.Context, field graphql.C
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -3618,7 +3603,6 @@ func (ec *executionContext) _Query_project(ctx context.Context, field graphql.Co
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -3699,7 +3683,6 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -3763,7 +3746,6 @@ func (ec *executionContext) _Query_qualityProjectDesc(ctx context.Context, field
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -3822,7 +3804,6 @@ func (ec *executionContext) _Query_runtimes(ctx context.Context, field graphql.C
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -3882,7 +3863,6 @@ func (ec *executionContext) _Query_runningRuntime(ctx context.Context, field gra
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		return graphql.Null
@@ -3939,7 +3919,6 @@ func (ec *executionContext) _Query_capabilities(ctx context.Context, field graph
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -3991,7 +3970,6 @@ func (ec *executionContext) _Query_runningCapability(ctx context.Context, field 
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		return graphql.Null
@@ -4040,7 +4018,6 @@ func (ec *executionContext) _Query_kubeconfig(ctx context.Context, field graphql
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4084,7 +4061,6 @@ func (ec *executionContext) _Query___type(ctx context.Context, field graphql.Col
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		return graphql.Null
@@ -4158,7 +4134,6 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		return graphql.Null
@@ -7393,7 +7368,12 @@ func (ec *executionContext) unmarshalInputAddMembersInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"projectId", "userIds"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "projectId":
 			var err error
@@ -7424,7 +7404,12 @@ func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"email", "username", "password", "accessLevel"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "email":
 			var err error
@@ -7471,7 +7456,12 @@ func (ec *executionContext) unmarshalInputApiTokenInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"userId", "name"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "userId":
 			var err error
@@ -7502,7 +7492,12 @@ func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "name", "description", "repository"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -7549,7 +7544,12 @@ func (ec *executionContext) unmarshalInputDeleteProjectInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -7572,7 +7572,12 @@ func (ec *executionContext) unmarshalInputExternalRepositoryInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"url", "username", "credential", "authMethod"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "url":
 			var err error
@@ -7619,7 +7624,12 @@ func (ec *executionContext) unmarshalInputRemoveApiTokenInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"apiTokenId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "apiTokenId":
 			var err error
@@ -7642,7 +7652,12 @@ func (ec *executionContext) unmarshalInputRemoveMembersInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"projectId", "userIds"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "projectId":
 			var err error
@@ -7673,7 +7688,12 @@ func (ec *executionContext) unmarshalInputRemoveUsersInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"userIds"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "userIds":
 			var err error
@@ -7696,7 +7716,12 @@ func (ec *executionContext) unmarshalInputRepositoryInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"type", "external"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "type":
 			var err error
@@ -7727,7 +7752,12 @@ func (ec *executionContext) unmarshalInputSetActiveUserToolsInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"active", "runtimeId", "capabilitiesId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "active":
 			var err error
@@ -7766,7 +7796,12 @@ func (ec *executionContext) unmarshalInputSetBoolFieldInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "value"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -7797,7 +7832,12 @@ func (ec *executionContext) unmarshalInputUpdateAccessLevelInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"userIds", "accessLevel"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "userIds":
 			var err error
@@ -7828,7 +7868,12 @@ func (ec *executionContext) unmarshalInputUpdateMembersInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"projectId", "userIds", "accessLevel"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "projectId":
 			var err error
@@ -7867,7 +7912,12 @@ func (ec *executionContext) unmarshalInputUpdateProjectInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"id", "name", "description", "archived"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "id":
 			var err error
@@ -8090,7 +8140,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	})
 
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
 	for i, field := range fields {
 		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
 			Object: field.Name,
@@ -8106,45 +8155,30 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_removeUsers(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "updateAccessLevel":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateAccessLevel(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "regenerateSSHKey":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_regenerateSSHKey(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "createProject":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createProject(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "updateProject":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateProject(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "deleteProject":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -8157,27 +8191,18 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_addMembers(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "removeMembers":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_removeMembers(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "updateMembers":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateMembers(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "addApiToken":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -8190,35 +8215,23 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_removeApiToken(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "setActiveUserTools":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_setActiveUserTools(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "syncUsers":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_syncUsers(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
 	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
 	return out
 }
 
@@ -8397,7 +8410,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	})
 
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
 	for i, field := range fields {
 		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
 			Object: field.Name,
@@ -8417,9 +8429,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_me(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -8440,9 +8449,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_projects(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -8463,9 +8469,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_project(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -8486,9 +8489,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_users(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -8509,9 +8509,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_qualityProjectDesc(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -8532,9 +8529,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_runtimes(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -8575,9 +8569,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_capabilities(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -8618,9 +8609,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_kubeconfig(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -8648,9 +8636,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		}
 	}
 	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
 	return out
 }
 

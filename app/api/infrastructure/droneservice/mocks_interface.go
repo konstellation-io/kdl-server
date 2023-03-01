@@ -46,3 +46,17 @@ func (mr *MockDroneServiceMockRecorder) ActivateRepository(repoName interface{})
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ActivateRepository", reflect.TypeOf((*MockDroneService)(nil).ActivateRepository), repoName)
 }
+
+// DeleteRepository mocks base method.
+func (m *MockDroneService) DeleteRepository(repoName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteRepository", repoName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteRepository indicates an expected call of DeleteRepository.
+func (mr *MockDroneServiceMockRecorder) DeleteRepository(repoName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRepository", reflect.TypeOf((*MockDroneService)(nil).DeleteRepository), repoName)
+}

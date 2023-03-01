@@ -178,6 +178,43 @@ func (mr *MockRepositoryMockRecorder) UpdateName(ctx, projectID, name interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateName", reflect.TypeOf((*MockRepository)(nil).UpdateName), ctx, projectID, name)
 }
 
+// MockUserActivityRepo is a mock of UserActivityRepo interface.
+type MockUserActivityRepo struct {
+	ctrl     *gomock.Controller
+	recorder *MockUserActivityRepoMockRecorder
+}
+
+// MockUserActivityRepoMockRecorder is the mock recorder for MockUserActivityRepo.
+type MockUserActivityRepoMockRecorder struct {
+	mock *MockUserActivityRepo
+}
+
+// NewMockUserActivityRepo creates a new mock instance.
+func NewMockUserActivityRepo(ctrl *gomock.Controller) *MockUserActivityRepo {
+	mock := &MockUserActivityRepo{ctrl: ctrl}
+	mock.recorder = &MockUserActivityRepoMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockUserActivityRepo) EXPECT() *MockUserActivityRepoMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method.
+func (m *MockUserActivityRepo) Create(activity entity.UserActivity) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", activity)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockUserActivityRepoMockRecorder) Create(activity interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUserActivityRepo)(nil).Create), activity)
+}
+
 // MockUseCase is a mock of UseCase interface.
 type MockUseCase struct {
 	ctrl     *gomock.Controller
@@ -232,17 +269,18 @@ func (mr *MockUseCaseMockRecorder) Create(ctx, opt interface{}) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockUseCase) Delete(ctx context.Context, projectID string) error {
+func (m *MockUseCase) Delete(ctx context.Context, opt DeleteProjectOption) (*entity.Project, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", ctx, projectID)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "Delete", ctx, opt)
+	ret0, _ := ret[0].(*entity.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockUseCaseMockRecorder) Delete(ctx, projectID interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) Delete(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockUseCase)(nil).Delete), ctx, projectID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockUseCase)(nil).Delete), ctx, opt)
 }
 
 // FindAll mocks base method.

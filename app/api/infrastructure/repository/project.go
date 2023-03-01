@@ -44,7 +44,7 @@ type projectMongoDBRepo struct {
 	collection *mongo.Collection
 }
 
-// NewProjectMongoDBRepo implements project.Repository interface.
+// NewProjectMongoDBRepo implements project.ProjectRepo interface.
 func NewProjectMongoDBRepo(logger logging.Logger, client *mongo.Client, dbName string) project.Repository {
 	collection := client.Database(dbName).Collection(projectCollName)
 	return &projectMongoDBRepo{logger, collection}

@@ -22,6 +22,11 @@ type Repository interface {
 	DeleteOne(ctx context.Context, projectID string) error
 }
 
+// UserActivityRepo interface to persist user actions for audit purposes.
+type UserActivityRepo interface {
+	Create(activity entity.UserActivity) error
+}
+
 // UseCase interface to manage all operations related with projects.
 type UseCase interface {
 	Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error)
@@ -31,5 +36,5 @@ type UseCase interface {
 	RemoveMembers(ctx context.Context, opt RemoveMembersOption) (entity.Project, error)
 	UpdateMembers(ctx context.Context, opt UpdateMembersOption) (entity.Project, error)
 	Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error)
-	Delete(ctx context.Context, projectID string) (entity.Project, error)
+	Delete(ctx context.Context, opt DeleteProjectOption) (*entity.Project, error)
 }

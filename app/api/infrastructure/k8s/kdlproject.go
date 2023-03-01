@@ -152,11 +152,11 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 func (k *k8sClient) DeleteKDLProjectCR(ctx context.Context, projectID string) error {
 	resName := k.getProjectName(projectID)
 
-	k.logger.Infof("Attempting to delete KDL Project CR with name \"%s\"", resName)
+	k.logger.Infof("Attempting to delete KDL Project CR with name %q", resName)
 
 	err := k.kdlprojectRes.Namespace(k.cfg.Kubernetes.Namespace).Delete(ctx, resName, *metav1.NewDeleteOptions(0))
 	if err == nil {
-		k.logger.Infof("The KDL Project CR with name \"%s\" was deleted correctly in k8s", resName)
+		k.logger.Infof("The KDL Project CR with name %q was deleted correctly in k8s", resName)
 	}
 
 	return err

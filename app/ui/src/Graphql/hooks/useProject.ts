@@ -2,16 +2,19 @@ import { ApolloCache, FetchResult, useMutation } from '@apollo/client';
 import { CreateProject, CreateProjectVariables } from 'Graphql/mutations/types/CreateProject';
 import { GetProjects, GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { UpdateProject, UpdateProjectVariables } from '../mutations/types/UpdateProject';
+import { DeleteProject, DeleteProjectVariables } from '../mutations/types/DeleteProject';
 
-import { CreateProjectInput } from '../types/globalTypes';
+import { CreateProjectInput, DeleteProjectInput } from '../types/globalTypes';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 
 import GetProjectsQuery from 'Graphql/queries/getProjects';
 import CreateProjectMutation from 'Graphql/mutations/createProject';
 import UpdateProjectMutation from 'Graphql/mutations/updateProject';
+import DeleteProjectMutation from 'Graphql/mutations/deleteProject';
 
 type UseProjectParams = {
   onUpdateCompleted?: () => void;
+  onDeleteCompleted?: () => void;
 };
 export default function useProject(options?: UseProjectParams) {
   const [mutationCreateProject, { data, error }] = useMutation<CreateProject, CreateProjectVariables>(
@@ -30,7 +33,16 @@ export default function useProject(options?: UseProjectParams) {
     },
   );
 
-  function updateCache(cache: ApolloCache<CreateProject>, write: (projects: GetProjects_projects[]) => void) {
+  const [mutationDeleteProject, { loading: deleteLoading }] = useMutation<DeleteProject, DeleteProjectVariables>(
+    DeleteProjectMutation,
+    {
+      onError: (e) => console.error(`deleteProject: ${e}`),
+      onCompleted: options?.onDeleteCompleted,
+      update: updateCacheDelete,
+    },
+  );
+
+  function updateCache(cache: ApolloCache<GetProjects>, write: (projects: GetProjects_projects[]) => void) {
     const cacheResult = cache.readQuery<GetProjects>({
       query: GetProjectsQuery,
     });
@@ -40,13 +52,26 @@ export default function useProject(options?: UseProjectParams) {
     }
   }
 
-  function updateCacheAdd(cache: ApolloCache<CreateProject>, { data: dataCreate }: FetchResult<CreateProject>) {
+  function updateCacheAdd(cache: ApolloCache<GetProjects>, { data: dataCreate }: FetchResult<CreateProject>) {
     if (dataCreate && dataCreate.createProject) {
       updateCache(cache, (projects) =>
         cache.writeQuery({
           query: GetProjectsQuery,
           data: {
             projects: [...projects, dataCreate.createProject],
+          },
+        }),
+      );
+    }
+  }
+
+  function updateCacheDelete(cache: ApolloCache<GetProjects>, { data: dataDelete }: FetchResult<DeleteProject>) {
+    if (dataDelete && dataDelete.deleteProject) {
+      updateCache(cache, (projects) =>
+        cache.writeQuery({
+          query: GetProjectsQuery,
+          data: {
+            projects: projects.filter((project) => project.id !== dataDelete.deleteProject?.id),
           },
         }),
       );
@@ -69,6 +94,10 @@ export default function useProject(options?: UseProjectParams) {
     mutationUpdateProject(mutationPayloadHelper({ id, archived }));
   }
 
+  function deleteProject(id: string) {
+    mutationDeleteProject(mutationPayloadHelper({ id }));
+  }
+
   return {
     addNewProject,
     updateProjectName,
@@ -76,6 +105,10 @@ export default function useProject(options?: UseProjectParams) {
     archiveProjectAction: {
       updateProjectArchived,
       loading,
+    },
+    deleteProjectAction: {
+      deleteProject,
+      loading: deleteLoading,
     },
     create: { data, error },
   };

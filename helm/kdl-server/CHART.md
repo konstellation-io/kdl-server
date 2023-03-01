@@ -11,10 +11,12 @@
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | backup.activeDeadlineSeconds | int | `3600` | Sets the activeDeadlineSeconds param for the backup cronjob. Ref: https://kubernetes.io/docs/concepts/workloads/controllers/job/#job-termination-and-cleanup |
-| backup.backoffLimit | int | `3` | Sets tge backoffLimit param for the backup cronjob. Ref: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy |
+| backup.backoffLimit | int | `3` | Sets the backoffLimit param for the backup cronjob. Ref: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy |
+| backup.concurrencyPolicy | string | `"Forbid"` | Specifies how to treat concurrent executions of a Job. Ref: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#concurrency-policy |
 | backup.enabled | bool | `false` | Whether to enable backup |
 | backup.extraVolumeMounts | list | `[]` | Extra volume mounts for backup pods |
 | backup.extraVolumes | list | `[]` | Extra volumes for backup pods |
+| backup.failedJobsHistoryLimit | int | `1` | The number of failed finished jobs to retain. Ref: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#jobs-history-limits |
 | backup.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | backup.image.repository | string | `"konstellation/kdl-backup"` | Image repository |
 | backup.image.tag | string | `"0.23.0"` | Image tag |
@@ -24,6 +26,9 @@
 | backup.s3.awsSecretAccessKey | string | `"aws-secret-access-key"` | AWS Secret Access Key for acceding backup bucket |
 | backup.s3.bucketName | string | `"s3-bucket-name"` | The S3 bucket that will store all backups |
 | backup.schedule | string | `"0 1 * * 0"` | Backup cronjob schedule |
+| backup.startingDeadlineSeconds | int | `60` | Optional deadline in seconds for starting the job if it misses scheduled time for any reason. Missed jobs executions will be counted as failed ones. Ref: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#job-creation |
+| backup.successfulJobsHistoryLimit | int | `0` | The number of successful finished jobs to retain. Ref: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#jobs-history-limits |
+| backup.ttlSecondsAfterFinished | string | `""` | Limits the lifetime of a Job that has finished execution (either Complete or Failed). |
 | cleaner.enabled | bool | `false` | Whether to enable cleaner cronjob |
 | cleaner.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | cleaner.image.repository | string | `"konstellation/cleaner"` | The image repository |
@@ -47,7 +52,7 @@
 | drone.tolerations | list | `[]` | If specified, the pod's tolerations. Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | droneAuthorizer.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | droneAuthorizer.image.repository | string | `"konstellation/drone-authorizer"` | The image repository |
-| droneAuthorizer.image.tag | string | `"v0.13.5"` | The image tag |
+| droneAuthorizer.image.tag | string | `"0.16.0"` | The image tag |
 | droneRunner.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | droneRunner.debug | string | `"true"` | Sets DRONE_DEBUG environment variable |
 | droneRunner.droneRunnerEnviron | string | `""` | Configures the DRONE_RUNNER_ENVIRON environment variable. Ref: https://docs.drone.io/runner/kubernetes/configuration/reference/drone-runner-environ/ |
@@ -89,7 +94,7 @@
 | kdlServer.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | kdlServer.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | kdlServer.image.repository | string | `"konstellation/kdl-server"` | The image repository |
-| kdlServer.image.tag | string | `"1.29.0"` | The image tag |
+| kdlServer.image.tag | string | `"1.35.0"` | The image tag |
 | kdlServer.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/proxy-body-size":"1000000m","nginx.ingress.kubernetes.io/proxy-connect-timeout":"3600","nginx.ingress.kubernetes.io/proxy-read-timeout":"3600","nginx.ingress.kubernetes.io/proxy-send-timeout":"3600"}` | Ingress annotations |
 | kdlServer.ingress.className | string | `"nginx"` | The ingress class name |
 | kdlServer.ingress.tls.secretName | string | `nil` | The TLS secret name that will be used. It takes precedence over `.Values.global.ingress.tls.secretName`. |
@@ -166,7 +171,7 @@
 | userToolsOperator.affinity | object | `{}` | Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ |
 | userToolsOperator.image.pullPolicy | string | `"IfNotPresent"` | The image pull policy |
 | userToolsOperator.image.repository | string | `"konstellation/user-tools-operator"` | The image repository |
-| userToolsOperator.image.tag | string | `"0.26.0"` | The image tag |
+| userToolsOperator.image.tag | string | `"0.29.0"` | The image tag |
 | userToolsOperator.ingress.annotations | object | `{"nginx.ingress.kubernetes.io/configuration-snippet":"more_set_headers \"Content-Security-Policy: frame-ancestors 'self' *\";\n","nginx.ingress.kubernetes.io/proxy-body-size":"1000000m"}` | Ingress annotations |
 | userToolsOperator.ingress.className | string | `"nginx"` | The ingress class name |
 | userToolsOperator.ingress.tls.secretName | string | `nil` | The TLS secret name that will be used. It takes precedence over `.Values.global.ingress.tls.secretName`. |

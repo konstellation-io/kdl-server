@@ -1,5 +1,5 @@
 {{ if .Values.backup.enabled }}
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: backup
@@ -7,16 +7,17 @@ metadata:
     app: backup
 spec:
   schedule: {{ .Values.backup.schedule | quote }}
-  concurrencyPolicy: Forbid
-  failedJobsHistoryLimit: 5
-  successfulJobsHistoryLimit: 2
-  startingDeadlineSeconds: 60 # 1min
+  concurrencyPolicy: {{ .Values.backup.concurrencyPolicy }}
+  failedJobsHistoryLimit: {{ .Values.backup.failedJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ .Values.backup.successfulJobsHistoryLimit }}
+  startingDeadlineSeconds: {{ .Values.backup.startingDeadlineSeconds }}
   jobTemplate:
     metadata:
       name: {{ .Values.backup.name }}
     spec:
       backoffLimit: {{ .Values.backup.backoffLimit }}
       activeDeadlineSeconds: {{ .Values.backup.activeDeadlineSeconds }}
+      ttlSecondsAfterFinished: {{ .Values.backup.ttlSecondsAfterFinished }}
       template:
         spec:
           securityContext:

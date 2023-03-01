@@ -47,7 +47,7 @@ function ProjectSettings({ project }: Props) {
             <TabMembers projectId={project.id} />
           </TabPanel>
           <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
-            <TabDangerZone projectId={project.id} />
+            <TabDangerZone projectId={project.id} projectName={project.name} />
           </TabPanel>
         </div>
       </Tabs>

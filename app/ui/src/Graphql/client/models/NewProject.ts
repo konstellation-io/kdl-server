@@ -24,7 +24,7 @@ export interface ExternalRepositoryValues {
   url: string;
   username: string;
   credential: string;
-  authMethod: RepositoryAuthMethod | null;
+  authMethod: RepositoryAuthMethod;
 }
 
 export interface ExternalRepositoryErrors {

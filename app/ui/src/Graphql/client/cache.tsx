@@ -10,7 +10,6 @@ import { PanelInfo } from './models/Panel';
 import { SettingsTab } from './models/SettingsTab';
 import { GetRuntimes_runtimes } from '../queries/types/GetRuntimes';
 import { GetCapabilities_capabilities } from '../queries/types/GetCapabilities';
-import { RepositoryAuthMethod } from '../types/globalTypes';
 
 type ToolName = keyof GetUserTools_project_toolUrls;
 
@@ -41,7 +40,7 @@ export const initialNewProject: NewProject = {
       url: '',
       username: '',
       credential: '',
-      authMethod: RepositoryAuthMethod.TOKEN,
+      authMethod: null,
     },
     errors: {
       url: 'This field is mandatory',

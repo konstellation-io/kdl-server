@@ -40,15 +40,11 @@ export interface CreateProjectInput {
   repository: RepositoryInput;
 }
 
-export interface DeleteProjectInput {
-  id: string;
-}
-
 export interface ExternalRepositoryInput {
   url: string;
   username: string;
   credential: string;
-  authMethod: RepositoryAuthMethod;
+  authMethod: RepositoryAuthMethod | null;
 }
 
 export interface RemoveApiTokenInput {

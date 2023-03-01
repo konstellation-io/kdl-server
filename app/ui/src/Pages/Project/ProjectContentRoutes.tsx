@@ -22,11 +22,13 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
     return openedProject.archived && <Redirect from={ROUTE.PROJECT} to={ROUTE.PROJECTS} />;
   }
 
+  function redirectIfDeleted() {
+    return !openedProject && <Redirect from={ROUTE.PROJECT} to={ROUTE.PROJECTS} />;
+  }
+
   function redirectIfToolsActives() {
     if (runtimeRunning && runtimeLoading === null) return;
-    return [ROUTE.PROJECT_TOOL_VSCODE].map((r) => (
-      <Redirect key={r} from={r} to={ROUTE.PROJECT_OVERVIEW} />
-    ));
+    return [ROUTE.PROJECT_TOOL_VSCODE].map((r) => <Redirect key={r} from={r} to={ROUTE.PROJECT_OVERVIEW} />);
   }
 
   function redirectDisabledKG() {
@@ -42,6 +44,7 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
       <Redirect exact from={ROUTE.PROJECT} to={ROUTE.PROJECT_OVERVIEW} />
 
       {redirectIfArchived()}
+      {redirectIfDeleted()}
       {redirectIfToolsActives()}
       {redirectDisabledKG()}
 

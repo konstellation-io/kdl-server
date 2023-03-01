@@ -38,10 +38,11 @@ export default function useProject(options?: UseProjectParams) {
     {
       onError: (e) => console.error(`deleteProject: ${e}`),
       onCompleted: options?.onDeleteCompleted,
+      update: updateCacheDelete,
     },
   );
 
-  function updateCache(cache: ApolloCache<CreateProject>, write: (projects: GetProjects_projects[]) => void) {
+  function updateCache(cache: ApolloCache<GetProjects>, write: (projects: GetProjects_projects[]) => void) {
     const cacheResult = cache.readQuery<GetProjects>({
       query: GetProjectsQuery,
     });
@@ -51,13 +52,26 @@ export default function useProject(options?: UseProjectParams) {
     }
   }
 
-  function updateCacheAdd(cache: ApolloCache<CreateProject>, { data: dataCreate }: FetchResult<CreateProject>) {
+  function updateCacheAdd(cache: ApolloCache<GetProjects>, { data: dataCreate }: FetchResult<CreateProject>) {
     if (dataCreate && dataCreate.createProject) {
       updateCache(cache, (projects) =>
         cache.writeQuery({
           query: GetProjectsQuery,
           data: {
             projects: [...projects, dataCreate.createProject],
+          },
+        }),
+      );
+    }
+  }
+
+  function updateCacheDelete(cache: ApolloCache<GetProjects>, { data: dataDelete }: FetchResult<DeleteProject>) {
+    if (dataDelete && dataDelete.deleteProject) {
+      updateCache(cache, (projects) =>
+        cache.writeQuery({
+          query: GetProjectsQuery,
+          data: {
+            projects: projects.filter((project) => project.id !== dataDelete.deleteProject?.id),
           },
         }),
       );

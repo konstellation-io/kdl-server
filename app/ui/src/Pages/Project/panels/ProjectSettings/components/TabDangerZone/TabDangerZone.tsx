@@ -9,6 +9,8 @@ import useBoolState from 'Hooks/useBoolState';
 import { ModalContainer, ModalLayoutInfo, TextInput } from 'kwc';
 import IconRemove from '@material-ui/icons/Delete';
 import { useState } from 'react';
+import ROUTE from 'Constants/routes';
+import { useHistory } from 'react-router-dom';
 
 type Props = {
   projectId: string;
@@ -22,20 +24,27 @@ function TabDangerZone({ projectId, projectName }: Props) {
   } = useProject({ onUpdateCompleted: handleUpdateCompleted, onDeleteCompleted: handleDeleteCompleted });
 
   const { activate: showArchiveModal, deactivate: closeArchiveModal, value: isArchiveModalVisible } = useBoolState();
-  const { activate: showDeleteModal, deactivate: closeDeleteModal, value: isDeleteModalVisible } = useBoolState(true);
+  const { activate: showDeleteModal, deactivate: closeDeleteModal, value: isDeleteModalVisible } = useBoolState();
   const [inputProjectName, setInputProjectName] = useState<string>('');
+
+  const { activate: setError, value: hasInputNameError } = useBoolState();
+
+  const history = useHistory();
 
   function handleUpdateCompleted() {
     toast.info('The project has been archived successfully!');
   }
 
   function handleDeleteCompleted() {
+    history.push(ROUTE.PROJECTS);
     toast.info('The project has been deleted successfully!');
   }
 
   function onDeleteProject() {
-    if (inputProjectName !== projectName) return;
-
+    if (inputProjectName !== projectName) {
+      setError();
+      return;
+    }
     deleteProject(projectId);
   }
 
@@ -69,7 +78,7 @@ function TabDangerZone({ projectId, projectName }: Props) {
             label: 'Delete',
             onClick: showDeleteModal,
             Icon: IconRemove,
-            loading,
+            loading: loadingDelete,
           }}
           theme={BOX_THEME.ERROR}
         />
@@ -110,7 +119,11 @@ function TabDangerZone({ projectId, projectName }: Props) {
           <div>
             Please type &quot;<span className={styles.projectName}>{projectName}</span>&quot; to confirm.
           </div>
-          <TextInput placeholder="Project name" onChange={setInputProjectName} />
+          <TextInput
+            placeholder="Project name"
+            onChange={setInputProjectName}
+            error={hasInputNameError ? 'The repository name you entered is incorrect.' : ''}
+          />
         </ModalContainer>
       )}
     </div>

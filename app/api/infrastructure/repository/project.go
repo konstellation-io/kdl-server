@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -183,7 +182,7 @@ func (m *projectMongoDBRepo) DeleteOne(ctx context.Context, projectID string) er
 
 	if res.DeletedCount != 1 {
 		m.logger.Errorf("Could not delete project \"\" from MongoDB", projectID)
-		return fmt.Errorf("number of projects deleted is not 1: %d", res.DeletedCount)
+		return NewErrWrongNumberProjectsDeleted(int(res.DeletedCount))
 	}
 
 	m.logger.Infof("Deleted project \"%s\" from MongoDB ", projectID)

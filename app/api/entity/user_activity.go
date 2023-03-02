@@ -23,11 +23,11 @@ type UserActivityVar struct {
 	Value string `bson:"value"`
 }
 
-func NewActivityVarsDeleteRepo(projectId, minioBackupBucket string) []UserActivityVar {
+func NewActivityVarsDeleteRepo(projectID, minioBackupBucket string) []UserActivityVar {
 	return []UserActivityVar{
 		{
 			Key:   "PROJECT_ID",
-			Value: projectId,
+			Value: projectID,
 		},
 		{
 			Key:   "MINIO_BACKUP_BUCKET",

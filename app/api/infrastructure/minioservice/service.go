@@ -83,8 +83,6 @@ func (m *minioService) DeleteBucket(ctx context.Context, bucketName string) (str
 		return "", err
 	}
 
-	m.logger.Infof("Created backup bucket %q for project %q", backupBucketName, bucketName)
-
 	objects := m.client.ListObjects(ctx, bucketName, minio.ListObjectsOptions{
 		Recursive: true,
 	})

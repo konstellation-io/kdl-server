@@ -19,7 +19,6 @@ describe('Capabilities Behaviour', () => {
   });
 
   describe('Sorting behaviour', () => {
-
     it('should sort the capabilities by the default values first', () => {
       // GIVEN there is no capabilities
       cy.kstInterceptor('GetCapabilities', { data: GetCapabilitiesQuery });
@@ -50,14 +49,12 @@ describe('Capabilities Behaviour', () => {
       cy.getByTestId('capabilitiesCrumb').click();
       cy.getByTestId('capabilitiesCrumb').contains('Capability Name 1');
     });
-
   });
 
-    describe('Default value selection behaviour', () => {
-
+  describe('Default value selection behaviour', () => {
     it('should select the default capability from the list of possible capabilities when there is more than one default capability by selecting the first value between the defaults', () => {
       // GIVEN there is no capabilities
-      cy.kstInterceptor('GetCapabilities', { data: {capabilities: [capability, capability3, capability2]}, });
+      cy.kstInterceptor('GetCapabilities', { data: { capabilities: [capability, capability3, capability2] } });
       // and there is not running capability
       cy.kstInterceptor('GetRunningCapabilities', { data: null });
 

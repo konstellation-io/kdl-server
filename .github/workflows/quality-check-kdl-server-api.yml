@@ -1,0 +1,65 @@
+name: KAI Lab API - Quality Check
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "app/api/*"
+  push:
+    paths:
+      - "app/api/*"
+
+jobs:
+  lint-dockerfile:
+    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.7.6
+    with:
+      component_path: app
+
+  quality-checks:
+    runs-on: ubuntu-20.04
+    needs: lint-dockerfile
+    steps:
+      - name: CheckOut
+        uses: actions/checkout@v3
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18.3
+      - name: API Go Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.45.0
+          working-directory: ./app/api
+          args: --timeout 5m
+          skip-pkg-cache: true
+          skip-build-cache: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: API Test
+        run: go test ./... -cover -v -coverprofile=coverage.out
+        working-directory: ./app/api
+      - name: API Archive code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: app/api/coverage.out
+
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    needs: quality-checks
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Download code coverage results
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage-report
+          path: app/api
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          projectBaseDir: app/api
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_API }}

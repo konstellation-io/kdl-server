@@ -75,7 +75,7 @@ const createProject = (name: string, id: string, customResponse?: Object) => {
 
   cy.getByTestId('externalRepositoryInputs').find('input').eq(0).type('http://test.com');
   cy.getByTestId('externalRepositoryInputs').find('input').eq(1).type('username-test');
-  cy.contains('Select one').click();
+  // cy.contains('Select one').click();
   cy.contains('TOKEN').click();
 
   cy.getByTestId('externalRepositoryInputs').find('input').eq(2).type('token-test');

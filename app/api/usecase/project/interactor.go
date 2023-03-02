@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
@@ -12,7 +14,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
-	"regexp"
 )
 
 const (
@@ -274,7 +275,7 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 
 	accessLevel := i.getMemberAccessLevel(opt.LoggedUser.ID, p.Members)
 	if accessLevel != entity.AccessLevelAdmin {
-		return nil, errors.New("only admin users can delete projects")
+		return nil, ErrWrongAccessLevel
 	}
 
 	minioBackup, err := i.minioService.DeleteBucket(ctx, projectID)

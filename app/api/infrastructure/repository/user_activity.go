@@ -2,10 +2,11 @@ package repository
 
 import (
 	"context"
+	"time"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
-	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -18,6 +19,7 @@ type UserActivityRepoMongoDB struct {
 
 func NewUserActivityRepoMongoDB(cfg *config.Config, logger logging.Logger, client *mongo.Client) *UserActivityRepoMongoDB {
 	collection := client.Database(cfg.MongoDB.DBName).Collection("userActivity")
+
 	return &UserActivityRepoMongoDB{
 		cfg,
 		logger,

@@ -2,34 +2,40 @@
 
 ## App
 
-|  Component  | Coverage  |  Bugs  |  Maintainability Rating  |
-| :---------: | :-----:   |  :---: |  :--------------------:  |
-|  App API  | [![coverage][app-api-coverage]][app-api-coverage-link] | [![bugs][app-api-bugs]][app-api-bugs-link] | [![mr][app-api-mr]][app-api-mr-link] |
-|  App UI  | [![coverage][app-ui-coverage]][app-ui-coverage-link] | [![bugs][app-ui-bugs]][app-ui-bugs-link] | [![mr][app-ui-mr]][app-ui-mr-link] |
+|  Component  | Coverage  |  Bugs  |  Maintainability Rating  |  Go report  |
+| :---------: | :-----:   |  :---: |  :--------------------:  |  :---: |
+|  App API  | [![coverage][app-api-coverage]][app-api-coverage-link] | [![bugs][app-api-bugs]][app-api-bugs-link] | [![mr][app-api-mr]][app-api-mr-link] | [![go-report][report-badge]][report-link] |
+|  App UI  | [![coverage][app-ui-coverage]][app-ui-coverage-link] | [![bugs][app-ui-bugs]][app-ui-bugs-link] | [![mr][app-ui-mr]][app-ui-mr-link] | - |
 
-[app-api-coverage]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_api&metric=coverage
+[report-badge]: https://goreportcard.com/badge/github.com/konstellation-io/kdl-server/app/api
 
-[app-api-coverage-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_api&metric=Coverage
+[report-link]: https://goreportcard.com/report/github.com/konstellation-io/kdl-server/app/api
 
-[app-api-bugs]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_api&metric=bugs
+[app-api-coverage]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab-app-api&metric=coverage
 
-[app-api-bugs-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_api&metric=Reliability
+[app-api-coverage-link]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab-app-api&metric=coverage
 
-[app-api-mr]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_api&metric=sqale_rating
+[app-api-bugs]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab-app-api&metric=bugs
 
-[app-api-mr-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_api&metric=Maintainability
+[app-api-bugs-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab-app-api&metric=Reliability
 
-[app-ui-coverage]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_ui&metric=coverage
+[app-api-mr]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab-app-api&metric=sqale_rating
 
-[app-ui-coverage-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_ui&metric=Coverage
+[app-api-mr-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab-app-api&metric=Maintainability
 
-[app-ui-bugs]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_ui&metric=bugs
+[app-ui-coverage]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab_app_ui&metric=coverage
 
-[app-ui-bugs-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_ui&metric=Reliability
+[app-ui-coverage-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab_app_ui&metric=Coverage
 
-[app-ui-mr]: https://sonarcloud.io/api/project_badges/measure?project=konstellation_kdl_server_app_ui&metric=sqale_rating
+[app-ui-bugs]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab_app_ui&metric=bugs
 
-[app-ui-mr-link]: https://sonarcloud.io/component_measures?id=konstellation_kdl_server_app_ui&metric=Maintainability
+[app-ui-bugs-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab_app_ui&metric=Reliability
+
+[app-ui-mr]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab_app_ui&metric=sqale_rating
+
+[app-ui-mr-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab_app_ui&metric=Maintainability
+
+---
 
 ## Helm Chart
 

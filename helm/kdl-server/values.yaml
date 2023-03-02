@@ -38,11 +38,26 @@ backup:
     # -- Image pull policy
     pullPolicy: IfNotPresent
 
+  # -- Specifies how to treat concurrent executions of a Job. Ref: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#concurrency-policy
+  concurrencyPolicy: Forbid
+
+  # -- The number of failed finished jobs to retain. Ref: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#jobs-history-limits
+  failedJobsHistoryLimit: 1
+
+  # -- The number of successful finished jobs to retain. Ref: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#jobs-history-limits
+  successfulJobsHistoryLimit: 0
+
+  # -- Optional deadline in seconds for starting the job if it misses scheduled time for any reason. Missed jobs executions will be counted as failed ones. Ref: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#job-creation
+  startingDeadlineSeconds: 60
+
+  # -- Sets the backoffLimit param for the backup cronjob. Ref: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy
+  backoffLimit: 3
+
   # -- Sets the activeDeadlineSeconds param for the backup cronjob. Ref: https://kubernetes.io/docs/concepts/workloads/controllers/job/#job-termination-and-cleanup
   activeDeadlineSeconds: 3600
 
-  # -- Sets tge backoffLimit param for the backup cronjob. Ref: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy
-  backoffLimit: 3
+  # -- Limits the lifetime of a Job that has finished execution (either Complete or Failed).
+  ttlSecondsAfterFinished: ""
 
   s3:
     # -- AWS Access Key ID for acceding backup bucket
@@ -311,7 +326,7 @@ kdlServer:
     # -- The image repository
     repository: konstellation/kdl-server
     # -- The image tag
-    tag: 1.35.0
+    tag: 1.36.0
     # -- The image pull policy
     pullPolicy: IfNotPresent
   ingress:

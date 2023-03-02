@@ -41,11 +41,11 @@ function RuntimeInfo({ selectedRuntime: runtime, isKubeconfigEnabled }: Props) {
           </div>
           <div className={styles.runtimeLabels}>
             {checkReady()}
-            {selectedCapability &&
+            {selectedCapability && (
               <div className={styles.capabilitiesTag} data-testid="capabilitiesTag">
                 {selectedCapability?.name}
               </div>
-            }
+            )}
           </div>
           <div className={styles.runtimeTags}>
             <LabelList runtime={runtime} />

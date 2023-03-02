@@ -267,7 +267,10 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 	projectID := opt.ProjectID
 
 	p, err := i.projectRepo.Get(ctx, projectID)
-	if err != nil {
+	if errors.Is(err, entity.ErrProjectNotFound) {
+		i.logger.Infof("Project %q doesn't exist, skipping", projectID)
+		return &entity.Project{}, nil
+	} else if err != nil {
 		return nil, err
 	}
 

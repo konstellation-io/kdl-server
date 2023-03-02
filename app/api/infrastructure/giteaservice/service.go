@@ -100,7 +100,7 @@ func (g *giteaService) MirrorRepo(url, repoName, userName, ownerUsername string,
 func (g *giteaService) DeleteRepo(repoName string) error {
 	_, err := g.client.DeleteRepo(kdlOrganization, repoName)
 	if err != nil {
-		g.logger.Infof("Could not delete Gitea repository with name %q ", repoName)
+		g.logger.Errorf("Could not delete Gitea repository with name %q", repoName)
 		return err
 	}
 

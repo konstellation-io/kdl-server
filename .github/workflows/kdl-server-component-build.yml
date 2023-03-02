@@ -4,15 +4,15 @@ on:
   pull_request:
     branches:
       - main
-      - "release/v*"
+      - 'release/v*'
     paths:
-      - "app/**/*"
+      - 'app/**/*'
   push:
     branches:
       - main
-      - "release/v*"
+      - 'release/v*'
     paths:
-      - "app/**/*"
+      - 'app/**/*'
 
 concurrency: build_component
 
@@ -58,7 +58,7 @@ jobs:
         name: API Go Lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.45.0
+          version: v1.51.2
           working-directory: ./app/api
           args: --timeout 5m
           skip-pkg-cache: true
@@ -68,7 +68,7 @@ jobs:
       - if: steps.changes.outputs.ui == 'true'
         uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: '14'
 
       - if: steps.changes.outputs.ui == 'true'
         name: UI Run tests
@@ -98,7 +98,7 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=6144
 
   build:
-    needs: [ lint-dockerfile, quality-checks ]
+    needs: [lint-dockerfile, quality-checks]
     uses: konstellation-io/github-workflows/.github/workflows/build.yaml@v1.7.6
     with:
       component: kdl-app

@@ -96,6 +96,19 @@ func (g *giteaService) MirrorRepo(url, repoName, userName, ownerUsername string,
 	return g.AddCollaborator(repoName, ownerUsername, entity.AccessLevelAdmin)
 }
 
+// DeleteRepo deletes an existing repo from Gitea.
+func (g *giteaService) DeleteRepo(repoName string) error {
+	_, err := g.client.DeleteRepo(kdlOrganization, repoName)
+	if err != nil {
+		g.logger.Errorf("Could not delete Gitea repository with name %q", repoName)
+		return err
+	}
+
+	g.logger.Infof("Deleted Gitea repository with name %q", repoName)
+
+	return err
+}
+
 // AddCollaborator adds a new collaborator to the given repository.
 func (g *giteaService) AddCollaborator(repoName, username string, accessLevel entity.AccessLevel) error {
 	var accessMode gitea.AccessMode

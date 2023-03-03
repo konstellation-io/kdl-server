@@ -182,18 +182,6 @@ func (mr *MockRepositoryMockRecorder) UpdateEmail(ctx, userID, email interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEmail", reflect.TypeOf((*MockRepository)(nil).UpdateEmail), ctx, userID, email)
 }
 
-func (m *MockRepository) UpdateUsername(ctx context.Context, userID, email string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateUsername", ctx, email, userID)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-func (mr *MockRepositoryMockRecorder) UpdateUsername(ctx, email, userID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUsername", reflect.TypeOf((*MockRepository)(nil).UpdateUsername), ctx, email, userID)
-}
-
 // UpdateSSHKey mocks base method.
 func (m *MockRepository) UpdateSSHKey(ctx context.Context, username string, SSHKey entity.SSHKey) error {
 	m.ctrl.T.Helper()
@@ -206,6 +194,20 @@ func (m *MockRepository) UpdateSSHKey(ctx context.Context, username string, SSHK
 func (mr *MockRepositoryMockRecorder) UpdateSSHKey(ctx, username, SSHKey interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSSHKey", reflect.TypeOf((*MockRepository)(nil).UpdateSSHKey), ctx, username, SSHKey)
+}
+
+// UpdateUsername mocks base method.
+func (m *MockRepository) UpdateUsername(ctx context.Context, email, userID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUsername", ctx, email, userID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateUsername indicates an expected call of UpdateUsername.
+func (mr *MockRepositoryMockRecorder) UpdateUsername(ctx, email, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUsername", reflect.TypeOf((*MockRepository)(nil).UpdateUsername), ctx, email, userID)
 }
 
 // MockUseCase is a mock of UseCase interface.
@@ -406,18 +408,18 @@ func (mr *MockUseCaseMockRecorder) ScheduleUsersSyncJob(interval interface{}) *g
 }
 
 // StartTools mocks base method.
-func (m *MockUseCase) StartTools(ctx context.Context, username string, runtimeID *string) (entity.User, error) {
+func (m *MockUseCase) StartTools(ctx context.Context, username string, runtimeID, capabilitiesID *string) (entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StartTools", ctx, username, runtimeID)
+	ret := m.ctrl.Call(m, "StartTools", ctx, username, runtimeID, capabilitiesID)
 	ret0, _ := ret[0].(entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // StartTools indicates an expected call of StartTools.
-func (mr *MockUseCaseMockRecorder) StartTools(ctx, username, runtimeID interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) StartTools(ctx, username, runtimeID, capabilitiesID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartTools", reflect.TypeOf((*MockUseCase)(nil).StartTools), ctx, username, runtimeID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartTools", reflect.TypeOf((*MockUseCase)(nil).StartTools), ctx, username, runtimeID, capabilitiesID)
 }
 
 // StopTools mocks base method.

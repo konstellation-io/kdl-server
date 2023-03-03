@@ -8,4 +8,5 @@ import "context"
 type MinioService interface {
 	CreateBucket(ctx context.Context, bucketName string) error
 	CreateProjectDirs(ctx context.Context, bucketName string) error
+	DeleteBucket(ctx context.Context, bucketName string) (string, error)
 }

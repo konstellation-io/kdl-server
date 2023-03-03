@@ -21,6 +21,7 @@ type Client interface {
 	GetRuntimeIDFromUserTools(ctx context.Context, username string) (string, error)
 	GetCapabilitiesIDFromUserTools(ctx context.Context, username string) (string, error)
 	CreateKDLProjectCR(ctx context.Context, projectID string) error
+	DeleteKDLProjectCR(ctx context.Context, projectID string) error
 	CreateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error
 	UpdateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error
 	GetUserSSHKeySecret(ctx context.Context, usernameSlug string) ([]byte, error)

@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - "app/api/*"
+      - 'app/api/*'
   push:
     paths:
-      - "app/api/*"
+      - 'app/api/*'
 
 jobs:
   lint-dockerfile:
@@ -28,7 +28,7 @@ jobs:
       - name: API Go Lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.45.0
+          version: v1.51.2
           working-directory: ./app/api
           args: --timeout 5m
           skip-pkg-cache: true

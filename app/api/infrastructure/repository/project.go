@@ -43,7 +43,7 @@ type projectMongoDBRepo struct {
 	collection *mongo.Collection
 }
 
-// NewProjectMongoDBRepo implements project.Repository interface.
+// NewProjectMongoDBRepo implements project.ProjectRepo interface.
 func NewProjectMongoDBRepo(logger logging.Logger, client *mongo.Client, dbName string) project.Repository {
 	collection := client.Database(dbName).Collection(projectCollName)
 	return &projectMongoDBRepo{logger, collection}
@@ -168,6 +168,26 @@ func (m *projectMongoDBRepo) UpdateDescription(ctx context.Context, projectID, d
 // UpdateArchived changes the archived field for the given project.
 func (m *projectMongoDBRepo) UpdateArchived(ctx context.Context, projectID string, archived bool) error {
 	return m.updateProjectFields(ctx, projectID, bson.M{"archived": archived})
+}
+
+func (m *projectMongoDBRepo) DeleteOne(ctx context.Context, projectID string) error {
+	filter := bson.M{
+		"_id": projectID,
+	}
+
+	res, err := m.collection.DeleteOne(ctx, filter)
+	if err != nil {
+		m.logger.Errorf("Could not delete project \"\" from MongoDB", projectID)
+	}
+
+	if res.DeletedCount != 1 {
+		m.logger.Errorf("Could not delete project \"\" from MongoDB", projectID)
+		return NewErrWrongNumberProjectsDeleted(int(res.DeletedCount))
+	}
+
+	m.logger.Infof("Deleted project \"%s\" from MongoDB ", projectID)
+
+	return nil
 }
 
 func (m *projectMongoDBRepo) updateProjectFields(ctx context.Context, projectID string, fields bson.M) error {

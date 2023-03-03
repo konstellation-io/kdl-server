@@ -55,7 +55,6 @@ linters:
   disable-all: true
   enable:
     - bodyclose
-    - deadcode
     - depguard
     - dogsled
     - dupl
@@ -78,15 +77,12 @@ linters:
     - nakedret
     - noctx
     - nolintlint
-    - rowserrcheck
     - staticcheck
-    - structcheck
     - stylecheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
     - whitespace
     - asciicheck
     - gochecknoglobals
@@ -107,7 +103,7 @@ issues:
     # https://github.com/go-critic/go-critic/issues/926
     - linters:
         - gocritic
-      text: "unnecessaryDefer:"
+      text: 'unnecessaryDefer:'
   # Disable default exclude rules
   exclude-use-default: false
   exclude:

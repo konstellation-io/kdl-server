@@ -75,3 +75,16 @@ func (d *droneService) ActivateRepository(repoName string) error {
 
 	return nil
 }
+
+// DeleteRepository deletes a repository in drone.
+func (d *droneService) DeleteRepository(repoName string) error {
+	d.logger.Infof("Deleting %q repository in Drone...", repoName)
+
+	err := d.client.RepoDelete(repoOrg, repoName)
+	if err != nil {
+		d.logger.Error(err.Error())
+		return fmt.Errorf("error deleting repo: %w", err)
+	}
+
+	return nil
+}

@@ -61,3 +61,18 @@ func (mr *MockMinioServiceMockRecorder) CreateProjectDirs(ctx, bucketName interf
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProjectDirs", reflect.TypeOf((*MockMinioService)(nil).CreateProjectDirs), ctx, bucketName)
 }
+
+// DeleteBucket mocks base method.
+func (m *MockMinioService) DeleteBucket(ctx context.Context, bucketName string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteBucket", ctx, bucketName)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteBucket indicates an expected call of DeleteBucket.
+func (mr *MockMinioServiceMockRecorder) DeleteBucket(ctx, bucketName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBucket", reflect.TypeOf((*MockMinioService)(nil).DeleteBucket), ctx, bucketName)
+}

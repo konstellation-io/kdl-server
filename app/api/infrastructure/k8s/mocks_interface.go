@@ -102,9 +102,23 @@ func (m *MockClient) CreateUserToolsCR(ctx context.Context, username, runtimeID,
 }
 
 // CreateUserToolsCR indicates an expected call of CreateUserToolsCR.
-func (mr *MockClientMockRecorder) CreateUserToolsCR(ctx, username, runtimeID, runtimeImage, runtimeTag interface{}, capabilities entity.Capabilities) *gomock.Call {
+func (mr *MockClientMockRecorder) CreateUserToolsCR(ctx, username, runtimeID, runtimeImage, runtimeTag, capabilities interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserToolsCR", reflect.TypeOf((*MockClient)(nil).CreateUserToolsCR), ctx, username, runtimeID, runtimeImage, runtimeTag, capabilities)
+}
+
+// DeleteKDLProjectCR mocks base method.
+func (m *MockClient) DeleteKDLProjectCR(ctx context.Context, projectID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteKDLProjectCR", ctx, projectID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteKDLProjectCR indicates an expected call of DeleteKDLProjectCR.
+func (mr *MockClientMockRecorder) DeleteKDLProjectCR(ctx, projectID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteKDLProjectCR", reflect.TypeOf((*MockClient)(nil).DeleteKDLProjectCR), ctx, projectID)
 }
 
 // DeleteUserServiceAccount mocks base method.
@@ -135,6 +149,21 @@ func (mr *MockClientMockRecorder) DeleteUserToolsCR(ctx, username interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserToolsCR", reflect.TypeOf((*MockClient)(nil).DeleteUserToolsCR), ctx, username)
 }
 
+// GetCapabilitiesIDFromUserTools mocks base method.
+func (m *MockClient) GetCapabilitiesIDFromUserTools(ctx context.Context, username string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCapabilitiesIDFromUserTools", ctx, username)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCapabilitiesIDFromUserTools indicates an expected call of GetCapabilitiesIDFromUserTools.
+func (mr *MockClientMockRecorder) GetCapabilitiesIDFromUserTools(ctx, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCapabilitiesIDFromUserTools", reflect.TypeOf((*MockClient)(nil).GetCapabilitiesIDFromUserTools), ctx, username)
+}
+
 // GetRuntimeIDFromUserTools mocks base method.
 func (m *MockClient) GetRuntimeIDFromUserTools(ctx context.Context, username string) (string, error) {
 	m.ctrl.T.Helper()
@@ -148,19 +177,6 @@ func (m *MockClient) GetRuntimeIDFromUserTools(ctx context.Context, username str
 func (mr *MockClientMockRecorder) GetRuntimeIDFromUserTools(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRuntimeIDFromUserTools", reflect.TypeOf((*MockClient)(nil).GetRuntimeIDFromUserTools), ctx, username)
-}
-
-func (m *MockClient) GetCapabilitiesIDFromUserTools(ctx context.Context, username string) (string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCapabilitiesIDFromUserTools", ctx, username)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-func (mr *MockClientMockRecorder) GetCapabilitiesIDFromUserTools(ctx context.Context, username interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCapabilitiesIDFromUserTools", reflect.TypeOf((*MockClient)(nil).GetCapabilitiesIDFromUserTools), ctx, username)
 }
 
 // GetSecret mocks base method.

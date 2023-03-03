@@ -17,6 +17,7 @@ type Mutation {
   regenerateSSHKey: User!
   createProject(input: CreateProjectInput!): Project!
   updateProject(input: UpdateProjectInput!): Project!
+  deleteProject(input: DeleteProjectInput!): Project
   addMembers(input: AddMembersInput!): Project!
   removeMembers(input: RemoveMembersInput!): Project!
   updateMembers(input: UpdateMembersInput!): Project!
@@ -109,6 +110,10 @@ input UpdateProjectInput {
   name: String
   description: String
   archived: Boolean
+}
+
+input DeleteProjectInput {
+  id: ID!
 }
 
 input AddMembersInput {

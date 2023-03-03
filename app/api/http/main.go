@@ -72,23 +72,26 @@ func main() {
 	userRepo := repository.NewUserMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 	runtimeRepo := repository.NewRuntimeMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 	capabilitiesRepo := repository.NewCapabilitiesMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
+	userActivityRepo := repository.NewUserActivityRepoMongoDB(&cfg, logger, mongodbClient)
 
 	err = userRepo.EnsureIndexes()
 	if err != nil {
 		logger.Errorf("Error creating indexes for users: %s", err)
 	}
 
-	userInteractor := user.NewInteractor(logger, cfg, userRepo, runtimeRepo, capabilitiesRepo, sshHelper, realClock, giteaService, k8sClient)
+	userInteractor := user.NewInteractor(logger, cfg, userRepo, runtimeRepo, capabilitiesRepo,
+		sshHelper, realClock, giteaService, k8sClient)
 	initUserInteractor(userInteractor, cfg, logger)
 
 	projectDeps := &project.InteractorDeps{
-		Logger:       logger,
-		Repo:         projectRepo,
-		Clock:        realClock,
-		GiteaService: giteaService,
-		MinioService: minioService,
-		DroneService: droneService,
-		K8sClient:    k8sClient,
+		Logger:           logger,
+		Repo:             projectRepo,
+		Clock:            realClock,
+		GiteaService:     giteaService,
+		MinioService:     minioService,
+		DroneService:     droneService,
+		K8sClient:        k8sClient,
+		UserActivityRepo: userActivityRepo,
 	}
 
 	projectInteractor := project.NewInteractor(projectDeps)

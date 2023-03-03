@@ -5,10 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+
+	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
 var (
@@ -63,7 +65,7 @@ func (m *minioService) CreateProjectDirs(ctx context.Context, bucketName string)
 	}
 
 	for _, f := range folders {
-		// Creating an empty file with a ending slash in the name, is the only way to create empty dirs in Minio
+		// Creating an empty file with an ending slash in the name, is the only way to create empty dirs in Minio
 		_, err := m.client.PutObject(ctx, bucketName, f, bytes.NewReader([]byte{}), 0, minio.PutObjectOptions{})
 		if err != nil {
 			return err
@@ -71,4 +73,52 @@ func (m *minioService) CreateProjectDirs(ctx context.Context, bucketName string)
 	}
 
 	return nil
+}
+
+func (m *minioService) DeleteBucket(ctx context.Context, bucketName string) (string, error) {
+	backupBucketName := fmt.Sprintf("%s-backup-%d", bucketName, time.Now().UnixMilli())
+
+	err := m.CreateBucket(ctx, backupBucketName)
+	if err != nil {
+		return "", err
+	}
+
+	objects := m.client.ListObjects(ctx, bucketName, minio.ListObjectsOptions{
+		Recursive: true,
+	})
+
+	m.logger.Debugf("Copying content from bucket %q to bucket %q", bucketName, backupBucketName)
+
+	for object := range objects {
+		if object.Err != nil {
+			return "", fmt.Errorf("error listing objects: %w", object.Err)
+		}
+
+		dstOpt := minio.CopyDestOptions{
+			Bucket: backupBucketName,
+			Object: object.Key,
+		}
+		srcOpt := minio.CopySrcOptions{
+			Bucket: bucketName,
+			Object: object.Key,
+		}
+
+		_, err := m.client.CopyObject(ctx, dstOpt, srcOpt)
+		if err != nil {
+			return "", fmt.Errorf("error copying object: %w", err)
+		}
+	}
+
+	removeBucketOpts := minio.RemoveBucketOptions{
+		ForceDelete: true,
+	}
+
+	err = m.client.RemoveBucketWithOptions(ctx, bucketName, removeBucketOpts)
+	if err != nil {
+		return "", fmt.Errorf("error deleting bucket: %w", err)
+	}
+
+	m.logger.Infof("Bucket %q removed", bucketName)
+
+	return backupBucketName, nil
 }

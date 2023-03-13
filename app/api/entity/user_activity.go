@@ -37,7 +37,6 @@ func NewActivityVarsDeleteRepo(projectID, minioBackupBucket string) []UserActivi
 }
 
 type UserActivity struct {
-	ID     string            `bson:"_id"`
 	Date   time.Time         `bson:"date"`
 	UserID string            `bson:"userId"`
 	Type   UserActivityType  `bson:"type"`

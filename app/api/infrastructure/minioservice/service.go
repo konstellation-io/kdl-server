@@ -48,12 +48,12 @@ func (m *minioService) CreateBucket(ctx context.Context, bucketName string) erro
 			return err
 		}
 
-		m.logger.Infof("Created bucket \"%s\" in Minio", bucketName)
+		m.logger.Infof("Created bucket %q in Minio", bucketName)
 
 		return nil
 	}
 
-	return fmt.Errorf("%w: bucket name \"%s\"", ErrBucketAlreadyExists, bucketName)
+	return fmt.Errorf("%w: bucket name %q", ErrBucketAlreadyExists, bucketName)
 }
 
 func (m *minioService) CreateProjectDirs(ctx context.Context, bucketName string) error {

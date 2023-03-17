@@ -73,7 +73,7 @@ func NewInteractor(
 // - Creates a new secret in Kubernetes with the generated SSH keys.
 // - Created a service account for the user.
 func (i *interactor) Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error) {
-	i.logger.Infof("Creating user \"%s\" with email \"%s\"", username, email)
+	i.logger.Infof("Creating user %q with email %q", username, email)
 
 	// Check if the user already exists
 	_, err := i.repo.GetByUsername(ctx, username)
@@ -120,7 +120,7 @@ func (i *interactor) Create(ctx context.Context, email, username string, accessL
 		return entity.User{}, err
 	}
 
-	i.logger.Infof("The user \"%s\" (%s) was created with ID \"%s\"", user.Username, user.Email, insertedID)
+	i.logger.Infof("The user %q (%s) was created with ID %q", user.Username, user.Email, insertedID)
 
 	err = i.k8sClient.CreateUserSSHKeySecret(ctx, user, keys.Public, keys.Private)
 	if err != nil {
@@ -144,7 +144,7 @@ func (i *interactor) FindAll(ctx context.Context) ([]entity.User, error) {
 
 // GetByUsername returns the user with the desired username or returns entity.ErrUserNotFound if the user doesn't exist.
 func (i *interactor) GetByUsername(ctx context.Context, username string) (entity.User, error) {
-	i.logger.Infof("Getting user by username \"%s\"", username)
+	i.logger.Infof("Getting user by username %q", username)
 	return i.repo.GetByUsername(ctx, username)
 }
 
@@ -181,7 +181,7 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeID,
 		rID = r.ID
 		rImage = r.DockerImage
 		rTag = r.DockerTag
-		i.logger.Debugf("Runtime id \"%s\" with docker image \"%s:%s\"", rID, rImage, rTag)
+		i.logger.Debugf("Runtime id %q with docker image \"%s:%s\"", rID, rImage, rTag)
 	} else {
 		rID = "default"
 		rImage = i.cfg.UserToolsVsCodeRuntime.Image.Repository
@@ -197,7 +197,7 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeID,
 		}
 	}
 
-	i.logger.Infof("Creating user tools for user: \"%s\"", username)
+	i.logger.Infof("Creating user tools for user: %q", username)
 
 	err = i.k8sClient.CreateUserToolsCR(ctx, username, rID, rImage, rTag, retrievedCapabilities)
 	if err != nil {
@@ -224,7 +224,7 @@ func (i *interactor) StopTools(ctx context.Context, username string) (entity.Use
 		return entity.User{}, ErrStopUserTools
 	}
 
-	i.logger.Infof("Deleting user tools for user: \"%s\"", username)
+	i.logger.Infof("Deleting user tools for user: %q", username)
 
 	err = i.k8sClient.DeleteUserToolsCR(ctx, username)
 	if err != nil {
@@ -286,7 +286,7 @@ func (i *interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, le
 // - Update public key on Gitea
 // - Update ssh keys for user in database.
 func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error) {
-	i.logger.Infof("Regenerating user SSH keys for user \"%s\" ", user.Username)
+	i.logger.Infof("Regenerating user SSH keys for user %q ", user.Username)
 
 	// Check if userTools are running
 	userToolsRunning, err := i.AreToolsRunning(ctx, user.Username)
@@ -322,7 +322,7 @@ func (i *interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 		return entity.User{}, err
 	}
 
-	i.logger.Infof("The SSH keys for user \"%s\" has been successfully regenerated", user.Username)
+	i.logger.Infof("The SSH keys for user %q has been successfully regenerated", user.Username)
 
 	return i.repo.GetByUsername(ctx, user.Username)
 }
@@ -359,7 +359,7 @@ func (i *interactor) CreateAdminUser(username, email string) error {
 
 	_, err := i.repo.GetByUsername(ctx, username)
 	if err == nil {
-		i.logger.Debugf("The admin user \"%s\" already exists", username)
+		i.logger.Debugf("The admin user %q already exists", username)
 		return nil
 	}
 
@@ -367,14 +367,14 @@ func (i *interactor) CreateAdminUser(username, email string) error {
 		return err
 	}
 
-	i.logger.Debugf("Creating the admin user \"%s\"...", username)
+	i.logger.Debugf("Creating the admin user %q...", username)
 
 	user, err := i.Create(ctx, email, username, entity.AccessLevelAdmin)
 	if err != nil {
 		return err
 	}
 
-	i.logger.Debugf("Admin user \"%s\" (%s) created correctly with id \"%s\"", user.Username, user.Email, user.ID)
+	i.logger.Debugf("Admin user %q (%s) created correctly with id %q", user.Username, user.Email, user.ID)
 
 	return nil
 }
@@ -393,7 +393,7 @@ func (i *interactor) GetKubeconfig(ctx context.Context, username string) (string
 
 	usernameSlug := slug.Make(username)
 
-	i.logger.Debugf("Getting kubeconfig for user \"%s\"", usernameSlug)
+	i.logger.Debugf("Getting kubeconfig for user %q", usernameSlug)
 
 	kubeconfig, err := i.k8sClient.GetUserKubeconfig(ctx, usernameSlug)
 	if err != nil {

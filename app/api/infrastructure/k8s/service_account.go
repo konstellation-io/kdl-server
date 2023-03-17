@@ -30,7 +30,7 @@ func (k k8sClient) getUserServiceAccountName(usernameSlug string) string {
 
 // CreateUserServiceAccount creates a new k8s serviceAccount for a user.
 func (k *k8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
-	k.logger.Infof("Creating service account for user \"%s\" in k8s...", usernameSlug)
+	k.logger.Infof("Creating service account for user %q in k8s...", usernameSlug)
 
 	sa := k.newServiceAccount(usernameSlug)
 
@@ -39,14 +39,14 @@ func (k *k8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug s
 		return nil, err
 	}
 
-	k.logger.Infof("The service account \"%s\" was created in k8s correctly", serviceAccount.Name)
+	k.logger.Infof("The service account %q was created in k8s correctly", serviceAccount.Name)
 
 	return serviceAccount, nil
 }
 
 // DeleteUserServiceAccount delete a serviceAccount.
 func (k *k8sClient) DeleteUserServiceAccount(ctx context.Context, usernameSlug string) error {
-	k.logger.Infof("Deleting service account for user \"%s\" in k8s...", usernameSlug)
+	k.logger.Infof("Deleting service account for user %q in k8s...", usernameSlug)
 
 	saName := k.getUserServiceAccountName(usernameSlug)
 

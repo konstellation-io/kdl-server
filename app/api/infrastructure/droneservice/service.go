@@ -39,7 +39,7 @@ func NewDroneService(logger logging.Logger, url, token string) DroneService {
 
 // ActivateRepository activates a repository in drone.
 func (d *droneService) ActivateRepository(repoName string) error {
-	d.logger.Infof("Activating \"%s\" repository in Drone...", repoName)
+	d.logger.Infof("Activating %q repository in Drone...", repoName)
 
 	repos, err := d.client.RepoListSync()
 	if err != nil {

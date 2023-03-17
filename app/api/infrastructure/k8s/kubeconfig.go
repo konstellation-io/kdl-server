@@ -24,7 +24,7 @@ func (k *k8sClient) extractServiceAccountSecretInfo(ctx context.Context, service
 
 	secret, err := k.GetSecret(ctx, secretName)
 	if err != nil {
-		k.logger.Infof("error retrieving secret \"%s\"", secretName)
+		k.logger.Infof("error retrieving secret %q", secretName)
 		return nil, nil, ErrReadingSecretInServiceAccount
 	}
 

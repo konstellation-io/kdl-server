@@ -23,7 +23,7 @@ func main() {
 	}
 
 	if exists {
-		log.Printf("The \"%s\" oAuth2 application already exists in Gitea, nothing to do.\n", cfg.Gitea.AppName)
+		log.Printf("The %q oAuth2 application already exists in Gitea, nothing to do.\n", cfg.Gitea.AppName)
 		os.Exit(0)
 	}
 
@@ -46,8 +46,8 @@ func main() {
 	}
 	err = k8s.CreateSecret(ctx, cfg.Credentials.SecretName, secretValues)
 	if err != nil {
-		log.Fatalf("Error creating \"%s\" k8s secret credentials: %s\n", cfg.Credentials.SecretName, err)
+		log.Fatalf("Error creating %q k8s secret credentials: %s\n", cfg.Credentials.SecretName, err)
 	}
 
-	log.Printf("The oAuth2 application \"%s\" was created correctly.", cfg.Gitea.AppName)
+	log.Printf("The oAuth2 application %q was created correctly.", cfg.Gitea.AppName)
 }

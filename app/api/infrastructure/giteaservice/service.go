@@ -40,7 +40,7 @@ func (g *giteaService) AddSSHKey(username, publicSSHKey string) error {
 		return err
 	}
 
-	g.logger.Infof("Created public SSH key for user \"%s\" in Gitea with id \"%d\"", username, key.ID)
+	g.logger.Infof("Created public SSH key for user %q in Gitea with id \"%d\"", username, key.ID)
 
 	return nil
 }
@@ -60,7 +60,7 @@ func (g *giteaService) UpdateSSHKey(username, publicSSHKey string) error {
 			return err
 		}
 
-		g.logger.Infof("Deleted public SSH key for user \"%s\" in Gitea with id \"%d\"", username, keyID)
+		g.logger.Infof("Deleted public SSH key for user %q in Gitea with id \"%d\"", username, keyID)
 	}
 
 	return g.AddSSHKey(username, publicSSHKey)
@@ -91,7 +91,7 @@ func (g *giteaService) MirrorRepo(url, repoName, userName, ownerUsername string,
 		return err
 	}
 
-	g.logger.Infof("Mirrored repository from \"%s\" in organization \"%s\" in Gitea with id \"%d\"", url, kdlOrganization, repo.ID)
+	g.logger.Infof("Mirrored repository from %q in organization %q in Gitea with id \"%d\"", url, kdlOrganization, repo.ID)
 
 	return g.AddCollaborator(repoName, ownerUsername, entity.AccessLevelAdmin)
 }
@@ -130,7 +130,7 @@ func (g *giteaService) AddCollaborator(repoName, username string, accessLevel en
 		return err
 	}
 
-	g.logger.Infof("Added \"%s\" collaborator to Gitea repository \"%s\" with access level \"%s\"", username, repoName, accessLevel)
+	g.logger.Infof("Added %q collaborator to Gitea repository %q with access level %q", username, repoName, accessLevel)
 
 	return nil
 }
@@ -142,7 +142,7 @@ func (g *giteaService) RemoveCollaborator(repoName, username string) error {
 		return err
 	}
 
-	g.logger.Infof("Removed \"%s\" collaborator from Gitea repository \"%s\"", username, repoName)
+	g.logger.Infof("Removed %q collaborator from Gitea repository %q", username, repoName)
 
 	return nil
 }

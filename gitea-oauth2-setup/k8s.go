@@ -67,7 +67,7 @@ func newKubernetesConfig(config *Config) *rest.Config {
 
 // IsSecretPresent checks if there is a secret with the given name
 func (k *K8s) IsSecretPresent(ctx context.Context, name string) (bool, error) {
-	log.Printf("Checking if secret \"%s\" is present\n", name)
+	log.Printf("Checking if secret %q is present\n", name)
 
 	_, err := k.client.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Get(ctx, name, metav1.GetOptions{})
 	if err != nil && !k8s_errors.IsNotFound(err) {
@@ -79,7 +79,7 @@ func (k *K8s) IsSecretPresent(ctx context.Context, name string) (bool, error) {
 
 // CreateSecret creates a secret on kubernetes with the given data
 func (k *K8s) CreateSecret(ctx context.Context, name string, input map[string]string) error {
-	log.Printf("Creating secret \"%s\"...\n", name)
+	log.Printf("Creating secret %q...\n", name)
 
 	data := map[string][]byte{}
 	for key, v := range input {

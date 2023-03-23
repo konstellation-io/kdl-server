@@ -220,7 +220,7 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		return entity.Project{}, err
 	}
 
-	i.logger.Infof("Created a new project \"%s\" with ID \"%s\"", project.Name, insertedID)
+	i.logger.Infof("Created a new project %q with ID %q", project.Name, insertedID)
 
 	return i.projectRepo.Get(ctx, insertedID)
 }
@@ -233,7 +233,7 @@ func (i *interactor) FindAll(ctx context.Context) ([]entity.Project, error) {
 
 // GetByID returns the project with the desired identifier.
 func (i *interactor) GetByID(ctx context.Context, id string) (entity.Project, error) {
-	i.logger.Infof("Getting project with id \"%s\"", id)
+	i.logger.Infof("Getting project with id %q", id)
 	return i.projectRepo.Get(ctx, id)
 }
 

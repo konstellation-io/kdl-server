@@ -136,7 +136,7 @@ func (i *interactor) syncAddUsers(ctx context.Context, users []entity.User, wg *
 
 			_, err := i.Create(ctx, userToAdd.Email, userToAdd.Username, entity.AccessLevelViewer)
 			if err != nil {
-				i.logger.Errorf("Error creating user \"%s\": %s", userToAdd.Username, err)
+				i.logger.Errorf("Error creating user %q: %s", userToAdd.Username, err)
 			}
 		}(u)
 	}
@@ -151,7 +151,7 @@ func (i *interactor) syncUpdateUserEmails(ctx context.Context, users []entity.Us
 
 			err := i.repo.UpdateEmail(ctx, userToUpd.Username, userToUpd.Email)
 			if err != nil {
-				i.logger.Errorf("Error updating user \"%s\": %s", userToUpd.Username, err)
+				i.logger.Errorf("Error updating user %q: %s", userToUpd.Username, err)
 			}
 		}(u)
 	}
@@ -166,7 +166,7 @@ func (i *interactor) syncUpdateUsernames(ctx context.Context, users []entity.Use
 
 			err := i.repo.UpdateUsername(ctx, userToUpd.Email, userToUpd.Username)
 			if err != nil {
-				i.logger.Errorf("Error updating user \"%s\": %s", userToUpd.Username, err)
+				i.logger.Errorf("Error updating user %q: %s", userToUpd.Username, err)
 			}
 		}(u)
 	}
@@ -181,7 +181,7 @@ func (i *interactor) syncDelUsers(ctx context.Context, users []entity.User, wg *
 
 			err := i.repo.UpdateDeleted(ctx, userToDel.Username, true)
 			if err != nil {
-				i.logger.Errorf("Error marking as deleted user \"%s\": %s", userToDel.Username, err)
+				i.logger.Errorf("Error marking as deleted user %q: %s", userToDel.Username, err)
 			}
 		}(u)
 	}
@@ -198,19 +198,19 @@ func (i *interactor) syncRestoreUsers(ctx context.Context, users []entity.User, 
 			// Get the user SSH public key from k8s secret
 			publicKey, err := i.k8sClient.GetUserSSHKeyPublic(ctx, userToRestore.UsernameSlug())
 			if err != nil {
-				i.logger.Errorf("Error getting the public SSH key for user \"%s\": %s", userToRestore.Username, err)
+				i.logger.Errorf("Error getting the public SSH key for user %q: %s", userToRestore.Username, err)
 			}
 
 			// Upload the SSH public key to Gitea
 			err = i.giteaService.AddSSHKey(userToRestore.Username, string(publicKey))
 			if err != nil {
-				i.logger.Errorf("Error restoring SSH key for user \"%s\": %s", userToRestore.Username, err)
+				i.logger.Errorf("Error restoring SSH key for user %q: %s", userToRestore.Username, err)
 			}
 
 			// Update deleted user field
 			err = i.repo.UpdateDeleted(ctx, userToRestore.Username, false)
 			if err != nil {
-				i.logger.Errorf("Error restoring user \"%s\": %s", userToRestore.Username, err)
+				i.logger.Errorf("Error restoring user %q: %s", userToRestore.Username, err)
 			}
 		}(u)
 	}

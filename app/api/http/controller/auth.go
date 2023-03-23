@@ -63,7 +63,7 @@ func (a *AuthController) HandleProjectAuth(res http.ResponseWriter, req *http.Re
 	}
 
 	if !p.HasMember(u.ID) {
-		a.logger.Infof("HandleProjectAuth: The user \"%s\" is not member of project \"%s\"", u.ID, projectID)
+		a.logger.Infof("HandleProjectAuth: The user %q is not member of project %q", u.ID, projectID)
 		res.WriteHeader(http.StatusForbidden)
 
 		return

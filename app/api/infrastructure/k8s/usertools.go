@@ -371,7 +371,7 @@ func (k *k8sClient) waitUserToolsDeleted(ctx context.Context, resName string) er
 			}
 
 		case <-ctx.Done():
-			k.logger.Debugf("Exit from waitUserToolsDeleted for POD \"%s\" because the context is done", resName)
+			k.logger.Debugf("Exit from waitUserToolsDeleted for POD %q because the context is done", resName)
 			return nil
 		}
 	}
@@ -392,12 +392,12 @@ func (k *k8sClient) waitUserToolsRunning(ctx context.Context, resName string) er
 			pod := event.Object.(*v1.Pod)
 
 			if pod.Status.Phase == v1.PodRunning {
-				k.logger.Infof("The POD \"%s\" is running", resName)
+				k.logger.Infof("The POD %q is running", resName)
 				return nil
 			}
 
 		case <-ctx.Done():
-			k.logger.Debugf("Exit from waitUserToolsRunning for POD \"%s\" because the context is done", resName)
+			k.logger.Debugf("Exit from waitUserToolsRunning for POD %q because the context is done", resName)
 			return nil
 		}
 	}

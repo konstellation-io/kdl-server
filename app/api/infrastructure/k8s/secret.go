@@ -10,7 +10,7 @@ import (
 
 // CreateSecret creates a new k8s secret.
 func (k *k8sClient) CreateSecret(ctx context.Context, name string, values map[string]string) error {
-	k.logger.Infof("Creating secret \"%s\" in k8s...", name)
+	k.logger.Infof("Creating secret %q in k8s...", name)
 
 	secret := k.newSecret(name, values)
 
@@ -19,14 +19,14 @@ func (k *k8sClient) CreateSecret(ctx context.Context, name string, values map[st
 		return err
 	}
 
-	k.logger.Infof("The secret \"%s\" was created in k8s correctly", createdSecret.Name)
+	k.logger.Infof("The secret %q was created in k8s correctly", createdSecret.Name)
 
 	return nil
 }
 
 // UpdateSecret updates a k8s secret.
 func (k *k8sClient) UpdateSecret(ctx context.Context, name string, values map[string]string) error {
-	k.logger.Infof("Updating secret \"%s\" in k8s...", name)
+	k.logger.Infof("Updating secret %q in k8s...", name)
 
 	secret := k.newSecret(name, values)
 
@@ -35,7 +35,7 @@ func (k *k8sClient) UpdateSecret(ctx context.Context, name string, values map[st
 		return err
 	}
 
-	k.logger.Infof("The secret \"%s\" was updated in k8s correctly", name)
+	k.logger.Infof("The secret %q was updated in k8s correctly", name)
 
 	return nil
 }

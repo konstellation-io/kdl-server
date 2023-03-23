@@ -143,7 +143,7 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 	_, err = k.kdlprojectRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
 
 	if err == nil {
-		k.logger.Infof("The kdl project \"%s\" was created correctly in k8s", resName)
+		k.logger.Infof("The kdl project %q was created correctly in k8s", resName)
 	}
 
 	return err

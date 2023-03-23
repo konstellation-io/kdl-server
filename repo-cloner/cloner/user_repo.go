@@ -148,7 +148,7 @@ func (c *UserRepoCloner) cloneRepo(project repository.Project) {
 		return
 	}
 
-	c.logger.Infof("Repository \"%s\" (%s) successfully created", project.ID, repoURL)
+	c.logger.Infof("Repository %q (%s) successfully created", project.ID, repoURL)
 }
 
 func (c *UserRepoCloner) getRepoPath(project repository.Project) string {

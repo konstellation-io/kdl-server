@@ -41,7 +41,7 @@ func (m *runtimeMongoDBRepo) Get(ctx context.Context, id string) (entity.Runtime
 }
 
 func (m *runtimeMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.Runtime, error) {
-	m.logger.Debugf("Finding one runtime by \"%s\" from database...", filters)
+	m.logger.Debugf("Finding one runtime by %q from database...", filters)
 
 	dto := runtimeDTO{}
 
@@ -59,7 +59,7 @@ func (m *runtimeMongoDBRepo) FindAll(ctx context.Context) ([]entity.Runtime, err
 }
 
 func (m *runtimeMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity.Runtime, error) {
-	m.logger.Debugf("Finding runtimes with filters \"%s\"...", filters)
+	m.logger.Debugf("Finding runtimes with filters %q...", filters)
 
 	var dtos []runtimeDTO
 

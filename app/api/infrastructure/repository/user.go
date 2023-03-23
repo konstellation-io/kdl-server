@@ -47,7 +47,7 @@ func NewUserMongoDBRepo(logger logging.Logger, client *mongo.Client, dbName stri
 
 // EnsureIndexes creates if not exists the indexes for the user collection.
 func (m *userMongoDBRepo) EnsureIndexes() error {
-	m.logger.Infof("Creating index for \"%s\" collection...", userCollName)
+	m.logger.Infof("Creating index for %q collection...", userCollName)
 
 	ctx, cancel := context.WithTimeout(context.Background(), ensureIndexesTimeout)
 	defer cancel()
@@ -68,7 +68,7 @@ func (m *userMongoDBRepo) EnsureIndexes() error {
 		},
 	})
 
-	m.logger.Infof("Indexes %s created for \"%s\" collection", result, userCollName)
+	m.logger.Infof("Indexes %s created for %q collection", result, userCollName)
 
 	return err
 }
@@ -108,7 +108,7 @@ func (m *userMongoDBRepo) FindAll(ctx context.Context, includeDeleted bool) ([]e
 
 // Create inserts into the database a new entity.
 func (m *userMongoDBRepo) Create(ctx context.Context, u entity.User) (string, error) {
-	m.logger.Debugf("Inserting a new user \"%s\" into %s collection...", u.Email, userCollName)
+	m.logger.Debugf("Inserting a new user %q into %s collection...", u.Email, userCollName)
 
 	dto, err := m.entityToDTO(u)
 	if err != nil {
@@ -196,7 +196,7 @@ func (m *userMongoDBRepo) UpdateDeleted(ctx context.Context, username string, de
 }
 
 func (m *userMongoDBRepo) updateUserFields(ctx context.Context, username string, fields bson.M) error {
-	m.logger.Debugf("Updating user \"%s\" with \"%#v\"...", username, fields)
+	m.logger.Debugf("Updating user %q with \"%#v\"...", username, fields)
 
 	filter := bson.M{"username": username}
 

@@ -585,7 +585,7 @@ userToolsOperator:
       # -- The image repository
       repository: konstellation/repo-cloner
       # -- The image tag
-      tag: 0.16.0
+      tag: 0.17.0
       # -- The image pull policy
       pullPolicy: IfNotPresent
   vscode:

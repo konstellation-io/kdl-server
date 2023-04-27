@@ -48,9 +48,9 @@ data:
   {{- end }}
   PROJECT_MLFLOW_NODESELECTOR: |+
     {{- toYaml .Values.projectOperator.mlflow.nodeSelector | b64enc | nindent 4 }}
-  ROJECT_MLFLOW_AFFINITY: |+
+  PROJECT_MLFLOW_AFFINITY: |+
     {{- toYaml .Values.projectOperator.mlflow.affinity | b64enc | nindent 4 }}
-  ROJECT_MLFLOW_TOLERATIONS: |+
+  PROJECT_MLFLOW_TOLERATIONS: |+
     {{- toYaml .Values.projectOperator.mlflow.tolerations | b64enc | nindent 4 }}
 
   PROJECT_FILEBROWSER_IMG_REPO: "{{ .Values.projectOperator.filebrowser.image.repository }}"

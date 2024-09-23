@@ -1,4 +1,4 @@
-FROM golang:1.18.3-alpine3.16 as builder
+FROM golang:1.23.1-alpine3.20 as builder
 
 LABEL maintainer="Builder"
 
@@ -23,13 +23,13 @@ WORKDIR /app
 
 # Create kre user.
 RUN adduser \
-      --disabled-password \
-      --gecos "" \
-      --home "/home/kdl" \
-      --shell "/sbin/nologin" \
-      --uid "${UID}" \
-      "${USER}" && \
-# Install openssh client
+    --disabled-password \
+    --gecos "" \
+    --home "/home/kdl" \
+    --shell "/sbin/nologin" \
+    --uid "${UID}" \
+    "${USER}" && \
+    # Install openssh client
     apk add --no-cache git openssh-client
 
 # Copy build from previous stage

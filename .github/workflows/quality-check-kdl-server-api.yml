@@ -24,11 +24,11 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.18.3
+          go-version: 1.23.1
       - name: API Go Lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.51.2
+          version: v1.61.0
           working-directory: ./app/api
           args: --timeout 5m
           skip-pkg-cache: true

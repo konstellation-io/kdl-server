@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -164,7 +165,15 @@ func startHTTPServer(
 
 	logger.Infof("Server running at port %s", port)
 
-	err := http.ListenAndServe(":"+port, nil)
+	server := &http.Server{
+		Addr:         ":" + port,
+		Handler:      nil,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  15 * time.Second,
+	}
+
+	err := server.ListenAndServe()
 	if err != nil {
 		logger.Errorf("Unexpected error: %s", err)
 		os.Exit(1)

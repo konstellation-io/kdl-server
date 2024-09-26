@@ -1,4 +1,4 @@
-FROM python:3.6.9-stretch
+FROM python:3.12
 
 # Maintainer of the Dockerfile
 LABEL maintainer="Intelygenz - Konstellation Team"
@@ -11,7 +11,7 @@ WORKDIR /mlflow/tracking
 # ENV ARTIFACTS_BUCKET
 
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-    sqlite
+    sqlite3
 
 COPY requirements.txt /mlflow/tracking/requirements.txt
 

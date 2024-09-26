@@ -1,6 +1,6 @@
 module github.com/konstellation-io/kdl-server/app/api
 
-go 1.23
+go 1.23.1
 
 require (
 	code.gitea.io/sdk/gitea v0.14.1

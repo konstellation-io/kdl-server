@@ -8,7 +8,7 @@ linters-settings:
     sections:
       - standard
       - default
-      - prefix(github.com/myrepo)
+      - prefix(github.com/konstellation-io/kdl-server)
       - blank
   goconst:
     min-len: 2

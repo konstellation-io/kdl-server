@@ -11,30 +11,6 @@
 
 [report-link]: https://goreportcard.com/report/github.com/konstellation-io/kdl-server/app/api
 
-[app-api-coverage]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab-app-api&metric=coverage
-
-[app-api-coverage-link]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab-app-api&metric=coverage
-
-[app-api-bugs]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab-app-api&metric=bugs
-
-[app-api-bugs-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab-app-api&metric=Reliability
-
-[app-api-mr]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab-app-api&metric=sqale_rating
-
-[app-api-mr-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab-app-api&metric=Maintainability
-
-[app-ui-coverage]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab_app_ui&metric=coverage
-
-[app-ui-coverage-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab_app_ui&metric=Coverage
-
-[app-ui-bugs]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab_app_ui&metric=bugs
-
-[app-ui-bugs-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab_app_ui&metric=Reliability
-
-[app-ui-mr]: https://sonarcloud.io/api/project_badges/measure?project=konstellation-io_kai_lab_app_ui&metric=sqale_rating
-
-[app-ui-mr-link]: https://sonarcloud.io/component_measures?id=konstellation-io_kai_lab_app_ui&metric=Maintainability
-
 ---
 
 ## Helm Chart
@@ -73,6 +49,11 @@ Needed to build the KDL images. Installation:
 K8s package manager. Make sure you have v3+. Installation:
 
 <https://helm.sh/docs/intro/install/>
+
+Please install all required helm plugins via
+```
+helmfile init
+```
 
 #### gettext
 

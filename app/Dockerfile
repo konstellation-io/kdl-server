@@ -1,5 +1,5 @@
 # Build API.
-FROM golang:1.18.3-alpine3.16 as api-builder
+FROM golang:1.23.1-alpine3.20 as api-builder
 # 1.18
 
 # Pass Hadolint

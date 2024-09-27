@@ -3,7 +3,6 @@ package templates
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -44,7 +43,7 @@ func NewTemplating(
 // git repository.
 func (t *templating) GenerateInitialProjectContent(ctx context.Context, project entity.Project, user entity.User) error {
 	// Create a tmp dir to store the template files before git pushing
-	tmpDir, err := ioutil.TempDir("", "git_clone")
+	tmpDir, err := os.MkdirTemp("", "git_clone")
 	if err != nil {
 		return err
 	}

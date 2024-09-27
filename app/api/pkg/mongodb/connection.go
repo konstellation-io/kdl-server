@@ -31,15 +31,10 @@ func NewMongoDB(logger logging.Logger) *MongoDB {
 func (m *MongoDB) Connect(uri string) (*mongo.Client, error) {
 	m.logger.Info("MongoDB connecting...")
 
-	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
-	if err != nil {
-		return nil, err
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	err = client.Connect(ctx)
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
 		return nil, err
 	}

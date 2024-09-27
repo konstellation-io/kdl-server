@@ -2,7 +2,6 @@ package kdlutil_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -14,14 +13,14 @@ import (
 func TestGenerateTemplate(t *testing.T) {
 	const tmplSuffix = ".tmpl"
 
-	tmplFolder, err := ioutil.TempDir("", "tmpl_example")
+	tmplFolder, err := os.MkdirTemp("", "tmpl_example")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	defer os.RemoveAll(tmplFolder)
 
-	dest, err := ioutil.TempDir("", "tmpl_example_dest")
+	dest, err := os.MkdirTemp("", "tmpl_example_dest")
 	if err != nil {
 		t.Fatal(err)
 	}

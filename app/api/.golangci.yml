@@ -2,10 +2,14 @@ linters-settings:
   dupl:
     threshold: 100
   funlen:
-    lines: 200
+    lines: 120
     statements: 50
   gci:
-    local-prefixes: github.com/golangci/golangci-lint
+    sections:
+      - standard
+      - default
+      - prefix(github.com/konstellation-io/kdl-server)
+      - blank
   goconst:
     min-len: 2
     min-occurrences: 2
@@ -28,14 +32,16 @@ linters-settings:
   golint:
     min-confidence: 0
   gomnd:
-    settings:
-      mnd:
-        # don't include the "operation" and "assign"
-        checks:
-          - argument
-          - case
-          - condition
-          - return
+    checks:
+      - argument
+      - case
+      - condition
+      - operation
+      - return
+      - assign
+    ignored-numbers: []
+    ignored-files: []
+    ignored-functions: []
   lll:
     line-length: 140
   maligned:
@@ -54,17 +60,20 @@ linters:
   # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
   disable-all: true
   enable:
+    - asciicheck
     - bodyclose
-    - depguard
     - dogsled
     - dupl
     - errcheck
-    - exhaustive
-    - funlen
+    - gochecknoglobals
     - gochecknoinits
+    - gocognit
     - goconst
     - gocritic
     - gocyclo
+    - godot
+    - godox
+    - err113
     - gofmt
     - goimports
     - goprintffuncname
@@ -75,31 +84,41 @@ linters:
     - lll
     - misspell
     - nakedret
+    - nestif
     - noctx
     - nolintlint
+    - prealloc
+    - rowserrcheck
     - staticcheck
     - stylecheck
+    - testpackage
     - typecheck
     - unconvert
     - unparam
     - unused
     - whitespace
-    - asciicheck
-    - gochecknoglobals
-    - gocognit
-    - godot
-    - godox
-    - nestif
-    - prealloc
     - wsl
-    - testpackage
-    - goerr113
 issues:
   # Excluding configuration per-path, per-linter, per-text and per-source
   exclude-rules:
+    - path: _test.go
+      linters:
+        - gomnd
+        - goconst
+        - dupl
+        - gosec
+        - gochecknoglobals
+        - testpackage
+        - goerr113
     - path: _test\.go
       linters:
         - gomnd
+        - goconst
+        - dupl
+        - gosec
+        - gochecknoglobals
+        - testpackage
+        - goerr113
     # https://github.com/go-critic/go-critic/issues/926
     - linters:
         - gocritic
@@ -129,10 +148,6 @@ issues:
     - Potential file inclusion via variable
     # EXC0011 stylecheck: Annoying issue about not having a comment. The rare codebase has such comments
     - (comment on exported (method|function|type|const)|should have( a package)? comment|comment should be of the form)
-    # EXC0012 gosec: Use of net/http's ListenAndServe function has no support for setting timeouts
-    - Use of net/http serve function that has no support for setting timeouts
-
-run:
-  skip-dirs:
+  exclude-dirs:
     - test_krt
     - scripts

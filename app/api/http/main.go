@@ -18,10 +18,10 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/repository"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/mongodb"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
@@ -59,7 +59,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	mongo := mongodb.NewMongoDB(logger)
+	mongo := mongodbutils.NewMongoDB(logger)
 
 	mongodbClient, err := mongo.Connect(cfg.MongoDB.URI)
 	if err != nil {
@@ -69,11 +69,11 @@ func main() {
 
 	defer mongo.Disconnect()
 
-	projectRepo := repository.NewProjectMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
-	userRepo := repository.NewUserMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
-	runtimeRepo := repository.NewRuntimeMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
-	capabilitiesRepo := repository.NewCapabilitiesMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
-	userActivityRepo := repository.NewUserActivityRepoMongoDB(&cfg, logger, mongodbClient)
+	projectRepo := mongodb.NewProjectMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
+	userRepo := mongodb.NewUserMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
+	runtimeRepo := mongodb.NewRuntimeMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
+	capabilitiesRepo := mongodb.NewCapabilitiesRepo(logger, mongodbClient, cfg.MongoDB.DBName)
+	userActivityRepo := mongodb.NewUserActivityRepoMongoDB(&cfg, logger, mongodbClient)
 
 	err = userRepo.EnsureIndexes()
 	if err != nil {

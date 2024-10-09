@@ -1,4 +1,4 @@
-package repository
+package mongodb
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 
-	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
@@ -119,7 +119,7 @@ func (m *userMongoDBRepo) Create(ctx context.Context, u entity.User) (string, er
 
 	result, err := m.collection.InsertOne(ctx, dto)
 	if err != nil {
-		if mongodb.IsDuplKeyError(err) {
+		if mongodbutils.IsDuplKeyError(err) {
 			return "", entity.ErrDuplicatedUser
 		}
 
@@ -240,7 +240,7 @@ func (m *userMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity.Us
 
 	var dtos []userDTO
 
-	err := mongodb.Find(ctx, filters, m.collection, &dtos)
+	err := mongodbutils.Find(ctx, filters, m.collection, &dtos)
 	if err != nil {
 		return nil, err
 	}

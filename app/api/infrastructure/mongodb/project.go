@@ -1,4 +1,4 @@
-package repository
+package mongodb
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 
@@ -220,7 +220,7 @@ func (m *projectMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity
 
 	var dtos []projectDTO
 
-	err := mongodb.Find(ctx, filters, m.collection, &dtos)
+	err := mongodbutils.Find(ctx, filters, m.collection, &dtos)
 	if err != nil {
 		return nil, err
 	}

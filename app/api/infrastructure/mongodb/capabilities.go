@@ -1,4 +1,4 @@
-package repository
+package mongodb
 
 import (
 	"context"
@@ -14,19 +14,21 @@ import (
 
 const capabilitiesCollName = "capabilities"
 
-type capabilitiesMongoDBRepo struct {
+type CapabilitiesRepo struct {
 	logger     logging.Logger
 	collection *mongo.Collection
 }
 
-// NewCapabilitiesMongoDBRepo implements project.Repository interface.
-func NewCapabilitiesMongoDBRepo(logger logging.Logger, client *mongo.Client, dbName string) capabilities.Repository {
+// capabilitiesMongoDBRepo implements the capabilities.Repository interface.
+var _ capabilities.Repository = (*CapabilitiesRepo)(nil)
+
+func NewCapabilitiesRepo(logger logging.Logger, client *mongo.Client, dbName string) *CapabilitiesRepo {
 	collection := client.Database(dbName).Collection(capabilitiesCollName)
-	return &capabilitiesMongoDBRepo{logger, collection}
+	return &CapabilitiesRepo{logger, collection}
 }
 
 // Get retrieves a capabilities struct using an identifier.
-func (m *capabilitiesMongoDBRepo) Get(ctx context.Context, id string) (entity.Capabilities, error) {
+func (m *CapabilitiesRepo) Get(ctx context.Context, id string) (entity.Capabilities, error) {
 	capability := entity.Capabilities{}
 
 	if id == "" {
@@ -49,7 +51,7 @@ func (m *capabilitiesMongoDBRepo) Get(ctx context.Context, id string) (entity.Ca
 }
 
 // Find all the capabilities in the database.
-func (m *capabilitiesMongoDBRepo) FindAll(ctx context.Context) ([]entity.Capabilities, error) {
+func (m *CapabilitiesRepo) FindAll(ctx context.Context) ([]entity.Capabilities, error) {
 	caps := []entity.Capabilities{}
 
 	response, err := m.collection.Find(ctx, bson.M{})

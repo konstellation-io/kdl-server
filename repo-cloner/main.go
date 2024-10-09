@@ -3,12 +3,12 @@ package main
 import (
 	"os"
 	"strings"
-	
+
+	"github.com/konstellation-io/kdl-server/repo-cloner/cloner"
 	"github.com/konstellation-io/kdl-server/repo-cloner/config"
 	"github.com/konstellation-io/kdl-server/repo-cloner/repository"
-	"github.com/konstellation-io/kdl-server/repo-cloner/cloner"
 
-	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kre/libs/simplelogger"
 )
 
@@ -29,7 +29,7 @@ func main() {
 	}
 
 	logger := simplelogger.New(level)
-	mongoManager := mongodb.NewMongoDB(logger)
+	mongoManager := mongodbutils.NewMongoDB(logger)
 
 	mongodbClient, err := mongoManager.Connect(cfg.MongoDB.URI)
 	if err != nil {

@@ -19,7 +19,7 @@ type CapabilitiesRepo struct {
 	collection *mongo.Collection
 }
 
-// capabilitiesMongoDBRepo implements the capabilities.Repository interface.
+// capabilitiesRepo implements the capabilities.Repository interface.
 var _ capabilities.Repository = (*CapabilitiesRepo)(nil)
 
 func NewCapabilitiesRepo(logger logging.Logger, client *mongo.Client, dbName string) *CapabilitiesRepo {
@@ -50,7 +50,7 @@ func (m *CapabilitiesRepo) Get(ctx context.Context, id string) (entity.Capabilit
 	return capability, nil
 }
 
-// Find all the capabilities in the database.
+// FindAll retrieves all the capabilities in the database.
 func (m *CapabilitiesRepo) FindAll(ctx context.Context) ([]entity.Capabilities, error) {
 	caps := []entity.Capabilities{}
 

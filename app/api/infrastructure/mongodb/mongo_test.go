@@ -15,6 +15,8 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -22,6 +24,11 @@ import (
 const (
 	dbName               = "kdl"
 	capabilitiesCollName = "capabilities"
+	projectCollName      = "projects"
+)
+
+var (
+	testTimeExample = time.Now().Add(-time.Hour).Truncate(time.Millisecond).UTC()
 )
 
 var capabilitiesExamples = map[string]entity.Capabilities{
@@ -42,17 +49,63 @@ var capabilitiesExamples = map[string]entity.Capabilities{
 	},
 }
 
-var (
-	testRepoUploadDate = time.Now().Add(-time.Hour).Truncate(time.Millisecond).UTC()
-)
+var projectExamples = map[string]entity.Project{
+	"project1": {
+		ID:                 "1",
+		Name:               "project1",
+		Description:        "description1",
+		CreationDate:       testTimeExample,
+		LastActivationDate: "01-01-1998",
+		Favorite:           false,
+		Archived:           false,
+		Error:              nil,
+		Repository: entity.Repository{
+			Type:            entity.RepositoryTypeExternal,
+			ExternalRepoURL: "http://repo1",
+			RepoName:        "repo1",
+			Error:           nil,
+			AuthMethod:      entity.RepositoryAuthToken,
+		},
+		Members: []entity.Member{
+			{
+				UserID:      primitive.NewObjectID().Hex(),
+				AccessLevel: entity.AccessLevelAdmin,
+				AddedDate:   testTimeExample,
+			},
+		},
+	},
+	"project2": {
+		ID:                 "2",
+		Name:               "project2",
+		Description:        "description2",
+		CreationDate:       testTimeExample,
+		LastActivationDate: "01-01-1998",
+		Favorite:           false,
+		Archived:           false,
+		Error:              nil,
+		Repository: entity.Repository{
+			Type:            entity.RepositoryTypeExternal,
+			ExternalRepoURL: "http://repo2",
+			RepoName:        "repo2",
+			Error:           nil,
+			AuthMethod:      entity.RepositoryAuthToken,
+		},
+		Members: []entity.Member{
+			{
+				UserID:      primitive.NewObjectID().Hex(),
+				AccessLevel: entity.AccessLevelAdmin,
+				AddedDate:   testTimeExample,
+			},
+		},
+	},
+}
 
 type TestSuite struct {
 	suite.Suite
 	mongoDBContainer testcontainers.Container
 	mongoClient      *mongo.Client
 	capabilitiesRepo *mongodb.CapabilitiesRepo
-	// runtimeRepo
-	// userRepo
+	projectRepo      *mongodb.ProjectRepo
 }
 
 func TestProcessRepositoryTestSuite(t *testing.T) {
@@ -95,6 +148,7 @@ func (s *TestSuite) SetupSuite() {
 	s.mongoDBContainer = mongoDBContainer
 	s.mongoClient = mongoClient
 	s.capabilitiesRepo = mongodb.NewCapabilitiesRepo(logger, mongoClient, dbName)
+	s.projectRepo = mongodb.NewProjectRepo(logger, mongoClient, dbName)
 
 	// viper.Set(config.MongoDBKaiDatabaseKey, _kaiProduct)
 
@@ -104,6 +158,7 @@ func (s *TestSuite) SetupSuite() {
 
 	// populate database with some data
 	s.SetupCapabilities(mongoClient)
+	s.SetupProjects(mongoClient)
 }
 
 // SetupCapabilities populates the database with some data regarding capabilites
@@ -112,6 +167,14 @@ func (s *TestSuite) SetupCapabilities(mongoClient *mongo.Client) {
 
 	for _, c := range capabilitiesExamples {
 		_, err := capabilitiesCollection.InsertOne(context.Background(), c)
+		s.Require().NoError(err)
+	}
+}
+
+// SetupProjects populates the database with some data regarding projects
+func (s *TestSuite) SetupProjects(mongoClient *mongo.Client) {
+	for _, p := range projectExamples {
+		_, err := s.projectRepo.Create(context.Background(), p)
 		s.Require().NoError(err)
 	}
 }
@@ -169,4 +232,30 @@ func (s *TestSuite) TestFindAllCapabilities_OK() {
 	s.Require().NoError(err)
 
 	s.Equal(expectedCapabilities, actualCapabilities)
+}
+
+func (s *TestSuite) TestCreateProject_OK() {
+	ctx := context.Background()
+
+	project := projectExamples["project1"]
+
+	// remove project1 from the database
+	projectsCollection := s.mongoClient.Database(dbName).Collection(projectCollName)
+	_, err := projectsCollection.DeleteOne(ctx, bson.M{"_id": project.ID})
+
+	id, err := s.projectRepo.Create(ctx, project)
+	s.Require().NoError(err)
+
+	s.NotEmpty(id)
+}
+
+func (s *TestSuite) TestGetProject_OK() {
+	ctx := context.Background()
+
+	expectedProject := projectExamples["project1"]
+
+	actualProject, err := s.projectRepo.Get(ctx, expectedProject.ID)
+	s.Require().NoError(err)
+
+	s.Equal(expectedProject, actualProject)
 }

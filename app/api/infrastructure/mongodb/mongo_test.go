@@ -239,7 +239,7 @@ func (s *TestSuite) TestCreateProject_OK() {
 
 	project := projectExamples["project1"]
 
-	// remove project1 from the database
+	// remove project1 from the database as it was saved previously
 	projectsCollection := s.mongoClient.Database(dbName).Collection(projectCollName)
 	_, err := projectsCollection.DeleteOne(ctx, bson.M{"_id": project.ID})
 
@@ -258,4 +258,185 @@ func (s *TestSuite) TestGetProject_OK() {
 	s.Require().NoError(err)
 
 	s.Equal(expectedProject, actualProject)
+}
+
+func (s *TestSuite) TestGetProject_NotFound() {
+	ctx := context.Background()
+
+	_, err := s.projectRepo.Get(ctx, "notfound")
+	s.Require().Error(err)
+	s.Equal(entity.ErrProjectNotFound, err)
+}
+
+func (s *TestSuite) TestFindAllProjects_OK() {
+	ctx := context.Background()
+
+	actualProjects, err := s.projectRepo.FindAll(ctx)
+	s.Require().NoError(err)
+
+	s.Len(actualProjects, 2)
+}
+
+func (s *TestSuite) TestAddMembers_OK() {
+	ctx := context.Background()
+
+	project := projectExamples["project1"]
+	members := []entity.Member{
+		{
+			UserID:      primitive.NewObjectID().Hex(),
+			AccessLevel: entity.AccessLevelManager,
+			AddedDate:   testTimeExample,
+		},
+	}
+
+	err := s.projectRepo.AddMembers(ctx, project.ID, members)
+	s.Require().NoError(err)
+
+	actualProject, err := s.projectRepo.Get(ctx, project.ID)
+	s.Require().NoError(err)
+
+	s.Equal(len(project.Members)+len(members), len(actualProject.Members))
+}
+
+func (s *TestSuite) TestRemoveMembers_OK() {
+	ctx := context.Background()
+
+	project := projectExamples["project1"]
+	members := []entity.Member{
+		{
+			UserID:      primitive.NewObjectID().Hex(),
+			AccessLevel: entity.AccessLevelManager,
+			AddedDate:   testTimeExample,
+		},
+	}
+	users := []entity.User{
+		{
+			ID:       members[0].UserID,
+			Username: "user1",
+		},
+	}
+
+	err := s.projectRepo.AddMembers(ctx, project.ID, members)
+	s.Require().NoError(err)
+
+	actualProject, err := s.projectRepo.Get(ctx, project.ID)
+	s.Require().NoError(err)
+
+	s.Equal(len(project.Members)+len(members), len(actualProject.Members))
+
+	err = s.projectRepo.RemoveMembers(ctx, project.ID, users)
+	s.Require().NoError(err)
+
+	actualProject, err = s.projectRepo.Get(ctx, project.ID)
+	s.Require().NoError(err)
+
+	s.Equal(len(project.Members), len(actualProject.Members))
+}
+
+func (s *TestSuite) TestUpdateMembersAccessLevel_OK() {
+	ctx := context.Background()
+
+	project := projectExamples["project1"]
+
+	actualProject, err := s.projectRepo.Get(ctx, project.ID)
+	s.Require().NoError(err)
+
+	s.Require().True(len(actualProject.Members) >= 1)
+	aGivenMember := actualProject.Members[len(actualProject.Members)-1]
+
+	usersToModify := []entity.User{
+		{
+			ID: aGivenMember.UserID,
+		},
+	}
+
+	newAccessLevel := entity.AccessLevelViewer
+
+	s.NotEqual(newAccessLevel, aGivenMember.AccessLevel)
+
+	err = s.projectRepo.UpdateMembersAccessLevel(ctx, project.ID, usersToModify, newAccessLevel)
+	s.Require().NoError(err)
+
+	actualProject, err = s.projectRepo.Get(ctx, project.ID)
+	s.Require().NoError(err)
+
+	for _, m := range actualProject.Members {
+		if m.UserID == usersToModify[0].ID {
+			s.Equal(newAccessLevel, m.AccessLevel)
+		}
+	}
+}
+
+func (s *TestSuite) TestUpdateName_OK() {
+	ctx := context.Background()
+
+	project := projectExamples["project1"]
+	newName := "newName"
+
+	err := s.projectRepo.UpdateName(ctx, project.ID, newName)
+	s.Require().NoError(err)
+
+	actualProject, err := s.projectRepo.Get(ctx, project.ID)
+	s.Require().NoError(err)
+
+	s.Equal(newName, actualProject.Name)
+}
+
+func (s *TestSuite) TestUpdateDescription_OK() {
+	ctx := context.Background()
+
+	project := projectExamples["project1"]
+	newDescription := "newDescription"
+
+	err := s.projectRepo.UpdateDescription(ctx, project.ID, newDescription)
+	s.Require().NoError(err)
+
+	actualProject, err := s.projectRepo.Get(ctx, project.ID)
+	s.Require().NoError(err)
+
+	s.Equal(newDescription, actualProject.Description)
+}
+
+func (s *TestSuite) TestUpdateArchived_OK() {
+	ctx := context.Background()
+
+	project := projectExamples["project1"]
+	newArchived := true
+
+	err := s.projectRepo.UpdateArchived(ctx, project.ID, newArchived)
+	s.Require().NoError(err)
+
+	actualProject, err := s.projectRepo.Get(ctx, project.ID)
+	s.Require().NoError(err)
+
+	s.Equal(newArchived, actualProject.Archived)
+}
+
+func (s *TestSuite) TestDeleteOne_OK() {
+	ctx := context.Background()
+
+	testProject := entity.Project{
+		ID:          "3",
+		Name:        "testProject",
+		Description: "description3",
+	}
+
+	_, err := s.projectRepo.Create(ctx, testProject)
+
+	_, err = s.projectRepo.Get(ctx, testProject.ID)
+	s.Require().NoError(err)
+
+	err = s.projectRepo.DeleteOne(ctx, testProject.ID)
+	s.Require().NoError(err)
+
+	_, err = s.projectRepo.Get(ctx, testProject.ID)
+	s.Require().Error(err)
+	s.Equal(entity.ErrProjectNotFound, err)
+}
+
+func (s *TestSuite) TestDeleteOne_NoPreviousProject() {
+	ctx := context.Background()
+
+	err := s.projectRepo.DeleteOne(ctx, "notfound")
+	s.Require().Error(err)
 }

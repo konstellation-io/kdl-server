@@ -130,7 +130,7 @@ func (m *ProjectRepo) RemoveMembers(ctx context.Context, projectID string, users
 	return err
 }
 
-// UpdateMembersAccessLevel deletes users from the member list for the given project.
+// UpdateMembersAccessLevel updates the access level for a given project to all given users.
 func (m *ProjectRepo) UpdateMembersAccessLevel(
 	ctx context.Context, projectID string, users []entity.User, accessLevel entity.AccessLevel) error {
 	m.logger.Debugf("Updating members access level to %q from project %q...", accessLevel, projectID)

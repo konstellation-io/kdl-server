@@ -9,16 +9,17 @@ import (
 	"time"
 
 	"bou.ke/monkey"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/mongodb"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -26,6 +27,7 @@ const (
 	capabilitiesCollName = "capabilities"
 	projectCollName      = "projects"
 	runtimesCollName     = "runtimes"
+	userActivityCollName = "userActivity"
 )
 
 var (
@@ -127,6 +129,7 @@ type TestSuite struct {
 	capabilitiesRepo *mongodb.CapabilitiesRepo
 	projectRepo      *mongodb.ProjectRepo
 	runtimeRepo      *mongodb.RuntimeRepo
+	userActivityRepo *mongodb.UserActivityRepo
 }
 
 func TestProcessRepositoryTestSuite(t *testing.T) {
@@ -171,6 +174,7 @@ func (s *TestSuite) SetupSuite() {
 	s.capabilitiesRepo = mongodb.NewCapabilitiesRepo(logger, mongoClient, dbName)
 	s.projectRepo = mongodb.NewProjectRepo(logger, mongoClient, dbName)
 	s.runtimeRepo = mongodb.NewRuntimeRepo(logger, mongoClient, dbName)
+	s.userActivityRepo = mongodb.NewUserActivityRepo(logger, mongoClient, dbName)
 
 	// viper.Set(config.MongoDBKaiDatabaseKey, _kaiProduct)
 
@@ -500,4 +504,23 @@ func (s *TestSuite) TestFindAllRuntimes_OK() {
 	s.Require().NoError(err)
 
 	s.Len(actualRuntimes, 2)
+}
+
+func (s *TestSuite) TestCreateUserActivity_OK() {
+	ctx := context.Background()
+
+	userActivityExample := entity.UserActivity{
+		Date:   testTimeExample,
+		UserID: primitive.NewObjectID().Hex(),
+		Type:   entity.UserActivityTypeDeleteProject,
+		Vars: []entity.UserActivityVar{
+			{
+				Key:   "PROJECT_ID",
+				Value: "projectID",
+			},
+		},
+	}
+
+	err := s.userActivityRepo.Create(ctx, userActivityExample)
+	s.Require().NoError(err)
 }

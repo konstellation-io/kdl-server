@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
-
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 const (
@@ -35,7 +35,6 @@ type RuntimeRepo struct {
 // RuntimeRepo implements the runtime.Repository interface.
 var _ runtime.Repository = (*RuntimeRepo)(nil)
 
-// NewRuntimeRepo implements runtimes.Repository interface.
 func NewRuntimeRepo(logger logging.Logger, client *mongo.Client, dbName string) *RuntimeRepo {
 	collection := client.Database(dbName).Collection(runtimesCollName)
 	return &RuntimeRepo{logger, collection}

@@ -5,16 +5,15 @@ import (
 	"errors"
 	"time"
 
-	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
-
-	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
-
-	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
 
 const (

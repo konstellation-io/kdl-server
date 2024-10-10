@@ -190,10 +190,8 @@ func (s *TestSuite) SetupSuite() {
 
 // SetupCapabilities populates the database with some data regarding capabilites
 func (s *TestSuite) SetupCapabilities(mongoClient *mongo.Client) {
-	capabilitiesCollection := mongoClient.Database(dbName).Collection(capabilitiesCollName)
-
 	for _, c := range capabilitiesExamples {
-		_, err := capabilitiesCollection.InsertOne(context.Background(), c)
+		_, err := s.capabilitiesRepo.Create(context.Background(), c)
 		s.Require().NoError(err)
 	}
 }
@@ -230,12 +228,12 @@ func (s *TestSuite) TearDownTest() {
 func (s *TestSuite) TestGetCapabilities_OK() {
 	ctx := context.Background()
 
-	expectedCapabilitie := capabilitiesExamples["capability1"]
+	expectedCapability := capabilitiesExamples["capability1"]
 
-	actualCapabilitie, err := s.capabilitiesRepo.Get(ctx, expectedCapabilitie.ID)
+	actualCapability, err := s.capabilitiesRepo.Get(ctx, expectedCapability.ID)
 	s.Require().NoError(err)
 
-	s.Equal(expectedCapabilitie, actualCapabilitie)
+	s.Equal(expectedCapability, actualCapability)
 }
 
 func (s *TestSuite) TestGetCapabilities_NoID() {

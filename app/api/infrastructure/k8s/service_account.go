@@ -10,6 +10,7 @@ import (
 
 // newServiceAccount conform a new k8s serviceAccount.
 func (k *k8sClient) newServiceAccount(usernameSlug string) *v1.ServiceAccount {
+	automount := true
 	return &v1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: k.getUserServiceAccountName(usernameSlug),
@@ -20,6 +21,7 @@ func (k *k8sClient) newServiceAccount(usernameSlug string) *v1.ServiceAccount {
 				"konstellation.io/chart-release": k.cfg.Labels.Common.ChartRelease,
 			},
 		},
+		AutomountServiceAccountToken: &automount,
 	}
 }
 

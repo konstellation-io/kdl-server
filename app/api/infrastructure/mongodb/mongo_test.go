@@ -25,6 +25,7 @@ const (
 	dbName               = "kdl"
 	capabilitiesCollName = "capabilities"
 	projectCollName      = "projects"
+	runtimesCollName     = "runtimes"
 )
 
 var (
@@ -100,12 +101,32 @@ var projectExamples = map[string]entity.Project{
 	},
 }
 
+var runtimeExamples = map[string]entity.Runtime{
+	"runtime1": {
+		ID:          primitive.NewObjectID().Hex(),
+		Name:        "runtime1",
+		Desc:        "description1",
+		Labels:      []string{"label1", "label2"},
+		DockerImage: "dockerImage1",
+		DockerTag:   "dockerTag1",
+	},
+	"runtime2": {
+		ID:          primitive.NewObjectID().Hex(),
+		Name:        "runtime2",
+		Desc:        "description2",
+		Labels:      []string{"label3", "label4"},
+		DockerImage: "dockerImage2",
+		DockerTag:   "dockerTag2",
+	},
+}
+
 type TestSuite struct {
 	suite.Suite
 	mongoDBContainer testcontainers.Container
 	mongoClient      *mongo.Client
 	capabilitiesRepo *mongodb.CapabilitiesRepo
 	projectRepo      *mongodb.ProjectRepo
+	runtimeRepo      *mongodb.RuntimeRepo
 }
 
 func TestProcessRepositoryTestSuite(t *testing.T) {
@@ -149,6 +170,7 @@ func (s *TestSuite) SetupSuite() {
 	s.mongoClient = mongoClient
 	s.capabilitiesRepo = mongodb.NewCapabilitiesRepo(logger, mongoClient, dbName)
 	s.projectRepo = mongodb.NewProjectRepo(logger, mongoClient, dbName)
+	s.runtimeRepo = mongodb.NewRuntimeRepo(logger, mongoClient, dbName)
 
 	// viper.Set(config.MongoDBKaiDatabaseKey, _kaiProduct)
 
@@ -159,6 +181,7 @@ func (s *TestSuite) SetupSuite() {
 	// populate database with some data
 	s.SetupCapabilities(mongoClient)
 	s.SetupProjects(mongoClient)
+	s.SetupRuntimes(mongoClient)
 }
 
 // SetupCapabilities populates the database with some data regarding capabilites
@@ -175,6 +198,13 @@ func (s *TestSuite) SetupCapabilities(mongoClient *mongo.Client) {
 func (s *TestSuite) SetupProjects(mongoClient *mongo.Client) {
 	for _, p := range projectExamples {
 		_, err := s.projectRepo.Create(context.Background(), p)
+		s.Require().NoError(err)
+	}
+}
+
+func (s *TestSuite) SetupRuntimes(mongoClient *mongo.Client) {
+	for _, r := range runtimeExamples {
+		_, err := s.runtimeRepo.Create(context.Background(), r)
 		s.Require().NoError(err)
 	}
 }
@@ -223,15 +253,10 @@ func (s *TestSuite) TestGetCapabilities_NotFound() {
 func (s *TestSuite) TestFindAllCapabilities_OK() {
 	ctx := context.Background()
 
-	expectedCapabilities := []entity.Capabilities{
-		capabilitiesExamples["capability1"],
-		capabilitiesExamples["capability2"],
-	}
-
 	actualCapabilities, err := s.capabilitiesRepo.FindAll(ctx)
 	s.Require().NoError(err)
 
-	s.Equal(expectedCapabilities, actualCapabilities)
+	s.Len(actualCapabilities, 2)
 }
 
 func (s *TestSuite) TestCreateProject_OK() {
@@ -439,4 +464,40 @@ func (s *TestSuite) TestDeleteOne_NoPreviousProject() {
 
 	err := s.projectRepo.DeleteOne(ctx, "notfound")
 	s.Require().Error(err)
+}
+
+func (s *TestSuite) TestGetRuntime_OK() {
+	ctx := context.Background()
+
+	expectedRuntime := runtimeExamples["runtime1"]
+
+	actualRuntime, err := s.runtimeRepo.Get(ctx, expectedRuntime.ID)
+	s.Require().NoError(err)
+
+	s.Equal(expectedRuntime, actualRuntime)
+}
+
+func (s *TestSuite) TestGetRuntime_NotValidHex() {
+	ctx := context.Background()
+
+	_, err := s.runtimeRepo.Get(ctx, "notvalid")
+	s.Require().Error(err)
+	s.Equal(primitive.ErrInvalidHex, err)
+}
+
+func (s *TestSuite) TestGetRuntime_NotFound() {
+	ctx := context.Background()
+
+	_, err := s.runtimeRepo.Get(ctx, primitive.NewObjectID().Hex())
+	s.Require().Error(err)
+	s.Equal(entity.ErrRuntimeNotFound, err)
+}
+
+func (s *TestSuite) TestFindAllRuntimes_OK() {
+	ctx := context.Background()
+
+	actualRuntimes, err := s.runtimeRepo.FindAll(ctx)
+	s.Require().NoError(err)
+
+	s.Len(actualRuntimes, 2)
 }

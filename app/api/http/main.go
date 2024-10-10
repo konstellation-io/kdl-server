@@ -71,7 +71,7 @@ func main() {
 
 	capabilitiesRepo := mongodb.NewCapabilitiesRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 	projectRepo := mongodb.NewProjectRepo(logger, mongodbClient, cfg.MongoDB.DBName)
-	runtimeRepo := mongodb.NewRuntimeMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
+	runtimeRepo := mongodb.NewRuntimeRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 	userActivityRepo := mongodb.NewUserActivityRepoMongoDB(&cfg, logger, mongodbClient)
 	userRepo := mongodb.NewUserMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 

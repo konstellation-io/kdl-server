@@ -8,6 +8,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -26,12 +27,39 @@ type runtimeDTO struct {
 	DockerTag   string             `bson:"docker_tag"`
 }
 
-type runtimeMongoDBRepo struct {
+type RuntimeRepo struct {
 	logger     logging.Logger
 	collection *mongo.Collection
 }
 
-func (m *runtimeMongoDBRepo) Get(ctx context.Context, id string) (entity.Runtime, error) {
+// RuntimeRepo implements the runtime.Repository interface.
+var _ runtime.Repository = (*RuntimeRepo)(nil)
+
+// NewRuntimeRepo implements runtimes.Repository interface.
+func NewRuntimeRepo(logger logging.Logger, client *mongo.Client, dbName string) *RuntimeRepo {
+	collection := client.Database(dbName).Collection(runtimesCollName)
+	return &RuntimeRepo{logger, collection}
+}
+
+// Create inserts into the database a new runtime entity.
+// This Create is not exposed to the API, it's only used internally for testing.
+func (m *RuntimeRepo) Create(ctx context.Context, r entity.Runtime) (string, error) {
+	m.logger.Debugf("Creating new runtime %q...", r.Name)
+
+	dto, err := m.entityToDTO(r)
+	if err != nil {
+		return "", err
+	}
+
+	result, err := m.collection.InsertOne(ctx, dto)
+	if err != nil {
+		return "", err
+	}
+
+	return result.InsertedID.(primitive.ObjectID).Hex(), nil
+}
+
+func (m *RuntimeRepo) Get(ctx context.Context, id string) (entity.Runtime, error) {
 	idFromHex, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return entity.Runtime{}, err
@@ -40,7 +68,7 @@ func (m *runtimeMongoDBRepo) Get(ctx context.Context, id string) (entity.Runtime
 	return m.findOne(ctx, bson.M{"_id": idFromHex})
 }
 
-func (m *runtimeMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.Runtime, error) {
+func (m *RuntimeRepo) findOne(ctx context.Context, filters bson.M) (entity.Runtime, error) {
 	m.logger.Debugf("Finding one runtime by %q from database...", filters)
 
 	dto := runtimeDTO{}
@@ -54,11 +82,11 @@ func (m *runtimeMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entit
 }
 
 // FindAll retrieves all projects.
-func (m *runtimeMongoDBRepo) FindAll(ctx context.Context) ([]entity.Runtime, error) {
+func (m *RuntimeRepo) FindAll(ctx context.Context) ([]entity.Runtime, error) {
 	return m.find(ctx, bson.M{})
 }
 
-func (m *runtimeMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity.Runtime, error) {
+func (m *RuntimeRepo) find(ctx context.Context, filters bson.M) ([]entity.Runtime, error) {
 	m.logger.Debugf("Finding runtimes with filters %q...", filters)
 
 	var dtos []runtimeDTO
@@ -71,7 +99,7 @@ func (m *runtimeMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity
 	return m.dtosToEntities(dtos), nil
 }
 
-func (m *runtimeMongoDBRepo) dtoToEntity(dto runtimeDTO) entity.Runtime {
+func (m *RuntimeRepo) dtoToEntity(dto runtimeDTO) entity.Runtime {
 	p := entity.Runtime{
 		ID:          dto.ID.Hex(),
 		Name:        dto.Name,
@@ -84,7 +112,7 @@ func (m *runtimeMongoDBRepo) dtoToEntity(dto runtimeDTO) entity.Runtime {
 	return p
 }
 
-func (m *runtimeMongoDBRepo) dtosToEntities(dtos []runtimeDTO) []entity.Runtime {
+func (m *RuntimeRepo) dtosToEntities(dtos []runtimeDTO) []entity.Runtime {
 	result := make([]entity.Runtime, len(dtos))
 
 	for i, dto := range dtos {
@@ -94,8 +122,21 @@ func (m *runtimeMongoDBRepo) dtosToEntities(dtos []runtimeDTO) []entity.Runtime 
 	return result
 }
 
-// NewRuntimeMongoDBRepo implements runtimes.Repository interface.
-func NewRuntimeMongoDBRepo(logger logging.Logger, client *mongo.Client, dbName string) runtime.Repository {
-	collection := client.Database(dbName).Collection(runtimesCollName)
-	return &runtimeMongoDBRepo{logger, collection}
+func (m *RuntimeRepo) entityToDTO(r entity.Runtime) (runtimeDTO, error) {
+	objectID, err := primitive.ObjectIDFromHex(r.ID)
+	if err != nil {
+
+		return runtimeDTO{}, err
+	}
+
+	dto := runtimeDTO{
+		ID:          objectID,
+		Name:        r.Name,
+		Desc:        r.Desc,
+		Labels:      r.Labels,
+		DockerImage: r.DockerImage,
+		DockerTag:   r.DockerTag,
+	}
+
+	return dto, nil
 }

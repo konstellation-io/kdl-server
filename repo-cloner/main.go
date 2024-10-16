@@ -1,43 +1,35 @@
 package main
 
 import (
+	"log"
 	"os"
-	"strings"
-	
+
+	"github.com/go-logr/zapr"
+	"go.uber.org/zap"
+
+	"github.com/konstellation-io/kdl-server/repo-cloner/cloner"
 	"github.com/konstellation-io/kdl-server/repo-cloner/config"
 	"github.com/konstellation-io/kdl-server/repo-cloner/repository"
-	"github.com/konstellation-io/kdl-server/repo-cloner/cloner"
-
-	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
-	"github.com/konstellation-io/kre/libs/simplelogger"
+	"github.com/konstellation-io/kdl-server/repo-cloner/utils"
 )
 
 func main() {
 	cfg := config.NewConfig()
 
-	var level simplelogger.LogLevel
-
-	switch strings.ToLower(cfg.LogLevel) {
-	case "debug":
-		level = simplelogger.LevelDebug
-	case "info":
-		level = simplelogger.LevelInfo
-	case "warn":
-		level = simplelogger.LevelWarn
-	case "error":
-		level = simplelogger.LevelError
+	zapLog, err := zap.NewDevelopment()
+	if err != nil {
+		log.Fatal(err)
 	}
+	logger := zapr.NewLogger(zapLog)
 
-	logger := simplelogger.New(level)
-	mongoManager := mongodb.NewMongoDB(logger)
+	mongoManager := utils.NewMongoDB(logger)
+	defer mongoManager.Disconnect()
 
 	mongodbClient, err := mongoManager.Connect(cfg.MongoDB.URI)
 	if err != nil {
-		logger.Errorf("Error connecting to MongoDB: %s", err)
+		logger.Error(err, "Error connecting to MongoDB")
 		os.Exit(1)
 	}
-
-	defer mongoManager.Disconnect()
 
 	projectRepo := repository.NewProjectMongoDBRepo(cfg, logger, mongodbClient)
 	userRepo := repository.NewUserMongoDBRepo(cfg, logger, mongodbClient)

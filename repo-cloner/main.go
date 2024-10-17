@@ -23,13 +23,13 @@ func main() {
 	logger := zapr.NewLogger(zapLog)
 
 	mongoManager := utils.NewMongoDB(logger)
-	defer mongoManager.Disconnect()
 
 	mongodbClient, err := mongoManager.Connect(cfg.MongoDB.URI)
 	if err != nil {
 		logger.Error(err, "Error connecting to MongoDB")
 		os.Exit(1)
 	}
+	defer mongoManager.Disconnect()
 
 	projectRepo := repository.NewProjectMongoDBRepo(cfg, logger, mongodbClient)
 	userRepo := repository.NewUserMongoDBRepo(cfg, logger, mongodbClient)

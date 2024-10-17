@@ -1,7 +1,6 @@
 package cloner
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -90,7 +89,7 @@ func (c *UserRepoCloner) checkAndCloneNewRepos(user repository.User) {
 		return
 	}
 
-	c.logger.Info(fmt.Sprintf("Found %d new repositories to clone", len(projectToClone)))
+	c.logger.Info("Found new repositories to clone", "TotalRepos", len(projectToClone))
 
 	for _, project := range projectToClone {
 		go c.cloneRepo(project)

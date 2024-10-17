@@ -2,14 +2,14 @@ package repository
 
 import (
 	"context"
-	
-	"github.com/konstellation-io/kdl-server/repo-cloner/config"
 
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
+	"github.com/go-logr/logr"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/konstellation-io/kdl-server/repo-cloner/config"
 )
 
 type User struct {
@@ -20,12 +20,12 @@ type User struct {
 
 type UserMongoDBRepo struct {
 	cfg        config.Config
-	logger     logging.Logger
+	logger     logr.Logger
 	collection *mongo.Collection
 }
 
 // NewUserMongoDBRepo implements user.Repository interface.
-func NewUserMongoDBRepo(cfg config.Config, logger logging.Logger, client *mongo.Client) *UserMongoDBRepo {
+func NewUserMongoDBRepo(cfg config.Config, logger logr.Logger, client *mongo.Client) *UserMongoDBRepo {
 	collection := client.Database(cfg.MongoDB.DBName).Collection(cfg.MongoDB.UsersCollName)
 	return &UserMongoDBRepo{cfg, logger, collection}
 }

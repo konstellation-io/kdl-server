@@ -28,6 +28,7 @@ const (
 	projectCollName      = "projects"
 	runtimesCollName     = "runtimes"
 	userActivityCollName = "userActivity"
+	userCollName         = "users"
 )
 
 var (
@@ -122,6 +123,35 @@ var runtimeExamples = map[string]entity.Runtime{
 	},
 }
 
+var userExamples = map[string]entity.User{
+	"user1": {
+		ID:           primitive.NewObjectID().Hex(),
+		Email:        "email1",
+		Username:     "user1",
+		Deleted:      false,
+		CreationDate: testTimeExample,
+		AccessLevel:  entity.AccessLevelAdmin,
+		SSHKey: entity.SSHKey{
+			Public:       "publicKey1",
+			Private:      "privateKey1",
+			CreationDate: testTimeExample,
+		},
+	},
+	"user2": {
+		ID:           primitive.NewObjectID().Hex(),
+		Email:        "email2",
+		Username:     "user2",
+		Deleted:      false,
+		CreationDate: testTimeExample,
+		AccessLevel:  entity.AccessLevelAdmin,
+		SSHKey: entity.SSHKey{
+			Public:       "publicKey2",
+			Private:      "privateKey2",
+			CreationDate: testTimeExample,
+		},
+	},
+}
+
 type TestSuite struct {
 	suite.Suite
 	mongoDBContainer testcontainers.Container
@@ -130,6 +160,7 @@ type TestSuite struct {
 	projectRepo      *mongodb.ProjectRepo
 	runtimeRepo      *mongodb.RuntimeRepo
 	userActivityRepo *mongodb.UserActivityRepo
+	userRepo         *mongodb.UserRepo
 }
 
 func TestProcessRepositoryTestSuite(t *testing.T) {
@@ -138,7 +169,7 @@ func TestProcessRepositoryTestSuite(t *testing.T) {
 
 func (s *TestSuite) SetupSuite() {
 	ctx := context.Background()
-	logger := logging.NewLogger("debug")
+	logger := logging.NewLogger("info")
 
 	rootUsername := "root"
 	rootPassword := "root"
@@ -175,40 +206,11 @@ func (s *TestSuite) SetupSuite() {
 	s.projectRepo = mongodb.NewProjectRepo(logger, mongoClient, dbName)
 	s.runtimeRepo = mongodb.NewRuntimeRepo(logger, mongoClient, dbName)
 	s.userActivityRepo = mongodb.NewUserActivityRepo(logger, mongoClient, dbName)
-
-	// viper.Set(config.MongoDBKaiDatabaseKey, _kaiProduct)
+	s.userRepo = mongodb.NewUserRepo(logger, mongoClient, dbName)
 
 	monkey.Patch(time.Now, func() time.Time {
 		return time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
 	})
-
-	// populate database with some data
-	s.SetupCapabilities(mongoClient)
-	s.SetupProjects(mongoClient)
-	s.SetupRuntimes(mongoClient)
-}
-
-// SetupCapabilities populates the database with some data regarding capabilites
-func (s *TestSuite) SetupCapabilities(mongoClient *mongo.Client) {
-	for _, c := range capabilitiesExamples {
-		_, err := s.capabilitiesRepo.Create(context.Background(), c)
-		s.Require().NoError(err)
-	}
-}
-
-// SetupProjects populates the database with some data regarding projects
-func (s *TestSuite) SetupProjects(mongoClient *mongo.Client) {
-	for _, p := range projectExamples {
-		_, err := s.projectRepo.Create(context.Background(), p)
-		s.Require().NoError(err)
-	}
-}
-
-func (s *TestSuite) SetupRuntimes(mongoClient *mongo.Client) {
-	for _, r := range runtimeExamples {
-		_, err := s.runtimeRepo.Create(context.Background(), r)
-		s.Require().NoError(err)
-	}
 }
 
 func (s *TestSuite) TearDownSuite() {
@@ -216,16 +218,37 @@ func (s *TestSuite) TearDownSuite() {
 	s.Require().NoError(s.mongoDBContainer.Terminate(context.Background()))
 }
 
-func (s *TestSuite) TearDownTest() {
-	// filter := bson.D{}
+func (s *TestSuite) SetupTest() {
+	// setup capabilities
+	for _, c := range capabilitiesExamples {
+		_, err := s.capabilitiesRepo.Create(context.Background(), c)
+		s.Require().NoError(err)
+	}
 
-	// _, err := s.mongoClient.Database(_productID).
-	// 	Collection(registeredProcessCollectionName).
-	// 	DeleteMany(context.Background(), filter)
-	// s.Require().NoError(err)
+	// setup projects
+	for _, p := range projectExamples {
+		_, err := s.projectRepo.Create(context.Background(), p)
+		s.Require().NoError(err)
+	}
+
+	// setup runtimes
+	for _, r := range runtimeExamples {
+		_, err := s.runtimeRepo.Create(context.Background(), r)
+		s.Require().NoError(err)
+	}
+
+	// setup users
+	for _, u := range userExamples {
+		_, err := s.userRepo.Create(context.Background(), u)
+		s.Require().NoError(err)
+	}
 }
 
-func (s *TestSuite) TestGetCapabilities_OK() {
+func (s *TestSuite) TearDownTest() {
+	s.mongoClient.Database(dbName).Drop(context.Background())
+}
+
+func (s *TestSuite) TestCapabilitiesGet_OK() {
 	ctx := context.Background()
 
 	expectedCapability := capabilitiesExamples["capability1"]
@@ -236,7 +259,7 @@ func (s *TestSuite) TestGetCapabilities_OK() {
 	s.Equal(expectedCapability, actualCapability)
 }
 
-func (s *TestSuite) TestGetCapabilities_NoID() {
+func (s *TestSuite) TestCapabilitiesGet_NoID() {
 	ctx := context.Background()
 
 	_, err := s.capabilitiesRepo.Get(ctx, "")
@@ -252,7 +275,7 @@ func (s *TestSuite) TestGetCapabilities_NotFound() {
 	s.Equal(entity.ErrCapabilitiesNotFound, err)
 }
 
-func (s *TestSuite) TestFindAllCapabilities_OK() {
+func (s *TestSuite) TestCapabilitiesFindAll_OK() {
 	ctx := context.Background()
 
 	actualCapabilities, err := s.capabilitiesRepo.FindAll(ctx)
@@ -261,22 +284,7 @@ func (s *TestSuite) TestFindAllCapabilities_OK() {
 	s.Len(actualCapabilities, 2)
 }
 
-func (s *TestSuite) TestCreateProject_OK() {
-	ctx := context.Background()
-
-	project := projectExamples["project1"]
-
-	// remove project1 from the database as it was saved previously
-	projectsCollection := s.mongoClient.Database(dbName).Collection(projectCollName)
-	_, err := projectsCollection.DeleteOne(ctx, bson.M{"_id": project.ID})
-
-	id, err := s.projectRepo.Create(ctx, project)
-	s.Require().NoError(err)
-
-	s.NotEmpty(id)
-}
-
-func (s *TestSuite) TestGetProject_OK() {
+func (s *TestSuite) TestProjectGet_OK() {
 	ctx := context.Background()
 
 	expectedProject := projectExamples["project1"]
@@ -287,7 +295,7 @@ func (s *TestSuite) TestGetProject_OK() {
 	s.Equal(expectedProject, actualProject)
 }
 
-func (s *TestSuite) TestGetProject_NotFound() {
+func (s *TestSuite) TestProjectGet_NotFound() {
 	ctx := context.Background()
 
 	_, err := s.projectRepo.Get(ctx, "notfound")
@@ -295,7 +303,7 @@ func (s *TestSuite) TestGetProject_NotFound() {
 	s.Equal(entity.ErrProjectNotFound, err)
 }
 
-func (s *TestSuite) TestFindAllProjects_OK() {
+func (s *TestSuite) TestProjectFindAll_OK() {
 	ctx := context.Background()
 
 	actualProjects, err := s.projectRepo.FindAll(ctx)
@@ -304,7 +312,7 @@ func (s *TestSuite) TestFindAllProjects_OK() {
 	s.Len(actualProjects, 2)
 }
 
-func (s *TestSuite) TestAddMembers_OK() {
+func (s *TestSuite) TestProjectAddMembers_OK() {
 	ctx := context.Background()
 
 	project := projectExamples["project1"]
@@ -325,7 +333,7 @@ func (s *TestSuite) TestAddMembers_OK() {
 	s.Equal(len(project.Members)+len(members), len(actualProject.Members))
 }
 
-func (s *TestSuite) TestRemoveMembers_OK() {
+func (s *TestSuite) TestProjectRemoveMembers_OK() {
 	ctx := context.Background()
 
 	project := projectExamples["project1"]
@@ -360,7 +368,7 @@ func (s *TestSuite) TestRemoveMembers_OK() {
 	s.Equal(len(project.Members), len(actualProject.Members))
 }
 
-func (s *TestSuite) TestUpdateMembersAccessLevel_OK() {
+func (s *TestSuite) TestProjectUpdateMembersAccessLevel_OK() {
 	ctx := context.Background()
 
 	project := projectExamples["project1"]
@@ -394,7 +402,7 @@ func (s *TestSuite) TestUpdateMembersAccessLevel_OK() {
 	}
 }
 
-func (s *TestSuite) TestUpdateName_OK() {
+func (s *TestSuite) TestProjectUpdateName_OK() {
 	ctx := context.Background()
 
 	project := projectExamples["project1"]
@@ -409,7 +417,7 @@ func (s *TestSuite) TestUpdateName_OK() {
 	s.Equal(newName, actualProject.Name)
 }
 
-func (s *TestSuite) TestUpdateDescription_OK() {
+func (s *TestSuite) TestProjectUpdateDescription_OK() {
 	ctx := context.Background()
 
 	project := projectExamples["project1"]
@@ -424,7 +432,7 @@ func (s *TestSuite) TestUpdateDescription_OK() {
 	s.Equal(newDescription, actualProject.Description)
 }
 
-func (s *TestSuite) TestUpdateArchived_OK() {
+func (s *TestSuite) TestProjectUpdateArchived_OK() {
 	ctx := context.Background()
 
 	project := projectExamples["project1"]
@@ -439,36 +447,28 @@ func (s *TestSuite) TestUpdateArchived_OK() {
 	s.Equal(newArchived, actualProject.Archived)
 }
 
-func (s *TestSuite) TestDeleteOne_OK() {
+func (s *TestSuite) TestProjectDeleteOne_OK() {
 	ctx := context.Background()
 
-	testProject := entity.Project{
-		ID:          "3",
-		Name:        "testProject",
-		Description: "description3",
-	}
-
-	_, err := s.projectRepo.Create(ctx, testProject)
-
-	_, err = s.projectRepo.Get(ctx, testProject.ID)
+	_, err := s.projectRepo.Get(ctx, projectExamples["project1"].ID)
 	s.Require().NoError(err)
 
-	err = s.projectRepo.DeleteOne(ctx, testProject.ID)
+	err = s.projectRepo.DeleteOne(ctx, projectExamples["project1"].ID)
 	s.Require().NoError(err)
 
-	_, err = s.projectRepo.Get(ctx, testProject.ID)
+	_, err = s.projectRepo.Get(ctx, projectExamples["project1"].ID)
 	s.Require().Error(err)
 	s.Equal(entity.ErrProjectNotFound, err)
 }
 
-func (s *TestSuite) TestDeleteOne_NoPreviousProject() {
+func (s *TestSuite) TestProjectDeleteOne_NoPreviousProject() {
 	ctx := context.Background()
 
 	err := s.projectRepo.DeleteOne(ctx, "notfound")
 	s.Require().Error(err)
 }
 
-func (s *TestSuite) TestGetRuntime_OK() {
+func (s *TestSuite) TestRuntimeGet_OK() {
 	ctx := context.Background()
 
 	expectedRuntime := runtimeExamples["runtime1"]
@@ -479,7 +479,7 @@ func (s *TestSuite) TestGetRuntime_OK() {
 	s.Equal(expectedRuntime, actualRuntime)
 }
 
-func (s *TestSuite) TestGetRuntime_NotValidHex() {
+func (s *TestSuite) TestRuntimeGet_NotValidHex() {
 	ctx := context.Background()
 
 	_, err := s.runtimeRepo.Get(ctx, "notvalid")
@@ -487,7 +487,7 @@ func (s *TestSuite) TestGetRuntime_NotValidHex() {
 	s.Equal(primitive.ErrInvalidHex, err)
 }
 
-func (s *TestSuite) TestGetRuntime_NotFound() {
+func (s *TestSuite) TestRuntimeGet_NotFound() {
 	ctx := context.Background()
 
 	_, err := s.runtimeRepo.Get(ctx, primitive.NewObjectID().Hex())
@@ -495,7 +495,7 @@ func (s *TestSuite) TestGetRuntime_NotFound() {
 	s.Equal(entity.ErrRuntimeNotFound, err)
 }
 
-func (s *TestSuite) TestFindAllRuntimes_OK() {
+func (s *TestSuite) TestRuntimeFindAll_OK() {
 	ctx := context.Background()
 
 	actualRuntimes, err := s.runtimeRepo.FindAll(ctx)
@@ -504,7 +504,7 @@ func (s *TestSuite) TestFindAllRuntimes_OK() {
 	s.Len(actualRuntimes, 2)
 }
 
-func (s *TestSuite) TestCreateUserActivity_OK() {
+func (s *TestSuite) TestUserActivityCreate_OK() {
 	ctx := context.Background()
 
 	userActivityExample := entity.UserActivity{
@@ -521,4 +521,239 @@ func (s *TestSuite) TestCreateUserActivity_OK() {
 
 	err := s.userActivityRepo.Create(ctx, userActivityExample)
 	s.Require().NoError(err)
+}
+
+func (s *TestSuite) TestUserGet_OK() {
+	ctx := context.Background()
+
+	expectedUser := userExamples["user1"]
+
+	actualUser, err := s.userRepo.Get(ctx, expectedUser.ID)
+	s.Require().NoError(err)
+
+	s.Equal(expectedUser, actualUser)
+}
+
+func (s *TestSuite) TestUserGet_NotValidHex() {
+	ctx := context.Background()
+
+	_, err := s.userRepo.Get(ctx, "notfound")
+	s.Require().Error(err)
+	s.Equal(primitive.ErrInvalidHex, err)
+}
+
+func (s *TestSuite) TestUserGet_NotFound() {
+	ctx := context.Background()
+
+	_, err := s.userRepo.Get(ctx, primitive.NewObjectID().Hex())
+	s.Require().Error(err)
+	s.Equal(entity.ErrUserNotFound, err)
+}
+
+func (s *TestSuite) TestUserGetByUsername_OK() {
+	ctx := context.Background()
+
+	expectedUser := userExamples["user1"]
+
+	actualUser, err := s.userRepo.GetByUsername(ctx, expectedUser.Username)
+	s.Require().NoError(err)
+
+	s.Equal(expectedUser, actualUser)
+}
+
+func (s *TestSuite) TestUserGetByUsername_NotFound() {
+	ctx := context.Background()
+
+	_, err := s.userRepo.GetByUsername(ctx, "notfound")
+	s.Require().Error(err)
+	s.Equal(entity.ErrUserNotFound, err)
+}
+
+func (s *TestSuite) TestUserGetByEmail_OK() {
+	ctx := context.Background()
+
+	expectedUser := userExamples["user1"]
+
+	actualUser, err := s.userRepo.GetByEmail(ctx, expectedUser.Email)
+	s.Require().NoError(err)
+
+	s.Equal(expectedUser, actualUser)
+}
+
+func (s *TestSuite) TestUserGetByEmail_NotFound() {
+	ctx := context.Background()
+
+	_, err := s.userRepo.GetByEmail(ctx, "notfound")
+	s.Require().Error(err)
+	s.Equal(entity.ErrUserNotFound, err)
+}
+
+func (s *TestSuite) TestUserFindAll_OK() {
+	ctx := context.Background()
+
+	actualUsers, err := s.userRepo.FindAll(ctx, false)
+	s.Require().NoError(err)
+
+	s.Len(actualUsers, 2)
+}
+
+func (s *TestSuite) TestUserFindAllPlusDeleted_OK() {
+	ctx := context.Background()
+
+	deletedUser := userExamples["user1"]
+	deletedUser.ID = primitive.NewObjectID().Hex()
+	deletedUser.Deleted = true
+
+	_, err := s.userRepo.Create(ctx, deletedUser)
+	s.Require().NoError(err)
+
+	actualUsers, err := s.userRepo.FindAll(ctx, true)
+	s.Require().NoError(err)
+
+	s.Len(actualUsers, 3)
+}
+
+func (s *TestSuite) TestUserFindByIDs_OK() {
+	ctx := context.Background()
+
+	userIDs := []string{
+		userExamples["user1"].ID,
+		userExamples["user2"].ID,
+	}
+
+	actualUsers, err := s.userRepo.FindByIDs(ctx, userIDs)
+	s.Require().NoError(err)
+
+	s.Len(actualUsers, 2)
+
+	userIDs = []string{
+		userExamples["user1"].ID,
+	}
+
+	actualUsers, err = s.userRepo.FindByIDs(ctx, userIDs)
+	s.Require().NoError(err)
+
+	s.Len(actualUsers, 1)
+}
+
+func (s *TestSuite) TestUserUpdateAccessLevel_OK() {
+	ctx := context.Background()
+
+	user := userExamples["user1"]
+	newAccessLevel := entity.AccessLevelViewer
+
+	s.NotEqual(newAccessLevel, user.AccessLevel)
+
+	err := s.userRepo.UpdateAccessLevel(ctx, []string{user.ID}, newAccessLevel)
+	s.Require().NoError(err)
+
+	actualUser, err := s.userRepo.Get(ctx, user.ID)
+	s.Require().NoError(err)
+
+	s.Equal(newAccessLevel, actualUser.AccessLevel)
+}
+
+func (s *TestSuite) TestUserUpdateDeleted_OK() {
+	ctx := context.Background()
+
+	user := userExamples["user1"]
+	newDeleted := true
+
+	s.NotEqual(newDeleted, user.Deleted)
+
+	err := s.userRepo.UpdateDeleted(ctx, user.Username, newDeleted)
+	s.Require().NoError(err)
+
+	actualUser, err := s.userRepo.Get(ctx, user.ID)
+	s.Require().NoError(err)
+
+	s.Equal(newDeleted, actualUser.Deleted)
+}
+
+func (s *TestSuite) TestUserUpdateSSHKey_OK() {
+	ctx := context.Background()
+
+	user := userExamples["user1"]
+	newSSHKey := entity.SSHKey{
+		Public:       "newPublicKey",
+		Private:      "newPrivateKey",
+		CreationDate: testTimeExample,
+	}
+
+	err := s.userRepo.UpdateSSHKey(ctx, user.Username, newSSHKey)
+	s.Require().NoError(err)
+
+	actualUser, err := s.userRepo.Get(ctx, user.ID)
+	s.Require().NoError(err)
+
+	s.Equal(newSSHKey, actualUser.SSHKey)
+}
+
+func (s *TestSuite) TestUserUpdateEmail_OK() {
+	ctx := context.Background()
+
+	user := userExamples["user1"]
+	newEmail := "newEmail"
+
+	err := s.userRepo.UpdateEmail(ctx, user.Username, newEmail)
+	s.Require().NoError(err)
+
+	actualUser, err := s.userRepo.Get(ctx, user.ID)
+	s.Require().NoError(err)
+
+	s.Equal(newEmail, actualUser.Email)
+}
+
+func (s *TestSuite) TestUserUpdateUsername_OK() {
+	ctx := context.Background()
+
+	user := userExamples["user1"]
+	newUsername := "newUsername"
+
+	err := s.userRepo.UpdateUsername(ctx, user.Email, newUsername)
+	s.Require().NoError(err)
+
+	actualUser, err := s.userRepo.Get(ctx, user.ID)
+	s.Require().NoError(err)
+
+	s.Equal(newUsername, actualUser.Username)
+}
+
+func (s *TestSuite) TestUserEnsureIndexes_OK() {
+	collection := s.mongoClient.Database(dbName).Collection(userCollName)
+	indexView := collection.Indexes()
+
+	cursor, err := indexView.List(context.Background())
+	s.Require().NoError(err)
+
+	var indexes []string
+	for cursor.Next(context.Background()) {
+		var index bson.M
+		err := cursor.Decode(&index)
+		s.Require().NoError(err)
+
+		indexes = append(indexes, index["name"].(string))
+	}
+
+	s.NotContains(indexes, "email_1")
+	s.NotContains(indexes, "username_1")
+
+	err = s.userRepo.EnsureIndexes()
+	s.Require().NoError(err)
+
+	// check if index has been created
+	indexView = collection.Indexes()
+	cursor, err = indexView.List(context.Background())
+	s.Require().NoError(err)
+
+	for cursor.Next(context.Background()) {
+		var index bson.M
+		err := cursor.Decode(&index)
+		s.Require().NoError(err)
+
+		indexes = append(indexes, index["name"].(string))
+	}
+
+	s.Contains(indexes, "email_1")
+	s.Contains(indexes, "username_1")
 }

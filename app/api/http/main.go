@@ -73,7 +73,7 @@ func main() {
 	projectRepo := mongodb.NewProjectRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 	runtimeRepo := mongodb.NewRuntimeRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 	userActivityRepo := mongodb.NewUserActivityRepo(logger, mongodbClient, cfg.MongoDB.DBName)
-	userRepo := mongodb.NewUserMongoDBRepo(logger, mongodbClient, cfg.MongoDB.DBName)
+	userRepo := mongodb.NewUserRepo(logger, mongodbClient, cfg.MongoDB.DBName)
 
 	err = userRepo.EnsureIndexes()
 	if err != nil {

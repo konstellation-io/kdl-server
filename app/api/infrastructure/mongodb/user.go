@@ -33,19 +33,21 @@ type userDTO struct {
 	SSHKeyCreationDate time.Time          `bson:"ssh_key_creation_date"`
 }
 
-type userMongoDBRepo struct {
+type UserRepo struct {
 	logger     logging.Logger
 	collection *mongo.Collection
 }
 
-// NewUserMongoDBRepo implements user.Repository interface.
-func NewUserMongoDBRepo(logger logging.Logger, client *mongo.Client, dbName string) user.Repository {
+// UserRepo implements the user.Repository interface.
+var _ user.Repository = (*UserRepo)(nil)
+
+func NewUserRepo(logger logging.Logger, client *mongo.Client, dbName string) *UserRepo {
 	collection := client.Database(dbName).Collection(userCollName)
-	return &userMongoDBRepo{logger, collection}
+	return &UserRepo{logger, collection}
 }
 
 // EnsureIndexes creates if not exists the indexes for the user collection.
-func (m *userMongoDBRepo) EnsureIndexes() error {
+func (m *UserRepo) EnsureIndexes() error {
 	m.logger.Infof("Creating index for %q collection...", userCollName)
 
 	ctx, cancel := context.WithTimeout(context.Background(), ensureIndexesTimeout)
@@ -73,7 +75,7 @@ func (m *userMongoDBRepo) EnsureIndexes() error {
 }
 
 // Get retrieves the user using the identifier.
-func (m *userMongoDBRepo) Get(ctx context.Context, id string) (entity.User, error) {
+func (m *UserRepo) Get(ctx context.Context, id string) (entity.User, error) {
 	idFromHex, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return entity.User{}, err
@@ -83,17 +85,17 @@ func (m *userMongoDBRepo) Get(ctx context.Context, id string) (entity.User, erro
 }
 
 // GetByUsername retrieves the user using their user name.
-func (m *userMongoDBRepo) GetByUsername(ctx context.Context, username string) (entity.User, error) {
+func (m *UserRepo) GetByUsername(ctx context.Context, username string) (entity.User, error) {
 	return m.findOne(ctx, bson.M{"username": username})
 }
 
 // GetByUsername retrieves the user using their user email.
-func (m *userMongoDBRepo) GetByEmail(ctx context.Context, email string) (entity.User, error) {
+func (m *UserRepo) GetByEmail(ctx context.Context, email string) (entity.User, error) {
 	return m.findOne(ctx, bson.M{"email": email})
 }
 
 // FindAll retrieves all the existing users.
-func (m *userMongoDBRepo) FindAll(ctx context.Context, includeDeleted bool) ([]entity.User, error) {
+func (m *UserRepo) FindAll(ctx context.Context, includeDeleted bool) ([]entity.User, error) {
 	var filter bson.M
 
 	if includeDeleted {
@@ -106,7 +108,7 @@ func (m *userMongoDBRepo) FindAll(ctx context.Context, includeDeleted bool) ([]e
 }
 
 // Create inserts into the database a new entity.
-func (m *userMongoDBRepo) Create(ctx context.Context, u entity.User) (string, error) {
+func (m *UserRepo) Create(ctx context.Context, u entity.User) (string, error) {
 	m.logger.Debugf("Inserting a new user %q into %s collection...", u.Email, userCollName)
 
 	dto, err := m.entityToDTO(u)
@@ -114,7 +116,9 @@ func (m *userMongoDBRepo) Create(ctx context.Context, u entity.User) (string, er
 		return "", err
 	}
 
-	dto.ID = primitive.NewObjectID()
+	if dto.ID.IsZero() {
+		dto.ID = primitive.NewObjectID()
+	}
 
 	result, err := m.collection.InsertOne(ctx, dto)
 	if err != nil {
@@ -129,7 +133,7 @@ func (m *userMongoDBRepo) Create(ctx context.Context, u entity.User) (string, er
 }
 
 // FindByIDs retrieves the users for the given user identifiers.
-func (m *userMongoDBRepo) FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error) {
+func (m *UserRepo) FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error) {
 	objIDs, err := m.toObjectIDs(userIDs)
 	if err != nil {
 		return nil, err
@@ -139,7 +143,7 @@ func (m *userMongoDBRepo) FindByIDs(ctx context.Context, userIDs []string) ([]en
 }
 
 // UpdateAccessLevel update the user access level for the given user identifiers.
-func (m *userMongoDBRepo) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) error {
+func (m *UserRepo) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) error {
 	objIDs, err := m.toObjectIDs(userIDs)
 	if err != nil {
 		return err
@@ -162,7 +166,7 @@ func (m *userMongoDBRepo) UpdateAccessLevel(ctx context.Context, userIDs []strin
 	return err
 }
 
-func (m *userMongoDBRepo) UpdateSSHKey(ctx context.Context, username string, sshKey entity.SSHKey) error {
+func (m *UserRepo) UpdateSSHKey(ctx context.Context, username string, sshKey entity.SSHKey) error {
 	fields := bson.M{
 		"public_ssh_key":        sshKey.Public,
 		"private_ssh_key":       sshKey.Private,
@@ -172,11 +176,11 @@ func (m *userMongoDBRepo) UpdateSSHKey(ctx context.Context, username string, ssh
 	return m.updateUserFields(ctx, username, fields)
 }
 
-func (m *userMongoDBRepo) UpdateEmail(ctx context.Context, username, email string) error {
+func (m *UserRepo) UpdateEmail(ctx context.Context, username, email string) error {
 	return m.updateUserFields(ctx, username, bson.M{"email": email})
 }
 
-func (m *userMongoDBRepo) UpdateUsername(ctx context.Context, email, username string) error {
+func (m *UserRepo) UpdateUsername(ctx context.Context, email, username string) error {
 	m.logger.Debugf("Updating user %q with email %q ...", username, email)
 
 	filter := bson.M{"email": email}
@@ -190,11 +194,11 @@ func (m *userMongoDBRepo) UpdateUsername(ctx context.Context, email, username st
 	return err
 }
 
-func (m *userMongoDBRepo) UpdateDeleted(ctx context.Context, username string, deleted bool) error {
+func (m *UserRepo) UpdateDeleted(ctx context.Context, username string, deleted bool) error {
 	return m.updateUserFields(ctx, username, bson.M{"deleted": deleted})
 }
 
-func (m *userMongoDBRepo) updateUserFields(ctx context.Context, username string, fields bson.M) error {
+func (m *UserRepo) updateUserFields(ctx context.Context, username string, fields bson.M) error {
 	m.logger.Debugf("Updating user %q with \"%#v\"...", username, fields)
 
 	filter := bson.M{"username": username}
@@ -206,7 +210,7 @@ func (m *userMongoDBRepo) updateUserFields(ctx context.Context, username string,
 	return err
 }
 
-func (m *userMongoDBRepo) toObjectIDs(userIDs []string) ([]primitive.ObjectID, error) {
+func (m *UserRepo) toObjectIDs(userIDs []string) ([]primitive.ObjectID, error) {
 	objIDs := make([]primitive.ObjectID, len(userIDs))
 
 	for i, id := range userIDs {
@@ -221,7 +225,7 @@ func (m *userMongoDBRepo) toObjectIDs(userIDs []string) ([]primitive.ObjectID, e
 	return objIDs, nil
 }
 
-func (m *userMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.User, error) {
+func (m *UserRepo) findOne(ctx context.Context, filters bson.M) (entity.User, error) {
 	m.logger.Debugf("Finding one user by \"%#v\" from database...", filters)
 
 	dto := userDTO{}
@@ -234,7 +238,7 @@ func (m *userMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.U
 	return m.dtoToEntity(dto), err
 }
 
-func (m *userMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity.User, error) {
+func (m *UserRepo) find(ctx context.Context, filters bson.M) ([]entity.User, error) {
 	m.logger.Debugf("Finding users with filters \"%#v\"...", filters)
 
 	var dtos []userDTO
@@ -247,7 +251,7 @@ func (m *userMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity.Us
 	return m.dtosToEntities(dtos), nil
 }
 
-func (m *userMongoDBRepo) entityToDTO(u entity.User) (userDTO, error) {
+func (m *UserRepo) entityToDTO(u entity.User) (userDTO, error) {
 	dto := userDTO{
 		Username:           u.Username,
 		Email:              u.Email,
@@ -271,7 +275,7 @@ func (m *userMongoDBRepo) entityToDTO(u entity.User) (userDTO, error) {
 	return dto, nil
 }
 
-func (m *userMongoDBRepo) dtoToEntity(dto userDTO) entity.User {
+func (m *UserRepo) dtoToEntity(dto userDTO) entity.User {
 	return entity.User{
 		ID:           dto.ID.Hex(),
 		Username:     dto.Username,
@@ -287,7 +291,7 @@ func (m *userMongoDBRepo) dtoToEntity(dto userDTO) entity.User {
 	}
 }
 
-func (m *userMongoDBRepo) dtosToEntities(dtos []userDTO) []entity.User {
+func (m *UserRepo) dtosToEntities(dtos []userDTO) []entity.User {
 	result := make([]entity.User, len(dtos))
 
 	for i, dto := range dtos {

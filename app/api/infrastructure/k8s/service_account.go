@@ -42,25 +42,8 @@ func (k k8sClient) getServiceAccountSecretName(usernameSlug string) string {
 
 // CreateUserServiceAccount creates a new k8s serviceAccount for a user.
 func (k *k8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
-	// Create secret
 	saSecretName := k.getServiceAccountSecretName(usernameSlug)
-	k.logger.Infof("Creating secret service account token %q for user %q in k8s...", saSecretName, usernameSlug)
-	secret := v1.Secret{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: saSecretName,
-			Annotations: map[string]string{
-				"kubernetes.io/service-account.name": k.getUserServiceAccountName(usernameSlug),
-			},
-		},
-		Type: v1.SecretTypeServiceAccountToken,
-	}
 
-	_, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Create(ctx, &secret, metav1.CreateOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	k.logger.Infof("The secret service account token %q was created in k8s correctly", secret.Name)
 	k.logger.Infof("Creating service account for user %q in k8s...", usernameSlug)
 
 	sa := k.newServiceAccount(usernameSlug, saSecretName)
@@ -70,6 +53,26 @@ func (k *k8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug s
 	}
 
 	k.logger.Infof("The service account %q was created in k8s correctly", serviceAccount.Name)
+
+	// Create secret
+	k.logger.Infof("Creating secret service account token %q for user %q in k8s...", saSecretName, usernameSlug)
+	secret := v1.Secret{
+		TypeMeta: metav1.TypeMeta{},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: saSecretName,
+			Annotations: map[string]string{
+				"kubernetes.io/service-account.name": k.getUserServiceAccountName(usernameSlug),
+			},
+		},
+		Type: v1.SecretTypeServiceAccountToken,
+	}
+
+	_, err = k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Create(ctx, &secret, metav1.CreateOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	k.logger.Infof("The secret service account token %q was created in k8s correctly", secret.Name)
 
 	return serviceAccount, nil
 }

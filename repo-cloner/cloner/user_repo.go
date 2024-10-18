@@ -134,7 +134,7 @@ func (c *UserRepoCloner) cloneRepo(project repository.Project) {
 		if _, err := os.Stat(destPath); os.IsNotExist(err) {
 			err := os.RemoveAll(destPath)
 			if err != nil {
-				c.logger.Error(err, "Error deleting repo folder", err)
+				c.logger.Error(err, "Error deleting repo folder", "RepoPath", destPath)
 			}
 		}
 

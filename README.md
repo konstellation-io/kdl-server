@@ -23,12 +23,12 @@ Refer to chart's [README](helm/kdl-server/README.md).
 
 #### Microk8s
 
-The local version of Kubernetes to deploy KDL. The version required is **1.23**.
+The local version of Kubernetes to deploy KDL. The version required is **1.26**.
 
 Linux installation:
 
 ```
-snap install --channel=1.19/stable microk8s --classic
+snap install --channel=1.26/stable microk8s --classic
 ```
 
 In Mac, if the multipass vm doesn't exist the kdlctl.sh will create it automatically. You also can do it manually using:
@@ -163,6 +163,19 @@ Login link  : https://kdlapp.kdl.192.168.64.2.nip.io
 
 You can find the admin credentials `GITEA_ADMIN_USER` and `GITEA_ADMIN_PASSWORD` in the `.kdlctl.conf` file.
 
+### Install pre-commit
+
+In this project, there is a pre-commit configuration to run some checks before
+committing your code. It is not mandatory but it is recommended to have it in
+your machine.
+
+To install pre-commit hooks run the following command:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
 ### Uninstall local environment
 
 If you want to delete all resources generated into your microk8s run the following command:
@@ -267,7 +280,7 @@ The capabilities object contains three different ways of configuring the rules f
 1. NodeSelectors
 
 - A list of key-pair objects like in the example below:
-  
+
     ```json
     {
       "_id": "test_id",
@@ -327,7 +340,7 @@ To add capabilites to the mongodb, you should follow the next steps:
   ```bash
   kubectl port-forward mongo-.... 27017:27017
   ```
-  
+
 - Connect to the mongodb instance
 
   ```bash

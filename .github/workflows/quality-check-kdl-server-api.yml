@@ -38,7 +38,7 @@ jobs:
         run: go test ./... -cover -v -coverprofile=coverage.out
         working-directory: ./app/api
       - name: API Archive code coverage results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: app/api/coverage.out

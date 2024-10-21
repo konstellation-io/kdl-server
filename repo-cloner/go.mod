@@ -7,7 +7,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/konstellation-io/kdl-server/app/api v0.0.0-20210303152525-77c65485cf7b
 	github.com/konstellation-io/kre/libs/simplelogger v0.0.0-20210210145319-3480f96217e8
-	go.mongodb.org/mongo-driver v1.17.0
+	go.mongodb.org/mongo-driver v1.17.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 

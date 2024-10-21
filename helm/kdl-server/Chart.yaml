@@ -8,7 +8,7 @@ sources:
   - https://github.com/konstellation-io/kdl-server
 home: https://www.konstellation.io
 maintainers:
-  - name:  alexrodfe
+  - name: alexrodfe
     email: alex.rodriguez@intelygenz.com
   - name: igzor
     email: igor.prochazka@intelygenz.com

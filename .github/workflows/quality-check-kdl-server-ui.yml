@@ -21,22 +21,26 @@ jobs:
     steps:
       - name: CheckOut
         uses: actions/checkout@v3
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: '14'
           cache: 'yarn'
           cache-dependency-path: app/ui/yarn.lock
+
       - name: Run UI ESLinter
         working-directory: ./app/ui
         run: |
           yarn install
           yarn run lint
+
       - name: UI Run tests
         working-directory: ./app/ui
         run: |
           yarn install
           yarn run test:cov:sonar
+
       - name: UI Archive code coverage results
         uses: actions/upload-artifact@v3
         with:
@@ -44,6 +48,7 @@ jobs:
           path: |
             ./app/ui/coverage
             ./app/ui/test-report.xml
+
       - name: UI Run e2e tests
         uses: cypress-io/github-action@v5
         with:

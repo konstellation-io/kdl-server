@@ -21,10 +21,12 @@ jobs:
     steps:
       - name: CheckOut
         uses: actions/checkout@v3
+
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: 1.23.1
+
       - name: API Go Lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -34,9 +36,11 @@ jobs:
           skip-pkg-cache: true
           skip-build-cache: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: API Test
         run: go test ./... -cover -v -coverprofile=coverage.out
         working-directory: ./app/api
+
       - name: API Archive code coverage results
         uses: actions/upload-artifact@v3
         with:

@@ -42,7 +42,7 @@ jobs:
           yarn run test:cov:sonar
 
       - name: UI Archive code coverage results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: |

@@ -8,7 +8,6 @@
 |  App UI  | [![coverage][app-ui-coverage]][app-ui-coverage-link] | [![bugs][app-ui-bugs]][app-ui-bugs-link] | [![mr][app-ui-mr]][app-ui-mr-link] | - |
 
 [report-badge]: https://goreportcard.com/badge/github.com/konstellation-io/kdl-server/app/api
-
 [report-link]: https://goreportcard.com/report/github.com/konstellation-io/kdl-server/app/api
 
 ---
@@ -267,7 +266,7 @@ The capabilities object contains three different ways of configuring the rules f
 1. NodeSelectors
 
 - A list of key-pair objects like in the example below:
-  
+
     ```json
     {
       "_id": "test_id",
@@ -327,7 +326,7 @@ To add capabilites to the mongodb, you should follow the next steps:
   ```bash
   kubectl port-forward mongo-.... 27017:27017
   ```
-  
+
 - Connect to the mongodb instance
 
   ```bash

@@ -1,0 +1,8 @@
+addReviewers: true
+addAssignees: author
+numberOfReviewers: 0
+reviewers:
+  - ialejandro
+filterLabels:
+  include:
+    - devops-team

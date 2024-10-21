@@ -20,6 +20,10 @@ Refer to chart's [README](helm/kdl-server/README.md).
 
 ### Dependencies
 
+#### Golang
+
+This repository has been developed in Golang 1.23.2.
+
 #### Microk8s
 
 The local version of Kubernetes to deploy KDL. The version required is **1.23**.
@@ -50,6 +54,7 @@ K8s package manager. Make sure you have v3+. Installation:
 <https://helm.sh/docs/intro/install/>
 
 Please install all required helm plugins via
+
 ```
 helmfile init
 ```

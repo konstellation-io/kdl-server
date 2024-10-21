@@ -104,7 +104,7 @@ cleaner:
     # -- The image repository
     repository: konstellation/cleaner
     # -- The image tag
-    tag: 0.15.0
+    tag: 0.16.0
     # -- The image pull policy
     pullPolicy: IfNotPresent
 
@@ -326,7 +326,7 @@ kdlServer:
     # -- The image repository
     repository: konstellation/kdl-server
     # -- The image tag
-    tag: 1.38.0
+    tag: 1.39.0
     # -- The image pull policy
     pullPolicy: IfNotPresent
   ingress:

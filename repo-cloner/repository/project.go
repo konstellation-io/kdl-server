@@ -3,32 +3,30 @@ package repository
 import (
 	"context"
 	"time"
-	
-	"github.com/konstellation-io/kdl-server/repo-cloner/config"
 
-	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
+	"github.com/go-logr/logr"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/konstellation-io/kdl-server/repo-cloner/config"
 )
 
 type ProjectMongoDBRepo struct {
 	cfg        config.Config
-	logger     logging.Logger
+	logger     logr.Logger
 	collection *mongo.Collection
 }
 
 type Project struct {
-	ID              string                `bson:"_id"`
-	Name            string                `bson:"name"`
-	RepositoryType  entity.RepositoryType `bson:"repo_type"`
-	RepoName        string                `bson:"repo_name"`
-	ExternalRepoURL string                `bson:"external_repo_url"`
+	ID              string `bson:"_id"`
+	Name            string `bson:"name"`
+	RepoName        string `bson:"repo_name"`
+	ExternalRepoURL string `bson:"external_repo_url"`
 }
 
-func NewProjectMongoDBRepo(cfg config.Config, logger logging.Logger, client *mongo.Client) *ProjectMongoDBRepo {
+func NewProjectMongoDBRepo(cfg config.Config, logger logr.Logger, client *mongo.Client) *ProjectMongoDBRepo {
 	collection := client.Database(cfg.MongoDB.DBName).Collection(cfg.MongoDB.ProjectsCollName)
 	return &ProjectMongoDBRepo{cfg, logger, collection}
 }

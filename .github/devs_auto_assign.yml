@@ -1,0 +1,10 @@
+addReviewers: true
+addAssignees: author
+numberOfReviewers: 0
+reviewers:
+  - alexrodfe
+  - igzjaviergil
+  - igzor
+filterLabels:
+  exclude:
+    - devops-team

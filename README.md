@@ -180,6 +180,9 @@ pip install pre-commit
 pre-commit install
 ```
 
+Please also install golangci-lint because it is executed by a pre-commit hook, e.g. via snap.
+<https://golangci-lint.run/welcome/install/>
+
 ### Uninstall local environment
 
 If you want to delete all resources generated into your microk8s run the following command:

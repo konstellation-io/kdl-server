@@ -86,7 +86,8 @@ func (s *serviceAccountTestSuite) SetupTest() {
 }
 
 func (s *serviceAccountTestSuite) TearDownTest() {
-	(*s.container).Terminate(context.Background())
+	err := (*s.container).Terminate(context.Background())
+	s.NoError(err)
 }
 
 func (s *serviceAccountTestSuite) TestCreateServiceAccount() {

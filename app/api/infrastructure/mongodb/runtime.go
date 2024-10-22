@@ -124,7 +124,6 @@ func (m *RuntimeRepo) dtosToEntities(dtos []runtimeDTO) []entity.Runtime {
 func (m *RuntimeRepo) entityToDTO(r entity.Runtime) (runtimeDTO, error) {
 	objectID, err := primitive.ObjectIDFromHex(r.ID)
 	if err != nil {
-
 		return runtimeDTO{}, err
 	}
 

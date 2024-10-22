@@ -42,10 +42,7 @@ func NewCapabilitiesRepo(logger logging.Logger, client *mongo.Client, dbName str
 func (m *CapabilitiesRepo) Create(ctx context.Context, c entity.Capabilities) (string, error) {
 	m.logger.Debugf("Creating new capabilities %q...", c.ID)
 
-	dto, err := m.entityToDTO(c)
-	if err != nil {
-		return "", err
-	}
+	dto := m.entityToDTO(c)
 
 	result, err := m.collection.InsertOne(ctx, dto)
 	if err != nil {
@@ -106,7 +103,7 @@ func (m *CapabilitiesRepo) dtosToEntities(dto []capabilitiesDTO) []entity.Capabi
 	return caps
 }
 
-func (m *CapabilitiesRepo) entityToDTO(c entity.Capabilities) (capabilitiesDTO, error) {
+func (m *CapabilitiesRepo) entityToDTO(c entity.Capabilities) capabilitiesDTO {
 	dto := capabilitiesDTO{
 		ID:            c.ID,
 		Name:          c.Name,
@@ -116,5 +113,5 @@ func (m *CapabilitiesRepo) entityToDTO(c entity.Capabilities) (capabilitiesDTO, 
 		Affinities:    c.Affinities,
 	}
 
-	return dto, nil
+	return dto
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"time"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
@@ -308,12 +309,13 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 
 	deleteRepoActVars := entity.NewActivityVarsDeleteRepo(projectID, minioBackup)
 	deleteRepoUserAct := entity.UserActivity{
+		Date:   time.Now(),
 		UserID: opt.LoggedUser.ID,
 		Type:   entity.UserActivityTypeDeleteProject,
 		Vars:   deleteRepoActVars,
 	}
 
-	err = i.userActivityRepo.Create(deleteRepoUserAct)
+	err = i.userActivityRepo.Create(ctx, deleteRepoUserAct)
 	if err != nil {
 		return nil, err
 	}

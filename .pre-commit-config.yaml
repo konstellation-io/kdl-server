@@ -8,19 +8,14 @@ repos:
     - id: check-symlinks
     - id: end-of-file-fixer
 - repo: https://github.com/zricethezav/gitleaks
-  rev: v8.21.1
+  rev: v8.12.0
   hooks:
     - id: gitleaks
 - repo: https://github.com/norwoodj/helm-docs
-  rev: v1.14.2
+  rev: v1.11.0
   hooks:
     - id: helm-docs
       args:
         - --chart-search-root=./helm/kdl-server
         - --template-files=CHART.md.gotmpl
         - --output-file=CHART.md
-- repo: https://github.com/dnephin/pre-commit-golang
-  rev: v0.5.0
-  hooks:
-    - id: golangci-lint
-      args: ['app/api/...']

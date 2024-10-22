@@ -27,17 +27,8 @@ func TestAPISuite(t *testing.T) {
 	suite.Run(t, new(serviceAccountTestSuite))
 }
 
-func (s *serviceAccountTestSuite) SetupTest() {
-	ctx := context.Background()
-
-	// Launch a k3s container
-	k3sContainer, err := k3s.Run(ctx, "docker.io/rancher/k3s:v1.27.1-k3s1")
-	s.NoError(err)
-
-	s.container = k3sContainer
-
-	// Create a clientset
-	kubeConfigYaml, err := k3sContainer.GetKubeConfig(ctx)
+func (s *serviceAccountTestSuite) createClientset(ctx context.Context) {
+	kubeConfigYaml, err := s.container.GetKubeConfig(ctx)
 	s.NoError(err)
 
 	restcfg, err := clientcmd.RESTConfigFromKubeConfig(kubeConfigYaml)
@@ -46,15 +37,9 @@ func (s *serviceAccountTestSuite) SetupTest() {
 	s.clientset, err = kubernetes.NewForConfig(restcfg)
 	s.NoError(err)
 
-	// Create a namespace
-	s.clientset.CoreV1().Namespaces().Create(ctx, &v1.Namespace{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "kdl-test",
-		},
-	}, metav1.CreateOptions{})
-	s.NoError(err)
+}
 
-	// Create an k8s infrastructure client
+func (s *serviceAccountTestSuite) createClient() {
 	ctrl := gomock.NewController(s.T())
 	logger := logging.NewMockLogger(ctrl)
 	logging.AddLoggerExpects(logger)
@@ -73,6 +58,30 @@ func (s *serviceAccountTestSuite) SetupTest() {
 		nil,
 		nil,
 	)
+}
+
+func (s *serviceAccountTestSuite) initCluster(ctx context.Context) {
+	// Create a namespace
+	_, err := s.clientset.CoreV1().Namespaces().Create(ctx, &v1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "kdl-test",
+		},
+	}, metav1.CreateOptions{})
+	s.NoError(err)
+}
+
+func (s *serviceAccountTestSuite) SetupTest() {
+	ctx := context.Background()
+
+	// Launch a k3s container
+	container, err := k3s.Run(ctx, "docker.io/rancher/k3s:v1.27.1-k3s1")
+	s.NoError(err)
+	s.container = container
+
+	// Initialize cluster and client
+	s.createClientset(ctx)
+	s.initCluster(ctx)
+	s.createClient()
 
 }
 

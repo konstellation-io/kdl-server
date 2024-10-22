@@ -36,7 +36,6 @@ func (s *serviceAccountTestSuite) createClientset(ctx context.Context) {
 
 	s.clientset, err = kubernetes.NewForConfig(restcfg)
 	s.NoError(err)
-
 }
 
 func (s *serviceAccountTestSuite) createClient() {
@@ -82,11 +81,10 @@ func (s *serviceAccountTestSuite) SetupTest() {
 	s.createClientset(ctx)
 	s.initCluster(ctx)
 	s.createClient()
-
 }
 
 func (s *serviceAccountTestSuite) TearDownTest() {
-	err := (*s.container).Terminate(context.Background())
+	err := s.container.Terminate(context.Background())
 	s.NoError(err)
 }
 
@@ -99,5 +97,4 @@ func (s *serviceAccountTestSuite) TestCreateServiceAccount() {
 
 	_, err = s.client.GetUserServiceAccount(context.Background(), "sa")
 	s.NoError(err)
-
 }

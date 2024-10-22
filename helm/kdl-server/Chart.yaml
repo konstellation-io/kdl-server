@@ -1,10 +1,28 @@
 apiVersion: v2
-name: kdl-server
-description: KDL server
-
 type: application
-version: 6.1-rc.8
+name: kdl-server
+description: A Helm chart to deploy KDL server
+version: 6.0-rc.36
 appVersion: 1.39.0
+sources:
+  - https://github.com/konstellation-io/kdl-server
+home: https://www.konstellation.io
+maintainers:
+  - name: alexrodfe
+    email: alex.rodriguez@intelygenz.com
+  - name: igzor
+    email: igor.prochazka@intelygenz.com
+  - name: igzjaviergil
+    email: javier.gilm@intelygenz.com
+  - name: ialejandro
+    email: ivan.alejandro@intelygenz.com
+keywords:
+  - ia
+  - kdl
+  - kdl-server
+  - konstellation
+  - kubernetes
+  - machine learning
 dependencies:
   - name: minio
     version: "3.2.0"

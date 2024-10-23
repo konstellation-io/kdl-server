@@ -175,7 +175,7 @@ Example:
 ```console
 <type>(compoenent): <subject>
 
-BREAKING CHANGES:
+BREAKING CHANGE:
 
 Describe breaking changes here
 

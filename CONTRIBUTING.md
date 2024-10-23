@@ -36,7 +36,7 @@ See `git help commit`:
 * Run the `Setup` command to make sure your development dependencies are up-to-date.
 * Please ensure the test suite passes before submitting a PR.
 * If you've added new functionality, **please** include tests which validate its behavior.
-* Make reference to possible [issues](https://github.com/ngrx/platform/issues) on PR comment.
+* Make reference to possible [issues](https://github.com/konstellation-io/kdl-server/issues) on PR comment.
 
 ### Did you find a bug?
 

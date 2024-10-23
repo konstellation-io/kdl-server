@@ -41,22 +41,6 @@ Conditions:
 - Only in `release*` branch
 - It depends of the path for the component updated.
 
-## Helm release RC
-
-Generates a rc tag and a chart release. 
-
-Conditions:
-- When a workflow runs successfully.
-- `main` branch.
-
-## Helm release Fix
-
-Generates a fix tag and a chart release. 
-
-Conditions:
-- When a workflow runs successfully.
-- `release` branch.
-
 ## Release
 
 Build a new release. Generates a new branch release and tag.

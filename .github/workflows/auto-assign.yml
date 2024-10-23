@@ -13,11 +13,11 @@ jobs:
       - name: 'devs auto-assign'
         uses: kentaro-m/auto-assign-action@v2.0.0
         with:
-          repo-token: ${{ secrets.PATNAME }}
+          repo-token: ${{ secrets.PAT }}
           configuration-path: '.github/devs_auto_assign.yml'
 
       - name: 'devops auto-assign'
         uses: kentaro-m/auto-assign-action@v2.0.0
         with:
-          repo-token: ${{ secrets.PATNAME }}
+          repo-token: ${{ secrets.PAT }}
           configuration-path: '.github/devops_auto_assign.yml'

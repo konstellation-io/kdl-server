@@ -134,10 +134,11 @@ If the commit reverts a previous commit, it should begin with `revert:`, followe
 
 | Type      | Description                                        | Release           |
 | --------- | -------------------------------------------------- | ----------------- |
+| **chore** | guidestyle on code (white-space, formatting, etc.) | no release        |
+| **ci**    | GitHub Actions, `.github`                          | no release        |
 | **docs**  | changes on documentation                           | no release        |
 | **feat**  | new feature                                        | minor release     |
 | **fix**   | bug fix                                            | patch fix release |
-| **style** | guidestyle on code (white-space, formatting, etc.) | no release        |
 
 ### Component
 

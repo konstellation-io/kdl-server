@@ -10,11 +10,6 @@ on:
       - 'app/ui/*'
 
 jobs:
-  lint-dockerfile:
-    uses: konstellation-io/github-workflows/.github/workflows/lint-dockerfile.yaml@v1.7.6
-    with:
-      component_path: app
-
   quality-checks:
     runs-on: ubuntu-20.04
     needs: lint-dockerfile

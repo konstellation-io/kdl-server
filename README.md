@@ -360,7 +360,7 @@ To add capabilites to the mongodb, you should follow the next steps:
 - Add the needed capabilites
 
   ```bash
-  db.capabilities.insertOne([
+  db.capabilities.insertMany([
     {
       "_id": "test_id1",
       "name": "test 1",

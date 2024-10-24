@@ -5,7 +5,7 @@
   "author": "Konstellation",
   "version": "1.0.0",
   "dependencies": {
-    "puppeteer": "^19.4.0"
+    "puppeteer": "^23.6.0"
   },
   "devDependencies": {},
   "main": "index.js",

@@ -1,15 +1,39 @@
 {
   "name": "drone-authorizer",
-  "version": "1.0.0",
   "description": "This application uses a headless browser to automate the oAuth2 authorization with Drone process.",
-  "main": "index.js",
+  "license": "MIT",
+  "author": "Konstellation",
   "dependencies": {
     "puppeteer": "^19.4.0"
   },
   "devDependencies": {},
+  "main": "index.js",
+  "release": {
+    "tagFormat": "drone-authorizer-v${version}",
+    "branches": [
+      "main",
+      {
+        "channel": "default",
+        "name": "develop",
+        "prerelease": "rc"
+      }
+    ],
+    "extends": "semantic-release-monorepo",
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/github",
+        {
+          "failComment": false,
+          "published": true,
+          "successComment": false
+        }
+      ]
+    ]
+  },
   "scripts": {
     "authorize": "node index.js"
   },
-  "author": "Konstellation",
-  "license": "MIT"
+  "version": "1.0.0"
 }

@@ -2,7 +2,15 @@
     "name": "kdl-server",
     "private": true,
     "workspaces": [
-        "app"
+        "app",
+        "backup",
+        "drone-authorizer",
+        "drone-oauth2-setup",
+        "mlflow",
+        "project-operator",
+        "repo-cloner",
+        "user-tools-operator",
+        "vscode"
     ],
     "devDependencies": {
         "semantic-release-monorepo": "^8.0.2",

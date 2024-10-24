@@ -1,9 +1,9 @@
 {
-    "name": "kdl-app",
+    "name": "repo-cloner",
     "version": "1.0.0",
     "private": true,
     "release": {
-        "tagFormat": "kdl-app-v${version}",
+        "tagFormat": "repo-cloner-v${version}",
         "extends": "semantic-release-monorepo",
         "branches": [
             "main",

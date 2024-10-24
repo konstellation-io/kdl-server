@@ -34,7 +34,8 @@ type K8sClient struct {
 	kdlprojectRes dynamic.NamespaceableResourceInterface
 }
 
-func New(logger logging.Logger, cfg config.Config, clientset *kubernetes.Clientset, userToolsRes dynamic.NamespaceableResourceInterface, kdlprojectRes dynamic.NamespaceableResourceInterface) *K8sClient {
+func New(logger logging.Logger, cfg config.Config, clientset *kubernetes.Clientset, userToolsRes,
+	kdlprojectRes dynamic.NamespaceableResourceInterface) *K8sClient {
 	return &K8sClient{
 		logger:        logger,
 		cfg:           cfg,

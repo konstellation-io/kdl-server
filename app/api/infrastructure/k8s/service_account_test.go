@@ -47,7 +47,7 @@ func (s *serviceAccountTestSuite) SetupTest() {
 	s.NoError(err)
 
 	// Create a namespace
-	s.clientset.CoreV1().Namespaces().Create(ctx, &v1.Namespace{
+	_, err = s.clientset.CoreV1().Namespaces().Create(ctx, &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "kdl-test",
 		},
@@ -73,11 +73,10 @@ func (s *serviceAccountTestSuite) SetupTest() {
 		nil,
 		nil,
 	)
-
 }
 
 func (s *serviceAccountTestSuite) TearDownTest() {
-	err := (*s.container).Terminate(context.Background())
+	err := s.container.Terminate(context.Background())
 	s.NoError(err)
 }
 
@@ -90,5 +89,4 @@ func (s *serviceAccountTestSuite) TestCreateServiceAccount() {
 
 	_, err = s.client.GetUserServiceAccount(context.Background(), "sa")
 	s.NoError(err)
-
 }

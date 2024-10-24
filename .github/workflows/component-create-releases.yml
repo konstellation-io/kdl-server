@@ -1,4 +1,4 @@
-name: "[Component] Releases"
+name: "[Component] Create releases"
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ on:
 jobs:
   create-tag-release:
     runs-on: ubuntu-latest
-    if: github.ref == 'main'
+    if: github.ref_name == 'main'
 
     steps:
       - name: Checkout

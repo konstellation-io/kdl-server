@@ -1,4 +1,4 @@
-name: KAI Lab API - Quality Check
+name: "[KAI Lab API] Quality Check"
 
 on:
   workflow_dispatch:

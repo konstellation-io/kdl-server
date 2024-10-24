@@ -8,7 +8,6 @@
 |  App UI  | [![coverage][app-ui-coverage]][app-ui-coverage-link] | [![bugs][app-ui-bugs]][app-ui-bugs-link] | [![mr][app-ui-mr]][app-ui-mr-link] | - |
 
 [report-badge]: https://goreportcard.com/badge/github.com/konstellation-io/kdl-server/app/api
-
 [report-link]: https://goreportcard.com/report/github.com/konstellation-io/kdl-server/app/api
 
 ---
@@ -20,6 +19,10 @@ Refer to chart's [README](helm/kdl-server/README.md).
 ## Development
 
 ### Dependencies
+
+#### Golang
+
+This repository has been developed in Golang 1.23.2.
 
 #### Microk8s
 
@@ -51,6 +54,7 @@ K8s package manager. Make sure you have v3+. Installation:
 <https://helm.sh/docs/intro/install/>
 
 Please install all required helm plugins via
+
 ```
 helmfile init
 ```

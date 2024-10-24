@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"regexp"
 
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
+	"github.com/go-logr/logr"
 )
 
 var (
@@ -24,9 +24,9 @@ func isKnownHost(host string) bool {
 	return err == nil
 }
 
-func AddToKnownHost(host string, logger logging.Logger) error {
+func AddToKnownHost(host string, logger logr.Logger) error {
 	if isKnownHost(host) {
-		logger.Infof("%s is a known host", host)
+		logger.Info("The host is already known", "host", host)
 		return nil
 	}
 
@@ -38,7 +38,7 @@ func AddToKnownHost(host string, logger logging.Logger) error {
 		return err
 	}
 
-	logger.Infof("Added %s to known host", host)
+	logger.Info("Added host to known hosts", "host", host)
 
 	return nil
 }

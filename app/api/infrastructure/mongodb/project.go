@@ -1,21 +1,19 @@
-package repository
+package mongodb
 
 import (
 	"context"
 	"errors"
 	"time"
 
-	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodb"
-
-	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
-
-	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
 const projectCollName = "projects"
@@ -27,35 +25,34 @@ type memberDTO struct {
 }
 
 type projectDTO struct {
-	ID              string                `bson:"_id"`
-	Archived        bool                  `bson:"archived"`
-	Name            string                `bson:"name"`
-	Description     string                `bson:"description"`
-	CreationDate    time.Time             `bson:"creation_date"`
-	RepositoryType  entity.RepositoryType `bson:"repo_type"`
-	RepoName        string                `bson:"repo_name"`
-	ExternalRepoURL string                `bson:"external_repo_url"`
-	Members         []memberDTO           `bson:"members"`
+	ID                 string                      `bson:"_id"`
+	Archived           bool                        `bson:"archived"`
+	Name               string                      `bson:"name"`
+	Description        string                      `bson:"description"`
+	CreationDate       time.Time                   `bson:"creation_date"`
+	LastActivationDate string                      `bson:"last_activation_date"`
+	RepositoryType     entity.RepositoryType       `bson:"repo_type"`
+	RepoName           string                      `bson:"repo_name"`
+	AuthMethod         entity.RepositoryAuthMethod `bson:"auth_method"`
+	ExternalRepoURL    string                      `bson:"external_repo_url"`
+	Members            []memberDTO                 `bson:"members"`
 }
 
-type projectMongoDBRepo struct {
+type ProjectRepo struct {
 	logger     logging.Logger
 	collection *mongo.Collection
 }
 
-// NewProjectMongoDBRepo implements project.ProjectRepo interface.
-func NewProjectMongoDBRepo(logger logging.Logger, client *mongo.Client, dbName string) project.Repository {
+// projectRepo implements the capabilities.Repository interface.
+var _ project.Repository = (*ProjectRepo)(nil)
+
+func NewProjectRepo(logger logging.Logger, client *mongo.Client, dbName string) *ProjectRepo {
 	collection := client.Database(dbName).Collection(projectCollName)
-	return &projectMongoDBRepo{logger, collection}
+	return &ProjectRepo{logger, collection}
 }
 
-// Get retrieves the project using the identifier.
-func (m *projectMongoDBRepo) Get(ctx context.Context, id string) (entity.Project, error) {
-	return m.findOne(ctx, bson.M{"_id": id})
-}
-
-// Create inserts into the database a new entity.
-func (m *projectMongoDBRepo) Create(ctx context.Context, p entity.Project) (string, error) {
+// Create inserts into the database a new project entity.
+func (m *ProjectRepo) Create(ctx context.Context, p entity.Project) (string, error) {
 	m.logger.Debugf("Creating new project %q...", p.ID)
 
 	dto, err := m.entityToDTO(p)
@@ -71,13 +68,18 @@ func (m *projectMongoDBRepo) Create(ctx context.Context, p entity.Project) (stri
 	return result.InsertedID.(string), nil
 }
 
-// FindAll retrieves all projects.
-func (m *projectMongoDBRepo) FindAll(ctx context.Context) ([]entity.Project, error) {
+// Get retrieves a project using the identifier.
+func (m *ProjectRepo) Get(ctx context.Context, id string) (entity.Project, error) {
+	return m.findOne(ctx, bson.M{"_id": id})
+}
+
+// FindAll retrieves all projects in the database.
+func (m *ProjectRepo) FindAll(ctx context.Context) ([]entity.Project, error) {
 	return m.find(ctx, bson.M{})
 }
 
 // AddMembers creates a new user in the member list for the given project.
-func (m *projectMongoDBRepo) AddMembers(ctx context.Context, projectID string, members []entity.Member) error {
+func (m *ProjectRepo) AddMembers(ctx context.Context, projectID string, members []entity.Member) error {
 	m.logger.Debugf("Adding %d new members to project %q...", len(members), projectID)
 
 	filter := bson.M{"_id": projectID}
@@ -100,8 +102,8 @@ func (m *projectMongoDBRepo) AddMembers(ctx context.Context, projectID string, m
 	return err
 }
 
-// RemoveMembers delete users from the member list for the given project.
-func (m *projectMongoDBRepo) RemoveMembers(ctx context.Context, projectID string, users []entity.User) error {
+// RemoveMembers deletes users from the member list for the given project.
+func (m *ProjectRepo) RemoveMembers(ctx context.Context, projectID string, users []entity.User) error {
 	m.logger.Debugf("Removing members from project %q...", projectID)
 
 	uObjIDs, err := m.toObjectIDs(users)
@@ -126,8 +128,8 @@ func (m *projectMongoDBRepo) RemoveMembers(ctx context.Context, projectID string
 	return err
 }
 
-// UpdateMembersAccessLevel delete users from the member list for the given project.
-func (m *projectMongoDBRepo) UpdateMembersAccessLevel(
+// UpdateMembersAccessLevel updates the access level for a given project to all given users.
+func (m *ProjectRepo) UpdateMembersAccessLevel(
 	ctx context.Context, projectID string, users []entity.User, accessLevel entity.AccessLevel) error {
 	m.logger.Debugf("Updating members access level to %q from project %q...", accessLevel, projectID)
 
@@ -156,21 +158,21 @@ func (m *projectMongoDBRepo) UpdateMembersAccessLevel(
 }
 
 // UpdateName changes the name for the given project.
-func (m *projectMongoDBRepo) UpdateName(ctx context.Context, projectID, name string) error {
+func (m *ProjectRepo) UpdateName(ctx context.Context, projectID, name string) error {
 	return m.updateProjectFields(ctx, projectID, bson.M{"name": name})
 }
 
 // UpdateDescription changes the description for the given project.
-func (m *projectMongoDBRepo) UpdateDescription(ctx context.Context, projectID, description string) error {
+func (m *ProjectRepo) UpdateDescription(ctx context.Context, projectID, description string) error {
 	return m.updateProjectFields(ctx, projectID, bson.M{"description": description})
 }
 
 // UpdateArchived changes the archived field for the given project.
-func (m *projectMongoDBRepo) UpdateArchived(ctx context.Context, projectID string, archived bool) error {
+func (m *ProjectRepo) UpdateArchived(ctx context.Context, projectID string, archived bool) error {
 	return m.updateProjectFields(ctx, projectID, bson.M{"archived": archived})
 }
 
-func (m *projectMongoDBRepo) DeleteOne(ctx context.Context, projectID string) error {
+func (m *ProjectRepo) DeleteOne(ctx context.Context, projectID string) error {
 	filter := bson.M{
 		"_id": projectID,
 	}
@@ -190,7 +192,7 @@ func (m *projectMongoDBRepo) DeleteOne(ctx context.Context, projectID string) er
 	return nil
 }
 
-func (m *projectMongoDBRepo) updateProjectFields(ctx context.Context, projectID string, fields bson.M) error {
+func (m *ProjectRepo) updateProjectFields(ctx context.Context, projectID string, fields bson.M) error {
 	m.logger.Debugf("Updating the project %q with %q...", projectID, fields)
 
 	filter := bson.M{"_id": projectID}
@@ -202,7 +204,7 @@ func (m *projectMongoDBRepo) updateProjectFields(ctx context.Context, projectID 
 	return err
 }
 
-func (m *projectMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entity.Project, error) {
+func (m *ProjectRepo) findOne(ctx context.Context, filters bson.M) (entity.Project, error) {
 	m.logger.Debugf("Finding one project by %q from database...", filters)
 
 	dto := projectDTO{}
@@ -215,12 +217,12 @@ func (m *projectMongoDBRepo) findOne(ctx context.Context, filters bson.M) (entit
 	return m.dtoToEntity(dto), err
 }
 
-func (m *projectMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity.Project, error) {
+func (m *ProjectRepo) find(ctx context.Context, filters bson.M) ([]entity.Project, error) {
 	m.logger.Debugf("Finding projects with filters %q...", filters)
 
 	var dtos []projectDTO
 
-	err := mongodb.Find(ctx, filters, m.collection, &dtos)
+	err := mongodbutils.Find(ctx, filters, m.collection, &dtos)
 	if err != nil {
 		return nil, err
 	}
@@ -228,16 +230,18 @@ func (m *projectMongoDBRepo) find(ctx context.Context, filters bson.M) ([]entity
 	return m.dtosToEntities(dtos), nil
 }
 
-func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
+func (m *ProjectRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 	dto := projectDTO{
-		ID:              p.ID,
-		Name:            p.Name,
-		Description:     p.Description,
-		CreationDate:    p.CreationDate,
-		RepositoryType:  p.Repository.Type,
-		RepoName:        p.Repository.RepoName,
-		ExternalRepoURL: p.Repository.ExternalRepoURL,
-		Archived:        p.Archived,
+		ID:                 p.ID,
+		Name:               p.Name,
+		Description:        p.Description,
+		CreationDate:       p.CreationDate,
+		LastActivationDate: p.LastActivationDate,
+		RepositoryType:     p.Repository.Type,
+		RepoName:           p.Repository.RepoName,
+		AuthMethod:         p.Repository.AuthMethod,
+		ExternalRepoURL:    p.Repository.ExternalRepoURL,
+		Archived:           p.Archived,
 	}
 
 	memberDTOS, err := m.membersToDTOs(p.Members)
@@ -250,7 +254,7 @@ func (m *projectMongoDBRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 	return dto, nil
 }
 
-func (m *projectMongoDBRepo) membersToDTOs(members []entity.Member) ([]memberDTO, error) {
+func (m *ProjectRepo) membersToDTOs(members []entity.Member) ([]memberDTO, error) {
 	dtos := make([]memberDTO, len(members))
 
 	for i, m := range members {
@@ -269,13 +273,15 @@ func (m *projectMongoDBRepo) membersToDTOs(members []entity.Member) ([]memberDTO
 	return dtos, nil
 }
 
-func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
+func (m *ProjectRepo) dtoToEntity(dto projectDTO) entity.Project {
 	p := entity.Project{
-		ID:           dto.ID,
-		Name:         dto.Name,
-		Description:  dto.Description,
-		CreationDate: dto.CreationDate,
+		ID:                 dto.ID,
+		Name:               dto.Name,
+		Description:        dto.Description,
+		CreationDate:       dto.CreationDate,
+		LastActivationDate: dto.LastActivationDate,
 		Repository: entity.Repository{
+			AuthMethod:      dto.AuthMethod,
 			Type:            dto.RepositoryType,
 			ExternalRepoURL: dto.ExternalRepoURL,
 			RepoName:        dto.RepoName,
@@ -296,7 +302,7 @@ func (m *projectMongoDBRepo) dtoToEntity(dto projectDTO) entity.Project {
 	return p
 }
 
-func (m *projectMongoDBRepo) dtosToEntities(dtos []projectDTO) []entity.Project {
+func (m *ProjectRepo) dtosToEntities(dtos []projectDTO) []entity.Project {
 	result := make([]entity.Project, len(dtos))
 
 	for i, dto := range dtos {
@@ -306,7 +312,7 @@ func (m *projectMongoDBRepo) dtosToEntities(dtos []projectDTO) []entity.Project 
 	return result
 }
 
-func (m *projectMongoDBRepo) toObjectIDs(users []entity.User) ([]primitive.ObjectID, error) {
+func (m *ProjectRepo) toObjectIDs(users []entity.User) ([]primitive.ObjectID, error) {
 	objIDs := make([]primitive.ObjectID, len(users))
 
 	for i, user := range users {

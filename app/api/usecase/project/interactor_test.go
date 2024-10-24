@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"bou.ke/monkey"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 
@@ -461,6 +462,11 @@ func TestInteractor_Delete(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
+	monkey.Patch(time.Now, func() time.Time {
+		return time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
+	})
+	defer monkey.UnpatchAll()
+
 	ctx := context.Background()
 	now := time.Now().UTC()
 
@@ -490,6 +496,7 @@ func TestInteractor_Delete(t *testing.T) {
 	expectedMinioBackup := "minio-backup"
 
 	userActivity := entity.UserActivity{
+		Date:   time.Now(),
 		UserID: loggedUser.ID,
 		Type:   entity.UserActivityTypeDeleteProject,
 		Vars: []entity.UserActivityVar{
@@ -510,7 +517,7 @@ func TestInteractor_Delete(t *testing.T) {
 	s.mocks.repo.EXPECT().DeleteOne(ctx, testProjectID).Return(nil)
 	s.mocks.droneService.EXPECT().DeleteRepository(testProjectID)
 	s.mocks.minioService.EXPECT().DeleteBucket(ctx, testProjectID).Return(expectedMinioBackup, nil)
-	s.mocks.userActivityRepo.EXPECT().Create(userActivity).Return(nil)
+	s.mocks.userActivityRepo.EXPECT().Create(ctx, userActivity).Return(nil)
 
 	result, err := s.interactor.Delete(ctx, project.DeleteProjectOption{
 		LoggedUser: loggedUser,

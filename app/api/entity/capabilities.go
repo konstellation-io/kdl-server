@@ -40,12 +40,12 @@ func IsTolerationEffect(effect string) bool {
 
 // Capabilities entity definition.
 type Capabilities struct {
-	ID            string                   `bson:"_id"`
-	Name          string                   `bson:"name"`
-	Default       bool                     `bson:"default"`
-	NodeSelectors map[string]string        `bson:"node_selectors"`
-	Tolerations   []map[string]interface{} `bson:"tolerations"`
-	Affinities    map[string]interface{}   `bson:"affinities"`
+	ID            string
+	Name          string
+	Default       bool
+	NodeSelectors map[string]string
+	Tolerations   []map[string]interface{}
+	Affinities    map[string]interface{}
 }
 
 func (c Capabilities) Validate() error {
@@ -156,7 +156,7 @@ func checkTolerationSeconds(toleration map[string]interface{}) error {
 	seconds, ok := toleration["tolerationSeconds"] // optional
 
 	if ok {
-		_, isNumber := seconds.(int64)
+		_, isNumber := seconds.(int32)
 		if !isNumber {
 			return wrapErrWithValue(ErrCapabilitiesInvalidSeconds, fmt.Sprintf("%v", seconds))
 		}

@@ -13,7 +13,7 @@ var (
 	ErrReadingSecretInServiceAccount = errors.New("error reading secret in in the serviceAccount")
 )
 
-func (k *k8sClient) extractServiceAccountSecretInfo(ctx context.Context, serviceAccount *v1.ServiceAccount) (ca, token []byte, err error) {
+func (k *K8sClient) extractServiceAccountSecretInfo(ctx context.Context, serviceAccount *v1.ServiceAccount) (ca, token []byte, err error) {
 	secrets := serviceAccount.Secrets
 
 	if len(secrets) == 0 {
@@ -35,7 +35,7 @@ func (k *k8sClient) extractServiceAccountSecretInfo(ctx context.Context, service
 }
 
 // generateKubeconfig generate a kubeconfig file in a string.
-func (k *k8sClient) generateKubeconfig(ctx context.Context, serviceAccount *v1.ServiceAccount) ([]byte, error) {
+func (k *K8sClient) generateKubeconfig(ctx context.Context, serviceAccount *v1.ServiceAccount) ([]byte, error) {
 	ca, token, err := k.extractServiceAccountSecretInfo(ctx, serviceAccount)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ users:
 }
 
 // GetUserKubeconfig get a user kubeconfig string in k8s.
-func (k *k8sClient) GetUserKubeconfig(ctx context.Context, usernameSlug string) ([]byte, error) {
+func (k *K8sClient) GetUserKubeconfig(ctx context.Context, usernameSlug string) ([]byte, error) {
 	serviceAccount, err := k.GetUserServiceAccount(ctx, usernameSlug)
 	if err != nil {
 		return nil, err

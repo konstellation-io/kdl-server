@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func (k *k8sClient) getK8sMap(base64Map string) (map[string]interface{}, error) {
+func (k *K8sClient) getK8sMap(base64Map string) (map[string]interface{}, error) {
 	decodedMap, err := base64.StdEncoding.DecodeString(base64Map)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding map: %w", err)

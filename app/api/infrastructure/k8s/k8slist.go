@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func (k *k8sClient) getK8sList(base64List string) ([]map[string]string, error) {
+func (k *K8sClient) getK8sList(base64List string) ([]map[string]string, error) {
 	decodedK8sList, err := base64.StdEncoding.DecodeString(base64List)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding list: %w", err)

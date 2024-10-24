@@ -12,7 +12,6 @@ on:
 jobs:
   quality-checks:
     runs-on: ubuntu-20.04
-    needs: lint-dockerfile
     steps:
       - name: CheckOut
         uses: actions/checkout@v3

@@ -1,0 +1,22 @@
+{
+    "name": "backup",
+    "version": "1.0.0",
+    "private": true,
+    "release": {
+        "tagFormat": "backup-v${version}",
+        "extends": "semantic-release-monorepo",
+        "branches": ["main"],
+        "plugins": [
+            "@semantic-release/commit-analyzer",
+            "@semantic-release/release-notes-generator",
+            [
+                "@semantic-release/github",
+                {
+                    "published": true,
+                    "successComment": false,
+                    "failComment": false
+                }
+            ]
+        ]
+    }
+}

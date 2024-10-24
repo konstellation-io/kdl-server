@@ -1,0 +1,90 @@
+name: "[Releases] Create"
+
+on:
+  workflow_dispatch:
+    inputs:
+      component:
+        description: 'Select a component for release'
+        required: true
+        type: choice
+        options:
+          - all
+          - kdl-app
+          - backup
+          - cleaner
+          - drone-authorizer
+          - gitea-oauth2-setup
+          - mlflow
+          - project-operator
+          - repo-cloner
+          - user-tools-operator
+          - vscode
+      pre_release:
+        description: 'Create pre-release?'
+        required: false
+        type: boolean
+
+  create:
+    branches:
+      - 'release/*'
+
+  push:
+    branches:
+      - 'release/*'
+      - main
+
+jobs:
+  validate-conditions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate release conditions
+        run: |
+          if [[ "${{ github.event_name }}" == "create" && "${{ github.ref_type }}" == "branch" && "${{ github.ref }}" =~ ^refs/heads/release/ ]]; then
+            echo "Creating a release tag because a new release branch was created."
+
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" && ( "${{ github.head_ref }}" =~ ^release/ || "${{ github.head_ref }}" =~ ^hotfix/ ) ]]; then
+            echo "Creating a release tag because a release or hotfix branch was merged into main."
+
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" =~ ^refs/heads/release/ ]]; then
+            echo "Creating a release tag because there were changes pushed to a release/* branch."
+
+          elif [[ "${{ github.event.inputs.pre_release }}" == "true" && "${{ github.ref }}" =~ ^refs/heads/release/ ]]; then
+            echo "Creating pre-release tag because matching 'release/*'."
+
+          else
+            echo "Conditions aren't met for the release."
+            exit 1
+          fi
+
+  create-tag-release:
+    runs-on: ubuntu-latest
+    needs: validate-conditions
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install NPM dependencies
+        run: |
+          npm install
+
+      - name: Install NPM dependencies and create tag release
+        run: |
+          if [[ "${{ github.event.inputs.component }}" == "all" ]]; then
+            echo "No specific component selected. Releasing all components."
+            yarn workspaces run semantic-release
+          else
+            echo "Releasing component: ${{ github.event.inputs.component }}"
+            yarn workspace ${{ github.event.inputs.component }} run semantic-release
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}

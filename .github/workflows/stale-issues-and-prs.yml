@@ -1,4 +1,4 @@
-name: 'Mark stale issues and PRs'
+name: "[GitHub] Mark stale issues and PRs"
 on:
   schedule:
     - cron: '30 1 * * *'

@@ -26,7 +26,7 @@ const (
 	kdlprojectAPIVersion = kdlprojectGroup + "/" + kdlprojectVersion
 )
 
-type k8sClient struct {
+type K8sClient struct {
 	logger        logging.Logger
 	cfg           config.Config
 	clientset     *kubernetes.Clientset
@@ -34,7 +34,17 @@ type k8sClient struct {
 	kdlprojectRes dynamic.NamespaceableResourceInterface
 }
 
-func NewK8sClient(logger logging.Logger, cfg config.Config) (Client, error) {
+func New(logger logging.Logger, cfg config.Config, clientset *kubernetes.Clientset, userToolsRes dynamic.NamespaceableResourceInterface, kdlprojectRes dynamic.NamespaceableResourceInterface) *K8sClient {
+	return &K8sClient{
+		logger:        logger,
+		cfg:           cfg,
+		clientset:     clientset,
+		userToolsRes:  userToolsRes,
+		kdlprojectRes: kdlprojectRes,
+	}
+}
+
+func NewK8sClient(logger logging.Logger, cfg config.Config) (*K8sClient, error) {
 	kubeConfig := newKubernetesConfig(cfg)
 
 	clientset, err := kubernetes.NewForConfig(kubeConfig)
@@ -58,8 +68,7 @@ func NewK8sClient(logger logging.Logger, cfg config.Config) (Client, error) {
 		Version:  kdlprojectVersion,
 		Resource: kdlprojectResource,
 	})
-
-	c := &k8sClient{
+	c := &K8sClient{
 		logger:        logger,
 		clientset:     clientset,
 		cfg:           cfg,

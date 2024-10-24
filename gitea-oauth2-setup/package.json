@@ -1,9 +1,9 @@
 {
-    "name": "kdl-app",
+    "name": "gitea-oauth2-setup",
     "version": "1.0.0",
     "private": true,
     "release": {
-        "tagFormat": "kdl-app-v${version}",
+        "tagFormat": "gitea-oauth2-setup-v${version}",
         "extends": "semantic-release-monorepo",
         "branches": [
             "main",

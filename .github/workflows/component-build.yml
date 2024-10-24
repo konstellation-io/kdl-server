@@ -44,6 +44,7 @@ jobs:
 
           # HOTFIX: only for app nomenclature
           if [[ "${COMPONENT}" == "kdl-app" ]]; then
+            echo "COMPONENT=server" >> $GITHUB_ENV
             echo "WORKDIR_COMPONENT=app" >> $GITHUB_ENV
           fi
 

@@ -26,6 +26,8 @@ repositories:
     url: https://konstellation-io.github.io/enterprise_gateway/
   - name: minio
     url: https://charts.min.io/
+  - name: konstellation-io
+    url: https://charts.konstellation.io/
 
 releases:
   - name: "mongodb-operator"
@@ -40,6 +42,6 @@ releases:
 
   - name: "kdl-local"
     <<: *default
-    chart: "../../helm/kdl-server"
+    chart: konstellation-io/kdl-server
     needs:
     - kdl/mongodb-database

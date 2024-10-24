@@ -9,7 +9,8 @@
             "main",
             {
                 "name": "develop",
-                "prerelease": "rc"
+                "prerelease": "rc",
+                "channel": "default"
             }
         ],
         "plugins": [

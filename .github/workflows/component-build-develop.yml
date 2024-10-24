@@ -1,4 +1,4 @@
-name: "[Component] Build and push Docker image on develop"
+name: "[Component] Build and push from develop"
 
 env:
   DOCKERHUB_USER: konstellation

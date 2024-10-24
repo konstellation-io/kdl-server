@@ -1,0 +1,78 @@
+name: "[Releases] Create"
+
+on:
+  workflow_dispatch:
+    inputs:
+      component:
+        description: 'Select a component for release'
+        required: true
+        type: choice
+        options:
+          - all
+          - kdl-app
+          - backup
+          - cleaner
+          - drone-authorizer
+          - gitea-oauth2-setup
+          - mlflow
+          - project-operator
+          - repo-cloner
+          - user-tools-operator
+          - vscode
+      pre_release:
+        description: 'Create pre-release?'
+        required: false
+        type: boolean
+
+  push:
+    branches:
+      - 'release/*'
+
+jobs:
+  validate-conditions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate release conditions
+        run: |
+          if [[ "${{ github.event.inputs.pre_release }}" == "true" && ! "${{ github.ref }}" =~ ^refs/heads/release/ ]]; then
+            echo "Pre-release can only be created from branches matching 'release/*'."
+            exit 1
+          elif [[ "${{ github.event.inputs.pre_release }}" == "false" && "${{ github.ref_name }}" != "main" ]]; then
+            echo "Regular releases can only be created from the 'main' branch."
+            exit 1
+          else
+            echo "Conditions are met for the release."
+          fi
+
+  create-tag-release:
+    runs-on: ubuntu-latest
+    needs: validate-conditions
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install NPM dependencies
+        run: |
+          npm install
+
+      - name: Install NPM dependencies and create release
+        run: |
+          if [[ "${{ github.event.inputs.component }}" == "all" || -z "${{ github.event.inputs.component }}" ]]; then
+            echo "No specific component selected or 'all' selected. Releasing all components."
+            yarn workspaces run semantic-release
+          else
+            echo "Releasing component: ${{ github.event.inputs.component }}"
+            yarn workspace ${{ github.event.inputs.component }} run semantic-release
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}

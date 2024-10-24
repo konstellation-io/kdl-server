@@ -5,7 +5,13 @@
     "release": {
         "tagFormat": "user-tools-operator-v${version}",
         "extends": "semantic-release-monorepo",
-        "branches": ["main"],
+        "branches": [
+            "main",
+            {
+                "name": "release/*",
+                "prerelease": "rc"
+            }
+        ],
         "plugins": [
             "@semantic-release/commit-analyzer",
             "@semantic-release/release-notes-generator",

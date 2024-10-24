@@ -11,7 +11,13 @@
   "main": "index.js",
   "release": {
     "tagFormat": "drone-authorizer-v${version}",
-    "branches": ["main"],
+    "branches": [
+      "main",
+      {
+          "name": "release/*",
+          "prerelease": "rc"
+      }
+    ],
     "extends": "semantic-release-monorepo",
     "plugins": [
       "@semantic-release/commit-analyzer",

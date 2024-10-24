@@ -5,7 +5,13 @@
     "release": {
         "tagFormat": "gitea-oauth2-setup-v${version}",
         "extends": "semantic-release-monorepo",
-        "branches": ["main"],
+        "branches": [
+            "main",
+            {
+                "name": "release/*",
+                "prerelease": "rc"
+            }
+        ],
         "plugins": [
             "@semantic-release/commit-analyzer",
             "@semantic-release/release-notes-generator",

@@ -1,0 +1,38 @@
+name: "[Component] Linter"
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - '**/Dockerfile'
+
+jobs:
+  lint-dockerfile:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        directory:
+          - app
+          - backup
+          - cleaner
+          - drone-authorizer
+          - gitea-oauth2-setup
+          - mlflow
+          - project-operator
+          - repo-cloner
+          - user-tools-operator
+          - vscode
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: "[${{ matrix.directory }}] Pass hadolint"
+        uses: hadolint/hadolint-action@v2.1.0
+        with:
+          dockerfile: ./${{ matrix.directory }}/Dockerfile
+          format: tty
+          config: ./.github/.hadolint.yml

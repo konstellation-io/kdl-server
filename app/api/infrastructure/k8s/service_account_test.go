@@ -85,8 +85,8 @@ func (s *serviceAccountTestSuite) TestCreateServiceAccount() {
 	_, err := s.client.CreateUserServiceAccount(context.Background(), "sa")
 	s.NoError(err)
 
-	service_account := s.clientset.CoreV1().ServiceAccounts("sa")
-	s.NotNil(service_account)
+	serviceAccount := s.clientset.CoreV1().ServiceAccounts("sa")
+	s.NotNil(serviceAccount)
 
 	_, err = s.client.GetUserServiceAccount(context.Background(), "sa")
 	s.NoError(err)

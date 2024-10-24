@@ -5,11 +5,12 @@ on:
     branches:
       - main
       - develop
+    paths:
+      - '**/Dockerfile'
 
 jobs:
   lint-dockerfile:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
 
     strategy:
       matrix:

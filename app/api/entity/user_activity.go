@@ -19,8 +19,8 @@ func (e UserActivityType) String() string {
 }
 
 type UserActivityVar struct {
-	Key   string `bson:"key"`
-	Value string `bson:"value"`
+	Key   string
+	Value string
 }
 
 func NewActivityVarsDeleteRepo(projectID, minioBackupBucket string) []UserActivityVar {
@@ -37,10 +37,10 @@ func NewActivityVarsDeleteRepo(projectID, minioBackupBucket string) []UserActivi
 }
 
 type UserActivity struct {
-	Date   time.Time         `bson:"date"`
-	UserID string            `bson:"userId"`
-	Type   UserActivityType  `bson:"type"`
-	Vars   []UserActivityVar `bson:"vars"`
+	Date   time.Time
+	UserID string
+	Type   UserActivityType
+	Vars   []UserActivityVar
 }
 
 func NewUserActivity(

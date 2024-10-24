@@ -202,17 +202,17 @@ func (m *MockUserActivityRepo) EXPECT() *MockUserActivityRepoMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockUserActivityRepo) Create(activity entity.UserActivity) error {
+func (m *MockUserActivityRepo) Create(ctx context.Context, activity entity.UserActivity) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", activity)
+	ret := m.ctrl.Call(m, "Create", ctx, activity)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockUserActivityRepoMockRecorder) Create(activity interface{}) *gomock.Call {
+func (mr *MockUserActivityRepoMockRecorder) Create(ctx, activity interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUserActivityRepo)(nil).Create), activity)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUserActivityRepo)(nil).Create), ctx, activity)
 }
 
 // MockUseCase is a mock of UseCase interface.

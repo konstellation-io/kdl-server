@@ -24,7 +24,7 @@ type Repository interface {
 
 // UserActivityRepo interface to persist user actions for audit purposes.
 type UserActivityRepo interface {
-	Create(activity entity.UserActivity) error
+	Create(ctx context.Context, activity entity.UserActivity) error
 }
 
 // UseCase interface to manage all operations related with projects.

@@ -20,7 +20,7 @@ type AddUserInput struct {
 
 type APITokenInput struct {
 	UserID string  `json:"userId"`
-	Name   *string `json:"name"`
+	Name   *string `json:"name,omitempty"`
 }
 
 type Capability struct {
@@ -47,8 +47,14 @@ type ExternalRepositoryInput struct {
 	AuthMethod entity.RepositoryAuthMethod `json:"authMethod"`
 }
 
+type Mutation struct {
+}
+
 type QualityProjectDesc struct {
 	Quality int `json:"quality"`
+}
+
+type Query struct {
 }
 
 type RemoveAPITokenInput struct {
@@ -66,13 +72,13 @@ type RemoveUsersInput struct {
 
 type RepositoryInput struct {
 	Type     entity.RepositoryType    `json:"type"`
-	External *ExternalRepositoryInput `json:"external"`
+	External *ExternalRepositoryInput `json:"external,omitempty"`
 }
 
 type SetActiveUserToolsInput struct {
 	Active         bool    `json:"active"`
-	RuntimeID      *string `json:"runtimeId"`
-	CapabilitiesID *string `json:"capabilitiesId"`
+	RuntimeID      *string `json:"runtimeId,omitempty"`
+	CapabilitiesID *string `json:"capabilitiesId,omitempty"`
 }
 
 type SetBoolFieldInput struct {
@@ -102,7 +108,7 @@ type UpdateMembersInput struct {
 
 type UpdateProjectInput struct {
 	ID          string  `json:"id"`
-	Name        *string `json:"name"`
-	Description *string `json:"description"`
-	Archived    *bool   `json:"archived"`
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Archived    *bool   `json:"archived,omitempty"`
 }

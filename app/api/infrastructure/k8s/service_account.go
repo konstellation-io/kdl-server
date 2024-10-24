@@ -9,8 +9,9 @@ import (
 )
 
 // newServiceAccount conform a new k8s serviceAccount.
-func (k *k8sClient) newServiceAccount(usernameSlug string, secretName string) *v1.ServiceAccount {
+func (k *k8sClient) newServiceAccount(usernameSlug, secretName string) *v1.ServiceAccount {
 	automountServiceAccountToken := true
+
 	return &v1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: k.getUserServiceAccountName(usernameSlug),
@@ -48,6 +49,7 @@ func (k *k8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug s
 
 	sa := k.newServiceAccount(usernameSlug, saSecretName)
 	serviceAccount, err := k.clientset.CoreV1().ServiceAccounts(k.cfg.Kubernetes.Namespace).Create(ctx, sa, metav1.CreateOptions{})
+
 	if err != nil {
 		return nil, err
 	}

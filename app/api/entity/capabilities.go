@@ -160,12 +160,7 @@ func checkTolerationSeconds(toleration map[string]interface{}) error {
 
 	if ok {
 		switch seconds.(type) {
-		case int:
-			fmt.Println("seconds is of type int")
-		case int32:
-			fmt.Println("seconds is of type int32")
-		case int64:
-			fmt.Println("seconds is of type int64")
+		case int, int32, int64:
 		default:
 			return wrapErrWithValue(ErrCapabilitiesInvalidSeconds, fmt.Sprintf("%v", seconds))
 		}

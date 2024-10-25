@@ -8,9 +8,8 @@
         "branches": [
             "main",
             {
-                "name": "main",
-                "prerelease": "rc",
-                "channel": "default"
+                "name": "release/*",
+                "prerelease": "rc"
             }
         ],
         "plugins": [

@@ -155,9 +155,6 @@ func checkTolerationEffect(toleration map[string]interface{}) error {
 func checkTolerationSeconds(toleration map[string]interface{}) error {
 	seconds, ok := toleration["tolerationSeconds"] // optional
 
-	// Print the type of seconds
-	fmt.Printf("Type of seconds: %T\n", seconds)
-
 	if ok {
 		switch seconds.(type) {
 		case int, int32, int64:

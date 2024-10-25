@@ -1,0 +1,108 @@
+# TODO: refactor workflow when all components will migrate to
+# each repository or move on same folder
+#
+
+name: "[Releases] Create"
+
+env:
+  COMPONENTS: "app,backup,cleaner,drone-authorizer,gitea-oauth2-setup,mlflow,project-operator,repo-cloner,user-tools-operator,vscode"
+
+on:
+  workflow_dispatch:
+    inputs:
+      component:
+        description: 'Select a component for release'
+        required: true
+        type: choice
+        options:
+          - all
+          - app
+          - backup
+          - cleaner
+          - drone-authorizer
+          - gitea-oauth2-setup
+          - mlflow
+          - project-operator
+          - repo-cloner
+          - user-tools-operator
+          - vscode
+
+  push:
+    branches:
+      - 'release/*'
+
+jobs:
+  manual-create-tag-release:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+
+      - name: Install NPM dependencies and create release
+        run: |
+          npm install
+
+          if [[ "${{ github.event.inputs.component }}" == "all" || -z "${{ github.event.inputs.component }}" ]]; then
+            for COMPONENT in $(echo ${{ env.COMPONENTS }} | tr ',' ' '); do
+              echo "Releasing component: $COMPONENT"
+              yarn workspaces run semantic-release
+            done
+          else
+            echo "Releasing component: ${{ github.event.inputs.component }}"
+            yarn workspace ${{ github.event.inputs.component }} run semantic-release
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+
+  prerelease-create-tag-release:
+    runs-on: ubuntu-latest
+    if: |
+      startsWith(github.ref, 'refs/heads/release/') &&
+      github.event_name != 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: Detect changed components
+        id: detect-components
+        run: |
+          COMPONENTS_LIST=""
+          for COMPONENT in $(echo ${{ env.COMPONENTS }} | tr ',' ' '); do
+            if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^$COMPONENT/"; then
+              COMPONENTS_LIST="$COMPONENTS_LIST $COMPONENT"
+            fi
+          done
+
+          COMPONENTS_LIST=$(echo $COMPONENTS_LIST | xargs)
+          echo "Detected components: $COMPONENTS_LIST"
+          echo "CHANGED_COMPONENTS=$COMPONENTS_LIST" >> $GITHUB_ENV
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+
+      - name: Create release for changed component
+        run: |
+          npm install
+
+          for COMPONENT in $(echo ${{ env.CHANGED_COMPONENTS }} | tr ',' ' '); do
+            echo "Releasing component: $COMPONENT"
+            yarn workspace $COMPONENT run semantic-release
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}

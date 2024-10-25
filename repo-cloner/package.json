@@ -8,7 +8,7 @@
         "branches": [
             "main",
             {
-                "name": "main",
+                "name": "release/*",
                 "prerelease": "rc",
                 "channel": "default"
             }

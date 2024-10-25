@@ -24,14 +24,9 @@ on:
         required: false
         type: boolean
 
-  create:
-    branches:
-      - 'release/*'
-
   push:
     branches:
       - 'release/*'
-      - main
 
 jobs:
   validate-conditions:
@@ -39,21 +34,14 @@ jobs:
     steps:
       - name: Validate release conditions
         run: |
-          if [[ "${{ github.event_name }}" == "create" && "${{ github.ref_type }}" == "branch" && "${{ github.ref }}" =~ ^refs/heads/release/ ]]; then
-            echo "Creating a release tag because a new release branch was created."
-
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" && ( "${{ github.head_ref }}" =~ ^release/ || "${{ github.head_ref }}" =~ ^hotfix/ ) ]]; then
-            echo "Creating a release tag because a release or hotfix branch was merged into main."
-
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" =~ ^refs/heads/release/ ]]; then
-            echo "Creating a release tag because there were changes pushed to a release/* branch."
-
-          elif [[ "${{ github.event.inputs.pre_release }}" == "true" && "${{ github.ref }}" =~ ^refs/heads/release/ ]]; then
-            echo "Creating pre-release tag because matching 'release/*'."
-
-          else
-            echo "Conditions aren't met for the release."
+          if [[ "${{ github.event.inputs.pre_release }}" == "true" && ! "${{ github.ref }}" =~ ^refs/heads/release/ ]]; then
+            echo "Pre-release can only be created from branches matching 'release/*'."
             exit 1
+          elif [[ "${{ github.event.inputs.pre_release }}" == "false" && "${{ github.ref_name }}" != "main" ]]; then
+            echo "Regular releases can only be created from the 'main' branch."
+            exit 1
+          else
+            echo "Conditions are met for the release."
           fi
 
   create-tag-release:
@@ -77,10 +65,10 @@ jobs:
         run: |
           npm install
 
-      - name: Install NPM dependencies and create tag release
+      - name: Install NPM dependencies and create release
         run: |
-          if [[ "${{ github.event.inputs.component }}" == "all" ]]; then
-            echo "No specific component selected. Releasing all components."
+          if [[ "${{ github.event.inputs.component }}" == "all" || -z "${{ github.event.inputs.component }}" ]]; then
+            echo "No specific component selected or 'all' selected. Releasing all components."
             yarn workspaces run semantic-release
           else
             echo "Releasing component: ${{ github.event.inputs.component }}"

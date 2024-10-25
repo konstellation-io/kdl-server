@@ -2,8 +2,6 @@
 
 This document provides guidelines for contributing to the *KDL* project.
 
-## How can I contribute?
-
 ## Sign off contributions (DCO)
 
 The Developer Certificate of Origin (DCO) is a lightweight way for contributors to certify that they wrote or otherwise have the right to submit the code they are contributing to the project.

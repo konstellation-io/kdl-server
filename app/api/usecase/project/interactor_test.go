@@ -6,8 +6,11 @@ import (
 	"time"
 
 	"bou.ke/monkey"
+	"github.com/go-logr/logr"
+	"github.com/go-logr/zapr"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
@@ -15,7 +18,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
@@ -30,7 +32,7 @@ type projectSuite struct {
 }
 
 type projectMocks struct {
-	logger           *logging.MockLogger
+	logger           logr.Logger
 	repo             *project.MockRepository
 	userActivityRepo *project.MockUserActivityRepo
 	clock            *clock.MockClock
@@ -42,7 +44,6 @@ type projectMocks struct {
 
 func newProjectSuite(t *testing.T) *projectSuite {
 	ctrl := gomock.NewController(t)
-	logger := logging.NewMockLogger(ctrl)
 	repo := project.NewMockRepository(ctrl)
 	userActivityRepo := project.NewMockUserActivityRepo(ctrl)
 	clockMock := clock.NewMockClock(ctrl)
@@ -51,7 +52,9 @@ func newProjectSuite(t *testing.T) *projectSuite {
 	droneService := droneservice.NewMockDroneService(ctrl)
 	k8sClient := k8s.NewMockClient(ctrl)
 
-	logging.AddLoggerExpects(logger)
+	zapLog, err := zap.NewDevelopment()
+	require.NoError(t, err)
+	logger := zapr.NewLogger(zapLog)
 
 	deps := &project.InteractorDeps{
 		Logger:           logger,

@@ -5,8 +5,7 @@ package graph
 import (
 	"context"
 
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
-
+	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
@@ -23,7 +22,7 @@ import (
 
 // Resolver serves as dependency injection for the app, add any dependencies app require here.
 type Resolver struct {
-	logger       logging.Logger
+	logger       logr.Logger
 	cfg          config.Config
 	projects     project.UseCase
 	users        user.UseCase
@@ -33,7 +32,7 @@ type Resolver struct {
 
 // NewResolver is a constructor function.
 func NewResolver(
-	logger logging.Logger,
+	logger logr.Logger,
 	cfg config.Config,
 	projectInteractor project.UseCase,
 	userInteractor user.UseCase,

@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
@@ -27,14 +27,14 @@ const (
 )
 
 type k8sClient struct {
-	logger        logging.Logger
+	logger        logr.Logger
 	cfg           config.Config
 	clientset     *kubernetes.Clientset
 	userToolsRes  dynamic.NamespaceableResourceInterface
 	kdlprojectRes dynamic.NamespaceableResourceInterface
 }
 
-func NewK8sClient(logger logging.Logger, cfg config.Config) (Client, error) {
+func NewK8sClient(logger logr.Logger, cfg config.Config) (Client, error) {
 	kubeConfig := newKubernetesConfig(cfg)
 
 	clientset, err := kubernetes.NewForConfig(kubeConfig)

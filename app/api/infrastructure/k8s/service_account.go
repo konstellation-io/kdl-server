@@ -45,7 +45,7 @@ func (k k8sClient) getServiceAccountSecretName(usernameSlug string) string {
 func (k *k8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
 	saSecretName := k.getServiceAccountSecretName(usernameSlug)
 
-	k.logger.Infof("Creating service account for user %q in k8s...", usernameSlug)
+	k.logger.Info("Creating service account for user in k8s...", "username", usernameSlug)
 
 	sa := k.newServiceAccount(usernameSlug, saSecretName)
 	serviceAccount, err := k.clientset.CoreV1().ServiceAccounts(k.cfg.Kubernetes.Namespace).Create(ctx, sa, metav1.CreateOptions{})
@@ -54,10 +54,10 @@ func (k *k8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug s
 		return nil, err
 	}
 
-	k.logger.Infof("The service account %q was created in k8s correctly", serviceAccount.Name)
+	k.logger.Info("Service account created correctly in k8s", "serviceAccountName", serviceAccount.Name)
 
 	// Create secret
-	k.logger.Infof("Creating secret service account token %q for user %q in k8s...", saSecretName, usernameSlug)
+	k.logger.Info("Creating secret service account token for user in k8s...", "serviceAccountSecretName", saSecretName, "username", usernameSlug)
 	secret := v1.Secret{
 		TypeMeta: metav1.TypeMeta{},
 		ObjectMeta: metav1.ObjectMeta{
@@ -74,14 +74,14 @@ func (k *k8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug s
 		return nil, err
 	}
 
-	k.logger.Infof("The secret service account token %q was created in k8s correctly", secret.Name)
+	k.logger.Info("Secret service account token created correctly in k8s", "secretName", secret.Name)
 
 	return serviceAccount, nil
 }
 
-// DeleteUserServiceAccount delete a serviceAccount.
+// DeleteUserServiceAccount deletes a serviceAccount.
 func (k *k8sClient) DeleteUserServiceAccount(ctx context.Context, usernameSlug string) error {
-	k.logger.Infof("Deleting service account for user %q in k8s...", usernameSlug)
+	k.logger.Info("Deleting service account for user in k8s...", "username", usernameSlug)
 
 	saName := k.getUserServiceAccountName(usernameSlug)
 

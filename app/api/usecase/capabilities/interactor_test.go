@@ -4,15 +4,17 @@ import (
 	"context"
 	"testing"
 
+	"github.com/go-logr/logr"
+	"github.com/go-logr/zapr"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
+	"go.uber.org/zap"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
 )
 
@@ -23,7 +25,7 @@ type capabilitiesSuite struct {
 }
 
 type capabilitiesMocks struct {
-	logger    *logging.MockLogger
+	logger    logr.Logger
 	cfg       config.Config
 	repo      *capabilities.MockRepository
 	k8sClient *k8s.MockClient
@@ -31,11 +33,12 @@ type capabilitiesMocks struct {
 
 func newCapabilitiesSuite(t *testing.T, cfg *config.Config) *capabilitiesSuite {
 	ctrl := gomock.NewController(t)
-	logger := logging.NewMockLogger(ctrl)
 	repo := capabilities.NewMockRepository(ctrl)
 	k8sClient := k8s.NewMockClient(ctrl)
 
-	logging.AddLoggerExpects(logger)
+	zapLog, err := zap.NewDevelopment()
+	require.NoError(t, err)
+	logger := zapr.NewLogger(zapLog)
 
 	if cfg == nil {
 		cfg = &config.Config{}

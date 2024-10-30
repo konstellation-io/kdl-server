@@ -16,7 +16,7 @@ func (i *interactor) ScheduleUsersSyncJob(interval time.Duration) error {
 		return err
 	}
 
-	i.logger.Infof("Cron job for users sync running every %s", interval)
+	i.logger.Info("Cron job for users sync running", "secondsInterval", interval)
 
 	return nil
 }
@@ -30,19 +30,19 @@ func (i *interactor) RunSyncUsersCronJob() {
 
 // syncUsers synchronizes the server users with Gitea. Creates the new users or deletes the missing ones also synchronizes the user emails.
 func (i *interactor) syncUsers() {
-	i.logger.Debug("User synchronization starting")
+	i.logger.Info("User synchronization starting")
 
 	ctx := context.Background()
 
 	users, err := i.repo.FindAll(ctx, true)
 	if err != nil {
-		i.logger.Errorf("Error getting users from database: %s", err)
+		i.logger.Error(err, "Error getting users from database")
 		return
 	}
 
 	giteaUsers, err := i.giteaService.FindAllUsers()
 	if err != nil {
-		i.logger.Errorf("Error getting users from Gitea: %s", err)
+		i.logger.Error(err, "Error getting users from Gitea")
 		return
 	}
 
@@ -60,7 +60,7 @@ func (i *interactor) syncUsers() {
 
 	wg.Wait()
 
-	i.logger.Debug("User synchronization finished correctly")
+	i.logger.Info("User synchronization finished correctly")
 }
 
 func (i *interactor) syncGiteaUsersToDelete(giteaUsers, users []entity.User) (usersToDel []entity.User) {
@@ -79,7 +79,7 @@ func (i *interactor) syncGiteaUsersToDelete(giteaUsers, users []entity.User) (us
 			continue
 		}
 
-		i.logger.Debugf("The gitea user %q has been deleted", u.Username)
+		i.logger.Info("The gitea user has been deleted", "username", u.Username)
 		usersToDel = append(usersToDel, u)
 	}
 
@@ -103,22 +103,22 @@ func (i *interactor) syncGiteaUsersToUpdate(users, giteaUsers []entity.User) (us
 
 		switch {
 		case toBeCreated:
-			i.logger.Debugf("The gitea user %q with email %q is a new user", giteaUser.Username, giteaUser.Email)
+			i.logger.Info("The gitea user is a new user", "giteaUser", giteaUser.Username, "email", giteaUser.Email)
 
 			usersToAdd = append(usersToAdd, giteaUser)
 
 		case toBeRestored:
-			i.logger.Debugf("The gitea user %q has been restored", u.Username)
+			i.logger.Info("The gitea user has been restored", "username", u.Username)
 
 			usersToRestore = append(usersToRestore, giteaUser)
 
 		case toBeUpdated && userFound:
-			i.logger.Debugf("The gitea user %q has changed their email", u.Username)
+			i.logger.Info("The gitea user has changed their email", "username", u.Username)
 
 			usersEmailsToUpd = append(usersEmailsToUpd, giteaUser)
 
 		case toBeUpdated && !userFound:
-			i.logger.Debugf("The gitea user with email %q has changed their username", u.Email)
+			i.logger.Info("The gitea user with email has changed their username", "email", u.Email)
 
 			usernamesToUpd = append(usernamesToUpd, giteaUser)
 		}
@@ -136,7 +136,7 @@ func (i *interactor) syncAddUsers(ctx context.Context, users []entity.User, wg *
 
 			_, err := i.Create(ctx, userToAdd.Email, userToAdd.Username, entity.AccessLevelViewer)
 			if err != nil {
-				i.logger.Errorf("Error creating user %q: %s", userToAdd.Username, err)
+				i.logger.Error(err, "Error creating user %q: %s", userToAdd.Username, err)
 			}
 		}(u)
 	}
@@ -151,7 +151,7 @@ func (i *interactor) syncUpdateUserEmails(ctx context.Context, users []entity.Us
 
 			err := i.repo.UpdateEmail(ctx, userToUpd.Username, userToUpd.Email)
 			if err != nil {
-				i.logger.Errorf("Error updating user %q: %s", userToUpd.Username, err)
+				i.logger.Error(err, "Error updating user %q: %s", userToUpd.Username, err)
 			}
 		}(u)
 	}
@@ -166,7 +166,7 @@ func (i *interactor) syncUpdateUsernames(ctx context.Context, users []entity.Use
 
 			err := i.repo.UpdateUsername(ctx, userToUpd.Email, userToUpd.Username)
 			if err != nil {
-				i.logger.Errorf("Error updating user %q: %s", userToUpd.Username, err)
+				i.logger.Error(err, "Error updating user %q: %s", userToUpd.Username, err)
 			}
 		}(u)
 	}
@@ -181,7 +181,7 @@ func (i *interactor) syncDelUsers(ctx context.Context, users []entity.User, wg *
 
 			err := i.repo.UpdateDeleted(ctx, userToDel.Username, true)
 			if err != nil {
-				i.logger.Errorf("Error marking as deleted user %q: %s", userToDel.Username, err)
+				i.logger.Error(err, "Error marking as deleted user %q: %s", userToDel.Username, err)
 			}
 		}(u)
 	}
@@ -198,19 +198,19 @@ func (i *interactor) syncRestoreUsers(ctx context.Context, users []entity.User, 
 			// Get the user SSH public key from k8s secret
 			publicKey, err := i.k8sClient.GetUserSSHKeyPublic(ctx, userToRestore.UsernameSlug())
 			if err != nil {
-				i.logger.Errorf("Error getting the public SSH key for user %q: %s", userToRestore.Username, err)
+				i.logger.Error(err, "Error getting the public SSH key for user %q: %s", userToRestore.Username, err)
 			}
 
 			// Upload the SSH public key to Gitea
 			err = i.giteaService.AddSSHKey(userToRestore.Username, string(publicKey))
 			if err != nil {
-				i.logger.Errorf("Error restoring SSH key for user %q: %s", userToRestore.Username, err)
+				i.logger.Error(err, "Error restoring SSH key for user %q: %s", userToRestore.Username, err)
 			}
 
 			// Update deleted user field
 			err = i.repo.UpdateDeleted(ctx, userToRestore.Username, false)
 			if err != nil {
-				i.logger.Errorf("Error restoring user %q: %s", userToRestore.Username, err)
+				i.logger.Error(err, "Error restoring user %q: %s", userToRestore.Username, err)
 			}
 		}(u)
 	}

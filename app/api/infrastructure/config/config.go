@@ -11,7 +11,7 @@ import (
 
 // Config holds the configuration values of the application.
 type Config struct {
-	LogLevel        string `yaml:"logLevel" envconfig:"KDL_SERVER_LOG_LEVEL"`
+	LogLevel        string `yaml:"logLevel" envconfig:"KDL_SERVER_LOG_LEVEL"` // currently unused
 	Port            string `yaml:"port" envconfig:"KDL_SERVER_PORT"`
 	StaticFilesPath string `yaml:"staticFilesPath" envconfig:"KDL_SERVER_STATIC_FILES_PATH"`
 	BaseDomainName  string `envconfig:"BASE_DOMAIN_NAME"`

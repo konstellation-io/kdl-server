@@ -6,7 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-logr/logr"
+	"github.com/go-logr/zapr"
 	"github.com/gosimple/slug"
+	"go.uber.org/zap"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
@@ -19,7 +22,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
@@ -33,7 +35,7 @@ type userSuite struct {
 }
 
 type userMocks struct {
-	logger           *logging.MockLogger
+	logger           logr.Logger
 	cfg              config.Config
 	repo             *user.MockRepository
 	runtimeRepo      *runtime.MockRepository
@@ -46,7 +48,6 @@ type userMocks struct {
 
 func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	ctrl := gomock.NewController(t)
-	logger := logging.NewMockLogger(ctrl)
 	repo := user.NewMockRepository(ctrl)
 	repoRuntimes := runtime.NewMockRepository(ctrl)
 	repoCapabilities := capabilities.NewMockRepository(ctrl)
@@ -55,7 +56,9 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	giteaServiceMock := giteaservice.NewMockGiteaClient(ctrl)
 	k8sClientMock := k8s.NewMockClient(ctrl)
 
-	logging.AddLoggerExpects(logger)
+	zapLog, err := zap.NewDevelopment()
+	require.NoError(t, err)
+	logger := zapr.NewLogger(zapLog)
 
 	if cfg == nil {
 		cfg = &config.Config{}

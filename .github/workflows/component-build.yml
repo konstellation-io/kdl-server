@@ -39,7 +39,7 @@ jobs:
           if [[ "${TAG_NAME##*/}" == *-rc.* ]]; then
             echo "TAG_NAME_FIXED=develop" >> $GITHUB_ENV
           else
-            echo "TAG_NAME_FIXED=${TAG_NAME##*-}" >> $GITHUB_ENV
+            echo "TAG_NAME_FIXED=${TAG_NAME##*-v}" >> $GITHUB_ENV
           fi
 
           # HOTFIX: only for app nomenclature

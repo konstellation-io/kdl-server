@@ -2,8 +2,6 @@
 
 This document provides guidelines for contributing to the *KDL* project.
 
-## How can I contribute?
-
 ## Sign off contributions (DCO)
 
 The Developer Certificate of Origin (DCO) is a lightweight way for contributors to certify that they wrote or otherwise have the right to submit the code they are contributing to the project.
@@ -33,7 +31,6 @@ See `git help commit`:
 **Please follow these basic steps to simplify pull request reviews. If you don't you'll probably just be asked to anyway.**
 
 * Please rebase your branch against the current main.
-* Run the `Setup` command to make sure your development dependencies are up-to-date.
 * Please ensure the test suite passes before submitting a PR.
 * If you've added new functionality, **please** include tests which validate its behavior.
 * Make reference to possible [issues](https://github.com/konstellation-io/kdl-server/issues) on PR comment.

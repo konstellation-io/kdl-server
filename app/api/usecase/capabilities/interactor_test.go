@@ -38,6 +38,7 @@ func newCapabilitiesSuite(t *testing.T, cfg *config.Config) *capabilitiesSuite {
 
 	zapLog, err := zap.NewDevelopment()
 	require.NoError(t, err)
+
 	logger := zapr.NewLogger(zapLog)
 
 	if cfg == nil {

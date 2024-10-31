@@ -21,6 +21,7 @@ func TestUsersSyncTestSuite(t *testing.T) {
 func (testSuite *UsersSyncTestSuite) SetupSuite() {
 	zapLog, err := zap.NewDevelopment()
 	testSuite.Require().NoError(err)
+
 	logger := zapr.NewLogger(zapLog)
 
 	testSuite.interactor = &interactor{

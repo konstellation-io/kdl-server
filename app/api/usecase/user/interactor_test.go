@@ -58,6 +58,7 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 
 	zapLog, err := zap.NewDevelopment()
 	require.NoError(t, err)
+
 	logger := zapr.NewLogger(zapLog)
 
 	if cfg == nil {

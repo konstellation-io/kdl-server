@@ -28,6 +28,7 @@ type flavorMocks struct {
 func newRuntimesuite(t *testing.T) *Runtimesuite {
 	zapLog, err := zap.NewDevelopment()
 	require.NoError(t, err)
+
 	logger := zapr.NewLogger(zapLog)
 
 	ctrl := gomock.NewController(t)

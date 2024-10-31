@@ -3,7 +3,6 @@ package mongodb
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -184,8 +183,9 @@ func (m *ProjectRepo) DeleteOne(ctx context.Context, projectID string) error {
 	}
 
 	if res.DeletedCount != 1 {
-		m.logger.Error(fmt.Errorf("Deleted count different than 1"), "Could not delete project from MongoDB", "projectID", projectID)
-		return NewErrWrongNumberProjectsDeleted(int(res.DeletedCount))
+		err = NewErrWrongNumberProjectsDeleted(int(res.DeletedCount))
+		m.logger.Error(err, "Could not delete project from MongoDB", "projectID", projectID)
+		return err
 	}
 
 	m.logger.Info("Deleted project from MongoDB ", "projectID", projectID)

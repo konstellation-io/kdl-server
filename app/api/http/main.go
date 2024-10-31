@@ -40,6 +40,7 @@ func main() {
 		log.Fatal(err)
 		os.Exit(1)
 	}
+
 	logger := zapr.NewLogger(zapLog)
 
 	realClock := clock.NewRealClock()

@@ -54,6 +54,7 @@ func newProjectSuite(t *testing.T) *projectSuite {
 
 	zapLog, err := zap.NewDevelopment()
 	require.NoError(t, err)
+
 	logger := zapr.NewLogger(zapLog)
 
 	deps := &project.InteractorDeps{

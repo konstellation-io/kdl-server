@@ -3,9 +3,10 @@ package user
 import (
 	"testing"
 
+	"github.com/go-logr/zapr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/stretchr/testify/suite"
+	"go.uber.org/zap"
 )
 
 type UsersSyncTestSuite struct {
@@ -18,7 +19,10 @@ func TestUsersSyncTestSuite(t *testing.T) {
 }
 
 func (testSuite *UsersSyncTestSuite) SetupSuite() {
-	logger := logging.NewLogger("debug")
+	zapLog, err := zap.NewDevelopment()
+	testSuite.Require().NoError(err)
+
+	logger := zapr.NewLogger(zapLog)
 
 	testSuite.interactor = &interactor{
 		logger: logger,

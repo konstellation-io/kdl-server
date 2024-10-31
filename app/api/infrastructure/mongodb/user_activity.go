@@ -6,8 +6,8 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo"
 
+	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
@@ -28,14 +28,14 @@ type userActivityVarDTO struct {
 }
 
 type UserActivityRepo struct {
-	logger     logging.Logger
+	logger     logr.Logger
 	collection *mongo.Collection
 }
 
 // UserActivityRepo implements the project.UserActivityRepo interface.
 var _ project.UserActivityRepo = (*UserActivityRepo)(nil)
 
-func NewUserActivityRepo(logger logging.Logger, client *mongo.Client, dbName string) *UserActivityRepo {
+func NewUserActivityRepo(logger logr.Logger, client *mongo.Client, dbName string) *UserActivityRepo {
 	collection := client.Database(dbName).Collection(userActivityCollName)
 
 	return &UserActivityRepo{

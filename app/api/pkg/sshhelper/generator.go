@@ -7,18 +7,18 @@ import (
 	"encoding/pem"
 	"time"
 
+	"github.com/go-logr/logr"
 	"golang.org/x/crypto/ssh"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
 type generator struct {
-	logger logging.Logger
+	logger logr.Logger
 }
 
 // NewGenerator is a constructor function.
-func NewGenerator(logger logging.Logger) SSHKeyGenerator {
+func NewGenerator(logger logr.Logger) SSHKeyGenerator {
 	return &generator{
 		logger: logger,
 	}

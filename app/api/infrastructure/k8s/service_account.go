@@ -57,7 +57,10 @@ func (k *k8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug s
 	k.logger.Info("Service account created correctly in k8s", "serviceAccountName", serviceAccount.Name)
 
 	// Create secret
-	k.logger.Info("Creating secret service account token for user in k8s...", "serviceAccountSecretName", saSecretName, "username", usernameSlug)
+	k.logger.Info("Creating secret service account token for user in k8s...",
+		"serviceAccountSecretName", saSecretName, "username", usernameSlug,
+	)
+
 	secret := v1.Secret{
 		TypeMeta: metav1.TypeMeta{},
 		ObjectMeta: metav1.ObjectMeta{

@@ -185,6 +185,7 @@ func (m *ProjectRepo) DeleteOne(ctx context.Context, projectID string) error {
 	if res.DeletedCount != 1 {
 		err = NewErrWrongNumberProjectsDeleted(int(res.DeletedCount))
 		m.logger.Error(err, "Could not delete project from MongoDB", "projectID", projectID)
+
 		return err
 	}
 

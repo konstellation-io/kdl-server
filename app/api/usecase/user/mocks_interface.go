@@ -7,7 +7,6 @@ package user
 import (
 	context "context"
 	reflect "reflect"
-	time "time"
 
 	gomock "github.com/golang/mock/gomock"
 	entity "github.com/konstellation-io/kdl-server/app/api/entity"
@@ -263,20 +262,6 @@ func (mr *MockUseCaseMockRecorder) Create(ctx, email, username, accessLevel inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUseCase)(nil).Create), ctx, email, username, accessLevel)
 }
 
-// CreateAdminUser mocks base method.
-func (m *MockUseCase) CreateAdminUser(username, email string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateAdminUser", username, email)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CreateAdminUser indicates an expected call of CreateAdminUser.
-func (mr *MockUseCaseMockRecorder) CreateAdminUser(username, email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAdminUser", reflect.TypeOf((*MockUseCase)(nil).CreateAdminUser), username, email)
-}
-
 // FindAll mocks base method.
 func (m *MockUseCase) FindAll(ctx context.Context) ([]entity.User, error) {
 	m.ctrl.T.Helper()
@@ -379,32 +364,6 @@ func (m *MockUseCase) RegenerateSSHKeys(ctx context.Context, user entity.User) (
 func (mr *MockUseCaseMockRecorder) RegenerateSSHKeys(ctx, user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegenerateSSHKeys", reflect.TypeOf((*MockUseCase)(nil).RegenerateSSHKeys), ctx, user)
-}
-
-// RunSyncUsersCronJob mocks base method.
-func (m *MockUseCase) RunSyncUsersCronJob() {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "RunSyncUsersCronJob")
-}
-
-// RunSyncUsersCronJob indicates an expected call of RunSyncUsersCronJob.
-func (mr *MockUseCaseMockRecorder) RunSyncUsersCronJob() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunSyncUsersCronJob", reflect.TypeOf((*MockUseCase)(nil).RunSyncUsersCronJob))
-}
-
-// ScheduleUsersSyncJob mocks base method.
-func (m *MockUseCase) ScheduleUsersSyncJob(interval time.Duration) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ScheduleUsersSyncJob", interval)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// ScheduleUsersSyncJob indicates an expected call of ScheduleUsersSyncJob.
-func (mr *MockUseCaseMockRecorder) ScheduleUsersSyncJob(interval interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ScheduleUsersSyncJob", reflect.TypeOf((*MockUseCase)(nil).ScheduleUsersSyncJob), interval)
 }
 
 // StartTools mocks base method.

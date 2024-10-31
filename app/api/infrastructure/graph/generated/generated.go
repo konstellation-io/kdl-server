@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"strconv"
 	"sync"
-	
 	"sync/atomic"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -83,7 +82,6 @@ type ComplexityRoot struct {
 		RemoveMembers      func(childComplexity int, input model.RemoveMembersInput) int
 		RemoveUsers        func(childComplexity int, input model.RemoveUsersInput) int
 		SetActiveUserTools func(childComplexity int, input model.SetActiveUserToolsInput) int
-		SyncUsers          func(childComplexity int) int
 		UpdateAccessLevel  func(childComplexity int, input model.UpdateAccessLevelInput) int
 		UpdateMembers      func(childComplexity int, input model.UpdateMembersInput) int
 		UpdateProject      func(childComplexity int, input model.UpdateProjectInput) int
@@ -144,10 +142,6 @@ type ComplexityRoot struct {
 		Public       func(childComplexity int) int
 	}
 
-	SyncUsersResponse struct {
-		Msg func(childComplexity int) int
-	}
-
 	ToolUrls struct {
 		Drone           func(childComplexity int) int
 		Filebrowser     func(childComplexity int) int
@@ -193,7 +187,6 @@ type MutationResolver interface {
 	AddAPIToken(ctx context.Context, input *model.APITokenInput) (*entity.APIToken, error)
 	RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error)
 	SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error)
-	SyncUsers(ctx context.Context) (*model.SyncUsersResponse, error)
 }
 type ProjectResolver interface {
 	CreationDate(ctx context.Context, obj *entity.Project) (string, error)
@@ -426,13 +419,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.SetActiveUserTools(childComplexity, args["input"].(model.SetActiveUserToolsInput)), true
-
-	case "Mutation.syncUsers":
-		if e.complexity.Mutation.SyncUsers == nil {
-			break
-		}
-
-		return e.complexity.Mutation.SyncUsers(childComplexity), true
 
 	case "Mutation.updateAccessLevel":
 		if e.complexity.Mutation.UpdateAccessLevel == nil {
@@ -739,13 +725,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SSHKey.Public(childComplexity), true
 
-	case "SyncUsersResponse.msg":
-		if e.complexity.SyncUsersResponse.Msg == nil {
-			break
-		}
-
-		return e.complexity.SyncUsersResponse.Msg(childComplexity), true
-
 	case "ToolUrls.drone":
 		if e.complexity.ToolUrls.Drone == nil {
 			break
@@ -1011,7 +990,6 @@ type Mutation {
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
   setActiveUserTools(input: SetActiveUserToolsInput!): User!
-  syncUsers: SyncUsersResponse!
 }
 
 type QualityProjectDesc {
@@ -1198,10 +1176,6 @@ enum RepositoryAuthMethod {
 enum RepositoryType {
   INTERNAL
   EXTERNAL
-}
-
-type SyncUsersResponse {
-  msg: String!
 }
 `, BuiltIn: false},
 }
@@ -3138,54 +3112,6 @@ func (ec *executionContext) fieldContext_Mutation_setActiveUserTools(ctx context
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_syncUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_syncUsers(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SyncUsers(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.SyncUsersResponse)
-	fc.Result = res
-	return ec.marshalNSyncUsersResponse2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSyncUsersResponse(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_syncUsers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "msg":
-				return ec.fieldContext_SyncUsersResponse_msg(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type SyncUsersResponse", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Project_id(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Project_id(ctx, field)
 	if err != nil {
@@ -5111,50 +5037,6 @@ func (ec *executionContext) fieldContext_SSHKey_lastActivity(_ context.Context, 
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SyncUsersResponse_msg(ctx context.Context, field graphql.CollectedField, obj *model.SyncUsersResponse) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SyncUsersResponse_msg(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Msg, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SyncUsersResponse_msg(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SyncUsersResponse",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -8585,13 +8467,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "syncUsers":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_syncUsers(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9332,45 +9207,6 @@ func (ec *executionContext) _SSHKey(ctx context.Context, sel ast.SelectionSet, o
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var syncUsersResponseImplementors = []string{"SyncUsersResponse"}
-
-func (ec *executionContext) _SyncUsersResponse(ctx context.Context, sel ast.SelectionSet, obj *model.SyncUsersResponse) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, syncUsersResponseImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("SyncUsersResponse")
-		case "msg":
-			out.Values[i] = ec._SyncUsersResponse_msg(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10463,20 +10299,6 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNSyncUsersResponse2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSyncUsersResponse(ctx context.Context, sel ast.SelectionSet, v model.SyncUsersResponse) graphql.Marshaler {
-	return ec._SyncUsersResponse(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNSyncUsersResponse2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSyncUsersResponse(ctx context.Context, sel ast.SelectionSet, v *model.SyncUsersResponse) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._SyncUsersResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNToolUrls2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolUrls(ctx context.Context, sel ast.SelectionSet, v entity.ToolUrls) graphql.Marshaler {

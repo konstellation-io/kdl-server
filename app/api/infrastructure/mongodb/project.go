@@ -194,7 +194,7 @@ func (m *ProjectRepo) DeleteOne(ctx context.Context, projectID string) error {
 }
 
 func (m *ProjectRepo) updateProjectFields(ctx context.Context, projectID string, fields bson.M) error {
-	m.logger.Info("Updating the project %q with %q...", projectID, fields)
+	m.logger.Info("Updating the project", "projectId", projectID, "fields", fields)
 
 	filter := bson.M{"_id": projectID}
 

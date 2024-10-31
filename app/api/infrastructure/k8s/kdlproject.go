@@ -139,7 +139,7 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 		},
 	}
 
-	k.logger.Info(fmt.Sprintf("Creating kdl project: %#v", definition.Object))
+	k.logger.Info("Creating kdl project")
 	_, err = k.kdlprojectRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
 
 	if err == nil {

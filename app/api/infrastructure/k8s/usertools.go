@@ -206,15 +206,15 @@ func (k *k8sClient) createUserToolsDefinition(ctx context.Context, username, use
 	)
 
 	if err != nil {
-		k.logger.Error(err, "Error building tools: %s", err.Error())
+		k.logger.Error(err, "Error building tools")
 		return err
 	}
 
-	k.logger.Info(fmt.Sprintf("Creating users tools: %#v", definition.Object))
+	k.logger.Info("Creating users tools")
 	_, err = k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
 
 	if err != nil {
-		k.logger.Error(err, "Error creating user tools: %s", err.Error())
+		k.logger.Error(err, "Error creating user tools")
 		return err
 	}
 

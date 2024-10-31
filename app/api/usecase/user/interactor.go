@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/go-logr/logr"
@@ -182,12 +181,12 @@ func (i *interactor) StartTools(ctx context.Context, username string, runtimeID,
 		rID = r.ID
 		rImage = r.DockerImage
 		rTag = r.DockerTag
-		i.logger.Info(fmt.Sprintf("Runtime id %q with docker image \"%s:%s\"", rID, rImage, rTag))
+		i.logger.Info("Runtime with docker image", "runtimeId", rID, "image", rImage, "tag", rTag)
 	} else {
 		rID = "default"
 		rImage = i.cfg.UserToolsVsCodeRuntime.Image.Repository
 		rTag = i.cfg.UserToolsVsCodeRuntime.Image.Tag
-		i.logger.Info(fmt.Sprintf("Using default runtime image \"%s:%s\"", rImage, rTag))
+		i.logger.Info("Using default runtime image", "image", rImage, "tag", rTag)
 	}
 
 	retrievedCapabilities := entity.Capabilities{}

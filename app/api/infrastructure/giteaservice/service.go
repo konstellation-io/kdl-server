@@ -1,8 +1,6 @@
 package giteaservice
 
 import (
-	"fmt"
-
 	"code.gitea.io/sdk/gitea"
 	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
@@ -213,12 +211,12 @@ func (g *giteaService) FindAllUsers() ([]entity.User, error) {
 
 		lastNumberOfUsers = len(users)
 
-		g.logger.Info(fmt.Sprintf("There are %d users in the page %d", lastNumberOfUsers, page))
+		g.logger.Info("There are users in the page", "nOfUsers", lastNumberOfUsers, "pageNumber", page)
 
 		page++
 	}
 
-	g.logger.Info(fmt.Sprintf("Downloaded a total of %d users from Gitea", len(result)))
+	g.logger.Info("Downloaded users from Gitea", "nOfUsers", len(result))
 
 	return result, nil
 }

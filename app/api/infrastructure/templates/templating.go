@@ -9,11 +9,11 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
+	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
 const (
@@ -23,13 +23,13 @@ const (
 
 type templating struct {
 	cfg       config.Config
-	logger    logging.Logger
+	logger    logr.Logger
 	k8sClient k8s.Client
 }
 
 func NewTemplating(
 	cfg config.Config,
-	logger logging.Logger,
+	logger logr.Logger,
 	k8sClient k8s.Client,
 ) Templating {
 	return &templating{

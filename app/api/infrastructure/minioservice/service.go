@@ -7,10 +7,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/go-logr/logr"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
 var (
@@ -18,12 +17,12 @@ var (
 )
 
 type minioService struct {
-	logger logging.Logger
+	logger logr.Logger
 	client *minio.Client
 }
 
 // NewMinioService is a constructor function.
-func NewMinioService(logger logging.Logger, url, accessKey, secretKey string) (MinioService, error) {
+func NewMinioService(logger logr.Logger, url, accessKey, secretKey string) (MinioService, error) {
 	client, err := minio.New(url, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
 		Secure: false,
@@ -48,7 +47,7 @@ func (m *minioService) CreateBucket(ctx context.Context, bucketName string) erro
 			return err
 		}
 
-		m.logger.Infof("Created bucket %q in Minio", bucketName)
+		m.logger.Info("Created bucket in Minio", "bucketName", bucketName)
 
 		return nil
 	}
@@ -87,7 +86,7 @@ func (m *minioService) DeleteBucket(ctx context.Context, bucketName string) (str
 		Recursive: true,
 	})
 
-	m.logger.Debugf("Copying content from bucket %q to bucket %q", bucketName, backupBucketName)
+	m.logger.Info("Copying content from bucket to another", "bucketOrigin", bucketName, "bucketDestiny", backupBucketName)
 
 	for object := range objects {
 		if object.Err != nil {
@@ -118,7 +117,7 @@ func (m *minioService) DeleteBucket(ctx context.Context, bucketName string) (str
 		return "", fmt.Errorf("error deleting bucket: %w", err)
 	}
 
-	m.logger.Infof("Bucket %q removed", bucketName)
+	m.logger.Info("Bucket removed", "bucketName", bucketName)
 
 	return backupBucketName, nil
 }

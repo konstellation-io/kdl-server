@@ -69,13 +69,7 @@ func NewK8sClient(logger logging.Logger, cfg config.Config) (*K8sClient, error) 
 		Version:  kdlprojectVersion,
 		Resource: kdlprojectResource,
 	})
-	c := &K8sClient{
-		logger:        logger,
-		clientset:     clientset,
-		cfg:           cfg,
-		userToolsRes:  userToolsRes,
-		kdlprojectRes: kdlprojectRes,
-	}
+	c := New(logger, cfg, clientset, userToolsRes, kdlprojectRes)
 
 	return c, nil
 }

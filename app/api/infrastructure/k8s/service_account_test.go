@@ -87,6 +87,9 @@ func (s *serviceAccountTestSuite) TestCreateServiceAccount() {
 	serviceAccount := s.clientset.CoreV1().ServiceAccounts("sa")
 	s.NotNil(serviceAccount)
 
-	_, err = s.client.GetUserServiceAccount(context.Background(), "sa")
+	sa, err := s.client.GetUserServiceAccount(context.Background(), "sa")
 	s.NoError(err)
+
+	s.Equal("sa-service-account-secret", sa.Secrets[0].Name)
+
 }

@@ -8,6 +8,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type KubernetesConfig struct {
+	IsInsideCluster bool   `default:"true"`
+	Namespace       string `envconfig:"POD_NAMESPACE"`
+}
+
 // Config holds the configuration values of the application.
 type Config struct {
 	LogLevel        string `yaml:"logLevel" envconfig:"KDL_SERVER_LOG_LEVEL"` // currently unused
@@ -38,11 +43,8 @@ type Config struct {
 		AdminUser   string `envconfig:"GITEA_ADMIN_USER"`
 		AdminPass   string `envconfig:"GITEA_ADMIN_PASSWORD"`
 	} `yaml:"gitea"`
-	Kubernetes struct {
-		IsInsideCluster bool   `default:"true"`
-		Namespace       string `envconfig:"POD_NAMESPACE"`
-	} `yaml:"kubernetes"`
-	Minio struct {
+	Kubernetes KubernetesConfig `yaml:"kubernetes"`
+	Minio      struct {
 		Endpoint  string `envconfig:"MINIO_ENDPOINT"`
 		AccessKey string `envconfig:"MINIO_ACCESS_KEY"`
 		SecretKey string `envconfig:"MINIO_SECRET_KEY"`

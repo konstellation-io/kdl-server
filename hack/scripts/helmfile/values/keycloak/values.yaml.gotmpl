@@ -1,0 +1,46 @@
+image:
+  repository: keycloak/keycloak
+  tag: "26.0"
+
+service:
+  healthPath: /realms/master
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: traefik-internal
+  annotations:
+    nginx.org/proxy-buffer-size: "128k"
+    nginx.org/proxy-buffers: "8 256k"
+  hosts:
+  - host: keycloak.{{ requiredEnv "DOMAIN" }}
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+
+serviceAccount:
+  create: true
+
+livenessProbe:
+  enabled: true
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /realms/master
+
+command:
+- "/opt/keycloak/bin/kc.sh"
+- "start-dev"
+
+env:
+  KC_DB_PASSWORD: keycloak
+  KC_DB_URL: jdbc:postgresql://postgresql:5432/keycloak
+  KC_DB_USERNAME: keycloak
+  KC_DB: postgres
+  KC_HEALTH_ENABLED: true
+  KC_HOSTNAME: keycloak.{{ requiredEnv "DOMAIN" }}
+  KC_METRICS_ENABLED: true
+  KC_PROXY: edge
+  KEYCLOAK_ADMIN_PASSWORD: keycloak
+  KEYCLOAK_ADMIN: keycloak

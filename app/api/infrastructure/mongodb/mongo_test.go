@@ -15,7 +15,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
 
-	"github.com/go-logr/zapr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/mongodb"
 	"github.com/stretchr/testify/suite"

@@ -1,0 +1,19 @@
+# Number of PostgreSQL replicas to deploy
+replicaCount: 1
+
+# PostgreSQL Authentication parameters
+auth:
+  # PostgreSQL application username
+  # </br> Ref: https://github.com/bitnami/containers/tree/main/bitnami/postgresql#environment-variables
+  username: keycloak
+  # PostgreSQL application password
+  # </br> Ref: https://github.com/bitnami/containers/tree/main/bitnami/postgresql#environment-variables
+  password: keycloak
+  # PostgreSQL application database
+  # </br> Ref: https://github.com/bitnami/containers/tree/main/bitnami/postgresql#environment-variables
+  database: "keycloak"
+
+# Persistence parameters
+persistence:
+  # Enable PostgreSQL data persistence using PVC
+  enabled: false

@@ -1,4 +1,4 @@
-name: 'Mark stale issues and PRs'
+name: "[GitHub] Mark stale issues and PRs"
 on:
   schedule:
     - cron: '30 1 * * *'
@@ -6,6 +6,13 @@ on:
 jobs:
   stale:
     runs-on: ubuntu-latest
+
+    # ref: https://github.com/actions/stale?tab=readme-ov-file#recommended-permissions
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
     steps:
       - uses: actions/stale@v9
         with:

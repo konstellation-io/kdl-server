@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 
+	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
 var (
@@ -17,7 +17,7 @@ var (
 )
 
 type interactor struct {
-	logger    logging.Logger
+	logger    logr.Logger
 	cfg       config.Config
 	repo      Repository
 	k8sClient k8s.Client
@@ -25,7 +25,7 @@ type interactor struct {
 
 // NewInteractor factory function.
 func NewInteractor(
-	logger logging.Logger,
+	logger logr.Logger,
 	cfg config.Config,
 	repo Repository,
 	k8sClient k8s.Client,
@@ -40,19 +40,14 @@ func NewInteractor(
 
 // Retrieve all capabilities.
 func (i *interactor) GetCapabilities(ctx context.Context) ([]model.Capability, error) {
-	i.logger.Infof("Find all capabilities")
 	capabilities, err := i.repo.FindAll(ctx)
-
 	if err != nil {
 		return []model.Capability{}, err
 	}
 
-	i.logger.Infof("Retrieved capabilities: %v", capabilities)
-
-	//nolint:prealloc // No need to preallocate.
-	var capabilitiesList []model.Capability
-	for _, element := range capabilities {
-		capabilitiesList = append(capabilitiesList, model.Capability{ID: element.ID, Name: element.Name, Default: element.Default})
+	capabilitiesList := make([]model.Capability, len(capabilities))
+	for idx, element := range capabilities {
+		capabilitiesList[idx] = model.Capability{ID: element.ID, Name: element.Name, Default: element.Default}
 	}
 
 	return capabilitiesList, err
@@ -66,7 +61,7 @@ func (i *interactor) GetRunningCapability(ctx context.Context, username string) 
 	}
 
 	if capabilityID != "" {
-		i.logger.Infof("Capability in runtime POD: %s", capabilityID)
+		i.logger.Info("Capability in running runtime POD found", "capabilityID", capabilityID, "username", username)
 
 		capability, err := i.repo.Get(ctx, capabilityID)
 		if err != nil {

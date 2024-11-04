@@ -13,10 +13,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.uber.org/zap"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/mongodb"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -169,7 +169,10 @@ func TestProcessRepositoryTestSuite(t *testing.T) {
 
 func (s *TestSuite) SetupSuite() {
 	ctx := context.Background()
-	logger := logging.NewLogger("info")
+
+	zapLog, err := zap.NewDevelopment()
+	s.Require().NoError(err)
+	logger := zapr.NewLogger(zapLog)
 
 	rootUsername := "root"
 	rootPassword := "root"

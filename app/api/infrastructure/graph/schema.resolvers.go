@@ -80,7 +80,7 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 
 	createdProject, err := r.projects.Create(ctx, opts)
 	if err != nil {
-		r.logger.Errorf("Error creating project: %s", err)
+		r.logger.Error(err, "Error creating project")
 	}
 
 	return &createdProject, err

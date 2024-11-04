@@ -13,7 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 )
 
-// DeleteUserToolsCR removes the Custom Resource from Kubernetes.
+// DeleteUserToolsCR removes a given user tools custom resource from Kubernetes.
 func (k *K8sClient) DeleteUserToolsCR(ctx context.Context, username string) error {
 	slugUsername := k.getSlugUsername(username)
 	resName := k.getUserToolsResName(slugUsername)
@@ -28,7 +28,7 @@ func (k *K8sClient) DeleteUserToolsCR(ctx context.Context, username string) erro
 	})
 
 	if err != nil {
-		k.logger.Errorf("Error deleting user tools: %w", err)
+		k.logger.Error(err, "Error deleting user tools")
 		return err
 	}
 
@@ -40,7 +40,7 @@ func (k *K8sClient) DeleteUserToolsCR(ctx context.Context, username string) erro
 		return err
 	}
 
-	k.logger.Infof("Apply path to remove finalizers result: %s", result.Object)
+	k.logger.Info("Applied path to remove finalizers", "result", result.Object)
 
 	return k.waitUserToolsDeleted(ctx, resName)
 }
@@ -206,15 +206,15 @@ func (k *K8sClient) createUserToolsDefinition(ctx context.Context, username, use
 	)
 
 	if err != nil {
-		k.logger.Errorf("Error building tools: %s", err.Error())
+		k.logger.Error(err, "Error building tools")
 		return err
 	}
 
-	k.logger.Infof("Creating users tools: %#v", definition.Object)
+	k.logger.Info("Creating users tools")
 	_, err = k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
 
 	if err != nil {
-		k.logger.Errorf("Error creating user tools: %s", err.Error())
+		k.logger.Error(err, "Error creating user tools")
 		return err
 	}
 
@@ -340,7 +340,7 @@ func (k *K8sClient) getUserToolsDefinition(
 // Returns a watcher for the UserTools.
 func (k *K8sClient) createUserToolsWatcher(ctx context.Context, resName string) (watch.Interface, error) {
 	labelSelector := k.userToolsPODLabelSelector(resName)
-	k.logger.Debugf("Creating watcher for POD with label: %s", labelSelector)
+	k.logger.Info("Creating watcher for POD", "label", labelSelector)
 
 	opts := metav1.ListOptions{
 		TypeMeta:      metav1.TypeMeta{},
@@ -365,13 +365,13 @@ func (k *K8sClient) waitUserToolsDeleted(ctx context.Context, resName string) er
 		case event := <-watcher.ResultChan():
 			if event.Type == watch.Deleted {
 				pod := event.Object.(*v1.Pod)
-				k.logger.Infof("Pod %s has being deleted", pod.Name)
+				k.logger.Info("Pod deleted", "podName", pod.Name)
 
 				return nil
 			}
 
 		case <-ctx.Done():
-			k.logger.Debugf("Exit from waitUserToolsDeleted for POD %q because the context is done", resName)
+			k.logger.Info("Exit from waitUserToolsDeleted for POD because the context is done", "podName", resName)
 			return nil
 		}
 	}
@@ -392,12 +392,12 @@ func (k *K8sClient) waitUserToolsRunning(ctx context.Context, resName string) er
 			pod := event.Object.(*v1.Pod)
 
 			if pod.Status.Phase == v1.PodRunning {
-				k.logger.Infof("The POD %q is running", resName)
+				k.logger.Info("The POD is running", "podName", resName)
 				return nil
 			}
 
 		case <-ctx.Done():
-			k.logger.Debugf("Exit from waitUserToolsRunning for POD %q because the context is done", resName)
+			k.logger.Info("Exit from waitUserToolsRunning for POD because the context is done", "podName", resName)
 			return nil
 		}
 	}

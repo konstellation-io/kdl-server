@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - main
-      - develop
     paths:
       - '**/Dockerfile'
 
@@ -31,7 +30,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: "[${{ matrix.directory }}] Pass hadolint"
-        uses: hadolint/hadolint-action@v2.1.0
+        uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: ./${{ matrix.directory }}/Dockerfile
           format: tty

@@ -6,20 +6,19 @@ import (
 	"log"
 
 	"github.com/drone/drone-go/drone"
+	"github.com/go-logr/logr"
 	"golang.org/x/oauth2"
-
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
 const repoOrg = "kdl"
 
 type droneService struct {
-	logger logging.Logger
+	logger logr.Logger
 	client drone.Client
 }
 
 // NewDroneService is a constructor function.
-func NewDroneService(logger logging.Logger, url, token string) DroneService {
+func NewDroneService(logger logr.Logger, url, token string) DroneService {
 	config := new(oauth2.Config)
 	auth := config.Client(
 		context.Background(),
@@ -39,7 +38,7 @@ func NewDroneService(logger logging.Logger, url, token string) DroneService {
 
 // ActivateRepository activates a repository in drone.
 func (d *droneService) ActivateRepository(repoName string) error {
-	d.logger.Infof("Activating %q repository in Drone...", repoName)
+	d.logger.Info("Activating repository in Drone...", "repoName", repoName)
 
 	repos, err := d.client.RepoListSync()
 	if err != nil {
@@ -78,11 +77,10 @@ func (d *droneService) ActivateRepository(repoName string) error {
 
 // DeleteRepository deletes a repository in drone.
 func (d *droneService) DeleteRepository(repoName string) error {
-	d.logger.Infof("Deleting %q repository in Drone...", repoName)
+	d.logger.Info("Deleting %q repository in Drone...", "repoName", repoName)
 
 	err := d.client.RepoDelete(repoOrg, repoName)
 	if err != nil {
-		d.logger.Error(err.Error())
 		return fmt.Errorf("error deleting repo: %w", err)
 	}
 

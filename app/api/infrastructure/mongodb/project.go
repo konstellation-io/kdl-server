@@ -10,8 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
@@ -39,21 +39,21 @@ type projectDTO struct {
 }
 
 type ProjectRepo struct {
-	logger     logging.Logger
+	logger     logr.Logger
 	collection *mongo.Collection
 }
 
 // projectRepo implements the capabilities.Repository interface.
 var _ project.Repository = (*ProjectRepo)(nil)
 
-func NewProjectRepo(logger logging.Logger, client *mongo.Client, dbName string) *ProjectRepo {
+func NewProjectRepo(logger logr.Logger, client *mongo.Client, dbName string) *ProjectRepo {
 	collection := client.Database(dbName).Collection(projectCollName)
 	return &ProjectRepo{logger, collection}
 }
 
 // Create inserts into the database a new project entity.
 func (m *ProjectRepo) Create(ctx context.Context, p entity.Project) (string, error) {
-	m.logger.Debugf("Creating new project %q...", p.ID)
+	m.logger.Info("Creating new project", "projectID", p.ID)
 
 	dto, err := m.entityToDTO(p)
 	if err != nil {
@@ -80,7 +80,7 @@ func (m *ProjectRepo) FindAll(ctx context.Context) ([]entity.Project, error) {
 
 // AddMembers creates a new user in the member list for the given project.
 func (m *ProjectRepo) AddMembers(ctx context.Context, projectID string, members []entity.Member) error {
-	m.logger.Debugf("Adding %d new members to project %q...", len(members), projectID)
+	m.logger.Info("Adding new members to project", "nOfMembers", len(members), "projectID", projectID)
 
 	filter := bson.M{"_id": projectID}
 
@@ -104,7 +104,7 @@ func (m *ProjectRepo) AddMembers(ctx context.Context, projectID string, members 
 
 // RemoveMembers deletes users from the member list for the given project.
 func (m *ProjectRepo) RemoveMembers(ctx context.Context, projectID string, users []entity.User) error {
-	m.logger.Debugf("Removing members from project %q...", projectID)
+	m.logger.Info("Removing all members from project", "projectID", projectID)
 
 	uObjIDs, err := m.toObjectIDs(users)
 	if err != nil {
@@ -131,7 +131,7 @@ func (m *ProjectRepo) RemoveMembers(ctx context.Context, projectID string, users
 // UpdateMembersAccessLevel updates the access level for a given project to all given users.
 func (m *ProjectRepo) UpdateMembersAccessLevel(
 	ctx context.Context, projectID string, users []entity.User, accessLevel entity.AccessLevel) error {
-	m.logger.Debugf("Updating members access level to %q from project %q...", accessLevel, projectID)
+	m.logger.Info("Updating members' access level in project", "members", users, "newAccessLevel", accessLevel, "projectID", projectID)
 
 	uObjIDs, err := m.toObjectIDs(users)
 	if err != nil {
@@ -179,21 +179,23 @@ func (m *ProjectRepo) DeleteOne(ctx context.Context, projectID string) error {
 
 	res, err := m.collection.DeleteOne(ctx, filter)
 	if err != nil {
-		m.logger.Errorf("Could not delete project \"\" from MongoDB", projectID)
+		m.logger.Error(err, "Could not delete project from MongoDB", "projectID", projectID)
 	}
 
 	if res.DeletedCount != 1 {
-		m.logger.Errorf("Could not delete project \"\" from MongoDB", projectID)
-		return NewErrWrongNumberProjectsDeleted(int(res.DeletedCount))
+		err = NewErrWrongNumberProjectsDeleted(int(res.DeletedCount))
+		m.logger.Error(err, "Could not delete project from MongoDB", "projectID", projectID)
+
+		return err
 	}
 
-	m.logger.Infof("Deleted project %q from MongoDB ", projectID)
+	m.logger.Info("Deleted project from MongoDB ", "projectID", projectID)
 
 	return nil
 }
 
 func (m *ProjectRepo) updateProjectFields(ctx context.Context, projectID string, fields bson.M) error {
-	m.logger.Debugf("Updating the project %q with %q...", projectID, fields)
+	m.logger.Info("Updating the project", "projectId", projectID, "fields", fields)
 
 	filter := bson.M{"_id": projectID}
 
@@ -205,7 +207,7 @@ func (m *ProjectRepo) updateProjectFields(ctx context.Context, projectID string,
 }
 
 func (m *ProjectRepo) findOne(ctx context.Context, filters bson.M) (entity.Project, error) {
-	m.logger.Debugf("Finding one project by %q from database...", filters)
+	m.logger.Info("Fetching one project by from database...", "filters", filters)
 
 	dto := projectDTO{}
 
@@ -218,7 +220,7 @@ func (m *ProjectRepo) findOne(ctx context.Context, filters bson.M) (entity.Proje
 }
 
 func (m *ProjectRepo) find(ctx context.Context, filters bson.M) ([]entity.Project, error) {
-	m.logger.Debugf("Finding projects with filters %q...", filters)
+	m.logger.Info("Fetching projects", "filters", filters)
 
 	var dtos []projectDTO
 

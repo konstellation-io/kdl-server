@@ -4,12 +4,12 @@ import (
 	"context"
 	"testing"
 
-	gomock "github.com/golang/mock/gomock"
+	"github.com/go-logr/zapr"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go/modules/k3s"
+	"go.uber.org/zap"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -55,9 +55,10 @@ func (s *serviceAccountTestSuite) SetupTest() {
 	s.NoError(err)
 
 	// Create an k8s infrastructure client
-	ctrl := gomock.NewController(s.T())
-	logger := logging.NewMockLogger(ctrl)
-	logging.AddLoggerExpects(logger)
+	zapLog, err := zap.NewDevelopment()
+	s.Require().NoError(err)
+
+	logger := zapr.NewLogger(zapLog)
 
 	cfg := config.Config{
 		Kubernetes: config.KubernetesConfig{
@@ -91,5 +92,4 @@ func (s *serviceAccountTestSuite) TestCreateServiceAccount() {
 	s.NoError(err)
 
 	s.Equal("sa-service-account-secret", sa.Secrets[0].Name)
-
 }

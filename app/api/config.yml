@@ -6,6 +6,3 @@ mongodb:
   dbName: "kdl"
 gitea:
   internal_url: "http://gitea:3000"
-scheduledJob:
-  usersSync:
-    interval: 10m

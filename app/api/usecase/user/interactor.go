@@ -17,7 +17,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/cron"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 )
 
@@ -36,7 +35,6 @@ type interactor struct {
 	clock            clock.Clock
 	giteaService     giteaservice.GiteaClient
 	k8sClient        k8s.Client
-	scheduler        cron.Scheduler
 }
 
 // NewInteractor factory function.
@@ -61,7 +59,6 @@ func NewInteractor(
 		clock:            c,
 		giteaService:     giteaService,
 		k8sClient:        k8sClient,
-		scheduler:        cron.NewScheduler(logger),
 	}
 }
 

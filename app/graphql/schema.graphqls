@@ -24,7 +24,6 @@ type Mutation {
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
   setActiveUserTools(input: SetActiveUserToolsInput!): User!
-  syncUsers: SyncUsersResponse!
 }
 
 type QualityProjectDesc {
@@ -211,8 +210,4 @@ enum RepositoryAuthMethod {
 enum RepositoryType {
   INTERNAL
   EXTERNAL
-}
-
-type SyncUsersResponse {
-  msg: String!
 }

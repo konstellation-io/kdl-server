@@ -93,7 +93,9 @@ func main() {
 
 	userInteractor := user.NewInteractor(logger, cfg, userRepo, runtimeRepo, capabilitiesRepo,
 		sshHelper, realClock, giteaService, k8sClient)
-	initUserInteractor(userInteractor, cfg, logger)
+	if err = userInteractor.SynchronizeServiceAccountsForUsers(); err != nil {
+		logger.Error(err, "Unexpected error creating serviceAccount for users")
+	}
 
 	projectDeps := &project.InteractorDeps{
 		Logger:           logger,
@@ -122,31 +124,6 @@ func main() {
 	)
 
 	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, cfg.Kubernetes.IsInsideCluster, resolvers, userRepo, projectRepo)
-}
-
-func initUserInteractor(userInteractor user.UseCase, cfg config.Config, logger logr.Logger) {
-	err := userInteractor.CreateAdminUser(cfg.Admin.Username, cfg.Admin.Email)
-	if err != nil {
-		logger.Error(err, "Unexpected error creating admin user")
-
-		defer os.Exit(1)
-
-		return
-	}
-
-	err = userInteractor.ScheduleUsersSyncJob(cfg.ScheduledJob.UsersSync.Interval)
-	if err != nil {
-		logger.Error(err, "Unexpected error creating scheduled job for users synchronization")
-
-		defer os.Exit(1)
-
-		return
-	}
-
-	err = userInteractor.SynchronizeServiceAccountsForUsers()
-	if err != nil {
-		logger.Error(err, "Unexpected error creating serviceAccount for users")
-	}
 }
 
 func startHTTPServer(

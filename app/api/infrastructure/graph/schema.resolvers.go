@@ -201,13 +201,6 @@ func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.S
 	return &u, err
 }
 
-// SyncUsers is the resolver for the syncUsers field.
-func (r *mutationResolver) SyncUsers(ctx context.Context) (*model.SyncUsersResponse, error) {
-	r.users.RunSyncUsersCronJob()
-
-	return &model.SyncUsersResponse{Msg: "External user data synchronization has started."}, nil
-}
-
 // CreationDate is the resolver for the creationDate field.
 func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project) (string, error) {
 	return obj.CreationDate.Format(time.RFC3339), nil

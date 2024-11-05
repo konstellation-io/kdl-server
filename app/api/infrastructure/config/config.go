@@ -3,7 +3,6 @@ package config
 import (
 	"log"
 	"os"
-	"time"
 
 	"github.com/kelseyhightower/envconfig"
 	"gopkg.in/yaml.v3"
@@ -100,11 +99,6 @@ type Config struct {
 		Enabled bool   `envconfig:"KNOWLEDGE_GALAXY_ENABLED"`
 		URL     string `envconfig:"KNOWLEDGE_GALAXY_URL"`
 	}
-	ScheduledJob struct {
-		UsersSync struct {
-			Interval time.Duration `yaml:"interval" envconfig:"CRONJOB_USERS_SYNC_INTERVAL"`
-		} `yaml:"usersSync"`
-	} `yaml:"scheduledJob"`
 	OAuth2Proxy struct {
 		Image struct {
 			Repository string `envconfig:"OAUTH2_PROXY_IMG_REPO"`

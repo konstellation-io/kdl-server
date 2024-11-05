@@ -15,7 +15,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
 
-//go:generate go get -d github.com/99designs/gqlgen
+//go:generate go get github.com/99designs/gqlgen
 //go:generate go run github.com/99designs/gqlgen
 
 // This file will not be regenerated automatically.

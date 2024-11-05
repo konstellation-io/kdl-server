@@ -17,7 +17,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/cron"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 )
 
@@ -36,7 +35,6 @@ type interactor struct {
 	clock            clock.Clock
 	giteaService     giteaservice.GiteaClient
 	k8sClient        k8s.Client
-	scheduler        cron.Scheduler
 }
 
 // NewInteractor factory function.
@@ -61,7 +59,6 @@ func NewInteractor(
 		clock:            c,
 		giteaService:     giteaService,
 		k8sClient:        k8sClient,
-		scheduler:        cron.NewScheduler(logger),
 	}
 }
 
@@ -349,32 +346,6 @@ func (i *interactor) SynchronizeServiceAccountsForUsers() error {
 			}
 		}
 	}
-
-	return nil
-}
-
-// CreateAdminUser creates the KDL admin user if not exists.
-func (i *interactor) CreateAdminUser(username, email string) error {
-	ctx := context.Background()
-
-	_, err := i.repo.GetByUsername(ctx, username)
-	if err == nil {
-		i.logger.Info("The admin user already exists", "username", username)
-		return nil
-	}
-
-	if !errors.Is(err, entity.ErrUserNotFound) {
-		return err
-	}
-
-	i.logger.Info("Creating the admin user", "username", username)
-
-	user, err := i.Create(ctx, email, username, entity.AccessLevelAdmin)
-	if err != nil {
-		return err
-	}
-
-	i.logger.Info("Admin user created correctly", "username", user.Username, "userEmail", user.Email, "insertedID", user.ID)
 
 	return nil
 }

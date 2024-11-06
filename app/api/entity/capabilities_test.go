@@ -34,7 +34,7 @@ func getTestCapability() entity.Capabilities {
 				"operator":          "Equal",
 				"value":             "value1",
 				"effect":            "NoExecute",
-				"tolerationSeconds": int32(100),
+				"tolerationSeconds": 100,
 			},
 		},
 		Affinities: map[string]interface{}{},

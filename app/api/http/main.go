@@ -1,12 +1,16 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/go-logr/logr"
+	"github.com/go-logr/zapr"
+	"go.uber.org/zap"
 
 	"github.com/konstellation-io/kdl-server/app/api/http/controller"
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
@@ -20,7 +24,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/mongodb"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
@@ -31,7 +34,15 @@ import (
 
 func main() {
 	cfg := config.NewConfig()
-	logger := logging.NewLogger(cfg.LogLevel)
+
+	zapLog, err := zap.NewDevelopment()
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+
+	logger := zapr.NewLogger(zapLog)
+
 	realClock := clock.NewRealClock()
 	sshHelper := sshhelper.NewGenerator(logger)
 
@@ -39,7 +50,7 @@ func main() {
 		logger, cfg.Gitea.InternalURL, cfg.Gitea.AdminUser, cfg.Gitea.AdminPass,
 	)
 	if err != nil {
-		logger.Errorf("Error connecting to Gitea: %s", err)
+		logger.Error(err, "Error connecting to Gitea")
 		os.Exit(1)
 	}
 
@@ -47,7 +58,7 @@ func main() {
 		logger, cfg.Minio.Endpoint, cfg.Minio.AccessKey, cfg.Minio.SecretKey,
 	)
 	if err != nil {
-		logger.Errorf("Error connecting to Minio: %s", err)
+		logger.Error(err, "Error connecting to Minio")
 		os.Exit(1)
 	}
 
@@ -55,7 +66,7 @@ func main() {
 
 	k8sClient, err := k8s.NewK8sClient(logger, cfg)
 	if err != nil {
-		logger.Errorf("Error creating k8s client: %s", err)
+		logger.Error(err, "Error creating k8s client")
 		os.Exit(1)
 	}
 
@@ -63,7 +74,7 @@ func main() {
 
 	mongodbClient, err := mongo.Connect(cfg.MongoDB.URI)
 	if err != nil {
-		logger.Errorf("Error connecting to MongoDB: %s", err)
+		logger.Error(err, "Error connecting to MongoDB")
 		os.Exit(1)
 	}
 
@@ -77,12 +88,14 @@ func main() {
 
 	err = userRepo.EnsureIndexes()
 	if err != nil {
-		logger.Errorf("Error creating indexes for users: %s", err)
+		logger.Error(err, "Error creating indexes for users")
 	}
 
 	userInteractor := user.NewInteractor(logger, cfg, userRepo, runtimeRepo, capabilitiesRepo,
 		sshHelper, realClock, giteaService, k8sClient)
-	initUserInteractor(userInteractor, cfg, logger)
+	if err = userInteractor.SynchronizeServiceAccountsForUsers(); err != nil {
+		logger.Error(err, "Unexpected error creating serviceAccount for users")
+	}
 
 	projectDeps := &project.InteractorDeps{
 		Logger:           logger,
@@ -113,33 +126,8 @@ func main() {
 	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, cfg.Kubernetes.IsInsideCluster, resolvers, userRepo, projectRepo)
 }
 
-func initUserInteractor(userInteractor user.UseCase, cfg config.Config, logger logging.Logger) {
-	err := userInteractor.CreateAdminUser(cfg.Admin.Username, cfg.Admin.Email)
-	if err != nil {
-		logger.Errorf("Unexpected error creating admin user: %s", err)
-
-		defer os.Exit(1)
-
-		return
-	}
-
-	err = userInteractor.ScheduleUsersSyncJob(cfg.ScheduledJob.UsersSync.Interval)
-	if err != nil {
-		logger.Errorf("Unexpected error creating scheduled job for users synchronization: %s", err)
-
-		defer os.Exit(1)
-
-		return
-	}
-
-	err = userInteractor.SynchronizeServiceAccountsForUsers()
-	if err != nil {
-		logger.Errorf("Unexpected error creating serviceAccount for users: %s", err)
-	}
-}
-
 func startHTTPServer(
-	logger logging.Logger,
+	logger logr.Logger,
 	port,
 	staticFilesPath string,
 	insideK8Cluster bool,
@@ -163,7 +151,7 @@ func startHTTPServer(
 	http.Handle(apiQueryPath, authMiddleware(dataloader.Middleware(userRepo, srv)))
 	http.HandleFunc("/api/auth/project", authController.HandleProjectAuth)
 
-	logger.Infof("Server running at port %s", port)
+	logger.Info("Server running", "port", port)
 
 	server := &http.Server{
 		Addr:         ":" + port,
@@ -175,7 +163,7 @@ func startHTTPServer(
 
 	err := server.ListenAndServe()
 	if err != nil {
-		logger.Errorf("Unexpected error: %s", err)
+		logger.Error(err, "Unexpected error")
 		os.Exit(1)
 	}
 }

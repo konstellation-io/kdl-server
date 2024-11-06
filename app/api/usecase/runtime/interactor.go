@@ -3,21 +3,21 @@ package runtime
 import (
 	"context"
 
+	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
 type interactor struct {
-	logger    logging.Logger
+	logger    logr.Logger
 	k8sClient k8s.Client
 	repo      Repository
 }
 
 // NewInteractor factory function.
 func NewInteractor(
-	logger logging.Logger,
+	logger logr.Logger,
 	k8sClient k8s.Client,
 	repo Repository,
 ) UseCase {
@@ -52,7 +52,7 @@ func (i interactor) GetRunningRuntime(ctx context.Context, username string) (*en
 	}
 
 	if runtimeID != "" {
-		i.logger.Infof("RuntimeId in runtime POD " + runtimeID)
+		i.logger.Info("Running runtime POD found", "runtimeID", runtimeID)
 
 		runtime, err := i.repo.Get(ctx, runtimeID)
 		if err != nil {

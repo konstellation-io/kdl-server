@@ -9,11 +9,11 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-func (k *k8sClient) getProjectName(projectID string) string {
+func (k *K8sClient) getProjectName(projectID string) string {
 	return fmt.Sprintf("kdlproject-%s", projectID)
 }
 
-func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) error {
+func (k *K8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) error {
 	const oAuth2ProxyCookieSecretLen = 16
 
 	cookieSecret, err := kdlutil.GenerateRandomString(oAuth2ProxyCookieSecretLen)
@@ -139,24 +139,24 @@ func (k *k8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 		},
 	}
 
-	k.logger.Infof("Creating kdl project: %#v", definition.Object)
+	k.logger.Info("Creating kdl project")
 	_, err = k.kdlprojectRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
 
 	if err == nil {
-		k.logger.Infof("The kdl project %q was created correctly in k8s", resName)
+		k.logger.Info("KDL project created correctly in k8s", "projectName", resName)
 	}
 
 	return err
 }
 
-func (k *k8sClient) DeleteKDLProjectCR(ctx context.Context, projectID string) error {
+func (k *K8sClient) DeleteKDLProjectCR(ctx context.Context, projectID string) error {
 	resName := k.getProjectName(projectID)
 
-	k.logger.Infof("Attempting to delete KDL Project CR with name %q", resName)
+	k.logger.Info("Attempting to delete KDL Project CR in k8s", "projectName", resName)
 
 	err := k.kdlprojectRes.Namespace(k.cfg.Kubernetes.Namespace).Delete(ctx, resName, *metav1.NewDeleteOptions(0))
 	if err == nil {
-		k.logger.Infof("The KDL Project CR with name %q was deleted correctly in k8s", resName)
+		k.logger.Info("KDL Project CR correctly deleted in k8s", "projectName", resName)
 	}
 
 	return err

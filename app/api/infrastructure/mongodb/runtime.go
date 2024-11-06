@@ -8,8 +8,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
+	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 )
@@ -28,14 +28,14 @@ type runtimeDTO struct {
 }
 
 type RuntimeRepo struct {
-	logger     logging.Logger
+	logger     logr.Logger
 	collection *mongo.Collection
 }
 
 // RuntimeRepo implements the runtime.Repository interface.
 var _ runtime.Repository = (*RuntimeRepo)(nil)
 
-func NewRuntimeRepo(logger logging.Logger, client *mongo.Client, dbName string) *RuntimeRepo {
+func NewRuntimeRepo(logger logr.Logger, client *mongo.Client, dbName string) *RuntimeRepo {
 	collection := client.Database(dbName).Collection(runtimesCollName)
 	return &RuntimeRepo{logger, collection}
 }
@@ -43,7 +43,7 @@ func NewRuntimeRepo(logger logging.Logger, client *mongo.Client, dbName string) 
 // Create inserts into the database a new runtime entity.
 // This Create is not exposed to the API, it's only used internally for testing.
 func (m *RuntimeRepo) Create(ctx context.Context, r entity.Runtime) (string, error) {
-	m.logger.Debugf("Creating new runtime %q...", r.Name)
+	m.logger.Info("Creating new runtime", "runtimeName", r.Name)
 
 	dto, err := m.entityToDTO(r)
 	if err != nil {
@@ -68,7 +68,7 @@ func (m *RuntimeRepo) Get(ctx context.Context, id string) (entity.Runtime, error
 }
 
 func (m *RuntimeRepo) findOne(ctx context.Context, filters bson.M) (entity.Runtime, error) {
-	m.logger.Debugf("Finding one runtime by %q from database...", filters)
+	m.logger.Info("Fetching one runtime from database", "filters", filters)
 
 	dto := runtimeDTO{}
 
@@ -86,7 +86,7 @@ func (m *RuntimeRepo) FindAll(ctx context.Context) ([]entity.Runtime, error) {
 }
 
 func (m *RuntimeRepo) find(ctx context.Context, filters bson.M) ([]entity.Runtime, error) {
-	m.logger.Debugf("Finding runtimes with filters %q...", filters)
+	m.logger.Info("Fetching runtimes", "filters", filters)
 
 	var dtos []runtimeDTO
 

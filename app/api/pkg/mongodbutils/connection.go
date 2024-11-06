@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
+	"github.com/go-logr/logr"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,12 +15,12 @@ const timeout = 20 * time.Second
 
 // MongoDB will manage the connection with the database.
 type MongoDB struct {
-	logger logging.Logger
+	logger logr.Logger
 	client *mongo.Client
 }
 
 // NewMongoDB is a constructor function.
-func NewMongoDB(logger logging.Logger) *MongoDB {
+func NewMongoDB(logger logr.Logger) *MongoDB {
 	return &MongoDB{
 		logger,
 		nil,
@@ -65,7 +65,7 @@ func (m *MongoDB) Disconnect() {
 
 	err := m.client.Disconnect(ctx)
 	if err != nil {
-		m.logger.Errorf("Error disconnecting from MongoDB: %s", err)
+		m.logger.Error(err, "Error disconnecting from MongoDB")
 		return
 	}
 

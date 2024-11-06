@@ -10,8 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
@@ -34,21 +34,21 @@ type userDTO struct {
 }
 
 type UserRepo struct {
-	logger     logging.Logger
+	logger     logr.Logger
 	collection *mongo.Collection
 }
 
 // UserRepo implements the user.Repository interface.
 var _ user.Repository = (*UserRepo)(nil)
 
-func NewUserRepo(logger logging.Logger, client *mongo.Client, dbName string) *UserRepo {
+func NewUserRepo(logger logr.Logger, client *mongo.Client, dbName string) *UserRepo {
 	collection := client.Database(dbName).Collection(userCollName)
 	return &UserRepo{logger, collection}
 }
 
 // EnsureIndexes creates if not exists the indexes for the user collection.
 func (m *UserRepo) EnsureIndexes() error {
-	m.logger.Infof("Creating index for %q collection...", userCollName)
+	m.logger.Info("Creating indexes for collection", "collection", userCollName)
 
 	ctx, cancel := context.WithTimeout(context.Background(), ensureIndexesTimeout)
 	defer cancel()
@@ -69,7 +69,7 @@ func (m *UserRepo) EnsureIndexes() error {
 		},
 	})
 
-	m.logger.Infof("Indexes %s created for %q collection", result, userCollName)
+	m.logger.Info("Indexes created for collection", "result", result, "collection", userCollName)
 
 	return err
 }
@@ -109,7 +109,7 @@ func (m *UserRepo) FindAll(ctx context.Context, includeDeleted bool) ([]entity.U
 
 // Create inserts into the database a new entity.
 func (m *UserRepo) Create(ctx context.Context, u entity.User) (string, error) {
-	m.logger.Debugf("Inserting a new user %q into %s collection...", u.Email, userCollName)
+	m.logger.Info("Creating new user in database", "userEmail", u.Email, "collection", userCollName)
 
 	dto, err := m.entityToDTO(u)
 	if err != nil {
@@ -181,7 +181,7 @@ func (m *UserRepo) UpdateEmail(ctx context.Context, username, email string) erro
 }
 
 func (m *UserRepo) UpdateUsername(ctx context.Context, email, username string) error {
-	m.logger.Debugf("Updating user %q with email %q ...", username, email)
+	m.logger.Info("Updating username", "newUsername", username, "userEmail", email)
 
 	filter := bson.M{"email": email}
 
@@ -199,7 +199,7 @@ func (m *UserRepo) UpdateDeleted(ctx context.Context, username string, deleted b
 }
 
 func (m *UserRepo) updateUserFields(ctx context.Context, username string, fields bson.M) error {
-	m.logger.Debugf("Updating user %q with \"%#v\"...", username, fields)
+	m.logger.Info("Updating user", "username", username, "fields", fields)
 
 	filter := bson.M{"username": username}
 
@@ -226,7 +226,7 @@ func (m *UserRepo) toObjectIDs(userIDs []string) ([]primitive.ObjectID, error) {
 }
 
 func (m *UserRepo) findOne(ctx context.Context, filters bson.M) (entity.User, error) {
-	m.logger.Debugf("Finding one user by \"%#v\" from database...", filters)
+	m.logger.Info("Fetching one user from database", "filters", filters)
 
 	dto := userDTO{}
 
@@ -239,7 +239,7 @@ func (m *UserRepo) findOne(ctx context.Context, filters bson.M) (entity.User, er
 }
 
 func (m *UserRepo) find(ctx context.Context, filters bson.M) ([]entity.User, error) {
-	m.logger.Debugf("Finding users with filters \"%#v\"...", filters)
+	m.logger.Info("Fetching users", "filters", filters)
 
 	var dtos []userDTO
 

@@ -58,7 +58,10 @@ func (i *interactor) AddMembers(ctx context.Context, opt AddMembersOption) (enti
 	// Check the logged user is admin in this project
 	memberAccessLevel := i.getMemberAccessLevel(opt.LoggedUser.ID, p.Members)
 	if memberAccessLevel != entity.AccessLevelAdmin {
-		i.logger.Infof("The member %q has access level %q and cannot add new members", opt.LoggedUser.Username, memberAccessLevel)
+		i.logger.Info("This member has an insufficient access level and cannot add new members",
+			"username", opt.LoggedUser.Username, "accessLevel", memberAccessLevel,
+		)
+
 		return entity.Project{}, ErrOnlyAdminCanAddMember
 	}
 
@@ -114,7 +117,10 @@ func (i *interactor) RemoveMembers(ctx context.Context, opt RemoveMembersOption)
 	// Check the logged user is admin in this project
 	memberAccessLevel := i.getMemberAccessLevel(opt.LoggedUser.ID, p.Members)
 	if memberAccessLevel != entity.AccessLevelAdmin {
-		i.logger.Infof("The member %q has access level %q and cannot remove members", opt.LoggedUser.Username, memberAccessLevel)
+		i.logger.Info("This member has an insufficient access level and cannot remove members",
+			"username", opt.LoggedUser.Username, "accessLevel", memberAccessLevel,
+		)
+
 		return entity.Project{}, ErrOnlyAdminCanRemoveMember
 	}
 
@@ -150,7 +156,10 @@ func (i *interactor) UpdateMembers(ctx context.Context, opt UpdateMembersOption)
 	// Check the logged user is admin in this project
 	memberAccessLevel := i.getMemberAccessLevel(opt.LoggedUser.ID, p.Members)
 	if memberAccessLevel != entity.AccessLevelAdmin {
-		i.logger.Infof("The member %q has access level %q and cannot update members", opt.LoggedUser.Username, memberAccessLevel)
+		i.logger.Info("This member has an insufficient access level and cannot update members",
+			"username", opt.LoggedUser.Username, "accessLevel", memberAccessLevel,
+		)
+
 		return entity.Project{}, ErrOnlyAdminCanUpdateMember
 	}
 

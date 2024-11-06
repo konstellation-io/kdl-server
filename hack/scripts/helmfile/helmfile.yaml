@@ -40,8 +40,22 @@ releases:
     needs:
     - kdl/mongodb-operator
 
+  - name: "postgresql"
+    <<: *default
+    chart: oci://registry-1.docker.io/bitnamicharts/postgresql
+    version: 15.5.38
+
+  - name: "keycloak"
+    <<: *default
+    chart: oci://ghcr.io/konstellation-io/helm-charts/konstellation-base
+    version: 1.0.1
+    needs:
+    - kdl/postgresql
+
   - name: "kdl-local"
     <<: *default
-    chart: konstellation-io/kdl-server
+    chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
+    version: 6.0.2
     needs:
     - kdl/mongodb-database
+    - kdl/keycloak

@@ -7,8 +7,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
+	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
 )
@@ -25,14 +25,14 @@ type capabilitiesDTO struct {
 const capabilitiesCollName = "capabilities"
 
 type CapabilitiesRepo struct {
-	logger     logging.Logger
+	logger     logr.Logger
 	collection *mongo.Collection
 }
 
 // capabilitiesRepo implements the capabilities.Repository interface.
 var _ capabilities.Repository = (*CapabilitiesRepo)(nil)
 
-func NewCapabilitiesRepo(logger logging.Logger, client *mongo.Client, dbName string) *CapabilitiesRepo {
+func NewCapabilitiesRepo(logger logr.Logger, client *mongo.Client, dbName string) *CapabilitiesRepo {
 	collection := client.Database(dbName).Collection(capabilitiesCollName)
 	return &CapabilitiesRepo{logger, collection}
 }
@@ -40,8 +40,6 @@ func NewCapabilitiesRepo(logger logging.Logger, client *mongo.Client, dbName str
 // Create inserts into the database a new capabilities entity.
 // This Create is not exposed to the API, it's only used internally for testing.
 func (m *CapabilitiesRepo) Create(ctx context.Context, c entity.Capabilities) (string, error) {
-	m.logger.Debugf("Creating new capabilities %q...", c.ID)
-
 	dto := m.entityToDTO(c)
 
 	result, err := m.collection.InsertOne(ctx, dto)

@@ -130,7 +130,6 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
-	s.mocks.giteaService.EXPECT().AddSSHKey(username, sshKey.Public).Return(nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
 

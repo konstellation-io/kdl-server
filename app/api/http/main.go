@@ -123,7 +123,7 @@ func main() {
 		capabilitiesInteractor,
 	)
 
-	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, cfg.Kubernetes.IsInsideCluster, resolvers, userRepo, projectRepo)
+	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, cfg.Kubernetes.IsInsideCluster, resolvers, userRepo, userInteractor, projectRepo)
 }
 
 func startHTTPServer(
@@ -133,6 +133,7 @@ func startHTTPServer(
 	insideK8Cluster bool,
 	resolvers generated.ResolverRoot,
 	userRepo user.Repository,
+	userInteractor user.UseCase,
 	projectRepo project.Repository,
 ) {
 	const apiQueryPath = "/api/query"
@@ -147,8 +148,8 @@ func startHTTPServer(
 	authMiddleware := middleware.GenerateMiddleware(devEnvironment)
 
 	http.Handle("/", fs)
-	http.Handle("/api/playground", authMiddleware(pg))
-	http.Handle(apiQueryPath, authMiddleware(dataloader.Middleware(userRepo, srv)))
+	http.Handle("/api/playground", authMiddleware(pg, userInteractor))
+	http.Handle(apiQueryPath, authMiddleware(dataloader.Middleware(userRepo, srv), userInteractor))
 	http.HandleFunc("/api/auth/project", authController.HandleProjectAuth)
 
 	logger.Info("Server running", "port", port)

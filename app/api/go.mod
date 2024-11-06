@@ -14,7 +14,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/gosimple/slug v1.14.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/minio/minio-go/v7 v7.0.78
+	github.com/minio/minio-go/v7 v7.0.80
 	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go v0.34.0
 	github.com/testcontainers/testcontainers-go/modules/k3s v0.34.0
@@ -26,7 +26,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.31.2
 	k8s.io/apimachinery v0.31.2
-	k8s.io/client-go v0.31.1
+	k8s.io/client-go v0.31.2
 )
 
 require (

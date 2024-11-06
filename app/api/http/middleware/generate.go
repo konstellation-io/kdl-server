@@ -6,7 +6,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
 
-func GenerateMiddleware(devEnvironment bool) func(next http.Handler, userCase user.UseCase) http.Handler {
+func GenerateMiddleware(devEnvironment bool) func(next http.Handler, userUsecase user.UseCase) http.Handler {
 	if devEnvironment {
 		return DevAuthMiddleware
 	}

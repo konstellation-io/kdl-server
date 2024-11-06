@@ -25,7 +25,7 @@ var (
 	ErrUserToolsActive = errors.New("it is not possible to regenerate SSH keys with the usertools active")
 )
 
-type UserInteractor struct {
+type Interactor struct {
 	logger           logr.Logger
 	cfg              config.Config
 	repo             Repository
@@ -37,8 +37,8 @@ type UserInteractor struct {
 	k8sClient        k8s.Client
 }
 
-// UserInteractor implements the UseCase interface.
-var _ UseCase = (*UserInteractor)(nil)
+// Interactor implements the UseCase interface.
+var _ UseCase = (*Interactor)(nil)
 
 // NewInteractor factory function.
 func NewInteractor(
@@ -52,7 +52,7 @@ func NewInteractor(
 	giteaService giteaservice.GiteaClient,
 	k8sClient k8s.Client,
 ) UseCase {
-	return &UserInteractor{
+	return &Interactor{
 		logger:           logger,
 		cfg:              cfg,
 		repo:             repo,
@@ -72,7 +72,7 @@ func NewInteractor(
 // - Stores the user and ssh keys into the DB.
 // - Creates a new secret in Kubernetes with the generated SSH keys.
 // - Created a service account for the user.
-func (i *UserInteractor) Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error) {
+func (i *Interactor) Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error) {
 	i.logger.Info("Creating user", "username", username, "email", email)
 
 	// Check if the user already exists
@@ -135,20 +135,20 @@ func (i *UserInteractor) Create(ctx context.Context, email, username string, acc
 }
 
 // FindAll returns all users existing in the server.
-func (i *UserInteractor) FindAll(ctx context.Context) ([]entity.User, error) {
+func (i *Interactor) FindAll(ctx context.Context) ([]entity.User, error) {
 	i.logger.Info("Finding all users in the server")
 	return i.repo.FindAll(ctx, false)
 }
 
 // GetByUsername returns the user with the desired username or returns entity.ErrUserNotFound if the user doesn't exist.
-func (i *UserInteractor) GetByUsername(ctx context.Context, username string) (entity.User, error) {
+func (i *Interactor) GetByUsername(ctx context.Context, username string) (entity.User, error) {
 	i.logger.Info("Getting user by username", "username", username)
 	return i.repo.GetByUsername(ctx, username)
 }
 
 // StartTools creates a user-tools CustomResource in K8s to initialize the VSCode for the given username.
 // If there are already a user-tools for the user, they are replaced (stop + start new).
-func (i *UserInteractor) StartTools(ctx context.Context, username string, runtimeID, capabilitiesID *string) (entity.User, error) {
+func (i *Interactor) StartTools(ctx context.Context, username string, runtimeID, capabilitiesID *string) (entity.User, error) {
 	user, err := i.repo.GetByUsername(ctx, username)
 	if err != nil {
 		return entity.User{}, err
@@ -206,7 +206,7 @@ func (i *UserInteractor) StartTools(ctx context.Context, username string, runtim
 }
 
 // StopTools removes a created user-tools CustomResource from K8s for the given username.
-func (i *UserInteractor) StopTools(ctx context.Context, username string) (entity.User, error) {
+func (i *Interactor) StopTools(ctx context.Context, username string) (entity.User, error) {
 	user, err := i.repo.GetByUsername(ctx, username)
 	if err != nil {
 		return entity.User{}, err
@@ -233,27 +233,27 @@ func (i *UserInteractor) StopTools(ctx context.Context, username string) (entity
 }
 
 // AreToolsRunning checks if the user tools are running for the given username.
-func (i *UserInteractor) AreToolsRunning(ctx context.Context, username string) (bool, error) {
+func (i *Interactor) AreToolsRunning(ctx context.Context, username string) (bool, error) {
 	return i.k8sClient.IsUserToolPODRunning(ctx, username)
 }
 
 // IsKubeconfigActive checks if the kubeconfig is active.
-func (i *UserInteractor) IsKubeconfigActive() bool {
+func (i *Interactor) IsKubeconfigActive() bool {
 	return i.cfg.UserToolsKubeconfig.Enabled
 }
 
 // FindByIDs retrieves the users for the given identifiers.
-func (i *UserInteractor) FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error) {
+func (i *Interactor) FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error) {
 	return i.repo.FindByIDs(ctx, userIDs)
 }
 
 // GetByID retrieve the user for the given identifier.
-func (i *UserInteractor) GetByID(ctx context.Context, userID string) (entity.User, error) {
+func (i *Interactor) GetByID(ctx context.Context, userID string) (entity.User, error) {
 	return i.repo.Get(ctx, userID)
 }
 
 // UpdateAccessLevel update access level for the given identifiers.
-func (i *UserInteractor) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error) {
+func (i *Interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error) {
 	// Update user permissions in Gitea
 	users, err := i.FindByIDs(ctx, userIDs)
 	if err != nil {
@@ -283,7 +283,7 @@ func (i *UserInteractor) UpdateAccessLevel(ctx context.Context, userIDs []string
 // - Check if k8s secret exists. If yes, update it. Else, create it.
 // - Update public key on Gitea
 // - Update ssh keys for user in database.
-func (i *UserInteractor) RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error) {
+func (i *Interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error) {
 	i.logger.Info("Regenerating user SSH keys for user", "username", user.Username)
 
 	// Check if userTools are running
@@ -327,7 +327,7 @@ func (i *UserInteractor) RegenerateSSHKeys(ctx context.Context, user entity.User
 
 // SynchronizeServiceAccountsForUsers ensures all users has their serviceAccount created and delete it
 // - for users that has been removed.
-func (i *UserInteractor) SynchronizeServiceAccountsForUsers() error {
+func (i *Interactor) SynchronizeServiceAccountsForUsers() error {
 	ctx := context.Background()
 
 	users, err := i.repo.FindAll(ctx, true)
@@ -352,7 +352,7 @@ func (i *UserInteractor) SynchronizeServiceAccountsForUsers() error {
 }
 
 // GetKubeconfig returns user kubeconfig.
-func (i *UserInteractor) GetKubeconfig(ctx context.Context, username string) (string, error) {
+func (i *Interactor) GetKubeconfig(ctx context.Context, username string) (string, error) {
 	running, err := i.k8sClient.IsUserToolPODRunning(ctx, username)
 
 	if err != nil {

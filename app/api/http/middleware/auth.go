@@ -36,7 +36,7 @@ Example:
 
 	email := ctx.Value(middleware.LoggedUserEmailKey).(string).
 */
-func AuthMiddleware(next http.Handler, userCase user.UseCase) http.Handler {
+func AuthMiddleware(next http.Handler, userUsecase user.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		email := r.Header.Get("X-Forwarded-Email")
 		username := r.Header.Get("X-Forwarded-User")
@@ -46,9 +46,9 @@ func AuthMiddleware(next http.Handler, userCase user.UseCase) http.Handler {
 			return
 		}
 
-		_, err := userCase.GetByUsername(r.Context(), username)
+		_, err := userUsecase.GetByUsername(r.Context(), username)
 		if errors.Is(err, entity.ErrUserNotFound) {
-			_, err = userCase.Create(r.Context(), email, username, entity.AccessLevelViewer)
+			_, err = userUsecase.Create(r.Context(), email, username, entity.AccessLevelViewer)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return

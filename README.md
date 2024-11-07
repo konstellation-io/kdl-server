@@ -58,3 +58,21 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Client Dependencies Matrix Per Component
+
+| Component   | Dependencies                | Version | Compatibility          |
+|-------------|-----------------------------|---------|------------------------|
+| app         | code.gitea.io/sdk/gitea (TO BE REMOVED)     | v0.19.0 | -                      |
+|             | github.com/drone/drone-go (TO BE REMOVED)    | v1.7.1  | -                      |
+|             | github.com/minio/minio-go/v7| v7.0.78 | -                      |
+|             | go.mongodb.org/mongo-driver | v1.17.1 | [mongodb 3.6 to 7.0](https://www.mongodb.com/docs/drivers/go/current/compatibility/#std-label-golang-compatibility)     |
+|             | k8s.io/api                  | v0.31.1 | [Kubernetes 1.30](https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters)        |
+|             | k8s.io/apimachinery         | v0.31.1 | [Kubernetes 1.30](https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters)        |
+|             | k8s.io/client-go            | v0.31.1 | [Kubernetes 1.30](https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters)        |
+| repo cloner | go.mongodb.org/mongo-driver | v1.17.1 | [mongodb 3.6 to 7.0](https://www.mongodb.com/docs/drivers/go/current/compatibility/#std-label-golang-compatibility)     |
+| gitea (TO BE REMOVED)      | k8s.io/api                  | v0.31.1 | [Kubernetes 1.30](https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters)        |
+|             | k8s.io/apimachinery         | v0.31.1 | [Kubernetes 1.30](https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters)        |
+|             | k8s.io/client-go            | v0.31.1 | [Kubernetes 1.30](https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters)        |
+
+Other components do not have client dependencies.

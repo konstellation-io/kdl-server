@@ -9,8 +9,8 @@ import (
 )
 
 // CreateSecret creates a new k8s secret.
-func (k *k8sClient) CreateSecret(ctx context.Context, name string, values map[string]string) error {
-	k.logger.Infof("Creating secret %q in k8s...", name)
+func (k *K8sClient) CreateSecret(ctx context.Context, name string, values map[string]string) error {
+	k.logger.Info("Creating secret in k8s...", "secretName", name)
 
 	secret := k.newSecret(name, values)
 
@@ -19,14 +19,14 @@ func (k *k8sClient) CreateSecret(ctx context.Context, name string, values map[st
 		return err
 	}
 
-	k.logger.Infof("The secret %q was created in k8s correctly", createdSecret.Name)
+	k.logger.Info("Secret created correctly in k8s", "secretName", createdSecret.Name)
 
 	return nil
 }
 
 // UpdateSecret updates a k8s secret.
-func (k *k8sClient) UpdateSecret(ctx context.Context, name string, values map[string]string) error {
-	k.logger.Infof("Updating secret %q in k8s...", name)
+func (k *K8sClient) UpdateSecret(ctx context.Context, name string, values map[string]string) error {
+	k.logger.Info("Updating secret in k8s...", "secretName", name)
 
 	secret := k.newSecret(name, values)
 
@@ -35,13 +35,13 @@ func (k *k8sClient) UpdateSecret(ctx context.Context, name string, values map[st
 		return err
 	}
 
-	k.logger.Infof("The secret %q was updated in k8s correctly", name)
+	k.logger.Info("Secret updated correctly in k8s", "secretName", name)
 
 	return nil
 }
 
 // GetSecret returns the secret data.
-func (k *k8sClient) GetSecret(ctx context.Context, name string) (map[string][]byte, error) {
+func (k *K8sClient) GetSecret(ctx context.Context, name string) (map[string][]byte, error) {
 	s, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Get(ctx, name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (k *k8sClient) GetSecret(ctx context.Context, name string) (map[string][]by
 }
 
 // isSecretPresent checks if there is a secret with the given name.
-func (k *k8sClient) isSecretPresent(ctx context.Context, name string) (bool, error) {
+func (k *K8sClient) isSecretPresent(ctx context.Context, name string) (bool, error) {
 	_, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Get(ctx, name, metav1.GetOptions{})
 	if err != nil && !k8sErrors.IsNotFound(err) {
 		return false, err
@@ -61,7 +61,7 @@ func (k *k8sClient) isSecretPresent(ctx context.Context, name string) (bool, err
 }
 
 // newSecret conform a new k8s secret from values map.
-func (k *k8sClient) newSecret(name string, values map[string]string) *coreV1.Secret {
+func (k *K8sClient) newSecret(name string, values map[string]string) *coreV1.Secret {
 	secretData := map[string][]byte{}
 	for key, val := range values {
 		secretData[key] = []byte(val)

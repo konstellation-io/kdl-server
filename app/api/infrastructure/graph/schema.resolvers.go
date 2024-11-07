@@ -80,7 +80,7 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 
 	createdProject, err := r.projects.Create(ctx, opts)
 	if err != nil {
-		r.logger.Errorf("Error creating project: %s", err)
+		r.logger.Error(err, "Error creating project")
 	}
 
 	return &createdProject, err
@@ -199,13 +199,6 @@ func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.S
 	u, err := r.users.StopTools(ctx, username)
 
 	return &u, err
-}
-
-// SyncUsers is the resolver for the syncUsers field.
-func (r *mutationResolver) SyncUsers(ctx context.Context) (*model.SyncUsersResponse, error) {
-	r.users.RunSyncUsersCronJob()
-
-	return &model.SyncUsersResponse{Msg: "External user data synchronization has started."}, nil
 }
 
 // CreationDate is the resolver for the creationDate field.

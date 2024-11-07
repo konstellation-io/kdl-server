@@ -86,10 +86,6 @@ type SetBoolFieldInput struct {
 	Value bool   `json:"value"`
 }
 
-type SyncUsersResponse struct {
-	Msg string `json:"msg"`
-}
-
 type Topic struct {
 	Name      string  `json:"name"`
 	Relevance float64 `json:"relevance"`

@@ -2,8 +2,8 @@ package giteaservice
 
 import (
 	"code.gitea.io/sdk/gitea"
+	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
 const (
@@ -14,12 +14,12 @@ const (
 )
 
 type giteaService struct {
-	logger logging.Logger
+	logger logr.Logger
 	client *gitea.Client
 }
 
 // NewGiteaService is a constructor function.
-func NewGiteaService(logger logging.Logger, url, adminUser, adminPassword string) (GiteaClient, error) {
+func NewGiteaService(logger logr.Logger, url, adminUser, adminPassword string) (GiteaClient, error) {
 	client, err := gitea.NewClient(url, gitea.SetBasicAuth(adminUser, adminPassword))
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (g *giteaService) AddSSHKey(username, publicSSHKey string) error {
 		return err
 	}
 
-	g.logger.Infof("Created public SSH key for user %q in Gitea with id \"%d\"", username, key.ID)
+	g.logger.Info("Created public SSH key for user in Gitea", "username", username, "keyID", key.ID)
 
 	return nil
 }
@@ -60,7 +60,7 @@ func (g *giteaService) UpdateSSHKey(username, publicSSHKey string) error {
 			return err
 		}
 
-		g.logger.Infof("Deleted public SSH key for user %q in Gitea with id \"%d\"", username, keyID)
+		g.logger.Info("Deleted public SSH key for user in Gitea", "username", username, "keyID", keyID)
 	}
 
 	return g.AddSSHKey(username, publicSSHKey)
@@ -91,7 +91,7 @@ func (g *giteaService) MirrorRepo(url, repoName, userName, ownerUsername string,
 		return err
 	}
 
-	g.logger.Infof("Mirrored repository from %q in organization %q in Gitea with id \"%d\"", url, kdlOrganization, repo.ID)
+	g.logger.Info("Mirrored repository", "originURL", url, "organization", kdlOrganization, "repoID", repo.ID)
 
 	return g.AddCollaborator(repoName, ownerUsername, entity.AccessLevelAdmin)
 }
@@ -100,11 +100,11 @@ func (g *giteaService) MirrorRepo(url, repoName, userName, ownerUsername string,
 func (g *giteaService) DeleteRepo(repoName string) error {
 	_, err := g.client.DeleteRepo(kdlOrganization, repoName)
 	if err != nil {
-		g.logger.Errorf("Could not delete Gitea repository with name %q", repoName)
+		g.logger.Error(err, "Could not delete Gitea repository", "repoName", repoName)
 		return err
 	}
 
-	g.logger.Infof("Deleted Gitea repository with name %q", repoName)
+	g.logger.Info("Deleted Gitea repository", "repoName", repoName)
 
 	return err
 }
@@ -130,7 +130,7 @@ func (g *giteaService) AddCollaborator(repoName, username string, accessLevel en
 		return err
 	}
 
-	g.logger.Infof("Added %q collaborator to Gitea repository %q with access level %q", username, repoName, accessLevel)
+	g.logger.Info("Added collaborator to Gitea repository", "newCollaborator", username, "repoName", repoName, "accessLevel", accessLevel)
 
 	return nil
 }
@@ -142,7 +142,7 @@ func (g *giteaService) RemoveCollaborator(repoName, username string) error {
 		return err
 	}
 
-	g.logger.Infof("Removed %q collaborator from Gitea repository %q", username, repoName)
+	g.logger.Info("Removed collaborator from Gitea repository", "collaborator", username, "repoName", repoName)
 
 	return nil
 }
@@ -189,7 +189,7 @@ func (g *giteaService) FindAllUsers() ([]entity.User, error) {
 	lastNumberOfUsers := 0
 
 	for moreResults := true; moreResults; moreResults = lastNumberOfUsers == pageSize {
-		g.logger.Debugf("Request users from Gitea: page number = %d, page size = %d", page, pageSize)
+		g.logger.Info("Request users from Gitea", "pageNumber", page, "pageSize", pageSize)
 
 		users, _, err := g.client.AdminListUsers(gitea.AdminListUsersOptions{
 			ListOptions: gitea.ListOptions{
@@ -211,12 +211,12 @@ func (g *giteaService) FindAllUsers() ([]entity.User, error) {
 
 		lastNumberOfUsers = len(users)
 
-		g.logger.Debugf("There are %d users in the page %d", lastNumberOfUsers, page)
+		g.logger.Info("There are users in the page", "nOfUsers", lastNumberOfUsers, "pageNumber", page)
 
 		page++
 	}
 
-	g.logger.Debugf("Downloaded a total of %d users from Gitea", len(result))
+	g.logger.Info("Downloaded users from Gitea", "nOfUsers", len(result))
 
 	return result, nil
 }

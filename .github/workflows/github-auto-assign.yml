@@ -1,7 +1,9 @@
 name: "[GitHub] Auto-assign"
+
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, ready_for_review]
+
 jobs:
   run:
     runs-on: ubuntu-latest

@@ -9,21 +9,24 @@ require (
 	github.com/drone/drone-go v1.7.1
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-git/go-git/v5 v5.12.0
+	github.com/go-logr/logr v1.4.2
+	github.com/go-logr/zapr v1.3.0
 	github.com/golang/mock v1.6.0
 	github.com/gosimple/slug v1.14.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/konstellation-io/kre/libs/simplelogger v0.0.0-20230807143344-f6b2a55fc1c5
-	github.com/minio/minio-go/v7 v7.0.78
+	github.com/minio/minio-go/v7 v7.0.80
 	github.com/stretchr/testify v1.9.0
-	github.com/testcontainers/testcontainers-go v0.33.0
+	github.com/testcontainers/testcontainers-go v0.34.0
+	github.com/testcontainers/testcontainers-go/modules/k3s v0.34.0
 	github.com/vektah/gqlparser/v2 v2.5.18
 	go.mongodb.org/mongo-driver v1.17.1
+	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.28.0
 	golang.org/x/oauth2 v0.23.0
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/api v0.31.1
-	k8s.io/apimachinery v0.31.1
-	k8s.io/client-go v0.31.1
+	k8s.io/api v0.31.2
+	k8s.io/apimachinery v0.31.2
+	k8s.io/client-go v0.31.2
 )
 
 require (
@@ -37,7 +40,7 @@ require (
 	github.com/containerd/containerd v1.7.18 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/containerd/platforms v0.2.1 // indirect
-	github.com/cpuguy83/dockercfg v0.3.1 // indirect
+	github.com/cpuguy83/dockercfg v0.3.2 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/davidmz/go-pageant v1.0.2 // indirect
@@ -54,7 +57,6 @@ require (
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.5.0 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
-	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
@@ -73,7 +75,7 @@ require (
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/hashicorp/go-version v1.6.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
-	github.com/imdario/mergo v0.3.6 // indirect
+	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -124,6 +126,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect

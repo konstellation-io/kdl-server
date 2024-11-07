@@ -26,6 +26,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Prepare metadata to build
         id: prepare_metadata
@@ -39,7 +40,7 @@ jobs:
           if [[ "${TAG_NAME##*/}" == *-rc.* ]]; then
             echo "TAG_NAME_FIXED=develop" >> $GITHUB_ENV
           else
-            echo "TAG_NAME_FIXED=${TAG_NAME##*-}" >> $GITHUB_ENV
+            echo "TAG_NAME_FIXED=${TAG_NAME##*-v}" >> $GITHUB_ENV
           fi
 
           # HOTFIX: only for app nomenclature
@@ -52,7 +53,7 @@ jobs:
             echo "WORKDIR_COMPONENT=${WORKDIR_COMPONENT}" >> $GITHUB_ENV
           fi
 
-      - name: "Set Docker metadata"
+      - name: Set Docker metadata
         id: meta
         uses: docker/metadata-action@v5
         with:

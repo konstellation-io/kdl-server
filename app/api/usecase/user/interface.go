@@ -4,7 +4,6 @@ package user
 
 import (
 	"context"
-	"time"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 )
@@ -28,7 +27,6 @@ type Repository interface {
 // UseCase interface to manage all operations related with users.
 type UseCase interface {
 	Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error)
-	CreateAdminUser(username, email string) error
 	UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error)
 	FindAll(ctx context.Context) ([]entity.User, error)
 	GetByUsername(ctx context.Context, username string) (entity.User, error)
@@ -39,8 +37,6 @@ type UseCase interface {
 	FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error)
 	GetByID(ctx context.Context, userID string) (entity.User, error)
 	RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error)
-	ScheduleUsersSyncJob(interval time.Duration) error
-	RunSyncUsersCronJob()
 	GetKubeconfig(ctx context.Context, username string) (string, error)
 	SynchronizeServiceAccountsForUsers() error
 }

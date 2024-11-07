@@ -4,12 +4,14 @@ import (
 	"context"
 	"testing"
 
+	"github.com/go-logr/logr"
+	"github.com/go-logr/zapr"
 	"github.com/golang/mock/gomock"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
 )
 
 type Runtimesuite struct {
@@ -18,19 +20,21 @@ type Runtimesuite struct {
 	mocks      flavorMocks
 }
 type flavorMocks struct {
-	logger   *logging.MockLogger
+	logger   logr.Logger
 	repo     *runtime.MockRepository
 	k8client *k8s.MockClient
 }
 
 func newRuntimesuite(t *testing.T) *Runtimesuite {
+	zapLog, err := zap.NewDevelopment()
+	require.NoError(t, err)
+
+	logger := zapr.NewLogger(zapLog)
+
 	ctrl := gomock.NewController(t)
-	logger := logging.NewMockLogger(ctrl)
 	repo := runtime.NewMockRepository(ctrl)
 	k8client := k8s.NewMockClient(ctrl)
 	interactor := runtime.NewInteractor(logger, k8client, repo)
-
-	logging.AddLoggerExpects(logger)
 
 	return &Runtimesuite{
 		ctrl:       ctrl,

@@ -3,15 +3,19 @@ package config
 import (
 	"log"
 	"os"
-	"time"
 
 	"github.com/kelseyhightower/envconfig"
 	"gopkg.in/yaml.v3"
 )
 
+type KubernetesConfig struct {
+	IsInsideCluster bool   `default:"true"`
+	Namespace       string `envconfig:"POD_NAMESPACE"`
+}
+
 // Config holds the configuration values of the application.
 type Config struct {
-	LogLevel        string `yaml:"logLevel" envconfig:"KDL_SERVER_LOG_LEVEL"`
+	LogLevel        string `yaml:"logLevel" envconfig:"KDL_SERVER_LOG_LEVEL"` // currently unused
 	Port            string `yaml:"port" envconfig:"KDL_SERVER_PORT"`
 	StaticFilesPath string `yaml:"staticFilesPath" envconfig:"KDL_SERVER_STATIC_FILES_PATH"`
 	BaseDomainName  string `envconfig:"BASE_DOMAIN_NAME"`
@@ -39,11 +43,8 @@ type Config struct {
 		AdminUser   string `envconfig:"GITEA_ADMIN_USER"`
 		AdminPass   string `envconfig:"GITEA_ADMIN_PASSWORD"`
 	} `yaml:"gitea"`
-	Kubernetes struct {
-		IsInsideCluster bool   `default:"true"`
-		Namespace       string `envconfig:"POD_NAMESPACE"`
-	} `yaml:"kubernetes"`
-	Minio struct {
+	Kubernetes KubernetesConfig `yaml:"kubernetes"`
+	Minio      struct {
 		Endpoint  string `envconfig:"MINIO_ENDPOINT"`
 		AccessKey string `envconfig:"MINIO_ACCESS_KEY"`
 		SecretKey string `envconfig:"MINIO_SECRET_KEY"`
@@ -98,11 +99,6 @@ type Config struct {
 		Enabled bool   `envconfig:"KNOWLEDGE_GALAXY_ENABLED"`
 		URL     string `envconfig:"KNOWLEDGE_GALAXY_URL"`
 	}
-	ScheduledJob struct {
-		UsersSync struct {
-			Interval time.Duration `yaml:"interval" envconfig:"CRONJOB_USERS_SYNC_INTERVAL"`
-		} `yaml:"usersSync"`
-	} `yaml:"scheduledJob"`
 	OAuth2Proxy struct {
 		Image struct {
 			Repository string `envconfig:"OAUTH2_PROXY_IMG_REPO"`

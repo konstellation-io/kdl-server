@@ -31,7 +31,6 @@ See `git help commit`:
 **Please follow these basic steps to simplify pull request reviews. If you don't you'll probably just be asked to anyway.**
 
 * Please rebase your branch against the current main.
-* Run the `Setup` command to make sure your development dependencies are up-to-date.
 * Please ensure the test suite passes before submitting a PR.
 * If you've added new functionality, **please** include tests which validate its behavior.
 * Make reference to possible [issues](https://github.com/konstellation-io/kdl-server/issues) on PR comment.

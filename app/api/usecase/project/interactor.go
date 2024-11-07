@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
@@ -14,7 +15,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
-	"github.com/konstellation-io/kdl-server/app/api/pkg/logging"
 )
 
 const (
@@ -105,7 +105,7 @@ func (c CreateProjectOption) Validate() error {
 
 // interactor implements the UseCase interface.
 type interactor struct {
-	logger           logging.Logger
+	logger           logr.Logger
 	projectRepo      Repository
 	userActivityRepo UserActivityRepo
 	clock            clock.Clock
@@ -117,7 +117,7 @@ type interactor struct {
 
 // InteractorDeps encapsulates all project interactor dependencies.
 type InteractorDeps struct {
-	Logger           logging.Logger
+	Logger           logr.Logger
 	Repo             Repository
 	UserActivityRepo UserActivityRepo
 	Clock            clock.Clock
@@ -221,7 +221,7 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		return entity.Project{}, err
 	}
 
-	i.logger.Infof("Created a new project %q with ID %q", project.Name, insertedID)
+	i.logger.Info("Created a new project", "projectName", project.Name, "projectID", insertedID)
 
 	return i.projectRepo.Get(ctx, insertedID)
 }
@@ -234,7 +234,7 @@ func (i *interactor) FindAll(ctx context.Context) ([]entity.Project, error) {
 
 // GetByID returns the project with the desired identifier.
 func (i *interactor) GetByID(ctx context.Context, id string) (entity.Project, error) {
-	i.logger.Infof("Getting project with id %q", id)
+	i.logger.Info("Getting project by ID", "projectID", id)
 	return i.projectRepo.Get(ctx, id)
 }
 
@@ -269,13 +269,13 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 
 	p, err := i.projectRepo.Get(ctx, projectID)
 	if errors.Is(err, entity.ErrProjectNotFound) {
-		i.logger.Infof("Project %q doesn't exist, skipping", projectID)
+		i.logger.Info("Project doesn't exist, skipping", "projectID", projectID)
 		return &entity.Project{}, nil
 	} else if err != nil {
 		return nil, err
 	}
 
-	i.logger.Infof("Attempting to delete project with id %q", projectID)
+	i.logger.Info("Attempting to delete project", "projectID", projectID)
 
 	accessLevel := i.getMemberAccessLevel(opt.LoggedUser.ID, p.Members)
 	if accessLevel != entity.AccessLevelAdmin {
@@ -320,7 +320,7 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 		return nil, err
 	}
 
-	i.logger.Infof("Project with id %q successfully deleted", projectID)
+	i.logger.Info("Project with successfully deleted", "projectID", projectID)
 
 	return &p, nil
 }

@@ -38,7 +38,7 @@ func (k k8sClient) getUserServiceAccountName(usernameSlug string) string {
 
 // getServiceAccountSecretName returns the name of the service account secret for a given user.
 func (k k8sClient) getServiceAccountSecretName(usernameSlug string) string {
-	return fmt.Sprintf("%s-service-account-secret", usernameSlug)
+	return fmt.Sprintf("%s-service-account-secret-fix", usernameSlug)
 }
 
 // CreateUserServiceAccount creates a new k8s serviceAccount for a user.

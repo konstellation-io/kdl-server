@@ -1,27 +1,23 @@
 # kdl-server
 
-|  Component  | Coverage  |  Bugs  |  Maintainability Rating  |  Go report  |
-| :---------: | :-----:   |  :---: |  :--------------------:  |  :---: |
-|  App API  | [![coverage][app-api-coverage]][app-api-coverage-link] | [![bugs][app-api-bugs]][app-api-bugs-link] | [![mr][app-api-mr]][app-api-mr-link] | [![go-report][report-badge]][report-link] |
-|  App UI  | [![coverage][app-ui-coverage]][app-ui-coverage-link] | [![bugs][app-ui-bugs]][app-ui-bugs-link] | [![mr][app-ui-mr]][app-ui-mr-link] | - |
+Konstellation AI Lab, formerly known as `kdl-server`, is the training server of Konstellation AI. It's the on-premises component of the solution, currently deployed in our Dell environment.
 
-[report-badge]: https://goreportcard.com/badge/github.com/konstellation-io/kdl-server/app/api
-[report-link]: https://goreportcard.com/report/github.com/konstellation-io/kdl-server/app/api
+As a Machine Learning training server, it's where the training of the models occurs, which will be used later by the inference server, Konstellation AI Server.
 
-Konstellation AI Lab, formerly known as `kdl-server`, is the training server of Konstellation AI. It's the on-premises component of the solution, currently deployed in our Dell environment. As a Machine Learning training server, it's where the training of the models occurs, which will be used later by the inference server, Konstellation AI Server.
+The main goal of KAI Lab is to provide a user-friendly environment for Data Scientists where they can carry out their experiments.
 
-The main goal of KAI Lab is to provide a user-friendly environment for Data Scientists where they can carry out their experiments. At the same time, it integrates a powerful solution for project management, user environments with GPU capabilities, and job management.
+At the same time, it integrates a powerful solution for project management, user environments with GPU capabilities, and job management.
 
 ## Components
 
 * `kai-lab-api`: main component of the application, providing API access for other components and managing interactions with `MongoDB`.
 * `kai-lab-ui`: web application offering the interface for data scientists.
 * `repo-cloner`: in-house solution that clones all accessible repositories into the user's user-tools pod.
-* `gitea`: git server mirroring project repositories.
-* `postgresql`: database storing `gitea` data.
-* `gitea-oauth2-proxy`: in-house solution exposing `gitea` login page to other pods.
-* `drone-authorizer`: puppeteer-based tool authorizing `drone.io` with `gitea` via `oauth2`.
-* `drone`: CI/CD tool building and deploying the application.
+* `gitea`: git server mirroring project repositories (TO BE DEPRECATED).
+* `postgresql`: database storing `gitea` data (TO BE DEPRECATED).
+* `gitea-oauth2-proxy`: in-house solution exposing `gitea` login page to other pods (TO BE DEPRECATED).
+* `drone-authorizer`: puppeteer-based tool authorizing `drone.io` with `gitea` via `oauth2` (TO BE DEPRECATED).
+* `drone`: CI/CD tool building and deploying the application (TO BE DEPRECATED).
 * `minio`: s3-compatible object storage, holding artifacts from training jobs; `MinIO` is installed as a pinned dependency, with only the console deployed through the chart.
 * `backup`: Kubernetes `cronJob` that backs up `PostgreSQL` and `MongoDB` databases and stores Kubernetes `ETCD` manifests in `AWS S3`
 * `cleaner`: currently unused, potentially slated for deprecation.

@@ -79,9 +79,9 @@ function TabDangerZone({ projectId, projectName }: Props) {
         <div className={styles.actionBox}>
           <MessageActionBox
             title="Delete project"
-            description="This action is irreversible, and deletes are
-            Kubernetes, Drone, Minio, Gitea and Konstellation resources
-            associated with the project"
+            description="This action is irreversible, delete aproject and all
+            Kubernetes, Minio, Gitea and Konstellation resources
+            associated with it"
             action={{
               label: 'Delete',
               onClick: showDeleteModal,
@@ -101,7 +101,7 @@ function TabDangerZone({ projectId, projectName }: Props) {
           actionButtonCancel="Cancel"
           warning
           blocking
-          // disabled={inputProjectName === projectName}
+        // disabled={inputProjectName === projectName}
         >
           <ModalLayoutInfo>
             You are going to archive this project. When a project is archived you will not be able to make changes or
@@ -122,7 +122,7 @@ function TabDangerZone({ projectId, projectName }: Props) {
         >
           <ModalLayoutInfo>
             You are going to delete this project. When a project is deleted all resources associated with this project
-            (gitea, drone, mlflow, filebrowser,...) are removed. This is a non reversible action. Are you sure you want
+            (gitea, mlflow, filebrowser,...) will be removed. This is a non reversible action. Are you sure you want
             to delete it?
           </ModalLayoutInfo>
           <div>

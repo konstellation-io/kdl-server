@@ -39,7 +39,7 @@ export const projectToolsRoutesConfig: RouteConfiguration[] = [
   },
   {
     id: 'gitea',
-    label: 'Giteaa',
+    label: 'Gitea',
     Icon: GiteaIcon,
     route: ROUTE.PROJECT_TOOL_GITEA,
   },

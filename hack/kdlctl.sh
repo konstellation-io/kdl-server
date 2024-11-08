@@ -108,6 +108,12 @@ case $COMMAND in
     exit 0
   ;;
 
+  kdl)
+    build_server "$@"
+    echo_done "Dev environment created"
+    exit 0
+  ;;
+
   login)
     cmd_login "$@"
     echo_done "Login done"

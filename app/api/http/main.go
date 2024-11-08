@@ -93,8 +93,14 @@ func main() {
 
 	userInteractor := user.NewInteractor(logger, cfg, userRepo, runtimeRepo, capabilitiesRepo,
 		sshHelper, realClock, giteaService, k8sClient)
+
 	if err = userInteractor.SynchronizeServiceAccountsForUsers(); err != nil {
 		logger.Error(err, "Unexpected error creating serviceAccount for users")
+	}
+
+	err = userInteractor.CreateAdminUser(cfg.Admin.Username, cfg.Admin.Email)
+	if err != nil {
+		logger.Error(err, "Unexpected error creating admin user")
 	}
 
 	projectDeps := &project.InteractorDeps{

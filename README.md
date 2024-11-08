@@ -1,28 +1,58 @@
 # kdl-server
 
-Konstellation AI Lab, formerly known as `kdl-server`, is the training server of Konstellation AI. It's the on-premises component of the solution, currently deployed in our Dell environment.
+Konstellation AI Lab, formerly known as `kdl-server`, is the training server of Konstellation AI.
 
-As a Machine Learning training server, it's where the training of the models occurs, which will be used later by the inference server, Konstellation AI Server.
+The main goal of KAI Lab is to provide a user-friendly environment for Data Scientists where they can carry out their experiments. At the same time, it integrates a powerful solution for project management, user environments with GPU capabilities and job management.
 
-The main goal of KAI Lab is to provide a user-friendly environment for Data Scientists where they can carry out their experiments.
+## Builds
 
-At the same time, it integrates a powerful solution for project management, user environments with GPU capabilities, and job management.
+| Component   | Coverage  | Bugs | Maintainability Rating | Go report                                                         |
+| ----------- | --------- | ---- | ---------------------- | ----------------------------------------------------------------- |
+| app-api     | TBD       | TBD  | TBD                    | [![go-report][api-report-badge]][api-report-link]                 |
+| repo-cloner | TBD       | TBD  | TBD                    | [![go-report][repo-cloner-report-badge]][repo-cloner-report-link] |
+
+[api-report-badge]: https://goreportcard.com/badge/github.com/konstellation-io/kdl-server/app/api
+[api-report-link]: https://goreportcard.com/report/github.com/konstellation-io/kdl-server/app/api
+[repo-cloner-report-badge]: https://goreportcard.com/badge/github.com/konstellation-io/kdl-server/repo-cloner
+[repo-cloner-report-link]: https://goreportcard.com/report/github.com/konstellation-io/kdl-server/repo-cloner
 
 ## Components
 
-* `kai-lab-api`: main component of the application, providing API access for other components and managing interactions with `MongoDB`.
-* `kai-lab-ui`: web application offering the interface for data scientists.
+* `app-api`: main component of the application, providing API access for other components and managing interactions with `MongoDB`.
+* `app-ui`: web application offering the interface for data scientists.
 * `repo-cloner`: in-house solution that clones all accessible repositories into the user's user-tools pod.
-* `gitea`: git server mirroring project repositories (TO BE DEPRECATED).
-* `postgresql`: database storing `gitea` data (TO BE DEPRECATED).
-* `gitea-oauth2-proxy`: in-house solution exposing `gitea` login page to other pods (TO BE DEPRECATED).
-* `drone-authorizer`: puppeteer-based tool authorizing `drone.io` with `gitea` via `oauth2` (TO BE DEPRECATED).
-* `drone`: CI/CD tool building and deploying the application (TO BE DEPRECATED).
+* `gitea`: git server mirroring project repositories.
+* `postgresql`: database storing `gitea` data.
+* `gitea-oauth2-proxy`: in-house solution exposing `gitea` login page to other pods.
+* `drone-authorizer`: puppeteer-based tool authorizing `drone.io` with `gitea` via `oauth2`.
+* `drone`: CI/CD tool building and deploying the application.
 * `minio`: s3-compatible object storage, holding artifacts from training jobs; `MinIO` is installed as a pinned dependency, with only the console deployed through the chart.
 * `backup`: Kubernetes `cronJob` that backs up `PostgreSQL` and `MongoDB` databases and stores Kubernetes `ETCD` manifests in `AWS S3`
 * `cleaner`: currently unused, potentially slated for deprecation.
 * `project-operator`: Kubernetes operator listening to `KAI Lab API`; on new project creation in the UI, it deploys a project-specific pod with `mlflow` and `file browser`.
 * `user-tools-operator`: Kubernetes operator monitoring kai lab api; each time a user starts or changes runtime in the UI, this operator deploys a pod with vscode server and runtime containers based on selected image.
+
+## Matrix compatibility
+
+> [!NOTE]
+> If component isn't on the matrix, that means it component hasn't dependencies.
+
+| Component     | Dependencies                 | Version   | Compatibility                 |
+| ------------- | ---------------------------- | --------- | ----------------------------- |
+| `app`         | code.gitea.io/sdk/gitea      | `v0.19.0` | -                             |
+|               | github.com/drone/drone-go    | `v1.7.1`  | -                             |
+|               | github.com/minio/minio-go/v7 | `v7.0.78` | -                             |
+|               | go.mongodb.org/mongo-driver  | `v1.17.1` | [MongoDB `>=3.6, =<7.X`]      |
+|               | k8s.io/api                   | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
+|               | k8s.io/apimachinery          | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
+|               | k8s.io/client-go             | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
+| `repo-cloner` | go.mongodb.org/mongo-driver  | `v1.17.1` | [MongoDB `>=3.6, =<7.X`]      |
+| `gitea`       | k8s.io/api                   | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
+|               | k8s.io/apimachinery          | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
+|               | k8s.io/client-go             | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
+
+[MongoDB `>=3.6, =<7.X`]: https://www.mongodb.com/docs/drivers/go/current/compatibility/#std-label-golang-compatibility
+[Kubernetes `>=1.24, =<1.30`]: https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters
 
 ## Development
 
@@ -54,21 +84,3 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Client Dependencies Matrix Per Component
-
-| Component   | Dependencies                | Version | Compatibility          |
-|-------------|-----------------------------|---------|------------------------|
-| app         | code.gitea.io/sdk/gitea (TO BE REMOVED)     | v0.19.0 | -                      |
-|             | github.com/drone/drone-go (TO BE REMOVED)    | v1.7.1  | -                      |
-|             | github.com/minio/minio-go/v7| v7.0.78 | -                      |
-|             | go.mongodb.org/mongo-driver | v1.17.1 | [mongodb 3.6 to 7.0](https://www.mongodb.com/docs/drivers/go/current/compatibility/#std-label-golang-compatibility)     |
-|             | k8s.io/api                  | v0.31.1 | [Kubernetes 1.30](https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters)        |
-|             | k8s.io/apimachinery         | v0.31.1 | [Kubernetes 1.30](https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters)        |
-|             | k8s.io/client-go            | v0.31.1 | [Kubernetes 1.30](https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters)        |
-| repo cloner | go.mongodb.org/mongo-driver | v1.17.1 | [mongodb 3.6 to 7.0](https://www.mongodb.com/docs/drivers/go/current/compatibility/#std-label-golang-compatibility)     |
-| gitea (TO BE REMOVED)      | k8s.io/api                  | v0.31.1 | [Kubernetes 1.30](https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters)        |
-|             | k8s.io/apimachinery         | v0.31.1 | [Kubernetes 1.30](https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters)        |
-|             | k8s.io/client-go            | v0.31.1 | [Kubernetes 1.30](https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters)        |
-
-Other components do not have client dependencies.

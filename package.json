@@ -26,6 +26,10 @@
             {
                 "name": "develop",
                 "prerelease": "rc"
+            },
+            {
+                "name": "hotfix/*",
+                "prerelease": false
             }
         ],
         "plugins": [

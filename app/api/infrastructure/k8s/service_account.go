@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	v1 "k8s.io/api/core/v1"
+	k8errors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -41,21 +42,34 @@ func (k k8sClient) getServiceAccountSecretName(usernameSlug string) string {
 	return fmt.Sprintf("%s-service-account-secret", usernameSlug)
 }
 
-// CreateUserServiceAccount creates a new k8s serviceAccount for a user.
-func (k *k8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
-	saSecretName := k.getServiceAccountSecretName(usernameSlug)
+func (k k8sClient) updateAutomountExistingServiceAccount(ctx context.Context, serviceAccount *v1.ServiceAccount, saSecretName, usernameSlug string) (*v1.ServiceAccount, error) {
+	// Update the service account
+	k.logger.Infof("Updating service account %q in k8s...", serviceAccount.Name)
+	automountServiceAccountToken := true
+	serviceAccount.AutomountServiceAccountToken = &automountServiceAccountToken
+	serviceAccount.Secrets = []v1.ObjectReference{
+		{
+			Name: saSecretName,
+		},
+	}
 
-	k.logger.Infof("Creating service account for user %q in k8s...", usernameSlug)
+	serviceAccount, err := k.clientset.CoreV1().ServiceAccounts(k.cfg.Kubernetes.Namespace).Update(ctx, serviceAccount, metav1.UpdateOptions{})
+	if err != nil {
+		return nil, err
+	}
 
-	sa := k.newServiceAccount(usernameSlug, saSecretName)
-	serviceAccount, err := k.clientset.CoreV1().ServiceAccounts(k.cfg.Kubernetes.Namespace).Create(ctx, sa, metav1.CreateOptions{})
+	err = k.createSecretTypeServiceAccountToken(ctx, saSecretName, usernameSlug)
 
 	if err != nil {
 		return nil, err
 	}
 
-	k.logger.Infof("The service account %q was created in k8s correctly", serviceAccount.Name)
+	k.logger.Infof("The service account %q was updated in k8s correctly", serviceAccount.Name)
 
+	return serviceAccount, nil
+}
+
+func (k k8sClient) createSecretTypeServiceAccountToken(ctx context.Context, saSecretName, usernameSlug string) error {
 	// Create secret
 	k.logger.Infof("Creating secret service account token %q for user %q in k8s...", saSecretName, usernameSlug)
 	secret := v1.Secret{
@@ -69,12 +83,51 @@ func (k *k8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug s
 		Type: v1.SecretTypeServiceAccountToken,
 	}
 
-	_, err = k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Create(ctx, &secret, metav1.CreateOptions{})
+	_, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Create(ctx, &secret, metav1.CreateOptions{})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	k.logger.Infof("The secret service account token %q was created in k8s correctly", secret.Name)
+
+	return nil
+}
+
+// CreateUserServiceAccount creates a new k8s serviceAccount for a user.
+func (k *k8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
+	saSecretName := k.getServiceAccountSecretName(usernameSlug)
+
+	serviceAccount, err := k.GetUserServiceAccount(ctx, usernameSlug)
+
+	if err != nil && k8errors.IsNotFound(err) {
+		// Create the service account
+		k.logger.Infof("Creating service account for user %q in k8s...", usernameSlug)
+
+		sa := k.newServiceAccount(usernameSlug, saSecretName)
+		serviceAccount, err := k.clientset.CoreV1().ServiceAccounts(k.cfg.Kubernetes.Namespace).Create(ctx, sa, metav1.CreateOptions{})
+
+		if err != nil {
+			return nil, err
+		}
+
+		err = k.createSecretTypeServiceAccountToken(ctx, saSecretName, usernameSlug)
+
+		if err != nil {
+			return nil, err
+		}
+
+		k.logger.Infof("The service account %q was created in k8s correctly", serviceAccount.Name)
+		return serviceAccount, nil
+	}
+
+	// if service account AutomountServiceAccountToken value is nil, update service account
+	if serviceAccount.AutomountServiceAccountToken == nil {
+		serviceAccount, err = k.updateAutomountExistingServiceAccount(ctx, serviceAccount, saSecretName, usernameSlug)
+		if err != nil {
+			return nil, err
+		}
+		return serviceAccount, nil
+	}
 
 	return serviceAccount, nil
 }

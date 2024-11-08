@@ -1,0 +1,27 @@
+name: "[SonarQube] Quality Check"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'app/**'
+      - 'cleaner/**'
+      - 'repo-cloner/**'
+
+jobs:
+  build:
+    name: Build and analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: sonarsource/sonarqube-scan-action@v3
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_INT }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL_INT }}

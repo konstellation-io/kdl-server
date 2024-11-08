@@ -146,6 +146,12 @@ func (i *Interactor) GetByUsername(ctx context.Context, username string) (entity
 	return i.repo.GetByUsername(ctx, username)
 }
 
+// GetByEmail returns the user with the desired email or returns entity.ErrUserNotFound if the user doesn't exist.
+func (i *Interactor) GetByEmail(ctx context.Context, email string) (entity.User, error) {
+	i.logger.Info("Getting user by email", "email", email)
+	return i.repo.GetByEmail(ctx, email)
+}
+
 // StartTools creates a user-tools CustomResource in K8s to initialize the VSCode for the given username.
 // If there are already a user-tools for the user, they are replaced (stop + start new).
 func (i *Interactor) StartTools(ctx context.Context, username string, runtimeID, capabilitiesID *string) (entity.User, error) {

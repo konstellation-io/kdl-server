@@ -143,7 +143,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 		CreationDate: now,
 	}
 
-	ts.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
+	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.clock.EXPECT().Now().Return(now)
@@ -182,7 +182,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameFound() {
 
 	ctx := context.Background()
 
-	ts.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, nil)
+	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, nil)
 
 	// Act
 	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

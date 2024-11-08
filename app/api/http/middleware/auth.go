@@ -46,7 +46,7 @@ func AuthMiddleware(next http.Handler, userUsecase user.UseCase) http.Handler {
 			return
 		}
 
-		_, err := userUsecase.GetByUsername(r.Context(), username)
+		_, err := userUsecase.GetByEmail(r.Context(), email)
 		if errors.Is(err, entity.ErrUserNotFound) {
 			_, err = userUsecase.Create(r.Context(), email, username, entity.AccessLevelViewer)
 			if err != nil {

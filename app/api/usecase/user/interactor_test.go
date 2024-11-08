@@ -448,6 +448,41 @@ func TestInteractor_GetByUsername_Err(t *testing.T) {
 	require.Equal(t, emptyUser, u)
 }
 
+func TestInteractor_GetByEmail(t *testing.T) {
+	s := newUserSuite(t, nil)
+	defer s.ctrl.Finish()
+
+	const email = "john@doe.com"
+
+	ctx := context.Background()
+	expectedUser := entity.User{Email: email}
+
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(expectedUser, nil)
+
+	u, err := s.interactor.GetByEmail(ctx, email)
+
+	require.NoError(t, err)
+	require.Equal(t, expectedUser, u)
+}
+
+func TestInteractor_GetByEmail_Err(t *testing.T) {
+	s := newUserSuite(t, nil)
+	defer s.ctrl.Finish()
+
+	const email = "john@doe.com"
+
+	ctx := context.Background()
+	someErr := entity.ErrUserNotFound
+	emptyUser := entity.User{}
+
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(emptyUser, someErr)
+
+	u, err := s.interactor.GetByEmail(ctx, email)
+
+	require.Equal(t, someErr, err)
+	require.Equal(t, emptyUser, u)
+}
+
 func TestInteractor_FindByIDs(t *testing.T) {
 	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()

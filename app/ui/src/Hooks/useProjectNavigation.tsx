@@ -1,7 +1,6 @@
 import ROUTE, { buildRoute } from 'Constants/routes';
 import { useCallback, useMemo } from 'react';
 
-import DroneIcon from 'Components/Icons/DroneIcon/DroneIcon';
 import GiteaIcon from 'Components/Icons/GiteaIcon/GiteaIcon';
 import IconHome from '@material-ui/icons/Dashboard';
 import IconKG from '@material-ui/icons/EmojiObjects';
@@ -40,15 +39,9 @@ export const projectToolsRoutesConfig: RouteConfiguration[] = [
   },
   {
     id: 'gitea',
-    label: 'Gitea',
+    label: 'Giteaa',
     Icon: GiteaIcon,
     route: ROUTE.PROJECT_TOOL_GITEA,
-  },
-  {
-    id: 'drone',
-    route: ROUTE.PROJECT_TOOL_DRONE,
-    label: 'Drone',
-    Icon: DroneIcon,
   },
   {
     id: 'filebrowser',
@@ -86,10 +79,10 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
 
   const buildRoutes = useCallback(
     (route: RouteConfiguration) =>
-      ({
-        ...route,
-        route: buildRoute(route.route, projectId),
-      } as RouteConfiguration),
+    ({
+      ...route,
+      route: buildRoute(route.route, projectId),
+    } as RouteConfiguration),
     [projectId],
   );
 

@@ -79,7 +79,7 @@ function TabDangerZone({ projectId, projectName }: Props) {
         <div className={styles.actionBox}>
           <MessageActionBox
             title="Delete project"
-            description="This action is irreversible, delete aproject and all
+            description="This action is irreversible, delete a project and all
             Kubernetes, Minio, Gitea and Konstellation resources
             associated with it"
             action={{

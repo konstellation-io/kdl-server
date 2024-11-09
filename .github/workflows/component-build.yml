@@ -28,6 +28,11 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
       - name: Prepare metadata to build
         id: prepare_metadata
         run: |

@@ -57,11 +57,6 @@ type Config struct {
 			PullPolicy string `envconfig:"VSCODE_IMG_PULLPOLICY"`
 		}
 	}
-	Drone struct {
-		URL         string `envconfig:"DRONE_URL"`
-		InternalURL string `envconfig:"DRONE_INTERNAL_URL"`
-		Token       string `envconfig:"DRONE_TOKEN"`
-	}
 	ProjectMLFlow struct {
 		URL   string `envconfig:"PROJECT_MLFLOW_URL"`
 		Image struct {

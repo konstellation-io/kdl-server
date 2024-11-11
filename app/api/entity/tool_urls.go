@@ -6,6 +6,5 @@ type ToolUrls struct {
 	Gitea           string `json:"gitea"`
 	Filebrowser     string `json:"filebrowser"`
 	VSCode          string `json:"vscode"`
-	Drone           string `json:"drone"`
 	MLFlow          string `json:"mlflow"`
 }

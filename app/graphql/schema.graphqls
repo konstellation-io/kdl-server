@@ -89,7 +89,6 @@ type ToolUrls {
   gitea: String!
   filebrowser: String!
   vscode: String!
-  drone: String!
   mlflow: String!
 }
 

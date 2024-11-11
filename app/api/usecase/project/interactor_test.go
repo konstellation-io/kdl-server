@@ -13,7 +13,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
@@ -38,7 +37,6 @@ type projectMocks struct {
 	clock            *clock.MockClock
 	giteaService     *giteaservice.MockGiteaClient
 	minioService     *minioservice.MockMinioService
-	droneService     *droneservice.MockDroneService
 	k8sClient        *k8s.MockClient
 }
 
@@ -49,7 +47,6 @@ func newProjectSuite(t *testing.T) *projectSuite {
 	clockMock := clock.NewMockClock(ctrl)
 	giteaService := giteaservice.NewMockGiteaClient(ctrl)
 	minioService := minioservice.NewMockMinioService(ctrl)
-	droneService := droneservice.NewMockDroneService(ctrl)
 	k8sClient := k8s.NewMockClient(ctrl)
 
 	zapLog, err := zap.NewDevelopment()
@@ -64,7 +61,6 @@ func newProjectSuite(t *testing.T) *projectSuite {
 		Clock:            clockMock,
 		GiteaService:     giteaService,
 		MinioService:     minioService,
-		DroneService:     droneService,
 		K8sClient:        k8sClient,
 	}
 	interactor := project.NewInteractor(deps)
@@ -79,7 +75,6 @@ func newProjectSuite(t *testing.T) *projectSuite {
 			clock:            clockMock,
 			giteaService:     giteaService,
 			minioService:     minioService,
-			droneService:     droneService,
 			k8sClient:        k8sClient,
 		},
 	}
@@ -137,7 +132,6 @@ func TestInteractor_CreateExternal(t *testing.T) {
 	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().CreateBucket(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().CreateProjectDirs(ctx, testProjectID).Return(nil)
-	s.mocks.droneService.EXPECT().ActivateRepository(testProjectID).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(testProjectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(expectedProject, nil)
@@ -519,7 +513,6 @@ func TestInteractor_Delete(t *testing.T) {
 	s.mocks.giteaService.EXPECT().DeleteRepo(testProjectID).Return(nil)
 	s.mocks.k8sClient.EXPECT().DeleteKDLProjectCR(ctx, testProjectID).Return(nil)
 	s.mocks.repo.EXPECT().DeleteOne(ctx, testProjectID).Return(nil)
-	s.mocks.droneService.EXPECT().DeleteRepository(testProjectID)
 	s.mocks.minioService.EXPECT().DeleteBucket(ctx, testProjectID).Return(expectedMinioBackup, nil)
 	s.mocks.userActivityRepo.EXPECT().Create(ctx, userActivity).Return(nil)
 

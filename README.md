@@ -24,8 +24,6 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 * `gitea`: git server mirroring project repositories.
 * `postgresql`: database storing `gitea` data.
 * `gitea-oauth2-proxy`: in-house solution exposing `gitea` login page to other pods.
-* `drone-authorizer`: puppeteer-based tool authorizing `drone.io` with `gitea` via `oauth2`.
-* `drone`: CI/CD tool building and deploying the application.
 * `minio`: s3-compatible object storage, holding artifacts from training jobs; `MinIO` is installed as a pinned dependency, with only the console deployed through the chart.
 * `backup`: Kubernetes `cronJob` that backs up `PostgreSQL` and `MongoDB` databases and stores Kubernetes `ETCD` manifests in `AWS S3`
 * `cleaner`: currently unused, potentially slated for deprecation.
@@ -40,7 +38,6 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 | Component     | Dependencies                 | Version   | Compatibility                 |
 | ------------- | ---------------------------- | --------- | ----------------------------- |
 | `app`         | code.gitea.io/sdk/gitea      | `v0.19.0` | -                             |
-|               | github.com/drone/drone-go    | `v1.7.1`  | -                             |
 |               | github.com/minio/minio-go/v7 | `v7.0.78` | -                             |
 |               | go.mongodb.org/mongo-driver  | `v1.17.1` | [MongoDB `>=3.6, =<7.X`]      |
 |               | k8s.io/api                   | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |

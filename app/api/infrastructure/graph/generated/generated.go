@@ -143,7 +143,6 @@ type ComplexityRoot struct {
 	}
 
 	ToolUrls struct {
-		Drone           func(childComplexity int) int
 		Filebrowser     func(childComplexity int) int
 		Gitea           func(childComplexity int) int
 		KnowledgeGalaxy func(childComplexity int) int
@@ -725,13 +724,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SSHKey.Public(childComplexity), true
 
-	case "ToolUrls.drone":
-		if e.complexity.ToolUrls.Drone == nil {
-			break
-		}
-
-		return e.complexity.ToolUrls.Drone(childComplexity), true
-
 	case "ToolUrls.filebrowser":
 		if e.complexity.ToolUrls.Filebrowser == nil {
 			break
@@ -1055,7 +1047,6 @@ type ToolUrls {
   gitea: String!
   filebrowser: String!
   vscode: String!
-  drone: String!
   mlflow: String!
 }
 
@@ -3565,8 +3556,6 @@ func (ec *executionContext) fieldContext_Project_toolUrls(_ context.Context, fie
 				return ec.fieldContext_ToolUrls_filebrowser(ctx, field)
 			case "vscode":
 				return ec.fieldContext_ToolUrls_vscode(ctx, field)
-			case "drone":
-				return ec.fieldContext_ToolUrls_drone(ctx, field)
 			case "mlflow":
 				return ec.fieldContext_ToolUrls_mlflow(ctx, field)
 			}
@@ -5208,50 +5197,6 @@ func (ec *executionContext) _ToolUrls_vscode(ctx context.Context, field graphql.
 }
 
 func (ec *executionContext) fieldContext_ToolUrls_vscode(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ToolUrls",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ToolUrls_drone(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ToolUrls_drone(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Drone, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ToolUrls_drone(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ToolUrls",
 		Field:      field,
@@ -9258,11 +9203,6 @@ func (ec *executionContext) _ToolUrls(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "vscode":
 			out.Values[i] = ec._ToolUrls_vscode(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "drone":
-			out.Values[i] = ec._ToolUrls_drone(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

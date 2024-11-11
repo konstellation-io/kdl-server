@@ -13,21 +13,6 @@ global:
       secretName: "mongodb-database-kdl-connection-string"
       secretKey: "connectionString.standardSrv"
 
-drone:
-  storage:
-    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-  ingress:
-    className: "public"
-
-droneAuthorizer:
-  image:
-    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/drone-authorizer
-    tag: latest
-    pullPolicy: Always
-
-droneRunner:
-  droneRunnerEnviron: "GIT_SSL_NO_VERIFY:true"
-
 gitea:
   admin:
     username: {{ requiredEnv "GITEA_ADMIN_USER" | quote }}

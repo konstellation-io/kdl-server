@@ -3,7 +3,7 @@ helmDefaults:
   atomic: false
   verify: false
   wait: false
-  timeout: 3600
+  timeout: 120
   disableValidation: true
 
 templates:
@@ -31,7 +31,8 @@ releases:
 
   - name: "kdl-local"
     <<: *default
-    version: 6.0.3-rc.2
+    chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
+    version: 6.0.3-rc.3
     needs:
     - kdl/mongodb-string-uri
 

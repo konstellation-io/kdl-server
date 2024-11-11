@@ -198,17 +198,17 @@ oauth2Proxy:
     # The image tag
     tag: v7.7.1-amd64
   customConfig:
-    # oauth2_proxy.cfg: |-
+    # |-
     # provider="keycloak-oidc"
-    # oidc_issuer_url="https://keycloak.kdl.{{ requiredEnv "DOMAIN" }}/realms/kdl"
-    # redirect_url="https://kdlapp.kdl.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
+    # oidc_issuer_url="https://keycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl"
+    # redirect_url="https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
     # client_id="proxy"
     # client_secret="JafucVibWO49akI3aOJi1n9ypO46Voi1"
     # cookie_secret="mycookiesecret16"
     # cookie_secure=true
     # email_domains="*"
     # set_xauthrequest=true
-    # http_address="https://kdlapp.kdl.{{ requiredEnv "DOMAIN" }}/"
+    # http_address="https://kdlapp.{{ requiredEnv "DOMAIN" }}/"
     # ssl_insecure_skip_verify=true
 
 # -- OAuth2-Proxy subchart deployment

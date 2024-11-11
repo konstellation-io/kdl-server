@@ -6,6 +6,16 @@ resources:
   spec:
     template:
       spec:
+        initContainers:
+          - name: wait-for-mongodb
+            image: busybox
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                until nc -zv mongodb 27017 > /dev/null; do
+                  sleep 10
+                done
+                echo "MongoDB is up and running!"
         containers:
           - name: mongodb-insert
             image: docker.io/bitnami/mongodb:7.0.15

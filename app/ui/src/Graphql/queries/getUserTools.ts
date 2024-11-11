@@ -9,7 +9,6 @@ export default gql`
         gitea
         filebrowser
         vscode
-        drone
         mlflow
       }
     }

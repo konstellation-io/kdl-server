@@ -67,7 +67,6 @@ exports[`Project component Component match snapshot 1`] = `
           "needAccess": true,
           "repository": null,
           "toolUrls": Object {
-            "drone": "https://drone",
             "filebrowser": "https://filebrowser",
             "gitea": "https://gitea",
             "knowledgeGalaxy": "https://knowledgeGalaxy",
@@ -128,7 +127,6 @@ exports[`Project component Component match snapshot 1`] = `
                 "needAccess": true,
                 "repository": null,
                 "toolUrls": Object {
-                  "drone": "https://drone",
                   "filebrowser": "https://filebrowser",
                   "gitea": "https://gitea",
                   "knowledgeGalaxy": "https://knowledgeGalaxy",
@@ -211,7 +209,6 @@ exports[`Project component Component match snapshot 1`] = `
                 "needAccess": true,
                 "repository": null,
                 "toolUrls": Object {
-                  "drone": "https://drone",
                   "filebrowser": "https://filebrowser",
                   "gitea": "https://gitea",
                   "knowledgeGalaxy": "https://knowledgeGalaxy",
@@ -300,7 +297,6 @@ exports[`Project component Component match snapshot 1`] = `
                 "needAccess": true,
                 "repository": null,
                 "toolUrls": Object {
-                  "drone": "https://drone",
                   "filebrowser": "https://filebrowser",
                   "gitea": "https://gitea",
                   "knowledgeGalaxy": "https://knowledgeGalaxy",
@@ -370,7 +366,6 @@ exports[`Project component Component match snapshot 1`] = `
                 "needAccess": true,
                 "repository": null,
                 "toolUrls": Object {
-                  "drone": "https://drone",
                   "filebrowser": "https://filebrowser",
                   "gitea": "https://gitea",
                   "knowledgeGalaxy": "https://knowledgeGalaxy",

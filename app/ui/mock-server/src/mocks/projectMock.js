@@ -21,7 +21,6 @@ function buildProject(_, index) {
       gitea: 'https://gitea.io/en-us/',
       filebrowser: 'https://filebrowser.org/',
       vscode: 'https://code.visualstudio.com/',
-      drone: 'https://www.drone.io/',
       mlflow: 'https://mlflow.org/',
     }),
   };

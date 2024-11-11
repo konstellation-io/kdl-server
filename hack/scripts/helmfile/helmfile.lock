@@ -1,0 +1,10 @@
+version: 0.169.1
+dependencies:
+- name: raw
+  repository: https://bedag.github.io/helm-charts/
+  version: 2.0.0
+- name: raw
+  repository: https://bedag.github.io/helm-charts/
+  version: 2.0.0
+digest: sha256:854e3f5110493b2bbf2c889f6557f9ad5b4de6e705c743d807b3e80a0e9d6260
+generated: "2024-11-10T13:44:53.332285+01:00"

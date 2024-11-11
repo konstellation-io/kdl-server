@@ -10,10 +10,12 @@ global:
         certFilename: mkcert-ca.crt
   mongodb:
     connectionString:
-      secretName: "mongodb-database-kdl-connection-string"
-      secretKey: "connectionString.standardSrv"
+      secretKey: mongodb-string-uri
+      secretName: mongodb-string-uri
 
 drone:
+  enabled: false
+
   storage:
     storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
   ingress:
@@ -29,13 +31,15 @@ droneRunner:
   droneRunnerEnviron: "GIT_SSL_NO_VERIFY:true"
 
 gitea:
+  enabled: true
+
   admin:
     username: {{ requiredEnv "GITEA_ADMIN_USER" | quote }}
     password: {{ requiredEnv "GITEA_ADMIN_PASSWORD" | quote }}
-  storage:
-    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
   ingress:
     className: "public"
+  storage:
+    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
 giteaOauth2Setup:
   image:
@@ -43,7 +47,64 @@ giteaOauth2Setup:
     tag: latest
     pullPolicy: Always
 
+# -- Keycloak subchart deployment
+# </br> Ref: https://github.com/konstellation-io/helm-charts/blob/konstellation-base-1.0.2/charts/konstellation-base/values.yaml
+keycloak:
+  enabled: true
+
+  fullnameOverride: keycloak
+
+  image:
+    repository: keycloak/keycloak
+    tag: "26.0"
+
+  service:
+    healthPath: /realms/master
+    targetPort: 8080
+
+  ingress:
+    enabled: true
+    className: public
+    annotations:
+      nginx.org/proxy-buffer-size: "128k"
+      nginx.org/proxy-buffers: "8 256k"
+    hosts:
+    - host: keycloak.{{ requiredEnv "DOMAIN" }}
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+
+  serviceAccount:
+    create: true
+
+  livenessProbe:
+    enabled: true
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /realms/master
+
+  command:
+  - "/opt/keycloak/bin/kc.sh"
+  - "start-dev"
+
+  env:
+    KC_DB_PASSWORD: keycloak
+    KC_DB_URL: jdbc:postgresql://postgresql:5432/keycloak
+    KC_DB_USERNAME: keycloak
+    KC_DB: postgres
+    KC_HEALTH_ENABLED: true
+    KC_HOSTNAME: keycloak.{{ requiredEnv "DOMAIN" }}
+    KC_HTTP_ENABLED: true
+    KC_METRICS_ENABLED: true
+    KC_PROXY_HEADERS: xforwarded
+    KEYCLOAK_ADMIN_PASSWORD: keycloak
+    KEYCLOAK_ADMIN: keycloak
+
 knowledgeGalaxy:
+  enabled: false
+
   image:
     repository: {{ requiredEnv "KNOWLEDGE_GALAXY_IMAGE_REPOSITORY" | quote }}
     tag: {{ env "KNOWLEDGE_GALAXY_IMAGE_TAG" | quote }}
@@ -53,23 +114,149 @@ kdlServer:
     repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-server
     tag: latest
     pullPolicy: Always
+
   ingress:
     className: "public"
 
+# -- (DEPRECATION) Legacy issues
+# minio:
+#   enabled: true
+#   resources:
+#     requests:
+#       memory: 1Gi
+#   mode: standalone
+#   rootUser: "minio"
+#   rootPassword: "minio123"
+#   serviceAccount:
+#     create: false
+#   persistence:
+#     storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+#     existingClaim: ""
+#     accessMode: ReadWriteMany
+
+# -- MinIO subchart deployment
+# </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/minio/values.yaml
 minio:
-  securityContext:
-    runAsUser: 0
+  enabled: true
+
+  fullnameOverride: minio
+  nameOverride: minio
+
+  mode: standalone
+
   ingress:
-    className: "public"
-  consoleIngress:
-    className: "public"
+    enabled: true
+    ingressClassName: public
+    hostname: minio-console.{{ requiredEnv "DOMAIN" }}
 
+  apiIngress:
+    enabled: true
+    ingressClassName: public
+    hostname: minio.{{ requiredEnv "DOMAIN" }}
+
+  auth:
+    rootUser: minio
+    rootPassword: minio123
+
+  persistence:
+    enabled: true
+    storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+
+# -- MongoDB subchart deployment
+# </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/mongodb/values.yaml
 mongodb:
-  connectionString: "mongodb+srv://admin:123456@kdl-local-mongodb-svc.kdl.svc.cluster.local/admin?replicaSet=kdl-local-mongodb&ssl=false"
+  enabled: true
 
+  fullnameOverride: mongodb
+  nameOverride: mongodb
+
+  image:
+    tag: 7.0.15
+
+  architecture: standalone
+
+  auth:
+    rootUser: admin
+    rootPassword: "123456"
+    usernames:
+    - kdl
+    passwords:
+    - 123456
+    databases:
+    - kdl
+
+  persistence:
+    enabled: true
+    storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+
+# (DEPRECATION) legacy, remove in future versions
+# OAuth2-Proxy legacy to configure user authentication
+oauth2Proxy:
+  image:
+    # The repository of the image
+    repository: quay.io/oauth2-proxy/oauth2-proxy
+    # The image tag
+    tag: v7.7.1-amd64
+  customConfig:
+    # oauth2_proxy.cfg: |-
+    # provider="keycloak-oidc"
+    # oidc_issuer_url="https://keycloak.kdl.{{ requiredEnv "DOMAIN" }}/realms/kdl"
+    # redirect_url="https://kdlapp.kdl.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
+    # client_id="proxy"
+    # client_secret="JafucVibWO49akI3aOJi1n9ypO46Voi1"
+    # cookie_secret="mycookiesecret16"
+    # cookie_secure=true
+    # email_domains="*"
+    # set_xauthrequest=true
+    # http_address="https://kdlapp.kdl.{{ requiredEnv "DOMAIN" }}/"
+    # ssl_insecure_skip_verify=true
+
+# -- OAuth2-Proxy subchart deployment
+# </br> Ref: https://github.com/oauth2-proxy/manifests/blob/main/helm/oauth2-proxy/values.yaml
+oauth2proxy:
+  enabled: false
+
+  clientID: "XXXXXXX"
+  clientSecret: "XXXXXXXX"
+  cookieSecret: "XXXXXXXX"
+  cookieName: ""
+
+# -- (DEPRECATION) only for gitea
 postgres:
+  dbName: gitea
+  dbPassword: gitea
   storage:
     storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+
+  # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  nodeSelector: {}
+
+  # -- Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+  affinity: {}
+
+  # -- If specified, the pod's tolerations. Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+# -- PostgreSQL subchart deployment
+# </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/postgresql/values.yaml
+postgresql:
+  enabled: true
+
+  fullnameOverride: postgresql
+
+  replicaCount: 1
+
+  auth:
+    postgresPassword: postgres
+    username: keycloak
+    password: keycloak
+    database: "keycloak"
+
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+      storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
 projectOperator:
   manager:

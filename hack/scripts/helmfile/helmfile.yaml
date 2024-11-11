@@ -2,7 +2,7 @@ helmDefaults:
   createNamespace: true
   atomic: false
   verify: false
-  wait: true
+  wait: false
   timeout: 3600
   disableValidation: true
 
@@ -18,44 +18,26 @@ templates:
     - "values/{{`{{ .Release.Name }}`}}/values.yaml"
 
 repositories:
-  - name: mongodb
-    url: https://mongodb.github.io/helm-charts
   - name: bedag
     url: https://bedag.github.io/helm-charts/
-  - name: enterprise-gateway
-    url: https://konstellation-io.github.io/enterprise_gateway/
   - name: minio
     url: https://charts.min.io/
-  - name: konstellation-io
-    url: https://charts.konstellation.io/
 
 releases:
-  - name: "mongodb-operator"
-    <<: *default
-    chart: mongodb/community-operator
-
-  - name: "mongodb-database"
+  - name: "mongodb-string-uri"
     <<: *default
     chart: bedag/raw
-    needs:
-    - kdl/mongodb-operator
-
-  - name: "postgresql"
-    <<: *default
-    chart: oci://registry-1.docker.io/bitnamicharts/postgresql
-    version: 15.5.38
-
-  - name: "keycloak"
-    <<: *default
-    chart: oci://ghcr.io/konstellation-io/helm-charts/konstellation-base
-    version: 1.0.1
-    needs:
-    - kdl/postgresql
+    version: 2.0.0
 
   - name: "kdl-local"
     <<: *default
-    chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
-    version: 6.0.2
+    version: 6.0.3-rc.2
     needs:
-    - kdl/mongodb-database
-    - kdl/keycloak
+    - kdl/mongodb-string-uri
+
+  - name: "mongodb-initial-data"
+    <<: *default
+    chart: bedag/raw
+    version: 2.0.0
+    needs:
+    - kdl/kdl-local

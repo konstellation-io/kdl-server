@@ -1,0 +1,46 @@
+resources:
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    name: mongodb-initial-data
+  spec:
+    template:
+      spec:
+        containers:
+          - name: mongodb-insert
+            image: docker.io/bitnami/mongodb:7.0.15
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                mongosh "$MONGODB_URI" --eval '
+                db.runtimes.insertOne({
+                  "name": "Python 3.10 CPU - test initial data",
+                  "desc": "(test) Runtime with Python 3.10 for CPU workloads",
+                  "labels": [
+                    "Python 3.10",
+                    "Ubuntu 22.04",
+                    "CPU",
+                    "test-initial-data"
+                  ],
+                  "docker_image": "konstellation/kdl-py",
+                  "docker_tag": "3.10-cuda11.8.0-runtime-ubuntu22.04-1.2.2"
+                });
+
+                db.capabilities.insertOne({
+                  "_id": "test_initial_data",
+                  "name": "test_initial_data",
+                  "node_selectors": {
+                    "kubernetes.io/os": "linux"
+                  },
+                  "tolerations": [],
+                  "affinities": {}
+                });
+                '
+            env:
+              - name: MONGODB_URI
+                valueFrom:
+                  secretKeyRef:
+                    name: mongodb-string-uri
+                    key: mongodb-string-uri
+        restartPolicy: Never
+    backoffLimit: 1

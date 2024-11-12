@@ -110,7 +110,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
           context: ./${{ env.WORKDIR_COMPONENT }}
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
           sbom: true
           tags: ${{ steps.meta.outputs.tags }}

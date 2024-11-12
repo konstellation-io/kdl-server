@@ -22,12 +22,14 @@
         "branches": [
             "main",
             {
-                "name": "develop",
-                "prerelease": "rc"
+                "name": "release/*",
+                "prerelease": "rc",
+                "channel": "default"
             },
             {
                 "name": "hotfix/*",
-                "prerelease": false
+                "prerelease": false,
+                "channel": "default"
             }
         ],
         "plugins": [

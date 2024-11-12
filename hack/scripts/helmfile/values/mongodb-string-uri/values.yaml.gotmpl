@@ -1,0 +1,8 @@
+resources:
+  - apiVersion: v1
+    data:
+      mongodb-string-uri: {{ "mongodb://kdl:123456@mongodb:27017/kdl?authSource=kdl&authMechanism=SCRAM-SHA-256" | b64enc | quote }}
+    kind: Secret
+    metadata:
+      name: mongodb-string-uri
+    type: Opaque

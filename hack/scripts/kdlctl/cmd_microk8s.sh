@@ -37,7 +37,10 @@ microk8s_start() {
 microk8s_enable_addons() {
   echo_info "Checking if all microk8s addons are enabled"
   microk8s enable host-access:ip=${HOST_IP}
-  microk8s enable dns storage ingress registry
+  microk8s enable dns
+  microk8s enable hostpath-storage
+  microk8s enable ingress
+  microk8s enable registry
 
   if [ "$ENABLE_GPU" = "1" ]; then
     echo_info "⚙️ Enabling microk8s GPU..."

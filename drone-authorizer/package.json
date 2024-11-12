@@ -6,7 +6,7 @@
   "description": "This application uses a headless browser to automate the oAuth2 authorization with Drone process.",
   "main": "index.js",
   "dependencies": {
-    "puppeteer": "^19.4.0"
+    "puppeteer": "^23.6.0"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",

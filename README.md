@@ -39,7 +39,6 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 [cleaner-report-maintain-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_cleaner
 [cleaner-report-security-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_cleaner&metric=security_rating
 [cleaner-report-security-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_cleaner
-[cleaner-report-badge]: https://goreportcard.com/badge/github.com/konstellation-io/kdl-server/cleaner
 [cleaner-report-link]: https://goreportcard.com/report/github.com/konstellation-io/kdl-server/cleaner
 [repo-cloner-report-bugs-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_repo-cloner&metric=bugs
 [repo-cloner-report-bugs-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_repo-cloner
@@ -58,8 +57,6 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 * `app-ui`: web application offering the interface for data scientists.
 * `backup`: Kubernetes `cronJob` that backs up `PostgreSQL` and `MongoDB` databases and stores Kubernetes `etcd` manifests in `AWS S3`
 * `cleaner`: currently unused, potentially slated for deprecation.
-* `drone-authorizer`: puppeteer-based tool authorizing `drone.io` with `gitea` via `oauth2`.
-* `drone`: CI/CD tool building and deploying the application.
 * `gitea-oauth2-proxy`: in-house solution exposing `gitea` login page to other pods.
 * `gitea`: git server mirroring project repositories.
 * `minio`: s3-compatible object storage, holding artifacts from training jobs; `MinIO` is installed as a pinned dependency, with only the console deployed through the chart.
@@ -76,7 +73,6 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 | Component     | Dependencies                 | Version   | Compatibility                 |
 | ------------- | ---------------------------- | --------- | ----------------------------- |
 | `app`         | code.gitea.io/sdk/gitea      | `v0.19.0` | -                             |
-|               | github.com/drone/drone-go    | `v1.7.1`  | -                             |
 |               | github.com/minio/minio-go/v7 | `v7.0.78` | -                             |
 |               | go.mongodb.org/mongo-driver  | `v1.17.1` | [MongoDB `>=3.6, =<7.X`]      |
 |               | k8s.io/api                   | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |

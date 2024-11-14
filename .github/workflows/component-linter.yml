@@ -17,7 +17,6 @@ jobs:
           - app
           - backup
           - cleaner
-          - drone-authorizer
           - gitea-oauth2-setup
           - mlflow
           - project-operator

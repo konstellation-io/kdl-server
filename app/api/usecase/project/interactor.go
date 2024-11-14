@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/droneservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
@@ -111,7 +110,6 @@ type interactor struct {
 	clock            clock.Clock
 	giteaService     giteaservice.GiteaClient
 	minioService     minioservice.MinioService
-	droneService     droneservice.DroneService
 	k8sClient        k8s.Client
 }
 
@@ -123,7 +121,6 @@ type InteractorDeps struct {
 	Clock            clock.Clock
 	GiteaService     giteaservice.GiteaClient
 	MinioService     minioservice.MinioService
-	DroneService     droneservice.DroneService
 	K8sClient        k8s.Client
 }
 
@@ -136,7 +133,6 @@ func NewInteractor(deps *InteractorDeps) UseCase {
 		clock:            deps.Clock,
 		giteaService:     deps.GiteaService,
 		minioService:     deps.MinioService,
-		droneService:     deps.DroneService,
 		k8sClient:        deps.K8sClient,
 	}
 }
@@ -150,7 +146,6 @@ Depending on the repository type:
   - Create a k8s KDLProject containing a MLFLow instance
   - Create Minio bucket
   - Create Minio folders
-  - Activate Drone.io projectRepo.
 */
 func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
 	// Validate the creation input
@@ -174,10 +169,6 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 
 	// Create repository
 	if opt.RepoType == entity.RepositoryTypeExternal {
-		if err != nil {
-			return entity.Project{}, err
-		}
-
 		err := i.giteaService.MirrorRepo(*opt.ExternalRepoURL, repoName, *opt.ExternalRepoUsername, opt.Owner.Username,
 			opt.ExternalRepoAuthMethod, opt.ExternalRepoCredential)
 		if err != nil {
@@ -205,12 +196,6 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 
 	// Create Minio folders
 	err = i.minioService.CreateProjectDirs(ctx, opt.ProjectID)
-	if err != nil {
-		return entity.Project{}, err
-	}
-
-	// Activate Drone.io projectRepo
-	err = i.droneService.ActivateRepository(opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err
 	}
@@ -293,11 +278,6 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 	}
 
 	err = i.k8sClient.DeleteKDLProjectCR(ctx, projectID)
-	if err != nil {
-		return nil, err
-	}
-
-	err = i.droneService.DeleteRepository(projectID)
 	if err != nil {
 		return nil, err
 	}

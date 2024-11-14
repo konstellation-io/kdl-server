@@ -10,10 +10,8 @@ mkdir -p /backup/gitea/data
 function gitea_backup (){
     # Backup postgresql database
     echo "${DB_HOST}:${POSTGRES_DB}:${DB_USER}:${POSTGRES_PASSWORD}" > ~/.pgpass
-    echo "${DB_HOST}:drone:${DB_USER}:${POSTGRES_PASSWORD}" >> ~/.pgpass
     chmod 600 ~/.pgpass
     pg_dump -h "$(echo ${DB_HOST} | cut -f 1 -d ":" )" -p "$(echo "${DB_HOST}" | cut -f 2 -d ":" )" -U "${DB_USER}" -v -F c -f /backup/gitea/postgres_gitea.dump "${POSTGRES_DB}"
-    pg_dump -h "$(echo ${DB_HOST} | cut -f 1 -d ":" )" -p "$(echo "${DB_HOST}" | cut -f 2 -d ":" )" -U "${DB_USER}" -v -F c -f /backup/gitea/postgres_drone.dump drone
 
     # Backup gitea data
     rsync -a --progress /data/ /backup/gitea/data/ \

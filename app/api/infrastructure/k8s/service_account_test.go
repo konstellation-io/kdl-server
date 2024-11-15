@@ -91,5 +91,38 @@ func (s *serviceAccountTestSuite) TestCreateServiceAccount() {
 	sa, err := s.client.GetUserServiceAccount(context.Background(), "sa")
 	s.NoError(err)
 
+	s.Equal(*sa.AutomountServiceAccountToken, true)
 	s.Equal("sa-service-account-secret", sa.Secrets[0].Name)
+
+	_, err = s.client.GetSecret(context.Background(), sa.Secrets[0].Name)
+	s.NoError(err)
+}
+
+func (s *serviceAccountTestSuite) TestCreateServiceAccountOnExistingSaWithoutAutomount() {
+	// Arrange, create a service account without automount
+	saNoAutomount, err := s.clientset.CoreV1().ServiceAccounts("kdl-test").Create(context.Background(), &v1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "sa",
+		},
+	}, metav1.CreateOptions{})
+	s.NoError(err)
+	s.NotNil(saNoAutomount)
+	s.Nil(saNoAutomount.AutomountServiceAccountToken)
+	s.Equal(len(saNoAutomount.Secrets), 0)
+
+	// Act
+	_, err = s.client.CreateUserServiceAccount(context.Background(), "sa")
+	s.NoError(err)
+
+	serviceAccount := s.clientset.CoreV1().ServiceAccounts("sa")
+	s.NotNil(serviceAccount)
+
+	sa, err := s.client.GetUserServiceAccount(context.Background(), "sa")
+	s.NoError(err)
+
+	s.Equal(*sa.AutomountServiceAccountToken, true)
+	s.Equal("sa-service-account-secret", sa.Secrets[0].Name)
+
+	_, err = s.client.GetSecret(context.Background(), sa.Secrets[0].Name)
+	s.NoError(err)
 }

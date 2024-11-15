@@ -16,6 +16,11 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+const (
+	namespace = "kdl-test"
+	saName    = "sa"
+)
+
 type serviceAccountTestSuite struct {
 	suite.Suite
 	container *k3s.K3sContainer
@@ -49,7 +54,7 @@ func (s *serviceAccountTestSuite) SetupTest() {
 	// Create a namespace
 	_, err = s.clientset.CoreV1().Namespaces().Create(ctx, &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "kdl-test",
+			Name: namespace,
 		},
 	}, metav1.CreateOptions{})
 	s.NoError(err)
@@ -63,7 +68,7 @@ func (s *serviceAccountTestSuite) SetupTest() {
 	cfg := config.Config{
 		Kubernetes: config.KubernetesConfig{
 			IsInsideCluster: true,
-			Namespace:       "kdl-test",
+			Namespace:       namespace,
 		},
 	}
 
@@ -82,13 +87,13 @@ func (s *serviceAccountTestSuite) TearDownTest() {
 }
 
 func (s *serviceAccountTestSuite) TestCreateServiceAccount() {
-	_, err := s.client.CreateUserServiceAccount(context.Background(), "sa")
+	_, err := s.client.CreateUserServiceAccount(context.Background(), saName)
 	s.NoError(err)
 
-	serviceAccount := s.clientset.CoreV1().ServiceAccounts("sa")
+	serviceAccount := s.clientset.CoreV1().ServiceAccounts(saName)
 	s.NotNil(serviceAccount)
 
-	sa, err := s.client.GetUserServiceAccount(context.Background(), "sa")
+	sa, err := s.client.GetUserServiceAccount(context.Background(), saName)
 	s.NoError(err)
 
 	s.Equal(*sa.AutomountServiceAccountToken, true)
@@ -100,9 +105,9 @@ func (s *serviceAccountTestSuite) TestCreateServiceAccount() {
 
 func (s *serviceAccountTestSuite) TestCreateServiceAccountOnExistingSaWithoutAutomount() {
 	// Arrange, create a service account without automount
-	saNoAutomount, err := s.clientset.CoreV1().ServiceAccounts("kdl-test").Create(context.Background(), &v1.ServiceAccount{
+	saNoAutomount, err := s.clientset.CoreV1().ServiceAccounts(namespace).Create(context.Background(), &v1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "sa",
+			Name: saName,
 		},
 	}, metav1.CreateOptions{})
 	s.NoError(err)
@@ -111,13 +116,13 @@ func (s *serviceAccountTestSuite) TestCreateServiceAccountOnExistingSaWithoutAut
 	s.Equal(len(saNoAutomount.Secrets), 0)
 
 	// Act
-	_, err = s.client.CreateUserServiceAccount(context.Background(), "sa")
+	_, err = s.client.CreateUserServiceAccount(context.Background(), saName)
 	s.NoError(err)
 
-	serviceAccount := s.clientset.CoreV1().ServiceAccounts("sa")
+	serviceAccount := s.clientset.CoreV1().ServiceAccounts(saName)
 	s.NotNil(serviceAccount)
 
-	sa, err := s.client.GetUserServiceAccount(context.Background(), "sa")
+	sa, err := s.client.GetUserServiceAccount(context.Background(), saName)
 	s.NoError(err)
 
 	s.Equal(*sa.AutomountServiceAccountToken, true)

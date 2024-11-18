@@ -10,16 +10,14 @@ that cloning through ssh is possible.
 
 ## Configuration
 
-| Environment variable      | Description                                                               |
-| ------------------------- | ------------------------------------------------------------------------- |
-| KDL_USER_NAME             | (required) username from which the repositories are to be cloned.         |
-| LOG_LEVEL                 | (optional) log verbosity level. Possibilities: debug, info, warn, error.  |
-| INTERNAL_REPO_BASE_URL    | (optional) base url to access internal gitea repositories.                |
-| REPOS_PATH                | (optional) absolute path to store the cloned repositories.                |
-| PEM_FILE                  | (optional) absolute path to user private ssh key.                         |
-| PEM_FILE_PASSWORD         | (optional) password for user private ssh key.                             |
-| CHECK_FREQUENCY_SECONDS   | (optional) frequency of checking new repositories (seconds)               |
-| KDL_SERVER_MONGODB_URI    | (optional) mongoDB URI.                                                   |
-| DB_NAME                   | (optional) KDL database name.                                             |
-| PROJECT_COLL_NAME         | (optional) projects collection name.                                      |
-| USER_COLL_NAME            | (optional) user collection name.                                          |
+| Environment variable      | Default                                      | Description                                                               |
+| ------------------------- | -------------------------------------------- | ------------------------------------------------------------------------- |
+| KDL_USER_NAME             | user                                         | (required) username from which the repositories are to be cloned.         |
+| REPOS_PATH                | /home/kdl/repos/                             | (optional) absolute path to store the cloned repositories.                |
+| PEM_FILE                  | /home/kdl/.ssh/id_rsa                        | (optional) absolute path to user private ssh key.                         |
+| PEM_FILE_PASSWORD         |                                              | (optional) password for user private ssh key.                             |
+| CHECK_FREQUENCY_SECONDS   | 10                                           | (optional) frequency of checking new repositories (seconds)               |
+| KDL_SERVER_MONGODB_URI    | mongodb://admin:123456@localhost:27017/admin | (optional) mongoDB URI.                                                   |
+| DB_NAME                   | kdl                                          | (optional) KDL database name.                                             |
+| PROJECT_COLL_NAME         | projects                                     | (optional) projects collection name.                                      |
+| USER_COLL_NAME            | users                                        | (optional) user collection name.                                          |

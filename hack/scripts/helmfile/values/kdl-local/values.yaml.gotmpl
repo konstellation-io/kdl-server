@@ -1,6 +1,20 @@
 global:
+  env: {}
+    # MY_VARIABLE: value
+
+  envFromSecrets: {}
+    # MY_VARIABLE:
+    #  name: <name-secret>
+    #  key: secret_key
+
+  envFromConfigMap: {}
+    # MY_VARIABLE:
+    #  name: <name-configmap>
+    #  key: key
+
   serverName: "local-server"
   domain: {{ requiredEnv "DOMAIN" | quote }}
+
   ingress:
     tls:
       enabled: {{ requiredEnv "ENABLE_TLS" }}
@@ -8,27 +22,55 @@ global:
       caSecret:
         name: mkcert-ca
         certFilename: mkcert-ca.crt
+
   mongodb:
     connectionString:
       secretKey: mongodb-string-uri
       secretName: mongodb-string-uri
 
-drone:
+image:
+  repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-server
+  tag: latest
+  pullPolicy: Always
+
+env:
+  KDL_SERVER_PORT: "8080"
+  MINIO_ACCESS_KEY: minio
+  MINIO_SECRET_KEY: minio123
+
+envFromSecrets: {}
+  # MY_VARIABLE:
+  #  name: <name-secret>
+  #  key: secret_key
+
+envFromConfigMap: {}
+  # MY_VARIABLE:
+  #  name: <name-configmap>
+  #  key: key
+
+ingress:
+  enabled: true
+  className: "public"
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-clusterissuer
+  hosts:
+  - host: kdlapp.{{ requiredEnv "DOMAIN" }}
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls:
+    - secretName: {{ requiredEnv "DOMAIN" }}-kdl-secret
+      hosts:
+      - kdlapp.{{ requiredEnv "DOMAIN" }}
+
+readyChecker:
   enabled: false
 
-  storage:
-    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-  ingress:
-    className: "public"
+podAnnotations:
+  env: "microk8s"
 
-droneAuthorizer:
-  image:
-    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/drone-authorizer
-    tag: latest
-    pullPolicy: Always
-
-droneRunner:
-  droneRunnerEnviron: "GIT_SSL_NO_VERIFY:true"
+podLabels:
+  env: "develop"
 
 gitea:
   enabled: true
@@ -36,8 +78,10 @@ gitea:
   admin:
     username: {{ requiredEnv "GITEA_ADMIN_USER" | quote }}
     password: {{ requiredEnv "GITEA_ADMIN_PASSWORD" | quote }}
+
   ingress:
     className: "public"
+
   storage:
     storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
@@ -68,11 +112,16 @@ keycloak:
     annotations:
       nginx.org/proxy-buffer-size: "128k"
       nginx.org/proxy-buffers: "8 256k"
+      cert-manager.io/cluster-issuer: selfsigned-clusterissuer
     hosts:
     - host: keycloak.{{ requiredEnv "DOMAIN" }}
       paths:
       - path: /
         pathType: ImplementationSpecific
+    tls:
+      - secretName: keycloak-kdl-tls
+        hosts:
+        - keycloak.{{ requiredEnv "DOMAIN" }}
 
   serviceAccount:
     create: true
@@ -87,7 +136,8 @@ keycloak:
 
   command:
   - "/opt/keycloak/bin/kc.sh"
-  - "start-dev"
+  - "start"
+  - "--import-realm"
 
   env:
     KC_DB_PASSWORD: keycloak
@@ -102,21 +152,23 @@ keycloak:
     KEYCLOAK_ADMIN_PASSWORD: keycloak
     KEYCLOAK_ADMIN: keycloak
 
+volumes:
+  - name: keycloak-initial-realm
+    configMap:
+      name: keycloak-initial-realm
+
+volumeMounts:
+  - name: keycloak-initial-realm
+    mountPath: /opt/keycloak/data/import
+    subPath: initial-realm.json
+    readOnly: true
+
 knowledgeGalaxy:
   enabled: false
 
   image:
     repository: {{ requiredEnv "KNOWLEDGE_GALAXY_IMAGE_REPOSITORY" | quote }}
     tag: {{ env "KNOWLEDGE_GALAXY_IMAGE_TAG" | quote }}
-
-kdlServer:
-  image:
-    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-server
-    tag: latest
-    pullPolicy: Always
-
-  ingress:
-    className: "public"
 
 # -- (DEPRECATION) Legacy issues
 # minio:
@@ -147,7 +199,10 @@ minio:
   ingress:
     enabled: true
     ingressClassName: public
+    annotations:
+      cert-manager.io/cluster-issuer: selfsigned-clusterissuer
     hostname: minio-console.{{ requiredEnv "DOMAIN" }}
+    tls: true
 
   apiIngress:
     enabled: true
@@ -193,33 +248,66 @@ mongodb:
 # OAuth2-Proxy legacy to configure user authentication
 oauth2Proxy:
   image:
-    # The repository of the image
     repository: quay.io/oauth2-proxy/oauth2-proxy
-    # The image tag
     tag: v7.7.1-amd64
-  customConfig:
-    # |-
-    # provider="keycloak-oidc"
-    # oidc_issuer_url="https://keycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl"
-    # redirect_url="https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
-    # client_id="proxy"
-    # client_secret="JafucVibWO49akI3aOJi1n9ypO46Voi1"
-    # cookie_secret="mycookiesecret16"
-    # cookie_secure=true
-    # email_domains="*"
-    # set_xauthrequest=true
-    # http_address="https://kdlapp.{{ requiredEnv "DOMAIN" }}/"
-    # ssl_insecure_skip_verify=true
+
+  customConfig: |-
+    provider="keycloak-oidc"
+    oidc_issuer_url="https://keycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl"
+    redirect_url="https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
+    cookie_secret="mycookiesecret16"
+    cookie_secure=true
+    email_domains="*"
+    set_xauthrequest=true
+    http_address="https://kdlapp.{{ requiredEnv "DOMAIN" }}/"
+    ssl_insecure_skip_verify=true
+    whitelist_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}"]
+    cookie_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}", "keycloak.{{ requiredEnv "DOMAIN" }}"]
+    errors_to_info_log=true
+    skip_provider_button=true
 
 # -- OAuth2-Proxy subchart deployment
 # </br> Ref: https://github.com/oauth2-proxy/manifests/blob/main/helm/oauth2-proxy/values.yaml
 oauth2proxy:
-  enabled: false
+  enabled: true
 
-  clientID: "XXXXXXX"
-  clientSecret: "XXXXXXXX"
-  cookieSecret: "XXXXXXXX"
-  cookieName: ""
+  httpScheme: http
+  clientID: a
+  clientSecret: b
+  cookieSecret: mycookiesecret16
+
+  image:
+    tag: "v7.7.1-amd64"
+
+  configFile: |-
+    provider="keycloak-oidc"
+    oidc_issuer_url="https://keycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl"
+    redirect_url="https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
+    cookie_secret="mycookiesecret16"
+    cookie_secure=true
+    email_domains="*"
+    set_xauthrequest=true
+    http_address="https://kdlapp.{{ requiredEnv "DOMAIN" }}/"
+    ssl_insecure_skip_verify=true
+    whitelist_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}"]
+    cookie_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}", "keycloak.{{ requiredEnv "DOMAIN" }}"]
+    errors_to_info_log=true
+    skip_provider_button=true
+
+  extraContainers:
+     - name: project-proxy
+       image: nginx:alpine
+       ports:
+         - containerPort: 9000
+       volumeMounts:
+         - name: project-proxy-nginx-config
+           mountPath: /etc/nginx/nginx.conf
+           subPath: nginx.conf
+
+  extraVolumes:
+    - name: project-proxy-nginx-config
+      configMap:
+        name: project-proxy-nginx-config
 
 # -- (DEPRECATION) only for gitea
 postgres:
@@ -228,21 +316,13 @@ postgres:
   storage:
     storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
-  # -- Define which Nodes the Pods are scheduled on. Ref: https://kubernetes.io/docs/user-guide/node-selection/
-  nodeSelector: {}
-
-  # -- Assign custom affinity rules. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  affinity: {}
-
-  # -- If specified, the pod's tolerations. Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-  tolerations: []
-
 # -- PostgreSQL subchart deployment
 # </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/postgresql/values.yaml
 postgresql:
   enabled: true
 
   fullnameOverride: postgresql
+  nameOverride: postgresql
 
   replicaCount: 1
 
@@ -259,11 +339,13 @@ postgresql:
       storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
 projectOperator:
-  manager:
-    image:
-      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/project-operator
-      tag: latest
-      pullPolicy: Always
+  enabled: true
+
+  image:
+    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/project-operator
+    tag: latest
+    pullPolicy: Always
+
   mlflow:
     image:
       repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/mlflow
@@ -274,28 +356,43 @@ projectOperator:
     ingress:
       className: "public"
 
+  filebrowser:
+    image:
+      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/filebrowser/filebrowser
+      pullPolicy: Always
+      tag: latest
+
 sharedVolume:
+  enabled: true
+
   storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
 userToolsOperator:
+  enabled: true
+
   image:
     repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/user-tools-operator
     tag: latest
     pullPolicy: Always
+
   storage:
     storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+
   repoCloner:
     image:
       repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/repo-cloner
       tag: latest
       pullPolicy: Always
+
   vscode:
     image:
       repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/vscode
       tag: latest
       pullPolicy: Always
+
   ingress:
     className: "public"
+
   kubeconfig:
     enabled: {{ requiredEnv "KUBECONFIG_ENABLED" }}
     externalServerUrl: {{ env "EXTERNAL_SERVER_URL" | quote }}

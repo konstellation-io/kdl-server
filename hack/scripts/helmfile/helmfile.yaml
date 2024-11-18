@@ -32,7 +32,7 @@ releases:
   - name: "kdl-local"
     <<: *default
     chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
-    version: 6.0.3-rc.4
+    version: 6.0.3-rc.5
     needs:
     - kdl/mongodb-string-uri
 

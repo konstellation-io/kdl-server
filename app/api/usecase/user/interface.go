@@ -30,7 +30,6 @@ type UseCase interface {
 	CreateAdminUser(username, email string) error
 	UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error)
 	FindAll(ctx context.Context) ([]entity.User, error)
-	GetByUsername(ctx context.Context, username string) (entity.User, error)
 	GetByEmail(ctx context.Context, email string) (entity.User, error)
 	StartTools(ctx context.Context, username string, runtimeID *string, capabilitiesID *string) (entity.User, error)
 	StopTools(ctx context.Context, username string) (entity.User, error)

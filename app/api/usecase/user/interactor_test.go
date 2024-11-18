@@ -413,41 +413,6 @@ func TestInteractor_FindAll_Err(t *testing.T) {
 	require.Equal(t, emptyUsers, users)
 }
 
-func TestInteractor_GetByUsername(t *testing.T) {
-	s := newUserSuite(t, nil)
-	defer s.ctrl.Finish()
-
-	const username = "john"
-
-	ctx := context.Background()
-	expectedUser := entity.User{Username: username}
-
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
-
-	u, err := s.interactor.GetByUsername(ctx, username)
-
-	require.NoError(t, err)
-	require.Equal(t, expectedUser, u)
-}
-
-func TestInteractor_GetByUsername_Err(t *testing.T) {
-	s := newUserSuite(t, nil)
-	defer s.ctrl.Finish()
-
-	const username = "john"
-
-	ctx := context.Background()
-	someErr := entity.ErrUserNotFound
-	emptyUser := entity.User{}
-
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(emptyUser, someErr)
-
-	u, err := s.interactor.GetByUsername(ctx, username)
-
-	require.Equal(t, someErr, err)
-	require.Equal(t, emptyUser, u)
-}
-
 func TestInteractor_GetByEmail(t *testing.T) {
 	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()

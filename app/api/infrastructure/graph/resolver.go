@@ -50,7 +50,7 @@ func NewResolver(
 }
 
 func (r *Resolver) getLoggedUser(ctx context.Context) (entity.User, error) {
-	username := ctx.Value(middleware.LoggedUserNameKey).(string)
+	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
 
-	return r.users.GetByUsername(ctx, username)
+	return r.users.GetByEmail(ctx, email)
 }

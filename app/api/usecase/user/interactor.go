@@ -140,12 +140,6 @@ func (i *Interactor) FindAll(ctx context.Context) ([]entity.User, error) {
 	return i.repo.FindAll(ctx, false)
 }
 
-// GetByUsername returns the user with the desired username or returns entity.ErrUserNotFound if the user doesn't exist.
-func (i *Interactor) GetByUsername(ctx context.Context, username string) (entity.User, error) {
-	i.logger.Info("Getting user by username", "username", username)
-	return i.repo.GetByUsername(ctx, username)
-}
-
 // GetByEmail returns the user with the desired email or returns entity.ErrUserNotFound if the user doesn't exist.
 func (i *Interactor) GetByEmail(ctx context.Context, email string) (entity.User, error) {
 	i.logger.Info("Getting user by email", "email", email)
@@ -358,7 +352,7 @@ func (i *Interactor) SynchronizeServiceAccountsForUsers() error {
 }
 
 // CreateAdminUser creates the KDL admin user if not exists.
-func (i *interactor) CreateAdminUser(username, email string) error {
+func (i *Interactor) CreateAdminUser(username, email string) error {
 	ctx := context.Background()
 
 	_, err := i.repo.GetByUsername(ctx, username)

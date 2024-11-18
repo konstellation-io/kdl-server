@@ -11,6 +11,11 @@
                 "name": "release/*",
                 "prerelease": "rc",
                 "channel": "default"
+            },
+            {
+                "name": "hotfix/*",
+                "range": "1.38.x",
+                "channel": "default"
             }
         ],
         "plugins": [

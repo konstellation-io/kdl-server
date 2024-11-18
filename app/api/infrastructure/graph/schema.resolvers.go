@@ -233,7 +233,6 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 		Gitea:           giteaWithFolder,
 		Filebrowser:     filebrowserWithProject,
 		VSCode:          vscodeWithUsernameAndFolder,
-		Drone:           r.cfg.Drone.URL,
 		MLFlow:          mlflowWithProject,
 	}, nil
 }

@@ -1,32 +1,90 @@
 # kdl-server
 
-|  Component  | Coverage  |  Bugs  |  Maintainability Rating  |  Go report  |
-| :---------: | :-----:   |  :---: |  :--------------------:  |  :---: |
-|  App API  | [![coverage][app-api-coverage]][app-api-coverage-link] | [![bugs][app-api-bugs]][app-api-bugs-link] | [![mr][app-api-mr]][app-api-mr-link] | [![go-report][report-badge]][report-link] |
-|  App UI  | [![coverage][app-ui-coverage]][app-ui-coverage-link] | [![bugs][app-ui-bugs]][app-ui-bugs-link] | [![mr][app-ui-mr]][app-ui-mr-link] | - |
+Konstellation AI Lab, formerly known as `kdl-server`, is the training server of Konstellation AI.
 
-[report-badge]: https://goreportcard.com/badge/github.com/konstellation-io/kdl-server/app/api
-[report-link]: https://goreportcard.com/report/github.com/konstellation-io/kdl-server/app/api
+The main goal of KAI Lab is to provide a user-friendly environment for Data Scientists where they can carry out their experiments. At the same time, it integrates a powerful solution for project management, user environments with GPU capabilities and job management.
 
-Konstellation AI Lab, formerly known as `kdl-server`, is the training server of Konstellation AI. It's the on-premises component of the solution, currently deployed in our Dell environment. As a Machine Learning training server, it's where the training of the models occurs, which will be used later by the inference server, Konstellation AI Server.
+## Builds
 
-The main goal of KAI Lab is to provide a user-friendly environment for Data Scientists where they can carry out their experiments. At the same time, it integrates a powerful solution for project management, user environments with GPU capabilities, and job management.
+| Component   | Bugs  | Coverage  | Maintainability Rating | Go report | Security |
+| ----------- | ----- | --------- | ---------------------- | --------- | -------- |
+| app-api     | [![api-report-bugs-badge]][api-report-bugs-link] | [![api-report-coverage-badge]][api-report-coverage-link] | [![api-report-maintain-badge]][api-report-maintain-link] | [![go-report][api-report-badge]][api-report-link] | [![api-report-security-badge]][api-report-security-link] |
+| app-ui      | [![ui-report-bugs-badge]][ui-report-bugs-link] | [![ui-report-coverage-badge]][ui-report-coverage-link] | [![ui-report-maintain-badge]][ui-report-maintain-link] | - | [![ui-report-security-badge]][ui-report-security-link] |
+| cleaner     | [![cleaner-report-bugs-badge]][cleaner-report-bugs-link] | [![cleaner-report-coverage-badge]][cleaner-report-coverage-link] | [![cleaner-report-maintain-badge]][cleaner-report-maintain-link] | [![go-report][api-report-badge]][cleaner-report-link] | [![cleaner-report-security-badge]][cleaner-report-security-link] |
+| repo-cloner | [![repo-cloner-report-bugs-badge]][repo-cloner-report-bugs-link] | [![repo-cloner-report-coverage-badge]][repo-cloner-report-coverage-link] | [![repo-cloner-report-maintain-badge]][repo-cloner-report-maintain-link] | [![go-report][repo-cloner-report-badge]][repo-cloner-report-link] | [![repo-cloner-report-security-badge]][repo-cloner-report-security-link] |
+
+[api-report-bugs-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_app-api&metric=bugs
+[api-report-bugs-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_app-api
+[api-report-coverage-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_app-api&metric=coverage
+[api-report-coverage-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_app-api
+[api-report-maintain-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_app-api&metric=sqale_rating
+[api-report-maintain-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_app-api
+[api-report-security-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_app-api&metric=security_rating
+[api-report-security-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_app-api
+[api-report-badge]: https://goreportcard.com/badge/github.com/konstellation-io/kdl-server/app/api
+[api-report-link]: https://goreportcard.com/report/github.com/konstellation-io/kdl-server/app/api
+[ui-report-bugs-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_app-ui&metric=bugs
+[ui-report-bugs-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_app-ui
+[ui-report-coverage-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_app-ui&metric=coverage
+[ui-report-coverage-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_app-ui
+[ui-report-maintain-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_app-ui&metric=sqale_rating
+[ui-report-maintain-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_app-ui
+[ui-report-security-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_app-ui&metric=security_rating
+[ui-report-security-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_app-ui
+[cleaner-report-bugs-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_cleaner&metric=bugs
+[cleaner-report-bugs-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_cleaner
+[cleaner-report-coverage-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_cleaner&metric=coverage
+[cleaner-report-coverage-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_cleaner
+[cleaner-report-maintain-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_cleaner&metric=sqale_rating
+[cleaner-report-maintain-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_cleaner
+[cleaner-report-security-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_cleaner&metric=security_rating
+[cleaner-report-security-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_cleaner
+[cleaner-report-link]: https://goreportcard.com/report/github.com/konstellation-io/kdl-server/cleaner
+[repo-cloner-report-bugs-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_repo-cloner&metric=bugs
+[repo-cloner-report-bugs-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_repo-cloner
+[repo-cloner-report-coverage-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_repo-cloner&metric=coverage
+[repo-cloner-report-coverage-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_repo-cloner
+[repo-cloner-report-maintain-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_repo-cloner&metric=sqale_rating
+[repo-cloner-report-maintain-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_repo-cloner
+[repo-cloner-report-security-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_repo-cloner&metric=security_rating
+[repo-cloner-report-security-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_repo-cloner
+[repo-cloner-report-badge]: https://goreportcard.com/badge/github.com/konstellation-io/kdl-server/repo-cloner
+[repo-cloner-report-link]: https://goreportcard.com/report/github.com/konstellation-io/kdl-server/repo-cloner
 
 ## Components
 
-* `kai-lab-api`: main component of the application, providing API access for other components and managing interactions with `MongoDB`.
-* `kai-lab-ui`: web application offering the interface for data scientists.
-* `repo-cloner`: in-house solution that clones all accessible repositories into the user's user-tools pod.
-* `gitea`: git server mirroring project repositories.
-* `postgresql`: database storing `gitea` data.
-* `gitea-oauth2-proxy`: in-house solution exposing `gitea` login page to other pods.
-* `drone-authorizer`: puppeteer-based tool authorizing `drone.io` with `gitea` via `oauth2`.
-* `drone`: CI/CD tool building and deploying the application.
-* `minio`: s3-compatible object storage, holding artifacts from training jobs; `MinIO` is installed as a pinned dependency, with only the console deployed through the chart.
-* `backup`: Kubernetes `cronJob` that backs up `PostgreSQL` and `MongoDB` databases and stores Kubernetes `ETCD` manifests in `AWS S3`
+* `app-api`: main component of the application, providing API access for other components and managing interactions with `MongoDB`.
+* `app-ui`: web application offering the interface for data scientists.
+* `backup`: Kubernetes `cronJob` that backs up `PostgreSQL` and `MongoDB` databases and stores Kubernetes `etcd` manifests in `AWS S3`
 * `cleaner`: currently unused, potentially slated for deprecation.
+* `gitea-oauth2-proxy`: in-house solution exposing `gitea` login page to other pods.
+* `gitea`: git server mirroring project repositories.
+* `minio`: s3-compatible object storage, holding artifacts from training jobs; `MinIO` is installed as a pinned dependency, with only the console deployed through the chart.
+* `postgresql`: database storing `gitea` data.
 * `project-operator`: Kubernetes operator listening to `KAI Lab API`; on new project creation in the UI, it deploys a project-specific pod with `mlflow` and `file browser`.
+* `repo-cloner`: in-house solution that clones all accessible repositories into the user's user-tools pod.
 * `user-tools-operator`: Kubernetes operator monitoring kai lab api; each time a user starts or changes runtime in the UI, this operator deploys a pod with vscode server and runtime containers based on selected image.
+
+## Matrix compatibility
+
+> [!NOTE]
+> If component isn't on the matrix, that means it component hasn't dependencies.
+
+| Component     | Dependencies                 | Version   | Compatibility                 |
+| ------------- | ---------------------------- | --------- | ----------------------------- |
+| `app`         | code.gitea.io/sdk/gitea      | `v0.19.0` | -                             |
+|               | github.com/minio/minio-go/v7 | `v7.0.78` | -                             |
+|               | go.mongodb.org/mongo-driver  | `v1.17.1` | [MongoDB `>=3.6, =<7.X`]      |
+|               | k8s.io/api                   | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
+|               | k8s.io/apimachinery          | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
+|               | k8s.io/client-go             | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
+| `repo-cloner` | go.mongodb.org/mongo-driver  | `v1.17.1` | [MongoDB `>=3.6, =<7.X`]      |
+| `gitea`       | k8s.io/api                   | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
+|               | k8s.io/apimachinery          | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
+|               | k8s.io/client-go             | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
+
+[MongoDB `>=3.6, =<7.X`]: https://www.mongodb.com/docs/drivers/go/current/compatibility/#std-label-golang-compatibility
+[Kubernetes `>=1.24, =<1.30`]: https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters
 
 ## Development
 

@@ -13,7 +13,6 @@ export interface GetUserTools_project_toolUrls {
   gitea: string;
   filebrowser: string;
   vscode: string;
-  drone: string;
   mlflow: string;
 }
 

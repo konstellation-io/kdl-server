@@ -21,7 +21,6 @@ export default gql`
       error
       toolUrls {
         knowledgeGalaxy
-        drone
         gitea
         filebrowser
         mlflow

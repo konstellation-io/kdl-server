@@ -357,6 +357,32 @@ func (i *Interactor) SynchronizeServiceAccountsForUsers() error {
 	return nil
 }
 
+// CreateAdminUser creates the KDL admin user if not exists.
+func (i *interactor) CreateAdminUser(username, email string) error {
+	ctx := context.Background()
+
+	_, err := i.repo.GetByUsername(ctx, username)
+	if err == nil {
+		i.logger.Info("The admin user already exists", "username", username)
+		return nil
+	}
+
+	if !errors.Is(err, entity.ErrUserNotFound) {
+		return err
+	}
+
+	i.logger.Info("Creating the admin user", "username", username)
+
+	user, err := i.Create(ctx, email, username, entity.AccessLevelAdmin)
+	if err != nil {
+		return err
+	}
+
+	i.logger.Info("Admin user created correctly", "username", user.Username, "userEmail", user.Email, "insertedID", user.ID)
+
+	return nil
+}
+
 // GetKubeconfig returns user kubeconfig.
 func (i *Interactor) GetKubeconfig(ctx context.Context, username string) (string, error) {
 	running, err := i.k8sClient.IsUserToolPODRunning(ctx, username)

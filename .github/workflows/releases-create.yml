@@ -29,6 +29,7 @@ on:
   push:
     branches:
       - 'release/*'
+      - 'hotfix/*'
 
 jobs:
   manual-create-tag-release:
@@ -63,11 +64,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
 
-  prerelease-create-tag-release:
+  create-tag-release:
     runs-on: ubuntu-latest
-    if: |
-      startsWith(github.ref, 'refs/heads/release/') &&
-      github.event_name != 'workflow_dispatch'
+    if: github.event_name != 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v3

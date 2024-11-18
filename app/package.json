@@ -1,34 +1,79 @@
 {
-    "name": "kdl-app",
-    "version": "1.0.0",
-    "private": true,
-    "release": {
-        "tagFormat": "kdl-app-v${version}",
-        "extends": "semantic-release-monorepo",
-        "branches": [
-            "main",
-            {
-                "name": "release/*",
-                "prerelease": "rc",
-                "channel": "default"
-            },
-            {
-                "name": "hotfix/*",
-                "range": "1.38.x",
-                "channel": "default"
-            }
-        ],
-        "plugins": [
-            "@semantic-release/commit-analyzer",
-            "@semantic-release/release-notes-generator",
-            [
-                "@semantic-release/github",
-                {
-                    "published": true,
-                    "successComment": false,
-                    "failComment": false
-                }
+  "name": "kdl-app",
+  "version": "1.0.0",
+  "private": true,
+  "release": {
+    "tagFormat": "kdl-app-v${version}",
+    "extends": "semantic-release-monorepo",
+    "branches": [
+      "main",
+      {
+        "channel": "default",
+        "name": "release/*",
+        "prerelease": "rc"
+      },
+      {
+        "channel": "default",
+        "name": "hotfix/+([0-9])?(.{+([0-9]),x}).x",
+        "prerelease": false,
+        "range": "${name.replace(/^hotfix\\//g, '')}"
+      }
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "**/package.json"
+          ],
+          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        }
+      ],
+      [
+        "@semantic-release/github",
+        {
+          "failComment": false,
+          "published": true,
+          "successComment": false
+        }
+      ],
+      [
+        "@semantic-release/release-notes-generator",
+        {
+          "preset": "conventionalcommits",
+          "presetConfig": {
+            "types": [
+              {
+                "type": "chore",
+                "section": "Miscellaneous Chores"
+              },
+              {
+                "type": "ci",
+                "section": "Continuous Integration",
+                "hidden": true
+              },
+              {
+                "type": "docs",
+                "section": "Documentation",
+                "hidden": true
+              },
+              {
+                "type": "feat",
+                "section": "Features"
+              },
+              {
+                "type": "fix",
+                "section": "Bug Fixes"
+              },
+              {
+                "type": "refactor",
+                "section": "Code Refactoring"
+              }
             ]
-        ]
-    }
+          }
+        }
+      ]
+    ]
+  }
 }

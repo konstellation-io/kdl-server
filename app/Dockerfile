@@ -52,7 +52,6 @@ RUN adduser --disabled-password --gecos "" --no-create-home --uid 1001 ${USER} &
         mkdir .ssh && chown -R ${USER}:0 .ssh
 
 COPY --from=api-builder --chown=kdl:0 /app/kdl-server /app/config.yml ./
-COPY --from=api-builder --chown=kdl:0 /app/templates ./templates
 COPY --from=ui-builder --chown=kdl:0 /app/build/ /public
 
 # openssh-client is needed to clone git repositories using ssh on project creation

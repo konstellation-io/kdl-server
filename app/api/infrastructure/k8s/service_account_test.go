@@ -17,8 +17,10 @@ import (
 )
 
 const (
-	namespace = "kdl-test"
-	saName    = "sa"
+	namespace    = "kdl-test"
+	saSimpleName = "sa"
+	saName       = "sa-service-account"
+	saSecretName = "sa-service-account-secret"
 )
 
 type serviceAccountTestSuite struct {
@@ -87,17 +89,17 @@ func (s *serviceAccountTestSuite) TearDownTest() {
 }
 
 func (s *serviceAccountTestSuite) TestCreateServiceAccount() {
-	_, err := s.client.CreateUserServiceAccount(context.Background(), saName)
+	_, err := s.client.CreateUserServiceAccount(context.Background(), saSimpleName)
 	s.NoError(err)
 
-	serviceAccount := s.clientset.CoreV1().ServiceAccounts(saName)
+	serviceAccount := s.clientset.CoreV1().ServiceAccounts(saSimpleName)
 	s.NotNil(serviceAccount)
 
-	sa, err := s.client.GetUserServiceAccount(context.Background(), saName)
+	sa, err := s.client.GetUserServiceAccount(context.Background(), saSimpleName)
 	s.NoError(err)
 
 	s.Equal(*sa.AutomountServiceAccountToken, true)
-	s.Equal("sa-service-account-secret", sa.Secrets[0].Name)
+	s.Equal(saSecretName, sa.Secrets[0].Name)
 
 	_, err = s.client.GetSecret(context.Background(), sa.Secrets[0].Name)
 	s.NoError(err)
@@ -116,17 +118,17 @@ func (s *serviceAccountTestSuite) TestCreateServiceAccountOnExistingSaWithoutAut
 	s.Equal(len(saNoAutomount.Secrets), 0)
 
 	// Act
-	_, err = s.client.CreateUserServiceAccount(context.Background(), saName)
+	_, err = s.client.CreateUserServiceAccount(context.Background(), saSimpleName)
 	s.NoError(err)
 
-	serviceAccount := s.clientset.CoreV1().ServiceAccounts(saName)
+	serviceAccount := s.clientset.CoreV1().ServiceAccounts(saSimpleName)
 	s.NotNil(serviceAccount)
 
-	sa, err := s.client.GetUserServiceAccount(context.Background(), saName)
+	sa, err := s.client.GetUserServiceAccount(context.Background(), saSimpleName)
 	s.NoError(err)
 
 	s.Equal(*sa.AutomountServiceAccountToken, true)
-	s.Equal("sa-service-account-secret", sa.Secrets[0].Name)
+	s.Equal(saSecretName, sa.Secrets[0].Name)
 
 	_, err = s.client.GetSecret(context.Background(), sa.Secrets[0].Name)
 	s.NoError(err)

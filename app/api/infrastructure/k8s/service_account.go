@@ -125,6 +125,8 @@ func (k *K8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug s
 		k.logger.Info("The service account was created in k8s correctly", "name", serviceAccount.Name)
 
 		return serviceAccount, nil
+	} else if err != nil && !k8errors.IsNotFound(err) {
+		return nil, err
 	}
 
 	// if service account AutomountServiceAccountToken value is nil, update service account

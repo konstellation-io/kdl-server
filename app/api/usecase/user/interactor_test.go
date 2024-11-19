@@ -10,6 +10,7 @@ import (
 	"github.com/go-logr/zapr"
 	"github.com/gosimple/slug"
 	"go.uber.org/zap"
+	"gotest.tools/v3/assert"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
@@ -409,7 +410,7 @@ func TestInteractor_FindAll_Err(t *testing.T) {
 
 	users, err := s.interactor.FindAll(ctx)
 
-	require.Equal(t, someErr, err)
+	assert.ErrorIs(t, someErr, err)
 	require.Equal(t, emptyUsers, users)
 }
 
@@ -444,7 +445,7 @@ func TestInteractor_GetByEmail_Err(t *testing.T) {
 
 	u, err := s.interactor.GetByEmail(ctx, email)
 
-	require.Equal(t, someErr, err)
+	assert.ErrorIs(t, someErr, err)
 	require.Equal(t, emptyUser, u)
 }
 

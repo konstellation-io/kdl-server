@@ -104,5 +104,5 @@ deploy_helm_chart() {
   fi
   echo_info "📦 Applying helm chart..."
   helmfile -f scripts/helmfile/helmfile.yaml deps
-  helmfile -f scripts/helmfile/helmfile.yaml sync  # apply
+  helmfile -f scripts/helmfile/helmfile.yaml apply
 }

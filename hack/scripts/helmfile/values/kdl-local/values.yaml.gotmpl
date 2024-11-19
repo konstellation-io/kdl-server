@@ -81,6 +81,16 @@ podAnnotations:
 podLabels:
   env: "develop"
 
+volumes:
+  - name: kdl-server
+    configMap:
+      name: kdl-local-server
+
+volumeMounts:
+  - name: kdl-server
+    mountPath: /public/config.json
+    subPath: config.json
+
 gitea:
   enabled: true
 
@@ -150,8 +160,6 @@ keycloak:
   - "--import-realm"
 
   env:
-    KC_ADMIN_PASSWORD: {{ requiredEnv "KEYCLOAK_ADMIN_PASSWORD" | quote }}
-    KC_ADMIN: {{ requiredEnv "KEYCLOAK_ADMIN_USER" | quote }}
     KC_DB_PASSWORD: keycloak
     KC_DB_URL: jdbc:postgresql://postgresql:5432/keycloak
     KC_DB_USERNAME: keycloak
@@ -307,7 +315,7 @@ oauth2proxy:
     - "--skip-auth-route=/config.json"
   config:
     clientID: proxy
-    clientSecret: b4GnDIvbHS8WhcrtAdr4D23Sh5JSTqhj
+    clientSecret: Zj6LksErcd51Q5LQS1YH4WLsTu3YVI4M
     configFile: |-
       provider="keycloak-oidc"
       oidc_issuer_url="https://keycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl"

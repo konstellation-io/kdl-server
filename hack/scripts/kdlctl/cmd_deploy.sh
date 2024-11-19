@@ -35,9 +35,9 @@ deploy() {
 
   create_namespace
 
-  if [ "$ENABLE_TLS" != "false" ]; then
-    ./scripts/create_self_signed_cert.sh $NAMESPACE $DOMAIN $OS
-  fi
+  # if [ "$ENABLE_TLS" != "false" ]; then
+  #   ./scripts/create_self_signed_cert.sh $NAMESPACE $DOMAIN $OS
+  # fi
   ./scripts/create_nginx_ingress_configmap.sh
 
   deploy_helm_chart

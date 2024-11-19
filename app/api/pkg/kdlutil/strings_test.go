@@ -1,15 +1,9 @@
-package kdlutil_test
+package kdlutil
 
 import (
 	"testing"
 
-	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/stretchr/testify/suite"
-)
-
-const (
-	email    = "john.doe@gmail.com"
-	username = "john.doe"
 )
 
 type StringTestSuite struct {
@@ -21,27 +15,30 @@ func TestStringTestSuite(t *testing.T) {
 }
 
 func (testSuite *StringTestSuite) TestGetUsernameFromEmailOk() {
-	got := kdlutil.GetUsernameFromEmail(email)
+	email := "john.doe@gmail.com"
+	want := "john.doe"
+	got := GetUsernameFromEmail(email)
 
-	testSuite.Equal(username, got)
+	testSuite.Equal(want, got)
 }
 
 func (testSuite *StringTestSuite) TestGetUsernameFromEmailko() {
-	got := kdlutil.GetUsernameFromEmail(username)
+	email := "john.doe"
+	got := GetUsernameFromEmail(email)
 
 	testSuite.Empty(got)
 }
 
 func (testSuite *StringTestSuite) TestIsNilOrEmptyOk() {
 	textStringEmpty := ""
-	got := kdlutil.IsNilOrEmpty(&textStringEmpty)
+	got := IsNilOrEmpty(&textStringEmpty)
 
 	testSuite.True(got)
 }
 
 func (testSuite *StringTestSuite) TestIsNilOrEmptyKo() {
-	text := username
-	got := kdlutil.IsNilOrEmpty(&text)
+	text := "john.doe"
+	got := IsNilOrEmpty(&text)
 
 	testSuite.False(got)
 }

@@ -33,8 +33,8 @@ type UseCase interface {
 	UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error)
 	FindAll(ctx context.Context) ([]entity.User, error)
 	GetByEmail(ctx context.Context, email string) (entity.User, error)
-	StartTools(ctx context.Context, email string, runtimeID *string, capabilitiesID *string) (entity.User, error)
-	StopTools(ctx context.Context, email string) (entity.User, error)
+	StartTools(ctx context.Context, username string, runtimeID *string, capabilitiesID *string) (entity.User, error)
+	StopTools(ctx context.Context, username string) (entity.User, error)
 	AreToolsRunning(ctx context.Context, username string) (bool, error)
 	IsKubeconfigActive() bool
 	FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error)

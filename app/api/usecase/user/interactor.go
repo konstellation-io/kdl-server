@@ -68,11 +68,7 @@ func NewInteractor(
 // - Stores the user and ssh keys into the DB.
 // - Creates a new secret in Kubernetes with the generated SSH keys.
 // - Created a service account for the user.
-func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel entity.AccessLevel) (entity.User, error) {
-	// extract username from email
-	username := kdlutil.GetUsernameFromEmail(email)
-
-	fmt.Println("Creating user", "username", username, "email", email)
+func (i *Interactor) Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error) {
 	i.logger.Info("Creating user", "username", username, "email", email)
 
 	// Check if the user already exists
@@ -86,15 +82,6 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 	}
 
 	_, err = i.repo.GetByEmail(ctx, email)
-	if err == nil {
-		return entity.User{}, entity.ErrDuplicatedUser
-	}
-
-	if !errors.Is(err, entity.ErrUserNotFound) {
-		return entity.User{}, err
-	}
-
-	_, err = i.repo.GetBySub(ctx, sub)
 	if err == nil {
 		return entity.User{}, entity.ErrDuplicatedUser
 	}
@@ -158,13 +145,13 @@ func (i *Interactor) GetByEmail(ctx context.Context, email string) (entity.User,
 
 // StartTools creates a user-tools CustomResource in K8s to initialize the VSCode for the given email.
 // If there are already a user-tools for the user, they are replaced (stop + start new).
-func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, capabilitiesID *string) (entity.User, error) {
-	user, err := i.repo.GetByEmail(ctx, email)
+func (i *Interactor) StartTools(ctx context.Context, username string, runtimeID, capabilitiesID *string) (entity.User, error) {
+	user, err := i.repo.GetByUsername(ctx, username)
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	running, err := i.AreToolsRunning(ctx, user.Username)
+	running, err := i.AreToolsRunning(ctx, username)
 
 	if err != nil {
 		return entity.User{}, err
@@ -215,14 +202,14 @@ func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, ca
 	return user, nil
 }
 
-// StopTools removes a created user-tools CustomResource from K8s for the given email.
-func (i *Interactor) StopTools(ctx context.Context, email string) (entity.User, error) {
-	user, err := i.repo.GetByEmail(ctx, email)
+// StopTools removes a created user-tools CustomResource from K8s for the given username.
+func (i *Interactor) StopTools(ctx context.Context, username string) (entity.User, error) {
+	user, err := i.repo.GetByUsername(ctx, username)
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	running, err := i.AreToolsRunning(ctx, user.Username)
+	running, err := i.AreToolsRunning(ctx, username)
 
 	if err != nil {
 		return entity.User{}, err
@@ -264,6 +251,19 @@ func (i *Interactor) GetByID(ctx context.Context, userID string) (entity.User, e
 
 // UpdateAccessLevel update access level for the given identifiers.
 func (i *Interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error) {
+	// Update user permissions in Gitea
+	users, err := i.FindByIDs(ctx, userIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, user := range users {
+		err := i.giteaService.UpdateUserPermissions(user.Username, level)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// Update access level in our DataBase
 	if err := i.repo.UpdateAccessLevel(ctx, userIDs, level); err != nil {
 		return nil, err
@@ -351,6 +351,32 @@ func (i *Interactor) SynchronizeServiceAccountsForUsers() error {
 			}
 		}
 	}
+
+	return nil
+}
+
+// CreateAdminUser creates the KDL admin user if not exists.
+func (i *Interactor) CreateAdminUser(username, email string) error {
+	ctx := context.Background()
+
+	_, err := i.repo.GetByUsername(ctx, username)
+	if err == nil {
+		i.logger.Info("The admin user already exists", "username", username)
+		return nil
+	}
+
+	if !errors.Is(err, entity.ErrUserNotFound) {
+		return err
+	}
+
+	i.logger.Info("Creating the admin user", "username", username)
+
+	user, err := i.Create(ctx, email, username, entity.AccessLevelAdmin)
+	if err != nil {
+		return err
+	}
+
+	i.logger.Info("Admin user created correctly", "username", user.Username, "userEmail", user.Email, "insertedID", user.ID)
 
 	return nil
 }

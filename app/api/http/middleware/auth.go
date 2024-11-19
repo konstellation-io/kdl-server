@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
 
@@ -45,22 +46,21 @@ func AuthMiddleware(next http.Handler, userUsecase user.UseCase) http.Handler {
 			return
 		}
 
-		user, err := userUsecase.GetByEmail(r.Context(), email)
+		_, err := userUsecase.GetByEmail(r.Context(), email)
 		if errors.Is(err, entity.ErrUserNotFound) {
-			_, err = userUsecase.Create(r.Context(), email, sub, entity.AccessLevelViewer)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
+			extractedUsername := kdlutil.GetUsernameFromEmail(email)
+			if extractedUsername != "" {
+				username = extractedUsername
 			}
-		} else if user.Sub != sub {
-			_, err = userUsecase.UpdateSub(r.Context(), user, sub)
+
+			_, err = userUsecase.Create(r.Context(), email, username, entity.AccessLevelViewer)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
 		}
 
-		// only truth is the email
+		r = r.WithContext(context.WithValue(r.Context(), LoggedUserNameKey, username))
 		r = r.WithContext(context.WithValue(r.Context(), LoggedUserEmailKey, email))
 
 		next.ServeHTTP(w, r)

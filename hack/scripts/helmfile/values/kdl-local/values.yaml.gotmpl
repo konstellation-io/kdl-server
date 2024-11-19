@@ -149,8 +149,8 @@ keycloak:
     KC_HTTP_ENABLED: true
     KC_METRICS_ENABLED: true
     KC_PROXY_HEADERS: xforwarded
-    KEYCLOAK_ADMIN_PASSWORD: keycloak
-    KEYCLOAK_ADMIN: keycloak
+    KEYCLOAK_ADMIN_PASSWORD: {{ requiredEnv "KEYCLOAK_ADMIN_USER" | quote }}
+    KEYCLOAK_ADMIN: {{ requiredEnv "KEYCLOAK_ADMIN_PASSWORD" | quote }}
 
 volumes:
   - name: keycloak-initial-realm

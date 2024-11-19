@@ -19,9 +19,9 @@ global:
     tls:
       enabled: {{ requiredEnv "ENABLE_TLS" }}
       secretName: {{ requiredEnv "DOMAIN" }}-tls-secret
-      caSecret:
-        name: mkcert-ca
-        certFilename: mkcert-ca.crt
+#      caSecret:
+#        name: mkcert-ca
+#        certFilename: mkcert-ca.crt
 
   mongodb:
     connectionString:
@@ -35,6 +35,7 @@ image:
 
 env:
   KDL_SERVER_PORT: "8080"
+  SERVER_URL: https://kdlapp.{{ requiredEnv "DOMAIN" }}
   MINIO_ACCESS_KEY: minio
   MINIO_SECRET_KEY: minio123
 
@@ -49,10 +50,13 @@ envFromConfigMap: {}
   #  key: key
 
 ingress:
-  enabled: true
+  enabled: false
   className: "public"
   annotations:
     cert-manager.io/cluster-issuer: selfsigned-clusterissuer
+    nginx.ingress.kubernetes.io/server-snippet: |
+      client_header_buffer_size 800k;
+
   hosts:
   - host: kdlapp.{{ requiredEnv "DOMAIN" }}
     paths:
@@ -65,6 +69,11 @@ ingress:
 
 readyChecker:
   enabled: false
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
 
 podAnnotations:
   env: "microk8s"
@@ -127,16 +136,17 @@ keycloak:
     create: true
 
   livenessProbe:
-    enabled: true
+    enabled: false
 
   readinessProbe:
-    enabled: true
+    enabled: false
     httpGet:
       path: /realms/master
 
   command:
   - "/opt/keycloak/bin/kc.sh"
   - "start"
+  - "--verbose"
   - "--import-realm"
 
   env:
@@ -149,19 +159,20 @@ keycloak:
     KC_HTTP_ENABLED: true
     KC_METRICS_ENABLED: true
     KC_PROXY_HEADERS: xforwarded
-    KEYCLOAK_ADMIN_PASSWORD: {{ requiredEnv "KEYCLOAK_ADMIN_PASSWORD" | quote }}
-    KEYCLOAK_ADMIN: {{ requiredEnv "KEYCLOAK_ADMIN_USER" | quote }}
+    KC_BOOTSTRAP_ADMIN_USERNAME: {{ requiredEnv "KEYCLOAK_ADMIN_USER" | quote }}
+    KC_BOOTSTRAP_ADMIN_PASSWORD: {{ requiredEnv "KEYCLOAK_ADMIN_PASSWORD" | quote }}
+    KC_PROXY: edge
 
-volumes:
-  - name: keycloak-initial-realm
-    configMap:
-      name: keycloak-initial-realm
+  volumes:
+    - name: keycloak-initial-realm
+      configMap:
+        name: keycloak-initial-realm
 
-volumeMounts:
-  - name: keycloak-initial-realm
-    mountPath: /opt/keycloak/data/import
-    subPath: initial-realm.json
-    readOnly: true
+  volumeMounts:
+    - name: keycloak-initial-realm
+      mountPath: /opt/keycloak/data/import/initial-realm.json
+      subPath: initial-realm.json
+      readOnly: true
 
 knowledgeGalaxy:
   enabled: false
@@ -271,28 +282,44 @@ oauth2Proxy:
 oauth2proxy:
   enabled: true
 
+  ingress:
+    enabled: true
+    className: public
+    path: /
+    pathType: ImplementationSpecific
+    hosts:
+      - kdlapp.{{ requiredEnv "DOMAIN" }}
+
   httpScheme: http
-  clientID: a
-  clientSecret: b
   cookieSecret: mycookiesecret16
 
   image:
     tag: "v7.7.1-amd64"
 
-  configFile: |-
-    provider="keycloak-oidc"
-    oidc_issuer_url="https://keycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl"
-    redirect_url="https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
-    cookie_secret="mycookiesecret16"
-    cookie_secure=true
-    email_domains="*"
-    set_xauthrequest=true
-    http_address="https://kdlapp.{{ requiredEnv "DOMAIN" }}/"
-    ssl_insecure_skip_verify=true
-    whitelist_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}"]
-    cookie_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}", "keycloak.{{ requiredEnv "DOMAIN" }}"]
-    errors_to_info_log=true
-    skip_provider_button=true
+  extraArgs:
+    - "--upstream=http://kdl-local-server:80/"
+    - "--upstream=http://127.0.0.1:9000/mlflow/"
+    - "--upstream=http://127.0.0.1:9000/filebrowser/"
+    - "--upstream=http://127.0.0.1:9000/kg/"
+    - "--pass-user-headers=true"
+    - "--skip-auth-route=/config.json"
+  config:
+    clientID: proxy
+    clientSecret: b4GnDIvbHS8WhcrtAdr4D23Sh5JSTqhj
+    configFile: |-
+      provider="keycloak-oidc"
+      oidc_issuer_url="https://keycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl"
+      redirect_url="https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
+      cookie_secret="mycookiesecret16"
+      cookie_secure=true
+      email_domains="*"
+      set_xauthrequest=true
+      http_address="https://kdlapp.{{ requiredEnv "DOMAIN" }}/"
+      ssl_insecure_skip_verify=true
+      whitelist_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}"]
+      cookie_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}", "keycloak.{{ requiredEnv "DOMAIN" }}"]
+      errors_to_info_log=true
+      skip_provider_button=true
 
   extraContainers:
      - name: project-proxy

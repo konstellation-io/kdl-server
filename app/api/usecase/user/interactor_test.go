@@ -10,6 +10,7 @@ import (
 	"github.com/go-logr/zapr"
 	"github.com/gosimple/slug"
 	"go.uber.org/zap"
+	"gotest.tools/v3/assert"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
@@ -130,7 +131,6 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
-	s.mocks.giteaService.EXPECT().AddSSHKey(username, sshKey.Public).Return(nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
 
@@ -410,42 +410,42 @@ func TestInteractor_FindAll_Err(t *testing.T) {
 
 	users, err := s.interactor.FindAll(ctx)
 
-	require.Equal(t, someErr, err)
+	assert.ErrorIs(t, someErr, err)
 	require.Equal(t, emptyUsers, users)
 }
 
-func TestInteractor_GetByUsername(t *testing.T) {
+func TestInteractor_GetByEmail(t *testing.T) {
 	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
-	const username = "john"
+	const email = "john@doe.com"
 
 	ctx := context.Background()
-	expectedUser := entity.User{Username: username}
+	expectedUser := entity.User{Email: email}
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(expectedUser, nil)
 
-	u, err := s.interactor.GetByUsername(ctx, username)
+	u, err := s.interactor.GetByEmail(ctx, email)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, u)
 }
 
-func TestInteractor_GetByUsername_Err(t *testing.T) {
+func TestInteractor_GetByEmail_Err(t *testing.T) {
 	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()
 
-	const username = "john"
+	const email = "john@doe.com"
 
 	ctx := context.Background()
 	someErr := entity.ErrUserNotFound
 	emptyUser := entity.User{}
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(emptyUser, someErr)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(emptyUser, someErr)
 
-	u, err := s.interactor.GetByUsername(ctx, username)
+	u, err := s.interactor.GetByEmail(ctx, email)
 
-	require.Equal(t, someErr, err)
+	assert.ErrorIs(t, someErr, err)
 	require.Equal(t, emptyUser, u)
 }
 

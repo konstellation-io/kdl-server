@@ -16,6 +16,13 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+const (
+	namespace    = "kdl-test"
+	saSimpleName = "sa"
+	saName       = "sa-service-account"
+	saSecretName = "sa-service-account-secret"
+)
+
 type serviceAccountTestSuite struct {
 	suite.Suite
 	container *k3s.K3sContainer
@@ -32,27 +39,27 @@ func (s *serviceAccountTestSuite) SetupTest() {
 
 	// Launch a k3s container
 	k3sContainer, err := k3s.Run(ctx, "docker.io/rancher/k3s:v1.27.1-k3s1")
-	s.NoError(err)
+	s.Require().NoError(err)
 
 	s.container = k3sContainer
 
 	// Create a clientset
 	kubeConfigYaml, err := k3sContainer.GetKubeConfig(ctx)
-	s.NoError(err)
+	s.Require().NoError(err)
 
 	restcfg, err := clientcmd.RESTConfigFromKubeConfig(kubeConfigYaml)
-	s.NoError(err)
+	s.Require().NoError(err)
 
 	s.clientset, err = kubernetes.NewForConfig(restcfg)
-	s.NoError(err)
+	s.Require().NoError(err)
 
 	// Create a namespace
 	_, err = s.clientset.CoreV1().Namespaces().Create(ctx, &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "kdl-test",
+			Name: namespace,
 		},
 	}, metav1.CreateOptions{})
-	s.NoError(err)
+	s.Require().NoError(err)
 
 	// Create an k8s infrastructure client
 	zapLog, err := zap.NewDevelopment()
@@ -63,7 +70,7 @@ func (s *serviceAccountTestSuite) SetupTest() {
 	cfg := config.Config{
 		Kubernetes: config.KubernetesConfig{
 			IsInsideCluster: true,
-			Namespace:       "kdl-test",
+			Namespace:       namespace,
 		},
 	}
 
@@ -78,18 +85,51 @@ func (s *serviceAccountTestSuite) SetupTest() {
 
 func (s *serviceAccountTestSuite) TearDownTest() {
 	err := s.container.Terminate(context.Background())
-	s.NoError(err)
+	s.Require().NoError(err)
 }
 
 func (s *serviceAccountTestSuite) TestCreateServiceAccount() {
-	_, err := s.client.CreateUserServiceAccount(context.Background(), "sa")
-	s.NoError(err)
+	_, err := s.client.CreateUserServiceAccount(context.Background(), saSimpleName)
+	s.Require().NoError(err)
 
-	serviceAccount := s.clientset.CoreV1().ServiceAccounts("sa")
+	serviceAccount := s.clientset.CoreV1().ServiceAccounts(saSimpleName)
 	s.NotNil(serviceAccount)
 
-	sa, err := s.client.GetUserServiceAccount(context.Background(), "sa")
-	s.NoError(err)
+	sa, err := s.client.GetUserServiceAccount(context.Background(), saSimpleName)
+	s.Require().NoError(err)
 
-	s.Equal("sa-service-account-secret", sa.Secrets[0].Name)
+	s.Equal(*sa.AutomountServiceAccountToken, true)
+	s.Equal(saSecretName, sa.Secrets[0].Name)
+
+	_, err = s.client.GetSecret(context.Background(), sa.Secrets[0].Name)
+	s.Require().NoError(err)
+}
+
+func (s *serviceAccountTestSuite) TestCreateServiceAccountOnExistingSaWithoutAutomount() {
+	// Arrange, create a service account without automount
+	saNoAutomount, err := s.clientset.CoreV1().ServiceAccounts(namespace).Create(context.Background(), &v1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: saName,
+		},
+	}, metav1.CreateOptions{})
+	s.Require().NoError(err)
+	s.NotNil(saNoAutomount)
+	s.Nil(saNoAutomount.AutomountServiceAccountToken)
+	s.Len(saNoAutomount.Secrets, 0)
+
+	// Act
+	_, err = s.client.CreateUserServiceAccount(context.Background(), saSimpleName)
+	s.Require().NoError(err)
+
+	serviceAccount := s.clientset.CoreV1().ServiceAccounts(saSimpleName)
+	s.NotNil(serviceAccount)
+
+	sa, err := s.client.GetUserServiceAccount(context.Background(), saSimpleName)
+	s.Require().NoError(err)
+
+	s.Equal(*sa.AutomountServiceAccountToken, true)
+	s.Equal(saSecretName, sa.Secrets[0].Name)
+
+	_, err = s.client.GetSecret(context.Background(), sa.Secrets[0].Name)
+	s.Require().NoError(err)
 }

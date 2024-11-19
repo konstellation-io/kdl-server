@@ -150,6 +150,8 @@ keycloak:
   - "--import-realm"
 
   env:
+    KC_ADMIN_PASSWORD: {{ requiredEnv "KEYCLOAK_ADMIN_PASSWORD" | quote }}
+    KC_ADMIN: {{ requiredEnv "KEYCLOAK_ADMIN_USER" | quote }}
     KC_DB_PASSWORD: keycloak
     KC_DB_URL: jdbc:postgresql://postgresql:5432/keycloak
     KC_DB_USERNAME: keycloak

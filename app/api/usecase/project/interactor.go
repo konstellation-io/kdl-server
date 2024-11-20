@@ -160,6 +160,13 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		},
 	}
 
+	// Set project repository
+	project.Repository = entity.Repository{
+		Type:            entity.RepositoryTypeExternal,
+		ExternalRepoURL: *opt.ExternalRepoURL,
+		RepoName:        opt.ProjectID,
+	}
+
 	// Create a k8s KDLProject containing a MLFLow instance
 	err = i.k8sClient.CreateKDLProjectCR(ctx, opt.ProjectID)
 	if err != nil {

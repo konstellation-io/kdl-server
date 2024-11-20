@@ -112,7 +112,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	const (
 		id            = "user.1234"
 		email         = "user@email.com"
-		username      = "john"
+		username      = "user"
 		accessLevel   = entity.AccessLevelViewer
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"

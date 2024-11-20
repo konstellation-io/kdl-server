@@ -10,7 +10,6 @@
 export interface GetUserTools_project_toolUrls {
   __typename: "ToolUrls";
   knowledgeGalaxy: string;
-  gitea: string;
   filebrowser: string;
   vscode: string;
   mlflow: string;

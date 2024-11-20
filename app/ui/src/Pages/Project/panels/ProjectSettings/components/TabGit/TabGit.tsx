@@ -31,20 +31,8 @@ function TabGit({ project }: Props) {
 
   const isExternal = repository.type === RepositoryType.EXTERNAL;
 
-  function openExternalRepoSettings() {
-    const projectGiteaUrl = new URL(toolUrls.gitea);
-    projectGiteaUrl.pathname += '/settings';
-
-    window.open(projectGiteaUrl.toString());
-  }
-
   return (
     <div className={styles.container} data-testid="tabGit">
-      {isAdmin && isExternal && (
-        <div className={styles.edit}>
-          <Button label="" Icon={IconEdit} onClick={openExternalRepoSettings} />
-        </div>
-      )}
       <div className={styles.repoType}>
         <RepositoryTypeComponent
           squareLocation={isExternal ? LOCATION.OUT : LOCATION.IN}

@@ -80,8 +80,7 @@ function TabDangerZone({ projectId, projectName }: Props) {
           <MessageActionBox
             title="Delete project"
             description="This action is irreversible, delete a project and all
-            Kubernetes, Minio, Gitea and Konstellation resources
-            associated with it"
+            Kubernetes, Minio and Konstellation resources associated with it"
             action={{
               label: 'Delete',
               onClick: showDeleteModal,
@@ -122,7 +121,7 @@ function TabDangerZone({ projectId, projectName }: Props) {
         >
           <ModalLayoutInfo>
             You are going to delete this project. When a project is deleted all resources associated with this project
-            (gitea, mlflow, filebrowser,...) will be removed. This is a non reversible action. Are you sure you want
+            (mlflow, filebrowser,...) will be removed. This is a non reversible action. Are you sure you want
             to delete it?
           </ModalLayoutInfo>
           <div>

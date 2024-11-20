@@ -3,7 +3,6 @@ import { RepositoryType } from '../../Graphql/types/globalTypes';
 
 const toolUrls = {
   knowledgeGalaxy: 'https://knowledgeGalaxy',
-  gitea: 'https://gitea',
   filebrowser: 'https://filebrowser',
   mlflow: 'https://mlflow',
   vscode: 'https://vscode',

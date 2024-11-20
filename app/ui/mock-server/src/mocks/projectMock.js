@@ -18,7 +18,6 @@ function buildProject(_, index) {
     archived: index < activeProjectsCount ? false : casual.boolean,
     toolUrls: () => ({
       knowledgeGalaxy: 'https://filebrowser.org/',
-      gitea: 'https://gitea.io/en-us/',
       filebrowser: 'https://filebrowser.org/',
       vscode: 'https://code.visualstudio.com/',
       mlflow: 'https://mlflow.org/',

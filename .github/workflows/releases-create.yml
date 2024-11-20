@@ -5,7 +5,7 @@
 name: "[Releases] Create"
 
 env:
-  COMPONENTS: "app,backup,cleaner,gitea-oauth2-setup,mlflow,project-operator,repo-cloner,user-tools-operator,vscode"
+  COMPONENTS: "app,backup,cleaner,mlflow,project-operator,repo-cloner,user-tools-operator,vscode"
 
 on:
   workflow_dispatch:
@@ -19,7 +19,6 @@ on:
           - app
           - backup
           - cleaner
-          - gitea-oauth2-setup
           - mlflow
           - project-operator
           - repo-cloner

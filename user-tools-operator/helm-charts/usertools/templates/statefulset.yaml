@@ -65,21 +65,6 @@ spec:
           volumeMounts:
             - name: user-pvc
               mountPath: /home/kdl
-        - name: codeserver-gitea-oauth2-setup
-          image: {{ .Values.giteaOauth2Setup.image.repository }}:{{ .Values.giteaOauth2Setup.image.tag }}
-          imagePullPolicy: {{ .Values.giteaOauth2Setup.image.pullPolicy }}
-          env:
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          envFrom:
-            - secretRef:
-                name: {{ .Values.giteaOauth2Setup.giteaAdminSecret }}
-            - secretRef:
-                name: codeserver-oauth2-secrets-{{ .Values.usernameSlug }}
-            - configMapRef:
-                name: {{ .Values.giteaOauth2Setup.giteaOauth2Configmap }}
       containers:
         - name: {{ .Chart.Name }}-repo-cloner
           image: {{ .Values.repoCloner.image.repository }}:{{ .Values.repoCloner.image.tag }}

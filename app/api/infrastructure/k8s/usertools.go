@@ -274,15 +274,6 @@ func (k *K8sClient) getUserToolsDefinition(
 			},
 			"mongodbURI": k.cfg.MongoDB.URI,
 		},
-		"giteaOauth2Setup": map[string]interface{}{
-			"image": map[string]string{
-				"repository": k.cfg.UserToolsGiteaOAuth2Setup.Image.Repository,
-				"tag":        k.cfg.UserToolsGiteaOAuth2Setup.Image.Tag,
-				"pullPolicy": k.cfg.UserToolsGiteaOAuth2Setup.Image.PullPolicy,
-			},
-			"giteaAdminSecret":     k.cfg.UserToolsGiteaOAuth2Setup.GiteaAdminSecret,
-			"giteaOauth2Configmap": k.cfg.UserToolsGiteaOAuth2Setup.GiteaOauth2Configmap,
-		},
 		"oauth2Proxy": map[string]interface{}{
 			"image": map[string]string{
 				"repository": k.cfg.UserToolsOAuth2Proxy.Image.Repository,

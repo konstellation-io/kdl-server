@@ -101,28 +101,12 @@ type Config struct {
 			PullPolicy string `envconfig:"OAUTH2_PROXY_IMG_PULLPOLICY"`
 		}
 	}
-	GiteaOAuth2Setup struct {
-		Image struct {
-			Repository string `envconfig:"GITEA_OAUTH2_SETUP_IMG_REPO"`
-			Tag        string `envconfig:"GITEA_OAUTH2_SETUP_IMG_TAG"`
-			PullPolicy string `envconfig:"GITEA_OAUTH2_SETUP_IMG_PULLPOLICY"`
-		}
-	}
 	RepoCloner struct {
 		Image struct {
 			Repository string `envconfig:"REPO_CLONER_IMG_REPO"`
 			Tag        string `envconfig:"REPO_CLONER_IMG_TAG"`
 			PullPolicy string `envconfig:"REPO_CLONER_IMG_PULLPOLICY"`
 		}
-	}
-	UserToolsGiteaOAuth2Setup struct {
-		Image struct {
-			Repository string `envconfig:"USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_REPO"`
-			Tag        string `envconfig:"USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_TAG"`
-			PullPolicy string `envconfig:"USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_PULLPOLICY"`
-		}
-		GiteaAdminSecret     string `envconfig:"GITEA_OAUTH2_SETUP_ADMIN_SECRETS"`
-		GiteaOauth2Configmap string `envconfig:"GITEA_OAUTH2_SETUP_CONFIGMAP"`
 	}
 	UserToolsOAuth2Proxy struct {
 		Image struct {

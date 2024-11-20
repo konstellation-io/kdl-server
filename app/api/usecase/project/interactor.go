@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
@@ -108,7 +107,6 @@ type interactor struct {
 	projectRepo      Repository
 	userActivityRepo UserActivityRepo
 	clock            clock.Clock
-	giteaService     giteaservice.GiteaClient
 	minioService     minioservice.MinioService
 	k8sClient        k8s.Client
 }
@@ -119,7 +117,6 @@ type InteractorDeps struct {
 	Repo             Repository
 	UserActivityRepo UserActivityRepo
 	Clock            clock.Clock
-	GiteaService     giteaservice.GiteaClient
 	MinioService     minioservice.MinioService
 	K8sClient        k8s.Client
 }
@@ -131,7 +128,6 @@ func NewInteractor(deps *InteractorDeps) UseCase {
 		projectRepo:      deps.Repo,
 		userActivityRepo: deps.UserActivityRepo,
 		clock:            deps.Clock,
-		giteaService:     deps.GiteaService,
 		minioService:     deps.MinioService,
 		k8sClient:        deps.K8sClient,
 	}
@@ -141,8 +137,6 @@ func NewInteractor(deps *InteractorDeps) UseCase {
 Create stores into the DB a new project.
 Depending on the repository type:
 
-  - For internal repositories creates a repository in Gitea.
-  - For external repositories, mirrors the external repository in Gitea.
   - Create a k8s KDLProject containing a MLFLow instance
   - Create Minio bucket
   - Create Minio folders
@@ -164,22 +158,6 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 			AccessLevel: entity.AccessLevelAdmin,
 			AddedDate:   now,
 		},
-	}
-	repoName := opt.ProjectID
-
-	// Create repository
-	if opt.RepoType == entity.RepositoryTypeExternal {
-		err := i.giteaService.MirrorRepo(*opt.ExternalRepoURL, repoName, *opt.ExternalRepoUsername, opt.Owner.Username,
-			opt.ExternalRepoAuthMethod, opt.ExternalRepoCredential)
-		if err != nil {
-			return entity.Project{}, err
-		}
-
-		project.Repository = entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: *opt.ExternalRepoURL,
-			RepoName:        repoName,
-		}
 	}
 
 	// Create a k8s KDLProject containing a MLFLow instance
@@ -268,11 +246,6 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 	}
 
 	minioBackup, err := i.minioService.DeleteBucket(ctx, projectID)
-	if err != nil {
-		return nil, err
-	}
-
-	err = i.giteaService.DeleteRepo(p.ID)
 	if err != nil {
 		return nil, err
 	}

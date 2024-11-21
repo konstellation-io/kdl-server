@@ -19,31 +19,9 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
-        - name: create-kubeconfig
-          image: alpine/k8s:1.20.7
-          imagePullPolicy: IfNotPresent
-          command:
-            - sh
-            - /generate-kubeconfig.sh
-          volumeMounts:
-            - name: user-pvc
-              mountPath: /home/coder
-            - name: kubeconfig-tpl-configmap
-              mountPath: /kubeconfig.tpl
-              subPath: kubeconfig.tpl
-            - name: kubeconfig-tpl-configmap
-              mountPath: /generate-kubeconfig.sh
-              subPath: generate-kubeconfig.sh
-        - name: create-ssh-folder
-          image: alpine:3.10
-          imagePullPolicy: IfNotPresent
-          command:
-          - sh
-          - -c
-          - mkdir -p /home/kdl/.ssh && chown 1000:1000 /home/kdl/.ssh
-          volumeMounts:
-            - name: user-pvc
-              mountPath: /home/kdl
+        {{- with .Values.initContainers }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
       containers:
         - name: {{ .Chart.Name }}-repo-cloner
           image: {{ .Values.repoCloner.image.repository }}:{{ .Values.repoCloner.image.tag }}
@@ -133,7 +111,11 @@ spec:
               mountPath: /home/kdl/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
-        {{- if .Values.vscode.enabled }}
+            {{- with .Values.repoCloner.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.repoCloner.resources | nindent 12 }}
         - name: {{ .Chart.Name }}-vscode
           image: {{ .Values.vscode.image.repository }}:{{ .Values.vscode.image.tag }}
           imagePullPolicy: {{ .Values.vscode.image.pullPolicy }}
@@ -227,7 +209,11 @@ spec:
               mountPath: /home/coder/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
-        {{- end }}
+            {{- with .Values.vscode.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.vscode.resources | nindent 12 }}
         - name: {{ .Chart.Name }}-vscode-runtime
           image: {{ .Values.vscodeRuntime.image.repository }}:{{ .Values.vscodeRuntime.image.tag }}
           imagePullPolicy: {{ .Values.vscodeRuntime.image.pullPolicy }}
@@ -339,7 +325,11 @@ spec:
               mountPath: /home/coder/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
-        {{- if .Values.vscode.enabled }}
+            {{- with .Values.vscodeRuntime.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.vscodeRuntime.resources | nindent 12 }}
         - name: {{ .Chart.Name }}-vscode-proxy
           image: {{ .Values.oauth2Proxy.image.repository }}:{{ .Values.oauth2Proxy.image.tag }}
           imagePullPolicy: {{ .Values.oauth2Proxy.image.pullPolicy }}
@@ -445,11 +435,15 @@ spec:
             - name: oauth2-config
               mountPath: /etc/oauth2_proxy.cfg
               subPath: oauth2_proxy.cfg
-          ports:
-            - name: http
-              containerPort: 4180
-              protocol: TCP
-          {{- end }}
+            {{- with .Values.oauth2Proxy.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.oauth2Proxy.resources | nindent 12 }}
+        {{- if .Values.extraContainers }}
+          {{- toYaml .Values.extraContainers | nindent 8 }}
+        {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       volumes:
         - name: kubeconfig-tpl-configmap
           configMap:

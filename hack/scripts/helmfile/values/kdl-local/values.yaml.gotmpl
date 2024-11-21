@@ -19,9 +19,6 @@ global:
     tls:
       enabled: {{ requiredEnv "ENABLE_TLS" }}
       secretName: {{ requiredEnv "DOMAIN" }}-tls-secret
-#      caSecret:
-#        name: mkcert-ca
-#        certFilename: mkcert-ca.crt
 
   mongodb:
     connectionString:
@@ -35,6 +32,7 @@ image:
 
 env:
   KDL_SERVER_PORT: "8080"
+  KDL_SERVER_MONGODB_URI: "mongodb://kdl:123456@mongodb:27017/kdl?authSource=kdl&authMechanism=SCRAM-SHA-256"
   SERVER_URL: https://kdlapp.{{ requiredEnv "DOMAIN" }}
   MINIO_ACCESS_KEY: minio
   MINIO_SECRET_KEY: minio123
@@ -49,31 +47,12 @@ envFromConfigMap: {}
   #  name: <name-configmap>
   #  key: key
 
-ingress:
-  enabled: false
-  className: "public"
-  annotations:
-    cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-    nginx.ingress.kubernetes.io/server-snippet: |
-      client_header_buffer_size 800k;
-
-  hosts:
-  - host: kdlapp.{{ requiredEnv "DOMAIN" }}
-    paths:
-    - path: /
-      pathType: ImplementationSpecific
-  tls:
-    - secretName: {{ requiredEnv "DOMAIN" }}-kdl-secret
-      hosts:
-      - kdlapp.{{ requiredEnv "DOMAIN" }}
-
 readyChecker:
   enabled: false
 
 service:
   type: ClusterIP
   port: 80
-  targetPort: 8080
 
 podAnnotations:
   env: "microk8s"

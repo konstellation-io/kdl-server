@@ -117,7 +117,7 @@ spec:
                   key: MINIO_SECRET_KEY
             - name: MINIO_ENDPOINT
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
                   name: kdl-server
                   key: MINIO_ENDPOINT
             - name: MC_HOST_dell

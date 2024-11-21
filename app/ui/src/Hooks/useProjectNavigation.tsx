@@ -1,7 +1,6 @@
 import ROUTE, { buildRoute } from 'Constants/routes';
 import { useCallback, useMemo } from 'react';
 
-import GiteaIcon from 'Components/Icons/GiteaIcon/GiteaIcon';
 import IconHome from '@material-ui/icons/Dashboard';
 import IconKG from '@material-ui/icons/EmojiObjects';
 import MlFlowIcon from 'Components/Icons/MlFlowIcon/MlFlowIcon';
@@ -36,12 +35,6 @@ export const projectToolsRoutesConfig: RouteConfiguration[] = [
     label: 'Knowledge Galaxy',
     Icon: IconKG,
     route: ROUTE.PROJECT_TOOL_KG,
-  },
-  {
-    id: 'gitea',
-    label: 'Gitea',
-    Icon: GiteaIcon,
-    route: ROUTE.PROJECT_TOOL_GITEA,
   },
   {
     id: 'filebrowser',

@@ -6,7 +6,6 @@ export default gql`
       id
       toolUrls {
         knowledgeGalaxy
-        gitea
         filebrowser
         vscode
         mlflow

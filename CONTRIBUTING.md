@@ -144,7 +144,6 @@ The following is the list of supported component:
 
 * `api`
 * `ui`
-* `backup`
 * `cleaner`
 * `gitea`
 * `mlflow`

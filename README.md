@@ -55,7 +55,6 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 
 * `app-api`: main component of the application, providing API access for other components and managing interactions with `MongoDB`.
 * `app-ui`: web application offering the interface for data scientists.
-* `backup`: Kubernetes `cronJob` that backs up `PostgreSQL` and `MongoDB` databases and stores Kubernetes `etcd` manifests in `AWS S3`
 * `cleaner`: currently unused, potentially slated for deprecation.
 * `gitea-oauth2-proxy`: in-house solution exposing `gitea` login page to other pods.
 * `gitea`: git server mirroring project repositories.

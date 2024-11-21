@@ -204,17 +204,18 @@ func TestInteractor_StopTools(t *testing.T) {
 
 	const (
 		username     = "john"
+		email        = "john@doe.com"
 		toolsRunning = true
 	)
 
 	ctx := context.Background()
-	expectedUser := entity.User{Username: username}
+	expectedUser := entity.User{Username: username, Email: email}
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(expectedUser, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 	s.mocks.k8sClientMock.EXPECT().DeleteUserToolsCR(ctx, username).Return(nil)
 
-	returnedUser, err := s.interactor.StopTools(ctx, username)
+	returnedUser, err := s.interactor.StopTools(ctx, email)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, returnedUser)
@@ -226,17 +227,18 @@ func TestInteractor_StopTools_Err(t *testing.T) {
 
 	const (
 		username     = "john"
+		email        = "john@doe.com"
 		toolsRunning = false
 	)
 
 	ctx := context.Background()
-	u := entity.User{Username: username}
+	u := entity.User{Username: username, Email: email}
 	emptyUser := entity.User{}
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(u, nil)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(u, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 
-	returnedUser, err := s.interactor.StopTools(ctx, username)
+	returnedUser, err := s.interactor.StopTools(ctx, email)
 
 	require.Equal(t, user.ErrStopUserTools, err)
 	require.Equal(t, returnedUser, emptyUser)
@@ -248,6 +250,7 @@ func TestInteractor_StartTools(t *testing.T) {
 
 	const (
 		username     = "john"
+		email        = "john@doe.com"
 		toolsRunning = false
 		runtimeImage = "konstellation/image"
 		runtimeTag   = "3.9"
@@ -266,15 +269,16 @@ func TestInteractor_StartTools(t *testing.T) {
 	runtimeID := "12345"
 
 	ctx := context.Background()
-	expectedUser := entity.User{Username: username}
+	expectedUser := entity.User{Username: username, Email: email}
 	expectedRuntime := entity.Runtime{ID: runtimeID, DockerImage: runtimeImage, DockerTag: runtimeTag}
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(expectedUser, nil)
 	s.mocks.runtimeRepo.EXPECT().Get(ctx, runtimeID).Return(expectedRuntime, nil)
 	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capability.ID).Return(capability, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeID, runtimeImage, runtimeTag, capability).Return(nil)
-	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeID, &capability.ID)
+
+	returnedUser, err := s.interactor.StartTools(ctx, email, &runtimeID, &capability.ID)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, returnedUser)
@@ -291,6 +295,7 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 
 	const (
 		username     = "john"
+		email        = "john@doe.com"
 		toolsRunning = false
 		runtimeID    = "default"
 	)
@@ -306,10 +311,10 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	expectedUser := entity.User{Username: username}
+	expectedUser := entity.User{Username: username, Email: email}
 
 	// AND the user is the in repo
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(expectedUser, nil)
 	// AND the usertools for the user was not running
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 
@@ -319,7 +324,7 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 		cfg.UserToolsVsCodeRuntime.Image.Repository, cfg.UserToolsVsCodeRuntime.Image.Tag, capability).Return(nil)
 
 	// WHEN the tools are started
-	returnedUser, err := s.interactor.StartTools(ctx, username, nil, &capability.ID)
+	returnedUser, err := s.interactor.StartTools(ctx, email, nil, &capability.ID)
 
 	// THEN
 	// There are no errors
@@ -339,6 +344,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 
 	const (
 		username     = "john"
+		email        = "john@doe.com"
 		toolsRunning = true
 		dockerImage  = "image"
 		dockerTag    = "3.9"
@@ -346,7 +352,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 
 	runtimeID := "12345"
 	expectedRuntime := entity.Runtime{ID: runtimeID, DockerImage: dockerImage, DockerTag: dockerTag}
-	expectedUser := entity.User{Username: username}
+	expectedUser := entity.User{Username: username, Email: email}
 
 	capability := entity.Capabilities{
 		ID:   "test_id",
@@ -361,7 +367,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 	ctx := context.Background()
 
 	// AND the user is the in repo
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).AnyTimes().Return(expectedUser, nil)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).AnyTimes().Return(expectedUser, nil)
 	// AND the runtime is in the repo
 	s.mocks.runtimeRepo.EXPECT().Get(ctx, runtimeID).Return(expectedRuntime, nil)
 	// AND the user-tools are running
@@ -374,7 +380,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeID, dockerImage, dockerTag, capability).Return(nil)
 
 	// WHEN the tools are started
-	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeID, &capability.ID)
+	returnedUser, err := s.interactor.StartTools(ctx, email, &runtimeID, &capability.ID)
 
 	// THEN there are no errors
 	require.NoError(t, err)

@@ -1,0 +1,10 @@
+global:
+  logLevel: 5
+
+crds:
+  enabled: true
+
+ingressShim:
+  defaultIssuerName: selfsigned-clusterissuer
+  defaultIssuerKind: ClusterIssuer
+  defaultIssuerGroup: cert-manager.io

@@ -89,7 +89,7 @@ func (m *UserRepo) GetByUsername(ctx context.Context, username string) (entity.U
 	return m.findOne(ctx, bson.M{"username": username})
 }
 
-// GetByUsername retrieves the user using their user email.
+// GetByEmail retrieves the user using their user email.
 func (m *UserRepo) GetByEmail(ctx context.Context, email string) (entity.User, error) {
 	return m.findOne(ctx, bson.M{"email": email})
 }

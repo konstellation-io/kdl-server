@@ -57,7 +57,6 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 * `app-ui`: web application offering the interface for data scientists.
 * `backup`: Kubernetes `cronJob` that backs up `PostgreSQL` and `MongoDB` databases and stores Kubernetes `etcd` manifests in `AWS S3`
 * `cleaner`: currently unused, potentially slated for deprecation.
-* `gitea-oauth2-proxy`: in-house solution exposing `gitea` login page to other pods.
 * `gitea`: git server mirroring project repositories.
 * `minio`: s3-compatible object storage, holding artifacts from training jobs; `MinIO` is installed as a pinned dependency, with only the console deployed through the chart.
 * `postgresql`: database storing `gitea` data.

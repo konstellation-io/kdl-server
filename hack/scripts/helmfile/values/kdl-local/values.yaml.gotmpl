@@ -104,12 +104,6 @@ gitea:
   storage:
     storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
-giteaOauth2Setup:
-  image:
-    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/gitea-oauth2-setup
-    tag: latest
-    pullPolicy: Always
-
 # -- Keycloak subchart deployment
 # </br> Ref: https://github.com/konstellation-io/helm-charts/blob/konstellation-base-1.0.2/charts/konstellation-base/values.yaml
 keycloak:

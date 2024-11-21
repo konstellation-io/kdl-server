@@ -1,3 +1,11 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "user-tools.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
+  {{- end }}
+{{- end }}
 {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1
 {{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
@@ -7,18 +15,18 @@ apiVersion: extensions/v1beta1
 {{- end }}
 kind: Ingress
 metadata:
-  name: {{ include "user-tools.fullname" . }}
+  name: {{ $fullName }}
   labels:
-{{ include "user-tools.labels" . | indent 4 }}
+    {{- include "user-tools.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if .Values.ingress.className }}
+  {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ .Values.ingress.className }}
   {{- end }}
-  {{- if .Values.tls.enabled }}
+  {{- if .Values.ingress.tls }}
   tls:
     - hosts:
         - {{ .Values.usernameSlug }}-code.{{ .Values.domain }}
@@ -29,16 +37,17 @@ spec:
       http:
         paths:
           {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
-          - pathType: Prefix
-            path: "/"
+          - path: "/"
+            pathType: Prefix
             backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
-                name: {{ include "user-tools.fullname" . }}-code
+                name: {{ $fullName }}
                 port:
-                  number: 80
-          {{- else }}
-          - path: /
-            backend:
-              serviceName: {{ include "user-tools.fullname" . }}-code
-              servicePort: http
+                  number: {{ $svcPort }}
+              {{- else }}
+              serviceName: {{ $fullName }}
+              servicePort: {{ $svcPort }}
+              {{- end }}
           {{- end }}
+{{- end }}

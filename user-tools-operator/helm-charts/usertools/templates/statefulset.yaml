@@ -1,85 +1,27 @@
-{{ if .Capabilities.APIVersions.Has "apps/v1" }}
 apiVersion: apps/v1
-{{ else if .Capabilities.APIVersions.Has "apps/v1beta1" }}
-apiVersion: apps/v1beta1
-{{ end }}
 kind: StatefulSet
 metadata:
   name: {{ include "user-tools.fullname" . }}
   labels:
-{{ include "user-tools.labels" . | indent 4 }}
+    {{- include "user-tools.labels" . | nindent 4 }}
 spec:
   serviceName: {{ include "user-tools.fullname" . }}
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "user-tools.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "user-tools.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "user-tools.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
-        app: user-tools-{{ .Values.usernameSlug }}
-        runtimeId: {{ .Values.vscodeRuntime.runtimeId }}
-        capabilityId: {{ .Values.vscodeRuntime.capabilityId }}
+        {{- include "user-tools.labels" . | nindent 8 }}
     spec:
-    {{- with .Values.nodeSelector }}
-      nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.affinity }}
-      affinity:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-      serviceAccountName: {{ .Values.serviceAccountName }}
+      serviceAccountName: {{ include "user-tools.serviceAccountName" . }}
       securityContext:
-        fsGroup: 1000
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
-        - name: create-kubeconfig
-          image: alpine/k8s:1.20.7
-          imagePullPolicy: IfNotPresent
-          command:
-            - sh
-            - /generate-kubeconfig.sh
-          volumeMounts:
-            - name: user-pvc
-              mountPath: /home/coder
-            - name: kubeconfig-tpl-configmap
-              mountPath: /kubeconfig.tpl
-              subPath: kubeconfig.tpl
-            - name: kubeconfig-tpl-configmap
-              mountPath: /generate-kubeconfig.sh
-              subPath: generate-kubeconfig.sh
-        - name: create-ssh-folder
-          image: alpine:3.10
-          imagePullPolicy: IfNotPresent
-          command:
-          - sh
-          - -c
-          - mkdir -p /home/kdl/.ssh && chown 1000:1000 /home/kdl/.ssh
-          volumeMounts:
-            - name: user-pvc
-              mountPath: /home/kdl
-        - name: codeserver-gitea-oauth2-setup
-          image: {{ .Values.giteaOauth2Setup.image.repository }}:{{ .Values.giteaOauth2Setup.image.tag }}
-          imagePullPolicy: {{ .Values.giteaOauth2Setup.image.pullPolicy }}
-          env:
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          envFrom:
-            - secretRef:
-                name: {{ .Values.giteaOauth2Setup.giteaAdminSecret }}
-            - secretRef:
-                name: codeserver-oauth2-secrets-{{ .Values.usernameSlug }}
-            - configMapRef:
-                name: {{ .Values.giteaOauth2Setup.giteaOauth2Configmap }}
+        {{- with .Values.initContainers }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
       containers:
         - name: {{ .Chart.Name }}-repo-cloner
           image: {{ .Values.repoCloner.image.repository }}:{{ .Values.repoCloner.image.tag }}
@@ -89,6 +31,79 @@ spec:
               value: "{{ .Values.username }}"
             - name: KDL_SERVER_MONGODB_URI
               value: "{{ .Values.repoCloner.mongodbURI }}"
+            # Variables from secrets have precedence
+            {{- $envList := dict }}
+            {{- if .Values.repoCloner.envFromSecrets }}
+            {{- range $key, $value := .Values.repoCloner.envFromSecrets }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables from configmap have precedence
+            {{- if .Values.repoCloner.envFromConfigMap }}
+            {{- range $key, $value := .Values.repoCloner.envFromConfigMap }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Add Variables in plain text if they were not already added from secrets
+            {{- if .Values.repoCloner.env }}
+            {{- range $key, $value := .Values.repoCloner.env }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables global from secrets have precedence
+            {{- if .Values.global.envFromSecrets }}
+            {{- range $key, $value := .Values.global.envFromSecrets }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables global from configmap have precedence
+            {{- if .Values.global.envFromConfigMap }}
+            {{- range $key, $value := .Values.global.envFromConfigMap }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Global variables in plain text if they were not already added from secrets
+            {{- if .Values.global.env }}
+            {{- range $key, $value := .Values.global.env }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
           volumeMounts:
             - name: user-pvc
               mountPath: /home/kdl
@@ -96,21 +111,109 @@ spec:
               mountPath: /home/kdl/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
+            {{- with .Values.repoCloner.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.repoCloner.resources | nindent 12 }}
         - name: {{ .Chart.Name }}-vscode
           image: {{ .Values.vscode.image.repository }}:{{ .Values.vscode.image.tag }}
           imagePullPolicy: {{ .Values.vscode.image.pullPolicy }}
+          ports:
+            - name: vscode
+              containerPort: 8080
+              protocol: TCP
+          env:
+          # Variables from secrets have precedence
+            {{- $envList := dict }}
+            {{- if .Values.vscode.envFromSecrets }}
+            {{- range $key, $value := .Values.vscode.envFromSecrets }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables from configmap have precedence
+            {{- if .Values.vscode.envFromConfigMap }}
+            {{- range $key, $value := .Values.vscode.envFromConfigMap }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Add Variables in plain text if they were not already added from secrets
+            {{- if .Values.vscode.env }}
+            {{- range $key, $value := .Values.vscode.env }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables global from secrets have precedence
+            {{- if .Values.global.envFromSecrets }}
+            {{- range $key, $value := .Values.global.envFromSecrets }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables global from configmap have precedence
+            {{- if .Values.global.envFromConfigMap }}
+            {{- range $key, $value := .Values.global.envFromConfigMap }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Global variables in plain text if they were not already added from secrets
+            {{- if .Values.global.env }}
+            {{- range $key, $value := .Values.global.env }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
           volumeMounts:
             - name: user-pvc
               mountPath: /home/coder
-          {{- if .Values.sharedVolume.name }}
+            {{- if .Values.sharedVolume.name }}
             - name: {{ .Values.sharedVolume.name }}
               mountPath: /home/coder/shared-storage
               readOnly: false
-          {{- end }}
+            {{- end }}
             - name: {{ .Values.usernameSlug }}-ssh-keys-vol
               mountPath: /home/coder/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
+            {{- with .Values.vscode.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.vscode.resources | nindent 12 }}
         - name: {{ .Chart.Name }}-vscode-runtime
           image: {{ .Values.vscodeRuntime.image.repository }}:{{ .Values.vscodeRuntime.image.tag }}
           imagePullPolicy: {{ .Values.vscodeRuntime.image.pullPolicy }}
@@ -137,6 +240,79 @@ spec:
                   key: MINIO_ENDPOINT
             - name: MC_HOST_dell
               value: "http://$(MINIO_ACCESS_KEY):$(MINIO_SECRET_KEY)@$(MINIO_ENDPOINT)"
+            # Variables from secrets have precedence
+            {{- $envList := dict }}
+            {{- if .Values.vscodeRuntime.envFromSecrets }}
+            {{- range $key, $value := .Values.vscodeRuntime.envFromSecrets }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables from configmap have precedence
+            {{- if .Values.vscodeRuntime.envFromConfigMap }}
+            {{- range $key, $value := .Values.vscodeRuntime.envFromConfigMap }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Add Variables in plain text if they were not already added from secrets
+            {{- if .Values.vscodeRuntime.env }}
+            {{- range $key, $value := .Values.vscodeRuntime.env }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables global from secrets have precedence
+            {{- if .Values.global.envFromSecrets }}
+            {{- range $key, $value := .Values.global.envFromSecrets }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables global from configmap have precedence
+            {{- if .Values.global.envFromConfigMap }}
+            {{- range $key, $value := .Values.global.envFromConfigMap }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Global variables in plain text if they were not already added from secrets
+            {{- if .Values.global.env }}
+            {{- range $key, $value := .Values.global.env }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
           volumeMounts:
             - name: user-pvc
               mountPath: /home/coder
@@ -149,6 +325,11 @@ spec:
               mountPath: /home/coder/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
+            {{- with .Values.vscodeRuntime.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.vscodeRuntime.resources | nindent 12 }}
         - name: {{ .Chart.Name }}-vscode-proxy
           image: {{ .Values.oauth2Proxy.image.repository }}:{{ .Values.oauth2Proxy.image.tag }}
           imagePullPolicy: {{ .Values.oauth2Proxy.image.pullPolicy }}
@@ -160,6 +341,10 @@ spec:
             - "--pass-user-headers=true"
             - "--set-xauthrequest=true"
             - "--skip-provider-button=true"
+          ports:
+            - name: http
+              containerPort: 4180
+              protocol: TCP
           env:
             - name: OAUTH2_PROXY_GITEA_USER
               value: "{{ .Values.username }}"
@@ -175,14 +360,92 @@ spec:
                 secretKeyRef:
                   name: codeserver-oauth2-credentials-{{ .Values.usernameSlug }}
                   key: OAUTH2_CLIENT_SECRET
+            # Variables from secrets have precedence
+            {{- $envList := dict }}
+            {{- if .Values.oauth2Proxy.envFromSecrets }}
+            {{- range $key, $value := .Values.oauth2Proxy.envFromSecrets }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables from configmap have precedence
+            {{- if .Values.oauth2Proxy.envFromConfigMap }}
+            {{- range $key, $value := .Values.oauth2Proxy.envFromConfigMap }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Add Variables in plain text if they were not already added from secrets
+            {{- if .Values.oauth2Proxy.env }}
+            {{- range $key, $value := .Values.oauth2Proxy.env }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables global from secrets have precedence
+            {{- if .Values.global.envFromSecrets }}
+            {{- range $key, $value := .Values.global.envFromSecrets }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables global from configmap have precedence
+            {{- if .Values.global.envFromConfigMap }}
+            {{- range $key, $value := .Values.global.envFromConfigMap }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Global variables in plain text if they were not already added from secrets
+            {{- if .Values.global.env }}
+            {{- range $key, $value := .Values.global.env }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
           volumeMounts:
             - name: oauth2-config
               mountPath: /etc/oauth2_proxy.cfg
               subPath: oauth2_proxy.cfg
-          ports:
-            - name: http
-              containerPort: 4180
-              protocol: TCP
+            {{- with .Values.oauth2Proxy.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.oauth2Proxy.resources | nindent 12 }}
+        {{- if .Values.extraContainers }}
+          {{- toYaml .Values.extraContainers | nindent 8 }}
+        {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       volumes:
         - name: kubeconfig-tpl-configmap
           configMap:
@@ -208,6 +471,21 @@ spec:
             items:
             - key: KDL_USER_PUBLIC_SSH_KEY
               path: authorized_keys
+      {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
   volumeClaimTemplates:
     - metadata:
         name: user-pvc

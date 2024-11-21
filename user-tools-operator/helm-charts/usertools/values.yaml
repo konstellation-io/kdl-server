@@ -1,12 +1,29 @@
-domain: kdl.local
+global:
+  # -- Environment variables to configure application
+  env: {}
+    # MY_VARIABLE: value
 
-giteaOauth2Setup:
-  image:
-    repository: konstellation/gitea-oauth2-setup
-    tag: "latest"
-    pullPolicy: IfNotPresent
-  giteaAdminSecret: gitea-admin
-  giteaOauth2Configmap: gitea-oauth2
+  # -- Variables from secrets
+  envFromSecrets: {}
+    # MY_VARIABLE:
+    #  name: <name-secret>
+    #  key: secret_key
+
+  # -- Variables from configMap
+  envFromConfigMap: {}
+    # MY_VARIABLE:
+    #  name: <name-configmap>
+    #  key: key
+
+  # -- Variables from files managed by you
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables
+  envFromFiles: {}
+    # - secretRef:
+    #     name: <name-secret>
+    # - configMapRef:
+    #     name: <name-configmap>
+
+domain: kdl.local
 
 ingress:
   className: "nginx"
@@ -15,22 +32,79 @@ ingress:
     nginx.ingress.kubernetes.io/configuration-snippet: |
       more_set_headers "Content-Security-Policy: frame-ancestors 'self' *";
 
+# -- Kubernetes service to expose Pod
+# </br> Ref: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  # -- Kubernetes Service type. Allowed values: NodePort, LoadBalancer or ClusterIP
+  type: ClusterIP
+  # -- Kubernetes Service port
+  port: 80
+  # -- Pod expose port
+  targetPort: 4180
+  # -- Pod extra ports
+  # extraPorts:
+  # - name: metrics
+  #   port: 9080
+  #   targetPort: 9080
+
+# -- OAuth2Proxy
 oauth2Proxy:
   image:
+    # -- Image repository
     repository: quay.io/oauth2-proxy/oauth2-proxy
-    tag: v7.0.1-amd64
+    # -- Image pull policy
     pullPolicy: IfNotPresent
+    # -- Image tag
+    tag: v7.0.1-amd64
 
+  # -- Environment variables to configure application
+  env: {}
+    # MY_VARIABLE: value
+
+  # -- Variables from secrets
+  envFromSecrets: {}
+    # MY_VARIABLE:
+    #  name: <name-secret>
+    #  key: secret_key
+
+  # -- Variables from configMap
+  envFromConfigMap: {}
+    # MY_VARIABLE:
+    #  name: <name-configmap>
+    #  key: key
+
+# -- repoCloner
 repoCloner:
   image:
+    # -- Image repository
     repository: konstellation/repo-cloner
-    tag: "latest"
+    # -- Image pull policy
     pullPolicy: IfNotPresent
+    # -- Image tag
+    tag: latest
   mongodbURI: ""
 
+  # -- Environment variables to configure application
+  env: {}
+    # MY_VARIABLE: value
+
+  # -- Variables from secrets
+  envFromSecrets: {}
+    # MY_VARIABLE:
+    #  name: <name-secret>
+    #  key: secret_key
+
+  # -- Variables from configMap
+  envFromConfigMap: {}
+    # MY_VARIABLE:
+    #  name: <name-configmap>
+    #  key: key
+
+# -- sharedVolume
 sharedVolume:
   name: ""
 
+# -- storage
 storage:
   size: 10Gi
   className: standard
@@ -50,43 +124,157 @@ username: user.name
 
 usernameSlug: user-name
 
-## The service account for the user that owns the user-tools
-serviceAccountName: default
+# -- Enable creation of ServiceAccount
+# </br> Ref: https://kubernetes.io/docs/concepts/security/service-accounts/
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use
+  # If not set and create is true, a name is generated using the fullname template
+  name: default
 
 ## If enabled, users will be able to download a kubeconfig file, so they can attach an external terminal/IDE to
 ## the vscodeRuntime running inside KST.
 kubeconfig:
+  #
   enabled: false
-  # enabled: true
 
-  ## External cluster address to be able to connect to it from the outside.
+  # -- External cluster address to be able to connect to it from the outside
   # externalServerUrl: https://192.168.0.21:16443
 
+# -- vscode
 vscode:
   image:
+    # -- Image repository
     repository: konstellation/vscode
-    tag: "latest"
+    # -- Image pull policy
     pullPolicy: IfNotPresent
+    # -- Image tag
+    tag: latest
 
+  # -- Environment variables to configure application
+  env: {}
+    # MY_VARIABLE: value
+
+  # -- Variables from secrets
+  envFromSecrets: {}
+    # MY_VARIABLE:
+    #  name: <name-secret>
+    #  key: secret_key
+
+  # -- Variables from configMap
+  envFromConfigMap: {}
+    # MY_VARIABLE:
+    #  name: <name-configmap>
+    #  key: key
+
+# -- vscodeRuntime
 vscodeRuntime:
   runtimeId: "61383716a8c1d7ce4764f411"
   capabilityId: "capability_id_1"
   image:
+    # -- Image repository
     repository: konstellation/kdl-py
-    tag: "3.9"
+    # -- Image pull policy
     pullPolicy: Always
+    # -- Image tag
+    tag: "3.9"
 
-## Define which Nodes the Pods are scheduled on.
-## ref: https://kubernetes.io/docs/user-guide/node-selection/
-##
+  # -- Environment variables to configure application
+  env: {}
+    # MY_VARIABLE: value
+
+  # -- Variables from secrets
+  envFromSecrets: {}
+    # MY_VARIABLE:
+    #  name: <name-secret>
+    #  key: secret_key
+
+  # -- Variables from configMap
+  envFromConfigMap: {}
+    # MY_VARIABLE:
+    #  name: <name-configmap>
+    #  key: key
+
+# -- Configure additional containers
+# </br> Ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+initContainers:
+  - name: create-kubeconfig
+    image: alpine/k8s:1.20.7
+    imagePullPolicy: IfNotPresent
+    command:
+      - sh
+      - /generate-kubeconfig.sh
+    volumeMounts:
+      - name: user-pvc
+        mountPath: /home/coder
+      - name: kubeconfig-tpl-configmap
+        mountPath: /kubeconfig.tpl
+        subPath: kubeconfig.tpl
+      - name: kubeconfig-tpl-configmap
+        mountPath: /generate-kubeconfig.sh
+        subPath: generate-kubeconfig.sh
+
+  - name: create-ssh-folder
+    image: alpine:3.10
+    imagePullPolicy: IfNotPresent
+    command:
+      - sh
+      - -c
+      - mkdir -p /home/kdl/.ssh && chown 1000:1000 /home/kdl/.ssh
+    volumeMounts:
+      - name: user-pvc
+        mountPath: /home/kdl
+
+# -- Configure extra containers
+extraContainers: []
+  # - name: project-proxy
+  #   image: nginx:alpine
+  #   command: ['sh', '-c', 'echo "Hello, World!"']
+
+# -- Defines privilege and access control settings for a Pod
+# </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+# </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+podSecurityContext:
+  fsGroup: 1000
+
+# -- Defines privilege and access control settings for a Container
+# </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+# </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# -- Configure Pod termination grace period
+# </br> Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination
+terminationGracePeriodSeconds: 30
+
+# -- Resources limits and requested
+# </br> Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# -- Node labels for pod assignment
+# </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
 nodeSelector: {}
 
-## Assign custom affinity rules
-## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-##
-affinity: {}
-
-## If specified, the pod's tolerations.
-## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-##
+# -- Tolerations for pod assignment
+# </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 tolerations: []
+
+# -- Affinity for pod assignment
+# </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}

@@ -33,14 +33,7 @@ const Section: FC<SectionProps> = ({ title, children }) => (
 
 function Summary() {
   const { information, repository, externalRepository } = useReactiveVar(newProject);
-
-  const type = repository?.values?.type || RepositoryType.EXTERNAL;
-  const isExternalRepo = type === RepositoryType.EXTERNAL;
   const { name, description, id } = information.values;
-
-  function getRepositoryUrl() {
-    return isExternalRepo ? externalRepository.values.url : `${CONFIG.GITEA_URL}/kdl/${id}`;
-  }
 
   return (
     <div className={styles.container}>
@@ -55,8 +48,8 @@ function Summary() {
           <div className={styles.repository}>
             <div className={styles.urlContainer}>
               <IconLink className="icon-regular" />
-              <p className={styles.url}>{getRepositoryUrl()}</p>
-              <CopyToClipboard>{getRepositoryUrl()}</CopyToClipboard>
+              <p className={styles.url}>{externalRepository.values.url}</p>
+              <CopyToClipboard>{externalRepository.values.url}</CopyToClipboard>
             </div>
           </div>
         </Field>

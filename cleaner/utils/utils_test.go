@@ -1,34 +1,34 @@
-package main
+package utils_test
 
 import (
+	"log"
 	"os"
 	"sync"
 	"testing"
 	"time"
 
-	"log"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"cleaner/utils"
 )
 
-func TestCheckAgeThreshold(t *testing.T) {
-	loc, _ := time.LoadLocation("UTC")
-	now := time.Now().In(loc)
+const numberOfTempFiles = 4
 
+func TestCheckAgeThreshold(t *testing.T) {
+	loc, err := time.LoadLocation("UTC")
+	require.NoError(t, err)
+
+	now := time.Now().In(loc)
 	fileAge := time.Now().Add(-48 * time.Hour)
 
-	// Check that not list files newer than daysThreshold
-
-	var daysThreshold time.Duration = 72 * time.Hour
-	if checkAgeThreshold(daysThreshold, now, fileAge) {
-		t.Error("With this threshold this file should not be set as true.")
-	}
+	daysThreshold := 72 * time.Hour
+	check := utils.CheckAgeThreshold(daysThreshold, now, fileAge)
+	assert.False(t, check)
 
 	daysThreshold = 24 * time.Hour
-	if !checkAgeThreshold(daysThreshold, now, fileAge) {
-		t.Error("With this threshold this file should be set as true.")
-	}
+	check = utils.CheckAgeThreshold(daysThreshold, now, fileAge)
+	assert.True(t, check)
 }
 
 func TestListToRemove(t *testing.T) {
@@ -38,10 +38,10 @@ func TestListToRemove(t *testing.T) {
 	createTestFolder(t, trashPath)
 
 	threshold := 48 * time.Hour
-	assert.Len(t, listToRemove(threshold, trashPath, now), 0)
+	assert.Empty(t, utils.ListToRemove(threshold, trashPath, now))
 
 	threshold = 0 * time.Hour
-	assert.Len(t, listToRemove(threshold, trashPath, now), 4)
+	assert.Len(t, utils.ListToRemove(threshold, trashPath, now), numberOfTempFiles)
 
 	removeTestFolder(t, trashPath)
 }
@@ -57,7 +57,7 @@ func TestRemoveTrashItem(t *testing.T) {
 
 	wg.Add(1)
 
-	go removeTrashItem(&wg, dir, false)
+	go utils.RemoveTrashItem(&wg, dir, false)
 	wg.Wait()
 
 	itemsList, err := os.ReadDir(trashPath)
@@ -76,9 +76,9 @@ func createTestFolder(t *testing.T, trashPath string) []string {
 		t.Fatalf("Error creating testFolder: %s", err)
 	}
 
-	var tmpDir []string
+	tmpDir := make([]string, 0, numberOfTempFiles)
 
-	for i := 0; i < 4; i++ {
+	for range numberOfTempFiles {
 		dir, err := os.MkdirTemp(trashPath, "*")
 		if err != nil {
 			log.Printf("Can not create temp dir")

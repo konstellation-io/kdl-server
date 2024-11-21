@@ -1,7 +1,13 @@
 linters:
   enable-all: true
-  disable: 
+  disable:
+    - gci
+    - gofumpt
+    - paralleltest
     - testpackage
+    - exportloopref
+    - gomnd
+    - execinquery
 # all available settings of specific linters
 linters-settings:
   unparam:
@@ -9,3 +15,9 @@ linters-settings:
   funlen:
     lines: 120
     statements: 80
+  depguard:
+    rules:
+      prevent_unmaintained_packages:
+        list-mode: lax # allow unless explicitely denied
+        allow:
+          - cleaner

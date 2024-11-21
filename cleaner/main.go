@@ -4,10 +4,10 @@ import (
 	"flag"
 	"log"
 	"os"
-	"path"
-	"path/filepath"
 	"sync"
 	"time"
+
+	"cleaner/utils"
 )
 
 const defaultThreshold time.Duration = 120 * time.Hour
@@ -34,7 +34,7 @@ func main() {
 	}
 
 	// Get the list of files and folders within the trashPath to be removed because fit the threshold
-	itemsToRemove := listToRemove(threshold, trashPath, now)
+	itemsToRemove := utils.ListToRemove(threshold, trashPath, now)
 
 	// Iterate the list of items to remove to remove these recursively
 	var mainWaitGroup sync.WaitGroup
@@ -42,73 +42,8 @@ func main() {
 	for _, v := range itemsToRemove {
 		mainWaitGroup.Add(1)
 
-		go removeTrashItem(&mainWaitGroup, v, debug)
+		go utils.RemoveTrashItem(&mainWaitGroup, v, debug)
 	}
 
 	mainWaitGroup.Wait()
-}
-
-func checkAgeThreshold(threshold time.Duration, now time.Time, fileAge time.Time) bool {
-	diff := now.Sub(fileAge)
-
-	return diff >= threshold
-}
-
-func listToRemove(threshold time.Duration, trashPath string, now time.Time) []string {
-	var itemsToRemove []string
-
-	trashItems, err := os.ReadDir(trashPath)
-	if err != nil {
-		log.Fatalf("Problems listing files within trash folder: %v", err)
-	}
-
-	for _, trashItem := range trashItems {
-		info, err := trashItem.Info()
-		if err != nil {
-			log.Printf("Could not get info for file %s: %v", trashItem.Name(), err)
-			continue
-		}
-
-		fileAge := info.ModTime()
-
-		if checkAgeThreshold(threshold, now, fileAge) {
-			itemsToRemove = append(itemsToRemove, path.Join(trashPath, trashItem.Name()))
-		}
-	}
-
-	return itemsToRemove
-}
-
-func removeTrashItem(wg *sync.WaitGroup, itemToRemove string, debug bool) {
-	defer wg.Done()
-
-	err := filepath.Walk(
-		itemToRemove,
-		func(_ string, info os.FileInfo, err error) error {
-			if err != nil {
-				log.Fatalf("Error calling list files to remove: %s", err)
-			}
-
-			if !info.IsDir() {
-				os.Remove(info.Name())
-
-				if debug {
-					log.Printf("File deleted: %v \n", info.Name())
-				}
-			}
-			return nil
-		},
-	)
-	if err != nil {
-		log.Fatalf("Error calling list files to remove: %s", err)
-	}
-
-	if debug {
-		log.Printf("Element deleted: %v", itemToRemove)
-	}
-
-	err = os.RemoveAll(itemToRemove)
-	if err != nil {
-		log.Fatalf("Error calling list files to remove: %s", err)
-	}
 }

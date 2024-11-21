@@ -395,12 +395,14 @@ projectOperator:
 
   filebrowser:
     image:
-      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/filebrowser/filebrowser
+      repository: filebrowser/filebrowser
       pullPolicy: Always
       tag: latest
 
 sharedVolume:
   enabled: true
+
+  name: kdl-local
 
   storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 

@@ -104,7 +104,6 @@ func main() {
 		Logger:           logger,
 		Repo:             projectRepo,
 		Clock:            realClock,
-		GiteaService:     giteaService,
 		MinioService:     minioService,
 		K8sClient:        k8sClient,
 		UserActivityRepo: userActivityRepo,

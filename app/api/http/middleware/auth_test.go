@@ -112,7 +112,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	const (
 		id            = "user.1234"
 		email         = "user@email.com"
-		username      = "john"
+		username      = "user"
 		accessLevel   = entity.AccessLevelViewer
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"
@@ -156,7 +156,6 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	// Act
 	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ts.Equal(r.Context().Value(LoggedUserEmailKey), email)
-		ts.Equal(r.Context().Value(LoggedUserNameKey), username)
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
@@ -187,7 +186,6 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameFound() {
 	// Act
 	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ts.Equal(r.Context().Value(LoggedUserEmailKey), email)
-		ts.Equal(r.Context().Value(LoggedUserNameKey), username)
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)

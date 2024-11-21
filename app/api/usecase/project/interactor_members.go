@@ -72,14 +72,6 @@ func (i *interactor) AddMembers(ctx context.Context, opt AddMembersOption) (enti
 		}
 	}
 
-	// Add collaborators to the Gitea repository
-	for _, u := range opt.Users {
-		err = i.giteaService.AddCollaborator(p.Repository.RepoName, u.Username, MemberAccessLevelOnCreation)
-		if err != nil {
-			return entity.Project{}, err
-		}
-	}
-
 	// Store new members into the DataBase
 	now := i.clock.Now()
 	newMembers := make([]entity.Member, len(opt.Users))
@@ -129,14 +121,6 @@ func (i *interactor) RemoveMembers(ctx context.Context, opt RemoveMembersOption)
 		return entity.Project{}, ErrRemoveNoMoreAdmins
 	}
 
-	// Remove collaborators from the Gitea repository
-	for _, u := range opt.Users {
-		err = i.giteaService.RemoveCollaborator(p.Repository.RepoName, u.Username)
-		if err != nil {
-			return entity.Project{}, err
-		}
-	}
-
 	// Remove members from stored project in our DataBase
 	err = i.projectRepo.RemoveMembers(ctx, opt.ProjectID, opt.Users)
 	if err != nil {
@@ -174,14 +158,6 @@ func (i *interactor) UpdateMembers(ctx context.Context, opt UpdateMembersOption)
 	if opt.AccessLevel != entity.AccessLevelAdmin {
 		if !i.checkAtLeastOneAdmin(opt.Users, p.Members) {
 			return entity.Project{}, ErrUpdateNoMoreAdmins
-		}
-	}
-
-	// Update collaborator permissions in Gitea repository
-	for _, u := range opt.Users {
-		err = i.giteaService.UpdateCollaboratorPermissions(p.Repository.RepoName, u.Username, opt.AccessLevel)
-		if err != nil {
-			return entity.Project{}, err
 		}
 	}
 

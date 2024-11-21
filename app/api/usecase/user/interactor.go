@@ -146,15 +146,15 @@ func (i *Interactor) GetByEmail(ctx context.Context, email string) (entity.User,
 	return i.repo.GetByEmail(ctx, email)
 }
 
-// StartTools creates a user-tools CustomResource in K8s to initialize the VSCode for the given username.
+// StartTools creates a user-tools CustomResource in K8s to initialize the VSCode for the given email.
 // If there are already a user-tools for the user, they are replaced (stop + start new).
-func (i *Interactor) StartTools(ctx context.Context, username string, runtimeID, capabilitiesID *string) (entity.User, error) {
-	user, err := i.repo.GetByUsername(ctx, username)
+func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, capabilitiesID *string) (entity.User, error) {
+	user, err := i.repo.GetByEmail(ctx, email)
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	running, err := i.AreToolsRunning(ctx, username)
+	running, err := i.AreToolsRunning(ctx, user.Username)
 
 	if err != nil {
 		return entity.User{}, err
@@ -162,7 +162,7 @@ func (i *Interactor) StartTools(ctx context.Context, username string, runtimeID,
 
 	if running {
 		// ignore the user returned by the stop, as it the same as we already have
-		_, err := i.StopTools(ctx, username)
+		_, err := i.StopTools(ctx, email)
 		if err != nil {
 			return entity.User{}, err
 		}
@@ -195,9 +195,9 @@ func (i *Interactor) StartTools(ctx context.Context, username string, runtimeID,
 		}
 	}
 
-	i.logger.Info("Creating user tools for user", "username", username)
+	i.logger.Info("Creating user tools for user", "email", email)
 
-	err = i.k8sClient.CreateUserToolsCR(ctx, username, rID, rImage, rTag, retrievedCapabilities)
+	err = i.k8sClient.CreateUserToolsCR(ctx, user.Username, rID, rImage, rTag, retrievedCapabilities)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -205,14 +205,14 @@ func (i *Interactor) StartTools(ctx context.Context, username string, runtimeID,
 	return user, nil
 }
 
-// StopTools removes a created user-tools CustomResource from K8s for the given username.
-func (i *Interactor) StopTools(ctx context.Context, username string) (entity.User, error) {
-	user, err := i.repo.GetByUsername(ctx, username)
+// StopTools removes a created user-tools CustomResource from K8s for the given email.
+func (i *Interactor) StopTools(ctx context.Context, email string) (entity.User, error) {
+	user, err := i.repo.GetByEmail(ctx, email)
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	running, err := i.AreToolsRunning(ctx, username)
+	running, err := i.AreToolsRunning(ctx, user.Username)
 
 	if err != nil {
 		return entity.User{}, err
@@ -222,9 +222,9 @@ func (i *Interactor) StopTools(ctx context.Context, username string) (entity.Use
 		return entity.User{}, ErrStopUserTools
 	}
 
-	i.logger.Info("Deleting user tools for user", "username", username)
+	i.logger.Info("Deleting user tools for user", "username", user.Username)
 
-	err = i.k8sClient.DeleteUserToolsCR(ctx, username)
+	err = i.k8sClient.DeleteUserToolsCR(ctx, user.Username)
 	if err != nil {
 		return entity.User{}, err
 	}

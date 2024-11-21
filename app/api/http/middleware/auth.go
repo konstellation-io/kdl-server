@@ -13,8 +13,7 @@ import (
 type contextKey int
 
 const (
-	LoggedUserNameKey contextKey = iota
-	LoggedUserEmailKey
+	LoggedUserEmailKey contextKey = iota
 )
 
 /*
@@ -32,7 +31,7 @@ The oAuth2 proxy sets the following headers:
 	X-Forwarded-Proto: https
 	X-Forwarded-Port: 443
 
-Use LoggedUserNameKey and LoggedUserEmailKey to retrieve this values from the context.
+Use LoggedUserEmailKey to retrieve this values from the context.
 Example:
 
 	email := ctx.Value(middleware.LoggedUserEmailKey).(string).
@@ -49,6 +48,7 @@ func AuthMiddleware(next http.Handler, userUsecase user.UseCase) http.Handler {
 
 		_, err := userUsecase.GetByEmail(r.Context(), email)
 		if errors.Is(err, entity.ErrUserNotFound) {
+			// make sure we use extracted username from email
 			extractedUsername := kdlutil.GetUsernameFromEmail(email)
 			if extractedUsername != "" {
 				username = extractedUsername
@@ -61,7 +61,7 @@ func AuthMiddleware(next http.Handler, userUsecase user.UseCase) http.Handler {
 			}
 		}
 
-		r = r.WithContext(context.WithValue(r.Context(), LoggedUserNameKey, username))
+		// only truth is the email, username can be changed
 		r = r.WithContext(context.WithValue(r.Context(), LoggedUserEmailKey, email))
 
 		next.ServeHTTP(w, r)

@@ -1,13 +1,15 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"sync"
 	"testing"
 	"time"
 
 	"log"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCheckAgeThreshold(t *testing.T) {
@@ -32,17 +34,16 @@ func TestCheckAgeThreshold(t *testing.T) {
 func TestListToRemove(t *testing.T) {
 	loc, _ := time.LoadLocation("UTC")
 	now := time.Now().In(loc)
-	trashPath := "./testdata"
+	trashPath := "./testdata_tmp"
+	createTestFolder(t, trashPath)
 
 	threshold := 48 * time.Hour
-	if len(listToRemove(threshold, trashPath, now)) != 0 {
-		t.Error("The list of files to be removed does not match with expected.")
-	}
+	assert.Len(t, listToRemove(threshold, trashPath, now), 0)
 
 	threshold = 0 * time.Hour
-	if len(listToRemove(threshold, trashPath, now)) != 6 {
-		t.Error("The list of files to be removed does not match with expected.")
-	}
+	assert.Len(t, listToRemove(threshold, trashPath, now), 4)
+
+	removeTestFolder(t, trashPath)
 }
 
 func TestRemoveTrashItem(t *testing.T) {
@@ -59,11 +60,12 @@ func TestRemoveTrashItem(t *testing.T) {
 	go removeTrashItem(&wg, dir, false)
 	wg.Wait()
 
-	itemsList, _ := ioutil.ReadDir(trashPath)
+	itemsList, err := os.ReadDir(trashPath)
+	require.NoError(t, err)
 
-	if len(itemsList) != 3 {
-		t.Error("The number of items removed differ from expected.")
-	}
+	assert.Len(t, itemsList, 3)
+
+	removeTestFolder(t, trashPath)
 }
 
 func createTestFolder(t *testing.T, trashPath string) []string {
@@ -77,12 +79,12 @@ func createTestFolder(t *testing.T, trashPath string) []string {
 	var tmpDir []string
 
 	for i := 0; i < 4; i++ {
-		dir, err := ioutil.TempDir(trashPath, "*")
+		dir, err := os.MkdirTemp(trashPath, "*")
 		if err != nil {
 			log.Printf("Can not create temp dir")
 		}
 
-		_, err = ioutil.TempFile(dir, "data_set_*")
+		_, err = os.CreateTemp(dir, "data_set_*")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -91,4 +93,13 @@ func createTestFolder(t *testing.T, trashPath string) []string {
 	}
 
 	return tmpDir
+}
+
+func removeTestFolder(t *testing.T, trashPath string) {
+	t.Helper()
+
+	err := os.RemoveAll(trashPath)
+	if err != nil {
+		t.Fatalf("Error removing testFolder: %s", err)
+	}
 }

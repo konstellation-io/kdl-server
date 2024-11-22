@@ -134,6 +134,7 @@ spec:
               mountPath: /home/coder/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
+        {{- if .Values.vscode.enabled }}
         - name: {{ .Chart.Name }}-vscode-proxy
           image: {{ .Values.oauth2Proxy.image.repository }}:{{ .Values.oauth2Proxy.image.tag }}
           imagePullPolicy: {{ .Values.oauth2Proxy.image.pullPolicy }}
@@ -168,13 +169,16 @@ spec:
             - name: http
               containerPort: 4180
               protocol: TCP
+          {{- end }}
       volumes:
         - name: kubeconfig-tpl-configmap
           configMap:
             name: kubeconfig-{{ .Values.usernameSlug }}-tpl-configmap
+        {{- if .Values.vscode.enabled }}
         - name: oauth2-config
           configMap:
             name: {{ include "user-tools.fullname" . }}-oauth2-proxy
+        {{- end }}
         {{ if .Values.sharedVolume.name -}}
         - name: {{ .Values.sharedVolume.name }}
           persistentVolumeClaim:

@@ -55,6 +55,7 @@ kubeconfig:
   # externalServerUrl: https://192.168.0.21:16443
 
 vscode:
+  enabled: false
   image:
     repository: konstellation/vscode
     tag: "latest"

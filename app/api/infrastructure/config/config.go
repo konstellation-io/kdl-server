@@ -51,7 +51,7 @@ type Config struct {
 	}
 	VSCode struct {
 		URL     string `envconfig:"USER_TOOLS_VSCODE_URL"`
-		Enabled string `envconfig:"USER_TOOLS_VSCODE_ENABLED"`
+		Enabled bool   `envconfig:"USER_TOOLS_VSCODE_ENABLED"`
 		Image   struct {
 			Repository string `envconfig:"VSCODE_IMG_REPO"`
 			Tag        string `envconfig:"VSCODE_IMG_TAG"`

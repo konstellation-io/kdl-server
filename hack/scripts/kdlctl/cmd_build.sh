@@ -22,7 +22,6 @@ build_docker_images() {
   build_repo_cloner
   build_mlflow
   build_kg
-  build_backup
 }
 
 build_server() {
@@ -65,10 +64,6 @@ build_kg() {
     fi
 
     build_image knowledge-galaxy $KNOWLEDGE_GALAXY_PATH
-}
-
-build_backup() {
-  build_image kdl-backup backup
 }
 
 build_image() {

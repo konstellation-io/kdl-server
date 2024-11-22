@@ -50,8 +50,9 @@ type Config struct {
 		SecretKey string `envconfig:"MINIO_SECRET_KEY"`
 	}
 	VSCode struct {
-		URL   string `envconfig:"USER_TOOLS_VSCODE_URL"`
-		Image struct {
+		URL     string `envconfig:"USER_TOOLS_VSCODE_URL"`
+		Enabled string `envconfig:"USER_TOOLS_VSCODE_ENABLED"`
+		Image   struct {
 			Repository string `envconfig:"VSCODE_IMG_REPO"`
 			Tag        string `envconfig:"VSCODE_IMG_TAG"`
 			PullPolicy string `envconfig:"VSCODE_IMG_PULLPOLICY"`

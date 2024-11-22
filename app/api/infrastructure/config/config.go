@@ -35,7 +35,7 @@ type Config struct {
 	}
 	MongoDB struct {
 		URI    string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
-		DBName string `yaml:"dbName"`
+		DBName string `yaml:"dbName" envconfig:"KDL_SERVER_MONGODB_NAME"`
 	} `yaml:"mongodb"`
 	Gitea struct {
 		InternalURL string `yaml:"internal_url" envconfig:"GITEA_INTERNAL_URL"`

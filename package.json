@@ -3,7 +3,6 @@
   "private": true,
   "workspaces": [
     "app",
-    "backup",
     "mlflow",
     "project-operator",
     "repo-cloner",

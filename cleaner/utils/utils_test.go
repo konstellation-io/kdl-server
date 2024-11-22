@@ -13,7 +13,10 @@ import (
 	"cleaner/utils"
 )
 
-const numberOfTempFiles = 4
+const (
+	numberOfTempFiles = 4
+	testDataPath      = "./testdata_tmp"
+)
 
 func TestCheckAgeThreshold(t *testing.T) {
 	loc, err := time.LoadLocation("UTC")
@@ -34,24 +37,23 @@ func TestCheckAgeThreshold(t *testing.T) {
 func TestListToRemove(t *testing.T) {
 	loc, _ := time.LoadLocation("UTC")
 	now := time.Now().In(loc)
-	trashPath := "./testdata_tmp"
-	createTestFolder(t, trashPath)
+
+	createTestFolder(t, testDataPath)
 
 	threshold := 48 * time.Hour
-	assert.Empty(t, utils.ListToRemove(threshold, trashPath, now))
+	assert.Empty(t, utils.ListToRemove(threshold, testDataPath, now))
 
 	threshold = 0 * time.Hour
-	assert.Len(t, utils.ListToRemove(threshold, trashPath, now), numberOfTempFiles)
+	assert.Len(t, utils.ListToRemove(threshold, testDataPath, now), numberOfTempFiles)
 
-	removeTestFolder(t, trashPath)
+	removeTestFolder(t, testDataPath)
 }
 
 func TestRemoveTrashItem(t *testing.T) {
-	trashPath := "./testdata_tmp"
-	dirs := createTestFolder(t, trashPath)
+	dirs := createTestFolder(t, testDataPath)
 	dir := dirs[0]
 
-	defer os.RemoveAll(trashPath)
+	defer os.RemoveAll(testDataPath)
 
 	var wg sync.WaitGroup
 
@@ -60,18 +62,18 @@ func TestRemoveTrashItem(t *testing.T) {
 	go utils.RemoveTrashItem(&wg, dir, false)
 	wg.Wait()
 
-	itemsList, err := os.ReadDir(trashPath)
+	itemsList, err := os.ReadDir(testDataPath)
 	require.NoError(t, err)
 
 	assert.Len(t, itemsList, 3)
 
-	removeTestFolder(t, trashPath)
+	removeTestFolder(t, testDataPath)
 }
 
-func createTestFolder(t *testing.T, trashPath string) []string {
+func createTestFolder(t *testing.T, testDataPath string) []string {
 	t.Helper()
 
-	err := os.Mkdir(trashPath, 0777)
+	err := os.Mkdir(testDataPath, 0777)
 	if err != nil {
 		t.Fatalf("Error creating testFolder: %s", err)
 	}
@@ -79,7 +81,7 @@ func createTestFolder(t *testing.T, trashPath string) []string {
 	tmpDir := make([]string, 0, numberOfTempFiles)
 
 	for range numberOfTempFiles {
-		dir, err := os.MkdirTemp(trashPath, "*")
+		dir, err := os.MkdirTemp(testDataPath, "*")
 		if err != nil {
 			log.Printf("Can not create temp dir")
 		}
@@ -95,10 +97,10 @@ func createTestFolder(t *testing.T, trashPath string) []string {
 	return tmpDir
 }
 
-func removeTestFolder(t *testing.T, trashPath string) {
+func removeTestFolder(t *testing.T, testDataPath string) {
 	t.Helper()
 
-	err := os.RemoveAll(trashPath)
+	err := os.RemoveAll(testDataPath)
 	if err != nil {
 		t.Fatalf("Error removing testFolder: %s", err)
 	}

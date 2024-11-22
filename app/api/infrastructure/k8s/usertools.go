@@ -260,6 +260,7 @@ func (k *K8sClient) getUserToolsDefinition(
 		},
 		"tls": tlsConfig,
 		"vscode": map[string]interface{}{
+			"enabled": k.cfg.VSCode.Enabled,
 			"image": map[string]string{
 				"repository": k.cfg.VSCode.Image.Repository,
 				"tag":        k.cfg.VSCode.Image.Tag,

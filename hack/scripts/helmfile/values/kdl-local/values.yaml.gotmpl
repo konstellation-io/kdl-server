@@ -392,6 +392,8 @@ userToolsOperator:
       pullPolicy: Always
 
   vscode:
+    enabled: false
+
     image:
       repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/vscode
       tag: latest

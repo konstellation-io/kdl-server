@@ -81,6 +81,7 @@ spec:
               mountPath: /home/kdl/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
+        {{- if .Values.vscode.enabled }}
         - name: {{ .Chart.Name }}-vscode
           image: {{ .Values.vscode.image.repository }}:{{ .Values.vscode.image.tag }}
           imagePullPolicy: {{ .Values.vscode.image.pullPolicy }}
@@ -96,6 +97,7 @@ spec:
               mountPath: /home/coder/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
+        {{- end }}
         - name: {{ .Chart.Name }}-vscode-runtime
           image: {{ .Values.vscodeRuntime.image.repository }}:{{ .Values.vscodeRuntime.image.tag }}
           imagePullPolicy: {{ .Values.vscodeRuntime.image.pullPolicy }}

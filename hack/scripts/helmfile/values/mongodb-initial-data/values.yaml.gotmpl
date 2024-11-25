@@ -14,7 +14,7 @@ resources:
                         - -c
                       args:
                         - |
-                          until nc -zv mongodb.mongodb 27017 > /dev/null; do
+                          until nc -zv mongodb 27017 > /dev/null; do
                             sleep 10
                           done
                           echo "MongoDB is up and running!"

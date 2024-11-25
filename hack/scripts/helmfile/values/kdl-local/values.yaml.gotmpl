@@ -20,11 +20,6 @@ global:
       enabled: {{ requiredEnv "ENABLE_TLS" }}
       secretName: {{ requiredEnv "DOMAIN" }}-tls-secret
 
-  mongodb:
-    connectionString:
-      secretKey: mongodb-string-uri
-      secretName: mongodb-string-uri
-
 image:
   repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-server
   tag: latest
@@ -53,17 +48,6 @@ readyChecker:
 service:
   type: ClusterIP
   port: 80
-
-podAnnotations:
-  env: "microk8s"
-
-podLabels:
-  env: "develop"
-
-volumes:
-  - name: kdl-server
-    configMap:
-      name: kdl-local-server
 
 gitea:
   enabled: true

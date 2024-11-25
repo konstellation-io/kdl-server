@@ -10,17 +10,17 @@ import (
 
 // Config holds the configuration values of the application.
 type Config struct {
-	UsrName               string `envconfig:"KDL_USER_NAME"`
-	ReposPath             string `yaml:"reposPath" envconfig:"REPOS_PATH"`
-	PemFile               string `yaml:"pemFile" envconfig:"PEM_FILE"`
-	PemFilePassword       string `yaml:"pemFilePassword" envconfig:"PEM_FILE_PASSWORD"`
-	CheckFrequencySeconds int    `yaml:"checkFrequencySeconds" envconfig:"CHECK_FREQUENCY_SECONDS"`
-	MongoDB               struct {
+	MongoDB struct {
 		URI              string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
 		DBName           string `yaml:"dbName" envconfig:"DB_NAME"`
 		ProjectsCollName string `yaml:"projectCollName" envconfig:"PROJECT_COLL_NAME"`
 		UsersCollName    string `yaml:"userCollName" envconfig:"USER_COLL_NAME"`
 	}
+	UsrName               string `envconfig:"KDL_USER_NAME"`
+	ReposPath             string `yaml:"reposPath" envconfig:"REPOS_PATH"`
+	PemFile               string `yaml:"pemFile" envconfig:"PEM_FILE"`
+	PemFilePassword       string `yaml:"pemFilePassword" envconfig:"PEM_FILE_PASSWORD"`
+	CheckFrequencySeconds int    `yaml:"checkFrequencySeconds" envconfig:"CHECK_FREQUENCY_SECONDS"`
 }
 
 // NewConfig will read the config.yml file and override values with env vars.

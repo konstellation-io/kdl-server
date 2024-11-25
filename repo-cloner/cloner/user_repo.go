@@ -18,8 +18,8 @@ import (
 type UserRepoCloner struct {
 	projectRepo *repository.ProjectMongoDBRepo
 	userRepo    *repository.UserMongoDBRepo
-	cfg         config.Config
 	logger      logr.Logger
+	cfg         config.Config
 }
 
 func NewUserRepoCloner(

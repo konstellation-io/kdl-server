@@ -16,10 +16,10 @@ import (
 )
 
 type UserRepoCloner struct {
-	cfg         config.Config
-	logger      logr.Logger
 	projectRepo *repository.ProjectMongoDBRepo
 	userRepo    *repository.UserMongoDBRepo
+	cfg         config.Config
+	logger      logr.Logger
 }
 
 func NewUserRepoCloner(

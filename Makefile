@@ -29,20 +29,20 @@ stop-microk8s: ## Stops microk8s
 
 .PHONY: build
 build: ## Builds docker images and pushes them to the microk8s registry
-	cd hack && .kdlctl.sh build && cd -
+	cd hack && ./kdlctl.sh build && cd -
 
 .PHONY: deploy
 deploy: ## Deploys Helm charts
-	cd hack && .kdlctl.sh deploy && cd -
+	cd hack && ./kdlctl.sh deploy && cd -
 
 .PHONY: restart
 restart: ## Restarts kdl pods and microk8s (use after build)
-	cd hack && .kdlctl.sh restart && cd -
+	cd hack && ./kdlctl.sh restart && cd -
 
 .PHONY: refresh-certs
 refresh-certs: ## Refreshes the certificates
-	cd hack && .kdlctl.sh refresh-certs && cd -
+	cd hack && ./kdlctl.sh refresh-certs && cd -
 
 .PHONY: uninstall
 uninstall: ## Remove all microk8s resources
-	cd hack && .kdlctl.sh uninstall && cd -
+	cd hack && ./kdlctl.sh uninstall && cd -

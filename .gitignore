@@ -6,7 +6,6 @@
 .envrc
 .run/*.xml
 .trunk/
-backup/restore-pod.yaml
 coverage/
 deprecations
 main

@@ -15,7 +15,6 @@ type Config = {
   SERVER_URL: string;
   KNOWLEDGE_GALAXY_ENABLED: boolean;
   KG_SERVER_URL: string;
-  GITEA_URL: string;
   RELEASE_VERSION: string;
   DESCRIPTION_MIN_WORDS: number;
 };

@@ -51,7 +51,7 @@ function UserSshKey() {
                 to verify that you are the user performing operations. In order to make this
                 possible, you need to copy the key shown above and paste it inside the SSH Keys section
                 (usually in user settings) of the application you want to be verified from.
-                Tipically this will be done in version-control systems, such as GitHub or Gitea."
+                Tipically this will be done in version-control systems, such as GitHub."
             />
           </div>
           <div className={styles.box}>

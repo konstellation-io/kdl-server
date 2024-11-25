@@ -68,7 +68,6 @@ exports[`Project component Component match snapshot 1`] = `
           "repository": null,
           "toolUrls": Object {
             "filebrowser": "https://filebrowser",
-            "gitea": "https://gitea",
             "knowledgeGalaxy": "https://knowledgeGalaxy",
             "mlflow": "https://mlflow",
             "vscode": "https://vscode",
@@ -128,7 +127,6 @@ exports[`Project component Component match snapshot 1`] = `
                 "repository": null,
                 "toolUrls": Object {
                   "filebrowser": "https://filebrowser",
-                  "gitea": "https://gitea",
                   "knowledgeGalaxy": "https://knowledgeGalaxy",
                   "mlflow": "https://mlflow",
                   "vscode": "https://vscode",
@@ -210,7 +208,6 @@ exports[`Project component Component match snapshot 1`] = `
                 "repository": null,
                 "toolUrls": Object {
                   "filebrowser": "https://filebrowser",
-                  "gitea": "https://gitea",
                   "knowledgeGalaxy": "https://knowledgeGalaxy",
                   "mlflow": "https://mlflow",
                   "vscode": "https://vscode",
@@ -298,7 +295,6 @@ exports[`Project component Component match snapshot 1`] = `
                 "repository": null,
                 "toolUrls": Object {
                   "filebrowser": "https://filebrowser",
-                  "gitea": "https://gitea",
                   "knowledgeGalaxy": "https://knowledgeGalaxy",
                   "mlflow": "https://mlflow",
                   "vscode": "https://vscode",
@@ -367,7 +363,6 @@ exports[`Project component Component match snapshot 1`] = `
                 "repository": null,
                 "toolUrls": Object {
                   "filebrowser": "https://filebrowser",
-                  "gitea": "https://gitea",
                   "knowledgeGalaxy": "https://knowledgeGalaxy",
                   "mlflow": "https://mlflow",
                   "vscode": "https://vscode",

@@ -66,23 +66,7 @@ Login link  : https://kdlapp.kdl.192.168.64.2.nip.io
 🔑 Password : a123456
 ```
 
-You can find the admin credentials `GITEA_ADMIN_USER` and `GITEA_ADMIN_PASSWORD` in the `.kdlctl.conf` file.
-
-## Install pre-commit
-
-In this project, there is a pre-commit configuration to run some checks before
-committing your code. It is not mandatory but it is recommended to have it in
-your machine.
-
-To install pre-commit hooks run the following command:
-
-```console
-pip install pre-commit
-pre-commit install
-```
-
-Please also install golangci-lint because it is executed by a pre-commit hook, e.g. via snap.
-<https://golangci-lint.run/welcome/install/>
+You can find the admin credentials `KEYCLOAK_ADMIN_USER` and `KEYCLOAK_ADMIN_PASSWORD` in the `.kdlctl.conf` file.
 
 ## Uninstall local environment
 

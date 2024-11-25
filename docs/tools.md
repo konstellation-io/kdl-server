@@ -1,4 +1,4 @@
-# Tools
+# Tools and requirements
 
 Follow these steps to setup your development environment:
 

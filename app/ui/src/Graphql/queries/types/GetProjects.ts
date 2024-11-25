@@ -19,7 +19,6 @@ export interface GetProjects_projects_repository {
 export interface GetProjects_projects_toolUrls {
   __typename: "ToolUrls";
   knowledgeGalaxy: string;
-  gitea: string;
   filebrowser: string;
   mlflow: string;
   vscode: string;

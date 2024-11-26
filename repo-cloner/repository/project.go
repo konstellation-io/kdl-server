@@ -15,8 +15,8 @@ import (
 
 type ProjectMongoDBRepo struct {
 	collection *mongo.Collection
-	cfg        config.Config
 	logger     logr.Logger
+	cfg        config.Config
 }
 
 type Project struct {

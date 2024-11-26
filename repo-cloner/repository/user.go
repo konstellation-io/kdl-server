@@ -20,8 +20,8 @@ type User struct {
 
 type UserMongoDBRepo struct {
 	collection *mongo.Collection
-	cfg        config.Config
 	logger     logr.Logger
+	cfg        config.Config
 }
 
 // NewUserMongoDBRepo implements user.Repository interface.

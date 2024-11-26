@@ -23,7 +23,7 @@ type Runtimesuite struct {
 type flavorMocks struct {
 	logger   logr.Logger
 	repo     *runtime.MockRepository
-	k8client *k8s.MockClient
+	k8client *k8s.MockClientInterface
 }
 
 func newRuntimesuite(t *testing.T) *Runtimesuite {
@@ -34,7 +34,7 @@ func newRuntimesuite(t *testing.T) *Runtimesuite {
 
 	ctrl := gomock.NewController(t)
 	repo := runtime.NewMockRepository(ctrl)
-	k8client := k8s.NewMockClient(ctrl)
+	k8client := k8s.NewMockClientInterface(ctrl)
 	interactor := runtime.NewInteractor(logger, k8client, repo)
 
 	return &Runtimesuite{

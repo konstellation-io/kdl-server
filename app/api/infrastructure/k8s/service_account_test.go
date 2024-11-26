@@ -27,7 +27,7 @@ const (
 type serviceAccountTestSuite struct {
 	suite.Suite
 	container *k3s.K3sContainer
-	client    *k8s.K8sClient
+	client    *k8s.Client
 	clientset *kubernetes.Clientset
 }
 

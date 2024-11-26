@@ -34,7 +34,7 @@ type interactor struct {
 	sshGenerator     sshhelper.SSHKeyGenerator
 	clock            clock.Clock
 	giteaService     giteaservice.GiteaClient
-	k8sClient        k8s.Client
+	k8sClient        k8s.ClientInterface
 }
 
 // NewInteractor factory function.
@@ -47,7 +47,7 @@ func NewInteractor(
 	sshGenerator sshhelper.SSHKeyGenerator,
 	c clock.Clock,
 	giteaService giteaservice.GiteaClient,
-	k8sClient k8s.Client,
+	k8sClient k8s.ClientInterface,
 ) UseCase {
 	return &interactor{
 		logger:           logger,

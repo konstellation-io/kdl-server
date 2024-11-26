@@ -37,7 +37,7 @@ type projectMocks struct {
 	clock            *clock.MockClock
 	giteaService     *giteaservice.MockGiteaClient
 	minioService     *minioservice.MockMinioService
-	k8sClient        *k8s.MockClient
+	k8sClient        *k8s.MockClientInterface
 	logger           logr.Logger
 }
 
@@ -48,7 +48,7 @@ func newProjectSuite(t *testing.T) *projectSuite {
 	clockMock := clock.NewMockClock(ctrl)
 	giteaService := giteaservice.NewMockGiteaClient(ctrl)
 	minioService := minioservice.NewMockMinioService(ctrl)
-	k8sClient := k8s.NewMockClient(ctrl)
+	k8sClient := k8s.NewMockClientInterface(ctrl)
 
 	zapLog, err := zap.NewDevelopment()
 	require.NoError(t, err)

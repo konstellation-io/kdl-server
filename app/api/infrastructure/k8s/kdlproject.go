@@ -20,11 +20,11 @@ type projectK8sResouces struct {
 	filebrowserTolerations   []map[string]string
 }
 
-func (k *K8sClient) getProjectName(projectID string) string {
+func (k *Client) getProjectName(projectID string) string {
 	return fmt.Sprintf("kdlproject-%s", projectID)
 }
 
-func (k *K8sClient) getProjectK8sResouces() (projectK8sResouces, error) {
+func (k *Client) getProjectK8sResouces() (projectK8sResouces, error) {
 	const oAuth2ProxyCookieSecretLen = 16
 
 	cookieSecret, err := kdlutil.GenerateRandomString(oAuth2ProxyCookieSecretLen)
@@ -79,7 +79,7 @@ func (k *K8sClient) getProjectK8sResouces() (projectK8sResouces, error) {
 	}, nil
 }
 
-func (k *K8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) error {
+func (k *Client) CreateKDLProjectCR(ctx context.Context, projectID string) error {
 	resName := k.getProjectName(projectID)
 
 	tlsConfig := map[string]interface{}{
@@ -177,7 +177,7 @@ func (k *K8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 	return err
 }
 
-func (k *K8sClient) DeleteKDLProjectCR(ctx context.Context, projectID string) error {
+func (k *Client) DeleteKDLProjectCR(ctx context.Context, projectID string) error {
 	resName := k.getProjectName(projectID)
 
 	k.logger.Info("Attempting to delete KDL Project CR in k8s", "projectName", resName)

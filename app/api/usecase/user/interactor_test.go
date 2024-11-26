@@ -42,7 +42,7 @@ type userMocks struct {
 	sshGenerator     *sshhelper.MockSSHKeyGenerator
 	clock            *clock.MockClock
 	giteaService     *giteaservice.MockGiteaClient
-	k8sClientMock    *k8s.MockClient
+	k8sClientMock    *k8s.MockClientInterface
 	logger           logr.Logger
 	cfg              config.Config
 }
@@ -55,7 +55,7 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	clockMock := clock.NewMockClock(ctrl)
 	sshGenerator := sshhelper.NewMockSSHKeyGenerator(ctrl)
 	giteaServiceMock := giteaservice.NewMockGiteaClient(ctrl)
-	k8sClientMock := k8s.NewMockClient(ctrl)
+	k8sClientMock := k8s.NewMockClientInterface(ctrl)
 
 	zapLog, err := zap.NewDevelopment()
 	require.NoError(t, err)

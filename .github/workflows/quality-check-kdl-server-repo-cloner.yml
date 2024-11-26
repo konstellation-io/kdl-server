@@ -35,7 +35,7 @@ jobs:
         with:
           version: v1.61.0
           working-directory: ./repo-cloner
-          args: --timeout 5m
+          args: --config ../.github/.golangci.yml
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: API Test

@@ -190,7 +190,7 @@ linters:
     - gosec # inspects source code for security problems
     - gosimple # ENABLED by default linter for Go source code that specializes in simplifying code
     - govet # ENABLED by default examines Go source code and reports suspicious constructs
-    - iface # detect the incorrect use of interfaces https://github.com/uudashr/iface
+    # unsupported by gitlab ci 26/11/24 - iface # detect the incorrect use of interfaces https://github.com/uudashr/iface
     - ineffassign # ENABLED by default detects when assignments to existing variables are not used
     - inamedparam # checks for interface methods with only a single parameter
     - lll # checks line length

@@ -110,21 +110,20 @@ func (k *K8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug s
 		k.logger.Info("Creating service account for user in k8s...", "username", usernameSlug)
 
 		sa := k.newServiceAccount(usernameSlug, saSecretName)
-		serviceAccount, err := k.clientset.CoreV1().ServiceAccounts(k.cfg.Kubernetes.Namespace).Create(ctx, sa, metav1.CreateOptions{})
 
+		createdSA, err := k.clientset.CoreV1().ServiceAccounts(k.cfg.Kubernetes.Namespace).Create(ctx, sa, metav1.CreateOptions{})
 		if err != nil {
 			return nil, err
 		}
 
 		err = k.createSecretTypeServiceAccountToken(ctx, saSecretName, usernameSlug)
-
 		if err != nil {
 			return nil, err
 		}
 
-		k.logger.Info("The service account was created in k8s correctly", "name", serviceAccount.Name)
+		k.logger.Info("The service account was created in k8s correctly", "name", createdSA.Name)
 
-		return serviceAccount, nil
+		return createdSA, nil
 	} else if err != nil && !k8errors.IsNotFound(err) {
 		return nil, err
 	}

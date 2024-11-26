@@ -6,7 +6,9 @@ import (
 )
 
 var (
-	ErrWrongNumberProjectsDeleted = errors.New("number of projects deleted is not 1")
+	ErrWrongNumberProjectsDeleted  = errors.New("number of projects deleted is not 1")
+	ErrCastingInsertedIDToObjectID = errors.New("error casting InsertedID to primitive.ObjectID")
+	ErrCastingInsertedIDToString   = errors.New("error casting InsertedID to string")
 )
 
 func NewErrWrongNumberProjectsDeleted(count int) error {

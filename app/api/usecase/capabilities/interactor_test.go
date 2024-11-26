@@ -25,10 +25,10 @@ type capabilitiesSuite struct {
 }
 
 type capabilitiesMocks struct {
-	logger    logr.Logger
-	cfg       config.Config
 	repo      *capabilities.MockRepository
 	k8sClient *k8s.MockClient
+	logger    logr.Logger
+	cfg       config.Config
 }
 
 func newCapabilitiesSuite(t *testing.T, cfg *config.Config) *capabilitiesSuite {

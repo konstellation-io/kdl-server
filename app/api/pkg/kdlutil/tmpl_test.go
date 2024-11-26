@@ -35,7 +35,7 @@ func TestGenerateTemplate(t *testing.T) {
 	}
 
 	tmpfn := filepath.Join(tmplFolder, "subdir1", "subdir2", "tmpfile.txt.tmpl")
-	if err := os.WriteFile(tmpfn, content, os.ModePerm); err != nil {
+	if err := os.WriteFile(tmpfn, content, 0600); err != nil {
 		t.Fatal(err)
 	}
 

@@ -9,61 +9,89 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
+type projectK8sResouces struct {
+	cookieSecret             string
+	mlflowIngressAnnotations map[string]interface{}
+	mlflowNodeSelector       map[string]interface{}
+	mlflowAffinity           map[string]interface{}
+	mlflowTolerations        []map[string]string
+	filebrowserNodeSelector  map[string]interface{}
+	filebrowserAffinity      map[string]interface{}
+	filebrowserTolerations   []map[string]string
+}
+
 func (k *K8sClient) getProjectName(projectID string) string {
 	return fmt.Sprintf("kdlproject-%s", projectID)
 }
 
-func (k *K8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) error {
+func (k *K8sClient) getProjectK8sResouces() (projectK8sResouces, error) {
 	const oAuth2ProxyCookieSecretLen = 16
 
 	cookieSecret, err := kdlutil.GenerateRandomString(oAuth2ProxyCookieSecretLen)
 	if err != nil {
-		return err
+		return projectK8sResouces{}, err
 	}
 
+	mlflowIngressAnnotations, err := k.getK8sMap(k.cfg.ProjectMLFlow.Ingress.Annotations)
+	if err != nil {
+		return projectK8sResouces{}, fmt.Errorf("error getting mlflow ingress annotations: %w", err)
+	}
+
+	mlflowNodeSelector, err := k.getK8sMap(k.cfg.ProjectMLFlow.NodeSelector)
+	if err != nil {
+		return projectK8sResouces{}, fmt.Errorf("error getting mlflow nodeSelector: %w", err)
+	}
+
+	mlflowAffinity, err := k.getK8sMap(k.cfg.ProjectMLFlow.Affinity)
+	if err != nil {
+		return projectK8sResouces{}, fmt.Errorf("error getting mlflow affinity: %w", err)
+	}
+
+	mlflowTolerations, err := k.getK8sList(k.cfg.ProjectMLFlow.Tolerations)
+	if err != nil {
+		return projectK8sResouces{}, fmt.Errorf("error getting mlflow tolerations: %w", err)
+	}
+
+	filebrowserNodeSelector, err := k.getK8sMap(k.cfg.ProjectFilebrowser.NodeSelector)
+	if err != nil {
+		return projectK8sResouces{}, fmt.Errorf("error getting filebrowser nodeSelector: %w", err)
+	}
+
+	filebrowserAffinity, err := k.getK8sMap(k.cfg.ProjectFilebrowser.Affinity)
+	if err != nil {
+		return projectK8sResouces{}, fmt.Errorf("error getting filebrowser affinity: %w", err)
+	}
+
+	filebrowserTolerations, err := k.getK8sList(k.cfg.ProjectFilebrowser.Tolerations)
+	if err != nil {
+		return projectK8sResouces{}, fmt.Errorf("error getting filebrowser tolerations: %w", err)
+	}
+
+	return projectK8sResouces{
+		cookieSecret:             cookieSecret,
+		mlflowIngressAnnotations: mlflowIngressAnnotations,
+		mlflowNodeSelector:       mlflowNodeSelector,
+		mlflowAffinity:           mlflowAffinity,
+		mlflowTolerations:        mlflowTolerations,
+		filebrowserNodeSelector:  filebrowserNodeSelector,
+		filebrowserAffinity:      filebrowserAffinity,
+		filebrowserTolerations:   filebrowserTolerations,
+	}, nil
+}
+
+func (k *K8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) error {
 	resName := k.getProjectName(projectID)
 
 	tlsConfig := map[string]interface{}{
 		"enabled": k.cfg.TLS.Enabled,
 	}
-
 	if k.cfg.ProjectMLFlow.Ingress.TLS.SecretName != nil {
 		tlsConfig["secretName"] = &k.cfg.ProjectMLFlow.Ingress.TLS.SecretName
 	}
 
-	mlflowIngressAnnotations, err := k.getK8sMap(k.cfg.ProjectMLFlow.Ingress.Annotations)
+	k8sResouces, err := k.getProjectK8sResouces()
 	if err != nil {
-		return fmt.Errorf("error getting mlflow ingress annotations: %w", err)
-	}
-
-	mlflowNodeSelector, err := k.getK8sMap(k.cfg.ProjectMLFlow.NodeSelector)
-	if err != nil {
-		return fmt.Errorf("error getting mlflow nodeSelector: %w", err)
-	}
-
-	mlflowAffinity, err := k.getK8sMap(k.cfg.ProjectMLFlow.Affinity)
-	if err != nil {
-		return fmt.Errorf("error getting mlflow affinity: %w", err)
-	}
-
-	mlflowTolerations, err := k.getK8sList(k.cfg.ProjectMLFlow.Tolerations)
-	if err != nil {
-		return fmt.Errorf("error getting mlflow tolerations: %w", err)
-	}
-
-	filebrowserNodeSelector, err := k.getK8sMap(k.cfg.ProjectFilebrowser.NodeSelector)
-	if err != nil {
-		return fmt.Errorf("error getting filebrowser nodeSelector: %w", err)
-	}
-
-	filebrowserAffinity, err := k.getK8sMap(k.cfg.ProjectFilebrowser.Affinity)
-	if err != nil {
-		return fmt.Errorf("error getting filebrowser affinity: %w", err)
-	}
-
-	filebrowserTolerations, err := k.getK8sList(k.cfg.ProjectFilebrowser.Tolerations)
-	if err != nil {
-		return fmt.Errorf("error getting filebrowser tolerations: %w", err)
+		return err
 	}
 
 	definition := &unstructured.Unstructured{
@@ -101,7 +129,7 @@ func (k *K8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 						"tag":        k.cfg.OAuth2Proxy.Image.Tag,
 						"pullPolicy": k.cfg.OAuth2Proxy.Image.PullPolicy,
 					},
-					"cookieSecret": cookieSecret,
+					"cookieSecret": k8sResouces.cookieSecret,
 				},
 				"mlflow": map[string]interface{}{
 					"image": map[string]string{
@@ -119,11 +147,11 @@ func (k *K8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 					"ingress": map[string]interface{}{
 						"tls":         tlsConfig,
 						"className":   k.cfg.ProjectMLFlow.Ingress.ClassName,
-						"annotations": mlflowIngressAnnotations,
+						"annotations": k8sResouces.mlflowIngressAnnotations,
 					},
-					"nodeSelector": mlflowNodeSelector,
-					"affinity":     mlflowAffinity,
-					"tolerations":  mlflowTolerations,
+					"nodeSelector": k8sResouces.mlflowNodeSelector,
+					"affinity":     k8sResouces.mlflowAffinity,
+					"tolerations":  k8sResouces.mlflowTolerations,
 				},
 				"filebrowser": map[string]interface{}{
 					"image": map[string]string{
@@ -131,17 +159,17 @@ func (k *K8sClient) CreateKDLProjectCR(ctx context.Context, projectID string) er
 						"tag":        k.cfg.ProjectFilebrowser.Image.Tag,
 						"pullPolicy": k.cfg.ProjectFilebrowser.Image.PullPolicy,
 					},
-					"nodeSelector": filebrowserNodeSelector,
-					"affinity":     filebrowserAffinity,
-					"tolerations":  filebrowserTolerations,
+					"nodeSelector": k8sResouces.filebrowserNodeSelector,
+					"affinity":     k8sResouces.filebrowserAffinity,
+					"tolerations":  k8sResouces.filebrowserTolerations,
 				},
 			},
 		},
 	}
 
 	k.logger.Info("Creating kdl project")
-	_, err = k.kdlprojectRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
 
+	_, err = k.kdlprojectRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
 	if err == nil {
 		k.logger.Info("KDL project created correctly in k8s", "projectName", resName)
 	}

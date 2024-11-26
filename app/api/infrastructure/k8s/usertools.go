@@ -18,7 +18,7 @@ func (k *K8sClient) DeleteUserToolsCR(ctx context.Context, username string) erro
 	slugUsername := k.getSlugUsername(username)
 	resName := k.getUserToolsResName(slugUsername)
 
-	var zero int64 = 0
+	var zero int64
 
 	delPropagationFg := metav1.DeletePropagationForeground
 
@@ -297,24 +297,9 @@ func (k *K8sClient) getUserToolsDefinition(
 		"serviceAccountName": serviceAccountName,
 	}
 
-	if capabilities.ID != "" {
-		if err := capabilities.Validate(); err != nil {
-			return nil, err
-		}
-
-		if !capabilities.IsNodeSelectorsEmpty() {
-			spec["nodeSelector"] = capabilities.GetNodeSelectors()
-		}
-
-		if !capabilities.IsTolerationsEmpty() {
-			spec["tolerations"] = capabilities.GetTolerations()
-		}
-
-		if !capabilities.IsAffinitiesEmpty() {
-			spec["affinity"] = capabilities.GetAffinities()
-		}
-
-		vscodeRuntime["capabilityId"] = capabilities.ID
+	err := k.loadCapabilites(spec, vscodeRuntime, capabilities)
+	if err != nil {
+		return nil, err
 	}
 
 	spec["vscodeRuntime"] = vscodeRuntime
@@ -335,6 +320,34 @@ func (k *K8sClient) getUserToolsDefinition(
 	}
 
 	return definition, nil
+}
+
+func (k *K8sClient) loadCapabilites(
+	spec map[string]interface{},
+	vscodeRuntime map[string]interface{},
+	capabilities entity.Capabilities,
+) error {
+	if capabilities.ID != "" {
+		if err := capabilities.Validate(); err != nil {
+			return err
+		}
+
+		if !capabilities.IsNodeSelectorsEmpty() {
+			spec["nodeSelector"] = capabilities.GetNodeSelectors()
+		}
+
+		if !capabilities.IsTolerationsEmpty() {
+			spec["tolerations"] = capabilities.GetTolerations()
+		}
+
+		if !capabilities.IsAffinitiesEmpty() {
+			spec["affinity"] = capabilities.GetAffinities()
+		}
+
+		vscodeRuntime["capabilityId"] = capabilities.ID
+	}
+
+	return nil
 }
 
 // Returns a watcher for the UserTools.
@@ -364,8 +377,10 @@ func (k *K8sClient) waitUserToolsDeleted(ctx context.Context, resName string) er
 		select {
 		case event := <-watcher.ResultChan():
 			if event.Type == watch.Deleted {
-				pod := event.Object.(*v1.Pod)
-				k.logger.Info("Pod deleted", "podName", pod.Name)
+				pod, assertType := event.Object.(*v1.Pod)
+				if assertType {
+					k.logger.Info("Pod deleted", "podName", pod.Name)
+				}
 
 				return nil
 			}
@@ -389,7 +404,11 @@ func (k *K8sClient) waitUserToolsRunning(ctx context.Context, resName string) er
 	for {
 		select {
 		case event := <-watcher.ResultChan():
-			pod := event.Object.(*v1.Pod)
+			pod, ok := event.Object.(*v1.Pod)
+			if !ok {
+				k.logger.Info("Event is not a POD", "event", event)
+				continue
+			}
 
 			if pod.Status.Phase == v1.PodRunning {
 				k.logger.Info("The POD is running", "podName", resName)

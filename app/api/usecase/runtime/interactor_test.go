@@ -12,6 +12,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
+	"gotest.tools/v3/assert"
 )
 
 type Runtimesuite struct {
@@ -70,7 +71,7 @@ func TestInteractor_GetRunningRuntime(t *testing.T) {
 	f, err := s.interactor.GetRunningRuntime(ctx, username)
 
 	require.NoError(t, err)
-	require.Equal(t, f, &expectedRuntime)
+	require.Equal(t, &expectedRuntime, f)
 }
 
 func TestInteractor_GetProjectRuntimes(t *testing.T) {
@@ -96,5 +97,5 @@ func TestInteractor_GetProjectRuntimes(t *testing.T) {
 	f, err := s.interactor.GetRuntimes(ctx, username)
 
 	require.NoError(t, err)
-	require.Equal(t, f, expectedGenericRuntimes)
+	assert.Equal(t, expectedGenericRuntimes, f)
 }

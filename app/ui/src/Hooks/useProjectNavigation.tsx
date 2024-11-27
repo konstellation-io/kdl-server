@@ -50,14 +50,7 @@ export const projectToolsRoutesConfig: RouteConfiguration[] = [
   },
 ];
 
-export const userToolsRoutesConfig: RouteConfiguration[] = [
-  // {
-  //   id: 'vscode',
-  //   route: ROUTE.PROJECT_TOOL_VSCODE,
-  //   label: 'Vscode',
-  //   Icon: VSIcon,
-  // },
-];
+export const userToolsRoutesConfig: RouteConfiguration[] = [];
 
 export interface RoutesConfiguration {
   allRoutes: RouteConfiguration[];

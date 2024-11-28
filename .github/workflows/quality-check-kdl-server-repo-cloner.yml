@@ -33,9 +33,9 @@ jobs:
       - name: API Go Lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.61.0
+          version: v1.62.2
           working-directory: ./repo-cloner
-          args: --timeout 5m
+          args: --config ../.github/.golangci.yml
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: API Test

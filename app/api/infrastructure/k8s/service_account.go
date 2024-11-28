@@ -10,7 +10,7 @@ import (
 )
 
 // newServiceAccount conform a new k8s serviceAccount.
-func (k *K8sClient) newServiceAccount(usernameSlug, secretName string) *v1.ServiceAccount {
+func (k *Client) newServiceAccount(usernameSlug, secretName string) *v1.ServiceAccount {
 	automountServiceAccountToken := true
 
 	return &v1.ServiceAccount{
@@ -33,16 +33,16 @@ func (k *K8sClient) newServiceAccount(usernameSlug, secretName string) *v1.Servi
 }
 
 // getUserServiceAccountName returns the name of the service account for a given user.
-func (k *K8sClient) getUserServiceAccountName(usernameSlug string) string {
+func (k *Client) getUserServiceAccountName(usernameSlug string) string {
 	return fmt.Sprintf("%s-service-account", usernameSlug)
 }
 
 // getServiceAccountSecretName returns the name of the service account secret for a given user.
-func (k *K8sClient) getServiceAccountSecretName(usernameSlug string) string {
+func (k *Client) getServiceAccountSecretName(usernameSlug string) string {
 	return fmt.Sprintf("%s-service-account-secret", usernameSlug)
 }
 
-func (k *K8sClient) updateAutomountExistingServiceAccount(
+func (k *Client) updateAutomountExistingServiceAccount(
 	ctx context.Context, serviceAccount *v1.ServiceAccount, saSecretName, usernameSlug string,
 ) (*v1.ServiceAccount, error) {
 	// Update the service account
@@ -72,7 +72,7 @@ func (k *K8sClient) updateAutomountExistingServiceAccount(
 	return serviceAccount, nil
 }
 
-func (k *K8sClient) createSecretTypeServiceAccountToken(ctx context.Context, saSecretName, usernameSlug string) error {
+func (k *Client) createSecretTypeServiceAccountToken(ctx context.Context, saSecretName, usernameSlug string) error {
 	// Create secret
 	k.logger.Info("Creating secret service account token for user in k8s...",
 		"serviceAccountSecretName", saSecretName, "username", usernameSlug,
@@ -100,7 +100,7 @@ func (k *K8sClient) createSecretTypeServiceAccountToken(ctx context.Context, saS
 }
 
 // CreateUserServiceAccount creates a new k8s serviceAccount for a user.
-func (k *K8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
+func (k *Client) CreateUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
 	saSecretName := k.getServiceAccountSecretName(usernameSlug)
 
 	serviceAccount, err := k.GetUserServiceAccount(ctx, usernameSlug)
@@ -110,21 +110,20 @@ func (k *K8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug s
 		k.logger.Info("Creating service account for user in k8s...", "username", usernameSlug)
 
 		sa := k.newServiceAccount(usernameSlug, saSecretName)
-		serviceAccount, err := k.clientset.CoreV1().ServiceAccounts(k.cfg.Kubernetes.Namespace).Create(ctx, sa, metav1.CreateOptions{})
 
+		createdSA, err := k.clientset.CoreV1().ServiceAccounts(k.cfg.Kubernetes.Namespace).Create(ctx, sa, metav1.CreateOptions{})
 		if err != nil {
 			return nil, err
 		}
 
 		err = k.createSecretTypeServiceAccountToken(ctx, saSecretName, usernameSlug)
-
 		if err != nil {
 			return nil, err
 		}
 
-		k.logger.Info("The service account was created in k8s correctly", "name", serviceAccount.Name)
+		k.logger.Info("The service account was created in k8s correctly", "name", createdSA.Name)
 
-		return serviceAccount, nil
+		return createdSA, nil
 	} else if err != nil && !k8errors.IsNotFound(err) {
 		return nil, err
 	}
@@ -143,7 +142,7 @@ func (k *K8sClient) CreateUserServiceAccount(ctx context.Context, usernameSlug s
 }
 
 // DeleteUserServiceAccount delete a serviceAccount.
-func (k *K8sClient) DeleteUserServiceAccount(ctx context.Context, usernameSlug string) error {
+func (k *Client) DeleteUserServiceAccount(ctx context.Context, usernameSlug string) error {
 	k.logger.Info("Deleting service account for user in k8s...", "username", usernameSlug)
 
 	saName := k.getUserServiceAccountName(usernameSlug)
@@ -157,7 +156,7 @@ func (k *K8sClient) DeleteUserServiceAccount(ctx context.Context, usernameSlug s
 }
 
 // GetUserServiceAccount returns the serviceAccount for the given user.
-func (k *K8sClient) GetUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
+func (k *Client) GetUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
 	serviceAccountName := k.getUserServiceAccountName(usernameSlug)
 
 	serviceAccount, err := k.clientset.CoreV1().ServiceAccounts(k.cfg.Kubernetes.Namespace).Get(ctx, serviceAccountName, metav1.GetOptions{})

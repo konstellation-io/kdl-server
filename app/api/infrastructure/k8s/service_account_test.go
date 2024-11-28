@@ -20,13 +20,14 @@ const (
 	namespace    = "kdl-test"
 	saSimpleName = "sa"
 	saName       = "sa-service-account"
+	//nolint:gosec //this is a test
 	saSecretName = "sa-service-account-secret"
 )
 
 type serviceAccountTestSuite struct {
 	suite.Suite
 	container *k3s.K3sContainer
-	client    *k8s.K8sClient
+	client    *k8s.Client
 	clientset *kubernetes.Clientset
 }
 
@@ -98,7 +99,7 @@ func (s *serviceAccountTestSuite) TestCreateServiceAccount() {
 	sa, err := s.client.GetUserServiceAccount(context.Background(), saSimpleName)
 	s.Require().NoError(err)
 
-	s.Equal(*sa.AutomountServiceAccountToken, true)
+	s.True(*sa.AutomountServiceAccountToken)
 	s.Equal(saSecretName, sa.Secrets[0].Name)
 
 	_, err = s.client.GetSecret(context.Background(), sa.Secrets[0].Name)
@@ -115,7 +116,7 @@ func (s *serviceAccountTestSuite) TestCreateServiceAccountOnExistingSaWithoutAut
 	s.Require().NoError(err)
 	s.NotNil(saNoAutomount)
 	s.Nil(saNoAutomount.AutomountServiceAccountToken)
-	s.Len(saNoAutomount.Secrets, 0)
+	s.Empty(saNoAutomount.Secrets)
 
 	// Act
 	_, err = s.client.CreateUserServiceAccount(context.Background(), saSimpleName)
@@ -127,7 +128,7 @@ func (s *serviceAccountTestSuite) TestCreateServiceAccountOnExistingSaWithoutAut
 	sa, err := s.client.GetUserServiceAccount(context.Background(), saSimpleName)
 	s.Require().NoError(err)
 
-	s.Equal(*sa.AutomountServiceAccountToken, true)
+	s.True(*sa.AutomountServiceAccountToken)
 	s.Equal(saSecretName, sa.Secrets[0].Name)
 
 	_, err = s.client.GetSecret(context.Background(), sa.Secrets[0].Name)

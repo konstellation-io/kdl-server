@@ -11,7 +11,6 @@ Follow these steps to setup your development environment:
 
   # deploy
   cd hack/
-  source .kdlctl.conf
   microk8s install --cpu ${MICROK8S_CPUS} --mem ${MICROK8S_MEMORY} --disk ${MICROK8S_DISK} --channel ${MICROK8S_CHANNEL}
   ```
 

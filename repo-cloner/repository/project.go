@@ -14,9 +14,9 @@ import (
 )
 
 type ProjectMongoDBRepo struct {
-	cfg        config.Config
-	logger     logr.Logger
 	collection *mongo.Collection
+	logger     logr.Logger
+	cfg        config.Config
 }
 
 type Project struct {
@@ -28,7 +28,7 @@ type Project struct {
 
 func NewProjectMongoDBRepo(cfg config.Config, logger logr.Logger, client *mongo.Client) *ProjectMongoDBRepo {
 	collection := client.Database(cfg.MongoDB.DBName).Collection(cfg.MongoDB.ProjectsCollName)
-	return &ProjectMongoDBRepo{cfg, logger, collection}
+	return &ProjectMongoDBRepo{cfg: cfg, logger: logger, collection: collection}
 }
 
 func (p *ProjectMongoDBRepo) FindUserRepos(userID primitive.ObjectID) ([]Project, error) {

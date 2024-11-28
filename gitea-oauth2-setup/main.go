@@ -13,7 +13,6 @@ func main() {
 	}
 
 	k8s := NewK8s(cfg)
-
 	ctx := context.Background()
 
 	// Check if the application already exists
@@ -28,13 +27,20 @@ func main() {
 	}
 
 	// Wait for Gitea ready
-	err = waitForGitea(cfg)
+	err = waitForGitea(ctx, cfg)
 	if err != nil {
 		log.Fatalf("Error waiting for Gitea: %s\n", err)
 	}
 
 	// Create the oAuth2 application in Gitea
-	credentials, err := createOauth2Application(cfg.Gitea.AppName, cfg.Gitea.RedirectUris, cfg.Gitea.URL, cfg.Gitea.Username, cfg.Gitea.Password)
+	credentials, err := createOauth2Application(
+		ctx,
+		cfg.Gitea.AppName,
+		cfg.Gitea.RedirectUris,
+		cfg.Gitea.URL,
+		cfg.Gitea.Username,
+		cfg.Gitea.Password,
+	)
 	if err != nil {
 		log.Fatalf("Error creating the application in Gitea: %s\n", err)
 	}
@@ -44,6 +50,7 @@ func main() {
 		"OAUTH2_CLIENT_ID":     credentials.ClientID,
 		"OAUTH2_CLIENT_SECRET": credentials.ClientSecret,
 	}
+
 	err = k8s.CreateSecret(ctx, cfg.Credentials.SecretName, secretValues)
 	if err != nil {
 		log.Fatalf("Error creating %q k8s secret credentials: %s\n", cfg.Credentials.SecretName, err)

@@ -108,7 +108,7 @@ type interactor struct {
 	userActivityRepo UserActivityRepo
 	clock            clock.Clock
 	minioService     minioservice.MinioService
-	k8sClient        k8s.Client
+	k8sClient        k8s.ClientInterface
 }
 
 // InteractorDeps encapsulates all project interactor dependencies.
@@ -118,7 +118,7 @@ type InteractorDeps struct {
 	UserActivityRepo UserActivityRepo
 	Clock            clock.Clock
 	MinioService     minioservice.MinioService
-	K8sClient        k8s.Client
+	K8sClient        k8s.ClientInterface
 }
 
 // NewInteractor is a constructor function.

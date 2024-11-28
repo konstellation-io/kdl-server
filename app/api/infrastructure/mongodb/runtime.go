@@ -55,7 +55,12 @@ func (m *RuntimeRepo) Create(ctx context.Context, r entity.Runtime) (string, err
 		return "", err
 	}
 
-	return result.InsertedID.(primitive.ObjectID).Hex(), nil
+	insertedID, ok := result.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return "", ErrCastingInsertedIDToObjectID
+	}
+
+	return insertedID.Hex(), nil
 }
 
 func (m *RuntimeRepo) Get(ctx context.Context, id string) (entity.Runtime, error) {

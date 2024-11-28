@@ -65,7 +65,12 @@ func (m *ProjectRepo) Create(ctx context.Context, p entity.Project) (string, err
 		return "", err
 	}
 
-	return result.InsertedID.(string), nil
+	insertedID, ok := result.InsertedID.(string)
+	if !ok {
+		return "", ErrCastingInsertedIDToString
+	}
+
+	return insertedID, nil
 }
 
 // Get retrieves a project using the identifier.

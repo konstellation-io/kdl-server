@@ -24,13 +24,13 @@ const (
 type templating struct {
 	cfg       config.Config
 	logger    logr.Logger
-	k8sClient k8s.Client
+	k8sClient k8s.ClientInterface
 }
 
 func NewTemplating(
 	cfg config.Config,
 	logger logr.Logger,
-	k8sClient k8s.Client,
+	k8sClient k8s.ClientInterface,
 ) Templating {
 	return &templating{
 		cfg:       cfg,

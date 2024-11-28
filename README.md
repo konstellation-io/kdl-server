@@ -55,7 +55,6 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 
 * `app-api`: main component of the application, providing API access for other components and managing interactions with `MongoDB`.
 * `app-ui`: web application offering the interface for data scientists.
-* `backup`: Kubernetes `cronJob` that backs up `PostgreSQL` and `MongoDB` databases and stores Kubernetes `etcd` manifests in `AWS S3`
 * `cleaner`: currently unused, potentially slated for deprecation.
 * `gitea`: git server mirroring project repositories.
 * `minio`: s3-compatible object storage, holding artifacts from training jobs; `MinIO` is installed as a pinned dependency, with only the console deployed through the chart.
@@ -97,11 +96,13 @@ We use the GitFlow branching model. Read more about it [here](docs/gitflow.md).
 
 Refer to the [docs](docs) folder for more information:
 
-* [capabilities](docs/capabilities.md): how-to install KDL's capabilities
-* [gke-integration](docs/gke-integration.md): GKE integration with develop tag images and CI/CD per each component
+* [capabilities](docs/capabilities.md): how-to install KDL capabilities
+* [gke-integration](https://github.com/konstellation-io/konstellation-infrastructure/blob/main/docs/README_KDL_INT.md): GKE integration with develop tag images and CI/CD per each component
+* [helm-value-precedence](docs/helm-value-precedence.md): Helm value precedence
+* [kdl-server-operator](docs/kdl-server-operators.md): KDL Server Operator workflow
 * [kdlctl](hack/README.md): deploy your KDL server on local
-* [knowledge-galaxy](docs/knowledge-galaxy.md): KDL's knowledge graph
-* [runtimes](docs/runtimes.md): how-to install KDL's runtimes
+* [knowledge-galaxy](docs/knowledge-galaxy.md): KDL knowledge graph
+* [runtimes](docs/runtimes.md): how-to install KDL runtimes
 * [tools](docs/tools.md): tools used in the development process
 
 ## Helm Chart

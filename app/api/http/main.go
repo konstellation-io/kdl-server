@@ -37,7 +37,6 @@ func main() {
 	zapLog, err := zap.NewDevelopment()
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 
 	logger := zapr.NewLogger(zapLog)

@@ -11,6 +11,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
+	"gotest.tools/v3/assert"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
@@ -30,12 +31,12 @@ type projectSuite struct {
 }
 
 type projectMocks struct {
-	logger           logr.Logger
 	repo             *project.MockRepository
 	userActivityRepo *project.MockUserActivityRepo
 	clock            *clock.MockClock
 	minioService     *minioservice.MockMinioService
-	k8sClient        *k8s.MockClient
+	k8sClient        *k8s.MockClientInterface
+	logger           logr.Logger
 }
 
 func newProjectSuite(t *testing.T) *projectSuite {
@@ -44,7 +45,7 @@ func newProjectSuite(t *testing.T) *projectSuite {
 	userActivityRepo := project.NewMockUserActivityRepo(ctrl)
 	clockMock := clock.NewMockClock(ctrl)
 	minioService := minioservice.NewMockMinioService(ctrl)
-	k8sClient := k8s.NewMockClient(ctrl)
+	k8sClient := k8s.NewMockClientInterface(ctrl)
 
 	zapLog, err := zap.NewDevelopment()
 	require.NoError(t, err)
@@ -158,7 +159,7 @@ func TestInteractor_FindByUserID(t *testing.T) {
 	p, err := s.interactor.FindAll(ctx)
 
 	require.NoError(t, err)
-	require.Equal(t, p, expectedProjects)
+	require.Equal(t, expectedProjects, p)
 }
 
 func TestInteractor_GetByID(t *testing.T) {
@@ -173,7 +174,7 @@ func TestInteractor_GetByID(t *testing.T) {
 	p, err := s.interactor.GetByID(ctx, testProjectID)
 
 	require.NoError(t, err)
-	require.Equal(t, p, expectedProject)
+	require.Equal(t, expectedProject, p)
 }
 
 func TestInteractor_AddMembers(t *testing.T) {
@@ -226,7 +227,7 @@ func TestInteractor_AddMembers(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	require.Equal(t, p, expectedProject)
+	assert.DeepEqual(t, p, expectedProject)
 }
 
 func TestInteractor_RemoveMembers(t *testing.T) {
@@ -277,7 +278,7 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	require.Equal(t, p, expectedProject)
+	assert.DeepEqual(t, expectedProject, p)
 }
 
 func TestInteractor_RemoveMembers_ErrNoMoreAdmins(t *testing.T) {
@@ -362,7 +363,7 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	require.Equal(t, p, expectedProject)
+	assert.DeepEqual(t, expectedProject, p)
 }
 
 func TestInteractor_UpdateMembers_ErrNoMoreAdmins(t *testing.T) {
@@ -396,7 +397,7 @@ func TestInteractor_UpdateMembers_ErrNoMoreAdmins(t *testing.T) {
 	})
 
 	require.Equal(t, project.ErrUpdateNoMoreAdmins, err)
-	require.Equal(t, p, entity.Project{})
+	assert.DeepEqual(t, entity.Project{}, p)
 }
 
 func TestInteractor_Update(t *testing.T) {

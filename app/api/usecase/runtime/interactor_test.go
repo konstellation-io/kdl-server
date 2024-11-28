@@ -12,6 +12,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
+	"gotest.tools/v3/assert"
 )
 
 type Runtimesuite struct {
@@ -22,7 +23,7 @@ type Runtimesuite struct {
 type flavorMocks struct {
 	logger   logr.Logger
 	repo     *runtime.MockRepository
-	k8client *k8s.MockClient
+	k8client *k8s.MockClientInterface
 }
 
 func newRuntimesuite(t *testing.T) *Runtimesuite {
@@ -33,7 +34,7 @@ func newRuntimesuite(t *testing.T) *Runtimesuite {
 
 	ctrl := gomock.NewController(t)
 	repo := runtime.NewMockRepository(ctrl)
-	k8client := k8s.NewMockClient(ctrl)
+	k8client := k8s.NewMockClientInterface(ctrl)
 	interactor := runtime.NewInteractor(logger, k8client, repo)
 
 	return &Runtimesuite{
@@ -70,7 +71,7 @@ func TestInteractor_GetRunningRuntime(t *testing.T) {
 	f, err := s.interactor.GetRunningRuntime(ctx, username)
 
 	require.NoError(t, err)
-	require.Equal(t, f, &expectedRuntime)
+	require.Equal(t, &expectedRuntime, f)
 }
 
 func TestInteractor_GetProjectRuntimes(t *testing.T) {
@@ -96,5 +97,5 @@ func TestInteractor_GetProjectRuntimes(t *testing.T) {
 	f, err := s.interactor.GetRuntimes(ctx, username)
 
 	require.NoError(t, err)
-	require.Equal(t, f, expectedGenericRuntimes)
+	assert.DeepEqual(t, expectedGenericRuntimes, f)
 }

@@ -10,8 +10,8 @@ import (
 
 //go:generate mockgen -source=${GOFILE} -destination=mocks_${GOFILE} -package=${GOPACKAGE}
 
-// Client defines all operation related to Kubernetes.
-type Client interface {
+// ClientInterface defines all operation related to Kubernetes.
+type ClientInterface interface {
 	CreateSecret(ctx context.Context, name string, values map[string]string) error
 	UpdateSecret(ctx context.Context, name string, values map[string]string) error
 	GetSecret(ctx context.Context, name string) (map[string][]byte, error)

@@ -15,7 +15,6 @@ jobs:
       matrix:
         directory:
           - app
-          - backup
           - cleaner
           - mlflow
           - project-operator

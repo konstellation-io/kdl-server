@@ -31,7 +31,6 @@ vim public/config.json
   "SERVER_URL": "http://localhost:4000",
   "KNOWLEDGE_GALAXY_ENABLED": false,
   "KG_SERVER_URL": "http://localhost:4001",
-  "GITEA_URL": "https://gitea.local",
   "RELEASE_VERSION": "kdl-server-0.10.0",
   "DESCRIPTION_MIN_WORDS": 50
 }

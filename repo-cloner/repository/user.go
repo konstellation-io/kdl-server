@@ -13,21 +13,21 @@ import (
 )
 
 type User struct {
-	ID       primitive.ObjectID `bson:"_id"`
 	Username string             `bson:"username"`
 	Email    string             `bson:"email"`
+	ID       primitive.ObjectID `bson:"_id"`
 }
 
 type UserMongoDBRepo struct {
-	cfg        config.Config
-	logger     logr.Logger
 	collection *mongo.Collection
+	logger     logr.Logger
+	cfg        config.Config
 }
 
 // NewUserMongoDBRepo implements user.Repository interface.
 func NewUserMongoDBRepo(cfg config.Config, logger logr.Logger, client *mongo.Client) *UserMongoDBRepo {
 	collection := client.Database(cfg.MongoDB.DBName).Collection(cfg.MongoDB.UsersCollName)
-	return &UserMongoDBRepo{cfg, logger, collection}
+	return &UserMongoDBRepo{cfg: cfg, logger: logger, collection: collection}
 }
 
 func (u *UserMongoDBRepo) GetUser(userName string) (User, error) {

@@ -6,10 +6,10 @@
 .envrc
 .run/*.xml
 .trunk/
-backup/backup-pod.yaml
 coverage/
 deprecations
 main
+.hadolint.yml
 
 ########
 # JETBRAINS

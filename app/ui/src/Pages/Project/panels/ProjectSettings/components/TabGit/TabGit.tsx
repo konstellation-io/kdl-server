@@ -6,8 +6,8 @@ import RepositoryTypeComponent, {
 import { ErrorMessage, SpinnerCircular } from 'kwc';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
-import React, { useMemo } from 'react';
-import { AccessLevel, RepositoryType } from 'Graphql/types/globalTypes';
+import React from 'react';
+import { RepositoryType } from 'Graphql/types/globalTypes';
 import styles from './TabGit.module.scss';
 import { useQuery } from '@apollo/client';
 import GetMeQuery from 'Graphql/queries/getMe';
@@ -17,8 +17,8 @@ type Props = {
   project: GetProjects_projects;
 };
 function TabGit({ project }: Props) {
-  const { toolUrls, repository, members } = project;
-  const { data: dataMe, loading, error } = useQuery<GetMe>(GetMeQuery);
+  const { repository } = project;
+  const { data: loading, error } = useQuery<GetMe>(GetMeQuery);
 
   if (loading) return <SpinnerCircular />;
   if (!repository || error) return <ErrorMessage />;

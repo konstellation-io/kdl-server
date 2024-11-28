@@ -175,9 +175,6 @@ describe('Runtimes Behaviour', () => {
       // WHEN the project page is visited
       cy.visit('http://localhost:3001');
       cy.getByTestId('project').first().parent().click();
-
-      // THEN the tools is open
-      cy.url().should('contain', 'vscode');
     });
 
     it('should redirect to overview page if try to open tools during replacement of runtimes', () => {

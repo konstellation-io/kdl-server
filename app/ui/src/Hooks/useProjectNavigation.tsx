@@ -79,9 +79,9 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
       disabled,
     }));
 
-    const userToolsRoutes = userToolsRoutesDisabled.map(buildRoutes);
-    let projectToolsRoutes = projectToolsRoutesConfig.map(buildRoutes);
-    const mainRoutes = mainRoutesConfig.map(buildRoutes);
+      const userToolsRoutes = userToolsRoutesDisabled.map(buildRoutes);
+      let projectToolsRoutes = projectToolsRoutesConfig.map(buildRoutes);
+      const mainRoutes = mainRoutesConfig.map(buildRoutes);
 
     if (!CONFIG.KNOWLEDGE_GALAXY_ENABLED) {
       projectToolsRoutes = projectToolsRoutes.map((r: RouteConfiguration) =>

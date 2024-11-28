@@ -30,7 +30,7 @@ const Section: FC<SectionProps> = ({ title, children }) => (
 );
 
 function Summary() {
-  const { information, repository, externalRepository } = useReactiveVar(newProject);
+  const { information, externalRepository } = useReactiveVar(newProject);
   const { name, description, id } = information.values;
 
   return (

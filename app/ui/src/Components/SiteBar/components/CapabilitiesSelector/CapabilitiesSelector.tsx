@@ -15,13 +15,15 @@ function sortCapability(capability1: GetCapabilities_capabilities) {
 }
 
 const CapabilitiesSelector: FC<Props & BottomComponentProps> = ({ capabilities, ...props }) => {
-
   return (
     <div className={styles.container}>
       <ul>
         {capabilities
           ?.slice()
-          .sort((a: GetCapabilities_capabilities, b: GetCapabilities_capabilities) => sortCapability(a),
+          .sort(
+            (a: GetCapabilities_capabilities, b: GetCapabilities_capabilities) =>
+              (a.default ? 1 : -1) - (b.default ? 1 : -1),
+          )
           .reverse()
           .map((capability: GetCapabilities_capabilities) => (
             <li key={capability.id}>

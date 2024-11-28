@@ -4,11 +4,13 @@ package graph
 
 import (
 	"context"
+	"errors"
 
 	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
@@ -19,6 +21,10 @@ import (
 //go:generate go run github.com/99designs/gqlgen
 
 // This file will not be regenerated automatically.
+
+var ErrCastingUsernameToString = errors.New("error casting username to string")
+
+var _ generated.ResolverRoot = &Resolver{}
 
 // Resolver serves as dependency injection for the app, add any dependencies app require here.
 type Resolver struct {
@@ -50,7 +56,10 @@ func NewResolver(
 }
 
 func (r *Resolver) getLoggedUser(ctx context.Context) (entity.User, error) {
-	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
+	username, ok := ctx.Value(middleware.LoggedUserNameKey).(string)
+	if !ok {
+		return entity.User{}, ErrCastingUsernameToString
+	}
 
 	return r.users.GetByEmail(ctx, email)
 }

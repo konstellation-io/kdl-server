@@ -129,7 +129,12 @@ func (m *UserRepo) Create(ctx context.Context, u entity.User) (string, error) {
 		return "", err
 	}
 
-	return result.InsertedID.(primitive.ObjectID).Hex(), nil
+	insertedID, ok := result.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return "", ErrCastingInsertedIDToObjectID
+	}
+
+	return insertedID.Hex(), nil
 }
 
 // FindByIDs retrieves the users for the given user identifiers.

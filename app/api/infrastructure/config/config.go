@@ -9,8 +9,8 @@ import (
 )
 
 type KubernetesConfig struct {
-	IsInsideCluster bool   `default:"true"`
 	Namespace       string `envconfig:"POD_NAMESPACE"`
+	IsInsideCluster bool   `default:"true"`
 }
 
 // Config holds the configuration values of the application.

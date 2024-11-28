@@ -110,7 +110,7 @@ type interactor struct {
 	clock            clock.Clock
 	giteaService     giteaservice.GiteaClient
 	minioService     minioservice.MinioService
-	k8sClient        k8s.Client
+	k8sClient        k8s.ClientInterface
 }
 
 // InteractorDeps encapsulates all project interactor dependencies.
@@ -121,7 +121,7 @@ type InteractorDeps struct {
 	Clock            clock.Clock
 	GiteaService     giteaservice.GiteaClient
 	MinioService     minioservice.MinioService
-	K8sClient        k8s.Client
+	K8sClient        k8s.ClientInterface
 }
 
 // NewInteractor is a constructor function.

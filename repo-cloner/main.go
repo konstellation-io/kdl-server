@@ -20,8 +20,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	logger := zapr.NewLogger(zapLog)
 
+	logger := zapr.NewLogger(zapLog)
 	mongoManager := utils.NewMongoDB(logger)
 
 	mongodbClient, err := mongoManager.Connect(cfg.MongoDB.URI)

@@ -1,7 +1,6 @@
 package entity_test
 
 import (
-	"errors"
 	"reflect"
 	"testing"
 
@@ -112,8 +111,7 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoName() {
 	// WHEN validated
 	err := wrongCapability.Validate()
 	// THEN an error promts
-	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNoName))
+	testSuite.Require().ErrorIs(err, entity.ErrCapabilitiesNoName)
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoParameters() {
@@ -125,8 +123,7 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoParameters() {
 	// WHEN validated
 	err := wrongCapability.Validate()
 	// THEN an error promts
-	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNoParameters))
+	testSuite.Require().ErrorIs(err, entity.ErrCapabilitiesNoParameters)
 }
 
 func (testSuite *CapabilitiesTestSuite) checkNoAttribute(attribute string, expectedErr error) {
@@ -136,16 +133,14 @@ func (testSuite *CapabilitiesTestSuite) checkNoAttribute(attribute string, expec
 	// WHEN validated
 	err := wrongCapability.Validate()
 	// THEN an error promts
-	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, expectedErr))
+	testSuite.Require().ErrorIs(err, expectedErr)
 
 	// GIVEN an incorrect capability with no 'attribute' in tolerations
 	delete(wrongCapability.Tolerations[0], attribute)
 	// WHEN validated
 	err = wrongCapability.Validate()
 	// THEN an error promts
-	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, expectedErr))
+	testSuite.Require().ErrorIs(err, expectedErr)
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationKey() {
@@ -163,8 +158,7 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidToleratio
 	// WHEN validated
 	err := wrongCapability.Validate()
 	// THEN an error promts
-	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesInvalidOperator))
+	testSuite.Require().ErrorIs(err, entity.ErrCapabilitiesInvalidOperator)
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationValueForEquals() {
@@ -175,16 +169,14 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationValu
 	// WHEN validated
 	err := wrongCapability.Validate()
 	// THEN an error promts
-	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNoValue))
+	testSuite.Require().ErrorIs(err, entity.ErrCapabilitiesNoValue)
 
 	// GIVEN an incorrect capability with no value and "Equal" operator in tolerations
 	delete(wrongCapability.Tolerations[0], "value")
 	// WHEN validated
 	err = wrongCapability.Validate()
 	// THEN an error promts
-	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesNoValue))
+	testSuite.Require().ErrorIs(err, entity.ErrCapabilitiesNoValue)
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateTolerationValueForExist() {
@@ -195,8 +187,7 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateTolerationValueF
 	// WHEN validated
 	err := wrongCapability.Validate()
 	// THEN an error promts
-	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesHasValue))
+	testSuite.Require().ErrorIs(err, entity.ErrCapabilitiesHasValue)
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateNoTolerationEffect() {
@@ -210,8 +201,7 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidToleratio
 	// WHEN validated
 	err := wrongCapability.Validate()
 	// THEN an error promts
-	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesInvalidOperator))
+	testSuite.Require().ErrorIs(err, entity.ErrCapabilitiesInvalidOperator)
 }
 
 func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidTolerationSeconds() {
@@ -221,6 +211,5 @@ func (testSuite *CapabilitiesTestSuite) TestCapabilitiesValidateInvalidToleratio
 	// WHEN validated
 	err := wrongCapability.Validate()
 	// THEN an error promts
-	testSuite.Require().Error(err)
-	testSuite.True(errors.Is(err, entity.ErrCapabilitiesInvalidSeconds))
+	testSuite.Require().ErrorIs(err, entity.ErrCapabilitiesInvalidSeconds)
 }

@@ -37,6 +37,7 @@ type User struct {
 }
 
 func (u User) UsernameSlug() string {
+	//nolint:reassign //this is the inteded usage of the library
 	slug.CustomSub = map[string]string{
 		"_": "-",
 	}

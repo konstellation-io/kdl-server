@@ -36,15 +36,15 @@ type userSuite struct {
 }
 
 type userMocks struct {
-	logger           logr.Logger
-	cfg              config.Config
 	repo             *user.MockRepository
 	runtimeRepo      *runtime.MockRepository
 	capabilitiesRepo *capabilities.MockRepository
 	sshGenerator     *sshhelper.MockSSHKeyGenerator
 	clock            *clock.MockClock
 	giteaService     *giteaservice.MockGiteaClient
-	k8sClientMock    *k8s.MockClient
+	k8sClientMock    *k8s.MockClientInterface
+	logger           logr.Logger
+	cfg              config.Config
 }
 
 func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
@@ -55,7 +55,7 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	clockMock := clock.NewMockClock(ctrl)
 	sshGenerator := sshhelper.NewMockSSHKeyGenerator(ctrl)
 	giteaServiceMock := giteaservice.NewMockGiteaClient(ctrl)
-	k8sClientMock := k8s.NewMockClient(ctrl)
+	k8sClientMock := k8s.NewMockClientInterface(ctrl)
 
 	zapLog, err := zap.NewDevelopment()
 	require.NoError(t, err)
@@ -156,8 +156,8 @@ func TestInteractor_Create_UserDuplEmail(t *testing.T) {
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, nil)
 
 	createdUser, err := s.interactor.Create(ctx, email, username, accessLevel)
-	require.Equal(t, createdUser, entity.User{})
-	require.Equal(t, err, entity.ErrDuplicatedUser)
+	assert.DeepEqual(t, entity.User{}, createdUser)
+	assert.ErrorIs(t, err, entity.ErrDuplicatedUser)
 }
 
 func TestInteractor_Create_UserDuplUsername(t *testing.T) {
@@ -175,8 +175,8 @@ func TestInteractor_Create_UserDuplUsername(t *testing.T) {
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, nil)
 
 	createdUser, err := s.interactor.Create(ctx, email, username, accessLevel)
-	require.Equal(t, createdUser, entity.User{})
-	require.Equal(t, err, entity.ErrDuplicatedUser)
+	assert.DeepEqual(t, entity.User{}, createdUser)
+	assert.ErrorIs(t, err, entity.ErrDuplicatedUser)
 }
 
 func TestInteractor_AreToolsRunning(t *testing.T) {
@@ -561,8 +561,9 @@ func TestInteractor_RegenerateSSHKeys_UserToolsRunning(t *testing.T) {
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(true, nil)
 	userData, err := s.interactor.RegenerateSSHKeys(ctx, targetUser)
 
-	require.Equal(t, userData, entity.User{})
-	require.Equal(t, err, user.ErrUserToolsActive)
+	// assert.Equal(t, entity.User{}, userData)
+	assert.DeepEqual(t, entity.User{}, userData)
+	assert.ErrorIs(t, err, user.ErrUserToolsActive)
 }
 
 func TestInteractor_UpdateAccessLevel(t *testing.T) {

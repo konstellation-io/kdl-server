@@ -14,20 +14,24 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-// K8s manager for Kuberentes interaction
+// K8s manager for Kuberentes interaction.
 type K8s struct {
-	cfg    *Config
 	client *kubernetes.Clientset
+	cfg    Config
 }
 
-// NewK8s initialize K8s manager
-func NewK8s(cfg *Config) K8s {
+// NewK8s initialize K8s manager.
+func NewK8s(cfg Config) K8s {
 	client := newClientset(cfg)
-	return K8s{cfg, client}
+
+	return K8s{
+		client: client,
+		cfg:    cfg,
+	}
 }
 
-// NewClientset return a Kuberentes client
-func newClientset(cfg *Config) *kubernetes.Clientset {
+// NewClientset return a Kuberentes client.
+func newClientset(cfg Config) *kubernetes.Clientset {
 	kubeConfig := newKubernetesConfig(cfg)
 
 	// create the clientset
@@ -39,8 +43,8 @@ func newClientset(cfg *Config) *kubernetes.Clientset {
 	return clientset
 }
 
-func newKubernetesConfig(config *Config) *rest.Config {
-	if config.Kubernetes.IsInsideCluster == true {
+func newKubernetesConfig(config Config) *rest.Config {
+	if config.Kubernetes.IsInsideCluster {
 		log.Printf("Creating K8s config in-cluster")
 
 		kubeConfig, err := rest.InClusterConfig()
@@ -65,7 +69,7 @@ func newKubernetesConfig(config *Config) *rest.Config {
 	return kubeConfig
 }
 
-// IsSecretPresent checks if there is a secret with the given name
+// IsSecretPresent checks if there is a secret with the given name.
 func (k *K8s) IsSecretPresent(ctx context.Context, name string) (bool, error) {
 	log.Printf("Checking if secret %q is present\n", name)
 
@@ -77,7 +81,7 @@ func (k *K8s) IsSecretPresent(ctx context.Context, name string) (bool, error) {
 	return !k8s_errors.IsNotFound(err), nil
 }
 
-// CreateSecret creates a secret on kubernetes with the given data
+// CreateSecret creates a secret on kubernetes with the given data.
 func (k *K8s) CreateSecret(ctx context.Context, name string, input map[string]string) error {
 	log.Printf("Creating secret %q...\n", name)
 

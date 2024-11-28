@@ -12,13 +12,13 @@ var (
 
 	ErrDuplicatedUser = errors.New("user is duplicated")
 
-	ErrNotImplemented = fmt.Errorf("not implemented")
+	ErrNotImplemented = errors.New("not implemented")
 
-	ErrInvalidRepoType = fmt.Errorf("invalid repo type")
+	ErrInvalidRepoType = errors.New("invalid repo type")
 
-	ErrRuntimeNotFound = fmt.Errorf("runtime not found")
+	ErrRuntimeNotFound = errors.New("runtime not found")
 
-	ErrNoRunningRuntime = fmt.Errorf("no running runtime")
+	ErrNoRunningRuntime = errors.New("no running runtime")
 
 	ErrCapabilitiesNotFound = errors.New("capabilities not found")
 
@@ -46,7 +46,7 @@ var (
 )
 
 func wrapCapabilitiesNotValidErr(err error) error {
-	return fmt.Errorf("%s: %w", ErrCapabilitiesNotValid, err)
+	return fmt.Errorf("%w: %w", ErrCapabilitiesNotValid, err)
 }
 
 func wrapErrWithValue(err error, value string) error {

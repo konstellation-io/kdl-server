@@ -20,7 +20,7 @@ type interactor struct {
 	logger    logr.Logger
 	cfg       config.Config
 	repo      Repository
-	k8sClient k8s.Client
+	k8sClient k8s.ClientInterface
 }
 
 // NewInteractor factory function.
@@ -28,7 +28,7 @@ func NewInteractor(
 	logger logr.Logger,
 	cfg config.Config,
 	repo Repository,
-	k8sClient k8s.Client,
+	k8sClient k8s.ClientInterface,
 ) UseCase {
 	return &interactor{
 		logger:    logger,

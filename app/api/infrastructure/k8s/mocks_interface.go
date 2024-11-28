@@ -13,31 +13,31 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// MockClient is a mock of Client interface.
-type MockClient struct {
+// MockClientInterface is a mock of ClientInterface interface.
+type MockClientInterface struct {
 	ctrl     *gomock.Controller
-	recorder *MockClientMockRecorder
+	recorder *MockClientInterfaceMockRecorder
 }
 
-// MockClientMockRecorder is the mock recorder for MockClient.
-type MockClientMockRecorder struct {
-	mock *MockClient
+// MockClientInterfaceMockRecorder is the mock recorder for MockClientInterface.
+type MockClientInterfaceMockRecorder struct {
+	mock *MockClientInterface
 }
 
-// NewMockClient creates a new mock instance.
-func NewMockClient(ctrl *gomock.Controller) *MockClient {
-	mock := &MockClient{ctrl: ctrl}
-	mock.recorder = &MockClientMockRecorder{mock}
+// NewMockClientInterface creates a new mock instance.
+func NewMockClientInterface(ctrl *gomock.Controller) *MockClientInterface {
+	mock := &MockClientInterface{ctrl: ctrl}
+	mock.recorder = &MockClientInterfaceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockClient) EXPECT() *MockClientMockRecorder {
+func (m *MockClientInterface) EXPECT() *MockClientInterfaceMockRecorder {
 	return m.recorder
 }
 
 // CreateKDLProjectCR mocks base method.
-func (m *MockClient) CreateKDLProjectCR(ctx context.Context, projectID string) error {
+func (m *MockClientInterface) CreateKDLProjectCR(ctx context.Context, projectID string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateKDLProjectCR", ctx, projectID)
 	ret0, _ := ret[0].(error)
@@ -45,13 +45,13 @@ func (m *MockClient) CreateKDLProjectCR(ctx context.Context, projectID string) e
 }
 
 // CreateKDLProjectCR indicates an expected call of CreateKDLProjectCR.
-func (mr *MockClientMockRecorder) CreateKDLProjectCR(ctx, projectID interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) CreateKDLProjectCR(ctx, projectID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKDLProjectCR", reflect.TypeOf((*MockClient)(nil).CreateKDLProjectCR), ctx, projectID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKDLProjectCR", reflect.TypeOf((*MockClientInterface)(nil).CreateKDLProjectCR), ctx, projectID)
 }
 
 // CreateSecret mocks base method.
-func (m *MockClient) CreateSecret(ctx context.Context, name string, values map[string]string) error {
+func (m *MockClientInterface) CreateSecret(ctx context.Context, name string, values map[string]string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateSecret", ctx, name, values)
 	ret0, _ := ret[0].(error)
@@ -59,13 +59,13 @@ func (m *MockClient) CreateSecret(ctx context.Context, name string, values map[s
 }
 
 // CreateSecret indicates an expected call of CreateSecret.
-func (mr *MockClientMockRecorder) CreateSecret(ctx, name, values interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) CreateSecret(ctx, name, values interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSecret", reflect.TypeOf((*MockClient)(nil).CreateSecret), ctx, name, values)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSecret", reflect.TypeOf((*MockClientInterface)(nil).CreateSecret), ctx, name, values)
 }
 
 // CreateUserSSHKeySecret mocks base method.
-func (m *MockClient) CreateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error {
+func (m *MockClientInterface) CreateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUserSSHKeySecret", ctx, user, public, private)
 	ret0, _ := ret[0].(error)
@@ -73,13 +73,13 @@ func (m *MockClient) CreateUserSSHKeySecret(ctx context.Context, user entity.Use
 }
 
 // CreateUserSSHKeySecret indicates an expected call of CreateUserSSHKeySecret.
-func (mr *MockClientMockRecorder) CreateUserSSHKeySecret(ctx, user, public, private interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) CreateUserSSHKeySecret(ctx, user, public, private interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserSSHKeySecret", reflect.TypeOf((*MockClient)(nil).CreateUserSSHKeySecret), ctx, user, public, private)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserSSHKeySecret", reflect.TypeOf((*MockClientInterface)(nil).CreateUserSSHKeySecret), ctx, user, public, private)
 }
 
 // CreateUserServiceAccount mocks base method.
-func (m *MockClient) CreateUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
+func (m *MockClientInterface) CreateUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUserServiceAccount", ctx, usernameSlug)
 	ret0, _ := ret[0].(*v1.ServiceAccount)
@@ -88,13 +88,13 @@ func (m *MockClient) CreateUserServiceAccount(ctx context.Context, usernameSlug 
 }
 
 // CreateUserServiceAccount indicates an expected call of CreateUserServiceAccount.
-func (mr *MockClientMockRecorder) CreateUserServiceAccount(ctx, usernameSlug interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) CreateUserServiceAccount(ctx, usernameSlug interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserServiceAccount", reflect.TypeOf((*MockClient)(nil).CreateUserServiceAccount), ctx, usernameSlug)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserServiceAccount", reflect.TypeOf((*MockClientInterface)(nil).CreateUserServiceAccount), ctx, usernameSlug)
 }
 
 // CreateUserToolsCR mocks base method.
-func (m *MockClient) CreateUserToolsCR(ctx context.Context, username, runtimeID, runtimeImage, runtimeTag string, capabilities entity.Capabilities) error {
+func (m *MockClientInterface) CreateUserToolsCR(ctx context.Context, username, runtimeID, runtimeImage, runtimeTag string, capabilities entity.Capabilities) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUserToolsCR", ctx, username, runtimeID, runtimeImage, runtimeTag, capabilities)
 	ret0, _ := ret[0].(error)
@@ -102,13 +102,13 @@ func (m *MockClient) CreateUserToolsCR(ctx context.Context, username, runtimeID,
 }
 
 // CreateUserToolsCR indicates an expected call of CreateUserToolsCR.
-func (mr *MockClientMockRecorder) CreateUserToolsCR(ctx, username, runtimeID, runtimeImage, runtimeTag, capabilities interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) CreateUserToolsCR(ctx, username, runtimeID, runtimeImage, runtimeTag, capabilities interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserToolsCR", reflect.TypeOf((*MockClient)(nil).CreateUserToolsCR), ctx, username, runtimeID, runtimeImage, runtimeTag, capabilities)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).CreateUserToolsCR), ctx, username, runtimeID, runtimeImage, runtimeTag, capabilities)
 }
 
 // DeleteKDLProjectCR mocks base method.
-func (m *MockClient) DeleteKDLProjectCR(ctx context.Context, projectID string) error {
+func (m *MockClientInterface) DeleteKDLProjectCR(ctx context.Context, projectID string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteKDLProjectCR", ctx, projectID)
 	ret0, _ := ret[0].(error)
@@ -116,13 +116,13 @@ func (m *MockClient) DeleteKDLProjectCR(ctx context.Context, projectID string) e
 }
 
 // DeleteKDLProjectCR indicates an expected call of DeleteKDLProjectCR.
-func (mr *MockClientMockRecorder) DeleteKDLProjectCR(ctx, projectID interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) DeleteKDLProjectCR(ctx, projectID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteKDLProjectCR", reflect.TypeOf((*MockClient)(nil).DeleteKDLProjectCR), ctx, projectID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteKDLProjectCR", reflect.TypeOf((*MockClientInterface)(nil).DeleteKDLProjectCR), ctx, projectID)
 }
 
 // DeleteUserServiceAccount mocks base method.
-func (m *MockClient) DeleteUserServiceAccount(ctx context.Context, usernameSlug string) error {
+func (m *MockClientInterface) DeleteUserServiceAccount(ctx context.Context, usernameSlug string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUserServiceAccount", ctx, usernameSlug)
 	ret0, _ := ret[0].(error)
@@ -130,13 +130,13 @@ func (m *MockClient) DeleteUserServiceAccount(ctx context.Context, usernameSlug 
 }
 
 // DeleteUserServiceAccount indicates an expected call of DeleteUserServiceAccount.
-func (mr *MockClientMockRecorder) DeleteUserServiceAccount(ctx, usernameSlug interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) DeleteUserServiceAccount(ctx, usernameSlug interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserServiceAccount", reflect.TypeOf((*MockClient)(nil).DeleteUserServiceAccount), ctx, usernameSlug)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserServiceAccount", reflect.TypeOf((*MockClientInterface)(nil).DeleteUserServiceAccount), ctx, usernameSlug)
 }
 
 // DeleteUserToolsCR mocks base method.
-func (m *MockClient) DeleteUserToolsCR(ctx context.Context, username string) error {
+func (m *MockClientInterface) DeleteUserToolsCR(ctx context.Context, username string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUserToolsCR", ctx, username)
 	ret0, _ := ret[0].(error)
@@ -144,13 +144,13 @@ func (m *MockClient) DeleteUserToolsCR(ctx context.Context, username string) err
 }
 
 // DeleteUserToolsCR indicates an expected call of DeleteUserToolsCR.
-func (mr *MockClientMockRecorder) DeleteUserToolsCR(ctx, username interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) DeleteUserToolsCR(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserToolsCR", reflect.TypeOf((*MockClient)(nil).DeleteUserToolsCR), ctx, username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).DeleteUserToolsCR), ctx, username)
 }
 
 // GetCapabilitiesIDFromUserTools mocks base method.
-func (m *MockClient) GetCapabilitiesIDFromUserTools(ctx context.Context, username string) (string, error) {
+func (m *MockClientInterface) GetCapabilitiesIDFromUserTools(ctx context.Context, username string) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCapabilitiesIDFromUserTools", ctx, username)
 	ret0, _ := ret[0].(string)
@@ -159,13 +159,13 @@ func (m *MockClient) GetCapabilitiesIDFromUserTools(ctx context.Context, usernam
 }
 
 // GetCapabilitiesIDFromUserTools indicates an expected call of GetCapabilitiesIDFromUserTools.
-func (mr *MockClientMockRecorder) GetCapabilitiesIDFromUserTools(ctx, username interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) GetCapabilitiesIDFromUserTools(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCapabilitiesIDFromUserTools", reflect.TypeOf((*MockClient)(nil).GetCapabilitiesIDFromUserTools), ctx, username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCapabilitiesIDFromUserTools", reflect.TypeOf((*MockClientInterface)(nil).GetCapabilitiesIDFromUserTools), ctx, username)
 }
 
 // GetRuntimeIDFromUserTools mocks base method.
-func (m *MockClient) GetRuntimeIDFromUserTools(ctx context.Context, username string) (string, error) {
+func (m *MockClientInterface) GetRuntimeIDFromUserTools(ctx context.Context, username string) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRuntimeIDFromUserTools", ctx, username)
 	ret0, _ := ret[0].(string)
@@ -174,13 +174,13 @@ func (m *MockClient) GetRuntimeIDFromUserTools(ctx context.Context, username str
 }
 
 // GetRuntimeIDFromUserTools indicates an expected call of GetRuntimeIDFromUserTools.
-func (mr *MockClientMockRecorder) GetRuntimeIDFromUserTools(ctx, username interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) GetRuntimeIDFromUserTools(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRuntimeIDFromUserTools", reflect.TypeOf((*MockClient)(nil).GetRuntimeIDFromUserTools), ctx, username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRuntimeIDFromUserTools", reflect.TypeOf((*MockClientInterface)(nil).GetRuntimeIDFromUserTools), ctx, username)
 }
 
 // GetSecret mocks base method.
-func (m *MockClient) GetSecret(ctx context.Context, name string) (map[string][]byte, error) {
+func (m *MockClientInterface) GetSecret(ctx context.Context, name string) (map[string][]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSecret", ctx, name)
 	ret0, _ := ret[0].(map[string][]byte)
@@ -189,13 +189,13 @@ func (m *MockClient) GetSecret(ctx context.Context, name string) (map[string][]b
 }
 
 // GetSecret indicates an expected call of GetSecret.
-func (mr *MockClientMockRecorder) GetSecret(ctx, name interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) GetSecret(ctx, name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecret", reflect.TypeOf((*MockClient)(nil).GetSecret), ctx, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecret", reflect.TypeOf((*MockClientInterface)(nil).GetSecret), ctx, name)
 }
 
 // GetUserKubeconfig mocks base method.
-func (m *MockClient) GetUserKubeconfig(ctx context.Context, usernameSlug string) ([]byte, error) {
+func (m *MockClientInterface) GetUserKubeconfig(ctx context.Context, usernameSlug string) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserKubeconfig", ctx, usernameSlug)
 	ret0, _ := ret[0].([]byte)
@@ -204,13 +204,13 @@ func (m *MockClient) GetUserKubeconfig(ctx context.Context, usernameSlug string)
 }
 
 // GetUserKubeconfig indicates an expected call of GetUserKubeconfig.
-func (mr *MockClientMockRecorder) GetUserKubeconfig(ctx, usernameSlug interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) GetUserKubeconfig(ctx, usernameSlug interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserKubeconfig", reflect.TypeOf((*MockClient)(nil).GetUserKubeconfig), ctx, usernameSlug)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserKubeconfig", reflect.TypeOf((*MockClientInterface)(nil).GetUserKubeconfig), ctx, usernameSlug)
 }
 
 // GetUserSSHKeyPublic mocks base method.
-func (m *MockClient) GetUserSSHKeyPublic(ctx context.Context, usernameSlug string) ([]byte, error) {
+func (m *MockClientInterface) GetUserSSHKeyPublic(ctx context.Context, usernameSlug string) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserSSHKeyPublic", ctx, usernameSlug)
 	ret0, _ := ret[0].([]byte)
@@ -219,13 +219,13 @@ func (m *MockClient) GetUserSSHKeyPublic(ctx context.Context, usernameSlug strin
 }
 
 // GetUserSSHKeyPublic indicates an expected call of GetUserSSHKeyPublic.
-func (mr *MockClientMockRecorder) GetUserSSHKeyPublic(ctx, usernameSlug interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) GetUserSSHKeyPublic(ctx, usernameSlug interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserSSHKeyPublic", reflect.TypeOf((*MockClient)(nil).GetUserSSHKeyPublic), ctx, usernameSlug)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserSSHKeyPublic", reflect.TypeOf((*MockClientInterface)(nil).GetUserSSHKeyPublic), ctx, usernameSlug)
 }
 
 // GetUserSSHKeySecret mocks base method.
-func (m *MockClient) GetUserSSHKeySecret(ctx context.Context, usernameSlug string) ([]byte, error) {
+func (m *MockClientInterface) GetUserSSHKeySecret(ctx context.Context, usernameSlug string) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserSSHKeySecret", ctx, usernameSlug)
 	ret0, _ := ret[0].([]byte)
@@ -234,13 +234,13 @@ func (m *MockClient) GetUserSSHKeySecret(ctx context.Context, usernameSlug strin
 }
 
 // GetUserSSHKeySecret indicates an expected call of GetUserSSHKeySecret.
-func (mr *MockClientMockRecorder) GetUserSSHKeySecret(ctx, usernameSlug interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) GetUserSSHKeySecret(ctx, usernameSlug interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserSSHKeySecret", reflect.TypeOf((*MockClient)(nil).GetUserSSHKeySecret), ctx, usernameSlug)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserSSHKeySecret", reflect.TypeOf((*MockClientInterface)(nil).GetUserSSHKeySecret), ctx, usernameSlug)
 }
 
 // GetUserServiceAccount mocks base method.
-func (m *MockClient) GetUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
+func (m *MockClientInterface) GetUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserServiceAccount", ctx, usernameSlug)
 	ret0, _ := ret[0].(*v1.ServiceAccount)
@@ -249,13 +249,13 @@ func (m *MockClient) GetUserServiceAccount(ctx context.Context, usernameSlug str
 }
 
 // GetUserServiceAccount indicates an expected call of GetUserServiceAccount.
-func (mr *MockClientMockRecorder) GetUserServiceAccount(ctx, usernameSlug interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) GetUserServiceAccount(ctx, usernameSlug interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserServiceAccount", reflect.TypeOf((*MockClient)(nil).GetUserServiceAccount), ctx, usernameSlug)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserServiceAccount", reflect.TypeOf((*MockClientInterface)(nil).GetUserServiceAccount), ctx, usernameSlug)
 }
 
 // IsUserToolPODRunning mocks base method.
-func (m *MockClient) IsUserToolPODRunning(ctx context.Context, username string) (bool, error) {
+func (m *MockClientInterface) IsUserToolPODRunning(ctx context.Context, username string) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IsUserToolPODRunning", ctx, username)
 	ret0, _ := ret[0].(bool)
@@ -264,13 +264,13 @@ func (m *MockClient) IsUserToolPODRunning(ctx context.Context, username string) 
 }
 
 // IsUserToolPODRunning indicates an expected call of IsUserToolPODRunning.
-func (mr *MockClientMockRecorder) IsUserToolPODRunning(ctx, username interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) IsUserToolPODRunning(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUserToolPODRunning", reflect.TypeOf((*MockClient)(nil).IsUserToolPODRunning), ctx, username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUserToolPODRunning", reflect.TypeOf((*MockClientInterface)(nil).IsUserToolPODRunning), ctx, username)
 }
 
 // UpdateSecret mocks base method.
-func (m *MockClient) UpdateSecret(ctx context.Context, name string, values map[string]string) error {
+func (m *MockClientInterface) UpdateSecret(ctx context.Context, name string, values map[string]string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateSecret", ctx, name, values)
 	ret0, _ := ret[0].(error)
@@ -278,13 +278,13 @@ func (m *MockClient) UpdateSecret(ctx context.Context, name string, values map[s
 }
 
 // UpdateSecret indicates an expected call of UpdateSecret.
-func (mr *MockClientMockRecorder) UpdateSecret(ctx, name, values interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) UpdateSecret(ctx, name, values interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSecret", reflect.TypeOf((*MockClient)(nil).UpdateSecret), ctx, name, values)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSecret", reflect.TypeOf((*MockClientInterface)(nil).UpdateSecret), ctx, name, values)
 }
 
 // UpdateUserSSHKeySecret mocks base method.
-func (m *MockClient) UpdateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error {
+func (m *MockClientInterface) UpdateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateUserSSHKeySecret", ctx, user, public, private)
 	ret0, _ := ret[0].(error)
@@ -292,7 +292,7 @@ func (m *MockClient) UpdateUserSSHKeySecret(ctx context.Context, user entity.Use
 }
 
 // UpdateUserSSHKeySecret indicates an expected call of UpdateUserSSHKeySecret.
-func (mr *MockClientMockRecorder) UpdateUserSSHKeySecret(ctx, user, public, private interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) UpdateUserSSHKeySecret(ctx, user, public, private interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserSSHKeySecret", reflect.TypeOf((*MockClient)(nil).UpdateUserSSHKeySecret), ctx, user, public, private)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserSSHKeySecret", reflect.TypeOf((*MockClientInterface)(nil).UpdateUserSSHKeySecret), ctx, user, public, private)
 }

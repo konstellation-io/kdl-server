@@ -2,30 +2,31 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
 )
 
-// Credentials to be returned to create a configMap
+// Credentials to be returned to create a configMap.
 type Credentials struct {
 	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 	ClientName   string `json:"name"`
 }
 
-func waitForGitea(cfg *Config) error {
+func waitForGitea(ctx context.Context, cfg Config) error {
 	doneCh := make(chan struct{})
 
 	go func() {
 		log.Println("Waiting for Gitea available...")
 
 		for {
-			giteaAvailable := checkGitea(cfg.Gitea.URL, cfg.Gitea.Username, cfg.Gitea.Password)
+			giteaAvailable := checkGitea(ctx, cfg.Gitea.URL, cfg.Gitea.Username, cfg.Gitea.Password)
 			if giteaAvailable {
 				doneCh <- struct{}{}
 				return
@@ -40,46 +41,70 @@ func waitForGitea(cfg *Config) error {
 		log.Println("Gitea is ready")
 		return nil
 	case <-time.After(time.Duration(cfg.Timeout) * time.Second):
-		return fmt.Errorf("timeout after %d seconds", cfg.Timeout)
+		return fmt.Errorf("%w after %d seconds", ErrTimeout, cfg.Timeout)
 	}
 }
 
-func checkGitea(url, username, password string) bool {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/v1/user", url), nil)
+func createInsecureClient() *http.Client {
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // #nosec G402
+	}
+
+	return &http.Client{Transport: transport}
+}
+
+func checkGitea(ctx context.Context, url, username, password string) bool {
+	client := createInsecureClient()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s/api/v1/user", url), nil)
 	if err != nil {
-		log.Printf("error calling Gitea: %w \n", err)
+		log.Printf("error calling Gitea: %v \n", err)
 		log.Println("Connection with Gitea fail, retrying.")
+
 		return false
 	}
+
 	req.SetBasicAuth(username, password)
-	resp, err := http.DefaultClient.Do(req)
+
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Println(err)
 		return false
 	}
+	defer resp.Body.Close()
+
 	log.Printf("Gitea response status: %d \n", resp.StatusCode)
 
 	return resp.StatusCode == http.StatusOK
-
 }
 
-func createOauth2Application(name string, redirectUris []string, url, username, password string) (*Credentials, error) {
+func createOauth2Application(
+	ctx context.Context,
+	name string,
+	redirectUris []string,
+	url, username, password string,
+) (*Credentials, error) {
 	payload := map[string]interface{}{
 		"name":          name,
 		"redirect_uris": redirectUris,
 	}
+
 	payloadData, err := json.Marshal(&payload)
 	if err != nil {
-		log.Printf("payload conversion error: %w \n", err)
+		log.Printf("payload conversion error: %v \n", err)
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/v1/user/applications/oauth2", url), bytes.NewBuffer(payloadData))
+
+	oauthURL := fmt.Sprintf("%s/api/v1/user/applications/oauth2", url)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, oauthURL, bytes.NewBuffer(payloadData))
 	if err != nil {
 		log.Printf("error calling Gitea when creating Oauth2 Application: %s \n", err)
 		log.Println("Connection with Gitea fail, retrying.")
+
 		return nil, err
 	}
+
 	req.Header.Set("Content-Type", "application/json")
 	req.SetBasicAuth(username, password)
 
@@ -90,7 +115,7 @@ func createOauth2Application(name string, redirectUris []string, url, username, 
 	}
 
 	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 
 	c := &Credentials{}
 	err = json.Unmarshal(body, c)

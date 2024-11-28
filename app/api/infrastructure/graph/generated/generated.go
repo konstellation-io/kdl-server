@@ -144,7 +144,6 @@ type ComplexityRoot struct {
 
 	ToolUrls struct {
 		Filebrowser     func(childComplexity int) int
-		Gitea           func(childComplexity int) int
 		KnowledgeGalaxy func(childComplexity int) int
 		MLFlow          func(childComplexity int) int
 		VSCode          func(childComplexity int) int
@@ -731,13 +730,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ToolUrls.Filebrowser(childComplexity), true
 
-	case "ToolUrls.gitea":
-		if e.complexity.ToolUrls.Gitea == nil {
-			break
-		}
-
-		return e.complexity.ToolUrls.Gitea(childComplexity), true
-
 	case "ToolUrls.knowledgeGalaxy":
 		if e.complexity.ToolUrls.KnowledgeGalaxy == nil {
 			break
@@ -841,8 +833,8 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 }
 
 func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
-	rc := graphql.GetOperationContext(ctx)
-	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
+	opCtx := graphql.GetOperationContext(ctx)
+	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAddMembersInput,
 		ec.unmarshalInputAddUserInput,
@@ -862,7 +854,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	)
 	first := true
 
-	switch rc.Operation.Operation {
+	switch opCtx.Operation.Operation {
 	case ast.Query:
 		return func(ctx context.Context) *graphql.Response {
 			var response graphql.Response
@@ -870,7 +862,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			if first {
 				first = false
 				ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-				data = ec._Query(ctx, rc.Operation.SelectionSet)
+				data = ec._Query(ctx, opCtx.Operation.SelectionSet)
 			} else {
 				if atomic.LoadInt32(&ec.pendingDeferred) > 0 {
 					result := <-ec.deferredResults
@@ -900,7 +892,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			}
 			first = false
 			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-			data := ec._Mutation(ctx, rc.Operation.SelectionSet)
+			data := ec._Mutation(ctx, opCtx.Operation.SelectionSet)
 			var buf bytes.Buffer
 			data.MarshalGQL(&buf)
 
@@ -1044,7 +1036,6 @@ type Member {
 
 type ToolUrls {
   knowledgeGalaxy: String!
-  gitea: String!
   filebrowser: String!
   vscode: String!
   mlflow: String!
@@ -3550,8 +3541,6 @@ func (ec *executionContext) fieldContext_Project_toolUrls(_ context.Context, fie
 			switch field.Name {
 			case "knowledgeGalaxy":
 				return ec.fieldContext_ToolUrls_knowledgeGalaxy(ctx, field)
-			case "gitea":
-				return ec.fieldContext_ToolUrls_gitea(ctx, field)
 			case "filebrowser":
 				return ec.fieldContext_ToolUrls_filebrowser(ctx, field)
 			case "vscode":
@@ -5065,50 +5054,6 @@ func (ec *executionContext) _ToolUrls_knowledgeGalaxy(ctx context.Context, field
 }
 
 func (ec *executionContext) fieldContext_ToolUrls_knowledgeGalaxy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ToolUrls",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ToolUrls_gitea(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ToolUrls_gitea(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Gitea, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ToolUrls_gitea(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ToolUrls",
 		Field:      field,
@@ -9188,11 +9133,6 @@ func (ec *executionContext) _ToolUrls(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = graphql.MarshalString("ToolUrls")
 		case "knowledgeGalaxy":
 			out.Values[i] = ec._ToolUrls_knowledgeGalaxy(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "gitea":
-			out.Values[i] = ec._ToolUrls_gitea(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

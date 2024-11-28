@@ -4,5 +4,3 @@ logLevel: "debug"
 mongodb:
   uri: "mongodb://admin:123456@mongodb:27017/admin"
   dbName: "kdl"
-gitea:
-  internal_url: "http://gitea:3000"

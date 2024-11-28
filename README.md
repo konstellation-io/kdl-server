@@ -56,9 +56,7 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 * `app-api`: main component of the application, providing API access for other components and managing interactions with `MongoDB`.
 * `app-ui`: web application offering the interface for data scientists.
 * `cleaner`: currently unused, potentially slated for deprecation.
-* `gitea`: git server mirroring project repositories.
 * `minio`: s3-compatible object storage, holding artifacts from training jobs; `MinIO` is installed as a pinned dependency, with only the console deployed through the chart.
-* `postgresql`: database storing `gitea` data.
 * `project-operator`: Kubernetes operator listening to `KAI Lab API`; on new project creation in the UI, it deploys a project-specific pod with `mlflow` and `file browser`.
 * `repo-cloner`: in-house solution that clones all accessible repositories into the user's user-tools pod.
 * `user-tools-operator`: Kubernetes operator monitoring kai lab api; each time a user starts or changes runtime in the UI, this operator deploys a pod with vscode server and runtime containers based on selected image.

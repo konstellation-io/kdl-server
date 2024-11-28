@@ -5,7 +5,7 @@ user participates. This way they are available for code-server to be able to wor
 
 To do this, it checks periodically the projects collection in the database, to locate the ones that the user is
 included in. So, those who do not have a folder with the code, try to clone the repository. For this it is necessary
-that the user's public key is included in the platform where the repository is stored (github, gitlab, gitea etc), so
+that the user's public key is included in the platform where the repository is stored (github, gitlab, etc), so
 that cloning through ssh is possible.
 
 ## Configuration

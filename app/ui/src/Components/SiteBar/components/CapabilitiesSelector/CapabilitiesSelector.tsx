@@ -12,8 +12,6 @@ type Props = {
 
 function sortCapability(
   capability1: GetCapabilities_capabilities,
-  capability2: GetCapabilities_capabilities,
-  selectedCapabilityId: string | null,
 ) {
   return capability1.default ? 1 : -1;
 }
@@ -27,7 +25,7 @@ const CapabilitiesSelector: FC<Props & BottomComponentProps> = ({ capabilities, 
         {capabilities
           ?.slice()
           .sort((a: GetCapabilities_capabilities, b: GetCapabilities_capabilities) =>
-            sortCapability(a, b, selectedCapability ? selectedCapability.id : null),
+            sortCapability(a),
           )
           .reverse()
           .map((capability: GetCapabilities_capabilities) => (

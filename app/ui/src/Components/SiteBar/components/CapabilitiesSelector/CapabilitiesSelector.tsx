@@ -10,23 +10,18 @@ type Props = {
   capabilities: GetCapabilities_capabilities[] | undefined;
 };
 
-function sortCapability(
-  capability1: GetCapabilities_capabilities,
-) {
+function sortCapability(capability1: GetCapabilities_capabilities) {
   return capability1.default ? 1 : -1;
 }
 
 const CapabilitiesSelector: FC<Props & BottomComponentProps> = ({ capabilities, ...props }) => {
-  const selectedCapability = useReactiveVar(selectedCapabilities);
 
   return (
     <div className={styles.container}>
       <ul>
         {capabilities
           ?.slice()
-          .sort((a: GetCapabilities_capabilities, b: GetCapabilities_capabilities) =>
-            sortCapability(a),
-          )
+          .sort((a: GetCapabilities_capabilities, b: GetCapabilities_capabilities) => sortCapability(a),
           .reverse()
           .map((capability: GetCapabilities_capabilities) => (
             <li key={capability.id}>

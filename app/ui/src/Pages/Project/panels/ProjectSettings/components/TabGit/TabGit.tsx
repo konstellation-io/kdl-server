@@ -3,10 +3,9 @@ import RepositoryTypeComponent, {
   SIZE,
 } from 'Pages/NewProject/pages/Repository/components/RepositoryTypeComponent/RepositoryTypeComponent';
 
-import { Button, ErrorMessage, SpinnerCircular } from 'kwc';
+import { ErrorMessage, SpinnerCircular } from 'kwc';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
-import IconEdit from '@material-ui/icons/Edit';
 import React, { useMemo } from 'react';
 import { AccessLevel, RepositoryType } from 'Graphql/types/globalTypes';
 import styles from './TabGit.module.scss';
@@ -20,11 +19,6 @@ type Props = {
 function TabGit({ project }: Props) {
   const { toolUrls, repository, members } = project;
   const { data: dataMe, loading, error } = useQuery<GetMe>(GetMeQuery);
-
-  const isAdmin = useMemo(() => {
-    const meAsMember = members.find((m) => m.user.email === dataMe?.me.email);
-    if (meAsMember) return meAsMember.accessLevel === AccessLevel.ADMIN;
-  }, [dataMe, members]);
 
   if (loading) return <SpinnerCircular />;
   if (!repository || error) return <ErrorMessage />;

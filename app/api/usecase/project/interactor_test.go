@@ -243,7 +243,7 @@ func TestInteractor_AddMembers(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	assert.Equal(t, p, expectedProject)
+	assert.DeepEqual(t, p, expectedProject)
 }
 
 func TestInteractor_RemoveMembers(t *testing.T) {
@@ -300,7 +300,7 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	require.Equal(t, expectedProject, p)
+	assert.DeepEqual(t, expectedProject, p)
 }
 
 func TestInteractor_RemoveMembers_ErrNoMoreAdmins(t *testing.T) {
@@ -391,7 +391,7 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	assert.Equal(t, expectedProject, p)
+	assert.DeepEqual(t, expectedProject, p)
 }
 
 func TestInteractor_UpdateMembers_ErrNoMoreAdmins(t *testing.T) {
@@ -425,7 +425,7 @@ func TestInteractor_UpdateMembers_ErrNoMoreAdmins(t *testing.T) {
 	})
 
 	require.Equal(t, project.ErrUpdateNoMoreAdmins, err)
-	assert.Equal(t, entity.Project{}, p)
+	assert.DeepEqual(t, entity.Project{}, p)
 }
 
 func TestInteractor_Update(t *testing.T) {

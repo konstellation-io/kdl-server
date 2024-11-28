@@ -97,5 +97,5 @@ func TestInteractor_GetProjectRuntimes(t *testing.T) {
 	f, err := s.interactor.GetRuntimes(ctx, username)
 
 	require.NoError(t, err)
-	assert.Equal(t, expectedGenericRuntimes, f)
+	assert.DeepEqual(t, expectedGenericRuntimes, f)
 }

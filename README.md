@@ -68,16 +68,12 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 
 | Component     | Dependencies                 | Version   | Compatibility                 |
 | ------------- | ---------------------------- | --------- | ----------------------------- |
-| `app`         | code.gitea.io/sdk/gitea      | `v0.19.0` | -                             |
-|               | github.com/minio/minio-go/v7 | `v7.0.78` | -                             |
+| `app`         | github.com/minio/minio-go/v7 | `v7.0.78` | -                             |
 |               | go.mongodb.org/mongo-driver  | `v1.17.1` | [MongoDB `>=3.6, =<7.X`]      |
 |               | k8s.io/api                   | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
 |               | k8s.io/apimachinery          | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
 |               | k8s.io/client-go             | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
 | `repo-cloner` | go.mongodb.org/mongo-driver  | `v1.17.1` | [MongoDB `>=3.6, =<7.X`]      |
-| `gitea`       | k8s.io/api                   | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
-|               | k8s.io/apimachinery          | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
-|               | k8s.io/client-go             | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
 
 [MongoDB `>=3.6, =<7.X`]: https://www.mongodb.com/docs/drivers/go/current/compatibility/#std-label-golang-compatibility
 [Kubernetes `>=1.24, =<1.30`]: https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters

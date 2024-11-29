@@ -65,15 +65,6 @@ golangci-lint run
 | KDL_SERVER_MONGODB_NAME      |                | MongoDB Database name for the KDL server    |
 | POD_NAMESPACE                |                | Namespace for the KDL server                |
 
-### GITEA
-
-| Environment variable         | Default value          | Description                         |
-| ---------------------------- | ---------------------- | ----------------------------------- |
-| GITEA_ADMIN_USER             | kdladmin               | Admin user for the Gitea server     |
-| GITEA_ADMIN_PASSWORD         | 123456                 | Admin password for the Gitea server |
-| GITEA_URL                    | http://gitea.kdl.local | External URL for the Gitea server   |
-| GITEA_INTERNAL_URL           | http://gitea:3000      | Internal URL for the Gitea server   |
-
 ### KNOWLEDGE GALAXY
 
 | Environment variable     | Default value                                   | Description                                |

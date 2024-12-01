@@ -14,10 +14,10 @@ require (
 	github.com/gosimple/slug v1.14.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/minio/minio-go/v7 v7.0.80
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/testcontainers/testcontainers-go v0.34.0
 	github.com/testcontainers/testcontainers-go/modules/k3s v0.34.0
-	github.com/vektah/gqlparser/v2 v2.5.18
+	github.com/vektah/gqlparser/v2 v2.5.20
 	go.mongodb.org/mongo-driver v1.17.1
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.28.0
@@ -33,7 +33,7 @@ require (
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.0.0 // indirect
-	github.com/agnivade/levenshtein v1.1.1 // indirect
+	github.com/agnivade/levenshtein v1.2.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/containerd/containerd v1.7.18 // indirect

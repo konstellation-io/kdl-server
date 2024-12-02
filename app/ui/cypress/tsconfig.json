@@ -4,8 +4,7 @@
     "*/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "cypress"
+    "node_modules/*/*.*", "**/*.spec.js"
   ],
   "types":["node"],
   "jsx": "react-jsx",

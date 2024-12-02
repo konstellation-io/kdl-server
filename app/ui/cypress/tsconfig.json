@@ -4,18 +4,20 @@
     "*/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "cypress"
   ],
   "types":["node"],
-  "moduleResolution": "bundler",
+  "jsx": "react-jsx",
+  "moduleResolution": "node",
   "compilerOptions": {
     "noEmit": false,
     "isolatedModules": false,
-    "types": ["cypress"],
+    "types": ["cypress", "node"],
     "paths": {
       "@/*": [
         "./src/*"
       ]
     },
-    },
+  },
 }

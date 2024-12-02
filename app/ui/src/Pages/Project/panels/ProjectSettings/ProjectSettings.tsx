@@ -32,7 +32,7 @@ function ProjectSettings({ project }: Props) {
         <TabList>
           <Tab>INFO</Tab>
           <Tab>GIT</Tab>
-          <Tab data-testid="members">MEMBERS</Tab>
+          <Tab data-testid="tabMembers">MEMBERS</Tab>
           <Tab className={cx('react-tabs__tab', 'danger-tab')}>DANGER ZONE</Tab>
         </TabList>
 

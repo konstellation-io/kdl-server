@@ -153,31 +153,43 @@ minio:
 
   mode: standalone
 
-  image:
-    registry: docker.io
-    repository: bitnami/minio
-    tag: 2021.10.13-debian-10-r5
-
   ingress:
     enabled: true
     ingressClassName: public
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-    hostname: minio-console.{{ requiredEnv "DOMAIN" }}
-    tls: true
+      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+    path: /
+    hosts:
+      - minio.{{ requiredEnv "DOMAIN" }}
+    tls:
+      - secretName: minio-tls
+        hosts:
+        - minio.{{ requiredEnv "DOMAIN" }}
 
-  apiIngress:
+  consoleIngress:
     enabled: true
     ingressClassName: public
-    hostname: minio.{{ requiredEnv "DOMAIN" }}
+    annotations:
+      cert-manager.io/cluster-issuer: selfsigned-clusterissuer
+      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+    path: /
+    hosts:
+      - minio-console.{{ requiredEnv "DOMAIN" }}
+    tls:
+      - secretName: minio-console-tls
+        hosts:
+        - minio-console.{{ requiredEnv "DOMAIN" }}
 
-  auth:
-    rootUser: minio
-    rootPassword: minio123
+  rootUser: minio
+  rootPassword: minio123
 
   persistence:
     enabled: true
     storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+    existingClaim: "kdl-local-claim"
+    size: 1Gi
+    accessMode: ReadWriteMany
 
 # -- MongoDB subchart deployment
 # </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/mongodb/values.yaml

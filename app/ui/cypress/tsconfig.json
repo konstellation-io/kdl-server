@@ -3,10 +3,18 @@
   "include": [
     "*/*.ts"
   ],
+  "exclude": [
+    "node_modules"
+  ],
   "types":["node"],
   "compilerOptions": {
     "noEmit": false,
     "isolatedModules": false,
-    "types": ["cypress"]
-  }
+    "types": ["cypress"],
+      "paths": {
+        "@/*": [
+          "src/*"
+        ]
+      }
+    },
 }

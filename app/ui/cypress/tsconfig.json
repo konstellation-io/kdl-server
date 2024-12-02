@@ -7,14 +7,15 @@
     "node_modules"
   ],
   "types":["node"],
+  "moduleResolution": "bundler",
   "compilerOptions": {
     "noEmit": false,
     "isolatedModules": false,
     "types": ["cypress"],
-      "paths": {
-        "@/*": [
-          "src/*"
-        ]
-      }
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
     },
 }

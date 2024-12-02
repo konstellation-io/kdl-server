@@ -6,9 +6,10 @@
   "exclude": [
     "node_modules"
   ],
+  "types":["node"],
   "compilerOptions": {
     "noEmit": false,
     "isolatedModules": false,
-    "types": ["cypress", "node"]
+    "types": ["cypress"]
   }
 }

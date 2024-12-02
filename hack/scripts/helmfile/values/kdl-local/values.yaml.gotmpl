@@ -1,17 +1,4 @@
 global:
-  env: {}
-    # MY_VARIABLE: value
-
-  envFromSecrets: {}
-    # MY_VARIABLE:
-    #  name: <name-secret>
-    #  key: secret_key
-
-  envFromConfigMap: {}
-    # MY_VARIABLE:
-    #  name: <name-configmap>
-    #  key: key
-
   serverName: "local-server"
   domain: {{ requiredEnv "DOMAIN" | quote }}
 
@@ -31,16 +18,6 @@ env:
   SERVER_URL: https://kdlapp.{{ requiredEnv "DOMAIN" }}
   MINIO_ACCESS_KEY: minio
   MINIO_SECRET_KEY: minio123
-
-envFromSecrets: {}
-  # MY_VARIABLE:
-  #  name: <name-secret>
-  #  key: secret_key
-
-envFromConfigMap: {}
-  # MY_VARIABLE:
-  #  name: <name-configmap>
-  #  key: key
 
 readyChecker:
   enabled: false
@@ -190,6 +167,10 @@ minio:
     existingClaim: "kdl-local-claim"
     size: 1Gi
     accessMode: ReadWriteMany
+
+  resources:
+    requests:
+      memory: 1Gi
 
 # -- MongoDB subchart deployment
 # </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/mongodb/values.yaml

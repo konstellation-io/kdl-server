@@ -55,15 +55,12 @@ jobs:
       - name: UI Run e2e tests
         uses: cypress-io/github-action@v5
         with:
-          install: true
-          working-directory: ./app/ui
-          start: npm start
           browser: chrome
-          tag: node-${{ vars.NODE_VERSION_UI_TESTS }}
-          wait-on: 'http://localhost:3001'
+          install: true
+          start: npm start
           wait-on-timeout: 120
-        env:
-          NODE_OPTIONS: --max-old-space-size=6144
+          wait-on: 'http://localhost:3001'
+          working-directory: ./app/ui
 
   sonarcloud:
     name: SonarCloud

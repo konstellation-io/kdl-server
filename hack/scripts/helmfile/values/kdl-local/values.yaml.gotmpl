@@ -13,11 +13,14 @@ image:
   pullPolicy: Always
 
 env:
-  KDL_SERVER_PORT: "8080"
+  KDL_ADMIN_EMAIL: "test@test.com"
+  KDL_ADMIN_USERNAME: {{ requiredEnv "KEYCLOAK_ADMIN_USER" | quote }}
   KDL_SERVER_MONGODB_URI: "mongodb://kdl:123456@mongodb:27017/kdl?authSource=kdl&authMechanism=SCRAM-SHA-256"
+  KDL_SERVER_PORT: "8080"
+  MINIO_ACCESS_KEY: "minio"
+  MINIO_ENDPOINT: "minio:9000"
+  MINIO_SECRET_KEY: "minio123"
   SERVER_URL: https://kdlapp.{{ requiredEnv "DOMAIN" }}
-  MINIO_ACCESS_KEY: minio
-  MINIO_SECRET_KEY: minio123
 
 readyChecker:
   enabled: false
@@ -186,28 +189,6 @@ mongodb:
     enabled: true
     storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
-# (DEPRECATION) legacy, remove in future versions
-# OAuth2-Proxy legacy to configure user authentication
-oauth2Proxy:
-  image:
-    repository: quay.io/oauth2-proxy/oauth2-proxy
-    tag: v7.7.1-amd64
-
-  customConfig: |-
-    provider="keycloak-oidc"
-    oidc_issuer_url="https://keycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl"
-    redirect_url="https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
-    cookie_secret="mycookiesecret16"
-    cookie_secure=true
-    email_domains="*"
-    set_xauthrequest=true
-    http_address="https://kdlapp.{{ requiredEnv "DOMAIN" }}/"
-    ssl_insecure_skip_verify=true
-    whitelist_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}"]
-    cookie_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}", "keycloak.{{ requiredEnv "DOMAIN" }}"]
-    errors_to_info_log=true
-    skip_provider_button=true
-
 # -- OAuth2-Proxy subchart deployment
 # </br> Ref: https://github.com/oauth2-proxy/manifests/blob/main/helm/oauth2-proxy/values.yaml
 oauth2proxy:
@@ -222,45 +203,42 @@ oauth2proxy:
       - kdlapp.{{ requiredEnv "DOMAIN" }}
 
   httpScheme: http
-  cookieSecret: mycookiesecret16
 
   image:
     tag: "v7.7.1-amd64"
 
-  extraArgs:
-    - "--upstream=http://kdl-local-server:80/"
-    - "--upstream=http://127.0.0.1:9000/mlflow/"
-    - "--upstream=http://127.0.0.1:9000/filebrowser/"
-    - "--upstream=http://127.0.0.1:9000/kg/"
-    - "--pass-user-headers=true"
-    - "--skip-auth-route=/config.json"
   config:
     clientID: proxy
     clientSecret: proxy654321
+    cookieSecret: mycookiesecret16
+
     configFile: |-
-      provider="keycloak-oidc"
-      oidc_issuer_url="https://keycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl"
-      redirect_url="https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
-      cookie_secret="mycookiesecret16"
+      upstreams=["http://kdl-local-server:80/", "http://127.0.0.1:9000/mlflow/", "http://127.0.0.1:9000/filebrowser/", "http://127.0.0.1:9000/kg/"]
+      cookie_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}", "keycloak.{{ requiredEnv "DOMAIN" }}"]
+      cookie_samesite="lax"
       cookie_secure=true
       email_domains="*"
-      set_xauthrequest=true
+      errors_to_info_log=true
       http_address="https://kdlapp.{{ requiredEnv "DOMAIN" }}/"
+      oidc_issuer_url="https://keycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl"
+      pass_user_headers=true
+      provider="keycloak-oidc"
+      redirect_url="https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
+      set_xauthrequest=true
+      skip_auth_routes="/config.json"
+      skip_provider_button=true
       ssl_insecure_skip_verify=true
       whitelist_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}"]
-      cookie_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}", "keycloak.{{ requiredEnv "DOMAIN" }}"]
-      errors_to_info_log=true
-      skip_provider_button=true
 
   extraContainers:
-     - name: project-proxy
-       image: nginx:alpine
-       ports:
-         - containerPort: 9000
-       volumeMounts:
-         - name: project-proxy-nginx-config
-           mountPath: /etc/nginx/nginx.conf
-           subPath: nginx.conf
+    - name: project-proxy
+      image: nginx:alpine
+      ports:
+        - containerPort: 9000
+      volumeMounts:
+        - name: project-proxy-nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
 
   extraVolumes:
     - name: project-proxy-nginx-config
@@ -311,7 +289,7 @@ projectOperator:
     image:
       repository: filebrowser/filebrowser
       pullPolicy: Always
-      tag: latest
+      tag: v2
 
 sharedVolume:
   enabled: true

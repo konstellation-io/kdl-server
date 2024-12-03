@@ -44,6 +44,7 @@ type ResolverRoot interface {
 	Project() ProjectResolver
 	Query() QueryResolver
 	SSHKey() SSHKeyResolver
+	ToolUrls() ToolUrlsResolver
 	User() UserResolver
 }
 
@@ -201,6 +202,9 @@ type QueryResolver interface {
 type SSHKeyResolver interface {
 	CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error)
 	LastActivity(ctx context.Context, obj *entity.SSHKey) (*string, error)
+}
+type ToolUrlsResolver interface {
+	Gitea(ctx context.Context, obj *entity.ToolUrls) (string, error)
 }
 type UserResolver interface {
 	CreationDate(ctx context.Context, obj *entity.User) (string, error)
@@ -810,11 +814,10 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 }
 
 func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
-	rc := graphql.GetOperationContext(ctx)
-	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
+	opCtx := graphql.GetOperationContext(ctx)
+	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAddMembersInput,
-		ec.unmarshalInputAddUserInput,
 		ec.unmarshalInputApiTokenInput,
 		ec.unmarshalInputCreateProjectInput,
 		ec.unmarshalInputDeleteProjectInput,
@@ -829,7 +832,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	)
 	first := true
 
-	switch rc.Operation.Operation {
+	switch opCtx.Operation.Operation {
 	case ast.Query:
 		return func(ctx context.Context) *graphql.Response {
 			var response graphql.Response
@@ -837,7 +840,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			if first {
 				first = false
 				ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-				data = ec._Query(ctx, rc.Operation.SelectionSet)
+				data = ec._Query(ctx, opCtx.Operation.SelectionSet)
 			} else {
 				if atomic.LoadInt32(&ec.pendingDeferred) > 0 {
 					result := <-ec.deferredResults
@@ -867,7 +870,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			}
 			first = false
 			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-			data := ec._Mutation(ctx, rc.Operation.SelectionSet)
+			data := ec._Mutation(ctx, opCtx.Operation.SelectionSet)
 			var buf bytes.Buffer
 			data.MarshalGQL(&buf)
 
@@ -1038,13 +1041,6 @@ type Runtime {
   dockerImage: String!
   dockerTag: String!
   runtimePod: String!
-}
-
-input AddUserInput {
-  email: String!
-  username: String!
-  password: String!
-  accessLevel: AccessLevel!
 }
 
 input RemoveUsersInput {
@@ -4993,7 +4989,7 @@ func (ec *executionContext) _ToolUrls_gitea(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Gitea, nil
+		return ec.resolvers.ToolUrls().Gitea(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5014,8 +5010,8 @@ func (ec *executionContext) fieldContext_ToolUrls_gitea(_ context.Context, field
 	fc = &graphql.FieldContext{
 		Object:     "ToolUrls",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -7377,54 +7373,6 @@ func (ec *executionContext) unmarshalInputAddMembersInput(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj interface{}) (model.AddUserInput, error) {
-	var it model.AddUserInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"email", "username", "password", "accessLevel"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "email":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Email = data
-		case "username":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Username = data
-		case "password":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Password = data
-		case "accessLevel":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("accessLevel"))
-			data, err := ec.unmarshalNAccessLevel2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAccessLevel(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.AccessLevel = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputApiTokenInput(ctx context.Context, obj interface{}) (model.APITokenInput, error) {
 	var it model.APITokenInput
 	asMap := map[string]interface{}{}
@@ -8899,27 +8847,58 @@ func (ec *executionContext) _ToolUrls(ctx context.Context, sel ast.SelectionSet,
 		case "knowledgeGalaxy":
 			out.Values[i] = ec._ToolUrls_knowledgeGalaxy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "gitea":
-			out.Values[i] = ec._ToolUrls_gitea(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ToolUrls_gitea(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "filebrowser":
 			out.Values[i] = ec._ToolUrls_filebrowser(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "vscode":
 			out.Values[i] = ec._ToolUrls_vscode(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "mlflow":
 			out.Values[i] = ec._ToolUrls_mlflow(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

@@ -11,13 +11,6 @@ type AddMembersInput struct {
 	UserIds   []string `json:"userIds"`
 }
 
-type AddUserInput struct {
-	Email       string             `json:"email"`
-	Username    string             `json:"username"`
-	Password    string             `json:"password"`
-	AccessLevel entity.AccessLevel `json:"accessLevel"`
-}
-
 type APITokenInput struct {
 	UserID string  `json:"userId"`
 	Name   *string `json:"name,omitempty"`

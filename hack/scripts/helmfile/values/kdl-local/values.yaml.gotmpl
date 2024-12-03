@@ -49,19 +49,6 @@ service:
   type: ClusterIP
   port: 80
 
-gitea:
-  enabled: true
-
-  admin:
-    username: {{ requiredEnv "GITEA_ADMIN_USER" | quote }}
-    password: {{ requiredEnv "GITEA_ADMIN_PASSWORD" | quote }}
-
-  ingress:
-    className: "public"
-
-  storage:
-    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-
 # -- Keycloak subchart deployment
 # </br> Ref: https://github.com/konstellation-io/helm-charts/blob/konstellation-base-1.0.2/charts/konstellation-base/values.yaml
 keycloak:
@@ -297,13 +284,6 @@ oauth2proxy:
     - name: project-proxy-nginx-config
       configMap:
         name: project-proxy-nginx-config
-
-# -- (DEPRECATION) only for gitea
-postgres:
-  dbName: gitea
-  dbPassword: gitea
-  storage:
-    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
 # -- PostgreSQL subchart deployment
 # </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/postgresql/values.yaml

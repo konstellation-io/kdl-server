@@ -2,8 +2,6 @@ global:
   serverName: "local-server"
   domain: {{ requiredEnv "DOMAIN" | quote }}
 
-  httpSchema: "https"
-
   ingress:
     tls:
       enabled: {{ requiredEnv "ENABLE_TLS" }}

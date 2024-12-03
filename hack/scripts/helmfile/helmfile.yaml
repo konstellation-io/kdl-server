@@ -51,7 +51,7 @@ releases:
   - name: "kdl-local"
     <<: *default
     chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
-    version: 6.0.3-rc.20
+    version: 6.0.3-rc.24
     needs:
     - kdl/initial-resources
 

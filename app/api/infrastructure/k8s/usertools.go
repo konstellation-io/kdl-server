@@ -51,14 +51,7 @@ func (k *Client) CreateUserToolsCR(ctx context.Context, username, runtimeID, run
 	slugUsername := k.getSlugUsername(username)
 	resName := fmt.Sprintf("usertools-%s", slugUsername)
 
-	err := k.checkOrCreateToolsSecrets(ctx, slugUsername)
-	if err != nil {
-		return err
-	}
-
-	k.logger.Info("UserTools secrets created")
-
-	err = k.createUserToolsDefinition(ctx, username, slugUsername, resName, runtimeID, runtimeImage, runtimeTag, capabilities)
+	err := k.createUserToolsDefinition(ctx, username, slugUsername, resName, runtimeID, runtimeImage, runtimeTag, capabilities)
 	if err != nil {
 		return err
 	}
@@ -146,41 +139,6 @@ func (k *Client) getUserToolsResName(slugUsername string) string {
 
 func (k *Client) userToolsPODLabelSelector(resName string) string {
 	return fmt.Sprintf("app.kubernetes.io/instance=%s", resName)
-}
-
-// checkOrCreateToolsSecrets set ClientID and ClientSecret on Kubernetes secret objects.
-func (k *Client) checkOrCreateToolsSecrets(ctx context.Context, slugUsername string) error {
-	secretName := fmt.Sprintf("codeserver-oauth2-secrets-%s", slugUsername)
-	credentialsSecretName := fmt.Sprintf("codeserver-oauth2-credentials-%s", slugUsername)
-
-	exist, err := k.isSecretPresent(ctx, secretName)
-	if err != nil {
-		return fmt.Errorf("check codeserver tool secret: %w", err)
-	}
-
-	if exist {
-		return nil
-	}
-
-	oAuthName := fmt.Sprintf("codeserver-app-%s", slugUsername)
-
-	protocol := "http"
-	if k.cfg.TLS.Enabled {
-		protocol = "https"
-	}
-
-	callbackURL := fmt.Sprintf("%s://%s-code.%s/oauth2/callback", protocol, slugUsername, k.cfg.BaseDomainName)
-	data := map[string]string{}
-	data["DEPLOYMENT_SECRET_NAME"] = credentialsSecretName
-	data["GITEA_REDIRECT_URIS"] = callbackURL
-	data["GITEA_APPLICATION_NAME"] = oAuthName
-
-	err = k.CreateSecret(ctx, secretName, data)
-	if err != nil {
-		return fmt.Errorf("creating codeserver tool secrets: %w", err)
-	}
-
-	return nil
 }
 
 // createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	coreV1 "k8s.io/api/core/v1"
-	k8sErrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -48,16 +47,6 @@ func (k *Client) GetSecret(ctx context.Context, name string) (map[string][]byte,
 	}
 
 	return s.Data, nil
-}
-
-// isSecretPresent checks if there is a secret with the given name.
-func (k *Client) isSecretPresent(ctx context.Context, name string) (bool, error) {
-	_, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Get(ctx, name, metav1.GetOptions{})
-	if err != nil && !k8sErrors.IsNotFound(err) {
-		return false, err
-	}
-
-	return !k8sErrors.IsNotFound(err), nil
 }
 
 // newSecret conform a new k8s secret from values map.

@@ -14,7 +14,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
@@ -33,7 +32,6 @@ type Interactor struct {
 	repoCapabilities capabilities.Repository
 	sshGenerator     sshhelper.SSHKeyGenerator
 	clock            clock.Clock
-	giteaService     giteaservice.GiteaClient
 	k8sClient        k8s.ClientInterface
 }
 
@@ -49,7 +47,6 @@ func NewInteractor(
 	repoCapabilities capabilities.Repository,
 	sshGenerator sshhelper.SSHKeyGenerator,
 	c clock.Clock,
-	giteaService giteaservice.GiteaClient,
 	k8sClient k8s.ClientInterface,
 ) UseCase {
 	return &Interactor{
@@ -60,7 +57,6 @@ func NewInteractor(
 		repoCapabilities: repoCapabilities,
 		sshGenerator:     sshGenerator,
 		clock:            c,
-		giteaService:     giteaService,
 		k8sClient:        k8sClient,
 	}
 }
@@ -68,7 +64,6 @@ func NewInteractor(
 // Create add a new user to the server.
 // - If the user already exists (email and username must be unique) returns entity.ErrDuplicatedUser.
 // - Generates a new SSH public/private keys.
-// - Adds the public SSH key to the user in Gitea.
 // - Stores the user and ssh keys into the DB.
 // - Creates a new secret in Kubernetes with the generated SSH keys.
 // - Created a service account for the user.
@@ -254,22 +249,8 @@ func (i *Interactor) GetByID(ctx context.Context, userID string) (entity.User, e
 
 // UpdateAccessLevel update access level for the given identifiers.
 func (i *Interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error) {
-	// Update user permissions in Gitea
-	users, err := i.FindByIDs(ctx, userIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, user := range users {
-		err := i.giteaService.UpdateUserPermissions(user.Username, level)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	// Update access level in our DataBase
-	err = i.repo.UpdateAccessLevel(ctx, userIDs, level)
-	if err != nil {
+	if err := i.repo.UpdateAccessLevel(ctx, userIDs, level); err != nil {
 		return nil, err
 	}
 
@@ -281,7 +262,6 @@ func (i *Interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, le
 // - Check if userTools are Running. (if yes, returns ErrUserNotFound error)
 // - Generate a new ssh key pair
 // - Check if k8s secret exists. If yes, update it. Else, create it.
-// - Update public key on Gitea
 // - Update ssh keys for user in database.
 func (i *Interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error) {
 	i.logger.Info("Regenerating user SSH keys for user", "username", user.Username)
@@ -304,12 +284,6 @@ func (i *Interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 
 	// Update the user SSH keys secret in k8s.
 	err = i.k8sClient.UpdateUserSSHKeySecret(ctx, user, keys.Public, keys.Private)
-	if err != nil {
-		return entity.User{}, err
-	}
-
-	// Update public key on Gitea
-	err = i.giteaService.UpdateSSHKey(user.Username, keys.Public)
 	if err != nil {
 		return entity.User{}, err
 	}

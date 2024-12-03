@@ -16,7 +16,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/dataloader"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
@@ -43,14 +42,6 @@ func main() {
 
 	realClock := clock.NewRealClock()
 	sshHelper := sshhelper.NewGenerator(logger)
-
-	giteaService, err := giteaservice.NewGiteaService(
-		logger, cfg.Gitea.InternalURL, cfg.Gitea.AdminUser, cfg.Gitea.AdminPass,
-	)
-	if err != nil {
-		logger.Error(err, "Error connecting to Gitea")
-		os.Exit(1)
-	}
 
 	minioService, err := minioservice.NewMinioService(
 		logger, cfg.Minio.Endpoint, cfg.Minio.AccessKey, cfg.Minio.SecretKey,
@@ -88,7 +79,7 @@ func main() {
 	}
 
 	userInteractor := user.NewInteractor(logger, cfg, userRepo, runtimeRepo, capabilitiesRepo,
-		sshHelper, realClock, giteaService, k8sClient)
+		sshHelper, realClock, k8sClient)
 
 	if err = userInteractor.SynchronizeServiceAccountsForUsers(); err != nil {
 		logger.Error(err, "Unexpected error creating serviceAccount for users")

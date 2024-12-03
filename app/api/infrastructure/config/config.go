@@ -37,12 +37,6 @@ type Config struct {
 		URI    string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
 		DBName string `yaml:"dbName" envconfig:"KDL_SERVER_MONGODB_NAME"`
 	} `yaml:"mongodb"`
-	Gitea struct {
-		InternalURL string `yaml:"internal_url" envconfig:"GITEA_INTERNAL_URL"`
-		URL         string `envconfig:"GITEA_URL"`
-		AdminUser   string `envconfig:"GITEA_ADMIN_USER"`
-		AdminPass   string `envconfig:"GITEA_ADMIN_PASSWORD"`
-	} `yaml:"gitea"`
 	Kubernetes KubernetesConfig `yaml:"kubernetes"`
 	Minio      struct {
 		Endpoint  string `envconfig:"MINIO_ENDPOINT"`

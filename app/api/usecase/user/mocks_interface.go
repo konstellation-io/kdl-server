@@ -425,16 +425,16 @@ func (mr *MockUseCaseMockRecorder) SynchronizeServiceAccountsForUsers() *gomock.
 }
 
 // UpdateAccessLevel mocks base method.
-func (m *MockUseCase) UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error) {
+func (m *MockUseCase) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateAccessLevel", ctx, userIds, level)
+	ret := m.ctrl.Call(m, "UpdateAccessLevel", ctx, userIDs, level)
 	ret0, _ := ret[0].([]entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // UpdateAccessLevel indicates an expected call of UpdateAccessLevel.
-func (mr *MockUseCaseMockRecorder) UpdateAccessLevel(ctx, userIds, level interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) UpdateAccessLevel(ctx, userIDs, level interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccessLevel", reflect.TypeOf((*MockUseCase)(nil).UpdateAccessLevel), ctx, userIds, level)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccessLevel", reflect.TypeOf((*MockUseCase)(nil).UpdateAccessLevel), ctx, userIDs, level)
 }

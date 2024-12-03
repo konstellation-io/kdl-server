@@ -20,7 +20,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
@@ -35,7 +34,6 @@ type userMocks struct {
 	capabilitiesRepo *capabilities.MockRepository
 	sshGenerator     *sshhelper.MockSSHKeyGenerator
 	clock            *clock.MockClock
-	giteaService     *giteaservice.MockGiteaClient
 	k8sClient        *k8s.MockClientInterface
 }
 
@@ -59,7 +57,6 @@ func (ts *AuthMiddlewareTestSuite) SetupSuite() {
 	ts.mocks.capabilitiesRepo = capabilities.NewMockRepository(ts.ctrl)
 	ts.mocks.clock = clock.NewMockClock(ts.ctrl)
 	ts.mocks.sshGenerator = sshhelper.NewMockSSHKeyGenerator(ts.ctrl)
-	ts.mocks.giteaService = giteaservice.NewMockGiteaClient(ts.ctrl)
 	ts.mocks.k8sClient = k8s.NewMockClientInterface(ts.ctrl)
 
 	zapLog, err := zap.NewDevelopment()
@@ -70,7 +67,7 @@ func (ts *AuthMiddlewareTestSuite) SetupSuite() {
 	ts.mocks.cfg = config.Config{}
 
 	ts.interactor = user.NewInteractor(ts.mocks.logger, ts.mocks.cfg, ts.mocks.repo, ts.mocks.runtimeRepo,
-		ts.mocks.capabilitiesRepo, ts.mocks.sshGenerator, ts.mocks.clock, ts.mocks.giteaService, ts.mocks.k8sClient)
+		ts.mocks.capabilitiesRepo, ts.mocks.sshGenerator, ts.mocks.clock, ts.mocks.k8sClient)
 }
 
 func (ts *AuthMiddlewareTestSuite) TestAuthMiddlewareNoEmailHeader() {

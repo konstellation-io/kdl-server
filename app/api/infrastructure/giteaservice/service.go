@@ -66,7 +66,7 @@ func (g *giteaService) UpdateSSHKey(username, publicSSHKey string) error {
 	return g.AddSSHKey(username, publicSSHKey)
 }
 
-// MirrorRepo creates a mirror of an external repository in the KDL organization.
+// MirrorRepo creates a mirror of a repository in the KDL organization.
 func (g *giteaService) MirrorRepo(url, repoName, userName, ownerUsername string, authMethod entity.RepositoryAuthMethod,
 	userCredential string) error {
 	migrateOpts := gitea.MigrateRepoOption{

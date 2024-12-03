@@ -9,7 +9,7 @@ locate the ones that the **user is included in**. So, those who do not have a
 folder with the code, try to clone the repository. For this it is necessary that
 the user's public key is included in the platform where the repository is stored
 (github, gitlab, etc), so that cloning through ssh is possible. User public key
-is mounted as a volumen from k8s secret.
+is mounted as a volume from a k8s secret.
 
 ## Configuration
 

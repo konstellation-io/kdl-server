@@ -107,22 +107,6 @@ knowledgeGalaxy:
     repository: {{ requiredEnv "KNOWLEDGE_GALAXY_IMAGE_REPOSITORY" | quote }}
     tag: {{ env "KNOWLEDGE_GALAXY_IMAGE_TAG" | quote }}
 
-# -- (DEPRECATION) Legacy issues
-# minio:
-#   enabled: true
-#   resources:
-#     requests:
-#       memory: 1Gi
-#   mode: standalone
-#   rootUser: "minio"
-#   rootPassword: "minio123"
-#   serviceAccount:
-#     create: false
-#   persistence:
-#     storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-#     existingClaim: ""
-#     accessMode: ReadWriteMany
-
 # -- MinIO subchart deployment
 # </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/minio/values.yaml
 minio:
@@ -138,21 +122,42 @@ minio:
     ingressClassName: public
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-    hostname: minio-console.{{ requiredEnv "DOMAIN" }}
-    tls: true
+      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+    path: /
+    hosts:
+      - minio.{{ requiredEnv "DOMAIN" }}
+    tls:
+      - secretName: minio-tls
+        hosts:
+        - minio.{{ requiredEnv "DOMAIN" }}
 
-  apiIngress:
+  consoleIngress:
     enabled: true
     ingressClassName: public
-    hostname: minio.{{ requiredEnv "DOMAIN" }}
+    annotations:
+      cert-manager.io/cluster-issuer: selfsigned-clusterissuer
+      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+    path: /
+    hosts:
+      - minio-console.{{ requiredEnv "DOMAIN" }}
+    tls:
+      - secretName: minio-console-tls
+        hosts:
+        - minio-console.{{ requiredEnv "DOMAIN" }}
 
-  auth:
-    rootUser: minio
-    rootPassword: minio123
+  rootUser: minio
+  rootPassword: minio123
 
   persistence:
     enabled: true
     storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+    existingClaim: "kdl-local-claim"
+    size: 1Gi
+    accessMode: ReadWriteMany
+
+  resources:
+    requests:
+      memory: 1Gi
 
 # -- MongoDB subchart deployment
 # </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/mongodb/values.yaml

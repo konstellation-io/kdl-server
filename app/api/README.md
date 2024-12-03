@@ -8,11 +8,10 @@ In order to develop in a local environment there are several things to consider:
 
 1. You need kdl up and running
 2. Port-forward the mongodb inside kdl `kubectl -n kdl port-forward pods/kdl-mongo-0 27017:27017`
-3. Port-forward the gitea inside kdl `kubectl -n kdl port-forward pods/gitea-0 3001:3000`
-4. Port-forward the gitea inside kdl `kubectl -n kdl port-forward pods/[MINIO-POD-ID] 9001:9001`
-5. Load the environment variables (they are located in `app/api/.env.dev`):
-6. run `go run http/main.go` (or launch it from your preferred IDE)
-7. You can now access the graphQL playground at `http://localhost:3000/api/playground`
+3. Port-forward the minio inside kdl `kubectl -n kdl port-forward pods/[MINIO-POD-ID] 9001:9001`
+4. Load the environment variables (they are located in `app/api/.env.dev`):
+5. run `go run http/main.go` (or launch it from your preferred IDE)
+6. You can now access the graphQL playground at `http://localhost:3000/api/playground`
 
 ## Testing
 
@@ -65,15 +64,6 @@ golangci-lint run
 | KDL_SERVER_MONGODB_URI       |                | MongoDB URI for the KDL server              |
 | KDL_SERVER_MONGODB_NAME      |                | MongoDB Database name for the KDL server    |
 | POD_NAMESPACE                |                | Namespace for the KDL server                |
-
-### GITEA
-
-| Environment variable         | Default value          | Description                         |
-| ---------------------------- | ---------------------- | ----------------------------------- |
-| GITEA_ADMIN_USER             | kdladmin               | Admin user for the Gitea server     |
-| GITEA_ADMIN_PASSWORD         | 123456                 | Admin password for the Gitea server |
-| GITEA_URL                    | http://gitea.kdl.local | External URL for the Gitea server   |
-| GITEA_INTERNAL_URL           | http://gitea:3000      | Internal URL for the Gitea server   |
 
 ### KNOWLEDGE GALAXY
 

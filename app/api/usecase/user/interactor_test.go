@@ -20,7 +20,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
@@ -41,7 +40,6 @@ type userMocks struct {
 	capabilitiesRepo *capabilities.MockRepository
 	sshGenerator     *sshhelper.MockSSHKeyGenerator
 	clock            *clock.MockClock
-	giteaService     *giteaservice.MockGiteaClient
 	k8sClientMock    *k8s.MockClientInterface
 	logger           logr.Logger
 	cfg              config.Config
@@ -54,7 +52,6 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	repoCapabilities := capabilities.NewMockRepository(ctrl)
 	clockMock := clock.NewMockClock(ctrl)
 	sshGenerator := sshhelper.NewMockSSHKeyGenerator(ctrl)
-	giteaServiceMock := giteaservice.NewMockGiteaClient(ctrl)
 	k8sClientMock := k8s.NewMockClientInterface(ctrl)
 
 	zapLog, err := zap.NewDevelopment()
@@ -67,7 +64,7 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	}
 
 	interactor := user.NewInteractor(logger, *cfg, repo, repoRuntimes, repoCapabilities, sshGenerator,
-		clockMock, giteaServiceMock, k8sClientMock)
+		clockMock, k8sClientMock)
 
 	return &userSuite{
 		ctrl:       ctrl,
@@ -80,7 +77,6 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 			capabilitiesRepo: repoCapabilities,
 			sshGenerator:     sshGenerator,
 			clock:            clockMock,
-			giteaService:     giteaServiceMock,
 			k8sClientMock:    k8sClientMock,
 		},
 	}
@@ -523,7 +519,6 @@ func TestInteractor_RegenerateSSHKeys(t *testing.T) {
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(false, nil)
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	s.mocks.k8sClientMock.EXPECT().UpdateUserSSHKeySecret(ctx, targetUser, publicSSHKey, privateSSHKey)
-	s.mocks.giteaService.EXPECT().UpdateSSHKey(username, sshKey.Public).Return(nil)
 	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, sshKey).Return(nil)
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(targetUser, nil).AnyTimes()
 
@@ -597,7 +592,6 @@ func TestInteractor_UpdateAccessLevel(t *testing.T) {
 
 	s.mocks.repo.EXPECT().UpdateAccessLevel(ctx, ids, accessLevel).Return(nil)
 	s.mocks.repo.EXPECT().FindByIDs(ctx, ids).Return(users, nil).AnyTimes()
-	s.mocks.giteaService.EXPECT().UpdateUserPermissions(username, accessLevel).Return(nil)
 
 	returnedUsers, err := s.interactor.UpdateAccessLevel(ctx, ids, accessLevel)
 

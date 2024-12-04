@@ -22,7 +22,7 @@ import (
 
 // This file will not be regenerated automatically.
 
-var ErrCastingUsernameToString = errors.New("error casting username to string")
+var ErrCastingEmailToString = errors.New("error casting email to string")
 
 var _ generated.ResolverRoot = &Resolver{}
 
@@ -56,10 +56,11 @@ func NewResolver(
 }
 
 func (r *Resolver) getLoggedUser(ctx context.Context) (entity.User, error) {
-	username, ok := ctx.Value(middleware.LoggedUserNameKey).(string)
+	email, ok := ctx.Value(middleware.LoggedUserEmailKey).(string)
+
 	if !ok {
-		return entity.User{}, ErrCastingUsernameToString
+		return entity.User{}, ErrCastingEmailToString
 	}
 
-	return r.users.GetByUsername(ctx, username)
+	return r.users.GetByEmail(ctx, email)
 }

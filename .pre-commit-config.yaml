@@ -16,4 +16,4 @@ repos:
   rev: v0.5.1
   hooks:
     - id: golangci-lint
-      args: ['--config', '.github/.golangci.yml', 'app/api/...', 'cleaner/...', 'gitea-oauth2-setup/...', 'repo-cloner/...']
+      args: ['--config', '.github/.golangci.yml', 'app/api/...', 'cleaner/...', 'repo-cloner/...']

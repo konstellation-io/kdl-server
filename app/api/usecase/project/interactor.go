@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
@@ -26,15 +25,14 @@ var (
 
 // CreateProjectOption options when creating project.
 type CreateProjectOption struct {
-	ProjectID              string
-	Name                   string
-	Description            string
-	RepoType               entity.RepositoryType
-	ExternalRepoURL        *string
-	ExternalRepoUsername   *string
-	ExternalRepoCredential string
-	ExternalRepoAuthMethod entity.RepositoryAuthMethod
-	Owner                  entity.User
+	ProjectID   string
+	Name        string
+	Description string
+	URL         *string
+	Username    *string
+	Credential  string
+	AuthMethod  entity.RepositoryAuthMethod
+	Owner       entity.User
 }
 
 // DeleteProjectOption options when deleting a project.
@@ -77,26 +75,20 @@ func (c CreateProjectOption) Validate() error {
 		return fmt.Errorf("%w: project description cannot be null", ErrCreateProjectValidation)
 	}
 
-	if !c.RepoType.IsValid() {
-		return fmt.Errorf("%w: invalid repository type", ErrCreateProjectValidation)
+	if kdlutil.IsNilOrEmpty(c.URL) {
+		return fmt.Errorf("%w: repository URL cannot be null", ErrCreateProjectValidation)
 	}
 
-	if c.RepoType == entity.RepositoryTypeExternal {
-		if kdlutil.IsNilOrEmpty(c.ExternalRepoURL) {
-			return fmt.Errorf("%w: external repository URL cannot be null", ErrCreateProjectValidation)
-		}
+	if kdlutil.IsNilOrEmpty(c.Username) {
+		return fmt.Errorf("%w: repository username cannot be null", ErrCreateProjectValidation)
+	}
 
-		if kdlutil.IsNilOrEmpty(c.ExternalRepoUsername) {
-			return fmt.Errorf("%w: external repository username cannot be null", ErrCreateProjectValidation)
-		}
+	if !c.AuthMethod.IsValid() {
+		return fmt.Errorf("%w: invalid repository authentication method", ErrCreateProjectValidation)
+	}
 
-		if !c.ExternalRepoAuthMethod.IsValid() {
-			return fmt.Errorf("%w: invalid repository authentication method", ErrCreateProjectValidation)
-		}
-
-		if c.ExternalRepoCredential == "" {
-			return fmt.Errorf("%w: external repository token cannot be null", ErrCreateProjectValidation)
-		}
+	if c.Credential == "" {
+		return fmt.Errorf("%w: repository token cannot be null", ErrCreateProjectValidation)
 	}
 
 	return nil
@@ -108,7 +100,6 @@ type interactor struct {
 	projectRepo      Repository
 	userActivityRepo UserActivityRepo
 	clock            clock.Clock
-	giteaService     giteaservice.GiteaClient
 	minioService     minioservice.MinioService
 	k8sClient        k8s.ClientInterface
 }
@@ -119,7 +110,6 @@ type InteractorDeps struct {
 	Repo             Repository
 	UserActivityRepo UserActivityRepo
 	Clock            clock.Clock
-	GiteaService     giteaservice.GiteaClient
 	MinioService     minioservice.MinioService
 	K8sClient        k8s.ClientInterface
 }
@@ -131,7 +121,6 @@ func NewInteractor(deps *InteractorDeps) UseCase {
 		projectRepo:      deps.Repo,
 		userActivityRepo: deps.UserActivityRepo,
 		clock:            deps.Clock,
-		giteaService:     deps.GiteaService,
 		minioService:     deps.MinioService,
 		k8sClient:        deps.K8sClient,
 	}
@@ -141,8 +130,6 @@ func NewInteractor(deps *InteractorDeps) UseCase {
 Create stores into the DB a new project.
 Depending on the repository type:
 
-  - For internal repositories creates a repository in Gitea.
-  - For external repositories, mirrors the external repository in Gitea.
   - Create a k8s KDLProject containing a MLFLow instance
   - Create Minio bucket
   - Create Minio folders
@@ -165,21 +152,11 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 			AddedDate:   now,
 		},
 	}
-	repoName := opt.ProjectID
 
-	// Create repository
-	if opt.RepoType == entity.RepositoryTypeExternal {
-		err := i.giteaService.MirrorRepo(*opt.ExternalRepoURL, repoName, *opt.ExternalRepoUsername, opt.Owner.Username,
-			opt.ExternalRepoAuthMethod, opt.ExternalRepoCredential)
-		if err != nil {
-			return entity.Project{}, err
-		}
-
-		project.Repository = entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: *opt.ExternalRepoURL,
-			RepoName:        repoName,
-		}
+	// Set project repository
+	project.Repository = entity.Repository{
+		URL:      *opt.URL,
+		RepoName: opt.ProjectID,
 	}
 
 	// Create a k8s KDLProject containing a MLFLow instance
@@ -268,11 +245,6 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 	}
 
 	minioBackup, err := i.minioService.DeleteBucket(ctx, projectID)
-	if err != nil {
-		return nil, err
-	}
-
-	err = i.giteaService.DeleteRepo(p.ID)
 	if err != nil {
 		return nil, err
 	}

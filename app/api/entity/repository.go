@@ -1,31 +1,5 @@
 package entity
 
-// RepositoryType is an enum for repository types.
-type RepositoryType string
-
-const (
-	// RepositoryTypeInternal repository type.
-	RepositoryTypeInternal RepositoryType = "INTERNAL"
-
-	// RepositoryTypeExternal repository type.
-	RepositoryTypeExternal RepositoryType = "EXTERNAL"
-)
-
-// IsValid checks if the type is valid.
-func (e RepositoryType) IsValid() bool {
-	switch e {
-	case RepositoryTypeInternal, RepositoryTypeExternal:
-		return true
-	}
-
-	return false
-}
-
-// String implements the fmt.Stringer interface.
-func (e RepositoryType) String() string {
-	return string(e)
-}
-
 // RepositoryAuthMethod is an enum for repository authentication method.
 type RepositoryAuthMethod string
 
@@ -53,9 +27,8 @@ func (e RepositoryAuthMethod) String() string {
 
 // Repository entity definition.
 type Repository struct {
-	Type            RepositoryType
-	ExternalRepoURL string
-	RepoName        string
-	Error           *string
-	AuthMethod      RepositoryAuthMethod
+	URL        string
+	RepoName   string
+	Error      *string
+	AuthMethod RepositoryAuthMethod
 }

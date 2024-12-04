@@ -158,7 +158,6 @@ The following is the list of supported component:
 * `api`
 * `ui`
 * `cleaner`
-* `gitea`
 * `mlflow`
 * `project-operator`
 * `repo-cloner`

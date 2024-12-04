@@ -14,7 +14,6 @@ import (
 	"gotest.tools/v3/assert"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
@@ -35,7 +34,6 @@ type projectMocks struct {
 	repo             *project.MockRepository
 	userActivityRepo *project.MockUserActivityRepo
 	clock            *clock.MockClock
-	giteaService     *giteaservice.MockGiteaClient
 	minioService     *minioservice.MockMinioService
 	k8sClient        *k8s.MockClientInterface
 	logger           logr.Logger
@@ -46,7 +44,6 @@ func newProjectSuite(t *testing.T) *projectSuite {
 	repo := project.NewMockRepository(ctrl)
 	userActivityRepo := project.NewMockUserActivityRepo(ctrl)
 	clockMock := clock.NewMockClock(ctrl)
-	giteaService := giteaservice.NewMockGiteaClient(ctrl)
 	minioService := minioservice.NewMockMinioService(ctrl)
 	k8sClient := k8s.NewMockClientInterface(ctrl)
 
@@ -60,7 +57,6 @@ func newProjectSuite(t *testing.T) *projectSuite {
 		Repo:             repo,
 		UserActivityRepo: userActivityRepo,
 		Clock:            clockMock,
-		GiteaService:     giteaService,
 		MinioService:     minioService,
 		K8sClient:        k8sClient,
 	}
@@ -74,14 +70,13 @@ func newProjectSuite(t *testing.T) *projectSuite {
 			repo:             repo,
 			userActivityRepo: userActivityRepo,
 			clock:            clockMock,
-			giteaService:     giteaService,
 			minioService:     minioService,
 			k8sClient:        k8sClient,
 		},
 	}
 }
 
-func TestInteractor_CreateExternal(t *testing.T) {
+func TestInteractor_Create(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
@@ -92,10 +87,10 @@ func TestInteractor_CreateExternal(t *testing.T) {
 		ownerUsername = "john"
 	)
 
-	externalRepoURL := "https://github.com/org/repo.git"
-	externalRepoUsername := "username"
-	externalRepoToken := "token"
-	externalAuthMethod := entity.RepositoryAuthToken
+	URL := "https://github.com/org/repo.git"
+	Username := "username"
+	Token := "token"
+	authMethod := entity.RepositoryAuthToken
 
 	ctx := context.Background()
 	now := time.Now().UTC()
@@ -110,9 +105,8 @@ func TestInteractor_CreateExternal(t *testing.T) {
 		},
 	}
 	createProject.Repository = entity.Repository{
-		Type:            entity.RepositoryTypeExternal,
-		ExternalRepoURL: externalRepoURL,
-		RepoName:        testProjectID,
+		URL:      URL,
+		RepoName: testProjectID,
 	}
 
 	expectedProject := entity.Project{
@@ -121,15 +115,11 @@ func TestInteractor_CreateExternal(t *testing.T) {
 		Description:  projectDesc,
 		CreationDate: now,
 		Repository: entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: externalRepoURL,
-			RepoName:        testProjectID,
+			URL:      URL,
+			RepoName: testProjectID,
 		},
 	}
 
-	s.mocks.giteaService.EXPECT().
-		MirrorRepo(externalRepoURL, testProjectID, externalRepoUsername, ownerUsername, externalAuthMethod, externalRepoToken).
-		Return(nil)
 	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().CreateBucket(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().CreateProjectDirs(ctx, testProjectID).Return(nil)
@@ -138,15 +128,14 @@ func TestInteractor_CreateExternal(t *testing.T) {
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(expectedProject, nil)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
-		ProjectID:              testProjectID,
-		Name:                   projectName,
-		Description:            projectDesc,
-		RepoType:               entity.RepositoryTypeExternal,
-		ExternalRepoURL:        &externalRepoURL,
-		ExternalRepoUsername:   &externalRepoUsername,
-		ExternalRepoCredential: externalRepoToken,
-		ExternalRepoAuthMethod: externalAuthMethod,
-		Owner:                  entity.User{ID: ownerUserID, Username: ownerUsername},
+		ProjectID:   testProjectID,
+		Name:        projectName,
+		Description: projectDesc,
+		URL:         &URL,
+		Username:    &Username,
+		Credential:  Token,
+		AuthMethod:  authMethod,
+		Owner:       entity.User{ID: ownerUserID, Username: ownerUsername},
 	})
 
 	require.NoError(t, err)
@@ -205,7 +194,6 @@ func TestInteractor_AddMembers(t *testing.T) {
 	p.ID = testProjectID
 	p.Members = []entity.Member{adminMember}
 	p.Repository = entity.Repository{
-		Type:     entity.RepositoryTypeInternal,
 		RepoName: "repo-A",
 	}
 
@@ -224,14 +212,6 @@ func TestInteractor_AddMembers(t *testing.T) {
 	expectedProject.Members = []entity.Member{adminMember, newMembers[0], newMembers[1]}
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
-	gomock.InOrder(
-		s.mocks.giteaService.EXPECT().
-			AddCollaborator(p.Repository.RepoName, usersToAdd[0].Username, project.MemberAccessLevelOnCreation).
-			Return(nil),
-		s.mocks.giteaService.EXPECT().
-			AddCollaborator(p.Repository.RepoName, usersToAdd[1].Username, project.MemberAccessLevelOnCreation).
-			Return(nil),
-	)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().AddMembers(ctx, p.ID, newMembers).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
@@ -274,7 +254,6 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 		{UserID: usersToRemove[1].ID},
 	}
 	p.Repository = entity.Repository{
-		Type:     entity.RepositoryTypeInternal,
 		RepoName: "projectRepo-A",
 	}
 
@@ -283,12 +262,6 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 	expectedProject.Members = []entity.Member{adminMember}
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
-	s.mocks.giteaService.EXPECT().
-		RemoveCollaborator(p.Repository.RepoName, usersToRemove[0].Username).
-		Return(nil)
-	s.mocks.giteaService.EXPECT().
-		RemoveCollaborator(p.Repository.RepoName, usersToRemove[1].Username).
-		Return(nil)
 
 	s.mocks.repo.EXPECT().RemoveMembers(ctx, p.ID, usersToRemove).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
@@ -364,7 +337,6 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 		{UserID: usersToUpd[1].ID},
 	}
 	p.Repository = entity.Repository{
-		Type:     entity.RepositoryTypeInternal,
 		RepoName: "projectRepo-A",
 	}
 
@@ -373,12 +345,6 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 	expectedProject.Members = []entity.Member{adminMember}
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
-	s.mocks.giteaService.EXPECT().
-		UpdateCollaboratorPermissions(p.Repository.RepoName, usersToUpd[0].Username, newAccessLevel).
-		Return(nil)
-	s.mocks.giteaService.EXPECT().
-		UpdateCollaboratorPermissions(p.Repository.RepoName, usersToUpd[1].Username, newAccessLevel).
-		Return(nil)
 
 	s.mocks.repo.EXPECT().UpdateMembersAccessLevel(ctx, p.ID, usersToUpd, newAccessLevel).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
@@ -480,9 +446,8 @@ func TestInteractor_Delete(t *testing.T) {
 		Description:  "The Project Y Description",
 		CreationDate: now,
 		Repository: entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: "https://github.com/org/repo.git",
-			RepoName:        testProjectID,
+			URL:      "https://github.com/org/repo.git",
+			RepoName: testProjectID,
 		},
 		Members: []entity.Member{
 			{
@@ -511,7 +476,6 @@ func TestInteractor_Delete(t *testing.T) {
 	}
 
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(expectedProject, nil)
-	s.mocks.giteaService.EXPECT().DeleteRepo(testProjectID).Return(nil)
 	s.mocks.k8sClient.EXPECT().DeleteKDLProjectCR(ctx, testProjectID).Return(nil)
 	s.mocks.repo.EXPECT().DeleteOne(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().DeleteBucket(ctx, testProjectID).Return(expectedMinioBackup, nil)
@@ -544,9 +508,8 @@ func TestInteractor_Delete_NotAdminUser(t *testing.T) {
 		Description:  "The Project Y Description",
 		CreationDate: now,
 		Repository: entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: "https://github.com/org/repo.git",
-			RepoName:        testProjectID,
+			URL:      "https://github.com/org/repo.git",
+			RepoName: testProjectID,
 		},
 	}
 

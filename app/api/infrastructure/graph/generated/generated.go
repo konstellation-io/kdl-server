@@ -43,8 +43,8 @@ type ResolverRoot interface {
 	Mutation() MutationResolver
 	Project() ProjectResolver
 	Query() QueryResolver
-	Repository() RepositoryResolver
 	SSHKey() SSHKeyResolver
+	ToolUrls() ToolUrlsResolver
 	User() UserResolver
 }
 
@@ -121,7 +121,6 @@ type ComplexityRoot struct {
 
 	Repository struct {
 		Error func(childComplexity int) int
-		Type  func(childComplexity int) int
 		URL   func(childComplexity int) int
 	}
 
@@ -150,11 +149,6 @@ type ComplexityRoot struct {
 		VSCode          func(childComplexity int) int
 	}
 
-	Topic struct {
-		Name      func(childComplexity int) int
-		Relevance func(childComplexity int) int
-	}
-
 	User struct {
 		APITokens           func(childComplexity int) int
 		AccessLevel         func(childComplexity int) int
@@ -174,18 +168,18 @@ type MemberResolver interface {
 	AddedDate(ctx context.Context, obj *entity.Member) (string, error)
 }
 type MutationResolver interface {
-	RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error)
-	UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]entity.User, error)
 	RegenerateSSHKey(ctx context.Context) (*entity.User, error)
-	CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error)
-	UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error)
-	DeleteProject(ctx context.Context, input model.DeleteProjectInput) (*entity.Project, error)
+	RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error)
+	SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error)
+	UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]entity.User, error)
 	AddMembers(ctx context.Context, input model.AddMembersInput) (*entity.Project, error)
+	CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error)
+	DeleteProject(ctx context.Context, input model.DeleteProjectInput) (*entity.Project, error)
 	RemoveMembers(ctx context.Context, input model.RemoveMembersInput) (*entity.Project, error)
 	UpdateMembers(ctx context.Context, input model.UpdateMembersInput) (*entity.Project, error)
+	UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error)
 	AddAPIToken(ctx context.Context, input *model.APITokenInput) (*entity.APIToken, error)
 	RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error)
-	SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error)
 }
 type ProjectResolver interface {
 	CreationDate(ctx context.Context, obj *entity.Project) (string, error)
@@ -194,23 +188,23 @@ type ProjectResolver interface {
 	NeedAccess(ctx context.Context, obj *entity.Project) (bool, error)
 }
 type QueryResolver interface {
-	Me(ctx context.Context) (*entity.User, error)
-	Projects(ctx context.Context) ([]entity.Project, error)
-	Project(ctx context.Context, id string) (*entity.Project, error)
-	Users(ctx context.Context) ([]entity.User, error)
-	QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error)
-	Runtimes(ctx context.Context) ([]entity.Runtime, error)
-	RunningRuntime(ctx context.Context) (*entity.Runtime, error)
 	Capabilities(ctx context.Context) ([]model.Capability, error)
-	RunningCapability(ctx context.Context) (*model.Capability, error)
 	Kubeconfig(ctx context.Context) (string, error)
-}
-type RepositoryResolver interface {
-	URL(ctx context.Context, obj *entity.Repository) (string, error)
+	Me(ctx context.Context) (*entity.User, error)
+	Project(ctx context.Context, id string) (*entity.Project, error)
+	Projects(ctx context.Context) ([]entity.Project, error)
+	QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error)
+	RunningCapability(ctx context.Context) (*model.Capability, error)
+	RunningRuntime(ctx context.Context) (*entity.Runtime, error)
+	Runtimes(ctx context.Context) ([]entity.Runtime, error)
+	Users(ctx context.Context) ([]entity.User, error)
 }
 type SSHKeyResolver interface {
 	CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error)
 	LastActivity(ctx context.Context, obj *entity.SSHKey) (*string, error)
+}
+type ToolUrlsResolver interface {
+	Gitea(ctx context.Context, obj *entity.ToolUrls) (string, error)
 }
 type UserResolver interface {
 	CreationDate(ctx context.Context, obj *entity.User) (string, error)
@@ -633,13 +627,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Repository.Error(childComplexity), true
 
-	case "Repository.type":
-		if e.complexity.Repository.Type == nil {
-			break
-		}
-
-		return e.complexity.Repository.Type(childComplexity), true
-
 	case "Repository.url":
 		if e.complexity.Repository.URL == nil {
 			break
@@ -759,20 +746,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ToolUrls.VSCode(childComplexity), true
 
-	case "Topic.name":
-		if e.complexity.Topic.Name == nil {
-			break
-		}
-
-		return e.complexity.Topic.Name(childComplexity), true
-
-	case "Topic.relevance":
-		if e.complexity.Topic.Relevance == nil {
-			break
-		}
-
-		return e.complexity.Topic.Relevance(childComplexity), true
-
 	case "User.apiTokens":
 		if e.complexity.User.APITokens == nil {
 			break
@@ -841,28 +814,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 }
 
 func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
-	rc := graphql.GetOperationContext(ctx)
-	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
+	opCtx := graphql.GetOperationContext(ctx)
+	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAddMembersInput,
-		ec.unmarshalInputAddUserInput,
 		ec.unmarshalInputApiTokenInput,
 		ec.unmarshalInputCreateProjectInput,
 		ec.unmarshalInputDeleteProjectInput,
-		ec.unmarshalInputExternalRepositoryInput,
 		ec.unmarshalInputRemoveApiTokenInput,
 		ec.unmarshalInputRemoveMembersInput,
 		ec.unmarshalInputRemoveUsersInput,
 		ec.unmarshalInputRepositoryInput,
 		ec.unmarshalInputSetActiveUserToolsInput,
-		ec.unmarshalInputSetBoolFieldInput,
 		ec.unmarshalInputUpdateAccessLevelInput,
 		ec.unmarshalInputUpdateMembersInput,
 		ec.unmarshalInputUpdateProjectInput,
 	)
 	first := true
 
-	switch rc.Operation.Operation {
+	switch opCtx.Operation.Operation {
 	case ast.Query:
 		return func(ctx context.Context) *graphql.Response {
 			var response graphql.Response
@@ -870,7 +840,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			if first {
 				first = false
 				ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-				data = ec._Query(ctx, rc.Operation.SelectionSet)
+				data = ec._Query(ctx, opCtx.Operation.SelectionSet)
 			} else {
 				if atomic.LoadInt32(&ec.pendingDeferred) > 0 {
 					result := <-ec.deferredResults
@@ -900,7 +870,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			}
 			first = false
 			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-			data := ec._Mutation(ctx, rc.Operation.SelectionSet)
+			data := ec._Mutation(ctx, opCtx.Operation.SelectionSet)
 			var buf bytes.Buffer
 			data.MarshalGQL(&buf)
 
@@ -957,63 +927,39 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	{Name: "../../../../graphql/schema.graphqls", Input: `type Query {
-  me: User!
-  projects: [Project!]!
-  project(id: ID!): Project!
-  users: [User!]!
-  qualityProjectDesc(description: String!): QualityProjectDesc!
-  runtimes: [Runtime!]!
-  runningRuntime: Runtime
   capabilities: [Capability!]!
-  runningCapability: Capability
   kubeconfig: String!
+  me: User!
+  project(id: ID!): Project!
+  projects: [Project!]!
+  qualityProjectDesc(description: String!): QualityProjectDesc!
+  runningCapability: Capability
+  runningRuntime: Runtime
+  runtimes: [Runtime!]!
+  users: [User!]!
 }
 
 type Mutation {
-  removeUsers(input: RemoveUsersInput!): [User!]!
-  updateAccessLevel(input: UpdateAccessLevelInput!): [User!]!
   regenerateSSHKey: User!
-  createProject(input: CreateProjectInput!): Project!
-  updateProject(input: UpdateProjectInput!): Project!
-  deleteProject(input: DeleteProjectInput!): Project
+  removeUsers(input: RemoveUsersInput!): [User!]!
+  setActiveUserTools(input: SetActiveUserToolsInput!): User!
+  updateAccessLevel(input: UpdateAccessLevelInput!): [User!]!
+
   addMembers(input: AddMembersInput!): Project!
+  createProject(input: CreateProjectInput!): Project!
+  deleteProject(input: DeleteProjectInput!): Project
   removeMembers(input: RemoveMembersInput!): Project!
   updateMembers(input: UpdateMembersInput!): Project!
+  updateProject(input: UpdateProjectInput!): Project!
+
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
-  setActiveUserTools(input: SetActiveUserToolsInput!): User!
-}
-
-type QualityProjectDesc {
-  quality: Int!
-}
-
-type Runtime {
-  id: ID!
-  name: String!
-  desc: String!
-  labels: [String!]
-  dockerImage: String!
-  dockerTag: String!
-  runtimePod: String!
 }
 
 type Capability {
   id: ID!
   name: String!
   default: Boolean!
-}
-
-type Topic {
-  name: String!
-  relevance: Float!
-}
-
-type SSHKey {
-  public: String!
-  private: String!
-  creationDate: String!
-  lastActivity: String
 }
 
 type User {
@@ -1028,6 +974,12 @@ type User {
   sshKey: SSHKey!
 }
 
+enum AccessLevel {
+  VIEWER
+  MANAGER
+  ADMIN
+}
+
 type ApiToken {
   id: ID!
   name: String!
@@ -1036,94 +988,11 @@ type ApiToken {
   token: String!
 }
 
-type Member {
-  user: User!
-  accessLevel: AccessLevel!
-  addedDate: String!
-}
-
-type ToolUrls {
-  knowledgeGalaxy: String!
-  gitea: String!
-  filebrowser: String!
-  vscode: String!
-  mlflow: String!
-}
-
-enum AccessLevel {
-  VIEWER
-  MANAGER
-  ADMIN
-}
-
-input ApiTokenInput {
-  userId: ID!
-  name: String
-}
-
-input UpdateProjectInput {
-  id: ID!
-  name: String
-  description: String
-  archived: Boolean
-}
-
-input DeleteProjectInput {
-  id: ID!
-}
-
-input AddMembersInput {
-  projectId: ID!
-  userIds: [ID!]!
-}
-
-input RemoveMembersInput {
-  projectId: ID!
-  userIds: [ID!]!
-}
-
-input RemoveApiTokenInput {
-  apiTokenId: ID!
-}
-
-input UpdateMembersInput {
-  projectId: ID!
-  userIds: [ID!]!
-  accessLevel: AccessLevel!
-}
-
-input RemoveUsersInput {
-  userIds: [ID!]!
-}
-
-input AddUserInput {
-  email: String!
-  username: String!
-  password: String!
-  accessLevel: AccessLevel!
-}
-
-input UpdateAccessLevelInput {
-  userIds: [ID!]!
-  accessLevel: AccessLevel!
-}
-
-input CreateProjectInput {
-  id: ID!
-  name: String!
-  description: String!
-  repository: RepositoryInput!
-}
-
-input SetBoolFieldInput {
-  id: ID!
-  value: Boolean!
-}
-
-input SetActiveUserToolsInput {
-  active: Boolean!,
-  runtimeId: String,
-  capabilitiesId: String
+type SSHKey {
+  public: String!
+  private: String!
+  creationDate: String!
+  lastActivity: String
 }
 
 type Project {
@@ -1141,22 +1010,71 @@ type Project {
   archived: Boolean!
 }
 
-input RepositoryInput {
-  type: RepositoryType!
-  external: ExternalRepositoryInput
+type Repository {
+  url: String!
+  error: String
 }
 
-input ExternalRepositoryInput {
+type Member {
+  user: User!
+  accessLevel: AccessLevel!
+  addedDate: String!
+}
+
+type ToolUrls {
+  knowledgeGalaxy: String!
+  gitea: String!
+  filebrowser: String!
+  vscode: String!
+  mlflow: String!
+}
+
+type QualityProjectDesc {
+  quality: Int!
+}
+
+type Runtime {
+  id: ID!
+  name: String!
+  desc: String!
+  labels: [String!]
+  dockerImage: String!
+  dockerTag: String!
+  runtimePod: String!
+}
+
+input RemoveUsersInput {
+  userIds: [ID!]!
+}
+
+input SetActiveUserToolsInput {
+  active: Boolean!,
+  runtimeId: String,
+  capabilitiesId: String
+}
+
+input UpdateAccessLevelInput {
+  userIds: [ID!]!
+  accessLevel: AccessLevel!
+}
+
+input AddMembersInput {
+  projectId: ID!
+  userIds: [ID!]!
+}
+
+input CreateProjectInput {
+  id: ID!
+  name: String!
+  description: String!
+  repository: RepositoryInput!
+}
+
+input RepositoryInput {
   url: String!
   username: String!
   credential: String!
   authMethod: RepositoryAuthMethod!
-}
-
-type Repository {
-  type: RepositoryType!
-  url: String!
-  error: String
 }
 
 enum RepositoryAuthMethod {
@@ -1164,9 +1082,35 @@ enum RepositoryAuthMethod {
   TOKEN
 }
 
-enum RepositoryType {
-  INTERNAL
-  EXTERNAL
+input DeleteProjectInput {
+  id: ID!
+}
+
+input RemoveMembersInput {
+  projectId: ID!
+  userIds: [ID!]!
+}
+
+input UpdateMembersInput {
+  projectId: ID!
+  userIds: [ID!]!
+  accessLevel: AccessLevel!
+}
+
+input UpdateProjectInput {
+  id: ID!
+  name: String
+  description: String
+  archived: Boolean
+}
+
+input ApiTokenInput {
+  userId: ID!
+  name: String
+}
+
+input RemoveApiTokenInput {
+  apiTokenId: ID!
 }
 `, BuiltIn: false},
 }
@@ -2200,6 +2144,70 @@ func (ec *executionContext) fieldContext_Member_addedDate(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_regenerateSSHKey(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_regenerateSSHKey(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RegenerateSSHKey(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*entity.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_regenerateSSHKey(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "creationDate":
+				return ec.fieldContext_User_creationDate(ctx, field)
+			case "accessLevel":
+				return ec.fieldContext_User_accessLevel(ctx, field)
+			case "lastActivity":
+				return ec.fieldContext_User_lastActivity(ctx, field)
+			case "apiTokens":
+				return ec.fieldContext_User_apiTokens(ctx, field)
+			case "isKubeconfigEnabled":
+				return ec.fieldContext_User_isKubeconfigEnabled(ctx, field)
+			case "sshKey":
+				return ec.fieldContext_User_sshKey(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_removeUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_removeUsers(ctx, field)
 	if err != nil {
@@ -2269,6 +2277,81 @@ func (ec *executionContext) fieldContext_Mutation_removeUsers(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_removeUsers_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_setActiveUserTools(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_setActiveUserTools(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().SetActiveUserTools(rctx, fc.Args["input"].(model.SetActiveUserToolsInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*entity.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_setActiveUserTools(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "creationDate":
+				return ec.fieldContext_User_creationDate(ctx, field)
+			case "accessLevel":
+				return ec.fieldContext_User_accessLevel(ctx, field)
+			case "lastActivity":
+				return ec.fieldContext_User_lastActivity(ctx, field)
+			case "apiTokens":
+				return ec.fieldContext_User_apiTokens(ctx, field)
+			case "isKubeconfigEnabled":
+				return ec.fieldContext_User_isKubeconfigEnabled(ctx, field)
+			case "sshKey":
+				return ec.fieldContext_User_sshKey(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_setActiveUserTools_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2350,8 +2433,8 @@ func (ec *executionContext) fieldContext_Mutation_updateAccessLevel(ctx context.
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_regenerateSSHKey(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_regenerateSSHKey(ctx, field)
+func (ec *executionContext) _Mutation_addMembers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addMembers(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2364,7 +2447,7 @@ func (ec *executionContext) _Mutation_regenerateSSHKey(ctx context.Context, fiel
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RegenerateSSHKey(rctx)
+		return ec.resolvers.Mutation().AddMembers(rctx, fc.Args["input"].(model.AddMembersInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2376,12 +2459,12 @@ func (ec *executionContext) _Mutation_regenerateSSHKey(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*entity.User)
+	res := resTmp.(*entity.Project)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx, field.Selections, res)
+	return ec.marshalNProject2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_regenerateSSHKey(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_addMembers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -2390,26 +2473,43 @@ func (ec *executionContext) fieldContext_Mutation_regenerateSSHKey(_ context.Con
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "username":
-				return ec.fieldContext_User_username(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
+				return ec.fieldContext_Project_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Project_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Project_description(ctx, field)
+			case "favorite":
+				return ec.fieldContext_Project_favorite(ctx, field)
+			case "repository":
+				return ec.fieldContext_Project_repository(ctx, field)
 			case "creationDate":
-				return ec.fieldContext_User_creationDate(ctx, field)
-			case "accessLevel":
-				return ec.fieldContext_User_accessLevel(ctx, field)
-			case "lastActivity":
-				return ec.fieldContext_User_lastActivity(ctx, field)
-			case "apiTokens":
-				return ec.fieldContext_User_apiTokens(ctx, field)
-			case "isKubeconfigEnabled":
-				return ec.fieldContext_User_isKubeconfigEnabled(ctx, field)
-			case "sshKey":
-				return ec.fieldContext_User_sshKey(ctx, field)
+				return ec.fieldContext_Project_creationDate(ctx, field)
+			case "lastActivationDate":
+				return ec.fieldContext_Project_lastActivationDate(ctx, field)
+			case "error":
+				return ec.fieldContext_Project_error(ctx, field)
+			case "members":
+				return ec.fieldContext_Project_members(ctx, field)
+			case "toolUrls":
+				return ec.fieldContext_Project_toolUrls(ctx, field)
+			case "needAccess":
+				return ec.fieldContext_Project_needAccess(ctx, field)
+			case "archived":
+				return ec.fieldContext_Project_archived(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addMembers_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -2495,87 +2595,6 @@ func (ec *executionContext) fieldContext_Mutation_createProject(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_updateProject(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_updateProject(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateProject(rctx, fc.Args["input"].(model.UpdateProjectInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*entity.Project)
-	fc.Result = res
-	return ec.marshalNProject2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_updateProject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Project_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Project_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Project_description(ctx, field)
-			case "favorite":
-				return ec.fieldContext_Project_favorite(ctx, field)
-			case "repository":
-				return ec.fieldContext_Project_repository(ctx, field)
-			case "creationDate":
-				return ec.fieldContext_Project_creationDate(ctx, field)
-			case "lastActivationDate":
-				return ec.fieldContext_Project_lastActivationDate(ctx, field)
-			case "error":
-				return ec.fieldContext_Project_error(ctx, field)
-			case "members":
-				return ec.fieldContext_Project_members(ctx, field)
-			case "toolUrls":
-				return ec.fieldContext_Project_toolUrls(ctx, field)
-			case "needAccess":
-				return ec.fieldContext_Project_needAccess(ctx, field)
-			case "archived":
-				return ec.fieldContext_Project_archived(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateProject_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_deleteProject(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_deleteProject(ctx, field)
 	if err != nil {
@@ -2648,87 +2667,6 @@ func (ec *executionContext) fieldContext_Mutation_deleteProject(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteProject_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_addMembers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_addMembers(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddMembers(rctx, fc.Args["input"].(model.AddMembersInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*entity.Project)
-	fc.Result = res
-	return ec.marshalNProject2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_addMembers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Project_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Project_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Project_description(ctx, field)
-			case "favorite":
-				return ec.fieldContext_Project_favorite(ctx, field)
-			case "repository":
-				return ec.fieldContext_Project_repository(ctx, field)
-			case "creationDate":
-				return ec.fieldContext_Project_creationDate(ctx, field)
-			case "lastActivationDate":
-				return ec.fieldContext_Project_lastActivationDate(ctx, field)
-			case "error":
-				return ec.fieldContext_Project_error(ctx, field)
-			case "members":
-				return ec.fieldContext_Project_members(ctx, field)
-			case "toolUrls":
-				return ec.fieldContext_Project_toolUrls(ctx, field)
-			case "needAccess":
-				return ec.fieldContext_Project_needAccess(ctx, field)
-			case "archived":
-				return ec.fieldContext_Project_archived(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_addMembers_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2897,6 +2835,87 @@ func (ec *executionContext) fieldContext_Mutation_updateMembers(ctx context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_updateProject(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateProject(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateProject(rctx, fc.Args["input"].(model.UpdateProjectInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*entity.Project)
+	fc.Result = res
+	return ec.marshalNProject2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateProject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Project_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Project_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Project_description(ctx, field)
+			case "favorite":
+				return ec.fieldContext_Project_favorite(ctx, field)
+			case "repository":
+				return ec.fieldContext_Project_repository(ctx, field)
+			case "creationDate":
+				return ec.fieldContext_Project_creationDate(ctx, field)
+			case "lastActivationDate":
+				return ec.fieldContext_Project_lastActivationDate(ctx, field)
+			case "error":
+				return ec.fieldContext_Project_error(ctx, field)
+			case "members":
+				return ec.fieldContext_Project_members(ctx, field)
+			case "toolUrls":
+				return ec.fieldContext_Project_toolUrls(ctx, field)
+			case "needAccess":
+				return ec.fieldContext_Project_needAccess(ctx, field)
+			case "archived":
+				return ec.fieldContext_Project_archived(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateProject_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_addApiToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_addApiToken(ctx, field)
 	if err != nil {
@@ -3022,81 +3041,6 @@ func (ec *executionContext) fieldContext_Mutation_removeApiToken(ctx context.Con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_removeApiToken_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_setActiveUserTools(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_setActiveUserTools(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SetActiveUserTools(rctx, fc.Args["input"].(model.SetActiveUserToolsInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*entity.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_setActiveUserTools(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "username":
-				return ec.fieldContext_User_username(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "creationDate":
-				return ec.fieldContext_User_creationDate(ctx, field)
-			case "accessLevel":
-				return ec.fieldContext_User_accessLevel(ctx, field)
-			case "lastActivity":
-				return ec.fieldContext_User_lastActivity(ctx, field)
-			case "apiTokens":
-				return ec.fieldContext_User_apiTokens(ctx, field)
-			case "isKubeconfigEnabled":
-				return ec.fieldContext_User_isKubeconfigEnabled(ctx, field)
-			case "sshKey":
-				return ec.fieldContext_User_sshKey(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_setActiveUserTools_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3315,8 +3259,6 @@ func (ec *executionContext) fieldContext_Project_repository(_ context.Context, f
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "type":
-				return ec.fieldContext_Repository_type(ctx, field)
 			case "url":
 				return ec.fieldContext_Repository_url(ctx, field)
 			case "error":
@@ -3697,6 +3639,102 @@ func (ec *executionContext) fieldContext_QualityProjectDesc_quality(_ context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_capabilities(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_capabilities(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Capabilities(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]model.Capability)
+	fc.Result = res
+	return ec.marshalNCapability2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐCapabilityᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_capabilities(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Capability_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Capability_name(ctx, field)
+			case "default":
+				return ec.fieldContext_Capability_default(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Capability", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_kubeconfig(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_kubeconfig(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Kubeconfig(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_kubeconfig(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_me(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_me(ctx, field)
 	if err != nil {
@@ -3756,76 +3794,6 @@ func (ec *executionContext) fieldContext_Query_me(_ context.Context, field graph
 				return ec.fieldContext_User_sshKey(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_projects(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_projects(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Projects(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]entity.Project)
-	fc.Result = res
-	return ec.marshalNProject2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProjectᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_projects(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Project_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Project_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Project_description(ctx, field)
-			case "favorite":
-				return ec.fieldContext_Project_favorite(ctx, field)
-			case "repository":
-				return ec.fieldContext_Project_repository(ctx, field)
-			case "creationDate":
-				return ec.fieldContext_Project_creationDate(ctx, field)
-			case "lastActivationDate":
-				return ec.fieldContext_Project_lastActivationDate(ctx, field)
-			case "error":
-				return ec.fieldContext_Project_error(ctx, field)
-			case "members":
-				return ec.fieldContext_Project_members(ctx, field)
-			case "toolUrls":
-				return ec.fieldContext_Project_toolUrls(ctx, field)
-			case "needAccess":
-				return ec.fieldContext_Project_needAccess(ctx, field)
-			case "archived":
-				return ec.fieldContext_Project_archived(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
 	}
 	return fc, nil
@@ -3912,8 +3880,8 @@ func (ec *executionContext) fieldContext_Query_project(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_users(ctx, field)
+func (ec *executionContext) _Query_projects(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_projects(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3926,7 +3894,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Users(rctx)
+		return ec.resolvers.Query().Projects(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3938,12 +3906,12 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]entity.User)
+	res := resTmp.([]entity.Project)
 	fc.Result = res
-	return ec.marshalNUser2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUserᚄ(ctx, field.Selections, res)
+	return ec.marshalNProject2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProjectᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_users(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_projects(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -3952,25 +3920,31 @@ func (ec *executionContext) fieldContext_Query_users(_ context.Context, field gr
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "username":
-				return ec.fieldContext_User_username(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
+				return ec.fieldContext_Project_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Project_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Project_description(ctx, field)
+			case "favorite":
+				return ec.fieldContext_Project_favorite(ctx, field)
+			case "repository":
+				return ec.fieldContext_Project_repository(ctx, field)
 			case "creationDate":
-				return ec.fieldContext_User_creationDate(ctx, field)
-			case "accessLevel":
-				return ec.fieldContext_User_accessLevel(ctx, field)
-			case "lastActivity":
-				return ec.fieldContext_User_lastActivity(ctx, field)
-			case "apiTokens":
-				return ec.fieldContext_User_apiTokens(ctx, field)
-			case "isKubeconfigEnabled":
-				return ec.fieldContext_User_isKubeconfigEnabled(ctx, field)
-			case "sshKey":
-				return ec.fieldContext_User_sshKey(ctx, field)
+				return ec.fieldContext_Project_creationDate(ctx, field)
+			case "lastActivationDate":
+				return ec.fieldContext_Project_lastActivationDate(ctx, field)
+			case "error":
+				return ec.fieldContext_Project_error(ctx, field)
+			case "members":
+				return ec.fieldContext_Project_members(ctx, field)
+			case "toolUrls":
+				return ec.fieldContext_Project_toolUrls(ctx, field)
+			case "needAccess":
+				return ec.fieldContext_Project_needAccess(ctx, field)
+			case "archived":
+				return ec.fieldContext_Project_archived(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
 	}
 	return fc, nil
@@ -4035,8 +4009,8 @@ func (ec *executionContext) fieldContext_Query_qualityProjectDesc(ctx context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_runtimes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_runtimes(ctx, field)
+func (ec *executionContext) _Query_runningCapability(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_runningCapability(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4049,24 +4023,21 @@ func (ec *executionContext) _Query_runtimes(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Runtimes(rctx)
+		return ec.resolvers.Query().RunningCapability(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.([]entity.Runtime)
+	res := resTmp.(*model.Capability)
 	fc.Result = res
-	return ec.marshalNRuntime2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRuntimeᚄ(ctx, field.Selections, res)
+	return ec.marshalOCapability2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐCapability(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_runtimes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_runningCapability(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -4075,21 +4046,13 @@ func (ec *executionContext) fieldContext_Query_runtimes(_ context.Context, field
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Runtime_id(ctx, field)
+				return ec.fieldContext_Capability_id(ctx, field)
 			case "name":
-				return ec.fieldContext_Runtime_name(ctx, field)
-			case "desc":
-				return ec.fieldContext_Runtime_desc(ctx, field)
-			case "labels":
-				return ec.fieldContext_Runtime_labels(ctx, field)
-			case "dockerImage":
-				return ec.fieldContext_Runtime_dockerImage(ctx, field)
-			case "dockerTag":
-				return ec.fieldContext_Runtime_dockerTag(ctx, field)
-			case "runtimePod":
-				return ec.fieldContext_Runtime_runtimePod(ctx, field)
+				return ec.fieldContext_Capability_name(ctx, field)
+			case "default":
+				return ec.fieldContext_Capability_default(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Runtime", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Capability", field.Name)
 		},
 	}
 	return fc, nil
@@ -4152,8 +4115,8 @@ func (ec *executionContext) fieldContext_Query_runningRuntime(_ context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_capabilities(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_capabilities(ctx, field)
+func (ec *executionContext) _Query_runtimes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_runtimes(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4166,7 +4129,7 @@ func (ec *executionContext) _Query_capabilities(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Capabilities(rctx)
+		return ec.resolvers.Query().Runtimes(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4178,12 +4141,12 @@ func (ec *executionContext) _Query_capabilities(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]model.Capability)
+	res := resTmp.([]entity.Runtime)
 	fc.Result = res
-	return ec.marshalNCapability2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐCapabilityᚄ(ctx, field.Selections, res)
+	return ec.marshalNRuntime2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRuntimeᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_capabilities(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_runtimes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -4192,20 +4155,28 @@ func (ec *executionContext) fieldContext_Query_capabilities(_ context.Context, f
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Capability_id(ctx, field)
+				return ec.fieldContext_Runtime_id(ctx, field)
 			case "name":
-				return ec.fieldContext_Capability_name(ctx, field)
-			case "default":
-				return ec.fieldContext_Capability_default(ctx, field)
+				return ec.fieldContext_Runtime_name(ctx, field)
+			case "desc":
+				return ec.fieldContext_Runtime_desc(ctx, field)
+			case "labels":
+				return ec.fieldContext_Runtime_labels(ctx, field)
+			case "dockerImage":
+				return ec.fieldContext_Runtime_dockerImage(ctx, field)
+			case "dockerTag":
+				return ec.fieldContext_Runtime_dockerTag(ctx, field)
+			case "runtimePod":
+				return ec.fieldContext_Runtime_runtimePod(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Capability", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Runtime", field.Name)
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_runningCapability(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_runningCapability(ctx, field)
+func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_users(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4218,56 +4189,7 @@ func (ec *executionContext) _Query_runningCapability(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().RunningCapability(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Capability)
-	fc.Result = res
-	return ec.marshalOCapability2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐCapability(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_runningCapability(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Capability_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Capability_name(ctx, field)
-			case "default":
-				return ec.fieldContext_Capability_default(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Capability", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_kubeconfig(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_kubeconfig(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Kubeconfig(rctx)
+		return ec.resolvers.Query().Users(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4279,19 +4201,39 @@ func (ec *executionContext) _Query_kubeconfig(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]entity.User)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUserᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_kubeconfig(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_users(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "creationDate":
+				return ec.fieldContext_User_creationDate(ctx, field)
+			case "accessLevel":
+				return ec.fieldContext_User_accessLevel(ctx, field)
+			case "lastActivity":
+				return ec.fieldContext_User_lastActivity(ctx, field)
+			case "apiTokens":
+				return ec.fieldContext_User_apiTokens(ctx, field)
+			case "isKubeconfigEnabled":
+				return ec.fieldContext_User_isKubeconfigEnabled(ctx, field)
+			case "sshKey":
+				return ec.fieldContext_User_sshKey(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
 	return fc, nil
@@ -4426,50 +4368,6 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Repository_type(ctx context.Context, field graphql.CollectedField, obj *entity.Repository) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Repository_type(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Type, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entity.RepositoryType)
-	fc.Result = res
-	return ec.marshalNRepositoryType2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepositoryType(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Repository_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Repository",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type RepositoryType does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Repository_url(ctx context.Context, field graphql.CollectedField, obj *entity.Repository) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Repository_url(ctx, field)
 	if err != nil {
@@ -4484,7 +4382,7 @@ func (ec *executionContext) _Repository_url(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Repository().URL(rctx, obj)
+		return obj.URL, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4505,8 +4403,8 @@ func (ec *executionContext) fieldContext_Repository_url(_ context.Context, field
 	fc = &graphql.FieldContext{
 		Object:     "Repository",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -5091,7 +4989,7 @@ func (ec *executionContext) _ToolUrls_gitea(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Gitea, nil
+		return ec.resolvers.ToolUrls().Gitea(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5112,8 +5010,8 @@ func (ec *executionContext) fieldContext_ToolUrls_gitea(_ context.Context, field
 	fc = &graphql.FieldContext{
 		Object:     "ToolUrls",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -5248,94 +5146,6 @@ func (ec *executionContext) fieldContext_ToolUrls_mlflow(_ context.Context, fiel
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Topic_name(ctx context.Context, field graphql.CollectedField, obj *model.Topic) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Topic_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Topic_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Topic",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Topic_relevance(ctx context.Context, field graphql.CollectedField, obj *model.Topic) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Topic_relevance(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Relevance, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(float64)
-	fc.Result = res
-	return ec.marshalNFloat2float64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Topic_relevance(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Topic",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7563,54 +7373,6 @@ func (ec *executionContext) unmarshalInputAddMembersInput(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputAddUserInput(ctx context.Context, obj interface{}) (model.AddUserInput, error) {
-	var it model.AddUserInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"email", "username", "password", "accessLevel"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "email":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Email = data
-		case "username":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Username = data
-		case "password":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Password = data
-		case "accessLevel":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("accessLevel"))
-			data, err := ec.unmarshalNAccessLevel2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐAccessLevel(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.AccessLevel = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputApiTokenInput(ctx context.Context, obj interface{}) (model.APITokenInput, error) {
 	var it model.APITokenInput
 	asMap := map[string]interface{}{}
@@ -7720,54 +7482,6 @@ func (ec *executionContext) unmarshalInputDeleteProjectInput(ctx context.Context
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputExternalRepositoryInput(ctx context.Context, obj interface{}) (model.ExternalRepositoryInput, error) {
-	var it model.ExternalRepositoryInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"url", "username", "credential", "authMethod"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "url":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.URL = data
-		case "username":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Username = data
-		case "credential":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("credential"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Credential = data
-		case "authMethod":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authMethod"))
-			data, err := ec.unmarshalNRepositoryAuthMethod2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepositoryAuthMethod(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.AuthMethod = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputRemoveApiTokenInput(ctx context.Context, obj interface{}) (model.RemoveAPITokenInput, error) {
 	var it model.RemoveAPITokenInput
 	asMap := map[string]interface{}{}
@@ -7863,27 +7577,41 @@ func (ec *executionContext) unmarshalInputRepositoryInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"type", "external"}
+	fieldsInOrder := [...]string{"url", "username", "credential", "authMethod"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "type":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNRepositoryType2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepositoryType(ctx, v)
+		case "url":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Type = data
-		case "external":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("external"))
-			data, err := ec.unmarshalOExternalRepositoryInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐExternalRepositoryInput(ctx, v)
+			it.URL = data
+		case "username":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.External = data
+			it.Username = data
+		case "credential":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("credential"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Credential = data
+		case "authMethod":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authMethod"))
+			data, err := ec.unmarshalNRepositoryAuthMethod2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepositoryAuthMethod(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AuthMethod = data
 		}
 	}
 
@@ -7925,40 +7653,6 @@ func (ec *executionContext) unmarshalInputSetActiveUserToolsInput(ctx context.Co
 				return it, err
 			}
 			it.CapabilitiesID = data
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputSetBoolFieldInput(ctx context.Context, obj interface{}) (model.SetBoolFieldInput, error) {
-	var it model.SetBoolFieldInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"id", "value"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "id":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			data, err := ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ID = data
-		case "value":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
-			data, err := ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Value = data
 		}
 	}
 
@@ -8334,9 +8028,23 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
+		case "regenerateSSHKey":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_regenerateSSHKey(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "removeUsers":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_removeUsers(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "setActiveUserTools":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_setActiveUserTools(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -8348,9 +8056,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "regenerateSSHKey":
+		case "addMembers":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_regenerateSSHKey(ctx, field)
+				return ec._Mutation_addMembers(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -8362,24 +8070,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "updateProject":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateProject(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "deleteProject":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteProject(ctx, field)
 			})
-		case "addMembers":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_addMembers(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "removeMembers":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_removeMembers(ctx, field)
@@ -8394,6 +8088,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "updateProject":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateProject(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "addApiToken":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addApiToken(ctx, field)
@@ -8401,13 +8102,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "removeApiToken":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_removeApiToken(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "setActiveUserTools":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_setActiveUserTools(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -8674,7 +8368,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "me":
+		case "capabilities":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -8683,7 +8377,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_me(ctx, field)
+				res = ec._Query_capabilities(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -8696,7 +8390,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "projects":
+		case "kubeconfig":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -8705,7 +8399,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_projects(ctx, field)
+				res = ec._Query_kubeconfig(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "me":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_me(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -8740,7 +8456,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "users":
+		case "projects":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -8749,7 +8465,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_users(ctx, field)
+				res = ec._Query_projects(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -8784,19 +8500,16 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "runtimes":
+		case "runningCapability":
 			field := field
 
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_runtimes(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
+				res = ec._Query_runningCapability(ctx, field)
 				return res
 			}
 
@@ -8825,7 +8538,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "capabilities":
+		case "runtimes":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -8834,7 +8547,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_capabilities(ctx, field)
+				res = ec._Query_runtimes(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -8847,26 +8560,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "runningCapability":
-			field := field
-
-			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_runningCapability(ctx, field)
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "kubeconfig":
+		case "users":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -8875,7 +8569,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_kubeconfig(ctx, field)
+				res = ec._Query_users(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -8930,47 +8624,11 @@ func (ec *executionContext) _Repository(ctx context.Context, sel ast.SelectionSe
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Repository")
-		case "type":
-			out.Values[i] = ec._Repository_type(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		case "url":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Repository_url(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
+			out.Values[i] = ec._Repository_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "error":
 			out.Values[i] = ec._Repository_error(ctx, field, obj)
 		default:
@@ -9189,71 +8847,58 @@ func (ec *executionContext) _ToolUrls(ctx context.Context, sel ast.SelectionSet,
 		case "knowledgeGalaxy":
 			out.Values[i] = ec._ToolUrls_knowledgeGalaxy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "gitea":
-			out.Values[i] = ec._ToolUrls_gitea(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ToolUrls_gitea(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "filebrowser":
 			out.Values[i] = ec._ToolUrls_filebrowser(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "vscode":
 			out.Values[i] = ec._ToolUrls_vscode(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "mlflow":
 			out.Values[i] = ec._ToolUrls_mlflow(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var topicImplementors = []string{"Topic"}
-
-func (ec *executionContext) _Topic(ctx context.Context, sel ast.SelectionSet, obj *model.Topic) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, topicImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Topic")
-		case "name":
-			out.Values[i] = ec._Topic_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "relevance":
-			out.Values[i] = ec._Topic_relevance(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -9925,21 +9570,6 @@ func (ec *executionContext) unmarshalNDeleteProjectInput2githubᚗcomᚋkonstell
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
-	res, err := graphql.UnmarshalFloatContext(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
-	res := graphql.MarshalFloatContext(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return graphql.WrapContextMarshaler(ctx, res)
-}
-
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -10151,22 +9781,6 @@ func (ec *executionContext) marshalNRepositoryAuthMethod2githubᚗcomᚋkonstell
 func (ec *executionContext) unmarshalNRepositoryInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRepositoryInput(ctx context.Context, v interface{}) (*model.RepositoryInput, error) {
 	res, err := ec.unmarshalInputRepositoryInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNRepositoryType2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepositoryType(ctx context.Context, v interface{}) (entity.RepositoryType, error) {
-	tmp, err := graphql.UnmarshalString(v)
-	res := entity.RepositoryType(tmp)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNRepositoryType2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepositoryType(ctx context.Context, sel ast.SelectionSet, v entity.RepositoryType) graphql.Marshaler {
-	res := graphql.MarshalString(string(v))
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
 }
 
 func (ec *executionContext) marshalNRuntime2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRuntime(ctx context.Context, sel ast.SelectionSet, v entity.Runtime) graphql.Marshaler {
@@ -10627,14 +10241,6 @@ func (ec *executionContext) marshalOCapability2ᚖgithubᚗcomᚋkonstellation�
 		return graphql.Null
 	}
 	return ec._Capability(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOExternalRepositoryInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐExternalRepositoryInput(ctx context.Context, v interface{}) (*model.ExternalRepositoryInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputExternalRepositoryInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOProject2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx context.Context, sel ast.SelectionSet, v *entity.Project) graphql.Marshaler {

@@ -13,7 +13,7 @@ docker-lint: ## Lints Dockerfile defined in dir Example: make docker-lint dir=ap
 
 .PHONY: tidy
 tidy: ## Run golangci-lint, goimports and gofmt
-	golangci-lint run --config .github/.golangci.yml app/api/... cleaner/... gitea-oauth2-setup/... repo-cloner/... && goimports -w app/api cleaner gitea-oauth2-setup repo-cloner && gofmt -s -w -e -d app/api cleaner gitea-oauth2-setup repo-cloner
+	golangci-lint run --config .github/.golangci.yml app/api/... cleaner/... repo-cloner/... && goimports -w app/api cleaner repo-cloner && gofmt -s -w -e -d app/api cleaner repo-cloner
 
 .PHONY: create
 create: ## Creates a complete local environment

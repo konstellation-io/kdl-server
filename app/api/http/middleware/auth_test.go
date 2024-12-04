@@ -110,6 +110,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 		id            = "user.1234"
 		email         = "user@email.com"
 		username      = "user"
+		sub           = "d5d70477-5192-4182-b80e-5d34550eb4fe"
 		accessLevel   = entity.AccessLevelViewer
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"
@@ -127,6 +128,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	u := entity.User{
 		Username:     username,
 		Email:        email,
+		Sub:          sub,
 		AccessLevel:  accessLevel,
 		SSHKey:       sshKey,
 		CreationDate: now,
@@ -135,6 +137,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 		ID:           id,
 		Username:     username,
 		Email:        email,
+		Sub:          sub,
 		AccessLevel:  accessLevel,
 		SSHKey:       sshKey,
 		CreationDate: now,
@@ -143,6 +146,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
+	ts.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.clock.EXPECT().Now().Return(now)
 	ts.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	ts.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
@@ -157,7 +161,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 
 	req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
 	req.Header.Set("X-Forwarded-Email", email)
-	req.Header.Set("X-Forwarded-User", username)
+	req.Header.Set("X-Forwarded-User", sub)
 
 	res := httptest.NewRecorder()
 

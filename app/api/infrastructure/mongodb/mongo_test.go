@@ -1,5 +1,3 @@
-//go:build integration
-
 package mongodb_test
 
 import (
@@ -30,13 +28,15 @@ const (
 	runtimesCollName     = "runtimes"
 	userActivityCollName = "userActivity"
 	userCollName         = "users"
+	rootUsername         = "root"
+	rootPassword         = "root"
 )
 
 var (
-	testTimeExample = time.Now().Add(-time.Hour).Truncate(time.Millisecond).UTC()
+	testTimeExample = time.Now().Add(-time.Hour).Truncate(time.Millisecond).UTC() //nolint: gochecknoglobals // ignore global variable for test
 )
 
-var capabilitiesExamples = map[string]entity.Capabilities{
+var capabilitiesExamples = map[string]entity.Capabilities{ //nolint: gochecknoglobals // ignore global variable for test
 	"capability1": {
 		ID:            "1",
 		Name:          "capability1",
@@ -54,7 +54,7 @@ var capabilitiesExamples = map[string]entity.Capabilities{
 	},
 }
 
-var projectExamples = map[string]entity.Project{
+var projectExamples = map[string]entity.Project{ //nolint: gochecknoglobals // ignore global variable for test
 	"project1": {
 		ID:                 "1",
 		Name:               "project1",
@@ -105,7 +105,7 @@ var projectExamples = map[string]entity.Project{
 	},
 }
 
-var runtimeExamples = map[string]entity.Runtime{
+var runtimeExamples = map[string]entity.Runtime{ //nolint: gochecknoglobals // ignore global variable for test
 	"runtime1": {
 		ID:          primitive.NewObjectID().Hex(),
 		Name:        "runtime1",
@@ -124,11 +124,12 @@ var runtimeExamples = map[string]entity.Runtime{
 	},
 }
 
-var userExamples = map[string]entity.User{
+var userExamples = map[string]entity.User{ //nolint: gochecknoglobals // ignore global variable for test
 	"user1": {
 		ID:           primitive.NewObjectID().Hex(),
 		Email:        "email1",
 		Username:     "user1",
+		Sub:          "d5d70477-5192-4182-b80e-5d34550eb4fe",
 		Deleted:      false,
 		CreationDate: testTimeExample,
 		AccessLevel:  entity.AccessLevelAdmin,
@@ -142,6 +143,7 @@ var userExamples = map[string]entity.User{
 		ID:           primitive.NewObjectID().Hex(),
 		Email:        "email2",
 		Username:     "user2",
+		Sub:          "4c5c3da6-2847-4a8a-9f68-9532fe559b6d",
 		Deleted:      false,
 		CreationDate: testTimeExample,
 		AccessLevel:  entity.AccessLevelAdmin,
@@ -173,10 +175,8 @@ func (s *TestSuite) SetupSuite() {
 
 	zapLog, err := zap.NewDevelopment()
 	s.Require().NoError(err)
-	logger := zapr.NewLogger(zapLog)
 
-	rootUsername := "root"
-	rootPassword := "root"
+	logger := zapr.NewLogger(zapLog)
 
 	req := testcontainers.ContainerRequest{
 		Image:        "mongo:8.0",
@@ -200,7 +200,7 @@ func (s *TestSuite) SetupSuite() {
 	s.Require().NoError(err)
 
 	port := p.Int()
-	uri := fmt.Sprintf("mongodb://%v:%v@%v:%v/", rootUsername, rootPassword, host, port) //NOSONAR not used in secure contexts
+	uri := fmt.Sprintf("mongodb://%v:%v@%v:%v/", rootUsername, rootPassword, host, port) // NOSONAR not used in secure contexts
 	mongoClient, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 	s.Require().NoError(err)
 
@@ -249,7 +249,10 @@ func (s *TestSuite) SetupTest() {
 }
 
 func (s *TestSuite) TearDownTest() {
-	s.mongoClient.Database(dbName).Drop(context.Background())
+	err := s.mongoClient.Database(dbName).Drop(context.Background())
+	if err != nil {
+		fmt.Println("Error dropping database: %w", err)
+	}
 }
 
 func (s *TestSuite) TestCapabilitiesGet_OK() {
@@ -334,7 +337,7 @@ func (s *TestSuite) TestProjectAddMembers_OK() {
 	actualProject, err := s.projectRepo.Get(ctx, project.ID)
 	s.Require().NoError(err)
 
-	s.Equal(len(project.Members)+len(members), len(actualProject.Members))
+	s.Len(actualProject.Members, len(project.Members)+len(members))
 }
 
 func (s *TestSuite) TestProjectRemoveMembers_OK() {
@@ -361,7 +364,7 @@ func (s *TestSuite) TestProjectRemoveMembers_OK() {
 	actualProject, err := s.projectRepo.Get(ctx, project.ID)
 	s.Require().NoError(err)
 
-	s.Equal(len(project.Members)+len(members), len(actualProject.Members))
+	s.Len(actualProject.Members, len(project.Members)+len(members))
 
 	err = s.projectRepo.RemoveMembers(ctx, project.ID, users)
 	s.Require().NoError(err)
@@ -369,7 +372,7 @@ func (s *TestSuite) TestProjectRemoveMembers_OK() {
 	actualProject, err = s.projectRepo.Get(ctx, project.ID)
 	s.Require().NoError(err)
 
-	s.Equal(len(project.Members), len(actualProject.Members))
+	s.Len(actualProject.Members, len(project.Members))
 }
 
 func (s *TestSuite) TestProjectUpdateMembersAccessLevel_OK() {
@@ -380,7 +383,7 @@ func (s *TestSuite) TestProjectUpdateMembersAccessLevel_OK() {
 	actualProject, err := s.projectRepo.Get(ctx, project.ID)
 	s.Require().NoError(err)
 
-	s.Require().True(len(actualProject.Members) >= 1)
+	s.Require().GreaterOrEqual(len(actualProject.Members), 1)
 	aGivenMember := actualProject.Members[len(actualProject.Members)-1]
 
 	usersToModify := []entity.User{
@@ -592,6 +595,25 @@ func (s *TestSuite) TestUserGetByEmail_NotFound() {
 	s.Equal(entity.ErrUserNotFound, err)
 }
 
+func (s *TestSuite) TestUserGetBySub_OK() {
+	ctx := context.Background()
+
+	expectedUser := userExamples["user1"]
+
+	actualUser, err := s.userRepo.GetBySub(ctx, expectedUser.Sub)
+	s.Require().NoError(err)
+
+	s.Equal(expectedUser, actualUser)
+}
+
+func (s *TestSuite) TestUserGetBySub_NotFound() {
+	ctx := context.Background()
+
+	_, err := s.userRepo.GetBySub(ctx, "notfound")
+	s.Require().Error(err)
+	s.Equal(entity.ErrUserNotFound, err)
+}
+
 func (s *TestSuite) TestUserFindAll_OK() {
 	ctx := context.Background()
 
@@ -731,16 +753,25 @@ func (s *TestSuite) TestUserEnsureIndexes_OK() {
 	s.Require().NoError(err)
 
 	var indexes []string
+
 	for cursor.Next(context.Background()) {
 		var index bson.M
 		err := cursor.Decode(&index)
 		s.Require().NoError(err)
 
-		indexes = append(indexes, index["name"].(string))
+		name, ok := index["name"].(string)
+		if !ok {
+			continue
+		}
+
+		indexes = append(indexes, name)
 	}
 
+	s.Len(indexes, 1)
+	s.Contains(indexes, "_id_")
 	s.NotContains(indexes, "email_1")
 	s.NotContains(indexes, "username_1")
+	s.NotContains(indexes, "sub_1")
 
 	err = s.userRepo.EnsureIndexes()
 	s.Require().NoError(err)
@@ -750,14 +781,24 @@ func (s *TestSuite) TestUserEnsureIndexes_OK() {
 	cursor, err = indexView.List(context.Background())
 	s.Require().NoError(err)
 
+	indexes = []string{}
+
 	for cursor.Next(context.Background()) {
 		var index bson.M
 		err := cursor.Decode(&index)
 		s.Require().NoError(err)
 
-		indexes = append(indexes, index["name"].(string))
+		name, ok := index["name"].(string)
+		if !ok {
+			continue
+		}
+
+		indexes = append(indexes, name)
 	}
 
+	s.Len(indexes, 4)
+	s.Contains(indexes, "_id_")
 	s.Contains(indexes, "email_1")
 	s.Contains(indexes, "username_1")
+	s.Contains(indexes, "sub_1")
 }

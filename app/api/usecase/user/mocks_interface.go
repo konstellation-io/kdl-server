@@ -124,6 +124,21 @@ func (mr *MockRepositoryMockRecorder) GetByEmail(ctx, email interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmail", reflect.TypeOf((*MockRepository)(nil).GetByEmail), ctx, email)
 }
 
+// GetBySub mocks base method.
+func (m *MockRepository) GetBySub(ctx context.Context, sub string) (entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBySub", ctx, sub)
+	ret0, _ := ret[0].(entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBySub indicates an expected call of GetBySub.
+func (mr *MockRepositoryMockRecorder) GetBySub(ctx, sub interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBySub", reflect.TypeOf((*MockRepository)(nil).GetBySub), ctx, sub)
+}
+
 // GetByUsername mocks base method.
 func (m *MockRepository) GetByUsername(ctx context.Context, username string) (entity.User, error) {
 	m.ctrl.T.Helper()
@@ -248,18 +263,18 @@ func (mr *MockUseCaseMockRecorder) AreToolsRunning(ctx, username interface{}) *g
 }
 
 // Create mocks base method.
-func (m *MockUseCase) Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error) {
+func (m *MockUseCase) Create(ctx context.Context, email, sub string, accessLevel entity.AccessLevel) (entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, email, username, accessLevel)
+	ret := m.ctrl.Call(m, "Create", ctx, email, sub, accessLevel)
 	ret0, _ := ret[0].(entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockUseCaseMockRecorder) Create(ctx, email, username, accessLevel interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) Create(ctx, email, sub, accessLevel interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUseCase)(nil).Create), ctx, email, username, accessLevel)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUseCase)(nil).Create), ctx, email, sub, accessLevel)
 }
 
 // CreateAdminUser mocks base method.

@@ -28,6 +28,7 @@ type User struct {
 	ID           string
 	Email        string
 	Username     string
+	Sub          string
 	Deleted      bool
 	CreationDate time.Time
 	AccessLevel  AccessLevel

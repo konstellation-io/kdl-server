@@ -3,20 +3,21 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/go-logr/logr"
 	"github.com/gosimple/slug"
 	k8errors "k8s.io/apimachinery/pkg/api/errors"
 
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
-
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 )
 
 var (
@@ -62,12 +63,16 @@ func NewInteractor(
 }
 
 // Create add a new user to the server.
-// - If the user already exists (email and username must be unique) returns entity.ErrDuplicatedUser.
+// - If the user already exists (email, username and sub must be unique) returns entity.ErrDuplicatedUser.
 // - Generates a new SSH public/private keys.
 // - Stores the user and ssh keys into the DB.
 // - Creates a new secret in Kubernetes with the generated SSH keys.
 // - Created a service account for the user.
-func (i *Interactor) Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error) {
+func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel entity.AccessLevel) (entity.User, error) {
+	// extract username from email
+	username := kdlutil.GetUsernameFromEmail(email)
+
+	fmt.Println("Creating user", "username", username, "email", email)
 	i.logger.Info("Creating user", "username", username, "email", email)
 
 	// Check if the user already exists
@@ -89,6 +94,15 @@ func (i *Interactor) Create(ctx context.Context, email, username string, accessL
 		return entity.User{}, err
 	}
 
+	_, err = i.repo.GetBySub(ctx, sub)
+	if err == nil {
+		return entity.User{}, entity.ErrDuplicatedUser
+	}
+
+	if !errors.Is(err, entity.ErrUserNotFound) {
+		return entity.User{}, err
+	}
+
 	// Create SSH public and private keys
 	keys, err := i.sshGenerator.NewKeys()
 	if err != nil {
@@ -100,6 +114,7 @@ func (i *Interactor) Create(ctx context.Context, email, username string, accessL
 	user := entity.User{
 		Username:     username,
 		Email:        email,
+		Sub:          sub,
 		AccessLevel:  accessLevel,
 		CreationDate: i.clock.Now(),
 		SSHKey:       keys,

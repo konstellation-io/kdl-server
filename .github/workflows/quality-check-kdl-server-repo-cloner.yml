@@ -39,7 +39,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: API Test
-        run: go test ./... -cover -v -coverprofile=coverage.out
+        run: go test ./... --tags=integration,unit -cover -v -coverprofile=coverage.out
         working-directory: ./repo-cloner
 
       - name: API Archive code coverage results

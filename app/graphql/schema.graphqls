@@ -95,7 +95,6 @@ type Member {
 
 type ToolUrls {
   knowledgeGalaxy: String!
-  gitea: String!
   filebrowser: String!
   vscode: String!
   mlflow: String!

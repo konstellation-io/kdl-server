@@ -1,3 +1,5 @@
+//go:build integration
+
 package mongodb_test
 
 import (
@@ -33,10 +35,10 @@ const (
 )
 
 var (
-	testTimeExample = time.Now().Add(-time.Hour).Truncate(time.Millisecond).UTC() //nolint: gochecknoglobals // ignore global variable for test
+	testTimeExample = time.Now().Add(-time.Hour).Truncate(time.Millisecond).UTC()
 )
 
-var capabilitiesExamples = map[string]entity.Capabilities{ //nolint: gochecknoglobals // ignore global variable for test
+var capabilitiesExamples = map[string]entity.Capabilities{
 	"capability1": {
 		ID:            "1",
 		Name:          "capability1",
@@ -54,7 +56,7 @@ var capabilitiesExamples = map[string]entity.Capabilities{ //nolint: gochecknogl
 	},
 }
 
-var projectExamples = map[string]entity.Project{ //nolint: gochecknoglobals // ignore global variable for test
+var projectExamples = map[string]entity.Project{
 	"project1": {
 		ID:                 "1",
 		Name:               "project1",
@@ -105,7 +107,7 @@ var projectExamples = map[string]entity.Project{ //nolint: gochecknoglobals // i
 	},
 }
 
-var runtimeExamples = map[string]entity.Runtime{ //nolint: gochecknoglobals // ignore global variable for test
+var runtimeExamples = map[string]entity.Runtime{
 	"runtime1": {
 		ID:          primitive.NewObjectID().Hex(),
 		Name:        "runtime1",
@@ -124,7 +126,7 @@ var runtimeExamples = map[string]entity.Runtime{ //nolint: gochecknoglobals // i
 	},
 }
 
-var userExamples = map[string]entity.User{ //nolint: gochecknoglobals // ignore global variable for test
+var userExamples = map[string]entity.User{
 	"user1": {
 		ID:           primitive.NewObjectID().Hex(),
 		Email:        "email1",

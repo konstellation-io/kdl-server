@@ -8,6 +8,24 @@ included in. So, those who do not have a folder with the code, try to clone the 
 that the user's public key is included in the platform where the repository is stored (github, gitlab, gitea etc), so
 that cloning through ssh is possible.
 
+## Run tests
+
+```console
+go test ./... --tags=integration,unit -v -cover
+```
+
+Run only unit tests
+
+```console
+go test ./... -tags=unit -v -cover
+```
+
+Run only integration tests
+
+```console
+go test ./... -tags=integration -v -cover
+```
+
 ## Configuration
 
 | Environment variable      | Default                                      | Description                                                               |

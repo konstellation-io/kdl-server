@@ -25,14 +25,26 @@ To create new tests install [GoMock](https://github.com/golang/mock). Mocks used
 
 To generate the mocks execute:
 
-```sh
-$ go generate ./...
+```console
+go generate ./...
 ```
 
 ### Run tests
 
-```sh
-go test ./...
+```console
+go test ./... --tags=integration,unit -v -cover
+```
+
+Run only unit tests
+
+```console
+go test ./... -tags=unit -v -cover
+```
+
+Run only integration tests
+
+```console
+go test ./... -tags=integration -v -cover
 ```
 
 ## Linters

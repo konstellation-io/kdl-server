@@ -24,11 +24,11 @@ func NewAuthController(logger logr.Logger, userRepo user.Repository, projectRepo
 }
 
 func (a *AuthController) HandleProjectAuth(res http.ResponseWriter, req *http.Request) {
-	username := req.Header.Get("X-Forwarded-User")
+	email := req.Header.Get("X-Forwarded-Email")
 	originalURI := req.Header.Get("X-Original-URI")
 
-	if username == "" {
-		a.logger.Info("Username not found in \"X-Forwarded-User\" header")
+	if email == "" {
+		a.logger.Info("Email not found in \"X-Forwarded-Email\" header")
 		res.WriteHeader(http.StatusUnauthorized)
 
 		return
@@ -48,15 +48,15 @@ func (a *AuthController) HandleProjectAuth(res http.ResponseWriter, req *http.Re
 
 	p, err := a.projectRepo.Get(req.Context(), projectID)
 	if err != nil {
-		a.logger.Error(err, "HandleProjectAuth: Error getting project")
+		a.logger.Error(err, "HandleProjectAuth: Error getting project", "projectId", projectID)
 		res.WriteHeader(http.StatusUnauthorized)
 
 		return
 	}
 
-	u, err := a.userRepo.GetByUsername(req.Context(), username)
+	u, err := a.userRepo.GetByEmail(req.Context(), email)
 	if err != nil {
-		a.logger.Error(err, "HandleProjectAuth: Error getting user")
+		a.logger.Error(err, "HandleProjectAuth: Error getting user", "email", email)
 		res.WriteHeader(http.StatusUnauthorized)
 
 		return

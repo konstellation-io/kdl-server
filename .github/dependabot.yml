@@ -13,7 +13,6 @@ updates:
   directories:
     - "/app/api"
     - "/cleaner"
-    - "/gitea-oauth2-setup"
     - "/repo-cloner"
   schedule:
     interval: monthly

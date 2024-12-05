@@ -3,6 +3,5 @@ go 1.23.2
 use (
 	./app/api
 	./cleaner
-	./gitea-oauth2-setup
 	./repo-cloner
 )

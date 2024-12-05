@@ -7,7 +7,6 @@ import MlFlowIcon from 'Components/Icons/MlFlowIcon/MlFlowIcon';
 import FolderIcon from '@material-ui/icons/Folder';
 import { OverridableComponent } from '@material-ui/core/OverridableComponent';
 import { SvgIconTypeMap } from '@material-ui/core';
-import VSIcon from 'Components/Icons/VSIcon/VSIcon';
 import { useReactiveVar } from '@apollo/client';
 import { CONFIG } from 'index';
 
@@ -65,10 +64,10 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
 
   const buildRoutes = useCallback(
     (route: RouteConfiguration) =>
-    ({
-      ...route,
-      route: buildRoute(route.route, projectId),
-    } as RouteConfiguration),
+      ({
+        ...route,
+        route: buildRoute(route.route, projectId),
+      } as RouteConfiguration),
     [projectId],
   );
 

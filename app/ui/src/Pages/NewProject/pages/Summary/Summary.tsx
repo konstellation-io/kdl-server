@@ -1,9 +1,7 @@
 import React, { FC } from 'react';
 
-import { CONFIG } from 'index';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
 import IconLink from '@material-ui/icons/Link';
-import { RepositoryType } from 'Graphql/types/globalTypes';
 import styles from './Summary.module.scss';
 import { useReactiveVar } from '@apollo/client';
 import { newProject } from 'Graphql/client/cache';
@@ -32,7 +30,7 @@ const Section: FC<SectionProps> = ({ title, children }) => (
 );
 
 function Summary() {
-  const { information, repository, externalRepository } = useReactiveVar(newProject);
+  const { information, externalRepository } = useReactiveVar(newProject);
   const { name, description, id } = information.values;
 
   return (

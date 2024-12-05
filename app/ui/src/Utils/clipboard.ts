@@ -7,6 +7,7 @@ export function copyToClipboard(value: string) {
   tempInput.select();
   document.execCommand('copy');
   document.body.removeChild(tempInput);
+  toast.info('Copied to clipboard');
 }
 
 export async function copyAndToast(value: string) {

@@ -74,7 +74,7 @@ function Project() {
       setRunningCapabilities(
         dataCapabilities.capabilities
           .slice()
-          .sort((a, b) => (a.default ? 1 : -1))
+          .sort((a) => (a.default ? 1 : -1))
           .reverse()[0],
       );
     }

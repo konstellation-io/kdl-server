@@ -11,6 +11,24 @@ the user's public key is included in the platform where the repository is stored
 (github, gitlab, etc), so that cloning through ssh is possible. User public key
 is mounted as a volume from a k8s secret.
 
+## Run tests
+
+```console
+go test ./... --tags=integration,unit -v -cover
+```
+
+Run only unit tests
+
+```console
+go test ./... -tags=unit -v -cover
+```
+
+Run only integration tests
+
+```console
+go test ./... -tags=integration -v -cover
+```
+
 ## Configuration
 
 | Environment variable      | Default                                      | Description                                                               |

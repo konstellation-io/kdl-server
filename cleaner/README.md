@@ -43,6 +43,18 @@ go build -o cleaner .
 
 ## Run tests
 
-```bash
-go test ./... -v -cover
+```console
+go test ./... --tags=integration,unit -v -cover
+```
+
+Run only unit tests
+
+```console
+go test ./... -tags=unit -v -cover
+```
+
+Run only integration tests
+
+```console
+go test ./... -tags=integration -v -cover
 ```

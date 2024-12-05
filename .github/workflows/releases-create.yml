@@ -5,7 +5,7 @@
 name: "[Releases] Create"
 
 env:
-  COMPONENTS: "app,cleaner,gitea-oauth2-setup,mlflow,project-operator,repo-cloner,user-tools-operator,vscode"
+  COMPONENTS: "app,cleaner,mlflow,project-operator,repo-cloner,user-tools-operator,vscode"
 
 on:
   workflow_dispatch:
@@ -16,9 +16,8 @@ on:
         type: choice
         options:
           - all
-          - app
+          - kdl-app
           - cleaner
-          - gitea-oauth2-setup
           - mlflow
           - project-operator
           - repo-cloner
@@ -52,10 +51,7 @@ jobs:
           npm install
 
           if [[ "${{ github.event.inputs.component }}" == "all" || -z "${{ github.event.inputs.component }}" ]]; then
-            for COMPONENT in $(echo ${{ env.COMPONENTS }} | tr ',' ' '); do
-              echo "Releasing component: $COMPONENT"
-              yarn workspaces run semantic-release
-            done
+            yarn workspaces run semantic-release
           else
             echo "Releasing component: ${{ github.event.inputs.component }}"
             yarn workspace ${{ github.event.inputs.component }} run semantic-release

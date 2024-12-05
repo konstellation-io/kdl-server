@@ -12,11 +12,6 @@ cd ../../cleaner
 rm go.sum
 go mod tidy
 
-echo 'Upgrading go dependencies for gitea-oauth2-setup'
-cd ../gitea-oauth2-setup
-rm go.sum
-go mod tidy
-
 echo 'Upgrading go dependencies for repo-cloner'
 cd ../repo-cloner
 rm go.sum

@@ -51,14 +51,7 @@ func (k *Client) CreateUserToolsCR(ctx context.Context, username, runtimeID, run
 	slugUsername := k.getSlugUsername(username)
 	resName := fmt.Sprintf("usertools-%s", slugUsername)
 
-	err := k.checkOrCreateToolsSecrets(ctx, slugUsername)
-	if err != nil {
-		return err
-	}
-
-	k.logger.Info("UserTools secrets created")
-
-	err = k.createUserToolsDefinition(ctx, username, slugUsername, resName, runtimeID, runtimeImage, runtimeTag, capabilities)
+	err := k.createUserToolsDefinition(ctx, username, slugUsername, resName, runtimeID, runtimeImage, runtimeTag, capabilities)
 	if err != nil {
 		return err
 	}
@@ -148,41 +141,6 @@ func (k *Client) userToolsPODLabelSelector(resName string) string {
 	return fmt.Sprintf("app.kubernetes.io/instance=%s", resName)
 }
 
-// checkOrCreateToolsSecrets set ClientID and ClientSecret on Kubernetes secret objects.
-func (k *Client) checkOrCreateToolsSecrets(ctx context.Context, slugUsername string) error {
-	secretName := fmt.Sprintf("codeserver-oauth2-secrets-%s", slugUsername)
-	credentialsSecretName := fmt.Sprintf("codeserver-oauth2-credentials-%s", slugUsername)
-
-	exist, err := k.isSecretPresent(ctx, secretName)
-	if err != nil {
-		return fmt.Errorf("check codeserver tool secret: %w", err)
-	}
-
-	if exist {
-		return nil
-	}
-
-	oAuthName := fmt.Sprintf("codeserver-app-%s", slugUsername)
-
-	protocol := "http"
-	if k.cfg.TLS.Enabled {
-		protocol = "https"
-	}
-
-	callbackURL := fmt.Sprintf("%s://%s-code.%s/oauth2/callback", protocol, slugUsername, k.cfg.BaseDomainName)
-	data := map[string]string{}
-	data["DEPLOYMENT_SECRET_NAME"] = credentialsSecretName
-	data["GITEA_REDIRECT_URIS"] = callbackURL
-	data["GITEA_APPLICATION_NAME"] = oAuthName
-
-	err = k.CreateSecret(ctx, secretName, data)
-	if err != nil {
-		return fmt.Errorf("creating codeserver tool secrets: %w", err)
-	}
-
-	return nil
-}
-
 // createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
 func (k *Client) createUserToolsDefinition(ctx context.Context, username, usernameSlug, resName, runtimeID,
 	runtimeImage, runtimeTag string, capabilities entity.Capabilities) error {
@@ -260,6 +218,7 @@ func (k *Client) getUserToolsDefinition(
 		},
 		"tls": tlsConfig,
 		"vscode": map[string]interface{}{
+			"enabled": k.cfg.VSCode.Enabled,
 			"image": map[string]string{
 				"repository": k.cfg.VSCode.Image.Repository,
 				"tag":        k.cfg.VSCode.Image.Tag,
@@ -273,15 +232,6 @@ func (k *Client) getUserToolsDefinition(
 				"pullPolicy": k.cfg.RepoCloner.Image.PullPolicy,
 			},
 			"mongodbURI": k.cfg.MongoDB.URI,
-		},
-		"giteaOauth2Setup": map[string]interface{}{
-			"image": map[string]string{
-				"repository": k.cfg.UserToolsGiteaOAuth2Setup.Image.Repository,
-				"tag":        k.cfg.UserToolsGiteaOAuth2Setup.Image.Tag,
-				"pullPolicy": k.cfg.UserToolsGiteaOAuth2Setup.Image.PullPolicy,
-			},
-			"giteaAdminSecret":     k.cfg.UserToolsGiteaOAuth2Setup.GiteaAdminSecret,
-			"giteaOauth2Configmap": k.cfg.UserToolsGiteaOAuth2Setup.GiteaOauth2Configmap,
 		},
 		"oauth2Proxy": map[string]interface{}{
 			"image": map[string]string{

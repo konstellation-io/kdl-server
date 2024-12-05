@@ -20,11 +20,30 @@ templates:
 repositories:
   - name: bedag
     url: https://bedag.github.io/helm-charts/
+  - name: jetstack
+    url: https://charts.jetstack.io
   - name: minio
     url: https://charts.min.io/
 
 releases:
-  - name: "mongodb-string-uri"
+  # ref: https://github.com/cert-manager/cert-manager/blob/v1.16.1/deploy/charts/cert-manager/values.yaml
+  - name: cert-manager
+    chart: jetstack/cert-manager
+    version: v1.16.1
+    namespace: cert-manager
+    inherit:
+    - template: default
+
+  - name: cert-manager-clusterissuers
+    chart: bedag/raw
+    version: 2.0.0
+    namespace: cert-manager
+    needs:
+    - cert-manager
+    inherit:
+    - template: default
+
+  - name: "initial-resources"
     <<: *default
     chart: bedag/raw
     version: 2.0.0
@@ -32,11 +51,18 @@ releases:
   - name: "kdl-local"
     <<: *default
     chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
-    version: 6.0.3-rc.5
+    version: 6.0.3-rc.1
     needs:
-    - kdl/mongodb-string-uri
+    - kdl/initial-resources
 
   - name: "mongodb-initial-data"
+    <<: *default
+    chart: bedag/raw
+    version: 2.0.0
+    needs:
+    - kdl/kdl-local
+
+  - name: "keycloak-initial-data"
     <<: *default
     chart: bedag/raw
     version: 2.0.0

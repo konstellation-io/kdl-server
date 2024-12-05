@@ -20,8 +20,8 @@ local_login() {
   fi
   LINK=$SCHEMA://kdlapp.kdl.$HOST_IP.nip.io
   echo "Login link  : ${LINK}"
-  echo "👤 User     : ${GITEA_ADMIN_USER}"
-  echo "🔑 Password : ${GITEA_ADMIN_PASSWORD}"
+  echo "👤 User     : ${KEYCLOAK_DEFAULT_USER}"
+  echo "🔑 Password : ${KEYCLOAK_DEFAULT_PASSWORD}"
 
   if [ "$OS" = "Darwin" ]; then
     open "$LINK"

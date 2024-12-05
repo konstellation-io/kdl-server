@@ -2,14 +2,17 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"net/http"
+
+	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
 
 type contextKey int
 
 const (
-	LoggedUserNameKey contextKey = iota
-	LoggedUserEmailKey
+	LoggedUserEmailKey contextKey = iota
 )
 
 /*
@@ -27,22 +30,31 @@ The oAuth2 proxy sets the following headers:
 	X-Forwarded-Proto: https
 	X-Forwarded-Port: 443
 
-Use LoggedUserNameKey and LoggedUserEmailKey to retrieve this values from the context.
+Use LoggedUserEmailKey to retrieve this values from the context.
 Example:
 
 	email := ctx.Value(middleware.LoggedUserEmailKey).(string).
 */
-func AuthMiddleware(next http.Handler) http.Handler {
+func AuthMiddleware(next http.Handler, userUsecase user.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		email := r.Header.Get("X-Forwarded-Email")
-		username := r.Header.Get("X-Forwarded-User")
+		sub := r.Header.Get("X-Forwarded-User")
 
-		if email == "" || username == "" {
+		if email == "" || sub == "" {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
-		r = r.WithContext(context.WithValue(r.Context(), LoggedUserNameKey, username))
+		_, err := userUsecase.GetByEmail(r.Context(), email)
+		if errors.Is(err, entity.ErrUserNotFound) {
+			_, err = userUsecase.Create(r.Context(), email, sub, entity.AccessLevelViewer)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+		}
+
+		// only truth is the email, username can be changed
 		r = r.WithContext(context.WithValue(r.Context(), LoggedUserEmailKey, email))
 
 		next.ServeHTTP(w, r)

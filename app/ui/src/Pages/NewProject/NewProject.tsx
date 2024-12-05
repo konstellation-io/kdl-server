@@ -32,8 +32,8 @@ enum StepNames {
   INFORMATION = 'information',
   REPOSITORY = 'repository',
   DETAILS = 'repository details',
-  EXTERNAL = 'externalRepository',
-  INTERNAL = 'internalRepository',
+  // EXTERNAL = 'externalRepository',
+  // INTERNAL = 'internalRepository',
   SUMMARY = 'summary',
 }
 
@@ -52,11 +52,11 @@ const stepperSteps = [
   },
 ];
 
-export const repoTypeToStepName: {
-  [k: string]: StepNames.EXTERNAL;
-} = {
-  [RepositoryType.EXTERNAL]: StepNames.EXTERNAL,
-};
+// export const repoTypeToStepName: {
+//   [k: string]: StepNames.EXTERNAL;
+// } = {
+//   [RepositoryType.EXTERNAL]: StepNames.EXTERNAL,
+// };
 
 function NewProject() {
   const history = useHistory();
@@ -66,13 +66,13 @@ function NewProject() {
   const [isPromptEnabled, setIsPromptEnabled] = useState(false);
 
   const { enableUnloadPrompt, disableUnloadPrompt } = useUnloadPrompt();
-  const data = useReactiveVar(newProject);
+  const data: { [key in StepNames.INFORMATION | StepNames.DETAILS]?: any } = useReactiveVar(newProject);
 
-  const type = data.repository.values.type;
+  // const type = data.repository.values.type;
 
-  const stepsWithData: (StepNames.INFORMATION | StepNames.EXTERNAL)[] = useMemo(() => {
-    return [StepNames.INFORMATION, repoTypeToStepName[type || '']];
-  }, [type]);
+  const stepsWithData: (StepNames.INFORMATION | StepNames.DETAILS)[] = useMemo(() => {
+    return [StepNames.INFORMATION];
+  }, []);
 
   // We want to execute this on on component mount and unmount
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -166,7 +166,7 @@ function NewProject() {
     switch (step) {
       case StepNames.INFORMATION:
         return <SidebarInformation />;
-      case StepNames.EXTERNAL:
+      case StepNames.DETAILS:
         return <SidebarExternalRepository />;
       default:
         return <></>;

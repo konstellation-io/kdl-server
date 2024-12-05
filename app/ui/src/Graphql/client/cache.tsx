@@ -32,12 +32,6 @@ export const initialNewProject: NewProject = {
   },
   repository: {
     values: {
-      type: null,
-    },
-    errors: { type: 'Please choose a repo type' },
-  },
-  externalRepository: {
-    values: {
       url: '',
       username: '',
       credential: '',
@@ -47,9 +41,24 @@ export const initialNewProject: NewProject = {
       url: 'This field is mandatory',
       credential: 'This field is mandatory',
       username: 'This field is mandatory',
-      authMethod: 'This field is mandatory',
+      authMethod: RepositoryAuthMethod.TOKEN,
     },
+    // errors: { type: 'Please choose a repo type' },
   },
+  // externalRepository: {
+  //   values: {
+  //     url: '',
+  //     username: '',
+  //     credential: '',
+  //     authMethod: RepositoryAuthMethod.TOKEN,
+  //   },
+  //   errors: {
+  //     url: 'This field is mandatory',
+  //     credential: 'This field is mandatory',
+  //     username: 'This field is mandatory',
+  //     authMethod: 'This field is mandatory',
+  //   },
+  // },
 };
 
 const initialStateUserSettings: UserSettings = {

@@ -22,7 +22,7 @@ function ProjectCreation() {
     create: { data: createData, error: createError },
   } = useProject();
 
-  const { repository, information, externalRepository } = useReactiveVar(newProject);
+  const { repository, information } = useReactiveVar(newProject);
 
   const error = animationFinished && !!createError;
   const success = animationFinished && !!createData;
@@ -42,15 +42,15 @@ function ProjectCreation() {
       history.push(ROUTE.HOME);
       return;
     }
-    const type = repository.values.type || RepositoryType.EXTERNAL;
+    const type = RepositoryType.EXTERNAL;
 
     const inputRepository: RepositoryInput = {
       type,
     };
 
-    if (type === RepositoryType.EXTERNAL) {
-      inputRepository.external = externalRepository.values;
-    }
+    // if (type === RepositoryType.EXTERNAL) {
+    //   inputRepository.external = externalRepository.values;
+    // }
 
     addNewProject({
       ...information.values,

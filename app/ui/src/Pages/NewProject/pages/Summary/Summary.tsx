@@ -3,7 +3,6 @@ import React, { FC } from 'react';
 import { CONFIG } from 'index';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
 import IconLink from '@material-ui/icons/Link';
-import { RepositoryType } from 'Graphql/types/globalTypes';
 import styles from './Summary.module.scss';
 import { useReactiveVar } from '@apollo/client';
 import { newProject } from 'Graphql/client/cache';
@@ -32,7 +31,7 @@ const Section: FC<SectionProps> = ({ title, children }) => (
 );
 
 function Summary() {
-  const { information, repository, externalRepository } = useReactiveVar(newProject);
+  const { information, repository } = useReactiveVar(newProject);
   const { name, description, id } = information.values;
 
   return (
@@ -48,8 +47,8 @@ function Summary() {
           <div className={styles.repository}>
             <div className={styles.urlContainer}>
               <IconLink className="icon-regular" />
-              <p className={styles.url}>{externalRepository.values.url}</p>
-              <CopyToClipboard>{externalRepository.values.url}</CopyToClipboard>
+              <p className={styles.url}>{repository.values.url}</p>
+              <CopyToClipboard>{repository.values.url}</CopyToClipboard>
             </div>
           </div>
         </Field>

@@ -195,6 +195,20 @@ func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.Remo
 	return nil, entity.ErrNotImplemented
 }
 
+// SetActiveUserTools is the resolver for the setActiveUserTools field.
+func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error) {
+	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
+
+	if input.Active {
+		u, err := r.users.StartTools(ctx, email, input.RuntimeID, input.CapabilitiesID)
+		return &u, err
+	}
+
+	u, err := r.users.StopTools(ctx, email)
+
+	return &u, err
+}
+
 // CreationDate is the resolver for the creationDate field.
 func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project) (string, error) {
 	return obj.CreationDate.Format(time.RFC3339), nil
@@ -296,17 +310,15 @@ func (r *queryResolver) QualityProjectDesc(ctx context.Context, description stri
 	panic(entity.ErrNotImplemented) // implemented in knowledge galaxy server
 }
 
-// RunningCapability is the resolver for the runningCapability field.
-func (r *queryResolver) RunningCapability(ctx context.Context) (*model.Capability, error) {
+// Runtimes is the resolver for the runtimes field.
+func (r *queryResolver) Runtimes(ctx context.Context) ([]entity.Runtime, error) {
 	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
 
 	user, err := r.users.GetByEmail(ctx, email)
 	if err != nil {
-		return &model.Capability{}, err
+		return nil, err
 	}
-
-	capabilities, err := r.capabilities.GetRunningCapability(ctx, user.Username)
-	return capabilities, err
+	return r.runtimes.GetRuntimes(ctx, user.Username)
 }
 
 // RunningRuntime is the resolver for the runningRuntime field.
@@ -325,9 +337,38 @@ func (r *queryResolver) RunningRuntime(ctx context.Context) (*entity.Runtime, er
 func (r *queryResolver) Runtimes(ctx context.Context) ([]entity.Runtime, error) {
 	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
 
+// RunningCapability is the resolver for the runningCapability field.
+func (r *queryResolver) RunningCapability(ctx context.Context) (*model.Capability, error) {
+	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
+
 	user, err := r.users.GetByEmail(ctx, email)
 	if err != nil {
-		return nil, err
+		return &model.Capability{}, err
+	}
+
+	capabilities, err := r.capabilities.GetRunningCapability(ctx, user.Username)
+	return capabilities, err
+}
+
+// Kubeconfig is the resolver for the kubeconfig field.
+func (r *queryResolver) Kubeconfig(ctx context.Context) (string, error) {
+	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
+
+	user, err := r.users.GetByEmail(ctx, email)
+	if err != nil {
+		return "", err
+	}
+
+	k, err := r.users.GetKubeconfig(ctx, user.Username)
+
+	return k, err
+}
+
+// URL is the resolver for the url field.
+func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (string, error) {
+	switch obj.Type {
+	case entity.RepositoryTypeExternal:
+		return obj.ExternalRepoURL, nil
 	}
 	return r.runtimes.GetRuntimes(ctx, user.Username)
 }

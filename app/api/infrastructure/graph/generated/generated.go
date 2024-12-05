@@ -976,11 +976,93 @@ type ApiToken {
   token: String!
 }
 
-type SSHKey {
-  public: String!
-  private: String!
-  creationDate: String!
-  lastActivity: String
+type Member {
+  user: User!
+  accessLevel: AccessLevel!
+  addedDate: String!
+}
+
+type ToolUrls {
+  knowledgeGalaxy: String!
+  filebrowser: String!
+  vscode: String!
+  mlflow: String!
+}
+
+enum AccessLevel {
+  VIEWER
+  MANAGER
+  ADMIN
+}
+
+input ApiTokenInput {
+  userId: ID!
+  name: String
+}
+
+input UpdateProjectInput {
+  id: ID!
+  name: String
+  description: String
+  archived: Boolean
+}
+
+input DeleteProjectInput {
+  id: ID!
+}
+
+input AddMembersInput {
+  projectId: ID!
+  userIds: [ID!]!
+}
+
+input RemoveMembersInput {
+  projectId: ID!
+  userIds: [ID!]!
+}
+
+input RemoveApiTokenInput {
+  apiTokenId: ID!
+}
+
+input UpdateMembersInput {
+  projectId: ID!
+  userIds: [ID!]!
+  accessLevel: AccessLevel!
+}
+
+input RemoveUsersInput {
+  userIds: [ID!]!
+}
+
+input AddUserInput {
+  email: String!
+  username: String!
+  password: String!
+  accessLevel: AccessLevel!
+}
+
+input UpdateAccessLevelInput {
+  userIds: [ID!]!
+  accessLevel: AccessLevel!
+}
+
+input CreateProjectInput {
+  id: ID!
+  name: String!
+  description: String!
+  repository: RepositoryInput!
+}
+
+input SetBoolFieldInput {
+  id: ID!
+  value: Boolean!
+}
+
+input SetActiveUserToolsInput {
+  active: Boolean!,
+  runtimeId: String,
+  capabilitiesId: String
 }
 
 type Project {

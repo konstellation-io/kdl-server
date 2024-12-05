@@ -43,7 +43,7 @@ releases:
     inherit:
     - template: default
 
-  - name: "mongodb-string-uri"
+  - name: "initial-resources"
     <<: *default
     chart: bedag/raw
     version: 2.0.0
@@ -56,12 +56,18 @@ releases:
   - name: "kdl-local"
     <<: *default
     chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
-    version: 6.0.3-rc.6
+    version: 6.0.3-rc.1
     needs:
-    - kdl/mongodb-string-uri
     - kdl/initial-resources
 
   - name: "mongodb-initial-data"
+    <<: *default
+    chart: bedag/raw
+    version: 2.0.0
+    needs:
+    - kdl/kdl-local
+
+  - name: "keycloak-initial-data"
     <<: *default
     chart: bedag/raw
     version: 2.0.0

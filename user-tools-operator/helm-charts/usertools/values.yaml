@@ -3,28 +3,6 @@ global:
   env: {}
     # MY_VARIABLE: value
 
-  # -- Variables from secrets
-  envFromSecrets: {}
-    # MY_VARIABLE:
-    #  name: <name-secret>
-    #  key: secret_key
-
-  # -- Variables from configMap
-  envFromConfigMap: {}
-    # MY_VARIABLE:
-    #  name: <name-configmap>
-    #  key: key
-
-  # -- Variables from files managed by you
-  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables
-  envFromFiles: {}
-    # - secretRef:
-    #     name: <name-secret>
-    # - configMapRef:
-    #     name: <name-configmap>
-
-domain: kdl.local
-
 ingress:
   className: "nginx"
   annotations:
@@ -52,7 +30,7 @@ oauth2Proxy:
   image:
     # -- Image repository
     repository: quay.io/oauth2-proxy/oauth2-proxy
-    # -- Image pull policy
+    tag: v7.7.1-amd64
     pullPolicy: IfNotPresent
     # -- Image tag
     tag: v7.0.1-amd64
@@ -148,6 +126,7 @@ kubeconfig:
 
 # -- vscode
 vscode:
+  enabled: false
   image:
     # -- Image repository
     repository: konstellation/vscode

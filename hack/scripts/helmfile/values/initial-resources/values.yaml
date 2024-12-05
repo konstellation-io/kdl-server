@@ -407,7 +407,7 @@ resources:
               "enabled": true,
               "alwaysDisplayInConsole": true,
               "clientAuthenticatorType": "client-secret",
-              "secret": "**********",
+              "secret": "proxy654321",
               "redirectUris": [
                 "https://kdlapp.kdl.10.0.1.1.nip.io/oauth2/callback"
               ],

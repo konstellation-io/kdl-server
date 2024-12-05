@@ -1,4 +1,4 @@
-package middleware
+package middleware_test
 
 import (
 	"context"
@@ -12,15 +12,14 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 
 	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
@@ -35,8 +34,7 @@ type userMocks struct {
 	capabilitiesRepo *capabilities.MockRepository
 	sshGenerator     *sshhelper.MockSSHKeyGenerator
 	clock            *clock.MockClock
-	giteaService     *giteaservice.MockGiteaClient
-	k8sClient        *k8s.MockClient
+	k8sClient        *k8s.MockClientInterface
 }
 
 type AuthMiddlewareTestSuite struct {
@@ -59,23 +57,22 @@ func (ts *AuthMiddlewareTestSuite) SetupSuite() {
 	ts.mocks.capabilitiesRepo = capabilities.NewMockRepository(ts.ctrl)
 	ts.mocks.clock = clock.NewMockClock(ts.ctrl)
 	ts.mocks.sshGenerator = sshhelper.NewMockSSHKeyGenerator(ts.ctrl)
-	ts.mocks.giteaService = giteaservice.NewMockGiteaClient(ts.ctrl)
-	ts.mocks.k8sClient = k8s.NewMockClient(ts.ctrl)
+	ts.mocks.k8sClient = k8s.NewMockClientInterface(ts.ctrl)
 
 	zapLog, err := zap.NewDevelopment()
-	require.NoError(ts.T(), err)
+	ts.Require().NoError(err)
 
 	ts.mocks.logger = zapr.NewLogger(zapLog)
 
 	ts.mocks.cfg = config.Config{}
 
 	ts.interactor = user.NewInteractor(ts.mocks.logger, ts.mocks.cfg, ts.mocks.repo, ts.mocks.runtimeRepo,
-		ts.mocks.capabilitiesRepo, ts.mocks.sshGenerator, ts.mocks.clock, ts.mocks.giteaService, ts.mocks.k8sClient)
+		ts.mocks.capabilitiesRepo, ts.mocks.sshGenerator, ts.mocks.clock, ts.mocks.k8sClient)
 }
 
 func (ts *AuthMiddlewareTestSuite) TestAuthMiddlewareNoEmailHeader() {
 	// Arrange
-	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
+	handlerFunc := http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {})
 
 	req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
 	req.Header.Set("X-Forwarded-User", "john")
@@ -83,7 +80,7 @@ func (ts *AuthMiddlewareTestSuite) TestAuthMiddlewareNoEmailHeader() {
 
 	res := httptest.NewRecorder()
 
-	authM := AuthMiddleware(handlerFunc, ts.interactor)
+	authM := middleware.AuthMiddleware(handlerFunc, ts.interactor)
 	authM.ServeHTTP(res, req)
 
 	// Assert
@@ -92,7 +89,7 @@ func (ts *AuthMiddlewareTestSuite) TestAuthMiddlewareNoEmailHeader() {
 
 func (ts *AuthMiddlewareTestSuite) TestAuthMiddlewareNoUserHeader() {
 	// Arrange
-	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
+	handlerFunc := http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {})
 
 	req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
 	req.Header.Set("X-Forwarded-User", "")
@@ -100,7 +97,7 @@ func (ts *AuthMiddlewareTestSuite) TestAuthMiddlewareNoUserHeader() {
 
 	res := httptest.NewRecorder()
 
-	authM := AuthMiddleware(handlerFunc, ts.interactor)
+	authM := middleware.AuthMiddleware(handlerFunc, ts.interactor)
 	authM.ServeHTTP(res, req)
 
 	// Assert
@@ -112,7 +109,8 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	const (
 		id            = "user.1234"
 		email         = "user@email.com"
-		username      = "john"
+		username      = "user"
+		sub           = "d5d70477-5192-4182-b80e-5d34550eb4fe"
 		accessLevel   = entity.AccessLevelViewer
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"
@@ -130,6 +128,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	u := entity.User{
 		Username:     username,
 		Email:        email,
+		Sub:          sub,
 		AccessLevel:  accessLevel,
 		SSHKey:       sshKey,
 		CreationDate: now,
@@ -138,6 +137,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 		ID:           id,
 		Username:     username,
 		Email:        email,
+		Sub:          sub,
 		AccessLevel:  accessLevel,
 		SSHKey:       sshKey,
 		CreationDate: now,
@@ -146,6 +146,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
+	ts.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.clock.EXPECT().Now().Return(now)
 	ts.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	ts.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
@@ -154,18 +155,17 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	ts.mocks.k8sClient.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
 
 	// Act
-	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ts.Equal(r.Context().Value(LoggedUserEmailKey), email)
-		ts.Equal(r.Context().Value(LoggedUserNameKey), username)
+	handlerFunc := http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+		ts.Equal(email, r.Context().Value(middleware.LoggedUserEmailKey))
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
 	req.Header.Set("X-Forwarded-Email", email)
-	req.Header.Set("X-Forwarded-User", username)
+	req.Header.Set("X-Forwarded-User", sub)
 
 	res := httptest.NewRecorder()
 
-	authM := AuthMiddleware(handlerFunc, ts.interactor)
+	authM := middleware.AuthMiddleware(handlerFunc, ts.interactor)
 	authM.ServeHTTP(res, req)
 
 	// Assert
@@ -185,9 +185,8 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameFound() {
 	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, nil)
 
 	// Act
-	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ts.Equal(r.Context().Value(LoggedUserEmailKey), email)
-		ts.Equal(r.Context().Value(LoggedUserNameKey), username)
+	handlerFunc := http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+		ts.Equal(email, r.Context().Value(middleware.LoggedUserEmailKey))
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
@@ -196,7 +195,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameFound() {
 
 	res := httptest.NewRecorder()
 
-	authM := AuthMiddleware(handlerFunc, ts.interactor)
+	authM := middleware.AuthMiddleware(handlerFunc, ts.interactor)
 	authM.ServeHTTP(res, req)
 
 	// Assert

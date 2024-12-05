@@ -19,14 +19,6 @@ global:
     tls:
       enabled: {{ requiredEnv "ENABLE_TLS" }}
       secretName: {{ requiredEnv "DOMAIN" }}-tls-secret
-#      caSecret:
-#        name: mkcert-ca
-#        certFilename: mkcert-ca.crt
-
-  mongodb:
-    connectionString:
-      secretKey: mongodb-string-uri
-      secretName: mongodb-string-uri
 
 image:
   repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-server
@@ -34,38 +26,14 @@ image:
   pullPolicy: Always
 
 env:
+  KDL_ADMIN_EMAIL: "test@test.com"
+  KDL_ADMIN_USERNAME: {{ requiredEnv "KEYCLOAK_ADMIN_USER" | quote }}
+  KDL_SERVER_MONGODB_URI: "mongodb://kdl:123456@mongodb:27017/kdl?authSource=kdl&authMechanism=SCRAM-SHA-256"
   KDL_SERVER_PORT: "8080"
+  MINIO_ACCESS_KEY: "minio"
+  MINIO_ENDPOINT: "minio:9000"
+  MINIO_SECRET_KEY: "minio123"
   SERVER_URL: https://kdlapp.{{ requiredEnv "DOMAIN" }}
-  MINIO_ACCESS_KEY: minio
-  MINIO_SECRET_KEY: minio123
-
-envFromSecrets: {}
-  # MY_VARIABLE:
-  #  name: <name-secret>
-  #  key: secret_key
-
-envFromConfigMap: {}
-  # MY_VARIABLE:
-  #  name: <name-configmap>
-  #  key: key
-
-ingress:
-  enabled: false
-  className: "public"
-  annotations:
-    cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-    nginx.ingress.kubernetes.io/server-snippet: |
-      client_header_buffer_size 800k;
-
-  hosts:
-  - host: kdlapp.{{ requiredEnv "DOMAIN" }}
-    paths:
-    - path: /
-      pathType: ImplementationSpecific
-  tls:
-    - secretName: {{ requiredEnv "DOMAIN" }}-kdl-secret
-      hosts:
-      - kdlapp.{{ requiredEnv "DOMAIN" }}
 
 readyChecker:
   enabled: false
@@ -73,42 +41,6 @@ readyChecker:
 service:
   type: ClusterIP
   port: 80
-  targetPort: 8080
-
-podAnnotations:
-  env: "microk8s"
-
-podLabels:
-  env: "develop"
-
-volumes:
-  - name: kdl-server
-    configMap:
-      name: kdl-local-server
-
-volumeMounts:
-  - name: kdl-server
-    mountPath: /public/config.json
-    subPath: config.json
-
-gitea:
-  enabled: true
-
-  admin:
-    username: {{ requiredEnv "GITEA_ADMIN_USER" | quote }}
-    password: {{ requiredEnv "GITEA_ADMIN_PASSWORD" | quote }}
-
-  ingress:
-    className: "public"
-
-  storage:
-    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-
-giteaOauth2Setup:
-  image:
-    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/gitea-oauth2-setup
-    tag: latest
-    pullPolicy: Always
 
 # -- Keycloak subchart deployment
 # </br> Ref: https://github.com/konstellation-io/helm-charts/blob/konstellation-base-1.0.2/charts/konstellation-base/values.yaml
@@ -191,22 +123,6 @@ knowledgeGalaxy:
     repository: {{ requiredEnv "KNOWLEDGE_GALAXY_IMAGE_REPOSITORY" | quote }}
     tag: {{ env "KNOWLEDGE_GALAXY_IMAGE_TAG" | quote }}
 
-# -- (DEPRECATION) Legacy issues
-# minio:
-#   enabled: true
-#   resources:
-#     requests:
-#       memory: 1Gi
-#   mode: standalone
-#   rootUser: "minio"
-#   rootPassword: "minio123"
-#   serviceAccount:
-#     create: false
-#   persistence:
-#     storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-#     existingClaim: ""
-#     accessMode: ReadWriteMany
-
 # -- MinIO subchart deployment
 # </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/minio/values.yaml
 minio:
@@ -222,21 +138,42 @@ minio:
     ingressClassName: public
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-    hostname: minio-console.{{ requiredEnv "DOMAIN" }}
-    tls: true
+      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+    path: /
+    hosts:
+      - minio.{{ requiredEnv "DOMAIN" }}
+    tls:
+      - secretName: minio-tls
+        hosts:
+        - minio.{{ requiredEnv "DOMAIN" }}
 
-  apiIngress:
+  consoleIngress:
     enabled: true
     ingressClassName: public
-    hostname: minio.{{ requiredEnv "DOMAIN" }}
+    annotations:
+      cert-manager.io/cluster-issuer: selfsigned-clusterissuer
+      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+    path: /
+    hosts:
+      - minio-console.{{ requiredEnv "DOMAIN" }}
+    tls:
+      - secretName: minio-console-tls
+        hosts:
+        - minio-console.{{ requiredEnv "DOMAIN" }}
 
-  auth:
-    rootUser: minio
-    rootPassword: minio123
+  rootUser: minio
+  rootPassword: minio123
 
   persistence:
     enabled: true
     storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+    existingClaim: "kdl-local-claim"
+    size: 1Gi
+    accessMode: ReadWriteMany
+
+  resources:
+    requests:
+      memory: 1Gi
 
 # -- MongoDB subchart deployment
 # </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/mongodb/values.yaml
@@ -265,28 +202,6 @@ mongodb:
     enabled: true
     storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
-# (DEPRECATION) legacy, remove in future versions
-# OAuth2-Proxy legacy to configure user authentication
-oauth2Proxy:
-  image:
-    repository: quay.io/oauth2-proxy/oauth2-proxy
-    tag: v7.7.1-amd64
-
-  customConfig: |-
-    provider="keycloak-oidc"
-    oidc_issuer_url="https://keycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl"
-    redirect_url="https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
-    cookie_secret="mycookiesecret16"
-    cookie_secure=true
-    email_domains="*"
-    set_xauthrequest=true
-    http_address="https://kdlapp.{{ requiredEnv "DOMAIN" }}/"
-    ssl_insecure_skip_verify=true
-    whitelist_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}"]
-    cookie_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}", "keycloak.{{ requiredEnv "DOMAIN" }}"]
-    errors_to_info_log=true
-    skip_provider_button=true
-
 # -- OAuth2-Proxy subchart deployment
 # </br> Ref: https://github.com/oauth2-proxy/manifests/blob/main/helm/oauth2-proxy/values.yaml
 oauth2proxy:
@@ -301,57 +216,47 @@ oauth2proxy:
       - kdlapp.{{ requiredEnv "DOMAIN" }}
 
   httpScheme: http
-  cookieSecret: mycookiesecret16
 
   image:
     tag: "v7.7.1-amd64"
 
-  extraArgs:
-    - "--upstream=http://kdl-local-server:80/"
-    - "--upstream=http://127.0.0.1:9000/mlflow/"
-    - "--upstream=http://127.0.0.1:9000/filebrowser/"
-    - "--upstream=http://127.0.0.1:9000/kg/"
-    - "--pass-user-headers=true"
-    - "--skip-auth-route=/config.json"
   config:
     clientID: proxy
-    clientSecret: Zj6LksErcd51Q5LQS1YH4WLsTu3YVI4M
+    clientSecret: proxy654321
+    cookieSecret: mycookiesecret16
+
     configFile: |-
-      provider="keycloak-oidc"
-      oidc_issuer_url="https://keycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl"
-      redirect_url="https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
-      cookie_secret="mycookiesecret16"
+      upstreams=["http://kdl-local-server:80/", "http://127.0.0.1:9000/mlflow/", "http://127.0.0.1:9000/filebrowser/", "http://127.0.0.1:9000/kg/"]
+      cookie_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}", "keycloak.{{ requiredEnv "DOMAIN" }}"]
+      cookie_samesite="lax"
       cookie_secure=true
       email_domains="*"
-      set_xauthrequest=true
+      errors_to_info_log=true
       http_address="https://kdlapp.{{ requiredEnv "DOMAIN" }}/"
+      oidc_issuer_url="https://keycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl"
+      pass_user_headers=true
+      provider="keycloak-oidc"
+      redirect_url="https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
+      set_xauthrequest=true
+      skip_auth_routes="/config.json"
+      skip_provider_button=true
       ssl_insecure_skip_verify=true
       whitelist_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}"]
-      cookie_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}", "keycloak.{{ requiredEnv "DOMAIN" }}"]
-      errors_to_info_log=true
-      skip_provider_button=true
 
   extraContainers:
-     - name: project-proxy
-       image: nginx:alpine
-       ports:
-         - containerPort: 9000
-       volumeMounts:
-         - name: project-proxy-nginx-config
-           mountPath: /etc/nginx/nginx.conf
-           subPath: nginx.conf
+    - name: project-proxy
+      image: nginx:alpine
+      ports:
+        - containerPort: 9000
+      volumeMounts:
+        - name: project-proxy-nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
 
   extraVolumes:
     - name: project-proxy-nginx-config
       configMap:
         name: project-proxy-nginx-config
-
-# -- (DEPRECATION) only for gitea
-postgres:
-  dbName: gitea
-  dbPassword: gitea
-  storage:
-    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
 # -- PostgreSQL subchart deployment
 # </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/postgresql/values.yaml
@@ -395,12 +300,14 @@ projectOperator:
 
   filebrowser:
     image:
-      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/filebrowser/filebrowser
+      repository: filebrowser/filebrowser
       pullPolicy: Always
-      tag: latest
+      tag: v2
 
 sharedVolume:
   enabled: true
+
+  name: kdl-local
 
   storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
@@ -422,6 +329,8 @@ userToolsOperator:
       pullPolicy: Always
 
   vscode:
+    enabled: false
+
     image:
       repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/vscode
       tag: latest

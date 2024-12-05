@@ -14,9 +14,7 @@ func DevAuthMiddleware(next http.Handler, _ user.UseCase) http.Handler {
 	// For development environments with the Auth from environment variables
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		email := os.Getenv("KDL_ADMIN_EMAIL")
-		username := os.Getenv("KDL_ADMIN_USERNAME")
 
-		r = r.WithContext(context.WithValue(r.Context(), LoggedUserNameKey, username))
 		r = r.WithContext(context.WithValue(r.Context(), LoggedUserEmailKey, email))
 
 		next.ServeHTTP(w, r)

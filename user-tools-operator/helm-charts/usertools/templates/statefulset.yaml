@@ -19,9 +19,31 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
-        {{- with .Values.initContainers }}
-          {{- toYaml . | nindent 8 }}
-        {{- end }}
+        - name: create-kubeconfig
+          image: alpine/k8s:1.20.7
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - /generate-kubeconfig.sh
+          volumeMounts:
+            - name: user-pvc
+              mountPath: /home/coder
+            - name: kubeconfig-tpl-configmap
+              mountPath: /kubeconfig.tpl
+              subPath: kubeconfig.tpl
+            - name: kubeconfig-tpl-configmap
+              mountPath: /generate-kubeconfig.sh
+              subPath: generate-kubeconfig.sh
+        - name: create-ssh-folder
+          image: alpine:3.10
+          imagePullPolicy: IfNotPresent
+          command:
+          - sh
+          - -c
+          - mkdir -p /home/kdl/.ssh && chown 1000:1000 /home/kdl/.ssh
+          volumeMounts:
+            - name: user-pvc
+              mountPath: /home/kdl
       containers:
         - name: {{ .Chart.Name }}-repo-cloner
           image: {{ .Values.repoCloner.image.repository }}:{{ .Values.repoCloner.image.tag }}
@@ -111,11 +133,7 @@ spec:
               mountPath: /home/kdl/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
-            {{- with .Values.repoCloner.volumeMounts }}
-              {{- toYaml . | nindent 12 }}
-            {{- end }}
-          resources:
-            {{- toYaml .Values.repoCloner.resources | nindent 12 }}
+        {{- if .Values.vscode.enabled }}
         - name: {{ .Chart.Name }}-vscode
           image: {{ .Values.vscode.image.repository }}:{{ .Values.vscode.image.tag }}
           imagePullPolicy: {{ .Values.vscode.image.pullPolicy }}
@@ -209,11 +227,7 @@ spec:
               mountPath: /home/coder/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
-            {{- with .Values.vscode.volumeMounts }}
-              {{- toYaml . | nindent 12 }}
-            {{- end }}
-          resources:
-            {{- toYaml .Values.vscode.resources | nindent 12 }}
+        {{- end }}
         - name: {{ .Chart.Name }}-vscode-runtime
           image: {{ .Values.vscodeRuntime.image.repository }}:{{ .Values.vscodeRuntime.image.tag }}
           imagePullPolicy: {{ .Values.vscodeRuntime.image.pullPolicy }}
@@ -235,7 +249,7 @@ spec:
                   key: MINIO_SECRET_KEY
             - name: MINIO_ENDPOINT
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
                   name: kdl-server
                   key: MINIO_ENDPOINT
             - name: MC_HOST_dell
@@ -325,11 +339,7 @@ spec:
               mountPath: /home/coder/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
-            {{- with .Values.vscodeRuntime.volumeMounts }}
-              {{- toYaml . | nindent 12 }}
-            {{- end }}
-          resources:
-            {{- toYaml .Values.vscodeRuntime.resources | nindent 12 }}
+        {{- if .Values.vscode.enabled }}
         - name: {{ .Chart.Name }}-vscode-proxy
           image: {{ .Values.oauth2Proxy.image.repository }}:{{ .Values.oauth2Proxy.image.tag }}
           imagePullPolicy: {{ .Values.oauth2Proxy.image.pullPolicy }}
@@ -346,8 +356,6 @@ spec:
               containerPort: 4180
               protocol: TCP
           env:
-            - name: OAUTH2_PROXY_GITEA_USER
-              value: "{{ .Values.username }}"
             - name: OAUTH2_PROXY_HTTP_ADDRESS
               value: "0.0.0.0:4180"
             - name: OAUTH2_PROXY_CLIENT_ID
@@ -437,22 +445,20 @@ spec:
             - name: oauth2-config
               mountPath: /etc/oauth2_proxy.cfg
               subPath: oauth2_proxy.cfg
-            {{- with .Values.oauth2Proxy.volumeMounts }}
-              {{- toYaml . | nindent 12 }}
-            {{- end }}
-          resources:
-            {{- toYaml .Values.oauth2Proxy.resources | nindent 12 }}
-        {{- if .Values.extraContainers }}
-          {{- toYaml .Values.extraContainers | nindent 8 }}
-        {{- end }}
-      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+          ports:
+            - name: http
+              containerPort: 4180
+              protocol: TCP
+          {{- end }}
       volumes:
         - name: kubeconfig-tpl-configmap
           configMap:
             name: kubeconfig-{{ .Values.usernameSlug }}-tpl-configmap
+        {{- if .Values.vscode.enabled }}
         - name: oauth2-config
           configMap:
             name: {{ include "user-tools.fullname" . }}-oauth2-proxy
+        {{- end }}
         {{ if .Values.sharedVolume.name -}}
         - name: {{ .Values.sharedVolume.name }}
           persistentVolumeClaim:

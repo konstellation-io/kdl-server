@@ -20,7 +20,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
@@ -41,7 +40,6 @@ type userMocks struct {
 	capabilitiesRepo *capabilities.MockRepository
 	sshGenerator     *sshhelper.MockSSHKeyGenerator
 	clock            *clock.MockClock
-	giteaService     *giteaservice.MockGiteaClient
 	k8sClientMock    *k8s.MockClientInterface
 	logger           logr.Logger
 	cfg              config.Config
@@ -54,7 +52,6 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	repoCapabilities := capabilities.NewMockRepository(ctrl)
 	clockMock := clock.NewMockClock(ctrl)
 	sshGenerator := sshhelper.NewMockSSHKeyGenerator(ctrl)
-	giteaServiceMock := giteaservice.NewMockGiteaClient(ctrl)
 	k8sClientMock := k8s.NewMockClientInterface(ctrl)
 
 	zapLog, err := zap.NewDevelopment()
@@ -67,7 +64,7 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	}
 
 	interactor := user.NewInteractor(logger, *cfg, repo, repoRuntimes, repoCapabilities, sshGenerator,
-		clockMock, giteaServiceMock, k8sClientMock)
+		clockMock, k8sClientMock)
 
 	return &userSuite{
 		ctrl:       ctrl,
@@ -80,7 +77,6 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 			capabilitiesRepo: repoCapabilities,
 			sshGenerator:     sshGenerator,
 			clock:            clockMock,
-			giteaService:     giteaServiceMock,
 			k8sClientMock:    k8sClientMock,
 		},
 	}
@@ -93,7 +89,8 @@ func TestInteractor_Create(t *testing.T) {
 	const (
 		id            = "user.1234"
 		email         = "user@email.com"
-		username      = "john.doe"
+		username      = "user"
+		sub           = "f6717d2b-ac1f-40da-ade6-00037512933b"
 		accessLevel   = entity.AccessLevelAdmin
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"
@@ -111,6 +108,7 @@ func TestInteractor_Create(t *testing.T) {
 	u := entity.User{
 		Username:     username,
 		Email:        email,
+		Sub:          sub,
 		AccessLevel:  accessLevel,
 		SSHKey:       sshKey,
 		CreationDate: now,
@@ -119,6 +117,7 @@ func TestInteractor_Create(t *testing.T) {
 	expectedUser := entity.User{
 		ID:           id,
 		Username:     username,
+		Sub:          sub,
 		Email:        email,
 		AccessLevel:  accessLevel,
 		SSHKey:       sshKey,
@@ -127,6 +126,7 @@ func TestInteractor_Create(t *testing.T) {
 
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
@@ -134,7 +134,7 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
 
-	createdUser, err := s.interactor.Create(ctx, email, username, accessLevel)
+	createdUser, err := s.interactor.Create(ctx, email, sub, accessLevel)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, createdUser)
@@ -146,16 +146,17 @@ func TestInteractor_Create_UserDuplEmail(t *testing.T) {
 
 	const (
 		email       = "user@email.com"
-		username    = "john"
+		user        = "user"
+		sub         = "f6717d2b-ac1f-40da-ade6-00037512933b"
 		accessLevel = entity.AccessLevelAdmin
 	)
 
 	ctx := context.Background()
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, user).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, nil)
 
-	createdUser, err := s.interactor.Create(ctx, email, username, accessLevel)
+	createdUser, err := s.interactor.Create(ctx, email, sub, accessLevel)
 	assert.DeepEqual(t, entity.User{}, createdUser)
 	assert.ErrorIs(t, err, entity.ErrDuplicatedUser)
 }
@@ -166,15 +167,38 @@ func TestInteractor_Create_UserDuplUsername(t *testing.T) {
 
 	const (
 		email       = "user@email.com"
-		username    = "john"
+		user        = "user"
+		sub         = "f6717d2b-ac1f-40da-ade6-00037512933b"
 		accessLevel = entity.AccessLevelAdmin
 	)
 
 	ctx := context.Background()
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, user).Return(entity.User{}, nil)
 
-	createdUser, err := s.interactor.Create(ctx, email, username, accessLevel)
+	createdUser, err := s.interactor.Create(ctx, email, sub, accessLevel)
+	assert.DeepEqual(t, entity.User{}, createdUser)
+	assert.ErrorIs(t, err, entity.ErrDuplicatedUser)
+}
+
+func TestInteractor_Create_UserDuplSub(t *testing.T) {
+	s := newUserSuite(t, nil)
+	defer s.ctrl.Finish()
+
+	const (
+		email       = "user@email.com"
+		user        = "user"
+		sub         = "f6717d2b-ac1f-40da-ade6-00037512933b"
+		accessLevel = entity.AccessLevelAdmin
+	)
+
+	ctx := context.Background()
+
+	s.mocks.repo.EXPECT().GetByUsername(ctx, user).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, nil)
+
+	createdUser, err := s.interactor.Create(ctx, email, sub, accessLevel)
 	assert.DeepEqual(t, entity.User{}, createdUser)
 	assert.ErrorIs(t, err, entity.ErrDuplicatedUser)
 }
@@ -204,17 +228,18 @@ func TestInteractor_StopTools(t *testing.T) {
 
 	const (
 		username     = "john"
+		email        = "john@doe.com"
 		toolsRunning = true
 	)
 
 	ctx := context.Background()
-	expectedUser := entity.User{Username: username}
+	expectedUser := entity.User{Username: username, Email: email}
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(expectedUser, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 	s.mocks.k8sClientMock.EXPECT().DeleteUserToolsCR(ctx, username).Return(nil)
 
-	returnedUser, err := s.interactor.StopTools(ctx, username)
+	returnedUser, err := s.interactor.StopTools(ctx, email)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, returnedUser)
@@ -226,17 +251,18 @@ func TestInteractor_StopTools_Err(t *testing.T) {
 
 	const (
 		username     = "john"
+		email        = "john@doe.com"
 		toolsRunning = false
 	)
 
 	ctx := context.Background()
-	u := entity.User{Username: username}
+	u := entity.User{Username: username, Email: email}
 	emptyUser := entity.User{}
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(u, nil)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(u, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 
-	returnedUser, err := s.interactor.StopTools(ctx, username)
+	returnedUser, err := s.interactor.StopTools(ctx, email)
 
 	require.Equal(t, user.ErrStopUserTools, err)
 	require.Equal(t, returnedUser, emptyUser)
@@ -248,6 +274,7 @@ func TestInteractor_StartTools(t *testing.T) {
 
 	const (
 		username     = "john"
+		email        = "john@doe.com"
 		toolsRunning = false
 		runtimeImage = "konstellation/image"
 		runtimeTag   = "3.9"
@@ -266,15 +293,16 @@ func TestInteractor_StartTools(t *testing.T) {
 	runtimeID := "12345"
 
 	ctx := context.Background()
-	expectedUser := entity.User{Username: username}
+	expectedUser := entity.User{Username: username, Email: email}
 	expectedRuntime := entity.Runtime{ID: runtimeID, DockerImage: runtimeImage, DockerTag: runtimeTag}
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(expectedUser, nil)
 	s.mocks.runtimeRepo.EXPECT().Get(ctx, runtimeID).Return(expectedRuntime, nil)
 	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capability.ID).Return(capability, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeID, runtimeImage, runtimeTag, capability).Return(nil)
-	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeID, &capability.ID)
+
+	returnedUser, err := s.interactor.StartTools(ctx, email, &runtimeID, &capability.ID)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, returnedUser)
@@ -291,6 +319,7 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 
 	const (
 		username     = "john"
+		email        = "john@doe.com"
 		toolsRunning = false
 		runtimeID    = "default"
 	)
@@ -306,10 +335,10 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	expectedUser := entity.User{Username: username}
+	expectedUser := entity.User{Username: username, Email: email}
 
 	// AND the user is the in repo
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(expectedUser, nil)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(expectedUser, nil)
 	// AND the usertools for the user was not running
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
 
@@ -319,7 +348,7 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 		cfg.UserToolsVsCodeRuntime.Image.Repository, cfg.UserToolsVsCodeRuntime.Image.Tag, capability).Return(nil)
 
 	// WHEN the tools are started
-	returnedUser, err := s.interactor.StartTools(ctx, username, nil, &capability.ID)
+	returnedUser, err := s.interactor.StartTools(ctx, email, nil, &capability.ID)
 
 	// THEN
 	// There are no errors
@@ -339,6 +368,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 
 	const (
 		username     = "john"
+		email        = "john@doe.com"
 		toolsRunning = true
 		dockerImage  = "image"
 		dockerTag    = "3.9"
@@ -346,7 +376,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 
 	runtimeID := "12345"
 	expectedRuntime := entity.Runtime{ID: runtimeID, DockerImage: dockerImage, DockerTag: dockerTag}
-	expectedUser := entity.User{Username: username}
+	expectedUser := entity.User{Username: username, Email: email}
 
 	capability := entity.Capabilities{
 		ID:   "test_id",
@@ -361,7 +391,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 	ctx := context.Background()
 
 	// AND the user is the in repo
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).AnyTimes().Return(expectedUser, nil)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).AnyTimes().Return(expectedUser, nil)
 	// AND the runtime is in the repo
 	s.mocks.runtimeRepo.EXPECT().Get(ctx, runtimeID).Return(expectedRuntime, nil)
 	// AND the user-tools are running
@@ -374,7 +404,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, runtimeID, dockerImage, dockerTag, capability).Return(nil)
 
 	// WHEN the tools are started
-	returnedUser, err := s.interactor.StartTools(ctx, username, &runtimeID, &capability.ID)
+	returnedUser, err := s.interactor.StartTools(ctx, email, &runtimeID, &capability.ID)
 
 	// THEN there are no errors
 	require.NoError(t, err)
@@ -517,7 +547,6 @@ func TestInteractor_RegenerateSSHKeys(t *testing.T) {
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(false, nil)
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	s.mocks.k8sClientMock.EXPECT().UpdateUserSSHKeySecret(ctx, targetUser, publicSSHKey, privateSSHKey)
-	s.mocks.giteaService.EXPECT().UpdateSSHKey(username, sshKey.Public).Return(nil)
 	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, sshKey).Return(nil)
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(targetUser, nil).AnyTimes()
 
@@ -591,7 +620,6 @@ func TestInteractor_UpdateAccessLevel(t *testing.T) {
 
 	s.mocks.repo.EXPECT().UpdateAccessLevel(ctx, ids, accessLevel).Return(nil)
 	s.mocks.repo.EXPECT().FindByIDs(ctx, ids).Return(users, nil).AnyTimes()
-	s.mocks.giteaService.EXPECT().UpdateUserPermissions(username, accessLevel).Return(nil)
 
 	returnedUsers, err := s.interactor.UpdateAccessLevel(ctx, ids, accessLevel)
 

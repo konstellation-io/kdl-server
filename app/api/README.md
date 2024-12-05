@@ -8,11 +8,10 @@ In order to develop in a local environment there are several things to consider:
 
 1. You need kdl up and running
 2. Port-forward the mongodb inside kdl `kubectl -n kdl port-forward pods/kdl-mongo-0 27017:27017`
-3. Port-forward the gitea inside kdl `kubectl -n kdl port-forward pods/gitea-0 3001:3000`
-4. Port-forward the gitea inside kdl `kubectl -n kdl port-forward pods/[MINIO-POD-ID] 9001:9001`
-5. Load the environment variables (they are located in `app/api/.env.dev`):
-6. run `go run http/main.go` (or launch it from your preferred IDE)
-7. You can now access the graphQL playground at `http://localhost:3000/api/playground`
+3. Port-forward the minio inside kdl `kubectl -n kdl port-forward pods/[MINIO-POD-ID] 9001:9001`
+4. Load the environment variables (they are located in `app/api/.env.dev`):
+5. run `go run http/main.go` (or launch it from your preferred IDE)
+6. You can now access the graphQL playground at `http://localhost:3000/api/playground`
 
 ## Testing
 
@@ -49,16 +48,23 @@ go test ./... -tags=integration -v -cover
 
 ## Linters
 
-`golangci-lint` is a fast Go linters runner. It runs linters in parallel, uses caching, supports yaml config, has
-integrations with all major IDE and has dozens of linters included.
+`golangci-lint` is a fast Go linters runner. It runs linters in parallel, uses
+caching, supports yaml config, has integrations with all major IDE and has
+dozens of linters included.
 
-As you can see in the `.golangci.yml` config file of this repo, we enable more linters than the default and have more
-strict settings.
+As you can see in the `.github/.golangci.yml` config file of this repo, we
+enable more linters than the default and have more strict settings.
 
-To run `golangci-lint` execute:
+To run `golangci-lint` in the repository execute:
 
+```console
+make tidy
 ```
-golangci-lint run
+
+To run `golangci-lint` in the app/api folder execute:
+
+```console
+golangci-lint run --config ../../.github/.golangci.yml --build-tags=integration,unit
 ```
 
 ## Environment variables
@@ -77,15 +83,6 @@ golangci-lint run
 | KDL_SERVER_MONGODB_URI       |                | MongoDB URI for the KDL server              |
 | KDL_SERVER_MONGODB_NAME      |                | MongoDB Database name for the KDL server    |
 | POD_NAMESPACE                |                | Namespace for the KDL server                |
-
-### GITEA
-
-| Environment variable         | Default value          | Description                         |
-| ---------------------------- | ---------------------- | ----------------------------------- |
-| GITEA_ADMIN_USER             | kdladmin               | Admin user for the Gitea server     |
-| GITEA_ADMIN_PASSWORD         | 123456                 | Admin password for the Gitea server |
-| GITEA_URL                    | http://gitea.kdl.local | External URL for the Gitea server   |
-| GITEA_INTERNAL_URL           | http://gitea:3000      | Internal URL for the Gitea server   |
 
 ### KNOWLEDGE GALAXY
 
@@ -163,9 +160,6 @@ golangci-lint run
 | USER_TOOLS_OAUTH2_PROXY_IMG_PULLPOLICY       | IfNotPresent                                                         | Pull policy for the VSCode image                       |
 | USER_TOOLS_OAUTH2_PROXY_IMG_REPO             | quay.io/oauth2-proxy/oauth2-proxy                                    | Repository for the OAuth2 Proxy image                  |
 | USER_TOOLS_OAUTH2_PROXY_IMG_TAG              | v7.0.1-amd64                                                         | Tag for the OAuth2 Proxy image                         |
-| USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_PULLPOLICY | IfNotPresent                                                         | Pull policy for the Gitea oauth proxy image            |
-| USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_REPO       | konstellation/kdl-gitea-oauth2-setup                                 | Repository for the Gitea oauth proxy image             |
-| USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_TAG        | 0.16.0                                                               | Tag for the Gitea oauth proxy image                    |
 | USER_TOOLS_VSCODE_RUNTIME_IMG_PULLPOLICY     | IfNotPresent                                                         | Pull policy for the VSCode Runtime image               |
 | USER_TOOLS_VSCODE_RUNTIME_IMG_REPO           | konstellation/kdl-py                                                 | Repository for the VSCode Runtime image                |
 | USER_TOOLS_VSCODE_RUNTIME_IMG_TAG            | 3.9                                                                  | Tag for the VSCode Runtime image                       |

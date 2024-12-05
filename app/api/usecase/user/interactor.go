@@ -3,21 +3,21 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/go-logr/logr"
 	"github.com/gosimple/slug"
 	k8errors "k8s.io/apimachinery/pkg/api/errors"
 
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
-
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 )
 
 var (
@@ -33,7 +33,6 @@ type Interactor struct {
 	repoCapabilities capabilities.Repository
 	sshGenerator     sshhelper.SSHKeyGenerator
 	clock            clock.Clock
-	giteaService     giteaservice.GiteaClient
 	k8sClient        k8s.ClientInterface
 }
 
@@ -49,7 +48,6 @@ func NewInteractor(
 	repoCapabilities capabilities.Repository,
 	sshGenerator sshhelper.SSHKeyGenerator,
 	c clock.Clock,
-	giteaService giteaservice.GiteaClient,
 	k8sClient k8s.ClientInterface,
 ) UseCase {
 	return &Interactor{
@@ -60,19 +58,21 @@ func NewInteractor(
 		repoCapabilities: repoCapabilities,
 		sshGenerator:     sshGenerator,
 		clock:            c,
-		giteaService:     giteaService,
 		k8sClient:        k8sClient,
 	}
 }
 
 // Create add a new user to the server.
-// - If the user already exists (email and username must be unique) returns entity.ErrDuplicatedUser.
+// - If the user already exists (email, username and sub must be unique) returns entity.ErrDuplicatedUser.
 // - Generates a new SSH public/private keys.
-// - Adds the public SSH key to the user in Gitea.
 // - Stores the user and ssh keys into the DB.
 // - Creates a new secret in Kubernetes with the generated SSH keys.
 // - Created a service account for the user.
-func (i *Interactor) Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error) {
+func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel entity.AccessLevel) (entity.User, error) {
+	// extract username from email
+	username := kdlutil.GetUsernameFromEmail(email)
+
+	fmt.Println("Creating user", "username", username, "email", email)
 	i.logger.Info("Creating user", "username", username, "email", email)
 
 	// Check if the user already exists
@@ -94,6 +94,15 @@ func (i *Interactor) Create(ctx context.Context, email, username string, accessL
 		return entity.User{}, err
 	}
 
+	_, err = i.repo.GetBySub(ctx, sub)
+	if err == nil {
+		return entity.User{}, entity.ErrDuplicatedUser
+	}
+
+	if !errors.Is(err, entity.ErrUserNotFound) {
+		return entity.User{}, err
+	}
+
 	// Create SSH public and private keys
 	keys, err := i.sshGenerator.NewKeys()
 	if err != nil {
@@ -105,6 +114,7 @@ func (i *Interactor) Create(ctx context.Context, email, username string, accessL
 	user := entity.User{
 		Username:     username,
 		Email:        email,
+		Sub:          sub,
 		AccessLevel:  accessLevel,
 		CreationDate: i.clock.Now(),
 		SSHKey:       keys,
@@ -146,15 +156,15 @@ func (i *Interactor) GetByEmail(ctx context.Context, email string) (entity.User,
 	return i.repo.GetByEmail(ctx, email)
 }
 
-// StartTools creates a user-tools CustomResource in K8s to initialize the VSCode for the given username.
+// StartTools creates a user-tools CustomResource in K8s to initialize the VSCode for the given email.
 // If there are already a user-tools for the user, they are replaced (stop + start new).
-func (i *Interactor) StartTools(ctx context.Context, username string, runtimeID, capabilitiesID *string) (entity.User, error) {
-	user, err := i.repo.GetByUsername(ctx, username)
+func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, capabilitiesID *string) (entity.User, error) {
+	user, err := i.repo.GetByEmail(ctx, email)
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	running, err := i.AreToolsRunning(ctx, username)
+	running, err := i.AreToolsRunning(ctx, user.Username)
 
 	if err != nil {
 		return entity.User{}, err
@@ -162,7 +172,7 @@ func (i *Interactor) StartTools(ctx context.Context, username string, runtimeID,
 
 	if running {
 		// ignore the user returned by the stop, as it the same as we already have
-		_, err := i.StopTools(ctx, username)
+		_, err := i.StopTools(ctx, email)
 		if err != nil {
 			return entity.User{}, err
 		}
@@ -195,9 +205,9 @@ func (i *Interactor) StartTools(ctx context.Context, username string, runtimeID,
 		}
 	}
 
-	i.logger.Info("Creating user tools for user", "username", username)
+	i.logger.Info("Creating user tools for user", "email", email)
 
-	err = i.k8sClient.CreateUserToolsCR(ctx, username, rID, rImage, rTag, retrievedCapabilities)
+	err = i.k8sClient.CreateUserToolsCR(ctx, user.Username, rID, rImage, rTag, retrievedCapabilities)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -205,14 +215,14 @@ func (i *Interactor) StartTools(ctx context.Context, username string, runtimeID,
 	return user, nil
 }
 
-// StopTools removes a created user-tools CustomResource from K8s for the given username.
-func (i *Interactor) StopTools(ctx context.Context, username string) (entity.User, error) {
-	user, err := i.repo.GetByUsername(ctx, username)
+// StopTools removes a created user-tools CustomResource from K8s for the given email.
+func (i *Interactor) StopTools(ctx context.Context, email string) (entity.User, error) {
+	user, err := i.repo.GetByEmail(ctx, email)
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	running, err := i.AreToolsRunning(ctx, username)
+	running, err := i.AreToolsRunning(ctx, user.Username)
 
 	if err != nil {
 		return entity.User{}, err
@@ -222,9 +232,9 @@ func (i *Interactor) StopTools(ctx context.Context, username string) (entity.Use
 		return entity.User{}, ErrStopUserTools
 	}
 
-	i.logger.Info("Deleting user tools for user", "username", username)
+	i.logger.Info("Deleting user tools for user", "username", user.Username)
 
-	err = i.k8sClient.DeleteUserToolsCR(ctx, username)
+	err = i.k8sClient.DeleteUserToolsCR(ctx, user.Username)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -254,22 +264,8 @@ func (i *Interactor) GetByID(ctx context.Context, userID string) (entity.User, e
 
 // UpdateAccessLevel update access level for the given identifiers.
 func (i *Interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error) {
-	// Update user permissions in Gitea
-	users, err := i.FindByIDs(ctx, userIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, user := range users {
-		err := i.giteaService.UpdateUserPermissions(user.Username, level)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	// Update access level in our DataBase
-	err = i.repo.UpdateAccessLevel(ctx, userIDs, level)
-	if err != nil {
+	if err := i.repo.UpdateAccessLevel(ctx, userIDs, level); err != nil {
 		return nil, err
 	}
 
@@ -281,7 +277,6 @@ func (i *Interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, le
 // - Check if userTools are Running. (if yes, returns ErrUserNotFound error)
 // - Generate a new ssh key pair
 // - Check if k8s secret exists. If yes, update it. Else, create it.
-// - Update public key on Gitea
 // - Update ssh keys for user in database.
 func (i *Interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error) {
 	i.logger.Info("Regenerating user SSH keys for user", "username", user.Username)
@@ -304,12 +299,6 @@ func (i *Interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 
 	// Update the user SSH keys secret in k8s.
 	err = i.k8sClient.UpdateUserSSHKeySecret(ctx, user, keys.Public, keys.Private)
-	if err != nil {
-		return entity.User{}, err
-	}
-
-	// Update public key on Gitea
-	err = i.giteaService.UpdateSSHKey(user.Username, keys.Public)
 	if err != nil {
 		return entity.User{}, err
 	}

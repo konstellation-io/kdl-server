@@ -29,16 +29,6 @@ func (r *memberResolver) AddedDate(ctx context.Context, obj *entity.Member) (str
 	return obj.AddedDate.Format(time.RFC3339), nil
 }
 
-// RemoveUsers is the resolver for the removeUsers field.
-func (r *mutationResolver) RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error) {
-	return nil, entity.ErrNotImplemented
-}
-
-// UpdateAccessLevel is the resolver for the updateAccessLevel field.
-func (r *mutationResolver) UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]entity.User, error) {
-	return r.users.UpdateAccessLevel(ctx, input.UserIds, input.AccessLevel)
-}
-
 // RegenerateSSHKey is the resolver for the regenerateSSHKey field.
 func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.User, error) {
 	loggedUser, err := r.getLoggedUser(ctx)
@@ -54,61 +44,28 @@ func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.User, 
 	return &loggedUser, nil
 }
 
-// CreateProject is the resolver for the createProject field.
-func (r *mutationResolver) CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error) {
-	loggedUser, err := r.getLoggedUser(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	opts := project.CreateProjectOption{
-		ProjectID:   input.ID,
-		Name:        input.Name,
-		Description: input.Description,
-		RepoType:    input.Repository.Type,
-		Owner:       loggedUser,
-	}
-
-	if input.Repository.External != nil {
-		opts.ExternalRepoURL = &input.Repository.External.URL
-		opts.ExternalRepoUsername = &input.Repository.External.Username
-		opts.ExternalRepoCredential = input.Repository.External.Credential
-		opts.ExternalRepoAuthMethod = input.Repository.External.AuthMethod
-	}
-
-	createdProject, err := r.projects.Create(ctx, opts)
-	if err != nil {
-		r.logger.Error(err, "Error creating project")
-	}
-
-	return &createdProject, err
+// RemoveUsers is the resolver for the removeUsers field.
+func (r *mutationResolver) RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error) {
+	return nil, entity.ErrNotImplemented
 }
 
-// UpdateProject is the resolver for the updateProject field.
-func (r *mutationResolver) UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error) {
-	p, err := r.projects.Update(ctx, project.UpdateProjectOption{
-		ProjectID:   input.ID,
-		Name:        input.Name,
-		Description: input.Description,
-		Archived:    input.Archived,
-	})
+// SetActiveUserTools is the resolver for the setActiveUserTools field.
+func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error) {
+	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
 
-	return &p, err
-}
-
-// DeleteProject is the resolver for the deleteProject field.
-func (r *mutationResolver) DeleteProject(ctx context.Context, input model.DeleteProjectInput) (*entity.Project, error) {
-	loggedUser, err := r.getLoggedUser(ctx)
-	if err != nil {
-		return nil, err
+	if input.Active {
+		u, err := r.users.StartTools(ctx, email, input.RuntimeID, input.CapabilitiesID)
+		return &u, err
 	}
 
-	p, err := r.projects.Delete(ctx, project.DeleteProjectOption{
-		LoggedUser: loggedUser,
-		ProjectID:  input.ID,
-	})
+	u, err := r.users.StopTools(ctx, email)
 
-	return p, err
+	return &u, err
+}
+
+// UpdateAccessLevel is the resolver for the updateAccessLevel field.
+func (r *mutationResolver) UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]entity.User, error) {
+	return r.users.UpdateAccessLevel(ctx, input.UserIds, input.AccessLevel)
 }
 
 // AddMembers is the resolver for the addMembers field.
@@ -130,6 +87,47 @@ func (r *mutationResolver) AddMembers(ctx context.Context, input model.AddMember
 	})
 
 	return &p, err
+}
+
+// CreateProject is the resolver for the createProject field.
+func (r *mutationResolver) CreateProject(ctx context.Context, input model.CreateProjectInput) (*entity.Project, error) {
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	opts := project.CreateProjectOption{
+		ProjectID:   input.ID,
+		Name:        input.Name,
+		Description: input.Description,
+		Owner:       loggedUser,
+		URL:         &input.Repository.URL,
+		Username:    &input.Repository.Username,
+		Credential:  input.Repository.Credential,
+		AuthMethod:  input.Repository.AuthMethod,
+	}
+
+	createdProject, err := r.projects.Create(ctx, opts)
+	if err != nil {
+		r.logger.Error(err, "Error creating project")
+	}
+
+	return &createdProject, err
+}
+
+// DeleteProject is the resolver for the deleteProject field.
+func (r *mutationResolver) DeleteProject(ctx context.Context, input model.DeleteProjectInput) (*entity.Project, error) {
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	p, err := r.projects.Delete(ctx, project.DeleteProjectOption{
+		LoggedUser: loggedUser,
+		ProjectID:  input.ID,
+	})
+
+	return p, err
 }
 
 // RemoveMembers is the resolver for the removeMembers field.
@@ -170,6 +168,18 @@ func (r *mutationResolver) UpdateMembers(ctx context.Context, input model.Update
 		Users:       users,
 		AccessLevel: input.AccessLevel,
 		LoggedUser:  loggedUser,
+	})
+
+	return &p, err
+}
+
+// UpdateProject is the resolver for the updateProject field.
+func (r *mutationResolver) UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error) {
+	p, err := r.projects.Update(ctx, project.UpdateProjectOption{
+		ProjectID:   input.ID,
+		Name:        input.Name,
+		Description: input.Description,
+		Archived:    input.Archived,
 	})
 
 	return &p, err
@@ -251,6 +261,25 @@ func (r *projectResolver) NeedAccess(ctx context.Context, obj *entity.Project) (
 	return true, nil
 }
 
+// Capabilities is the resolver for the capabilities field.
+func (r *queryResolver) Capabilities(ctx context.Context) ([]model.Capability, error) {
+	return r.capabilities.GetCapabilities(ctx)
+}
+
+// Kubeconfig is the resolver for the kubeconfig field.
+func (r *queryResolver) Kubeconfig(ctx context.Context) (string, error) {
+	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
+
+	user, err := r.users.GetByEmail(ctx, email)
+	if err != nil {
+		return "", err
+	}
+
+	k, err := r.users.GetKubeconfig(ctx, user.Username)
+
+	return k, err
+}
+
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
 	loggedUser, err := r.getLoggedUser(ctx)
@@ -259,11 +288,6 @@ func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
 	}
 
 	return &loggedUser, nil
-}
-
-// Projects is the resolver for the projects field.
-func (r *queryResolver) Projects(ctx context.Context) ([]entity.Project, error) {
-	return r.projects.FindAll(ctx)
 }
 
 // Project is the resolver for the project field.
@@ -276,9 +300,9 @@ func (r *queryResolver) Project(ctx context.Context, id string) (*entity.Project
 	return &p, nil
 }
 
-// Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
-	return r.users.FindAll(ctx)
+// Projects is the resolver for the projects field.
+func (r *queryResolver) Projects(ctx context.Context) ([]entity.Project, error) {
+	return r.projects.FindAll(ctx)
 }
 
 // QualityProjectDesc is the resolver for the qualityProjectDesc field.
@@ -309,10 +333,9 @@ func (r *queryResolver) RunningRuntime(ctx context.Context) (*entity.Runtime, er
 	return runtime, err
 }
 
-// Capabilities is the resolver for the capabilities field.
-func (r *queryResolver) Capabilities(ctx context.Context) ([]model.Capability, error) {
-	return r.capabilities.GetCapabilities(ctx)
-}
+// Runtimes is the resolver for the runtimes field.
+func (r *queryResolver) Runtimes(ctx context.Context) ([]entity.Runtime, error) {
+	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
 
 // RunningCapability is the resolver for the runningCapability field.
 func (r *queryResolver) RunningCapability(ctx context.Context) (*model.Capability, error) {
@@ -347,8 +370,12 @@ func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (s
 	case entity.RepositoryTypeExternal:
 		return obj.ExternalRepoURL, nil
 	}
+	return r.runtimes.GetRuntimes(ctx, user.Username)
+}
 
-	return "", nil
+// Users is the resolver for the users field.
+func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
+	return r.users.FindAll(ctx)
 }
 
 // CreationDate is the resolver for the creationDate field.
@@ -400,9 +427,6 @@ func (r *Resolver) Project() generated.ProjectResolver { return &projectResolver
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
-// Repository returns generated.RepositoryResolver implementation.
-func (r *Resolver) Repository() generated.RepositoryResolver { return &repositoryResolver{r} }
-
 // SSHKey returns generated.SSHKeyResolver implementation.
 func (r *Resolver) SSHKey() generated.SSHKeyResolver { return &sSHKeyResolver{r} }
 
@@ -413,6 +437,5 @@ type memberResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type projectResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-type repositoryResolver struct{ *Resolver }
 type sSHKeyResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }

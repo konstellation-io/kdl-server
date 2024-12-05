@@ -9,6 +9,7 @@
 coverage/
 deprecations
 main
+.hadolint.yml
 
 ########
 # JETBRAINS

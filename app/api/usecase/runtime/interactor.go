@@ -11,14 +11,14 @@ import (
 
 type interactor struct {
 	logger    logr.Logger
-	k8sClient k8s.Client
+	k8sClient k8s.ClientInterface
 	repo      Repository
 }
 
 // NewInteractor factory function.
 func NewInteractor(
 	logger logr.Logger,
-	k8sClient k8s.Client,
+	k8sClient k8s.ClientInterface,
 	repo Repository,
 ) UseCase {
 	return &interactor{

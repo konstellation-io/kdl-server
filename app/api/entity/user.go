@@ -28,6 +28,7 @@ type User struct {
 	ID           string
 	Email        string
 	Username     string
+	Sub          string
 	Deleted      bool
 	CreationDate time.Time
 	AccessLevel  AccessLevel
@@ -37,6 +38,7 @@ type User struct {
 }
 
 func (u User) UsernameSlug() string {
+	//nolint:reassign //this is the inteded usage of the library
 	slug.CustomSub = map[string]string{
 		"_": "-",
 	}

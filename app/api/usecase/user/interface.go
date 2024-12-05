@@ -14,6 +14,7 @@ type Repository interface {
 	Get(ctx context.Context, id string) (entity.User, error)
 	GetByUsername(ctx context.Context, username string) (entity.User, error)
 	GetByEmail(ctx context.Context, email string) (entity.User, error)
+	GetBySub(ctx context.Context, sub string) (entity.User, error)
 	Create(ctx context.Context, user entity.User) (string, error)
 	UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) error
 	UpdateSSHKey(ctx context.Context, username string, SSHKey entity.SSHKey) error
@@ -26,13 +27,13 @@ type Repository interface {
 
 // UseCase interface to manage all operations related with users.
 type UseCase interface {
-	Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error)
+	Create(ctx context.Context, email, sub string, accessLevel entity.AccessLevel) (entity.User, error)
 	CreateAdminUser(username, email string) error
-	UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error)
+	UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error)
 	FindAll(ctx context.Context) ([]entity.User, error)
-	GetByUsername(ctx context.Context, username string) (entity.User, error)
-	StartTools(ctx context.Context, username string, runtimeID *string, capabilitiesID *string) (entity.User, error)
-	StopTools(ctx context.Context, username string) (entity.User, error)
+	GetByEmail(ctx context.Context, email string) (entity.User, error)
+	StartTools(ctx context.Context, email string, runtimeID *string, capabilitiesID *string) (entity.User, error)
+	StopTools(ctx context.Context, email string) (entity.User, error)
 	AreToolsRunning(ctx context.Context, username string) (bool, error)
 	IsKubeconfigActive() bool
 	FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error)

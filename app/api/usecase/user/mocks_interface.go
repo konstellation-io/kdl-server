@@ -124,6 +124,21 @@ func (mr *MockRepositoryMockRecorder) GetByEmail(ctx, email interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmail", reflect.TypeOf((*MockRepository)(nil).GetByEmail), ctx, email)
 }
 
+// GetBySub mocks base method.
+func (m *MockRepository) GetBySub(ctx context.Context, sub string) (entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBySub", ctx, sub)
+	ret0, _ := ret[0].(entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBySub indicates an expected call of GetBySub.
+func (mr *MockRepositoryMockRecorder) GetBySub(ctx, sub interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBySub", reflect.TypeOf((*MockRepository)(nil).GetBySub), ctx, sub)
+}
+
 // GetByUsername mocks base method.
 func (m *MockRepository) GetByUsername(ctx context.Context, username string) (entity.User, error) {
 	m.ctrl.T.Helper()
@@ -248,18 +263,32 @@ func (mr *MockUseCaseMockRecorder) AreToolsRunning(ctx, username interface{}) *g
 }
 
 // Create mocks base method.
-func (m *MockUseCase) Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error) {
+func (m *MockUseCase) Create(ctx context.Context, email, sub string, accessLevel entity.AccessLevel) (entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, email, username, accessLevel)
+	ret := m.ctrl.Call(m, "Create", ctx, email, sub, accessLevel)
 	ret0, _ := ret[0].(entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockUseCaseMockRecorder) Create(ctx, email, username, accessLevel interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) Create(ctx, email, sub, accessLevel interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUseCase)(nil).Create), ctx, email, username, accessLevel)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUseCase)(nil).Create), ctx, email, sub, accessLevel)
+}
+
+// CreateAdminUser mocks base method.
+func (m *MockUseCase) CreateAdminUser(username, email string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateAdminUser", username, email)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateAdminUser indicates an expected call of CreateAdminUser.
+func (mr *MockUseCaseMockRecorder) CreateAdminUser(username, email interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAdminUser", reflect.TypeOf((*MockUseCase)(nil).CreateAdminUser), username, email)
 }
 
 // FindAll mocks base method.
@@ -292,6 +321,21 @@ func (mr *MockUseCaseMockRecorder) FindByIDs(ctx, userIDs interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByIDs", reflect.TypeOf((*MockUseCase)(nil).FindByIDs), ctx, userIDs)
 }
 
+// GetByEmail mocks base method.
+func (m *MockUseCase) GetByEmail(ctx context.Context, email string) (entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByEmail", ctx, email)
+	ret0, _ := ret[0].(entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByEmail indicates an expected call of GetByEmail.
+func (mr *MockUseCaseMockRecorder) GetByEmail(ctx, email interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmail", reflect.TypeOf((*MockUseCase)(nil).GetByEmail), ctx, email)
+}
+
 // GetByID mocks base method.
 func (m *MockUseCase) GetByID(ctx context.Context, userID string) (entity.User, error) {
 	m.ctrl.T.Helper()
@@ -305,21 +349,6 @@ func (m *MockUseCase) GetByID(ctx context.Context, userID string) (entity.User, 
 func (mr *MockUseCaseMockRecorder) GetByID(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockUseCase)(nil).GetByID), ctx, userID)
-}
-
-// GetByUsername mocks base method.
-func (m *MockUseCase) GetByUsername(ctx context.Context, username string) (entity.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByUsername", ctx, username)
-	ret0, _ := ret[0].(entity.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetByUsername indicates an expected call of GetByUsername.
-func (mr *MockUseCaseMockRecorder) GetByUsername(ctx, username interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByUsername", reflect.TypeOf((*MockUseCase)(nil).GetByUsername), ctx, username)
 }
 
 // GetKubeconfig mocks base method.
@@ -367,33 +396,33 @@ func (mr *MockUseCaseMockRecorder) RegenerateSSHKeys(ctx, user interface{}) *gom
 }
 
 // StartTools mocks base method.
-func (m *MockUseCase) StartTools(ctx context.Context, username string, runtimeID, capabilitiesID *string) (entity.User, error) {
+func (m *MockUseCase) StartTools(ctx context.Context, email string, runtimeID, capabilitiesID *string) (entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StartTools", ctx, username, runtimeID, capabilitiesID)
+	ret := m.ctrl.Call(m, "StartTools", ctx, email, runtimeID, capabilitiesID)
 	ret0, _ := ret[0].(entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // StartTools indicates an expected call of StartTools.
-func (mr *MockUseCaseMockRecorder) StartTools(ctx, username, runtimeID, capabilitiesID interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) StartTools(ctx, email, runtimeID, capabilitiesID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartTools", reflect.TypeOf((*MockUseCase)(nil).StartTools), ctx, username, runtimeID, capabilitiesID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartTools", reflect.TypeOf((*MockUseCase)(nil).StartTools), ctx, email, runtimeID, capabilitiesID)
 }
 
 // StopTools mocks base method.
-func (m *MockUseCase) StopTools(ctx context.Context, username string) (entity.User, error) {
+func (m *MockUseCase) StopTools(ctx context.Context, email string) (entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StopTools", ctx, username)
+	ret := m.ctrl.Call(m, "StopTools", ctx, email)
 	ret0, _ := ret[0].(entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // StopTools indicates an expected call of StopTools.
-func (mr *MockUseCaseMockRecorder) StopTools(ctx, username interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) StopTools(ctx, email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopTools", reflect.TypeOf((*MockUseCase)(nil).StopTools), ctx, username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopTools", reflect.TypeOf((*MockUseCase)(nil).StopTools), ctx, email)
 }
 
 // SynchronizeServiceAccountsForUsers mocks base method.
@@ -411,16 +440,16 @@ func (mr *MockUseCaseMockRecorder) SynchronizeServiceAccountsForUsers() *gomock.
 }
 
 // UpdateAccessLevel mocks base method.
-func (m *MockUseCase) UpdateAccessLevel(ctx context.Context, userIds []string, level entity.AccessLevel) ([]entity.User, error) {
+func (m *MockUseCase) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateAccessLevel", ctx, userIds, level)
+	ret := m.ctrl.Call(m, "UpdateAccessLevel", ctx, userIDs, level)
 	ret0, _ := ret[0].([]entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // UpdateAccessLevel indicates an expected call of UpdateAccessLevel.
-func (mr *MockUseCaseMockRecorder) UpdateAccessLevel(ctx, userIds, level interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) UpdateAccessLevel(ctx, userIDs, level interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccessLevel", reflect.TypeOf((*MockUseCase)(nil).UpdateAccessLevel), ctx, userIds, level)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccessLevel", reflect.TypeOf((*MockUseCase)(nil).UpdateAccessLevel), ctx, userIDs, level)
 }

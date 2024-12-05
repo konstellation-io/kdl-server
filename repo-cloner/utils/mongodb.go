@@ -14,15 +14,15 @@ const timeout = 20 * time.Second
 
 // MongoDB will manage the connection with the database.
 type MongoDB struct {
-	logger logr.Logger
 	client *mongo.Client
+	logger logr.Logger
 }
 
 // NewMongoDB is a constructor function.
 func NewMongoDB(logger logr.Logger) *MongoDB {
 	return &MongoDB{
-		logger,
-		nil,
+		client: nil,
+		logger: logger,
 	}
 }
 

@@ -55,35 +55,51 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 
 * `app-api`: main component of the application, providing API access for other components and managing interactions with `MongoDB`.
 * `app-ui`: web application offering the interface for data scientists.
-* `cleaner`: currently unused, potentially slated for deprecation.
-* `gitea-oauth2-proxy`: in-house solution exposing `gitea` login page to other pods.
-* `gitea`: git server mirroring project repositories.
-* `minio`: s3-compatible object storage, holding artifacts from training jobs; `MinIO` is installed as a pinned dependency, with only the console deployed through the chart.
-* `postgresql`: database storing `gitea` data.
-* `project-operator`: Kubernetes operator listening to `KAI Lab API`; on new project creation in the UI, it deploys a project-specific pod with `mlflow` and `file browser`.
-* `repo-cloner`: in-house solution that clones all accessible repositories into the user's user-tools pod.
-* `user-tools-operator`: Kubernetes operator monitoring kai lab api; each time a user starts or changes runtime in the UI, this operator deploys a pod with vscode server and runtime containers based on selected image.
+* `cleaner`: (*DEPRECATED*) currently unused, potentially slated for deprecation.
+* `project-operator`: Kubernetes operator listening to `KAI Lab API`, on new project creation in the UI, it deploys a project-specific pod with `mlflow` and `filebrowser`.
+* `repo-cloner`: in-house solution that clones all accessible repositories into the user's `user-tools` pod.
+* `user-tools-operator`: Kubernetes operator monitoring `KAI Lab API`, each time a user starts or changes runtime in the UI, this operator deploys a pod with a `runtime` containers based on selected image.
 
-## Matrix compatibility
+## Compatibility matrix
 
-> [!NOTE]
-> If component isn't on the matrix, that means it component hasn't dependencies.
+### app: 1.39.0
 
-| Component     | Dependencies                 | Version   | Compatibility                 |
-| ------------- | ---------------------------- | --------- | ----------------------------- |
-| `app`         | code.gitea.io/sdk/gitea      | `v0.19.0` | -                             |
-|               | github.com/minio/minio-go/v7 | `v7.0.78` | -                             |
-|               | go.mongodb.org/mongo-driver  | `v1.17.1` | [MongoDB `>=3.6, =<7.X`]      |
-|               | k8s.io/api                   | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
-|               | k8s.io/apimachinery          | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
-|               | k8s.io/client-go             | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
-| `repo-cloner` | go.mongodb.org/mongo-driver  | `v1.17.1` | [MongoDB `>=3.6, =<7.X`]      |
-| `gitea`       | k8s.io/api                   | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
-|               | k8s.io/apimachinery          | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
-|               | k8s.io/client-go             | `v0.31.1` | [Kubernetes `>=1.24, =<1.30`] |
+| Driver ↓ / Kubernetes → | 1.24 | 1.25 | 1.26 | 1.27 | 1.28 | 1.29 | 1.30 | 1.31 |
+|:-----------------------:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
+| 0.31.2                  | ✅   | ✅   | ✅   | ✅   | ✅   | ✅   | ✅   | ✅   |
 
-[MongoDB `>=3.6, =<7.X`]: https://www.mongodb.com/docs/drivers/go/current/compatibility/#std-label-golang-compatibility
-[Kubernetes `>=1.24, =<1.30`]: https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters
+| Driver ↓ / MongoDB → | 3.6 | 4.0 | 4.2 | 4.4 | 5.0 | 6.0 | 6.1 | 7.0 | 8.0 |
+|:--------------------:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1.17.1               | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | 🟠  |
+
+| Driver ↓ / MinIO → | RELEASE.2021 | RELEASE.2022 | RELEASE.2023 | RELEASE.2024 |
+|:------------------:|:------------:|:------------:|:------------:|:------------:|
+| 7.0.78             | ✅           | ✅           | ✅           | ✅           |
+
+### repo-cloner: 0.19.0
+
+| Driver ↓ / MongoDB → | 3.6 | 4.0 | 4.2 | 4.4 | 5.0 | 6.0 | 6.1 | 7.0 | 8.0 |
+|:--------------------:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1.17.1               | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | 🟠  |
+
+### Legend
+
+| Symbol | Description |
+|:------:|-------------|
+| ✅     | Perfect match: all features are supported. Client and server versions have exactly the same features/APIs. |
+| 🟠     | Forward compatibility: the client will work with the server, but not all new server features are supported. The server has features that the client library cannot use. |
+| ❌     | Backward compatibility/Not applicable: the client has features that may not be present in the server. Common features will work, but some client APIs might not be available in the server. |
+| -      | Not tested: this combination has not been verified or is not applicable. |
+
+### Notes
+
+* For optimal compatibility, use matching client and server versions (✅)
+* Common APIs between client and server versions will generally work even when marked with 🟠
+
+### References
+
+* [MongoDB driver matrix](https://www.mongodb.com/docs/drivers/go/current/compatibility/#std-label-golang-compatibility)
+* [Kubernetes client matrix](https://github.com/kubernetes/client-go#compatibility-client-go---kubernetes-clusters)
 
 ## Development
 

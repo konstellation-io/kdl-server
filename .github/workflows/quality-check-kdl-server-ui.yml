@@ -56,10 +56,9 @@ jobs:
         uses: cypress-io/github-action@v5
         with:
           browser: chrome
-          install: true
-          start: npm start
-          wait-on-timeout: 120
+          tag: node-${{ vars.NODE_VERSION_UI_TESTS }}
           wait-on: 'http://localhost:3001'
+          wait-on-timeout: 120
           working-directory: ./app/ui
 
   sonarcloud:

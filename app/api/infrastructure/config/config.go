@@ -9,8 +9,8 @@ import (
 )
 
 type KubernetesConfig struct {
-	IsInsideCluster bool   `default:"true"`
 	Namespace       string `envconfig:"POD_NAMESPACE"`
+	IsInsideCluster bool   `default:"true"`
 }
 
 // Config holds the configuration values of the application.
@@ -37,12 +37,6 @@ type Config struct {
 		URI    string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
 		DBName string `yaml:"dbName" envconfig:"KDL_SERVER_MONGODB_NAME"`
 	} `yaml:"mongodb"`
-	Gitea struct {
-		InternalURL string `yaml:"internal_url" envconfig:"GITEA_INTERNAL_URL"`
-		URL         string `envconfig:"GITEA_URL"`
-		AdminUser   string `envconfig:"GITEA_ADMIN_USER"`
-		AdminPass   string `envconfig:"GITEA_ADMIN_PASSWORD"`
-	} `yaml:"gitea"`
 	Kubernetes KubernetesConfig `yaml:"kubernetes"`
 	Minio      struct {
 		Endpoint  string `envconfig:"MINIO_ENDPOINT"`
@@ -50,8 +44,9 @@ type Config struct {
 		SecretKey string `envconfig:"MINIO_SECRET_KEY"`
 	}
 	VSCode struct {
-		URL   string `envconfig:"USER_TOOLS_VSCODE_URL"`
-		Image struct {
+		URL     string `envconfig:"USER_TOOLS_VSCODE_URL"`
+		Enabled bool   `envconfig:"USER_TOOLS_VSCODE_ENABLED"`
+		Image   struct {
 			Repository string `envconfig:"VSCODE_IMG_REPO"`
 			Tag        string `envconfig:"VSCODE_IMG_TAG"`
 			PullPolicy string `envconfig:"VSCODE_IMG_PULLPOLICY"`
@@ -101,28 +96,12 @@ type Config struct {
 			PullPolicy string `envconfig:"OAUTH2_PROXY_IMG_PULLPOLICY"`
 		}
 	}
-	GiteaOAuth2Setup struct {
-		Image struct {
-			Repository string `envconfig:"GITEA_OAUTH2_SETUP_IMG_REPO"`
-			Tag        string `envconfig:"GITEA_OAUTH2_SETUP_IMG_TAG"`
-			PullPolicy string `envconfig:"GITEA_OAUTH2_SETUP_IMG_PULLPOLICY"`
-		}
-	}
 	RepoCloner struct {
 		Image struct {
 			Repository string `envconfig:"REPO_CLONER_IMG_REPO"`
 			Tag        string `envconfig:"REPO_CLONER_IMG_TAG"`
 			PullPolicy string `envconfig:"REPO_CLONER_IMG_PULLPOLICY"`
 		}
-	}
-	UserToolsGiteaOAuth2Setup struct {
-		Image struct {
-			Repository string `envconfig:"USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_REPO"`
-			Tag        string `envconfig:"USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_TAG"`
-			PullPolicy string `envconfig:"USER_TOOLS_GITEA_OAUTH2_SETUP_IMG_PULLPOLICY"`
-		}
-		GiteaAdminSecret     string `envconfig:"GITEA_OAUTH2_SETUP_ADMIN_SECRETS"`
-		GiteaOauth2Configmap string `envconfig:"GITEA_OAUTH2_SETUP_CONFIGMAP"`
 	}
 	UserToolsOAuth2Proxy struct {
 		Image struct {

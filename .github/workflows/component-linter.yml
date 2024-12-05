@@ -16,7 +16,6 @@ jobs:
         directory:
           - app
           - cleaner
-          - gitea-oauth2-setup
           - mlflow
           - project-operator
           - repo-cloner

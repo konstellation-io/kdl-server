@@ -47,7 +47,12 @@ func (m *CapabilitiesRepo) Create(ctx context.Context, c entity.Capabilities) (s
 		return "", err
 	}
 
-	return result.InsertedID.(string), nil
+	insertedID, ok := result.InsertedID.(string)
+	if !ok {
+		return "", ErrCastingInsertedIDToString
+	}
+
+	return insertedID, nil
 }
 
 // Get retrieves a capabilities struct using an identifier.

@@ -7,20 +7,13 @@ repos:
     - id: check-merge-conflict
     - id: check-symlinks
     - id: end-of-file-fixer
-- repo: https://github.com/zricethezav/gitleaks
-  rev: v8.21.1
-  hooks:
-    - id: gitleaks
-- repo: https://github.com/norwoodj/helm-docs
-  rev: v1.14.2
-  hooks:
-    - id: helm-docs
-      args:
-        - --chart-search-root=./helm/kdl-server
-        - --template-files=CHART.md.gotmpl
-        - --output-file=CHART.md
+    - id: check-yaml
+# - repo: https://github.com/zricethezav/gitleaks
+#   rev: v8.21.1
+#   hooks:
+#     - id: gitleaks
 - repo: https://github.com/dnephin/pre-commit-golang
-  rev: v0.5.0
+  rev: v0.5.1
   hooks:
     - id: golangci-lint
-      args: ['app/api/...']
+      args: ['--config', '.github/.golangci.yml', 'app/api/...', 'cleaner/...', 'repo-cloner/...']

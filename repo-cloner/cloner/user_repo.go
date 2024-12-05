@@ -16,10 +16,10 @@ import (
 )
 
 type UserRepoCloner struct {
-	cfg         config.Config
-	logger      logr.Logger
 	projectRepo *repository.ProjectMongoDBRepo
 	userRepo    *repository.UserMongoDBRepo
+	logger      logr.Logger
+	cfg         config.Config
 }
 
 func NewUserRepoCloner(
@@ -32,11 +32,6 @@ func NewUserRepoCloner(
 }
 
 func (c *UserRepoCloner) Start() {
-	err := utils.AddToKnownHost("gitea", c.logger)
-	if err != nil {
-		c.logger.Error(err, "Error adding gitea to known hosts")
-	}
-
 	user := c.getUserAndInitGitConfigs()
 
 	c.checkAndCloneNewRepos(user)

@@ -11,9 +11,9 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
+	"gotest.tools/v3/assert"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
@@ -31,13 +31,12 @@ type projectSuite struct {
 }
 
 type projectMocks struct {
-	logger           logr.Logger
 	repo             *project.MockRepository
 	userActivityRepo *project.MockUserActivityRepo
 	clock            *clock.MockClock
-	giteaService     *giteaservice.MockGiteaClient
 	minioService     *minioservice.MockMinioService
-	k8sClient        *k8s.MockClient
+	k8sClient        *k8s.MockClientInterface
+	logger           logr.Logger
 }
 
 func newProjectSuite(t *testing.T) *projectSuite {
@@ -45,9 +44,8 @@ func newProjectSuite(t *testing.T) *projectSuite {
 	repo := project.NewMockRepository(ctrl)
 	userActivityRepo := project.NewMockUserActivityRepo(ctrl)
 	clockMock := clock.NewMockClock(ctrl)
-	giteaService := giteaservice.NewMockGiteaClient(ctrl)
 	minioService := minioservice.NewMockMinioService(ctrl)
-	k8sClient := k8s.NewMockClient(ctrl)
+	k8sClient := k8s.NewMockClientInterface(ctrl)
 
 	zapLog, err := zap.NewDevelopment()
 	require.NoError(t, err)
@@ -59,7 +57,6 @@ func newProjectSuite(t *testing.T) *projectSuite {
 		Repo:             repo,
 		UserActivityRepo: userActivityRepo,
 		Clock:            clockMock,
-		GiteaService:     giteaService,
 		MinioService:     minioService,
 		K8sClient:        k8sClient,
 	}
@@ -73,7 +70,6 @@ func newProjectSuite(t *testing.T) *projectSuite {
 			repo:             repo,
 			userActivityRepo: userActivityRepo,
 			clock:            clockMock,
-			giteaService:     giteaService,
 			minioService:     minioService,
 			k8sClient:        k8sClient,
 		},
@@ -126,9 +122,6 @@ func TestInteractor_CreateExternal(t *testing.T) {
 		},
 	}
 
-	s.mocks.giteaService.EXPECT().
-		MirrorRepo(externalRepoURL, testProjectID, externalRepoUsername, ownerUsername, externalAuthMethod, externalRepoToken).
-		Return(nil)
 	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().CreateBucket(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().CreateProjectDirs(ctx, testProjectID).Return(nil)
@@ -166,7 +159,7 @@ func TestInteractor_FindByUserID(t *testing.T) {
 	p, err := s.interactor.FindAll(ctx)
 
 	require.NoError(t, err)
-	require.Equal(t, p, expectedProjects)
+	require.Equal(t, expectedProjects, p)
 }
 
 func TestInteractor_GetByID(t *testing.T) {
@@ -181,7 +174,7 @@ func TestInteractor_GetByID(t *testing.T) {
 	p, err := s.interactor.GetByID(ctx, testProjectID)
 
 	require.NoError(t, err)
-	require.Equal(t, p, expectedProject)
+	require.Equal(t, expectedProject, p)
 }
 
 func TestInteractor_AddMembers(t *testing.T) {
@@ -223,14 +216,6 @@ func TestInteractor_AddMembers(t *testing.T) {
 	expectedProject.Members = []entity.Member{adminMember, newMembers[0], newMembers[1]}
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
-	gomock.InOrder(
-		s.mocks.giteaService.EXPECT().
-			AddCollaborator(p.Repository.RepoName, usersToAdd[0].Username, project.MemberAccessLevelOnCreation).
-			Return(nil),
-		s.mocks.giteaService.EXPECT().
-			AddCollaborator(p.Repository.RepoName, usersToAdd[1].Username, project.MemberAccessLevelOnCreation).
-			Return(nil),
-	)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().AddMembers(ctx, p.ID, newMembers).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
@@ -242,7 +227,7 @@ func TestInteractor_AddMembers(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	require.Equal(t, p, expectedProject)
+	assert.DeepEqual(t, p, expectedProject)
 }
 
 func TestInteractor_RemoveMembers(t *testing.T) {
@@ -282,12 +267,6 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 	expectedProject.Members = []entity.Member{adminMember}
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
-	s.mocks.giteaService.EXPECT().
-		RemoveCollaborator(p.Repository.RepoName, usersToRemove[0].Username).
-		Return(nil)
-	s.mocks.giteaService.EXPECT().
-		RemoveCollaborator(p.Repository.RepoName, usersToRemove[1].Username).
-		Return(nil)
 
 	s.mocks.repo.EXPECT().RemoveMembers(ctx, p.ID, usersToRemove).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
@@ -299,7 +278,7 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	require.Equal(t, p, expectedProject)
+	assert.DeepEqual(t, expectedProject, p)
 }
 
 func TestInteractor_RemoveMembers_ErrNoMoreAdmins(t *testing.T) {
@@ -372,12 +351,6 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 	expectedProject.Members = []entity.Member{adminMember}
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
-	s.mocks.giteaService.EXPECT().
-		UpdateCollaboratorPermissions(p.Repository.RepoName, usersToUpd[0].Username, newAccessLevel).
-		Return(nil)
-	s.mocks.giteaService.EXPECT().
-		UpdateCollaboratorPermissions(p.Repository.RepoName, usersToUpd[1].Username, newAccessLevel).
-		Return(nil)
 
 	s.mocks.repo.EXPECT().UpdateMembersAccessLevel(ctx, p.ID, usersToUpd, newAccessLevel).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
@@ -390,7 +363,7 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	require.Equal(t, p, expectedProject)
+	assert.DeepEqual(t, expectedProject, p)
 }
 
 func TestInteractor_UpdateMembers_ErrNoMoreAdmins(t *testing.T) {
@@ -424,7 +397,7 @@ func TestInteractor_UpdateMembers_ErrNoMoreAdmins(t *testing.T) {
 	})
 
 	require.Equal(t, project.ErrUpdateNoMoreAdmins, err)
-	require.Equal(t, p, entity.Project{})
+	assert.DeepEqual(t, entity.Project{}, p)
 }
 
 func TestInteractor_Update(t *testing.T) {
@@ -510,7 +483,6 @@ func TestInteractor_Delete(t *testing.T) {
 	}
 
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(expectedProject, nil)
-	s.mocks.giteaService.EXPECT().DeleteRepo(testProjectID).Return(nil)
 	s.mocks.k8sClient.EXPECT().DeleteKDLProjectCR(ctx, testProjectID).Return(nil)
 	s.mocks.repo.EXPECT().DeleteOne(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().DeleteBucket(ctx, testProjectID).Return(expectedMinioBackup, nil)

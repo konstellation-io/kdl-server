@@ -16,7 +16,6 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/dataloader"
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/giteaservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
@@ -37,21 +36,12 @@ func main() {
 	zapLog, err := zap.NewDevelopment()
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 
 	logger := zapr.NewLogger(zapLog)
 
 	realClock := clock.NewRealClock()
 	sshHelper := sshhelper.NewGenerator(logger)
-
-	giteaService, err := giteaservice.NewGiteaService(
-		logger, cfg.Gitea.InternalURL, cfg.Gitea.AdminUser, cfg.Gitea.AdminPass,
-	)
-	if err != nil {
-		logger.Error(err, "Error connecting to Gitea")
-		os.Exit(1)
-	}
 
 	minioService, err := minioservice.NewMinioService(
 		logger, cfg.Minio.Endpoint, cfg.Minio.AccessKey, cfg.Minio.SecretKey,
@@ -89,7 +79,7 @@ func main() {
 	}
 
 	userInteractor := user.NewInteractor(logger, cfg, userRepo, runtimeRepo, capabilitiesRepo,
-		sshHelper, realClock, giteaService, k8sClient)
+		sshHelper, realClock, k8sClient)
 
 	if err = userInteractor.SynchronizeServiceAccountsForUsers(); err != nil {
 		logger.Error(err, "Unexpected error creating serviceAccount for users")
@@ -104,7 +94,6 @@ func main() {
 		Logger:           logger,
 		Repo:             projectRepo,
 		Clock:            realClock,
-		GiteaService:     giteaService,
 		MinioService:     minioService,
 		K8sClient:        k8sClient,
 		UserActivityRepo: userActivityRepo,
@@ -125,7 +114,7 @@ func main() {
 		capabilitiesInteractor,
 	)
 
-	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, cfg.Kubernetes.IsInsideCluster, resolvers, userRepo, projectRepo)
+	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, cfg.Kubernetes.IsInsideCluster, resolvers, userRepo, userInteractor, projectRepo)
 }
 
 func startHTTPServer(
@@ -135,6 +124,7 @@ func startHTTPServer(
 	insideK8Cluster bool,
 	resolvers generated.ResolverRoot,
 	userRepo user.Repository,
+	userInteractor user.UseCase,
 	projectRepo project.Repository,
 ) {
 	const apiQueryPath = "/api/query"
@@ -149,8 +139,8 @@ func startHTTPServer(
 	authMiddleware := middleware.GenerateMiddleware(devEnvironment)
 
 	http.Handle("/", fs)
-	http.Handle("/api/playground", authMiddleware(pg))
-	http.Handle(apiQueryPath, authMiddleware(dataloader.Middleware(userRepo, srv)))
+	http.Handle("/api/playground", authMiddleware(pg, userInteractor))
+	http.Handle(apiQueryPath, authMiddleware(dataloader.Middleware(userRepo, srv), userInteractor))
 	http.HandleFunc("/api/auth/project", authController.HandleProjectAuth)
 
 	logger.Info("Server running", "port", port)

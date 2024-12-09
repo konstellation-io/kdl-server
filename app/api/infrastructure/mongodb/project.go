@@ -31,10 +31,9 @@ type projectDTO struct {
 	Description        string                      `bson:"description"`
 	CreationDate       time.Time                   `bson:"creation_date"`
 	LastActivationDate string                      `bson:"last_activation_date"`
-	RepositoryType     entity.RepositoryType       `bson:"repo_type"`
 	RepoName           string                      `bson:"repo_name"`
 	AuthMethod         entity.RepositoryAuthMethod `bson:"auth_method"`
-	ExternalRepoURL    string                      `bson:"external_repo_url"`
+	URL                string                      `bson:"url"`
 	Members            []memberDTO                 `bson:"members"`
 }
 
@@ -244,10 +243,9 @@ func (m *ProjectRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 		Description:        p.Description,
 		CreationDate:       p.CreationDate,
 		LastActivationDate: p.LastActivationDate,
-		RepositoryType:     p.Repository.Type,
 		RepoName:           p.Repository.RepoName,
 		AuthMethod:         p.Repository.AuthMethod,
-		ExternalRepoURL:    p.Repository.ExternalRepoURL,
+		URL:                p.Repository.URL,
 		Archived:           p.Archived,
 	}
 
@@ -288,10 +286,9 @@ func (m *ProjectRepo) dtoToEntity(dto projectDTO) entity.Project {
 		CreationDate:       dto.CreationDate,
 		LastActivationDate: dto.LastActivationDate,
 		Repository: entity.Repository{
-			AuthMethod:      dto.AuthMethod,
-			Type:            dto.RepositoryType,
-			ExternalRepoURL: dto.ExternalRepoURL,
-			RepoName:        dto.RepoName,
+			AuthMethod: dto.AuthMethod,
+			URL:        dto.URL,
+			RepoName:   dto.RepoName,
 		},
 		Archived: dto.Archived,
 	}

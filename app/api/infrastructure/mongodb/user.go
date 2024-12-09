@@ -197,6 +197,10 @@ func (m *UserRepo) UpdateEmail(ctx context.Context, username, email string) erro
 	return m.updateUserFields(ctx, username, bson.M{"email": email})
 }
 
+func (m *UserRepo) UpdateSub(ctx context.Context, username, sub string) error {
+	return m.updateUserFields(ctx, username, bson.M{"sub": sub})
+}
+
 func (m *UserRepo) UpdateUsername(ctx context.Context, email, username string) error {
 	m.logger.Info("Updating username", "newUsername", username, "userEmail", email)
 
@@ -251,6 +255,7 @@ func (m *UserRepo) findOne(ctx context.Context, filters bson.M) (entity.User, er
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		return entity.User{}, entity.ErrUserNotFound
 	}
+	// review this error handling: if err!=nil {entity.User{}. return err}
 
 	return m.dtoToEntity(dto), err
 }

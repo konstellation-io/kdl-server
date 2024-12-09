@@ -18,6 +18,7 @@ type Repository interface {
 	Create(ctx context.Context, user entity.User) (string, error)
 	UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) error
 	UpdateSSHKey(ctx context.Context, username string, SSHKey entity.SSHKey) error
+	UpdateSub(ctx context.Context, username, sub string) error
 	FindAll(ctx context.Context, includeDeleted bool) ([]entity.User, error)
 	FindByIDs(ctx context.Context, userIDs []string) ([]entity.User, error)
 	UpdateEmail(ctx context.Context, userID, email string) error
@@ -28,6 +29,7 @@ type Repository interface {
 // UseCase interface to manage all operations related with users.
 type UseCase interface {
 	Create(ctx context.Context, email, sub string, accessLevel entity.AccessLevel) (entity.User, error)
+	UpdateSub(ctx context.Context, user entity.User, sub string) (entity.User, error)
 	CreateAdminUser(username, email string) error
 	UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error)
 	FindAll(ctx context.Context) ([]entity.User, error)

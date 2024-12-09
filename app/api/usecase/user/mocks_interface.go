@@ -210,6 +210,20 @@ func (mr *MockRepositoryMockRecorder) UpdateSSHKey(ctx, username, SSHKey interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSSHKey", reflect.TypeOf((*MockRepository)(nil).UpdateSSHKey), ctx, username, SSHKey)
 }
 
+// UpdateSub mocks base method.
+func (m *MockRepository) UpdateSub(ctx context.Context, username, sub string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSub", ctx, username, sub)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateSub indicates an expected call of UpdateSub.
+func (mr *MockRepositoryMockRecorder) UpdateSub(ctx, username, sub interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSub", reflect.TypeOf((*MockRepository)(nil).UpdateSub), ctx, username, sub)
+}
+
 // UpdateUsername mocks base method.
 func (m *MockRepository) UpdateUsername(ctx context.Context, email, userID string) error {
 	m.ctrl.T.Helper()
@@ -452,4 +466,19 @@ func (m *MockUseCase) UpdateAccessLevel(ctx context.Context, userIDs []string, l
 func (mr *MockUseCaseMockRecorder) UpdateAccessLevel(ctx, userIDs, level interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccessLevel", reflect.TypeOf((*MockUseCase)(nil).UpdateAccessLevel), ctx, userIDs, level)
+}
+
+// UpdateSub mocks base method.
+func (m *MockUseCase) UpdateSub(ctx context.Context, user entity.User, sub string) (entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSub", ctx, user, sub)
+	ret0, _ := ret[0].(entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateSub indicates an expected call of UpdateSub.
+func (mr *MockUseCaseMockRecorder) UpdateSub(ctx, user, sub interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSub", reflect.TypeOf((*MockUseCase)(nil).UpdateSub), ctx, user, sub)
 }

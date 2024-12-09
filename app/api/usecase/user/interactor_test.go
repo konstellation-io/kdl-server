@@ -627,6 +627,98 @@ func TestInteractor_UpdateAccessLevel(t *testing.T) {
 	require.Equal(t, users, returnedUsers)
 }
 
+func TestInteractor_UpdateSub(t *testing.T) {
+	s := newUserSuite(t, nil)
+	defer s.ctrl.Finish()
+
+	const (
+		id          = "user.1234"
+		username    = "john.doe"
+		sub         = "f6717d2b-ac1f-40da-ade6-00037512933b"
+		email       = "john@doe.com"
+		accessLevel = entity.AccessLevelAdmin
+	)
+
+	ctx := context.Background()
+
+	user := entity.User{
+		ID:          id,
+		Username:    username,
+		Email:       email,
+		AccessLevel: accessLevel,
+	}
+
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().UpdateSub(ctx, username, sub).Return(nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(user, nil)
+
+	returnedUser, err := s.interactor.UpdateSub(ctx, user, sub)
+
+	require.NoError(t, err)
+	require.Equal(t, user, returnedUser)
+}
+
+func TestInteractor_UpdateSub_UpdateError(t *testing.T) {
+	s := newUserSuite(t, nil)
+	defer s.ctrl.Finish()
+
+	const (
+		id          = "user.1234"
+		username    = "john.doe"
+		sub         = "f6717d2b-ac1f-40da-ade6-00037512933b"
+		email       = "john@doe.com"
+		accessLevel = entity.AccessLevelAdmin
+	)
+
+	ctx := context.Background()
+
+	user := entity.User{
+		ID:          id,
+		Username:    username,
+		Email:       email,
+		AccessLevel: accessLevel,
+	}
+
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().UpdateSub(ctx, username, sub).Return(errUnexpected)
+
+	returnedUser, err := s.interactor.UpdateSub(ctx, user, sub)
+
+	require.Error(t, err)
+	require.Equal(t, entity.User{}, returnedUser)
+}
+
+func TestInteractor_UpdateSub_DuplicatedUserSub(t *testing.T) {
+	s := newUserSuite(t, nil)
+	defer s.ctrl.Finish()
+
+	const (
+		id          = "user.1234"
+		username    = "john.doe"
+		sub         = "f6717d2b-ac1f-40da-ade6-00037512933b"
+		email       = "john@doe.com"
+		accessLevel = entity.AccessLevelAdmin
+	)
+
+	ctx := context.Background()
+
+	user := entity.User{
+		ID:          id,
+		Username:    username,
+		Email:       email,
+		Sub:         sub,
+		AccessLevel: accessLevel,
+	}
+
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(user, nil)
+
+	returnedUser, err := s.interactor.UpdateSub(ctx, user, sub)
+
+	require.Error(t, err)
+	require.ErrorIs(t, err, entity.ErrDuplicatedUser)
+	require.Equal(t, entity.User{}, returnedUser)
+}
+
 func TestInteractor_GetKubeconfig(t *testing.T) {
 	s := newUserSuite(t, nil)
 	defer s.ctrl.Finish()

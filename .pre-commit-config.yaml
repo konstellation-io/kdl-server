@@ -8,10 +8,10 @@ repos:
     - id: check-symlinks
     - id: end-of-file-fixer
     - id: check-yaml
-# - repo: https://github.com/zricethezav/gitleaks
-#   rev: v8.21.1
-#   hooks:
-#     - id: gitleaks
+- repo: https://github.com/zricethezav/gitleaks
+  rev: v8.21.1
+  hooks:
+    - id: gitleaks
 - repo: https://github.com/dnephin/pre-commit-golang
   rev: v0.5.1
   hooks:

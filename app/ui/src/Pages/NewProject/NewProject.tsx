@@ -17,7 +17,6 @@ import useUnloadPrompt from 'Hooks/useUnloadPrompt/useUnloadPrompt';
 import { newProject } from 'Graphql/client/cache';
 import SidebarTop from 'Components/Layout/Page/DefaultPage/SidebarTop';
 import SidebarInformation from './pages/SidebarComponents/Information/SidebarInformation';
-import SidebarRepository from './pages/SidebarComponents/Repository/SidebarRepository';
 import SidebarExternalRepository from './pages/SidebarComponents/SidebarExternalRepository/SidebarExternalRepository';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 

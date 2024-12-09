@@ -1,12 +1,22 @@
 {
   "extends": "../tsconfig.json",
   "include": [
-    "../node_modules/cypress",
     "*/*.ts"
   ],
+  "exclude": [
+    "node_modules/*/*.*", "**/*.spec.js", "**/*.spec.ts", "**/*.spec.tsx", "**/*.d.ts", "cypress/*"
+  ],
+  "types":["node"],
+  "jsx": "react-jsx",
+  "moduleResolution": "node",
   "compilerOptions": {
     "noEmit": false,
     "isolatedModules": false,
-    "types": ["cypress"]
-  }
+    "types": ["cypress", "node"],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+  },
 }

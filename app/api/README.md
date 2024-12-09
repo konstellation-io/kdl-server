@@ -73,8 +73,6 @@ golangci-lint run --config ../../.github/.golangci.yml --build-tags=integration,
 
 | Environment variable         | Default value  | Description                                 |
 | ---------------------------- | -------------- | ------------------------------------------- |
-| KDL_ADMIN_EMAIL              | kdladmin       | Admin email for the KDL server              |
-| KDL_ADMIN_PASSWORD           | 123456         | Admin password for the KDL server           |
 | KDL_SERVER_PORT              | 8080           | Port for the KDL API                        |
 | BASE_DOMAIN_NAME             | kdl.local      | Base domain name for the KDL server         |
 | TLS_ENABLED                  | true           | Enable TLS for the KDL server               |

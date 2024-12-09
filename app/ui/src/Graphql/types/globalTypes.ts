@@ -18,10 +18,10 @@ export enum RepositoryAuthMethod {
   TOKEN = "TOKEN",
 }
 
-export enum RepositoryType {
-  EXTERNAL = "EXTERNAL",
-  INTERNAL = "INTERNAL",
-}
+// export enum RepositoryType {
+//   EXTERNAL = "EXTERNAL",
+//   INTERNAL = "INTERNAL",
+// }
 
 export interface AddMembersInput {
   projectId: string;
@@ -61,7 +61,7 @@ export interface RemoveMembersInput {
 }
 
 export interface RepositoryInput {
-  type: RepositoryType;
+  // type: RepositoryType;
   external?: ExternalRepositoryInput | null;
 }
 

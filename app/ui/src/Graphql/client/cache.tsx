@@ -42,6 +42,7 @@ export const initialNewProject: NewProject = {
       credential: 'This field is mandatory',
       username: 'This field is mandatory',
       authMethod: RepositoryAuthMethod.TOKEN,
+      type: 'Repo type is wrong',
     },
     // errors: { type: 'Please choose a repo type' },
   },

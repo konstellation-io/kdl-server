@@ -1,7 +1,7 @@
 import { Button } from 'kwc';
 import ROUTE, { buildRoute } from 'Constants/routes';
 import React, { useEffect, useState } from 'react';
-import { RepositoryInput, RepositoryType } from 'Graphql/types/globalTypes';
+import { RepositoryInput } from 'Graphql/types/globalTypes';
 import StatusCircle, { States } from 'Components/LottieShapes/StatusCircle/StatusCircle';
 
 import styles from './ProjectCreation.module.scss';
@@ -42,10 +42,10 @@ function ProjectCreation() {
       history.push(ROUTE.HOME);
       return;
     }
-    const type = RepositoryType.EXTERNAL;
+    // const type = RepositoryType.EXTERNAL;
 
     const inputRepository: RepositoryInput = {
-      type,
+      // type,
     };
 
     // if (type === RepositoryType.EXTERNAL) {

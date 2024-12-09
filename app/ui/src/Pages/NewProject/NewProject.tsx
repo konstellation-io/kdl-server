@@ -6,7 +6,7 @@ import DefaultPage from 'Components/Layout/Page/DefaultPage/DefaultPage';
 import Information from './pages/Information/Information';
 import ROUTE from 'Constants/routes';
 import RepositoryDetails from './pages/RepositoryDetails/RepositoryDetails';
-import { RepositoryType } from 'Graphql/types/globalTypes';
+// import { RepositoryType } from 'Graphql/types/globalTypes';
 import Stepper from 'Components/Stepper/Stepper';
 import Summary from './pages/Summary/Summary';
 import cx from 'classnames';

@@ -7,7 +7,7 @@ import RepositoryTypeComponent, {
 import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import * as React from 'react';
-import { RepositoryType } from 'Graphql/types/globalTypes';
+// import { RepositoryType } from 'Graphql/types/globalTypes';
 import styles from './Overview.module.scss';
 import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
 import useSettingTabs from 'Graphql/client/hooks/useSettingTabs';
@@ -71,11 +71,12 @@ function Overview({ openedProject }: Props) {
           </div>
           <div className={styles.repoType}>
             <RepositoryTypeComponent
-              squareLocation={openedProject.repository?.type === RepositoryType.EXTERNAL ? LOCATION.OUT : LOCATION.IN}
+              // squareLocation={openedProject.repository?.type === RepositoryType.EXTERNAL ? LOCATION.OUT : LOCATION.IN}
+              squareLocation={LOCATION.OUT}
               size={SIZE.TINY}
               shouldAnimate={false}
             />
-            <p className={styles.repoTypeName}>{`${openedProject.repository?.type} REPOSITORY`}</p>
+            {/* <p className={styles.repoTypeName}>{`${openedProject.repository?.type} REPOSITORY`}</p> */}
           </div>
         </div>
         <div

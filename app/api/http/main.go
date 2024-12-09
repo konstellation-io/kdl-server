@@ -85,11 +85,6 @@ func main() {
 		logger.Error(err, "Unexpected error creating serviceAccount for users")
 	}
 
-	err = userInteractor.CreateAdminUser(cfg.Admin.Username, cfg.Admin.Email)
-	if err != nil {
-		logger.Error(err, "Unexpected error creating admin user")
-	}
-
 	projectDeps := &project.InteractorDeps{
 		Logger:           logger,
 		Repo:             projectRepo,
@@ -114,14 +109,13 @@ func main() {
 		capabilitiesInteractor,
 	)
 
-	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, cfg.Kubernetes.IsInsideCluster, resolvers, userRepo, userInteractor, projectRepo)
+	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, resolvers, userRepo, userInteractor, projectRepo)
 }
 
 func startHTTPServer(
 	logger logr.Logger,
 	port,
 	staticFilesPath string,
-	insideK8Cluster bool,
 	resolvers generated.ResolverRoot,
 	userRepo user.Repository,
 	userInteractor user.UseCase,
@@ -135,12 +129,9 @@ func startHTTPServer(
 
 	authController := controller.NewAuthController(logger, userRepo, projectRepo)
 
-	devEnvironment := !insideK8Cluster
-	authMiddleware := middleware.GenerateMiddleware(devEnvironment)
-
 	http.Handle("/", fs)
-	http.Handle("/api/playground", authMiddleware(pg, userInteractor))
-	http.Handle(apiQueryPath, authMiddleware(dataloader.Middleware(userRepo, srv), userInteractor))
+	http.Handle("/api/playground", middleware.AuthMiddleware(pg, userInteractor))
+	http.Handle(apiQueryPath, middleware.AuthMiddleware(dataloader.Middleware(userRepo, srv), userInteractor))
 	http.HandleFunc("/api/auth/project", authController.HandleProjectAuth)
 
 	logger.Info("Server running", "port", port)

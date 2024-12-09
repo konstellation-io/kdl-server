@@ -291,20 +291,6 @@ func (mr *MockUseCaseMockRecorder) Create(ctx, email, sub, accessLevel interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockUseCase)(nil).Create), ctx, email, sub, accessLevel)
 }
 
-// CreateAdminUser mocks base method.
-func (m *MockUseCase) CreateAdminUser(username, email string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateAdminUser", username, email)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CreateAdminUser indicates an expected call of CreateAdminUser.
-func (mr *MockUseCaseMockRecorder) CreateAdminUser(username, email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAdminUser", reflect.TypeOf((*MockUseCase)(nil).CreateAdminUser), username, email)
-}
-
 // FindAll mocks base method.
 func (m *MockUseCase) FindAll(ctx context.Context) ([]entity.User, error) {
 	m.ctrl.T.Helper()

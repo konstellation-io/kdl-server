@@ -272,6 +272,21 @@ func (i *Interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, le
 	return i.repo.FindByIDs(ctx, userIDs)
 }
 
+// UpdateSub updates the sub for the given user.
+func (i *Interactor) UpdateSub(ctx context.Context, user entity.User, sub string) (entity.User, error) {
+	i.logger.Info("Updating user sub", "username", user.Username, "sub", sub)
+
+	if _, err := i.repo.GetBySub(ctx, sub); err == nil {
+		return entity.User{}, entity.ErrDuplicatedUser
+	}
+
+	if err := i.repo.UpdateSub(ctx, user.Username, sub); err != nil {
+		return entity.User{}, err
+	}
+
+	return i.repo.GetByUsername(ctx, user.Username)
+}
+
 // RegenerateSSHKeys generate new SSH key pair for the given user.
 // - Check if user exists. (if no, returns ErrUserNotFound error)
 // - Check if userTools are Running. (if yes, returns ErrUserNotFound error)

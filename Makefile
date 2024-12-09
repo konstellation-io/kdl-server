@@ -46,3 +46,11 @@ refresh-certs: ## Refreshes the certificates
 .PHONY: uninstall
 uninstall: ## Remove all microk8s resources
 	cd hack && ./kdlctl.sh uninstall && cd -
+
+.PHONY: api-test
+test-api: ## Executes api tests
+	cd app/api && go test ./... --tags=integration,unit -v && cd -
+
+.PHONY: api-coverage
+coverage-api: ## Executes api tests, generates coverage and opens the browser
+	cd app/api && go test ./... --tags=integration,unit -v -cover -coverprofile=coverage.out && go tool cover -html=coverage.out && rm coverage.out && cd -

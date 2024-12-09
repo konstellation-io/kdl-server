@@ -100,7 +100,6 @@ function TabDangerZone({ projectId, projectName }: Props) {
           actionButtonCancel="Cancel"
           warning
           blocking
-        // disabled={inputProjectName === projectName}
         >
           <ModalLayoutInfo>
             You are going to archive this project. When a project is archived you will not be able to make changes or
@@ -121,8 +120,8 @@ function TabDangerZone({ projectId, projectName }: Props) {
         >
           <ModalLayoutInfo>
             You are going to delete this project. When a project is deleted all resources associated with this project
-            (mlflow, filebrowser,...) will be removed. This is a non reversible action. Are you sure you want
-            to delete it?
+            (mlflow, filebrowser,...) will be removed. This is a non reversible action. Are you sure you want to delete
+            it?
           </ModalLayoutInfo>
           <div>
             Please type &quot;<span className={styles.projectName}>{projectName}</span>&quot; to confirm.

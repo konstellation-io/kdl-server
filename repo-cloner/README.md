@@ -1,44 +1,115 @@
-# User Repo Cloner
+# Repository Cloner
 
-This module is responsible for automatically cloning external repositories of
-the projects in which the user participates. This way they are available for
-code-server to be able to work with it.
+A specialized service within the KDL ecosystem that automatically manages repository cloning for user projects. It continuously monitors project collections in the database and ensures all repositories where a user has access are properly cloned and available for code-server operations.
 
-To do this, it checks periodically the projects collection in the database, to
-locate the ones that the **user is included in**. So, those who do not have a
-folder with the code, try to clone the repository. For this it is necessary that
-the user's public key is included in the platform where the repository is stored
-(github, gitlab, etc), so that cloning through ssh is possible. User public key
-is mounted as a volume from a k8s secret.
+## Security features
 
-## Run tests
+* Non-root user (`kdl`) execution with configurable UID/GID (default `1000:1000`)
+* Optimized binary build with debug information removal
+* SSH directory permission hardening
 
-```console
+## Application
+
+The service can be configured through environment variables and/or a YAML configuration file. The configuration follows a structured approach where MongoDB-related settings are grouped together for better organization.
+
+### Build arguments
+
+| Variable   | Description        | Default |
+|------------|--------------------|---------|
+| `USER`     | Non-root user name | `kdl`   |
+| `UID`      | User ID            | `1000`  |
+| `GID`      | Group ID           | `1000`  |
+
+### Environment variables and YAML configuration
+
+MongoDB Configuration:
+
+| Variable                | YAML Path                | Description                           | Default                                        |
+|-------------------------|--------------------------|---------------------------------------|------------------------------------------------|
+| `KDL_SERVER_MONGODB_URI`| `mongodb.uri`            | MongoDB connection string             | `mongodb://admin:123456@localhost:27017/admin` |
+| `DB_NAME`               | `mongodb.dbName`         | Database name                         | `kdl`                                          |
+| `PROJECT_COLL_NAME`     | `mongodb.projectCollName`| Projects collection name              | `projects`                                     |
+| `USER_COLL_NAME`        | `mongodb.userCollName`   | Users collection name                 | `users`                                        |
+
+General Configuration:
+
+| Variable                 | YAML Path              | Description                           | Default                                      |
+|--------------------------|------------------------|---------------------------------------|----------------------------------------------|
+| `KDL_USER_NAME`          |                        | Username for repository operations    |                                              |
+| `REPOS_PATH`             | `reposPath`            | Repository storage location           | `/home/kdl/repos/`                           |
+| `PEM_FILE`               | `pemFile`              | SSH private key path                  | `/home/kdl/.ssh/id_rsa`                      |
+| `PEM_FILE_PASSWORD`      | `pemFilePassword`      | SSH key password if encrypted         |                                              |
+| `CHECK_FREQUENCY_SECONDS`| `checkFrequencySeconds`| Repository check interval in seconds  | `10`                                         |
+
+### Configuration
+
+The service supports two configuration methods that can be used together:
+
+1. Environment variables: set any of the above environment variables directly.
+2. YAML configuration: provide a `config.yml` file with the following structure:
+
+```yaml
+mongodb:
+  uri: mongodb://admin:123456@localhost:27017/admin
+  dbName: kdl
+  projectCollName: projects
+  userCollName: users
+reposPath: /home/kdl/repos/
+pemFile: /home/kdl/.ssh/id_rsa
+pemFilePassword: ""
+checkFrequencySeconds: 10
+```
+
+> [!NOTE]
+> Environment variables take precedence over YAML configuration when both are provided.
+
+## Storage
+
+* Repository Storage: Configured through `reposPath` (default: `/home/kdl/repos/`)
+* SSH Keys: Located at path specified by `pemFile` (default: `/home/kdl/.ssh/id_rsa`)
+* User Home: `/home/kdl`
+
+## Local deployment
+
+Basic usage with environment variables:
+
+```bash
+docker run \
+  -e "KDL_USER_NAME=developer" \
+  -e "KDL_SERVER_MONGODB_URI=mongodb://mongo:27017/kdl" \
+  konstellation/kdl-repo-cloner:latest
+```
+
+Advanced configuration with SSH key and config file:
+
+```bash
+docker run \
+  --user 1000:1000 \
+  -v ./config.yml:/app/config.yml \
+  -e "KDL_USER_NAME=developer" \
+  -v /path/to/ssh/key:/home/kdl/.ssh/id_rsa \
+  -v /path/to/repos:/home/kdl/repos \
+  konstellation/kdl-repo-cloner:latest
+```
+
+## Development
+
+### Running tests
+
+All tests:
+
+```bash
 go test ./... --tags=integration,unit -v -cover
 ```
 
-Run only unit tests
+Unit tests only:
 
-```console
+```bash
 go test ./... -tags=unit -v -cover
 ```
 
-Run only integration tests
+Integration tests only:
 
-```console
+```bash
 go test ./... -tags=integration -v -cover
 ```
-
-## Configuration
-
-| Environment variable      | Default                                      | Description                                                               |
-| ------------------------- | -------------------------------------------- | ------------------------------------------------------------------------- |
-| KDL_USER_NAME             | user                                         | (required) username from which the repositories are to be cloned.         |
-| REPOS_PATH                | /home/kdl/repos/                             | (optional) absolute path to store the cloned repositories.                |
-| PEM_FILE                  | /home/kdl/.ssh/id_rsa                        | (optional) absolute path to user private ssh key.                         |
-| PEM_FILE_PASSWORD         |                                              | (optional) password for user private ssh key.                             |
-| CHECK_FREQUENCY_SECONDS   | 10                                           | (optional) frequency of checking new repositories (seconds)               |
-| KDL_SERVER_MONGODB_URI    | mongodb://admin:123456@localhost:27017/admin | (optional) mongoDB URI.                                                   |
-| DB_NAME                   | kdl                                          | (optional) KDL database name.                                             |
-| PROJECT_COLL_NAME         | projects                                     | (optional) projects collection name.                                      |
-| USER_COLL_NAME            | users                                        | (optional) user collection name.                                          |

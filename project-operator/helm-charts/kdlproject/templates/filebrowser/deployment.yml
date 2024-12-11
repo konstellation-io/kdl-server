@@ -14,10 +14,6 @@ spec:
       labels:
         app: {{ .Values.projectId }}-filebrowser
     spec:
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
     {{- with .Values.filebrowser.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
@@ -34,10 +30,6 @@ spec:
         - name: filebrowser
           image: {{ .Values.filebrowser.image.repository }}:{{ .Values.filebrowser.image.tag }}
           imagePullPolicy: {{ .Values.filebrowser.image.pullPolicy }}
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-            allowPrivilegeEscalation: false
           command:
             - /bin/sh
           args:

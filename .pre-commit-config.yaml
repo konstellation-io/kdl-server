@@ -8,12 +8,27 @@ repos:
     - id: check-symlinks
     - id: end-of-file-fixer
     - id: check-yaml
+      exclude: ^(project-operator|user-tools-operator)/
+
 - repo: https://github.com/zricethezav/gitleaks
   rev: v8.21.1
   hooks:
     - id: gitleaks
+
 - repo: https://github.com/dnephin/pre-commit-golang
   rev: v0.5.1
   hooks:
     - id: golangci-lint
       args: ['--config', '.github/.golangci.yml', 'app/api/...', 'cleaner/...', 'repo-cloner/...']
+
+- repo: https://github.com/gruntwork-io/pre-commit
+  rev: v0.1.15
+  hooks:
+    - id: helmlint
+      files: ^(project-operator|user-tools-operator)/
+
+- repo: https://github.com/norwoodj/helm-docs
+  rev: v1.10.0
+  hooks:
+    - id: helm-docs
+      files: ^(project-operator|user-tools-operator)/.*(README\.md\.gotmpl|(Chart|requirements|values)\.yaml)$

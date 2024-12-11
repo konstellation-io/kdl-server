@@ -15,9 +15,9 @@ Docker image for `MLflow Tracking Server`, part of the `Science Toolkit` ecosyst
 | Variable      | Description        | Default   |
 |---------------|--------------------|-----------|
 | `MLFOW_IMAGE` | MLflow version tag | `v2.18.0` |
-| `MLFLOW_USER` | Non-root user name | `mlflow`  |
-| `MLFLOW_UID`  | User ID            | `1000`    |
-| `MLFLOW_GID`  | Group ID           | `1000`    |
+| `USER`        | Non-root user name | `mlflow`  |
+| `UID`         | User ID            | `1000`    |
+| `GID`         | Group ID           | `1000`    |
 
 ### Environment variables
 

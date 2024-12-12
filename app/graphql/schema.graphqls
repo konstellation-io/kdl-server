@@ -1,37 +1,61 @@
 type Query {
-  capabilities: [Capability!]!
-  kubeconfig: String!
   me: User!
-  project(id: ID!): Project!
   projects: [Project!]!
-  qualityProjectDesc(description: String!): QualityProjectDesc!
-  runningCapability: Capability
-  runningRuntime: Runtime
-  runtimes: [Runtime!]!
+  project(id: ID!): Project!
   users: [User!]!
+  qualityProjectDesc(description: String!): QualityProjectDesc!
+  runtimes: [Runtime!]!
+  runningRuntime: Runtime
+  capabilities: [Capability!]!
+  runningCapability: Capability
+  kubeconfig: String!
 }
 
 type Mutation {
-  regenerateSSHKey: User!
   removeUsers(input: RemoveUsersInput!): [User!]!
-  setActiveUserTools(input: SetActiveUserToolsInput!): User!
   updateAccessLevel(input: UpdateAccessLevelInput!): [User!]!
-
-  addMembers(input: AddMembersInput!): Project!
+  regenerateSSHKey: User!
   createProject(input: CreateProjectInput!): Project!
+  updateProject(input: UpdateProjectInput!): Project!
   deleteProject(input: DeleteProjectInput!): Project
+  addMembers(input: AddMembersInput!): Project!
   removeMembers(input: RemoveMembersInput!): Project!
   updateMembers(input: UpdateMembersInput!): Project!
-  updateProject(input: UpdateProjectInput!): Project!
-
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
+  setActiveUserTools(input: SetActiveUserToolsInput!): User!
+}
+
+type QualityProjectDesc {
+  quality: Int!
+}
+
+type Runtime {
+  id: ID!
+  name: String!
+  desc: String!
+  labels: [String!]
+  dockerImage: String!
+  dockerTag: String!
+  runtimePod: String!
 }
 
 type Capability {
   id: ID!
   name: String!
   default: Boolean!
+}
+
+type Topic {
+  name: String!
+  relevance: Float!
+}
+
+type SSHKey {
+  public: String!
+  private: String!
+  creationDate: String!
+  lastActivity: String
 }
 
 type User {
@@ -44,12 +68,6 @@ type User {
   apiTokens: [ApiToken!]!
   isKubeconfigEnabled: Boolean!
   sshKey: SSHKey!
-}
-
-enum AccessLevel {
-  VIEWER
-  MANAGER
-  ADMIN
 }
 
 type ApiToken {
@@ -164,70 +182,22 @@ type Project {
   archived: Boolean!
 }
 
-type Repository {
-  url: String!
-  error: String
-}
-
-type Member {
-  user: User!
-  accessLevel: AccessLevel!
-  addedDate: String!
-}
-
-type ToolUrls {
-  knowledgeGalaxy: String!
-  filebrowser: String!
-  vscode: String!
-  mlflow: String!
-}
-
-type QualityProjectDesc {
-  quality: Int!
-}
-
-type Runtime {
-  id: ID!
-  name: String!
-  desc: String!
-  labels: [String!]
-  dockerImage: String!
-  dockerTag: String!
-  runtimePod: String!
-}
-
-input RemoveUsersInput {
-  userIds: [ID!]!
-}
-
-input SetActiveUserToolsInput {
-  active: Boolean!,
-  runtimeId: String,
-  capabilitiesId: String
-}
-
-input UpdateAccessLevelInput {
-  userIds: [ID!]!
-  accessLevel: AccessLevel!
-}
-
-input AddMembersInput {
-  projectId: ID!
-  userIds: [ID!]!
-}
-
-input CreateProjectInput {
-  id: ID!
-  name: String!
-  description: String!
-  repository: RepositoryInput!
-}
-
 input RepositoryInput {
+  type: RepositoryType!
+  external: ExternalRepositoryInput
+}
+
+input ExternalRepositoryInput {
   url: String!
   username: String!
   credential: String!
   authMethod: RepositoryAuthMethod!
+}
+
+type Repository {
+  type: RepositoryType!
+  url: String!
+  error: String
 }
 
 enum RepositoryAuthMethod {
@@ -235,33 +205,7 @@ enum RepositoryAuthMethod {
   TOKEN
 }
 
-input DeleteProjectInput {
-  id: ID!
-}
-
-input RemoveMembersInput {
-  projectId: ID!
-  userIds: [ID!]!
-}
-
-input UpdateMembersInput {
-  projectId: ID!
-  userIds: [ID!]!
-  accessLevel: AccessLevel!
-}
-
-input UpdateProjectInput {
-  id: ID!
-  name: String
-  description: String
-  archived: Boolean
-}
-
-input ApiTokenInput {
-  userId: ID!
-  name: String
-}
-
-input RemoveApiTokenInput {
-  apiTokenId: ID!
+enum RepositoryType {
+  INTERNAL
+  EXTERNAL
 }

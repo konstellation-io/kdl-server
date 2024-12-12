@@ -139,9 +139,9 @@ func startHTTPServer(
 	server := &http.Server{
 		Addr:         ":" + port,
 		Handler:      nil,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  15 * time.Second,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  30 * time.Second,
 	}
 
 	err := server.ListenAndServe()

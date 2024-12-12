@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	namespace = "kdl-test"
+	Namespace = "kdl-test"
 )
 
 type TestSuite struct {
@@ -47,7 +47,7 @@ func (s *TestSuite) SetupSuite() {
 	// Create a namespace
 	_, err = s.Clientset.CoreV1().Namespaces().Create(ctx, &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: namespace,
+			Name: Namespace,
 		},
 	}, metav1.CreateOptions{})
 	s.Require().NoError(err)
@@ -61,7 +61,7 @@ func (s *TestSuite) SetupSuite() {
 	cfg := config.Config{
 		Kubernetes: config.KubernetesConfig{
 			IsInsideCluster: true,
-			Namespace:       namespace,
+			Namespace:       Namespace,
 		},
 	}
 

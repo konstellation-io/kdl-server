@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	saNamespace                  = "kdl-test"
 	saSimpleName                 = "sa"
 	saSimpleNameWithoutAutomount = "sawa"
 	saName                       = "sa-service-account"
@@ -51,7 +50,7 @@ func (s *serviceAccountTestSuite) TestCreateServiceAccount() {
 
 func (s *serviceAccountTestSuite) TestCreateServiceAccountOnExistingSaWithoutAutomount() {
 	// Arrange, create a service account without automount
-	saNoAutomount, err := s.Clientset.CoreV1().ServiceAccounts(saNamespace).Create(context.Background(), &v1.ServiceAccount{
+	saNoAutomount, err := s.Clientset.CoreV1().ServiceAccounts(k8s.Namespace).Create(context.Background(), &v1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: saNameWithoutAutomount,
 		},

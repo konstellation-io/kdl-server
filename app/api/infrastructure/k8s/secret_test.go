@@ -11,7 +11,6 @@ import (
 )
 
 const (
-	secretNamespace  = "kdl-secret"
 	secretCreateName = "secret-create"
 	secretGetName    = "secret-get"
 	secretUpdateName = "secret-update"

@@ -71,6 +71,7 @@ function NewProject() {
 
   const stepsWithData: (StepNames.INFORMATION | StepNames.EXTERNAL)[] = useMemo(() => {
     return [StepNames.INFORMATION, repoTypeToStepName[type || '']];
+    return [StepNames.INFORMATION, StepNames.EXTERNAL, repoTypeToStepName[type || '']];
   }, [type]);
 
   // We want to execute this on on component mount and unmount
@@ -141,6 +142,8 @@ function NewProject() {
 
   // Updates completed and error step states
   function validateStep() {
+    console.log('stepsWithData', stepsWithData);
+    console.log('actStep', actStep);
     const stepData = stepsWithData[actStep];
     const hasData = !!stepData;
 
@@ -151,7 +154,6 @@ function NewProject() {
 
       const values = Object.values(actStepData.values).filter((v) => typeof v !== 'boolean');
       const completed = values && values.every((v) => !!v) && !error;
-
       updateState(completed, error);
       return !error;
     } else if (!hasData) {

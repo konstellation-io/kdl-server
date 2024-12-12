@@ -253,7 +253,6 @@ func (r *projectResolver) NeedAccess(ctx context.Context, obj *entity.Project) (
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
-	time.Sleep(11 * time.Second)
 	loggedUser, err := r.getLoggedUser(ctx)
 	if err != nil {
 		return nil, err

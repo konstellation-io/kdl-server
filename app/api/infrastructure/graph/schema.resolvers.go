@@ -23,9 +23,19 @@ func (r *memberResolver) AddedDate(ctx context.Context, obj *entity.Member) (str
 	panic(fmt.Errorf("not implemented: AddedDate - addedDate"))
 }
 
+// RegenerateSSHKey is the resolver for the regenerateSSHKey field.
+func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.User, error) {
+	panic(fmt.Errorf("not implemented: RegenerateSSHKey - regenerateSSHKey"))
+}
+
 // RemoveUsers is the resolver for the removeUsers field.
 func (r *mutationResolver) RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error) {
 	panic(fmt.Errorf("not implemented: RemoveUsers - removeUsers"))
+}
+
+// SetActiveUserTools is the resolver for the setActiveUserTools field.
+func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error) {
+	panic(fmt.Errorf("not implemented: SetActiveUserTools - setActiveUserTools"))
 }
 
 // UpdateAccessLevel is the resolver for the updateAccessLevel field.
@@ -33,9 +43,9 @@ func (r *mutationResolver) UpdateAccessLevel(ctx context.Context, input model.Up
 	panic(fmt.Errorf("not implemented: UpdateAccessLevel - updateAccessLevel"))
 }
 
-// RegenerateSSHKey is the resolver for the regenerateSSHKey field.
-func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.User, error) {
-	panic(fmt.Errorf("not implemented: RegenerateSSHKey - regenerateSSHKey"))
+// AddMembers is the resolver for the addMembers field.
+func (r *mutationResolver) AddMembers(ctx context.Context, input model.AddMembersInput) (*entity.Project, error) {
+	panic(fmt.Errorf("not implemented: AddMembers - addMembers"))
 }
 
 // CreateProject is the resolver for the createProject field.
@@ -43,19 +53,9 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 	panic(fmt.Errorf("not implemented: CreateProject - createProject"))
 }
 
-// UpdateProject is the resolver for the updateProject field.
-func (r *mutationResolver) UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error) {
-	panic(fmt.Errorf("not implemented: UpdateProject - updateProject"))
-}
-
 // DeleteProject is the resolver for the deleteProject field.
 func (r *mutationResolver) DeleteProject(ctx context.Context, input model.DeleteProjectInput) (*entity.Project, error) {
 	panic(fmt.Errorf("not implemented: DeleteProject - deleteProject"))
-}
-
-// AddMembers is the resolver for the addMembers field.
-func (r *mutationResolver) AddMembers(ctx context.Context, input model.AddMembersInput) (*entity.Project, error) {
-	panic(fmt.Errorf("not implemented: AddMembers - addMembers"))
 }
 
 // RemoveMembers is the resolver for the removeMembers field.
@@ -68,6 +68,11 @@ func (r *mutationResolver) UpdateMembers(ctx context.Context, input model.Update
 	panic(fmt.Errorf("not implemented: UpdateMembers - updateMembers"))
 }
 
+// UpdateProject is the resolver for the updateProject field.
+func (r *mutationResolver) UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error) {
+	panic(fmt.Errorf("not implemented: UpdateProject - updateProject"))
+}
+
 // AddAPIToken is the resolver for the addApiToken field.
 func (r *mutationResolver) AddAPIToken(ctx context.Context, input *model.APITokenInput) (*entity.APIToken, error) {
 	panic(fmt.Errorf("not implemented: AddAPIToken - addApiToken"))
@@ -76,11 +81,6 @@ func (r *mutationResolver) AddAPIToken(ctx context.Context, input *model.APIToke
 // RemoveAPIToken is the resolver for the removeApiToken field.
 func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error) {
 	panic(fmt.Errorf("not implemented: RemoveAPIToken - removeApiToken"))
-}
-
-// SetActiveUserTools is the resolver for the setActiveUserTools field.
-func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error) {
-	panic(fmt.Errorf("not implemented: SetActiveUserTools - setActiveUserTools"))
 }
 
 // CreationDate is the resolver for the creationDate field.
@@ -98,49 +98,9 @@ func (r *projectResolver) NeedAccess(ctx context.Context, obj *entity.Project) (
 	panic(fmt.Errorf("not implemented: NeedAccess - needAccess"))
 }
 
-// Me is the resolver for the me field.
-func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
-	panic(fmt.Errorf("not implemented: Me - me"))
-}
-
-// Projects is the resolver for the projects field.
-func (r *queryResolver) Projects(ctx context.Context) ([]entity.Project, error) {
-	panic(fmt.Errorf("not implemented: Projects - projects"))
-}
-
-// Project is the resolver for the project field.
-func (r *queryResolver) Project(ctx context.Context, id string) (*entity.Project, error) {
-	panic(fmt.Errorf("not implemented: Project - project"))
-}
-
-// Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
-	panic(fmt.Errorf("not implemented: Users - users"))
-}
-
-// QualityProjectDesc is the resolver for the qualityProjectDesc field.
-func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
-	panic(fmt.Errorf("not implemented: QualityProjectDesc - qualityProjectDesc"))
-}
-
-// Runtimes is the resolver for the runtimes field.
-func (r *queryResolver) Runtimes(ctx context.Context) ([]entity.Runtime, error) {
-	panic(fmt.Errorf("not implemented: Runtimes - runtimes"))
-}
-
-// RunningRuntime is the resolver for the runningRuntime field.
-func (r *queryResolver) RunningRuntime(ctx context.Context) (*entity.Runtime, error) {
-	panic(fmt.Errorf("not implemented: RunningRuntime - runningRuntime"))
-}
-
 // Capabilities is the resolver for the capabilities field.
 func (r *queryResolver) Capabilities(ctx context.Context) ([]model.Capability, error) {
 	panic(fmt.Errorf("not implemented: Capabilities - capabilities"))
-}
-
-// RunningCapability is the resolver for the runningCapability field.
-func (r *queryResolver) RunningCapability(ctx context.Context) (*model.Capability, error) {
-	panic(fmt.Errorf("not implemented: RunningCapability - runningCapability"))
 }
 
 // Kubeconfig is the resolver for the kubeconfig field.
@@ -148,9 +108,44 @@ func (r *queryResolver) Kubeconfig(ctx context.Context) (string, error) {
 	panic(fmt.Errorf("not implemented: Kubeconfig - kubeconfig"))
 }
 
-// Type is the resolver for the type field.
-func (r *repositoryResolver) Type(ctx context.Context, obj *entity.Repository) (model.RepositoryType, error) {
-	panic(fmt.Errorf("not implemented: Type - type"))
+// Me is the resolver for the me field.
+func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
+	panic(fmt.Errorf("not implemented: Me - me"))
+}
+
+// Project is the resolver for the project field.
+func (r *queryResolver) Project(ctx context.Context, id string) (*entity.Project, error) {
+	panic(fmt.Errorf("not implemented: Project - project"))
+}
+
+// Projects is the resolver for the projects field.
+func (r *queryResolver) Projects(ctx context.Context) ([]entity.Project, error) {
+	panic(fmt.Errorf("not implemented: Projects - projects"))
+}
+
+// QualityProjectDesc is the resolver for the qualityProjectDesc field.
+func (r *queryResolver) QualityProjectDesc(ctx context.Context, description string) (*model.QualityProjectDesc, error) {
+	panic(fmt.Errorf("not implemented: QualityProjectDesc - qualityProjectDesc"))
+}
+
+// RunningCapability is the resolver for the runningCapability field.
+func (r *queryResolver) RunningCapability(ctx context.Context) (*model.Capability, error) {
+	panic(fmt.Errorf("not implemented: RunningCapability - runningCapability"))
+}
+
+// RunningRuntime is the resolver for the runningRuntime field.
+func (r *queryResolver) RunningRuntime(ctx context.Context) (*entity.Runtime, error) {
+	panic(fmt.Errorf("not implemented: RunningRuntime - runningRuntime"))
+}
+
+// Runtimes is the resolver for the runtimes field.
+func (r *queryResolver) Runtimes(ctx context.Context) ([]entity.Runtime, error) {
+	panic(fmt.Errorf("not implemented: Runtimes - runtimes"))
+}
+
+// Users is the resolver for the users field.
+func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
+	panic(fmt.Errorf("not implemented: Users - users"))
 }
 
 // CreationDate is the resolver for the creationDate field.
@@ -190,9 +185,6 @@ func (r *Resolver) Project() generated.ProjectResolver { return &projectResolver
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
-// Repository returns generated.RepositoryResolver implementation.
-func (r *Resolver) Repository() generated.RepositoryResolver { return &repositoryResolver{r} }
-
 // SSHKey returns generated.SSHKeyResolver implementation.
 func (r *Resolver) SSHKey() generated.SSHKeyResolver { return &sSHKeyResolver{r} }
 
@@ -203,6 +195,19 @@ type memberResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type projectResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-type repositoryResolver struct{ *Resolver }
 type sSHKeyResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *repositoryResolver) Type(ctx context.Context, obj *entity.Repository) (model.RepositoryType, error) {
+	panic(fmt.Errorf("not implemented: Type - type"))
+}
+func (r *Resolver) Repository() generated.RepositoryResolver { return &repositoryResolver{r} }
+type repositoryResolver struct{ *Resolver }
+*/

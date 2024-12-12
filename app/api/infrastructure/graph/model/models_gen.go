@@ -3,23 +3,12 @@
 package model
 
 import (
-	"fmt"
-	"io"
-	"strconv"
-
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 )
 
 type AddMembersInput struct {
 	ProjectID string   `json:"projectId"`
 	UserIds   []string `json:"userIds"`
-}
-
-type AddUserInput struct {
-	Email       string             `json:"email"`
-	Username    string             `json:"username"`
-	Password    string             `json:"password"`
-	AccessLevel entity.AccessLevel `json:"accessLevel"`
 }
 
 type APITokenInput struct {
@@ -42,13 +31,6 @@ type CreateProjectInput struct {
 
 type DeleteProjectInput struct {
 	ID string `json:"id"`
-}
-
-type ExternalRepositoryInput struct {
-	URL        string                      `json:"url"`
-	Username   string                      `json:"username"`
-	Credential string                      `json:"credential"`
-	AuthMethod entity.RepositoryAuthMethod `json:"authMethod"`
 }
 
 type Mutation struct {
@@ -75,24 +57,16 @@ type RemoveUsersInput struct {
 }
 
 type RepositoryInput struct {
-	Type     RepositoryType           `json:"type"`
-	External *ExternalRepositoryInput `json:"external,omitempty"`
+	URL        string                      `json:"url"`
+	Username   string                      `json:"username"`
+	Credential string                      `json:"credential"`
+	AuthMethod entity.RepositoryAuthMethod `json:"authMethod"`
 }
 
 type SetActiveUserToolsInput struct {
 	Active         bool    `json:"active"`
 	RuntimeID      *string `json:"runtimeId,omitempty"`
 	CapabilitiesID *string `json:"capabilitiesId,omitempty"`
-}
-
-type SetBoolFieldInput struct {
-	ID    string `json:"id"`
-	Value bool   `json:"value"`
-}
-
-type Topic struct {
-	Name      string  `json:"name"`
-	Relevance float64 `json:"relevance"`
 }
 
 type UpdateAccessLevelInput struct {
@@ -111,45 +85,4 @@ type UpdateProjectInput struct {
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
 	Archived    *bool   `json:"archived,omitempty"`
-}
-
-type RepositoryType string
-
-const (
-	RepositoryTypeInternal RepositoryType = "INTERNAL"
-	RepositoryTypeExternal RepositoryType = "EXTERNAL"
-)
-
-var AllRepositoryType = []RepositoryType{
-	RepositoryTypeInternal,
-	RepositoryTypeExternal,
-}
-
-func (e RepositoryType) IsValid() bool {
-	switch e {
-	case RepositoryTypeInternal, RepositoryTypeExternal:
-		return true
-	}
-	return false
-}
-
-func (e RepositoryType) String() string {
-	return string(e)
-}
-
-func (e *RepositoryType) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = RepositoryType(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid RepositoryType", str)
-	}
-	return nil
-}
-
-func (e RepositoryType) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
 }

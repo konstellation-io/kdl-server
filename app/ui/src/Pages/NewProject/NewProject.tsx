@@ -70,7 +70,6 @@ function NewProject() {
   const type = data.repository.values.type;
 
   const stepsWithData: (StepNames.INFORMATION | StepNames.EXTERNAL)[] = useMemo(() => {
-    return [StepNames.INFORMATION, repoTypeToStepName[type || '']];
     return [StepNames.INFORMATION, StepNames.EXTERNAL, repoTypeToStepName[type || '']];
   }, [type]);
 
@@ -142,8 +141,6 @@ function NewProject() {
 
   // Updates completed and error step states
   function validateStep() {
-    console.log('stepsWithData', stepsWithData);
-    console.log('actStep', actStep);
     const stepData = stepsWithData[actStep];
     const hasData = !!stepData;
 

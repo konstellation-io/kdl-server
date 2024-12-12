@@ -745,6 +745,21 @@ func (s *TestSuite) TestUserUpdateUsername_OK() {
 	s.Equal(newUsername, actualUser.Username)
 }
 
+func (s *TestSuite) TestUserUpdateSub_OK() {
+	ctx := context.Background()
+
+	user := userExamples["user1"]
+	newSub := "e8fc5009-d220-427f-bf8c-dd63b69ca6f5"
+
+	err := s.userRepo.UpdateSub(ctx, user.Username, newSub)
+	s.Require().NoError(err)
+
+	actualUser, err := s.userRepo.Get(ctx, user.ID)
+	s.Require().NoError(err)
+
+	s.Equal(newSub, actualUser.Sub)
+}
+
 func (s *TestSuite) TestUserEnsureIndexes_OK() {
 	collection := s.mongoClient.Database(dbName).Collection(userCollName)
 	indexView := collection.Indexes()

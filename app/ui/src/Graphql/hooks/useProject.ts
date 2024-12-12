@@ -4,7 +4,7 @@ import { GetProjects, GetProjects_projects } from 'Graphql/queries/types/GetProj
 import { UpdateProject, UpdateProjectVariables } from '../mutations/types/UpdateProject';
 import { DeleteProject, DeleteProjectVariables } from '../mutations/types/DeleteProject';
 
-import { CreateProjectInput, DeleteProjectInput } from '../types/globalTypes';
+import { CreateProjectInput } from '../types/globalTypes';
 import { mutationPayloadHelper } from 'Utils/formUtils';
 
 import GetProjectsQuery from 'Graphql/queries/getProjects';

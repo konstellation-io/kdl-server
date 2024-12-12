@@ -272,6 +272,21 @@ func (i *Interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, le
 	return i.repo.FindByIDs(ctx, userIDs)
 }
 
+// UpdateSub updates the sub for the given user.
+func (i *Interactor) UpdateSub(ctx context.Context, user entity.User, sub string) (entity.User, error) {
+	i.logger.Info("Updating user sub", "username", user.Username, "sub", sub)
+
+	if _, err := i.repo.GetBySub(ctx, sub); err == nil {
+		return entity.User{}, entity.ErrDuplicatedUser
+	}
+
+	if err := i.repo.UpdateSub(ctx, user.Username, sub); err != nil {
+		return entity.User{}, err
+	}
+
+	return i.repo.GetByUsername(ctx, user.Username)
+}
+
 // RegenerateSSHKeys generate new SSH key pair for the given user.
 // - Check if user exists. (if no, returns ErrUserNotFound error)
 // - Check if userTools are Running. (if yes, returns ErrUserNotFound error)
@@ -336,32 +351,6 @@ func (i *Interactor) SynchronizeServiceAccountsForUsers() error {
 			}
 		}
 	}
-
-	return nil
-}
-
-// CreateAdminUser creates the KDL admin user if not exists.
-func (i *Interactor) CreateAdminUser(username, email string) error {
-	ctx := context.Background()
-
-	_, err := i.repo.GetByUsername(ctx, username)
-	if err == nil {
-		i.logger.Info("The admin user already exists", "username", username)
-		return nil
-	}
-
-	if !errors.Is(err, entity.ErrUserNotFound) {
-		return err
-	}
-
-	i.logger.Info("Creating the admin user", "username", username)
-
-	user, err := i.Create(ctx, email, username, entity.AccessLevelAdmin)
-	if err != nil {
-		return err
-	}
-
-	i.logger.Info("Admin user created correctly", "username", user.Username, "userEmail", user.Email, "insertedID", user.ID)
 
 	return nil
 }

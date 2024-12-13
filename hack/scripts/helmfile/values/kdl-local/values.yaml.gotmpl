@@ -211,11 +211,10 @@ oauth2proxy:
     cookieSecret: mycookiesecret16
 
     configFile: |-
-      upstreams=["http://kdl-local-server:80/", "http://127.0.0.1:9000/mlflow/", "http://127.0.0.1:9000/filebrowser/", "http://127.0.0.1:9000/kg/"]
-      silence_ping_logging=true
       cookie_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}", "keycloak.{{ requiredEnv "DOMAIN" }}"]
-      cookie_samesite="lax"
+      cookie_samesite="strict"
       cookie_secure=false
+      cookie_csrf_per_request=true
       email_domains="*"
       errors_to_info_log=true
       http_address="https://kdlapp.{{ requiredEnv "DOMAIN" }}/"
@@ -224,9 +223,12 @@ oauth2proxy:
       provider="keycloak-oidc"
       redirect_url="https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
       set_xauthrequest=true
+      silence_ping_logging=true
+      set_authorization_header=true
       skip_auth_routes="/config.json"
       skip_provider_button=true
       ssl_insecure_skip_verify=true
+      upstreams=["http://kdl-local-server:80/", "http://127.0.0.1:9000/mlflow/", "http://127.0.0.1:9000/filebrowser/", "http://127.0.0.1:9000/kg/"]
       whitelist_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}"]
 
   extraContainers:

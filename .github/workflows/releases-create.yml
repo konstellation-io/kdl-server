@@ -5,7 +5,7 @@
 name: "[Releases] Create"
 
 env:
-  COMPONENTS: "app,cleaner,mlflow,project-operator,repo-cloner,user-tools-operator,vscode"
+  COMPONENTS: "app,cleaner,mlflow,project-operator,repo-cloner,user-tools-operator"
 
 on:
   workflow_dispatch:
@@ -22,7 +22,6 @@ on:
           - project-operator
           - repo-cloner
           - user-tools-operator
-          - vscode
 
   push:
     branches:
@@ -51,6 +50,7 @@ jobs:
           npm install
 
           if [[ "${{ github.event.inputs.component }}" == "all" || -z "${{ github.event.inputs.component }}" ]]; then
+            echo "No specific components detected - releasing all workspaces"
             yarn workspaces run semantic-release
           else
             echo "Releasing component: ${{ github.event.inputs.component }}"
@@ -74,8 +74,11 @@ jobs:
         id: detect-components
         run: |
           COMPONENTS_LIST=""
+          # releases or pre-releases always from main branch
+          MERGE_BASE=$(git merge-base origin/main HEAD)
+
           for COMPONENT in $(echo ${{ env.COMPONENTS }} | tr ',' ' '); do
-            if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^$COMPONENT/"; then
+            if git diff --name-only $MERGE_BASE HEAD | grep -q "^$COMPONENT/"; then
               COMPONENTS_LIST="$COMPONENTS_LIST $COMPONENT"
             fi
           done
@@ -89,13 +92,18 @@ jobs:
         with:
           node-version: ${{ vars.NODE_VERSION }}
 
-      - name: Create release for changed component
+      - name: Create component releases
         run: |
           npm install
 
-          for COMPONENT in $(echo ${{ env.CHANGED_COMPONENTS }} | tr ',' ' '); do
-            echo "Releasing component: $COMPONENT"
-            yarn workspace $COMPONENT run semantic-release
-          done
+          if [ ! -z "${{ env.CHANGED_COMPONENTS }}" ]; then
+            for COMPONENT in $(echo ${{ env.CHANGED_COMPONENTS }} | tr ',' ' '); do
+              echo "Releasing component: $COMPONENT"
+              yarn workspace $COMPONENT run semantic-release
+            done
+          else
+            echo "No specific components detected - releasing all workspaces"
+            yarn workspaces run semantic-release
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}

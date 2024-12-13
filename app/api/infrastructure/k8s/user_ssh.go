@@ -18,26 +18,30 @@ func (k Client) getUserSSHSecretName(usernameSlug string) string {
 }
 
 // newUserSSHSecret returns the name and the k8s secret for public and private SSH keys.
-func (k *Client) newUserSSHSecret(user entity.User, public, private string) (secretName string, secretValues map[string]string) {
-	secretName = k.getUserSSHSecretName(user.UsernameSlug())
-	secretValues = map[string]string{
+func (k *Client) newUserSSHSecret(user entity.User, public, private string) (string, map[string]string, map[string]string) {
+	secretName := k.getUserSSHSecretName(user.UsernameSlug())
+	secretValues := map[string]string{
 		KdlUserPublicSSHKey:  public,
 		KdlUserPrivateSSHKey: private,
 	}
 
-	return secretName, secretValues
+	labels := map[string]string{
+		"konstellation.io/ssh-key": "true",
+	}
+
+	return secretName, secretValues, labels
 }
 
 // CreateUserSSHKeySecret creates the user SSH keys secret in k8s.
 func (k *Client) CreateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error {
-	secretName, k8sKeys := k.newUserSSHSecret(user, public, private)
-	return k.CreateSecret(ctx, secretName, k8sKeys)
+	secretName, k8sKeys, labels := k.newUserSSHSecret(user, public, private)
+	return k.CreateSecret(ctx, secretName, k8sKeys, labels)
 }
 
 // UpdateUserSSHKeySecret updates the user SSH keys secret in k8s.
 func (k *Client) UpdateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error {
-	secretName, k8sKeys := k.newUserSSHSecret(user, public, private)
-	return k.UpdateSecret(ctx, secretName, k8sKeys)
+	secretName, k8sKeys, labels := k.newUserSSHSecret(user, public, private)
+	return k.UpdateSecret(ctx, secretName, k8sKeys, labels)
 }
 
 // GetUserSSHKeySecret returns private SSH key for the given user.

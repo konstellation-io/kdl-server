@@ -82,6 +82,9 @@ func (k *Client) createSecretTypeServiceAccountToken(ctx context.Context, saSecr
 		TypeMeta: metav1.TypeMeta{},
 		ObjectMeta: metav1.ObjectMeta{
 			Name: saSecretName,
+			Labels: map[string]string{
+				"konstellation.io/secret-service-account-token": "true",
+			},
 			Annotations: map[string]string{
 				"kubernetes.io/service-account.name": k.getUserServiceAccountName(usernameSlug),
 			},

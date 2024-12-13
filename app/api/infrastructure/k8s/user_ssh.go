@@ -18,13 +18,14 @@ func (k Client) getUserSSHSecretName(usernameSlug string) string {
 }
 
 // newUserSSHSecret returns the name and the k8s secret for public and private SSH keys.
-func (k *Client) newUserSSHSecret(user entity.User, public, private string) (secretName string, secretValues, labels map[string]string) {
-	secretName = k.getUserSSHSecretName(user.UsernameSlug())
-	secretValues = map[string]string{
+func (k *Client) newUserSSHSecret(user entity.User, public, private string) (string, map[string]string, map[string]string) {
+	secretName := k.getUserSSHSecretName(user.UsernameSlug())
+	secretValues := map[string]string{
 		KdlUserPublicSSHKey:  public,
 		KdlUserPrivateSSHKey: private,
 	}
-	labels = map[string]string{
+
+	labels := map[string]string{
 		"konstellation.io/ssh-key": "true",
 	}
 

@@ -128,7 +128,9 @@ func startHTTPServer(
 	srv.AddTransport(transport.Websocket{
 		KeepAlivePingInterval: 30 * time.Second,
 	})
+	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.MultipartForm{})
 
 	pg := playground.Handler("GraphQL playground", apiQueryPath)
 	fs := http.FileServer(http.Dir(staticFilesPath))

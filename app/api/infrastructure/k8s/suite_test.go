@@ -1,10 +1,14 @@
-package k8s
+//go:build integration
+
+package k8s_test
 
 import (
 	"context"
+	"testing"
 
 	"github.com/go-logr/zapr"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go/modules/k3s"
 	"go.uber.org/zap"
@@ -15,17 +19,21 @@ import (
 )
 
 const (
-	Namespace = "kdl-test"
+	namespace = "kdl-test"
 )
 
-type TestSuite struct {
+type testSuite struct {
 	suite.Suite
 	Container *k3s.K3sContainer
-	Client    *Client
+	Client    *k8s.Client
 	Clientset *kubernetes.Clientset
 }
 
-func (s *TestSuite) SetupSuite() {
+func TestSuite(t *testing.T) {
+	suite.Run(t, new(testSuite))
+}
+
+func (s *testSuite) SetupSuite() {
 	ctx := context.Background()
 
 	// Launch a k3s container
@@ -47,7 +55,7 @@ func (s *TestSuite) SetupSuite() {
 	// Create a namespace
 	_, err = s.Clientset.CoreV1().Namespaces().Create(ctx, &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: Namespace,
+			Name: namespace,
 		},
 	}, metav1.CreateOptions{})
 	s.Require().NoError(err)
@@ -61,11 +69,11 @@ func (s *TestSuite) SetupSuite() {
 	cfg := config.Config{
 		Kubernetes: config.KubernetesConfig{
 			IsInsideCluster: true,
-			Namespace:       Namespace,
+			Namespace:       namespace,
 		},
 	}
 
-	s.Client = New(
+	s.Client = k8s.New(
 		logger,
 		cfg,
 		s.Clientset,
@@ -74,7 +82,15 @@ func (s *TestSuite) SetupSuite() {
 	)
 }
 
-func (s *TestSuite) TearDownSuite() {
+func (s *testSuite) TearDownSuite() {
 	err := s.Container.Terminate(context.Background())
+	s.Require().NoError(err)
+}
+
+func (s *testSuite) TearDownTest() {
+	err := s.Clientset.CoreV1().Secrets(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{})
+	s.Require().NoError(err)
+
+	err = s.Clientset.CoreV1().ServiceAccounts(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{})
 	s.Require().NoError(err)
 }

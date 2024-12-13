@@ -4,16 +4,10 @@ package k8s_test
 
 import (
 	"context"
-	"testing"
-
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
-	"github.com/stretchr/testify/suite"
 )
 
 const (
-	secretCreateName = "secret-create"
-	secretGetName    = "secret-get"
-	secretUpdateName = "secret-update"
+	secretName = "secret-create"
 )
 
 var (
@@ -21,47 +15,39 @@ var (
 	labels     = map[string]string{"label": "value"}
 )
 
-type secretTestSuite struct {
-	k8s.TestSuite
-}
-
-func TestSecretSuite(t *testing.T) {
-	suite.Run(t, new(secretTestSuite))
-}
-
-func (s *secretTestSuite) TestCreateSecret() {
+func (s *testSuite) TestCreateSecret() {
 	// Create a secret
-	err := s.Client.CreateSecret(context.Background(), secretCreateName, secretData, labels)
+	err := s.Client.CreateSecret(context.Background(), secretName, secretData, labels)
 	s.Require().NoError(err)
 }
 
-func (s *secretTestSuite) TestUpdateSecret() {
+func (s *testSuite) TestUpdateSecret() {
 	// Create a secret
-	err := s.Client.CreateSecret(context.Background(), secretUpdateName, secretData, labels)
+	err := s.Client.CreateSecret(context.Background(), secretName, secretData, labels)
 	s.Require().NoError(err)
 
 	// Assert secret exists
-	data, err := s.Client.GetSecret(context.Background(), secretUpdateName)
+	data, err := s.Client.GetSecret(context.Background(), secretName)
 	s.Require().NoError(err)
 	s.Require().Equal("value", string(data["key"]))
 
 	// Update secret
-	err = s.Client.UpdateSecret(context.Background(), secretUpdateName, map[string]string{"key": "new-value"}, labels)
+	err = s.Client.UpdateSecret(context.Background(), secretName, map[string]string{"key": "new-value"}, labels)
 	s.Require().NoError(err)
 
 	// Assert secret is updated
-	data, err = s.Client.GetSecret(context.Background(), secretUpdateName)
+	data, err = s.Client.GetSecret(context.Background(), secretName)
 	s.Require().NoError(err)
 	s.Require().Equal("new-value", string(data["key"]))
 }
 
-func (s *secretTestSuite) TestGetSecret() {
+func (s *testSuite) TestGetSecret() {
 	// Create a secret
-	err := s.Client.CreateSecret(context.Background(), secretGetName, secretData, labels)
+	err := s.Client.CreateSecret(context.Background(), secretName, secretData, labels)
 	s.Require().NoError(err)
 
 	// Assert secret exists
-	data, err := s.Client.GetSecret(context.Background(), secretGetName)
+	data, err := s.Client.GetSecret(context.Background(), secretName)
 	s.Require().NoError(err)
 	s.Require().Equal("value", string(data["key"]))
 }

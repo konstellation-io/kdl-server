@@ -10,9 +10,10 @@ import (
 )
 
 const (
-	userSSHName = "user"
+	userSSHName   = "user"
 	secretSSHName = "user-ssh-keys"
 )
+
 var user = entity.User{
 	Username: userSSHName,
 }
@@ -20,6 +21,12 @@ var user = entity.User{
 func (s *testSuite) TestCreateUserSSHKeySecret() {
 	err := s.Client.CreateUserSSHKeySecret(context.Background(), user, "public-key", "private-key")
 	s.Require().NoError(err)
+
+	// Assert user ssh secret exists
+	data, err := s.Client.GetSecret(context.Background(), secretSSHName)
+	s.Require().NoError(err)
+	s.Require().Equal("public-key", string(data[k8s.KdlUserPublicSSHKey]))
+	s.Require().Equal("private-key", string(data[k8s.KdlUserPrivateSSHKey]))
 }
 
 func (s *testSuite) TestUpdateUserSSHKeySecret() {
@@ -48,8 +55,31 @@ func (s *testSuite) TestGetUserSSHKeySecret() {
 	s.Require().NoError(err)
 
 	// Assert user ssh secret exists
-	data, err := s.Client.GetSecret(context.Background(), secretSSHName)
+	data, err := s.Client.GetUserSSHKeySecret(context.Background(), user.Username)
 	s.Require().NoError(err)
-	s.Require().Equal("public-key", string(data[k8s.KdlUserPublicSSHKey]))
-	s.Require().Equal("private-key", string(data[k8s.KdlUserPrivateSSHKey]))
+	s.Require().Equal("private-key", string(data))
+}
+
+func (s *testSuite) TestGetUserSSHKeySecret_NotExisting() {
+	// Assert secret does not exist
+	data, err := s.Client.GetUserSSHKeySecret(context.Background(), user.Username)
+	s.Require().Error(err)
+	s.Require().Nil(data)
+}
+
+func (s *testSuite) TestGetUserSSHKeyPublic() {
+	err := s.Client.CreateUserSSHKeySecret(context.Background(), user, "public-key", "private-key")
+	s.Require().NoError(err)
+
+	// Assert user ssh secret exists
+	data, err := s.Client.GetUserSSHKeyPublic(context.Background(), user.Username)
+	s.Require().NoError(err)
+	s.Require().Equal("public-key", string(data))
+}
+
+func (s *testSuite) TestGetUserSSHKeyPublic_NotExisting() {
+	// Assert secret does not exist
+	data, err := s.Client.GetUserSSHKeyPublic(context.Background(), user.Username)
+	s.Require().Error(err)
+	s.Require().Nil(data)
 }

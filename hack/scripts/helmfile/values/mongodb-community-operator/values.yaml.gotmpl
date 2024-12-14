@@ -1,0 +1,16 @@
+operator:
+  replicas: 1
+
+  watchNamespace: "*"
+  resources: {}
+
+database:
+  name: mongodb-database
+
+registry:
+  pullPolicy: IfNotPresent
+
+community-operator-crds:
+  enabled: true
+
+createResource: false

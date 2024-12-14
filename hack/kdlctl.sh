@@ -21,14 +21,7 @@ BUILD_RUNNERS=0
 SKIP_FRONTEND_BUILD=0
 SKIP_OPERATOR_BUILD=0
 OPERATOR_SDK_INSTALLED=0
-MONGO_POD=""
-ENABLE_TLS=false
 OS=$(uname)
-
-# Admin MongoDB credentials
-MONGO_DB=kdl
-MONGO_USER="admin"
-MONGO_PASS=123456
 
 . ./.kdlctl.conf
 . ./scripts/kdlctl/common_functions.sh
@@ -69,10 +62,6 @@ case $* in
     show_help "$@"
     exit
   ;;
-  *--tls*)
-    export ENABLE_TLS=true
-    shift
-    ;;
 esac
 
 if [ -z "$*" ] || { [ "$VERBOSE" = "0" ] && [ "$#" = "1" ]; }; then

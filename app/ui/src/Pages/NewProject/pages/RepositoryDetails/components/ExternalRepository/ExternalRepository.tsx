@@ -29,7 +29,6 @@ function ExternalRepository({ showErrors }: Props) {
   } = project.externalRepository;
 
   React.useEffect(() => {
-    console.log(authMethod);
     if (authMethod == 'PASSWORD' || authMethod == 'TOKEN') {
       updateValue('authMethod', '');
       authOk = false;

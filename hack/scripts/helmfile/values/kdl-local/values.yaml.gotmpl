@@ -198,7 +198,6 @@ oauth2proxy:
       cookie_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}", "keycloak.{{ requiredEnv "DOMAIN" }}"]
       cookie_samesite="strict"
       cookie_secure=false
-      cookie_csrf_per_request=true
       email_domains="*"
       errors_to_info_log=true
       http_address="https://kdlapp.{{ requiredEnv "DOMAIN" }}/"

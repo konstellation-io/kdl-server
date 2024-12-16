@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	saSimpleName                 = "sa"
-	saName                       = "sa-service-account"
+	saSimpleName = "sa"
+	saName       = "sa-service-account"
 	//nolint:gosec //this is a test
-	saSecretName                 = "sa-service-account-secret"
+	saSecretName = "sa-service-account-secret"
 )
 
 func (s *testSuite) TestCreateServiceAccount() {

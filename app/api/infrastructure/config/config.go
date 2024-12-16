@@ -22,10 +22,6 @@ type Config struct {
 	TLS             struct {
 		Enabled bool `envconfig:"TLS_ENABLED"`
 	}
-	Admin struct {
-		Username string `envconfig:"KDL_ADMIN_USERNAME"`
-		Email    string `envconfig:"KDL_ADMIN_EMAIL"`
-	}
 	Storage struct {
 		Size      string `envconfig:"USER_TOOLS_STORAGE_SIZE"`
 		ClassName string `envconfig:"USER_TOOLS_STORAGE_CLASSNAME"`

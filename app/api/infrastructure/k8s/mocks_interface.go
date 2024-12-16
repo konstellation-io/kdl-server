@@ -51,17 +51,17 @@ func (mr *MockClientInterfaceMockRecorder) CreateKDLProjectCR(ctx, projectID int
 }
 
 // CreateSecret mocks base method.
-func (m *MockClientInterface) CreateSecret(ctx context.Context, name string, values map[string]string) error {
+func (m *MockClientInterface) CreateSecret(ctx context.Context, name string, values, labels map[string]string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateSecret", ctx, name, values)
+	ret := m.ctrl.Call(m, "CreateSecret", ctx, name, values, labels)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateSecret indicates an expected call of CreateSecret.
-func (mr *MockClientInterfaceMockRecorder) CreateSecret(ctx, name, values interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) CreateSecret(ctx, name, values, labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSecret", reflect.TypeOf((*MockClientInterface)(nil).CreateSecret), ctx, name, values)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSecret", reflect.TypeOf((*MockClientInterface)(nil).CreateSecret), ctx, name, values, labels)
 }
 
 // CreateUserSSHKeySecret mocks base method.
@@ -270,17 +270,17 @@ func (mr *MockClientInterfaceMockRecorder) IsUserToolPODRunning(ctx, username in
 }
 
 // UpdateSecret mocks base method.
-func (m *MockClientInterface) UpdateSecret(ctx context.Context, name string, values map[string]string) error {
+func (m *MockClientInterface) UpdateSecret(ctx context.Context, name string, values, labels map[string]string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateSecret", ctx, name, values)
+	ret := m.ctrl.Call(m, "UpdateSecret", ctx, name, values, labels)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateSecret indicates an expected call of UpdateSecret.
-func (mr *MockClientInterfaceMockRecorder) UpdateSecret(ctx, name, values interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) UpdateSecret(ctx, name, values, labels interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSecret", reflect.TypeOf((*MockClientInterface)(nil).UpdateSecret), ctx, name, values)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSecret", reflect.TypeOf((*MockClientInterface)(nil).UpdateSecret), ctx, name, values, labels)
 }
 
 // UpdateUserSSHKeySecret mocks base method.

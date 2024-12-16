@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
@@ -85,11 +86,6 @@ func main() {
 		logger.Error(err, "Unexpected error creating serviceAccount for users")
 	}
 
-	err = userInteractor.CreateAdminUser(cfg.Admin.Username, cfg.Admin.Email)
-	if err != nil {
-		logger.Error(err, "Unexpected error creating admin user")
-	}
-
 	projectDeps := &project.InteractorDeps{
 		Logger:           logger,
 		Repo:             projectRepo,
@@ -114,14 +110,13 @@ func main() {
 		capabilitiesInteractor,
 	)
 
-	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, cfg.Kubernetes.IsInsideCluster, resolvers, userRepo, userInteractor, projectRepo)
+	startHTTPServer(logger, cfg.Port, cfg.StaticFilesPath, resolvers, userRepo, userInteractor, projectRepo)
 }
 
 func startHTTPServer(
 	logger logr.Logger,
 	port,
 	staticFilesPath string,
-	insideK8Cluster bool,
 	resolvers generated.ResolverRoot,
 	userRepo user.Repository,
 	userInteractor user.UseCase,
@@ -129,18 +124,22 @@ func startHTTPServer(
 ) {
 	const apiQueryPath = "/api/query"
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers}))
+	srv := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers}))
+	srv.AddTransport(transport.Websocket{
+		KeepAlivePingInterval: 30 * time.Second,
+	})
+	srv.AddTransport(transport.GET{})
+	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.MultipartForm{})
+
 	pg := playground.Handler("GraphQL playground", apiQueryPath)
 	fs := http.FileServer(http.Dir(staticFilesPath))
 
 	authController := controller.NewAuthController(logger, userRepo, projectRepo)
 
-	devEnvironment := !insideK8Cluster
-	authMiddleware := middleware.GenerateMiddleware(devEnvironment)
-
 	http.Handle("/", fs)
-	http.Handle("/api/playground", authMiddleware(pg, userInteractor))
-	http.Handle(apiQueryPath, authMiddleware(dataloader.Middleware(userRepo, srv), userInteractor))
+	http.Handle("/api/playground", middleware.AuthMiddleware(pg, userInteractor))
+	http.Handle(apiQueryPath, middleware.AuthMiddleware(dataloader.Middleware(userRepo, srv), userInteractor))
 	http.HandleFunc("/api/auth/project", authController.HandleProjectAuth)
 
 	logger.Info("Server running", "port", port)
@@ -148,9 +147,9 @@ func startHTTPServer(
 	server := &http.Server{
 		Addr:         ":" + port,
 		Handler:      nil,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  15 * time.Second,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  30 * time.Second,
 	}
 
 	err := server.ListenAndServe()

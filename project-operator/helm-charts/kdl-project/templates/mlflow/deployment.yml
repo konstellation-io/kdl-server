@@ -1,0 +1,181 @@
+{{ if .Values.mlflow.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kdl-project.mlflow.name" . }}
+  labels:
+    {{- include "kdl-project.mlflowLabels" . | nindent 4 }}
+spec:
+  {{- if not .Values.mlflow.autoscaling.enabled }}
+  replicas: {{ .Values.mlflow.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "kdl-project.selectorMlflowLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+      {{- with .Values.mlflow.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "kdl-project.mlflowLabels" . | nindent 8 }}
+        {{- with .Values.mlflow.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      imagePullSecrets:
+        {{- toYaml .Values.mlflow.imagePullSecrets | nindent 8 }}
+      serviceAccountName: {{ include "kdl-project.mlflowServiceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.mlflow.podSecurityContext | nindent 8 }}
+      {{- with .Values.mlflow.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: mlflow
+          image: {{ .Values.mlflow.image.repository }}:{{ .Values.mlflow.image.tag }}
+          imagePullPolicy: {{ .Values.mlflow.image.pullPolicy }}
+          args:
+            - server
+            - --backend-store-uri
+            - sqlite:///mlflow.db
+            - --default-artifact-root
+            - s3://$(ARTIFACTS_BUCKET)
+            - --host
+            - 0.0.0.0
+          command:
+            - mlflow
+          lifecycle:
+            {{- with .Values.mlflow.lifecycle }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if .Values.mlflow.livenessProbe.enabled }}
+          livenessProbe:
+            {{- if .Values.mlflow.livenessProbeCustom }}
+            {{- toYaml .Values.mlflow.livenessProbeCustom | nindent 12 }}
+            {{- else }}
+            httpGet:
+              path: {{ .Values.mlflow.service.healthPath | default "/" | quote }}
+              port: {{ .Values.mlflow.env.MLFLOW_PORT | default (int .Values.mlflow.service.targetPort | default .Values.mlflow.service.port) }}
+            failureThreshold: {{ .Values.mlflow.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.mlflow.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.mlflow.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.mlflow.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.mlflow.livenessProbe.timeoutSeconds }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.mlflow.readinessProbe.enabled }}
+          readinessProbe:
+            {{- if .Values.mlflow.readinessProbeCustom }}
+            {{- toYaml .Values.mlflow.readinessProbeCustom | nindent 12 }}
+            {{- else }}
+            httpGet:
+              path: {{ .Values.mlflow.service.healthPath | default "/" | quote }}
+              port: {{ .Values.mlflow.env.MLFLOW_PORT | default (int .Values.mlflow.service.targetPort | default .Values.mlflow.service.port) }}
+            failureThreshold: {{ .Values.mlflow.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.mlflow.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.mlflow.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.mlflow.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.mlflow.readinessProbe.timeoutSeconds }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.mlflow.startupProbe.enabled }}
+          startupProbe:
+            {{- if .Values.mlflow.startupProbeCustom }}
+            {{- toYaml .Values.mlflow.startupProbeCustom | nindent 12 }}
+            {{- else }}
+            httpGet:
+              path: {{ .Values.mlflow.service.healthPath | default "/" | quote }}
+              port: {{ .Values.mlflow.env.MLFLOW_PORT | default (int .Values.mlflow.service.targetPort | default .Values.mlflow.service.port) }}
+            failureThreshold: {{ .Values.mlflow.startupProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.mlflow.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.mlflow.startupProbe.periodSeconds }}
+            successThreshold: {{ .Values.mlflow.startupProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.mlflow.startupProbe.timeoutSeconds }}
+            {{- end }}
+          {{- end }}
+          envFrom:
+            {{- if .Values.mlflow.envFromFiles }}
+            {{- tpl (toYaml .Values.mlflow.envFromFiles) . | nindent 12 }}
+            {{- end }}
+          env:
+            # Variables from secrets have precedence
+            {{- $envList := dict }}
+            {{- if .Values.mlflow.envFromSecrets }}
+            {{- range $key, $value := .Values.mlflow.envFromSecrets }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables from configmap have precedence
+            {{- if .Values.mlflow.envFromConfigMap }}
+            {{- range $key, $value := .Values.mlflow.envFromConfigMap }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables in plain text if they were not already added from secrets
+            {{- if .Values.mlflow.env }}
+            {{- range $key, $value := .Values.mlflow.env }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+          volumeMounts:
+            {{- if .Values.mlflow.persistentVolume.enabled }}
+            - name: mlflow-tracking
+              mountPath: /mlflow/tracking
+            {{- end }}
+            {{- with .Values.mlflow.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.mlflow.resources | nindent 12 }}
+        {{- if .Values.mlflow.extraContainers }}
+          {{- toYaml .Values.mlflow.extraContainers | nindent 8 }}
+        {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.mlflow.terminationGracePeriodSeconds }}
+      volumes:
+        {{- if .Values.mlflow.persistentVolume.enabled }}
+        - name: mlflow-tracking
+          persistentVolumeClaim:
+            claimName: {{ include "kdl-project.mlflow.name" . }}
+        {{- end }}
+      {{- with .Values.mlflow.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mlflow.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mlflow.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mlflow.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mlflow.topologySpreadConstraints }}
+      {{- $_ := include "kdl-project.patchTopologySpreadConstraintsMlflow" $ }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

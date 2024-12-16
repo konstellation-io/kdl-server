@@ -1,0 +1,48 @@
+# {{ template "chart.name" . }}
+
+{{ template "chart.description" . }}
+
+## Description
+
+This Helm chart deploys the core components of a Kubernetes Data Lab (KDL) project, providing essential tools for data scientists and machine learning engineers in a Kubernetes-native environment. Overview The KDL Project chart creates a complete development environment for data science and machine learning workflows. It orchestrates multiple components designed to work together seamlessly in a Kubernetes cluster, following infrastructure-as-code best practices.
+
+## Components
+
+### Filebrowser
+
+A modern web-based file manager that provides:
+
+* Secure file access and management through a web interface
+* User authentication and authorization
+* File operations (upload, download, modify) with persistence
+* Integration with Kubernetes storage systems
+
+### MLflow
+
+A platform for the machine learning lifecycle that offers:
+
+* Experiment tracking and management
+* Model registry and versioning
+* Integration with various ML frameworks
+* Artifact storage with MinIO/S3 compatibility
+* Metric visualization and comparison
+
+{{ template "chart.maintainersSection" . }}
+
+## Prerequisites
+
+* Helm 3+
+* Kubernetes 1.26+
+
+{{ template "chart.requirementsSection" . }}
+
+## CI values
+
+Go to [ci](./ci) directory to see some examples of how to use this chart.
+
+```console
+# local chart
+helm template test . -f ci/ci-values.yaml
+```
+
+{{ template "chart.valuesSection" . }}

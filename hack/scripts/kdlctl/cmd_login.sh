@@ -12,13 +12,7 @@ show_login_help() {
 }
 
 local_login() {
-  if [ "$ENABLE_TLS" = "true" ];
-  then
-    export SCHEMA="https"
-  else
-    export SCHEMA="http"
-  fi
-  LINK=$SCHEMA://kdlapp.kdl.$HOST_IP.nip.io
+  LINK=https://kdlapp.kdl.$HOST_IP.nip.io
   echo "Login link  : ${LINK}"
   echo "👤 User     : ${KEYCLOAK_DEFAULT_USER}"
   echo "🔑 Password : ${KEYCLOAK_DEFAULT_PASSWORD}"

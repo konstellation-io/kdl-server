@@ -11,7 +11,6 @@ import { AccessLevel } from "./../../types/globalTypes";
 
 export interface GetProjects_projects_repository {
   __typename: "Repository";
-  // type: RepositoryType;
   url: string;
   error: string | null;
 }

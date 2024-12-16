@@ -12,7 +12,6 @@ import { UpdateProjectInput } from "./../../types/globalTypes";
 export interface UpdateProject_updateProject_repository {
   __typename: "Repository";
   error: string | null;
-  // type: RepositoryType;
   url: string;
 }
 

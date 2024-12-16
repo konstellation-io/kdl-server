@@ -18,11 +18,6 @@ export enum RepositoryAuthMethod {
   TOKEN = "TOKEN",
 }
 
-// export enum RepositoryType {
-//   EXTERNAL = "EXTERNAL",
-//   INTERNAL = "INTERNAL",
-// }
-
 export interface AddMembersInput {
   projectId: string;
   userIds: string[];
@@ -44,13 +39,6 @@ export interface DeleteProjectInput {
   id: string;
 }
 
-export interface ExternalRepositoryInput {
-  url: string;
-  username: string;
-  credential: string;
-  authMethod: RepositoryAuthMethod;
-}
-
 export interface RemoveApiTokenInput {
   apiTokenId: string;
 }
@@ -61,8 +49,10 @@ export interface RemoveMembersInput {
 }
 
 export interface RepositoryInput {
-  // type: RepositoryType;
-  external?: ExternalRepositoryInput | null;
+  url: string;
+  username: string;
+  credential: string;
+  authMethod: RepositoryAuthMethod;
 }
 
 export interface SetActiveUserToolsInput {

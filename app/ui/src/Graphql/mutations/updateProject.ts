@@ -8,7 +8,6 @@ export default gql`
       description
       repository {
         error
-        type
         url
       }
       archived

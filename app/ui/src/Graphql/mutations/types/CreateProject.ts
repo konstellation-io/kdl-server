@@ -11,7 +11,6 @@ import { CreateProjectInput } from "./../../types/globalTypes";
 
 export interface CreateProject_createProject_repository {
   __typename: "Repository";
-  // type: RepositoryType;
   url: string;
   error: string | null;
 }

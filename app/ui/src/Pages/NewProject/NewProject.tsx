@@ -70,7 +70,7 @@ function NewProject() {
   const type = data.repository.values.type;
 
   const stepsWithData: (StepNames.INFORMATION | StepNames.EXTERNAL)[] = useMemo(() => {
-    return [StepNames.INFORMATION, repoTypeToStepName[type || '']];
+    return [StepNames.INFORMATION, StepNames.EXTERNAL, repoTypeToStepName[type || '']];
   }, [type]);
 
   // We want to execute this on on component mount and unmount
@@ -151,7 +151,6 @@ function NewProject() {
 
       const values = Object.values(actStepData.values).filter((v) => typeof v !== 'boolean');
       const completed = values && values.every((v) => !!v) && !error;
-
       updateState(completed, error);
       return !error;
     } else if (!hasData) {

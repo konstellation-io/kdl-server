@@ -42,7 +42,6 @@ function useNewProject(section: keyof NewProject) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     newState[section].errors[key] = value;
-
     newProject(newState);
   }
 

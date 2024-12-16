@@ -15,6 +15,8 @@ type Props = {
 
 const authMethods = [RepositoryAuthMethod.PASSWORD, RepositoryAuthMethod.TOKEN];
 
+let authOk = false;
+
 function ExternalRepository({ showErrors }: Props) {
   const project = useReactiveVar(newProject);
   const { updateValue, updateError, clearError } = useNewProject('externalRepository');
@@ -25,6 +27,17 @@ function ExternalRepository({ showErrors }: Props) {
     values: { url, credential, username, authMethod },
     errors: { url: urlError, credential: credentialError, username: usernameError, authMethod: authMethodError },
   } = project.externalRepository;
+
+  React.useEffect(() => {
+    console.log(authMethod);
+    if (authMethod == 'PASSWORD' || authMethod == 'TOKEN') {
+      updateValue('authMethod', '');
+      authOk = false;
+    } else {
+      authOk = true;
+    }
+    //eslint-disable-next-line
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -69,16 +82,18 @@ function ExternalRepository({ showErrors }: Props) {
           whiteColor={false}
           showSelectAllOption={false}
           shouldSort={true}
+          defaultOption=""
           onChange={(value: string) => {
             updateValue('authMethod', value);
             clearError('authMethod');
+            authOk = true;
           }}
-          formSelectedOption={authMethod ?? undefined}
+          formSelectedOption={authMethod}
           className={styles.authMethod}
           error={showErrors ? authMethodError : ''}
         />
 
-        {authMethod && (
+        {authOk && (
           <TextInput
             label={authMethod}
             onChange={(value: string) => {

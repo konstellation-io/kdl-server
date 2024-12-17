@@ -1,7 +1,6 @@
 import { Button } from 'kwc';
 import ROUTE, { buildRoute } from 'Constants/routes';
 import React, { useEffect, useState } from 'react';
-import { RepositoryInput } from 'Graphql/types/globalTypes';
 import StatusCircle, { States } from 'Components/LottieShapes/StatusCircle/StatusCircle';
 
 import styles from './ProjectCreation.module.scss';
@@ -37,27 +36,15 @@ function ProjectCreation() {
   }, []);
 
   useEffect(() => {
-    // If the user reload the page he/she will be redirected to the home
+    // If the user reloads the page, they will be redirected to the home screen
     if (!information.values.id) {
       history.push(ROUTE.HOME);
       return;
     }
-    // const type = RepositoryType.EXTERNAL;
-
-    const inputRepository: RepositoryInput = {
-      url: repository.values.url,
-      username: repository.values.username,
-      credential: repository.values.credential,
-      authMethod: repository.values.authMethod,
-    };
-
-    // if (type === RepositoryType.EXTERNAL) {
-    //   inputRepository.external = externalRepository.values;
-    // }
 
     addNewProject({
       ...information.values,
-      repository: inputRepository,
+      repository: repository.values,
     });
     // We want to execute this on on component mount
     // eslint-disable-next-line react-hooks/exhaustive-deps

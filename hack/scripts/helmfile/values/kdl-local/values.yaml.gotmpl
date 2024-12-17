@@ -155,7 +155,7 @@ minio:
   persistence:
     enabled: true
     storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-    existingClaim: "kdl-local-claim"
+    existingClaim: "shared-volume"
     size: 1Gi
     accessMode: ReadWriteMany
 
@@ -278,7 +278,7 @@ projectOperator:
 sharedVolume:
   enabled: true
 
-  name: kdl-local
+  name: shared-volume
   storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
 userToolsOperator:

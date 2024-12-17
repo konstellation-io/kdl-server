@@ -4,7 +4,7 @@ global:
 
   ingress:
     tls:
-      enabled: {{ requiredEnv "ENABLE_TLS" }}
+      enabled: true
       secretName: {{ requiredEnv "DOMAIN" }}-tls-secret
 
 image:
@@ -13,15 +13,20 @@ image:
   pullPolicy: Always
 
 env:
-  KDL_SERVER_MONGODB_URI: "mongodb://kdl:123456@mongodb:27017/kdl?authSource=kdl&authMechanism=SCRAM-SHA-256"
+  KDL_SERVER_MONGODB_URI: "mongodb://{{ .Values.mongodb_user }}:{{ .Values.mongodb_password }}@mongodb-svc.mongodb:27017/{{ .Values.mongodb_user }}?authSource={{ .Values.mongodb_user }}&authMechanism=SCRAM-SHA-256"
   KDL_SERVER_PORT: "8080"
-  MINIO_ACCESS_KEY: "minio"
+  MINIO_ACCESS_KEY: "{{ .Values.minio_access_key }}"
   MINIO_ENDPOINT: "minio:9000"
-  MINIO_SECRET_KEY: "minio123"
+  MINIO_SECRET_KEY: "{{ .Values.minio_secret_key }}"
   SERVER_URL: https://kdlapp.{{ requiredEnv "DOMAIN" }}
 
 readyChecker:
-  enabled: false
+  enabled: true
+  services:
+  - name: mongodb-svc.mongodb
+    port: 27017
+  - name: keycloak
+    port: 80
 
 service:
   type: ClusterIP
@@ -46,8 +51,6 @@ keycloak:
     enabled: true
     className: public
     annotations:
-      nginx.org/proxy-buffer-size: "128k"
-      nginx.org/proxy-buffers: "8 256k"
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
     hosts:
     - host: keycloak.{{ requiredEnv "DOMAIN" }}
@@ -77,6 +80,8 @@ keycloak:
   - "--import-realm"
 
   env:
+    KC_BOOTSTRAP_ADMIN_PASSWORD: {{ .Values.keycloak_admin_password | quote }}
+    KC_BOOTSTRAP_ADMIN_USERNAME: {{ .Values.keycloak_admin_user | quote }}
     KC_DB_PASSWORD: keycloak
     KC_DB_URL: jdbc:postgresql://postgresql:5432/keycloak
     KC_DB_USERNAME: keycloak
@@ -86,8 +91,6 @@ keycloak:
     KC_HTTP_ENABLED: true
     KC_METRICS_ENABLED: true
     KC_PROXY_HEADERS: xforwarded
-    KC_BOOTSTRAP_ADMIN_USERNAME: {{ requiredEnv "KEYCLOAK_ADMIN_USER" | quote }}
-    KC_BOOTSTRAP_ADMIN_PASSWORD: {{ requiredEnv "KEYCLOAK_ADMIN_PASSWORD" | quote }}
     KC_PROXY: edge
 
   volumes:
@@ -163,29 +166,7 @@ minio:
 # -- MongoDB subchart deployment
 # </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/mongodb/values.yaml
 mongodb:
-  enabled: true
-
-  fullnameOverride: mongodb
-  nameOverride: mongodb
-
-  image:
-    tag: 7.0.15
-
-  architecture: standalone
-
-  auth:
-    rootUser: admin
-    rootPassword: "123456"
-    usernames:
-    - kdl
-    passwords:
-    - 123456
-    databases:
-    - kdl
-
-  persistence:
-    enabled: true
-    storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+  enabled: false
 
 # -- OAuth2-Proxy subchart deployment
 # </br> Ref: https://github.com/oauth2-proxy/manifests/blob/main/helm/oauth2-proxy/values.yaml
@@ -194,6 +175,8 @@ oauth2proxy:
 
   ingress:
     enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: selfsigned-clusterissuer
     className: public
     path: /
     pathType: ImplementationSpecific
@@ -203,7 +186,7 @@ oauth2proxy:
   httpScheme: http
 
   image:
-    tag: "v7.7.1-amd64"
+    tag: "v7.7.1"
 
   config:
     clientID: proxy
@@ -211,10 +194,10 @@ oauth2proxy:
     cookieSecret: mycookiesecret16
 
     configFile: |-
-      upstreams=["http://kdl-local-server:80/", "http://127.0.0.1:9000/mlflow/", "http://127.0.0.1:9000/filebrowser/", "http://127.0.0.1:9000/kg/"]
+      cookie_csrf_per_request=true
       cookie_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}", "keycloak.{{ requiredEnv "DOMAIN" }}"]
-      cookie_samesite="lax"
-      cookie_secure=true
+      cookie_samesite="strict"
+      cookie_secure=false
       email_domains="*"
       errors_to_info_log=true
       http_address="https://kdlapp.{{ requiredEnv "DOMAIN" }}/"
@@ -222,10 +205,13 @@ oauth2proxy:
       pass_user_headers=true
       provider="keycloak-oidc"
       redirect_url="https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
+      set_authorization_header=true
       set_xauthrequest=true
+      silence_ping_logging=true
       skip_auth_routes="/config.json"
       skip_provider_button=true
       ssl_insecure_skip_verify=true
+      upstreams=["http://kdl-local-server:80/", "http://127.0.0.1:9000/mlflow/", "http://127.0.0.1:9000/filebrowser/", "http://127.0.0.1:9000/kg/"]
       whitelist_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}"]
 
   extraContainers:
@@ -254,10 +240,10 @@ postgresql:
   replicaCount: 1
 
   auth:
+    database: keycloak
+    password: keycloak
     postgresPassword: postgres
     username: keycloak
-    password: keycloak
-    database: "keycloak"
 
   primary:
     persistence:
@@ -269,13 +255,13 @@ projectOperator:
   enabled: true
 
   image:
-    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/project-operator
+    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-project-operator
     tag: latest
     pullPolicy: Always
 
   mlflow:
     image:
-      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/mlflow
+      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-mlflow
       tag: latest
       pullPolicy: Always
     volume:
@@ -286,21 +272,20 @@ projectOperator:
   filebrowser:
     image:
       repository: filebrowser/filebrowser
-      pullPolicy: Always
+      pullPolicy: IfNotPresent
       tag: v2
 
 sharedVolume:
   enabled: true
 
   name: kdl-local
-
   storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
 userToolsOperator:
   enabled: true
 
   image:
-    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/user-tools-operator
+    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-user-tools-operator
     tag: latest
     pullPolicy: Always
 
@@ -309,7 +294,7 @@ userToolsOperator:
 
   repoCloner:
     image:
-      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/repo-cloner
+      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-repo-cloner
       tag: latest
       pullPolicy: Always
 
@@ -317,7 +302,7 @@ userToolsOperator:
     enabled: false
 
     image:
-      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/vscode
+      epository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-vscode
       tag: latest
       pullPolicy: Always
 

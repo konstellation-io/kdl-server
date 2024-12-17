@@ -1,8 +1,4 @@
-{{ if .Capabilities.APIVersions.Has "apps/v1" }}
 apiVersion: apps/v1
-  {{ else if .Capabilities.APIVersions.Has "extensions/v1beta1" }}
-apiVersion: extensions/v1beta1
-  {{ end }}
 kind: Deployment
 metadata:
   name: {{ .Values.projectId }}-filebrowser
@@ -57,9 +53,9 @@ spec:
             periodSeconds: 60
       {{- if .Values.imagePullSecrets }}
       imagePullSecrets:
-        {{- range .Values.imagePullSecrets  }}
+        {{- range .Values.imagePullSecrets }}
         - name: {{ . }}
-      {{- end }}
+        {{- end }}
       {{- end }}
       volumes:
         - name: filebrowser-config

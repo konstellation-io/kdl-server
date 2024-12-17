@@ -56,11 +56,11 @@ filebrowser:
 
   # -- Environment variables to configure application
   env: {}
-    # FB_ADDRESS=0.0.0.0
-    # FB_DATABASE=/database.db
-    # FB_LOG=stdout
-    # FB_PORT=9696
-    # FB_ROOT=/srv
+    # FB_ADDRESS: "0.0.0.0"
+    # FB_DATABASE: /database.db
+    # FB_LOG: stdout
+    # FB_PORT: "9696"
+    # FB_ROOT: /srv
 
   # -- Variables from secrets
   envFromSecrets: {}

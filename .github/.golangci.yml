@@ -221,6 +221,7 @@ issues:
     - path: _test\.go
       linters:
         - mnd
+        - gochecknoglobals
     # https://github.com/go-critic/go-critic/issues/926
     - linters:
         - gocritic

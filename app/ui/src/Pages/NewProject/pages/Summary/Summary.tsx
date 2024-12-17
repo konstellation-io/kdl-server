@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 
-import { CONFIG } from 'index';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
 import IconLink from '@material-ui/icons/Link';
 import styles from './Summary.module.scss';

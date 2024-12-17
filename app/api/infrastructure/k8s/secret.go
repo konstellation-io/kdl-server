@@ -8,10 +8,10 @@ import (
 )
 
 // CreateSecret creates a new k8s secret.
-func (k *Client) CreateSecret(ctx context.Context, name string, values map[string]string) error {
+func (k *Client) CreateSecret(ctx context.Context, name string, values, labels map[string]string) error {
 	k.logger.Info("Creating secret in k8s...", "secretName", name)
 
-	secret := k.newSecret(name, values)
+	secret := k.newSecret(name, values, labels)
 
 	createdSecret, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Create(ctx, secret, metav1.CreateOptions{})
 	if err != nil {
@@ -24,10 +24,10 @@ func (k *Client) CreateSecret(ctx context.Context, name string, values map[strin
 }
 
 // UpdateSecret updates a k8s secret.
-func (k *Client) UpdateSecret(ctx context.Context, name string, values map[string]string) error {
+func (k *Client) UpdateSecret(ctx context.Context, name string, values, labels map[string]string) error {
 	k.logger.Info("Updating secret in k8s...", "secretName", name)
 
-	secret := k.newSecret(name, values)
+	secret := k.newSecret(name, values, labels)
 
 	_, err := k.clientset.CoreV1().Secrets(k.cfg.Kubernetes.Namespace).Update(ctx, secret, metav1.UpdateOptions{})
 	if err != nil {
@@ -50,7 +50,7 @@ func (k *Client) GetSecret(ctx context.Context, name string) (map[string][]byte,
 }
 
 // newSecret conform a new k8s secret from values map.
-func (k *Client) newSecret(name string, values map[string]string) *coreV1.Secret {
+func (k *Client) newSecret(name string, values, labels map[string]string) *coreV1.Secret {
 	secretData := map[string][]byte{}
 	for key, val := range values {
 		secretData[key] = []byte(val)
@@ -59,7 +59,8 @@ func (k *Client) newSecret(name string, values map[string]string) *coreV1.Secret
 	return &coreV1.Secret{
 		TypeMeta: metav1.TypeMeta{},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: name,
+			Name:   name,
+			Labels: labels,
 		},
 		Data: secretData,
 	}

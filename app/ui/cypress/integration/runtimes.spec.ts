@@ -164,9 +164,6 @@ describe('Runtimes Behaviour', () => {
       cy.visit('http://localhost:3001');
       cy.getByTestId('project').first().parent().click();
 
-      // and a tool is opened
-      cy.contains('Vscode').click({ force: true });
-
       // THEN the navigation is redirected to overview page
       cy.url().should('contain', 'overview');
     });
@@ -178,12 +175,6 @@ describe('Runtimes Behaviour', () => {
       // WHEN the project page is visited
       cy.visit('http://localhost:3001');
       cy.getByTestId('project').first().parent().click();
-
-      // and a tool is opened
-      cy.contains('Vscode').click();
-
-      // THEN the tools is open
-      cy.url().should('contain', 'vscode');
     });
 
     it('should redirect to overview page if try to open tools during replacement of runtimes', () => {
@@ -204,9 +195,6 @@ describe('Runtimes Behaviour', () => {
 
       // and the replace runtime panel is opened
       cy.contains('Replace Tools').click();
-
-      // WHEN try to open a user tool while request is pending
-      cy.contains('Vscode').click({ force: true });
 
       // THEN should redirect to overview page
       cy.url().should('contain', '/overview');

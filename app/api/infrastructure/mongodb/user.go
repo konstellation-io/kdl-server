@@ -26,6 +26,7 @@ type userDTO struct {
 	Deleted            bool               `bson:"deleted"`
 	Username           string             `bson:"username"`
 	Email              string             `bson:"email"`
+	Sub                string             `bson:"sub"`
 	CreationDate       time.Time          `bson:"creation_date"`
 	AccessLevel        string             `bson:"access_level"`
 	PublicSSHKey       string             `bson:"public_ssh_key"`
@@ -67,6 +68,12 @@ func (m *UserRepo) EnsureIndexes() error {
 				Unique: &unique,
 			},
 		},
+		{
+			Keys: bson.M{"sub": 1},
+			Options: &options.IndexOptions{
+				Unique: &unique,
+			},
+		},
 	})
 
 	m.logger.Info("Indexes created for collection", "result", result, "collection", userCollName)
@@ -92,6 +99,11 @@ func (m *UserRepo) GetByUsername(ctx context.Context, username string) (entity.U
 // GetByEmail retrieves the user using their user email.
 func (m *UserRepo) GetByEmail(ctx context.Context, email string) (entity.User, error) {
 	return m.findOne(ctx, bson.M{"email": email})
+}
+
+// GetBySub retrieves the user using their user sub.
+func (m *UserRepo) GetBySub(ctx context.Context, sub string) (entity.User, error) {
+	return m.findOne(ctx, bson.M{"sub": sub})
 }
 
 // FindAll retrieves all the existing users.
@@ -185,6 +197,10 @@ func (m *UserRepo) UpdateEmail(ctx context.Context, username, email string) erro
 	return m.updateUserFields(ctx, username, bson.M{"email": email})
 }
 
+func (m *UserRepo) UpdateSub(ctx context.Context, username, sub string) error {
+	return m.updateUserFields(ctx, username, bson.M{"sub": sub})
+}
+
 func (m *UserRepo) UpdateUsername(ctx context.Context, email, username string) error {
 	m.logger.Info("Updating username", "newUsername", username, "userEmail", email)
 
@@ -239,6 +255,7 @@ func (m *UserRepo) findOne(ctx context.Context, filters bson.M) (entity.User, er
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		return entity.User{}, entity.ErrUserNotFound
 	}
+	// review this error handling: if err!=nil {entity.User{}. return err}
 
 	return m.dtoToEntity(dto), err
 }
@@ -260,6 +277,7 @@ func (m *UserRepo) entityToDTO(u entity.User) (userDTO, error) {
 	dto := userDTO{
 		Username:           u.Username,
 		Email:              u.Email,
+		Sub:                u.Sub,
 		AccessLevel:        string(u.AccessLevel),
 		PrivateSSHKey:      u.SSHKey.Private,
 		PublicSSHKey:       u.SSHKey.Public,
@@ -285,6 +303,7 @@ func (m *UserRepo) dtoToEntity(dto userDTO) entity.User {
 		ID:           dto.ID.Hex(),
 		Username:     dto.Username,
 		Email:        dto.Email,
+		Sub:          dto.Sub,
 		AccessLevel:  entity.AccessLevel(dto.AccessLevel),
 		CreationDate: dto.CreationDate,
 		SSHKey: entity.SSHKey{

@@ -23,14 +23,6 @@ describe('Project Overview Behavior', () => {
     cy.get('@projectName').then((projectName) => cy.getByTestId('overview').should('contain', projectName));
   });
 
-  it('should show the settings panel with the git tab selected when click on repository container', () => {
-    // Act.
-    cy.getByTestId('repositorySection').click();
-
-    // Assert.
-    cy.getByTestId('tabGit').should('exist');
-  });
-
   it('should show the settings panel with the members tab selected when click on members container', () => {
     // Act.
     cy.getByTestId('membersSection').click();

@@ -89,7 +89,8 @@ func TestInteractor_Create(t *testing.T) {
 	const (
 		id            = "user.1234"
 		email         = "user@email.com"
-		username      = "john.doe"
+		username      = "user"
+		sub           = "f6717d2b-ac1f-40da-ade6-00037512933b"
 		accessLevel   = entity.AccessLevelAdmin
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"
@@ -107,6 +108,7 @@ func TestInteractor_Create(t *testing.T) {
 	u := entity.User{
 		Username:     username,
 		Email:        email,
+		Sub:          sub,
 		AccessLevel:  accessLevel,
 		SSHKey:       sshKey,
 		CreationDate: now,
@@ -115,6 +117,7 @@ func TestInteractor_Create(t *testing.T) {
 	expectedUser := entity.User{
 		ID:           id,
 		Username:     username,
+		Sub:          sub,
 		Email:        email,
 		AccessLevel:  accessLevel,
 		SSHKey:       sshKey,
@@ -123,6 +126,7 @@ func TestInteractor_Create(t *testing.T) {
 
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
@@ -130,7 +134,7 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
 
-	createdUser, err := s.interactor.Create(ctx, email, username, accessLevel)
+	createdUser, err := s.interactor.Create(ctx, email, sub, accessLevel)
 
 	require.NoError(t, err)
 	require.Equal(t, expectedUser, createdUser)
@@ -142,16 +146,17 @@ func TestInteractor_Create_UserDuplEmail(t *testing.T) {
 
 	const (
 		email       = "user@email.com"
-		username    = "john"
+		user        = "user"
+		sub         = "f6717d2b-ac1f-40da-ade6-00037512933b"
 		accessLevel = entity.AccessLevelAdmin
 	)
 
 	ctx := context.Background()
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, user).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, nil)
 
-	createdUser, err := s.interactor.Create(ctx, email, username, accessLevel)
+	createdUser, err := s.interactor.Create(ctx, email, sub, accessLevel)
 	assert.DeepEqual(t, entity.User{}, createdUser)
 	assert.ErrorIs(t, err, entity.ErrDuplicatedUser)
 }
@@ -162,15 +167,38 @@ func TestInteractor_Create_UserDuplUsername(t *testing.T) {
 
 	const (
 		email       = "user@email.com"
-		username    = "john"
+		user        = "user"
+		sub         = "f6717d2b-ac1f-40da-ade6-00037512933b"
 		accessLevel = entity.AccessLevelAdmin
 	)
 
 	ctx := context.Background()
 
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, user).Return(entity.User{}, nil)
 
-	createdUser, err := s.interactor.Create(ctx, email, username, accessLevel)
+	createdUser, err := s.interactor.Create(ctx, email, sub, accessLevel)
+	assert.DeepEqual(t, entity.User{}, createdUser)
+	assert.ErrorIs(t, err, entity.ErrDuplicatedUser)
+}
+
+func TestInteractor_Create_UserDuplSub(t *testing.T) {
+	s := newUserSuite(t, nil)
+	defer s.ctrl.Finish()
+
+	const (
+		email       = "user@email.com"
+		user        = "user"
+		sub         = "f6717d2b-ac1f-40da-ade6-00037512933b"
+		accessLevel = entity.AccessLevelAdmin
+	)
+
+	ctx := context.Background()
+
+	s.mocks.repo.EXPECT().GetByUsername(ctx, user).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, nil)
+
+	createdUser, err := s.interactor.Create(ctx, email, sub, accessLevel)
 	assert.DeepEqual(t, entity.User{}, createdUser)
 	assert.ErrorIs(t, err, entity.ErrDuplicatedUser)
 }
@@ -597,6 +625,98 @@ func TestInteractor_UpdateAccessLevel(t *testing.T) {
 
 	require.NoError(t, err)
 	require.Equal(t, users, returnedUsers)
+}
+
+func TestInteractor_UpdateSub(t *testing.T) {
+	s := newUserSuite(t, nil)
+	defer s.ctrl.Finish()
+
+	const (
+		id          = "user.1234"
+		username    = "john.doe"
+		sub         = "f6717d2b-ac1f-40da-ade6-00037512933b"
+		email       = "john@doe.com"
+		accessLevel = entity.AccessLevelAdmin
+	)
+
+	ctx := context.Background()
+
+	user := entity.User{
+		ID:          id,
+		Username:    username,
+		Email:       email,
+		AccessLevel: accessLevel,
+	}
+
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().UpdateSub(ctx, username, sub).Return(nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(user, nil)
+
+	returnedUser, err := s.interactor.UpdateSub(ctx, user, sub)
+
+	require.NoError(t, err)
+	require.Equal(t, user, returnedUser)
+}
+
+func TestInteractor_UpdateSub_UpdateError(t *testing.T) {
+	s := newUserSuite(t, nil)
+	defer s.ctrl.Finish()
+
+	const (
+		id          = "user.1234"
+		username    = "john.doe"
+		sub         = "f6717d2b-ac1f-40da-ade6-00037512933b"
+		email       = "john@doe.com"
+		accessLevel = entity.AccessLevelAdmin
+	)
+
+	ctx := context.Background()
+
+	user := entity.User{
+		ID:          id,
+		Username:    username,
+		Email:       email,
+		AccessLevel: accessLevel,
+	}
+
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().UpdateSub(ctx, username, sub).Return(errUnexpected)
+
+	returnedUser, err := s.interactor.UpdateSub(ctx, user, sub)
+
+	require.Error(t, err)
+	require.Equal(t, entity.User{}, returnedUser)
+}
+
+func TestInteractor_UpdateSub_DuplicatedUserSub(t *testing.T) {
+	s := newUserSuite(t, nil)
+	defer s.ctrl.Finish()
+
+	const (
+		id          = "user.1234"
+		username    = "john.doe"
+		sub         = "f6717d2b-ac1f-40da-ade6-00037512933b"
+		email       = "john@doe.com"
+		accessLevel = entity.AccessLevelAdmin
+	)
+
+	ctx := context.Background()
+
+	user := entity.User{
+		ID:          id,
+		Username:    username,
+		Email:       email,
+		Sub:         sub,
+		AccessLevel: accessLevel,
+	}
+
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(user, nil)
+
+	returnedUser, err := s.interactor.UpdateSub(ctx, user, sub)
+
+	require.Error(t, err)
+	require.ErrorIs(t, err, entity.ErrDuplicatedUser)
+	require.Equal(t, entity.User{}, returnedUser)
 }
 
 func TestInteractor_GetKubeconfig(t *testing.T) {

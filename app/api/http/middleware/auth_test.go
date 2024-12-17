@@ -2,6 +2,7 @@ package middleware_test
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -25,6 +26,8 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
+
+var errUnexpected = errors.New("some error")
 
 type userMocks struct {
 	logger           logr.Logger
@@ -110,6 +113,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 		id            = "user.1234"
 		email         = "user@email.com"
 		username      = "user"
+		sub           = "d5d70477-5192-4182-b80e-5d34550eb4fe"
 		accessLevel   = entity.AccessLevelViewer
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"
@@ -127,6 +131,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	u := entity.User{
 		Username:     username,
 		Email:        email,
+		Sub:          sub,
 		AccessLevel:  accessLevel,
 		SSHKey:       sshKey,
 		CreationDate: now,
@@ -135,6 +140,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 		ID:           id,
 		Username:     username,
 		Email:        email,
+		Sub:          sub,
 		AccessLevel:  accessLevel,
 		SSHKey:       sshKey,
 		CreationDate: now,
@@ -143,6 +149,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
+	ts.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.clock.EXPECT().Now().Return(now)
 	ts.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	ts.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
@@ -151,13 +158,11 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	ts.mocks.k8sClient.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
 
 	// Act
-	handlerFunc := http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
-		ts.Equal(email, r.Context().Value(middleware.LoggedUserEmailKey))
-	})
+	handlerFunc := http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {})
 
 	req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
 	req.Header.Set("X-Forwarded-Email", email)
-	req.Header.Set("X-Forwarded-User", username)
+	req.Header.Set("X-Forwarded-User", sub)
 
 	res := httptest.NewRecorder()
 
@@ -168,17 +173,79 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	ts.Equal(http.StatusOK, res.Code)
 }
 
-func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameFound() {
+func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound_CreateError() {
 	// Arrange
 	const (
-		email       = "user@email.com"
-		username    = "john"
-		accessLevel = entity.AccessLevelViewer
+		id            = "user.1234"
+		email         = "user@email.com"
+		username      = "user"
+		sub           = "d5d70477-5192-4182-b80e-5d34550eb4fe"
+		accessLevel   = entity.AccessLevelViewer
+		publicSSHKey  = "test-ssh-key-public"
+		privateSSHKey = "test-ssh-key-private"
+	)
+
+	ctx := context.Background()
+	now := time.Now().UTC()
+
+	sshKey := entity.SSHKey{
+		Public:       publicSSHKey,
+		Private:      privateSSHKey,
+		CreationDate: now,
+	}
+
+	u := entity.User{
+		Username:     username,
+		Email:        email,
+		Sub:          sub,
+		AccessLevel:  accessLevel,
+		SSHKey:       sshKey,
+		CreationDate: now,
+	}
+
+	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
+	ts.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
+	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
+	ts.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
+	ts.mocks.clock.EXPECT().Now().Return(now)
+	ts.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
+	ts.mocks.repo.EXPECT().Create(ctx, u).Return(id, errUnexpected)
+
+	// Act
+	handlerFunc := http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {})
+
+	req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
+	req.Header.Set("X-Forwarded-Email", email)
+	req.Header.Set("X-Forwarded-User", sub)
+
+	res := httptest.NewRecorder()
+
+	authM := middleware.AuthMiddleware(handlerFunc, ts.interactor)
+	authM.ServeHTTP(res, req)
+
+	// Assert
+	ts.Equal(http.StatusInternalServerError, res.Code)
+}
+
+func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameFound_SubEmpty() {
+	// Arrange
+	const (
+		email    = "user@email.com"
+		username = "user"
+		sub      = "e8fc5009-d220-427f-bf8c-dd63b69ca6f5"
 	)
 
 	ctx := context.Background()
 
-	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, nil)
+	user := entity.User{
+		Username: username,
+		Email:    email,
+	}
+
+	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(user, nil)
+	ts.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
+	ts.mocks.repo.EXPECT().UpdateSub(ctx, user.Username, sub).Return(nil)
+	ts.mocks.repo.EXPECT().GetByUsername(ctx, user.Username).Return(user, nil)
 
 	// Act
 	handlerFunc := http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
@@ -187,7 +254,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameFound() {
 
 	req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
 	req.Header.Set("X-Forwarded-Email", email)
-	req.Header.Set("X-Forwarded-User", username)
+	req.Header.Set("X-Forwarded-User", sub)
 
 	res := httptest.NewRecorder()
 
@@ -196,4 +263,119 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameFound() {
 
 	// Assert
 	ts.Equal(http.StatusOK, res.Code)
+}
+
+func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameFound_DifferentSub() {
+	// Arrange
+	const (
+		email    = "user@email.com"
+		username = "user"
+		sub      = "e8fc5009-d220-427f-bf8c-dd63b69ca6f5"
+		newSub   = "e8fc5009-d220-427f-bf8c-dd63b69ca6f6"
+	)
+
+	ctx := context.Background()
+
+	user := entity.User{
+		Username: username,
+		Email:    email,
+		Sub:      sub,
+	}
+
+	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(user, nil)
+	ts.mocks.repo.EXPECT().GetBySub(ctx, newSub).Return(entity.User{}, entity.ErrUserNotFound)
+	ts.mocks.repo.EXPECT().UpdateSub(ctx, user.Username, newSub).Return(nil)
+	ts.mocks.repo.EXPECT().GetByUsername(ctx, user.Username).Return(user, nil)
+
+	// Act
+	handlerFunc := http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+		ts.Equal(email, r.Context().Value(middleware.LoggedUserEmailKey))
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
+	req.Header.Set("X-Forwarded-Email", email)
+	req.Header.Set("X-Forwarded-User", newSub)
+
+	res := httptest.NewRecorder()
+
+	authM := middleware.AuthMiddleware(handlerFunc, ts.interactor)
+	authM.ServeHTTP(res, req)
+
+	// Assert
+	ts.Equal(http.StatusOK, res.Code)
+}
+
+func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameFound_EqualSub() {
+	// Arrange
+	const (
+		email    = "user@email.com"
+		username = "user"
+		sub      = "e8fc5009-d220-427f-bf8c-dd63b69ca6f5"
+	)
+
+	ctx := context.Background()
+
+	user := entity.User{
+		Username: username,
+		Email:    email,
+		Sub:      sub,
+	}
+
+	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(user, nil)
+
+	// Act
+	handlerFunc := http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+		ts.Equal(email, r.Context().Value(middleware.LoggedUserEmailKey))
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
+	req.Header.Set("X-Forwarded-Email", email)
+	req.Header.Set("X-Forwarded-User", sub)
+
+	res := httptest.NewRecorder()
+
+	authM := middleware.AuthMiddleware(handlerFunc, ts.interactor)
+	authM.ServeHTTP(res, req)
+
+	// Assert
+	ts.Equal(http.StatusOK, res.Code)
+}
+
+func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameFound_UpdateSubErr() {
+	// Arrange
+	const (
+		email    = "user@email.com"
+		username = "user"
+		sub      = "e8fc5009-d220-427f-bf8c-dd63b69ca6f5"
+		newSub   = "e8fc5009-d220-427f-bf8c-dd63b69ca6f6"
+	)
+
+	ctx := context.Background()
+
+	user := entity.User{
+		Username: username,
+		Email:    email,
+		Sub:      sub,
+	}
+
+	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(user, nil)
+	ts.mocks.repo.EXPECT().GetBySub(ctx, newSub).Return(entity.User{}, entity.ErrUserNotFound)
+	ts.mocks.repo.EXPECT().UpdateSub(ctx, user.Username, newSub).Return(errUnexpected)
+
+	// Act
+	handlerFunc := http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+		ts.Equal(email, r.Context().Value(middleware.LoggedUserEmailKey))
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
+	req.Header.Set("X-Forwarded-Email", email)
+	req.Header.Set("X-Forwarded-User", newSub)
+
+	res := httptest.NewRecorder()
+
+	authM := middleware.AuthMiddleware(handlerFunc, ts.interactor)
+	authM.ServeHTTP(res, req)
+
+	// Assert
+	ts.Equal(http.StatusInternalServerError, res.Code)
 }

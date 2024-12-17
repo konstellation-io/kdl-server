@@ -3,20 +3,21 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/go-logr/logr"
 	"github.com/gosimple/slug"
 	k8errors "k8s.io/apimachinery/pkg/api/errors"
 
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
-
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 )
 
 var (
@@ -62,12 +63,16 @@ func NewInteractor(
 }
 
 // Create add a new user to the server.
-// - If the user already exists (email and username must be unique) returns entity.ErrDuplicatedUser.
+// - If the user already exists (email, username and sub must be unique) returns entity.ErrDuplicatedUser.
 // - Generates a new SSH public/private keys.
 // - Stores the user and ssh keys into the DB.
 // - Creates a new secret in Kubernetes with the generated SSH keys.
 // - Created a service account for the user.
-func (i *Interactor) Create(ctx context.Context, email, username string, accessLevel entity.AccessLevel) (entity.User, error) {
+func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel entity.AccessLevel) (entity.User, error) {
+	// extract username from email
+	username := kdlutil.GetUsernameFromEmail(email)
+
+	fmt.Println("Creating user", "username", username, "email", email)
 	i.logger.Info("Creating user", "username", username, "email", email)
 
 	// Check if the user already exists
@@ -89,6 +94,15 @@ func (i *Interactor) Create(ctx context.Context, email, username string, accessL
 		return entity.User{}, err
 	}
 
+	_, err = i.repo.GetBySub(ctx, sub)
+	if err == nil {
+		return entity.User{}, entity.ErrDuplicatedUser
+	}
+
+	if !errors.Is(err, entity.ErrUserNotFound) {
+		return entity.User{}, err
+	}
+
 	// Create SSH public and private keys
 	keys, err := i.sshGenerator.NewKeys()
 	if err != nil {
@@ -100,6 +114,7 @@ func (i *Interactor) Create(ctx context.Context, email, username string, accessL
 	user := entity.User{
 		Username:     username,
 		Email:        email,
+		Sub:          sub,
 		AccessLevel:  accessLevel,
 		CreationDate: i.clock.Now(),
 		SSHKey:       keys,
@@ -257,6 +272,21 @@ func (i *Interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, le
 	return i.repo.FindByIDs(ctx, userIDs)
 }
 
+// UpdateSub updates the sub for the given user.
+func (i *Interactor) UpdateSub(ctx context.Context, user entity.User, sub string) (entity.User, error) {
+	i.logger.Info("Updating user sub", "username", user.Username, "sub", sub)
+
+	if _, err := i.repo.GetBySub(ctx, sub); err == nil {
+		return entity.User{}, entity.ErrDuplicatedUser
+	}
+
+	if err := i.repo.UpdateSub(ctx, user.Username, sub); err != nil {
+		return entity.User{}, err
+	}
+
+	return i.repo.GetByUsername(ctx, user.Username)
+}
+
 // RegenerateSSHKeys generate new SSH key pair for the given user.
 // - Check if user exists. (if no, returns ErrUserNotFound error)
 // - Check if userTools are Running. (if yes, returns ErrUserNotFound error)
@@ -321,32 +351,6 @@ func (i *Interactor) SynchronizeServiceAccountsForUsers() error {
 			}
 		}
 	}
-
-	return nil
-}
-
-// CreateAdminUser creates the KDL admin user if not exists.
-func (i *Interactor) CreateAdminUser(username, email string) error {
-	ctx := context.Background()
-
-	_, err := i.repo.GetByUsername(ctx, username)
-	if err == nil {
-		i.logger.Info("The admin user already exists", "username", username)
-		return nil
-	}
-
-	if !errors.Is(err, entity.ErrUserNotFound) {
-		return err
-	}
-
-	i.logger.Info("Creating the admin user", "username", username)
-
-	user, err := i.Create(ctx, email, username, entity.AccessLevelAdmin)
-	if err != nil {
-		return err
-	}
-
-	i.logger.Info("Admin user created correctly", "username", user.Username, "userEmail", user.Email, "insertedID", user.ID)
 
 	return nil
 }

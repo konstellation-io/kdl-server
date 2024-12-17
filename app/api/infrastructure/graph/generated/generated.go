@@ -143,7 +143,6 @@ type ComplexityRoot struct {
 
 	ToolUrls struct {
 		Filebrowser     func(childComplexity int) int
-		Gitea           func(childComplexity int) int
 		KnowledgeGalaxy func(childComplexity int) int
 		MLFlow          func(childComplexity int) int
 		VSCode          func(childComplexity int) int
@@ -718,13 +717,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ToolUrls.Filebrowser(childComplexity), true
 
-	case "ToolUrls.gitea":
-		if e.complexity.ToolUrls.Gitea == nil {
-			break
-		}
-
-		return e.complexity.ToolUrls.Gitea(childComplexity), true
-
 	case "ToolUrls.knowledgeGalaxy":
 		if e.complexity.ToolUrls.KnowledgeGalaxy == nil {
 			break
@@ -988,11 +980,93 @@ type ApiToken {
   token: String!
 }
 
-type SSHKey {
-  public: String!
-  private: String!
-  creationDate: String!
-  lastActivity: String
+type Member {
+  user: User!
+  accessLevel: AccessLevel!
+  addedDate: String!
+}
+
+type ToolUrls {
+  knowledgeGalaxy: String!
+  filebrowser: String!
+  vscode: String!
+  mlflow: String!
+}
+
+enum AccessLevel {
+  VIEWER
+  MANAGER
+  ADMIN
+}
+
+input ApiTokenInput {
+  userId: ID!
+  name: String
+}
+
+input UpdateProjectInput {
+  id: ID!
+  name: String
+  description: String
+  archived: Boolean
+}
+
+input DeleteProjectInput {
+  id: ID!
+}
+
+input AddMembersInput {
+  projectId: ID!
+  userIds: [ID!]!
+}
+
+input RemoveMembersInput {
+  projectId: ID!
+  userIds: [ID!]!
+}
+
+input RemoveApiTokenInput {
+  apiTokenId: ID!
+}
+
+input UpdateMembersInput {
+  projectId: ID!
+  userIds: [ID!]!
+  accessLevel: AccessLevel!
+}
+
+input RemoveUsersInput {
+  userIds: [ID!]!
+}
+
+input AddUserInput {
+  email: String!
+  username: String!
+  password: String!
+  accessLevel: AccessLevel!
+}
+
+input UpdateAccessLevelInput {
+  userIds: [ID!]!
+  accessLevel: AccessLevel!
+}
+
+input CreateProjectInput {
+  id: ID!
+  name: String!
+  description: String!
+  repository: RepositoryInput!
+}
+
+input SetBoolFieldInput {
+  id: ID!
+  value: Boolean!
+}
+
+input SetActiveUserToolsInput {
+  active: Boolean!,
+  runtimeId: String,
+  capabilitiesId: String
 }
 
 type Project {
@@ -3492,8 +3566,6 @@ func (ec *executionContext) fieldContext_Project_toolUrls(_ context.Context, fie
 			switch field.Name {
 			case "knowledgeGalaxy":
 				return ec.fieldContext_ToolUrls_knowledgeGalaxy(ctx, field)
-			case "gitea":
-				return ec.fieldContext_ToolUrls_gitea(ctx, field)
 			case "filebrowser":
 				return ec.fieldContext_ToolUrls_filebrowser(ctx, field)
 			case "vscode":
@@ -4968,50 +5040,6 @@ func (ec *executionContext) fieldContext_ToolUrls_knowledgeGalaxy(_ context.Cont
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ToolUrls_gitea(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ToolUrls_gitea(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ToolUrls().Gitea(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ToolUrls_gitea(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ToolUrls",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -8849,42 +8877,6 @@ func (ec *executionContext) _ToolUrls(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "gitea":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ToolUrls_gitea(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "filebrowser":
 			out.Values[i] = ec._ToolUrls_filebrowser(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

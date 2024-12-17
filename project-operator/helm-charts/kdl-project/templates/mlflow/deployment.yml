@@ -49,9 +49,9 @@ spec:
             - 0.0.0.0
           ports:
             - name: http
-              containerPort: {{ .Values.filebrowser.env.MLFLOW_PORT | default (int .Values.filebrowser.service.targetPort | default .Values.filebrowser.service.port) }}
+              containerPort: {{ .Values.mlflow.env.MLFLOW_PORT | default (int .Values.mlflow.service.targetPort | default .Values.mlflow.service.port) }}
               protocol: TCP
-            {{- range $port := .Values.filebrowser.service.extraPorts }}
+            {{- range $port := .Values.mlflow.service.extraPorts }}
             - name: {{ $port.name }}
               containerPort: {{ $port.targetPort }}
               protocol: TCP

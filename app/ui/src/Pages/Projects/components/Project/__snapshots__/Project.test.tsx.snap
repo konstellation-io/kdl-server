@@ -306,9 +306,6 @@ exports[`Project component Component match snapshot 1`] = `
               className="band"
             >
               <div
-                className="label"
-              />
-              <div
                 className="otherLabels"
               >
                 <div
@@ -379,10 +376,10 @@ exports[`Project component Component match snapshot 1`] = `
                 <Memo(RepositoryTypeComponent)
                   customSize={38}
                   shouldAnimate={false}
-                  squareLocation="in"
+                  squareLocation="out"
                 >
                   <div
-                    className="square in medium notAnimate"
+                    className="square out medium notAnimate"
                     style={
                       Object {
                         "height": 38,

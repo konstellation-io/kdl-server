@@ -1,25 +1,23 @@
-# DESCRIPCION
+# DESCRIPTION
 
-Cuando desplegueis un nuevo KDL-Server que contenga este pr (siga apareciendo este mensaje en el repositorio) hay que tener en cuenta que hay una serie de cosas que cambian:
+When a new KDL version containing this commit (you can tell so if this upgrade guide still exists) were to be deployed, you will need to make some changes and take into account some others that have changed:
 
-- Tiene un breaking change en la mongo - para la coleccion de "project" cambian sus atributos: external_repo_url -> url y repo_type -> (eliminado)
+- There is a breaking change in the Mongo - for the collection "project", a couple of its row have changed: external_repo_url -> url y repo_type -> (deprecated)
 
-- Estas son las estructuras en el graphql.schema que han sido eliminadas:
+- These are the structures in the graphql.schema that have been deprecated:
   type Topic
   type SetBoolFieldInput
   type AddUserInput
   enum RepositoryType
 
-- Estas son las estructuras en el graphql.schema que han sido cambiadas:
+- These are the structures in the graphql.schema that have been changed:
   input RepositoryInput
   type Repository
   input ExternalRepositoryInput -> RepositoryInput
 
-Todas aquellas peticiones de la UI que hagan uso de estas estructuras han de ser actualizados.
+## MONGODB MIGRATION GUIDE
 
-## GUIA DE MIGRACIÓN MONGODB
-
-La Mongo ha de estar a la par con la nueva estructura de datos que se establece para la colección `projects`. Para ello, se ha de ejecutar el siguiente script:
+The MongoDB needs to be aligned with the new data structure for the collection `projects`. For that, you will need to execute the following script:
 
 ```mongo
 db.projects.updateMany(

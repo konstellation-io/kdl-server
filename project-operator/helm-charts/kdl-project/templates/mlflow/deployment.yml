@@ -41,12 +41,6 @@ spec:
             - mlflow
           args:
             - server
-            - --backend-store-uri
-            - sqlite:///mlflow.db
-            - --default-artifact-root
-            - s3://$(ARTIFACTS_BUCKET)
-            - --host
-            - 0.0.0.0
           ports:
             - name: http
               containerPort: {{ .Values.mlflow.env.MLFLOW_PORT | default (int .Values.mlflow.service.targetPort | default .Values.mlflow.service.port) }}
@@ -110,6 +104,8 @@ spec:
             {{- tpl (toYaml .Values.mlflow.envFromFiles) . | nindent 12 }}
             {{- end }}
           env:
+            - name: MLFLOW_DEFAULT_ARTIFACT_ROOT
+              value: s3://$(ARTIFACTS_BUCKET)
             # Variables from secrets have precedence
             {{- $envList := dict }}
             {{- if .Values.mlflow.envFromSecrets }}

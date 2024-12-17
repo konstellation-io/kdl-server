@@ -4,7 +4,44 @@
 
 ## Description
 
-This Helm chart deploys the core components of a Kubernetes Data Lab (KDL) project, providing essential tools for data scientists and machine learning engineers in a Kubernetes-native environment. Overview The KDL Project chart creates a complete development environment for data science and machine learning workflows. It orchestrates multiple components designed to work together seamlessly in a Kubernetes cluster, following infrastructure-as-code best practices.
+This Helm chart deploys the core components of a Kubernetes Data Lab (KDL) project, providing essential tools for data scientists and machine learning engineers in a Kubernetes-native environment. Overview The KDL Project chart creates a complete development environment for data science and machine learning workflows.
+
+## How works
+
+### Default values
+
+`values.yaml` its contains all the default configurations for the core services of a KDL project, specifically MLflow and Filebrowser:
+
+* Resource allocations
+* Security configurations
+* Network policies
+* Storage settings
+* Service ports and endpoints
+
+### Overriding values from `kdl-server` Helm chart
+
+`kdl-server`` Helm chart, which is the main deployment chart, has the power to override these default values. When kdl-server deploys, can provide its own values that take precedence over the defaults.
+
+For example, if the default values specify:
+
+```yaml
+  replicaCount: 1
+  resources:
+    limits:
+      memory: "128Mi"
+```
+
+The `kdl-server` chart might override these with:
+
+```yaml
+mlflow:
+  replicaCount: 2
+  resources:
+    limits:
+      memory: "256Mi"
+```
+
+This override mechanism is particularly powerful because it allows for environment-specific configurations while maintaining a consistent base configuration. The project operator, which is included in the kdl-server deployment, uses these final merged values when creating and managing KDL projects.
 
 ## Components
 
@@ -41,7 +78,6 @@ A platform for the machine learning lifecycle that offers:
 Go to [ci](./ci) directory to see some examples of how to use this chart.
 
 ```console
-# local chart
 helm template test . -f ci/ci-values.yaml
 ```
 

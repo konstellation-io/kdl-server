@@ -4,7 +4,44 @@ A Helm chart to deploy KDL projects
 
 ## Description
 
-This Helm chart deploys the core components of a Kubernetes Data Lab (KDL) project, providing essential tools for data scientists and machine learning engineers in a Kubernetes-native environment. Overview The KDL Project chart creates a complete development environment for data science and machine learning workflows. It orchestrates multiple components designed to work together seamlessly in a Kubernetes cluster, following infrastructure-as-code best practices.
+This Helm chart deploys the core components of a Kubernetes Data Lab (KDL) project, providing essential tools for data scientists and machine learning engineers in a Kubernetes-native environment. Overview The KDL Project chart creates a complete development environment for data science and machine learning workflows.
+
+## How works
+
+### Default values
+
+`values.yaml` its contains all the default configurations for the core services of a KDL project, specifically MLflow and Filebrowser:
+
+* Resource allocations
+* Security configurations
+* Network policies
+* Storage settings
+* Service ports and endpoints
+
+### Overriding values from `kdl-server` Helm chart
+
+`kdl-server`` Helm chart, which is the main deployment chart, has the power to override these default values. When kdl-server deploys, can provide its own values that take precedence over the defaults.
+
+For example, if the default values specify:
+
+```yaml
+  replicaCount: 1
+  resources:
+    limits:
+      memory: "128Mi"
+```
+
+The `kdl-server` chart might override these with:
+
+```yaml
+mlflow:
+  replicaCount: 2
+  resources:
+    limits:
+      memory: "256Mi"
+```
+
+This override mechanism is particularly powerful because it allows for environment-specific configurations while maintaining a consistent base configuration. The project operator, which is included in the kdl-server deployment, uses these final merged values when creating and managing KDL projects.
 
 ## Components
 
@@ -45,7 +82,6 @@ A platform for the machine learning lifecycle that offers:
 Go to [ci](./ci) directory to see some examples of how to use this chart.
 
 ```console
-# local chart
 helm template test . -f ci/ci-values.yaml
 ```
 
@@ -54,13 +90,13 @@ helm template test . -f ci/ci-values.yaml
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | domain | string | `"kdl.local"` | String to set domain to deploy |
-| filebrowser | object | `{"affinity":{},"args":["-c","/entrypoint.sh"],"autoscaling":{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":80},"command":["/bin/sh"],"enabled":true,"env":[],"envFromConfigMap":{},"envFromFiles":[],"envFromSecrets":{},"extraContainers":[],"image":{"pullPolicy":"IfNotPresent","repository":"filebrowser/filebrowser","tag":"v2"},"imagePullSecrets":[],"initContainers":[],"lifecycle":{},"livenessProbe":{"enabled":false,"failureThreshold":3,"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"livenessProbeCustom":{},"networkPolicy":{"egress":[],"enabled":false,"ingress":[],"policyTypes":[]},"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"maxUnavailable":1,"minAvailable":null},"podLabels":{},"podSecurityContext":{},"readinessProbe":{"enabled":false,"failureThreshold":3,"initialDelaySeconds":10,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"readinessProbeCustom":{},"replicaCount":1,"resources":{},"secrets":[],"securityContext":{},"service":{"port":9696,"type":"ClusterIP"},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"enabled":false,"failureThreshold":30,"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"startupProbeCustom":{},"terminationGracePeriodSeconds":30,"tolerations":[],"topologySpreadConstraints":[],"volumeMounts":[],"volumes":[]}` | Filebrowser sevice </br> Ref: https://filebrowser.org |
+| filebrowser | object | `{"affinity":{},"args":["-c","/entrypoint.sh"],"autoscaling":{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":80},"command":["/bin/sh"],"enabled":true,"env":{"FB_ADDRESS":"0.0.0.0","FB_DATABASE":"/database.db","FB_LOG":"stdout","FB_ROOT":"/srv"},"envFromConfigMap":{},"envFromFiles":[],"envFromSecrets":{},"extraContainers":[],"image":{"pullPolicy":"IfNotPresent","repository":"filebrowser/filebrowser","tag":"v2"},"imagePullSecrets":[],"initContainers":[],"lifecycle":{},"livenessProbe":{"enabled":false,"failureThreshold":3,"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"livenessProbeCustom":{},"networkPolicy":{"egress":[],"enabled":false,"ingress":[],"policyTypes":[]},"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"maxUnavailable":1,"minAvailable":null},"podLabels":{},"podSecurityContext":{},"readinessProbe":{"enabled":false,"failureThreshold":3,"initialDelaySeconds":10,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"readinessProbeCustom":{},"replicaCount":1,"resources":{},"secrets":[],"securityContext":{},"service":{"port":9696,"type":"ClusterIP"},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"enabled":false,"failureThreshold":30,"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"startupProbeCustom":{},"terminationGracePeriodSeconds":30,"tolerations":[],"topologySpreadConstraints":[],"volumeMounts":[],"volumes":[]}` | Filebrowser sevice </br> Ref: https://filebrowser.org |
 | filebrowser.affinity | object | `{}` | Affinity for pod assignment </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity |
 | filebrowser.args | list | `["-c","/entrypoint.sh"]` | Configure args </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/ |
 | filebrowser.autoscaling | object | `{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":80}` | Autoscaling with CPU or memory utilization percentage </br> Ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/ |
 | filebrowser.command | list | `["/bin/sh"]` | Configure command </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/ |
 | filebrowser.enabled | bool | `true` | Enable or disable fllebrowser |
-| filebrowser.env | list | `[]` | Environment variables to configure application |
+| filebrowser.env | object | `{"FB_ADDRESS":"0.0.0.0","FB_DATABASE":"/database.db","FB_LOG":"stdout","FB_ROOT":"/srv"}` | Environment variables to configure application |
 | filebrowser.envFromConfigMap | object | `{}` | Variables from configMap |
 | filebrowser.envFromFiles | list | `[]` | Load all variables from files </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables |
 | filebrowser.envFromSecrets | object | `{}` | Variables from secrets |
@@ -97,13 +133,13 @@ helm template test . -f ci/ci-values.yaml
 | filebrowser.volumeMounts | list | `[]` | Additional volumeMounts on the output Deployment definition |
 | filebrowser.volumes | list | `[]` | Additional volumes on the output Deployment definition </br> Ref: https://kubernetes.io/docs/concepts/storage/volumes/ </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/ </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#create-a-pod-that-has-access-to-the-secret-data-through-a-volume |
 | fullnameOverride | string | `""` | String to fully override kdl-project.fullname template |
-| mlflow | object | `{"affinity":{},"args":[],"autoscaling":{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":80},"command":[],"enabled":true,"env":{},"envFromConfigMap":{},"envFromFiles":[],"envFromSecrets":{},"extraContainers":[],"image":{"pullPolicy":"IfNotPresent","repository":"konstellation/kdl-mlflow","tag":"latest"},"imagePullSecrets":[],"ingress":{"annotations":{},"className":"","enabled":false,"hosts":[],"tls":{"enabled":false,"extraTLS":[]}},"initContainers":[],"lifecycle":{},"livenessProbe":{"enabled":false,"failureThreshold":3,"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"livenessProbeCustom":{},"networkPolicy":{"egress":[],"enabled":false,"ingress":[],"policyTypes":[]},"nodeSelector":{},"persistentVolume":{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":true,"labels":{},"selector":{},"size":"1Gi","storageClass":"","volumeBindingMode":"","volumeName":""},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"maxUnavailable":1,"minAvailable":null},"podLabels":{},"podSecurityContext":{},"readinessProbe":{"enabled":false,"failureThreshold":3,"initialDelaySeconds":10,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"readinessProbeCustom":{},"replicaCount":1,"resources":{},"secrets":[],"securityContext":{},"service":{"port":5000,"type":"ClusterIP"},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"enabled":false,"failureThreshold":30,"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"startupProbeCustom":{},"terminationGracePeriodSeconds":30,"tolerations":[],"topologySpreadConstraints":[],"volumeMounts":[],"volumes":[]}` | MLflow sevice </br> Ref: https://mlflow.org/docs/latest/index.html |
+| mlflow | object | `{"affinity":{},"args":[],"autoscaling":{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":80},"command":[],"enabled":true,"env":{"MLFLOW_BACKEND_STORE_URI":"sqlite:///mlflow.db","MLFLOW_HOST":"0.0.0.0","MLFLOW_PORT":"5000"},"envFromConfigMap":{},"envFromFiles":[],"envFromSecrets":{},"extraContainers":[],"image":{"pullPolicy":"IfNotPresent","repository":"konstellation/kdl-mlflow","tag":"latest"},"imagePullSecrets":[],"ingress":{"annotations":{},"className":"","enabled":false,"hosts":[],"tls":{"enabled":false,"extraTLS":[]}},"initContainers":[],"lifecycle":{},"livenessProbe":{"enabled":false,"failureThreshold":3,"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"livenessProbeCustom":{},"networkPolicy":{"egress":[],"enabled":false,"ingress":[],"policyTypes":[]},"nodeSelector":{},"persistentVolume":{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":true,"labels":{},"selector":{},"size":"1Gi","storageClass":"","volumeBindingMode":"","volumeName":""},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"maxUnavailable":1,"minAvailable":null},"podLabels":{},"podSecurityContext":{},"readinessProbe":{"enabled":false,"failureThreshold":3,"initialDelaySeconds":10,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"readinessProbeCustom":{},"replicaCount":1,"resources":{},"secrets":[],"securityContext":{},"service":{"port":5000,"type":"ClusterIP"},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"enabled":false,"failureThreshold":30,"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"startupProbeCustom":{},"terminationGracePeriodSeconds":30,"tolerations":[],"topologySpreadConstraints":[],"volumeMounts":[],"volumes":[]}` | MLflow sevice </br> Ref: https://mlflow.org/docs/latest/index.html |
 | mlflow.affinity | object | `{}` | Affinity for pod assignment </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity |
 | mlflow.args | list | `[]` | Configure args </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/ |
 | mlflow.autoscaling | object | `{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":80}` | Autoscaling with CPU or memory utilization percentage </br> Ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/ |
 | mlflow.command | list | `[]` | Configure command </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/ |
 | mlflow.enabled | bool | `true` | Enable or disable mlflow |
-| mlflow.env | object | `{}` | Environment variables to configure application |
+| mlflow.env | object | `{"MLFLOW_BACKEND_STORE_URI":"sqlite:///mlflow.db","MLFLOW_HOST":"0.0.0.0","MLFLOW_PORT":"5000"}` | Environment variables to configure application ref: https://mlflow.org/docs/latest/cli.html?highlight=Environment_variables#mlflow-server |
 | mlflow.envFromConfigMap | object | `{}` | Variables from configMap |
 | mlflow.envFromFiles | list | `[]` | Load all variables from files </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables |
 | mlflow.envFromSecrets | object | `{}` | Variables from secrets |

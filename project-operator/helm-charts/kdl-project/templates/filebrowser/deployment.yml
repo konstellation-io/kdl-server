@@ -168,9 +168,6 @@ spec:
           configMap:
             name: {{ include "kdl-project.filebrowser.name" . }}
             defaultMode: 0777
-        - name: received-data
-          persistentVolumeClaim:
-            claimName: received-data-claim
       {{- with .Values.filebrowser.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}

@@ -1,6 +1,7 @@
 const casual = require('casual');
 const { buildRandomMembers } = require('./membersMock');
 const buildRepository = require('./repositoryMock');
+// import { memberMe, member1, member2 } from './member';
 const activeProjectsCount = 4;
 
 function buildProject(_, index) {
@@ -16,12 +17,13 @@ function buildProject(_, index) {
     needAccess: index < activeProjectsCount ? false : casual.boolean,
     members: buildRandomMembers(casual.integer(1, 5)),
     archived: index < activeProjectsCount ? false : casual.boolean,
-    toolUrls: () => ({
+    toolUrls: {
       knowledgeGalaxy: 'https://filebrowser.org/',
       filebrowser: 'https://filebrowser.org/',
       vscode: 'https://code.visualstudio.com/',
       mlflow: 'https://mlflow.org/',
-    }),
+    },
+    // members: [memberMe, member1, member2],
   };
 }
 

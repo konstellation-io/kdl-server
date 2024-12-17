@@ -42,9 +42,7 @@ module.exports = {
     },
     removeMembers: (_, { input: { projectId, userIds } }) => {
       const project = projects.find(({ id }) => id === projectId);
-      project.members = project.members.filter(
-        ({ user }) => !userIds.includes(user.id)
-      );
+      project.members = project.members.filter(({ user }) => !userIds.includes(user.id));
 
       return project;
     },
@@ -58,9 +56,9 @@ module.exports = {
 
       return project;
     },
-    deleteProject:(_, { input: { id }}) => {
+    deleteProject: (_, { input: { id } }) => {
       const project = projects.find((p) => p.id === id);
-      projects = projects.filter(p => p.id !== id)
+      projects = projects.filter((p) => p.id !== id);
       return project;
     },
     removeApiToken: (_, { input: { apiTokenId } }) => ({
@@ -91,11 +89,9 @@ module.exports = {
         ...casualProject,
         ...input,
         repository: {
-          type: input.repository.type,
-          url:
-            input.repository.type === 'INTERNAL'
-              ? `${casual.url}${input.id}`
-              : input.repository.external.url,
+          // type: input.repository.type,
+          url: input.repository.url,
+          username: input.repository.username,
           error: false,
         },
         members: [meAsMember],

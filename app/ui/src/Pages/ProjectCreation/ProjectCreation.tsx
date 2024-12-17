@@ -45,7 +45,10 @@ function ProjectCreation() {
     // const type = RepositoryType.EXTERNAL;
 
     const inputRepository: RepositoryInput = {
-      // type,
+      url: repository.values.url,
+      username: repository.values.username,
+      credential: repository.values.credential,
+      authMethod: repository.values.authMethod,
     };
 
     // if (type === RepositoryType.EXTERNAL) {

@@ -29,18 +29,10 @@ function TabGit({ project }: Props) {
   if (loading) return <SpinnerCircular />;
   if (!repository || error) return <ErrorMessage />;
 
-  // const isExternal = repository.type === RepositoryType.EXTERNAL;
-
   return (
     <div className={styles.container} data-testid="tabGit">
       <div className={styles.repoType}>
-        <RepositoryTypeComponent
-          // squareLocation={isExternal ? LOCATION.OUT : LOCATION.IN}
-          squareLocation={LOCATION.OUT}
-          size={SIZE.TINY}
-          shouldAnimate={false}
-        />
-        {/* <p className={styles.repoTypeName}>{`${repository.type} REPOSITORY`}</p> */}
+        <RepositoryTypeComponent squareLocation={LOCATION.OUT} size={SIZE.TINY} shouldAnimate={false} />
       </div>
       <div className={styles.url}>
         <p>{repository.url}</p>

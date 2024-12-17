@@ -89,7 +89,6 @@ module.exports = {
         ...casualProject,
         ...input,
         repository: {
-          // type: input.repository.type,
           url: input.repository.url,
           username: input.repository.username,
           error: false,

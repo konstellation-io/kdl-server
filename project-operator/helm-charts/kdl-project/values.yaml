@@ -466,21 +466,6 @@ mlflow:
     className: ""
     annotations: {}
       # cert-manager.io/issuer: your-issuer
-    hosts:
-    - host: chart-example.local
-      paths:
-      - path: /
-        pathType: ImplementationSpecific
-    tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #    - chart-example.local
-
-  ingress:
-    enabled: false
-    className: ""
-    annotations: {}
-      # cert-manager.io/issuer: your-issuer
     hosts: []
       # - host: mlflow.example.com
       #   paths:

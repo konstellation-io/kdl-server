@@ -114,54 +114,10 @@ knowledgeGalaxy:
 # -- MinIO subchart deployment
 # </br> Ref: https://github.com/minio/minio/blob/RELEASE.2021-10-13T00-23-17Z/helm/minio/values.yaml
 minio:
-  enabled: true
-
-  fullnameOverride: minio
-  nameOverride: minio
-
-  mode: standalone
-
-  ingress:
-    enabled: true
-    ingressClassName: public
-    annotations:
-      cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
-    path: /
-    hosts:
-      - minio.{{ requiredEnv "DOMAIN" }}
-    tls:
-      - secretName: minio-tls
-        hosts:
-        - minio.{{ requiredEnv "DOMAIN" }}
-
-  consoleIngress:
-    enabled: true
-    ingressClassName: public
-    annotations:
-      cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
-    path: /
-    hosts:
-      - minio-console.{{ requiredEnv "DOMAIN" }}
-    tls:
-      - secretName: minio-console-tls
-        hosts:
-        - minio-console.{{ requiredEnv "DOMAIN" }}
-
+  enabled: false
+  
   rootUser: minio
   rootPassword: minio123
-
-  persistence:
-    enabled: true
-    storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-    existingClaim: "kdl-local-claim"
-    size: 1Gi
-    accessMode: ReadWriteMany
-
-  resources:
-    requests:
-      memory: 1Gi
 
 # -- MongoDB subchart deployment
 # </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/mongodb/values.yaml

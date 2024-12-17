@@ -81,6 +81,7 @@ releases:
     inherit:
       - template: default
 
+  # ref: https://github.com/konstellation-io/helm-charts/blob/kdl-server-6.1.0/charts/kdl-server/values.yaml
   - name: kdl-local
     chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
     version: 6.1.0
@@ -90,6 +91,15 @@ releases:
       - mongodb/mongodb-database
     inherit:
       - template: default
+
+  # ref: https://github.com/minio/minio/blob/RELEASE.2024-11-07T00-52-20Z/helm/minio/values.yaml
+  - name: "minio"
+    chart: minio/minio
+    version: 5.3.0
+    needs:
+    - kdl/kdl-local
+    inherit:
+    - template: default
 
   - name: mongodb-initial-data
     chart: bedag/raw

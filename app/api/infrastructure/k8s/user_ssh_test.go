@@ -11,7 +11,7 @@ import (
 
 const (
 	userSSHName   = "user"
-	secretSSHName = "user-ssh-keys" //nolint:gosec //this is a test
+	secretSSHName = "user-ssh-keys"
 )
 
 var user = entity.User{

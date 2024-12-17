@@ -12,7 +12,7 @@ import (
 const (
 	saSimpleName = "sa"
 	saName       = "sa-service-account"
-	saSecretName = "sa-service-account-secret" //nolint:gosec //this is a test
+	saSecretName = "sa-service-account-secret"
 )
 
 func (s *testSuite) TestCreateServiceAccount() {

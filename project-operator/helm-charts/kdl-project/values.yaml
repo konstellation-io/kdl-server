@@ -81,16 +81,6 @@ filebrowser:
     # - configMapRef:
     #     name: <name-configmap>
 
-  # -- Secrets values to create credentials and reference by envFromSecrets
-  # Generate Secret with following name: <release-name>-<name>
-  # </br> Ref: https://kubernetes.io/docs/concepts/configuration/secret/
-  secrets: []
-    # - name: secret-name
-    #   data:
-    #     my.key: |-
-    #       my-content
-    #     my_var: my-value
-
   # -- Configure extra containers
   extraContainers: []
     # - name: project-proxy
@@ -404,16 +394,6 @@ mlflow:
     #     name: <name-secret>
     # - configMapRef:
     #     name: <name-configmap>
-
-  # -- Secrets values to create credentials and reference by envFromSecrets
-  # Generate Secret with following name: <release-name>-<name>
-  # </br> Ref: https://kubernetes.io/docs/concepts/configuration/secret/
-  secrets: []
-    # - name: secret-name
-    #   data:
-    #     my.key: |-
-    #       my-content
-    #     my_var: my-value
 
   # -- Configure extra containers
   extraContainers: []

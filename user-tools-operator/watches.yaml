@@ -1,5 +1,5 @@
 ---
-- version: v1alpha1
+- version: v1
   group: kdl.konstellation.io
-  kind: UserTools
-  chart: helm-charts/usertools
+  kind: KDLUserTools
+  chart: helm-charts/kdl-user-tools

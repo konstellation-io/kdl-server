@@ -1,12 +1,12 @@
 {{/*
-Expand the name of the chart.
+Expand the name of the chart
 */}}
 {{- define "kdl-project.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-Create a default fully qualified app name.
+Create a default fully qualified app name
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
@@ -24,7 +24,7 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
-Create chart name and version as used by the chart label.
+Create chart name and version as used by the chart label
 */}}
 {{- define "kdl-project.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
@@ -57,7 +57,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 */}}
 
 {{/*
-Expand the name of the chart.
+Expand the name of the chart
 */}}
 {{- define "kdl-project.filebrowser.name" -}}
 {{- printf "%s-filebrowser" .Values.projectId | trunc 63 | trimSuffix "-" }}
@@ -75,7 +75,7 @@ Create the name of the service account to use
 {{- end -}}
 
 {{/*
-Default server component
+Default filebowser component
 */}}
 {{- define "kdl-project.filebrowserComponentLabel" -}}
 kdl-project/component: filebrowser
@@ -83,14 +83,14 @@ kdl-project/projectId: {{ .Values.projectId | quote }}
 {{- end -}}
 
 {{/*
-Generate labels for server component
+Generate labels for filebowser component
 */}}
 {{- define "kdl-project.filebrowserLabels" -}}
 {{- toYaml (merge ((include "kdl-project.labels" .) | fromYaml) ((include "kdl-project.filebrowserComponentLabel" .) | fromYaml)) }}
 {{- end }}
 
 {{/*
-Generate selectorLabels for server component
+Generate selectorLabels for filebowser component
 */}}
 {{- define "kdl-project.selectorFilebrowserLabels" -}}
 {{- toYaml (merge ((include "kdl-project.selectorLabels" .) | fromYaml) ((include "kdl-project.filebrowserComponentLabel" .) | fromYaml)) }}
@@ -129,7 +129,7 @@ This works because Helm treats dictionaries as mutable objects and allows passin
 */}}
 
 {{/*
-Expand the name of the chart.
+Expand the name of the chart
 */}}
 {{- define "kdl-project.mlflow.name" -}}
 {{- printf "%s-mlflow" .Values.projectId | trunc 63 | trimSuffix "-" }}
@@ -147,7 +147,7 @@ Create the name of the service account to use
 {{- end -}}
 
 {{/*
-Default server component
+Default MLflow component
 */}}
 {{- define "kdl-project.mlflowComponentLabel" -}}
 kdl-project/component: mlflow
@@ -155,14 +155,14 @@ kdl-project/projectId: {{ .Values.projectId | quote }}
 {{- end -}}
 
 {{/*
-Generate labels for server component
+Generate labels for MLflow component
 */}}
 {{- define "kdl-project.mlflowLabels" -}}
 {{- toYaml (merge ((include "kdl-project.labels" .) | fromYaml) ((include "kdl-project.mlflowComponentLabel" .) | fromYaml)) }}
 {{- end }}
 
 {{/*
-Generate selectorLabels for server component
+Generate selectorLabels for MLflow component
 */}}
 {{- define "kdl-project.selectorMlflowLabels" -}}
 {{- toYaml (merge ((include "kdl-project.selectorLabels" .) | fromYaml) ((include "kdl-project.mlflowComponentLabel" .) | fromYaml)) }}

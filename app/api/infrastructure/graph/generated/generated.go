@@ -980,93 +980,11 @@ type ApiToken {
   token: String!
 }
 
-type Member {
-  user: User!
-  accessLevel: AccessLevel!
-  addedDate: String!
-}
-
-type ToolUrls {
-  knowledgeGalaxy: String!
-  filebrowser: String!
-  vscode: String!
-  mlflow: String!
-}
-
-enum AccessLevel {
-  VIEWER
-  MANAGER
-  ADMIN
-}
-
-input ApiTokenInput {
-  userId: ID!
-  name: String
-}
-
-input UpdateProjectInput {
-  id: ID!
-  name: String
-  description: String
-  archived: Boolean
-}
-
-input DeleteProjectInput {
-  id: ID!
-}
-
-input AddMembersInput {
-  projectId: ID!
-  userIds: [ID!]!
-}
-
-input RemoveMembersInput {
-  projectId: ID!
-  userIds: [ID!]!
-}
-
-input RemoveApiTokenInput {
-  apiTokenId: ID!
-}
-
-input UpdateMembersInput {
-  projectId: ID!
-  userIds: [ID!]!
-  accessLevel: AccessLevel!
-}
-
-input RemoveUsersInput {
-  userIds: [ID!]!
-}
-
-input AddUserInput {
-  email: String!
-  username: String!
-  password: String!
-  accessLevel: AccessLevel!
-}
-
-input UpdateAccessLevelInput {
-  userIds: [ID!]!
-  accessLevel: AccessLevel!
-}
-
-input CreateProjectInput {
-  id: ID!
-  name: String!
-  description: String!
-  repository: RepositoryInput!
-}
-
-input SetBoolFieldInput {
-  id: ID!
-  value: Boolean!
-}
-
-input SetActiveUserToolsInput {
-  active: Boolean!,
-  runtimeId: String,
-  capabilitiesId: String
+type SSHKey {
+  public: String!
+  private: String!
+  creationDate: String!
+  lastActivity: String
 }
 
 type Project {
@@ -1097,7 +1015,6 @@ type Member {
 
 type ToolUrls {
   knowledgeGalaxy: String!
-  gitea: String!
   filebrowser: String!
   vscode: String!
   mlflow: String!
@@ -8890,7 +8807,7 @@ func (ec *executionContext) _ToolUrls(ctx context.Context, sel ast.SelectionSet,
 		case "mlflow":
 			out.Values[i] = ec._ToolUrls_mlflow(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

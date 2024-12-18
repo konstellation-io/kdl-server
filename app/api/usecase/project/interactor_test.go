@@ -87,9 +87,9 @@ func TestInteractor_Create(t *testing.T) {
 		ownerUsername = "john"
 	)
 
-	URL := "https://github.com/org/repo.git"
-	Username := "username"
-	Token := "token"
+	url := "https://github.com/org/repo.git"
+	username := "username"
+	token := "token"
 	authMethod := entity.RepositoryAuthToken
 
 	ctx := context.Background()
@@ -105,7 +105,7 @@ func TestInteractor_Create(t *testing.T) {
 		},
 	}
 	createProject.Repository = entity.Repository{
-		URL:      URL,
+		URL:      url,
 		RepoName: testProjectID,
 	}
 
@@ -115,7 +115,7 @@ func TestInteractor_Create(t *testing.T) {
 		Description:  projectDesc,
 		CreationDate: now,
 		Repository: entity.Repository{
-			URL:      URL,
+			URL:      url,
 			RepoName: testProjectID,
 		},
 	}
@@ -131,9 +131,9 @@ func TestInteractor_Create(t *testing.T) {
 		ProjectID:   testProjectID,
 		Name:        projectName,
 		Description: projectDesc,
-		URL:         &URL,
-		Username:    &Username,
-		Credential:  Token,
+		URL:         &url,
+		Username:    &username,
+		Credential:  token,
 		AuthMethod:  authMethod,
 		Owner:       entity.User{ID: ownerUserID, Username: ownerUsername},
 	})

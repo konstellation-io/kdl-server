@@ -24,7 +24,8 @@ import (
 
 var ErrCastingEmailToString = errors.New("error casting email to string")
 
-var _ generated.ResolverRoot = &Resolver{}
+// Resolver implements the generated.ResolverRoot interface.
+var _ generated.ResolverRoot = (*Resolver)(nil)
 
 // Resolver serves as dependency injection for the app, add any dependencies app require here.
 type Resolver struct {

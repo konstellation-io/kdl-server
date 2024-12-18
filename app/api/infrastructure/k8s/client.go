@@ -20,13 +20,13 @@ const (
 	userToolsVersion    = "v1alpha1"
 	userToolsAPIVersion = userToolsGroup + "/" + userToolsVersion
 
-	kdlprojectGroup      = "project.konstellation.io"
+	kdlprojectGroup      = "kdl.konstellation.io"
 	kdlprojectResource   = "kdlprojects"
 	kdlprojectVersion    = "v1"
 	kdlprojectAPIVersion = kdlprojectGroup + "/" + kdlprojectVersion
 )
 
-var _ ClientInterface = &Client{}
+var _ ClientInterface = (*Client)(nil)
 
 type Client struct {
 	logger        logr.Logger

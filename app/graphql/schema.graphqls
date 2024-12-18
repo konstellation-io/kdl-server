@@ -1,3 +1,10 @@
+# This schema.graphqls file uses the following sorting criteria:
+# 1. Queries (alphabetical order)
+# 2. Mutations (grouped by returned type, then alphabetical order)
+# 3. Types and Enums (apparicion order in schema.graphqls)
+# 3.1  Types that are contained within other types are to be under the parent type
+
+
 type Query {
   capabilities: [Capability!]!
   kubeconfig: String!

@@ -44,7 +44,6 @@ type ResolverRoot interface {
 	Project() ProjectResolver
 	Query() QueryResolver
 	SSHKey() SSHKeyResolver
-	ToolUrls() ToolUrlsResolver
 	User() UserResolver
 }
 
@@ -201,9 +200,6 @@ type QueryResolver interface {
 type SSHKeyResolver interface {
 	CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error)
 	LastActivity(ctx context.Context, obj *entity.SSHKey) (*string, error)
-}
-type ToolUrlsResolver interface {
-	Gitea(ctx context.Context, obj *entity.ToolUrls) (string, error)
 }
 type UserResolver interface {
 	CreationDate(ctx context.Context, obj *entity.User) (string, error)
@@ -918,7 +914,14 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../../../../graphql/schema.graphqls", Input: `type Query {
+	{Name: "../../../../graphql/schema.graphqls", Input: `# This schema.graphqls file uses the following sorting criteria:
+# 1. Queries (alphabetical order)
+# 2. Mutations (grouped by returned type, then alphabetical order)
+# 3. Types and Enums (apparicion order in schema.graphqls)
+# 3.1  Types that are contained within other types are to be under the parent type
+
+
+type Query {
   capabilities: [Capability!]!
   kubeconfig: String!
   me: User!
@@ -8792,17 +8795,17 @@ func (ec *executionContext) _ToolUrls(ctx context.Context, sel ast.SelectionSet,
 		case "knowledgeGalaxy":
 			out.Values[i] = ec._ToolUrls_knowledgeGalaxy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "filebrowser":
 			out.Values[i] = ec._ToolUrls_filebrowser(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "vscode":
 			out.Values[i] = ec._ToolUrls_vscode(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+				out.Invalids++
 			}
 		case "mlflow":
 			out.Values[i] = ec._ToolUrls_mlflow(ctx, field, obj)

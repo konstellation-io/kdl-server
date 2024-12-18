@@ -272,8 +272,6 @@ func (r *queryResolver) Me(ctx context.Context) (*entity.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	return r.runtimes.GetRuntimes(ctx, user.Username)
-}
 
 	return &loggedUser, nil
 }
@@ -355,11 +353,6 @@ func (r *sSHKeyResolver) LastActivity(ctx context.Context, obj *entity.SSHKey) (
 	return &lastActivity, nil
 }
 
-// Gitea is the resolver for the gitea field.
-func (r *toolUrlsResolver) Gitea(ctx context.Context, obj *entity.ToolUrls) (string, error) {
-	panic(fmt.Errorf("not implemented: Gitea - gitea"))
-}
-
 // CreationDate is the resolver for the creationDate field.
 func (r *userResolver) CreationDate(ctx context.Context, obj *entity.User) (string, error) {
 	return obj.CreationDate.Format(time.RFC3339), nil
@@ -396,9 +389,6 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 // SSHKey returns generated.SSHKeyResolver implementation.
 func (r *Resolver) SSHKey() generated.SSHKeyResolver { return &sSHKeyResolver{r} }
 
-// ToolUrls returns generated.ToolUrlsResolver implementation.
-func (r *Resolver) ToolUrls() generated.ToolUrlsResolver { return &toolUrlsResolver{r} }
-
 // User returns generated.UserResolver implementation.
 func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
 
@@ -407,5 +397,4 @@ type mutationResolver struct{ *Resolver }
 type projectResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type sSHKeyResolver struct{ *Resolver }
-type toolUrlsResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }

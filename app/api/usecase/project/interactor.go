@@ -30,8 +30,6 @@ type CreateProjectOption struct {
 	Description string
 	URL         *string
 	Username    *string
-	Credential  string
-	AuthMethod  entity.RepositoryAuthMethod
 	Owner       entity.User
 }
 
@@ -81,14 +79,6 @@ func (c CreateProjectOption) Validate() error {
 
 	if kdlutil.IsNilOrEmpty(c.Username) {
 		return fmt.Errorf("%w: repository username cannot be null", ErrCreateProjectValidation)
-	}
-
-	if !c.AuthMethod.IsValid() {
-		return fmt.Errorf("%w: invalid repository authentication method", ErrCreateProjectValidation)
-	}
-
-	if c.Credential == "" {
-		return fmt.Errorf("%w: repository token cannot be null", ErrCreateProjectValidation)
 	}
 
 	return nil

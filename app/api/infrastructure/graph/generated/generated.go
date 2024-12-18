@@ -914,7 +914,14 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../../../../graphql/schema.graphqls", Input: `type Query {
+	{Name: "../../../../graphql/schema.graphqls", Input: `# This schema.graphqls file uses the following sorting criteria:
+# 1. Queries (alphabetical order)
+# 2. Mutations (grouped by returned type, then alphabetical order)
+# 3. Types and Enums (apparicion order in schema.graphqls)
+# 3.1  Types that are contained within other types are to be under the parent type
+
+
+type Query {
   capabilities: [Capability!]!
   kubeconfig: String!
   me: User!
@@ -1060,13 +1067,6 @@ input CreateProjectInput {
 input RepositoryInput {
   url: String!
   username: String!
-  credential: String!
-  authMethod: RepositoryAuthMethod!
-}
-
-enum RepositoryAuthMethod {
-  PASSWORD
-  TOKEN
 }
 
 input DeleteProjectInput {
@@ -7518,7 +7518,7 @@ func (ec *executionContext) unmarshalInputRepositoryInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"url", "username", "credential", "authMethod"}
+	fieldsInOrder := [...]string{"url", "username"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7539,20 +7539,6 @@ func (ec *executionContext) unmarshalInputRepositoryInput(ctx context.Context, o
 				return it, err
 			}
 			it.Username = data
-		case "credential":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("credential"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Credential = data
-		case "authMethod":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authMethod"))
-			data, err := ec.unmarshalNRepositoryAuthMethod2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepositoryAuthMethod(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.AuthMethod = data
 		}
 	}
 
@@ -9665,22 +9651,6 @@ func (ec *executionContext) unmarshalNRemoveMembersInput2githubᚗcomᚋkonstell
 func (ec *executionContext) unmarshalNRemoveUsersInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRemoveUsersInput(ctx context.Context, v interface{}) (model.RemoveUsersInput, error) {
 	res, err := ec.unmarshalInputRemoveUsersInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNRepositoryAuthMethod2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepositoryAuthMethod(ctx context.Context, v interface{}) (entity.RepositoryAuthMethod, error) {
-	tmp, err := graphql.UnmarshalString(v)
-	res := entity.RepositoryAuthMethod(tmp)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNRepositoryAuthMethod2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐRepositoryAuthMethod(ctx context.Context, sel ast.SelectionSet, v entity.RepositoryAuthMethod) graphql.Marshaler {
-	res := graphql.MarshalString(string(v))
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
 }
 
 func (ec *executionContext) unmarshalNRepositoryInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRepositoryInput(ctx context.Context, v interface{}) (*model.RepositoryInput, error) {

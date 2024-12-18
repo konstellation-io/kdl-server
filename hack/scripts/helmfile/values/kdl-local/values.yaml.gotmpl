@@ -342,17 +342,6 @@ userToolsOperator:
       tag: latest
       pullPolicy: Always
 
-  vscode:
-    enabled: false
-
-    image:
-      epository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-vscode
-      tag: latest
-      pullPolicy: Always
-
-  ingress:
-    className: "public"
-
   kubeconfig:
     enabled: {{ requiredEnv "KUBECONFIG_ENABLED" }}
     externalServerUrl: {{ env "EXTERNAL_SERVER_URL" | quote }}

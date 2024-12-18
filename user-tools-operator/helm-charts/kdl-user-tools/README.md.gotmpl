@@ -1,0 +1,110 @@
+# {{ template "chart.name" . }}
+
+{{ template "chart.description" . }}
+
+## Description
+
+The KDL User Tools operator automates the creation and management of personalized development environments for data scientists within a Kubernetes cluster. Each environment provides a complete, isolated workspace with integrated development tools, secure access controls, and collaborative features.
+
+## How works
+
+### Default values
+
+`values.yaml` file contains all default configurations for user development environments, including:
+
+* Resource allocations and limits
+* Security settings and access controls
+* Network policies and isolation rules
+* Storage configurations and persistence
+* Service endpoints and connectivity
+* Development tool configurations
+
+### Overriding values from `kdl-server` Helm chart
+
+For example, if the default values specify:
+
+```yaml
+vscodeRuntime:
+  resources:
+    limits:
+      memory: "4Gi"
+      cpu: "2"
+```
+
+A user-tools might override these with:
+
+```yaml
+vscodeRuntime:
+  resources:
+    limits:
+      memory: "8Gi"
+      cpu: "4"
+    requests:
+      memory: "2Gi"
+      cpu: "500m"
+```
+
+## Components
+
+### VSCode Runtime
+
+* Pre-installed data science tools, frameworks and libraries necessary for model development
+* Environment ensuring consistency across all development stages
+* Built-in dependencies and configurations optimized for data science workflows
+* An isolated workspace that maintains reproducibility of experiments and model development
+
+### Repository Cloner
+
+* Automatic repository synchronization
+* Git credential management
+* Repository access control
+* Workspace initialization
+* Code availability management
+
+## Example
+
+Creating a new development environment:
+
+```yaml
+apiVersion: kdl.konstellation.io/v1
+kind: KDLUserTools
+metadata:
+  name: data-scientist-env
+spec:
+  username: "data.scientist"
+  usernameSlug: "data-scientist"
+  vscodeRuntime:
+    image:
+      repository: konstellation/kdl-py
+      tag: "3.9"
+  persistentVolume:
+    enabled: true
+    size: "10Gi"
+```
+
+This creates a complete development environment with:
+
+* runtime access
+* Python data science tools
+* Persistent storage
+* Security configurations
+* Network policies
+
+{{ template "chart.maintainersSection" . }}
+
+## Prerequisites
+
+* Helm 3+
+* Kubernetes 1.26+
+
+{{ template "chart.requirementsSection" . }}
+
+## CI values
+
+Go to [ci](./ci) directory to see some examples of how to use this chart.
+
+```console
+helm template test . -f ci/ci-values.yaml
+```
+
+{{ template "chart.valuesSection" . }}

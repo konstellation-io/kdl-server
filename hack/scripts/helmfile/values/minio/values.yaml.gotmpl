@@ -21,7 +21,6 @@ minioConsolePort: "9001"
 rootUser: minio
 rootPassword: minio123
 
-certsPath: "/etc/minio/certs/"
 configPathmc: "/etc/minio/mc/"
 
 mountPath: "/export"
@@ -79,18 +78,29 @@ users: []
 ## The following section documents environment variables for enabling external identity management using an OpenID Connect (OIDC)-compatible provider.
 ## See https://min.io/docs/minio/linux/operations/external-iam/configure-openid-external-identity-management.html for a tutorial on using these variables.
 oidc:
-  enabled: false
-  configUrl: "https://identity-provider-url/.well-known/openid-configuration"
+  enabled: true
+  configUrl: "https://keycloak.kdl.10.0.1.1.nip.io/realms/kdl/.well-known/openid-configuration"
   clientId: "minio"
-  clientSecret: ""
-  # Provide existing client secret from the Kubernetes Secret resource, existing secret will have priority over `clientId` and/or `clientSecret``
-  existingClientSecretName: ""
-  existingClientIdKey: ""
-  existingClientSecretKey: ""
-  claimName: "policy"
-  scopes: "openid,profile,email"
-  redirectUri: "https://console-endpoint-url/oauth_callback"
-  # Can leave empty
-  claimPrefix: ""
-  comment: ""
-  displayName: ""
+  clientSecret: "minio123456"
+  claimName: ""
+  scopes: "openid email"
+  redirectUri: "https://minio-console.kdl.10.0.1.1.nip.io/oauth_callback"
+  displayName: "Your VASS Account"
+  rolePolicy: "readwrite"
+
+certsPath: "/certs/"
+
+extraVolumes:
+  - name: cert
+    secret:
+      secretName: keycloak-kdl-tls
+      defaultMode: 420
+      items:
+      - key: ca.crt
+        path: ca.crt
+
+extraVolumeMounts:
+  - name: cert
+    mountPath: /certs/CAs/ca.crt
+    readOnly: true
+    subPath: ca.crt

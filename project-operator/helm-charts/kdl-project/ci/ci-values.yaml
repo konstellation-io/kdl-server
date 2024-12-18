@@ -1,3 +1,8 @@
+####
+## THESE VALUES ONLY USE TO MAKE HELM DIFF
+## OR HELM TEMPLATE
+####
+
 projectId: data-science-platform
 domain: kdl.local
 

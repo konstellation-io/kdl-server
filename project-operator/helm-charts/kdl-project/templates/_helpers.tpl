@@ -214,18 +214,32 @@ Always includes the default host and appends any additional hosts if configured
 */}}
 {{- define "kdl-project.mlflow.hosts" -}}
 {{- $defaultHost := include "kdl-project.mlflow.defaultHost" . -}}
+{{- $fullName := include "kdl-project.mlflow.name" . -}}
+{{- $svcPort := .Values.mlflow.service.port -}}
 - host: {{ $defaultHost }}
-  paths:
-    - path: /
-      pathType: ImplementationSpecific
+  http:
+    paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ $fullName }}
+            port:
+              number: {{ $svcPort }}
 {{- if .Values.mlflow.ingress.hosts }}
 {{- range .Values.mlflow.ingress.hosts }}
 - host: {{ .host }}
-  paths:
-  {{- range .paths }}
-    - path: {{ .path }}
-      pathType: {{ .pathType }}
-  {{- end }}
+  http:
+    paths:
+    {{- range .paths }}
+      - path: {{ .path }}
+        pathType: {{ .pathType }}
+        backend:
+          service:
+            name: {{ $fullName }}
+            port:
+              number: {{ $svcPort }}
+    {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -55,12 +55,11 @@ filebrowser:
     name: ""
 
   # -- Environment variables to configure application
-  env: {}
-    # FB_ADDRESS: "0.0.0.0"
-    # FB_DATABASE: /database.db
-    # FB_LOG: stdout
-    # FB_PORT: "9696"
-    # FB_ROOT: /srv
+  env:
+    FB_ADDRESS: "0.0.0.0"
+    FB_DATABASE: /database.db
+    FB_LOG: stdout
+    FB_ROOT: /srv
 
   # -- Variables from secrets
   envFromSecrets: {}
@@ -376,14 +375,15 @@ mlflow:
     name: ""
 
   # -- Environment variables to configure application
-  env: {}
+  # ref: https://mlflow.org/docs/latest/cli.html?highlight=Environment_variables#mlflow-server
+  env:
     # ARTIFACTS_BUCKET: mlflow-artifacts
     # AWS_ACCESS_KEY_ID: minio
     # AWS_SECRET_ACCESS_KEY: minio123
     # MLFLOW_S3_ENDPOINT_URL: "http://kdl-server-minio:9000"
-    # MLFLOW_PORT: 5000
-    # MLFLOW_HOST: "0.0.0.0"
-    # MY_VAR: my_value
+    MLFLOW_BACKEND_STORE_URI: "sqlite:///mlflow.db"
+    MLFLOW_HOST: "0.0.0.0"
+    MLFLOW_PORT: "5000"
 
   # -- Variables from secrets
   envFromSecrets: {}
@@ -461,21 +461,6 @@ mlflow:
 
   # -- Ingress configuration to expose app
   # </br> Ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
-  ingress:
-    enabled: false
-    className: ""
-    annotations: {}
-      # cert-manager.io/issuer: your-issuer
-    hosts:
-    - host: chart-example.local
-      paths:
-      - path: /
-        pathType: ImplementationSpecific
-    tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #    - chart-example.local
-
   ingress:
     enabled: false
     className: ""

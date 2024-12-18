@@ -67,11 +67,10 @@ var projectExamples = map[string]entity.Project{
 		Archived:           false,
 		Error:              nil,
 		Repository: entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: "http://repo1",
-			RepoName:        "repo1",
-			Error:           nil,
-			AuthMethod:      entity.RepositoryAuthToken,
+			URL:        "http://repo1",
+			RepoName:   "repo1",
+			Error:      nil,
+			AuthMethod: entity.RepositoryAuthToken,
 		},
 		Members: []entity.Member{
 			{
@@ -91,11 +90,10 @@ var projectExamples = map[string]entity.Project{
 		Archived:           false,
 		Error:              nil,
 		Repository: entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: "http://repo2",
-			RepoName:        "repo2",
-			Error:           nil,
-			AuthMethod:      entity.RepositoryAuthToken,
+			URL:        "http://repo2",
+			RepoName:   "repo2",
+			Error:      nil,
+			AuthMethod: entity.RepositoryAuthToken,
 		},
 		Members: []entity.Member{
 			{

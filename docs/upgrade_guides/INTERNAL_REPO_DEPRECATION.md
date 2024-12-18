@@ -1,6 +1,6 @@
 # DESCRIPTION
 
-When a new KDL version containing this commit (you can tell so if this upgrade guide still exists) were to be deployed, you will need to make some changes and take into account some others that have changed:
+When a new KDL version containing this commit (you can tell so if this upgrade guide still exists) was to be deployed, you will need to take into account some changes and execute the mongodb migration query:
 
 - There is a breaking change in the Mongo - for the collection "project", a couple of its row have changed: external_repo_url -> url y repo_type -> (deprecated)
 

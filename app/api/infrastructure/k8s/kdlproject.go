@@ -50,7 +50,7 @@ func (k *Client) CreateKDLProjectCR(ctx context.Context, projectID string) error
 	}
 
 	mlflowEnv["ARTIFACTS_BUCKET"] = projectID
-	// FUTURE: update AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY with minIO values for the project
+	// FUTURE: update MINIO_ACCESS_KEY and MINIO_SECRET_KEY with minIO values for the project
 
 	// update metadata.name and metadata.namespace in the CRD object
 	metadata, ok := crd["metadata"].(map[string]interface{})

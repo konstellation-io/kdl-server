@@ -7,15 +7,10 @@ import { useReactiveVar } from '@apollo/client';
 import { newProject } from 'Graphql/client/cache';
 import { validateMandatoryField, validateUrl } from './ExternalRepositoryUtils';
 import { getErrorMsg } from 'Utils/string';
-import { RepositoryAuthMethod } from 'Graphql/types/globalTypes';
 
 type Props = {
   showErrors: boolean;
 };
-
-const authMethods = [RepositoryAuthMethod.PASSWORD, RepositoryAuthMethod.TOKEN];
-
-let authOk = false;
 
 function ExternalRepository({ showErrors }: Props) {
   const project = useReactiveVar(newProject);
@@ -24,19 +19,9 @@ function ExternalRepository({ showErrors }: Props) {
   if (!project) return <SpinnerCircular />;
 
   const {
-    values: { url, credential, username, authMethod },
-    errors: { url: urlError, credential: credentialError, username: usernameError, authMethod: authMethodError },
+    values: { url, username },
+    errors: { url: urlError, username: usernameError },
   } = project.externalRepository;
-
-  React.useEffect(() => {
-    if (authMethod == 'PASSWORD' || authMethod == 'TOKEN') {
-      updateValue('authMethod', '');
-      authOk = false;
-    } else {
-      authOk = true;
-    }
-    //eslint-disable-next-line
-  }, []);
 
   return (
     <div className={styles.container}>
@@ -74,41 +59,6 @@ function ExternalRepository({ showErrors }: Props) {
           formValue={username}
           showClearButton
         />
-        <Select
-          label={'Authentication method'}
-          placeholder="Select one"
-          options={authMethods}
-          whiteColor={false}
-          showSelectAllOption={false}
-          shouldSort={true}
-          defaultOption=""
-          onChange={(value: string) => {
-            updateValue('authMethod', value);
-            clearError('authMethod');
-            authOk = true;
-          }}
-          formSelectedOption={authMethod}
-          className={styles.authMethod}
-          error={showErrors ? authMethodError : ''}
-        />
-
-        {authOk && (
-          <TextInput
-            label={authMethod}
-            onChange={(value: string) => {
-              updateValue('credential', value);
-              clearError('credential');
-            }}
-            onBlur={() => {
-              const isValidCredential = validateMandatoryField(credential ?? '');
-              updateError('credential', getErrorMsg(isValidCredential));
-            }}
-            error={showErrors ? credentialError : ''}
-            customClassname={styles.form}
-            formValue={credential}
-            hidden
-          />
-        )}
       </div>
     </div>
   );

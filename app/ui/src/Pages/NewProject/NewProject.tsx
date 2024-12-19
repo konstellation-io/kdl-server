@@ -6,7 +6,6 @@ import DefaultPage from 'Components/Layout/Page/DefaultPage/DefaultPage';
 import Information from './pages/Information/Information';
 import ROUTE from 'Constants/routes';
 import RepositoryDetails from './pages/RepositoryDetails/RepositoryDetails';
-// import { RepositoryType } from 'Graphql/types/globalTypes';
 import Stepper from 'Components/Stepper/Stepper';
 import Summary from './pages/Summary/Summary';
 import cx from 'classnames';
@@ -31,8 +30,6 @@ enum StepNames {
   INFORMATION = 'information',
   REPOSITORY = 'repository',
   DETAILS = 'repository details',
-  // EXTERNAL = 'externalRepository',
-  // INTERNAL = 'internalRepository',
   SUMMARY = 'summary',
 }
 
@@ -51,12 +48,6 @@ const stepperSteps = [
   },
 ];
 
-// export const repoTypeToStepName: {
-//   [k: string]: StepNames.EXTERNAL;
-// } = {
-//   [RepositoryType.EXTERNAL]: StepNames.EXTERNAL,
-// };
-
 function NewProject() {
   const history = useHistory();
   const { clearAll } = useNewProject('information');
@@ -66,8 +57,6 @@ function NewProject() {
 
   const { enableUnloadPrompt, disableUnloadPrompt } = useUnloadPrompt();
   const data: { [key in StepNames.INFORMATION | StepNames.DETAILS]?: any } = useReactiveVar(newProject);
-
-  // const type = data.repository.values.type;
 
   const stepsWithData: (StepNames.INFORMATION | StepNames.DETAILS)[] = useMemo(() => {
     return [StepNames.INFORMATION];

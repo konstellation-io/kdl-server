@@ -1,8 +1,4 @@
 import {
-  // ExternalRepositoryValues,
-  // ExternalRepositoryErrors,
-  // InternalRepositoryValues,
-  // InternalRepositoryErrors,
   InformationErrors,
   InformationValues,
   NewProject,
@@ -14,12 +10,7 @@ import { initialNewProject, newProject } from '../cache';
 import { cloneDeep } from 'lodash';
 
 function useNewProject(section: keyof NewProject) {
-  function updateValue(
-    key: keyof InformationValues | keyof RepositoryValues,
-    // | keyof ExternalRepositoryValues
-    // | keyof InternalRepositoryValues,
-    value: string | boolean,
-  ) {
+  function updateValue(key: keyof InformationValues | keyof RepositoryValues, value: string | boolean) {
     const newState = cloneDeep(newProject());
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -28,12 +19,7 @@ function useNewProject(section: keyof NewProject) {
     newProject(newState);
   }
 
-  function updateError(
-    key: keyof InformationErrors | keyof RepositoryErrors,
-    // | keyof ExternalRepositoryErrors
-    // | keyof InternalRepositoryErrors,
-    value: string,
-  ) {
+  function updateError(key: keyof InformationErrors | keyof RepositoryErrors, value: string) {
     const newState = cloneDeep(newProject());
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

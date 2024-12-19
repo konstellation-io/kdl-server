@@ -1,7 +1,6 @@
 import RepositoryTypeComponent, { LOCATION } from './components/RepositoryTypeComponent/RepositoryTypeComponent';
 import * as React from 'react';
 import RepositoryOption from './components/RepositoryOption/RepositoryOption';
-// import { RepositoryType } from 'Graphql/types/globalTypes';
 import cx from 'classnames';
 import styles from './Repository.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
@@ -23,15 +22,12 @@ function Repository(params: { showErrors: boolean }) {
         })}
       >
         <RepositoryOption
-          // dataTestId={RepositoryType.EXTERNAL}
           title="External Repository"
           subtitle="You will connect to a version-control system located outside the Server. Make sure you can access the repository before trying to connect to and include your SSH key inside it."
           actionLabel="USE EXTERNAL"
-          // isSelected={values.type === RepositoryType.EXTERNAL}
           isSelected={true}
           onSelect={() => {
             clearError('type');
-            // updateValue('type', RepositoryType.EXTERNAL);
           }}
           Repository={<RepositoryTypeComponent squareLocation={LOCATION.OUT} />}
         />

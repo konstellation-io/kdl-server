@@ -1,11 +1,11 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: user-tools-{{ .Values.usernameSlug }}
+  name: {{ include "kdl-user-tools.fullname" . }}
 subjects:
 - kind: ServiceAccount
-  name: {{ .Values.serviceAccountName }}
+  name: {{ include "kdl-user-tools.serviceAccountName" . }}
 roleRef:
   kind: Role
-  name: user-tools-{{ .Values.usernameSlug }}
+  name: {{ include "kdl-user-tools.fullname" . }}
   apiGroup: rbac.authorization.k8s.io

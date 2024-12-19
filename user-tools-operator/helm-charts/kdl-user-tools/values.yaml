@@ -8,9 +8,6 @@ nameOverride: ""
 # -- String to fully override kdl-user-tools.fullname template
 fullnameOverride: ""
 
-# -- String to set domain to deploy
-domain: kdl.local
-
 # -- String from KDL API
 username: "replaced-by-kdl-api"
 
@@ -59,8 +56,10 @@ updateStrategy:
     partition: 0
     # Maximum number of pods that can be unavailable during the update
     maxUnavailable: 1
-    # Maximum number of new pods that can be created above the desired number
-    maxSurge: 1
+
+# -- Minimum number of seconds for which a newly created pod should be ready without any
+# containers crashing
+minReadySeconds: 0
 
 # -- Ordering options for updates
 # Valid values: "OrderedReady" or "Parallel"
@@ -213,12 +212,6 @@ persistentVolume:
   accessModes:
     - ReadWriteOnce
 
-  # -- Persistent Volume annotations
-  annotations: {}
-
-  # -- Persistent Volume labels
-  labels: {}
-
   # -- Persistent Volume size
   size: 1Gi
 
@@ -229,21 +222,6 @@ persistentVolume:
   #   set, choosing the default provisioner.  (gp2 on AWS, standard on
   #   GKE, AWS & OpenStack)
   storageClass: ""
-
-  # -- Persistent Volume Binding Mode
-  # If defined, volumeBindingMode: <volumeBindingMode>
-  # If undefined (the default) or set to null, no volumeBindingMode spec is
-  # set, choosing the default mode.
-  volumeBindingMode: ""
-
-  # -- Persistent Volume Claim Selector
-  # Useful if Persistent Volumes have been provisioned in advance
-  # </br> Ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector
-  selector: {}
-    # matchLabels:
-    #   release: "stable"
-    # matchExpressions:
-    #   - { key: environment, operator: In, values: [ dev ] }
 
 # -- Additional volumes on the output Deployment definition
 # </br> Ref: https://kubernetes.io/docs/concepts/storage/volumes/
@@ -294,18 +272,18 @@ repoCloner:
 
   # -- Configure args
   # </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
-  args:
-    - -c
-    - /entrypoint.sh
+  args: []
+    # - -c
+    # - /entrypoint.sh
 
   # -- Configure command
   # </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
-  command:
-    - /bin/sh
+  command: []
+    # - /bin/sh
 
   # -- Environment variables to configure application
   env: {}
-    # KDL_SERVER_MONGODB_URI: "{{ .Values.repoCloner.mongodbURI }}"
+    # KDL_SERVER_MONGODB_URI: "mongodb://user:pass@mongodb:27017/db?authSource=user&authMechanism=SCRAM-SHA-256"
 
   # -- Variables from secrets
   envFromSecrets: {}

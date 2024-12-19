@@ -46,7 +46,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels
 */}}
 {{- define "kdl-user-tools.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "kdl-user-tools.name" . }}
+app.kubernetes.io/name: {{ include "kdl-user-tools.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 kdl-user-tools/component: user-tools
 kdl-user-tools/usernameSlug: {{ .Values.usernameSlug | quote }}
@@ -57,7 +57,7 @@ Create the name of the service account to use
 */}}
 {{- define "kdl-user-tools.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create -}}
-{{- default (include "kdl-user-tools.name" .) .Values.serviceAccount.name -}}
+{{- default (include "kdl-user-tools.fullname" .) .Values.serviceAccount.name -}}
 {{- else -}}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end -}}

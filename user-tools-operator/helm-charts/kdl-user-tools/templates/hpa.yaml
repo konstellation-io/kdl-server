@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "kdl-user-tools.name" . }}
+  name: {{ include "kdl-user-tools.fullname" . }}
   labels:
     {{- include "kdl-user-tools.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "kdl-user-tools.name" . }}
+    name: {{ include "kdl-user-tools.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

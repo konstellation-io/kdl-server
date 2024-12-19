@@ -1,68 +1,94 @@
-# kdl-usertools
+# kdl-user-tools
 
-A Helm chart to deploy KDL usertools
+A Helm chart to deploy KDL user-tools
 
 ## Description
 
-This Helm chart deploys the core components of a Kubernetes Data Lab (KDL) project, providing essential tools for data scientists and machine learning engineers in a Kubernetes-native environment. Overview The KDL Project chart creates a complete development environment for data science and machine learning workflows.
+The KDL User Tools operator automates the creation and management of personalized development environments for data scientists within a Kubernetes cluster. Each environment provides a complete, isolated workspace with integrated development tools, secure access controls, and collaborative features.
 
 ## How works
 
 ### Default values
 
-`values.yaml` its contains all the default configurations for the core services of a KDL project, specifically MLflow and Filebrowser:
+`values.yaml` file contains all default configurations for user development environments, including:
 
-* Resource allocations
-* Security configurations
-* Network policies
-* Storage settings
-* Service ports and endpoints
+* Resource allocations and limits
+* Security settings and access controls
+* Network policies and isolation rules
+* Storage configurations and persistence
+* Service endpoints and connectivity
+* Development tool configurations
 
 ### Overriding values from `kdl-server` Helm chart
-
-`kdl-server`` Helm chart, which is the main deployment chart, has the power to override these default values. When kdl-server deploys, can provide its own values that take precedence over the defaults.
 
 For example, if the default values specify:
 
 ```yaml
-  replicaCount: 1
+vscodeRuntime:
   resources:
     limits:
-      memory: "128Mi"
+      memory: "4Gi"
+      cpu: "2"
 ```
 
-The `kdl-server` chart might override these with:
+A user-tools might override these with:
 
 ```yaml
-mlflow:
-  replicaCount: 2
+vscodeRuntime:
   resources:
     limits:
-      memory: "256Mi"
+      memory: "8Gi"
+      cpu: "4"
+    requests:
+      memory: "2Gi"
+      cpu: "500m"
 ```
-
-This override mechanism is particularly powerful because it allows for environment-specific configurations while maintaining a consistent base configuration. The project operator, which is included in the kdl-server deployment, uses these final merged values when creating and managing KDL projects.
 
 ## Components
 
-### Filebrowser
+### VSCode Runtime
 
-A modern web-based file manager that provides:
+* Pre-installed data science tools, frameworks and libraries necessary for model development
+* Environment ensuring consistency across all development stages
+* Built-in dependencies and configurations optimized for data science workflows
+* An isolated workspace that maintains reproducibility of experiments and model development
 
-* Secure file access and management through a web interface
-* User authentication and authorization
-* File operations (upload, download, modify) with persistence
-* Integration with Kubernetes storage systems
+### Repository Cloner
 
-### MLflow
+* Automatic repository synchronization
+* Git credential management
+* Repository access control
+* Workspace initialization
+* Code availability management
 
-A platform for the machine learning lifecycle that offers:
+## Example
 
-* Experiment tracking and management
-* Model registry and versioning
-* Integration with various ML frameworks
-* Artifact storage with MinIO/S3 compatibility
-* Metric visualization and comparison
+Creating a new development environment:
+
+```yaml
+apiVersion: kdl.konstellation.io/v1
+kind: KDLUserTools
+metadata:
+  name: data-scientist-env
+spec:
+  username: "data.scientist"
+  usernameSlug: "data-scientist"
+  vscodeRuntime:
+    image:
+      repository: konstellation/kdl-py
+      tag: "3.9"
+  persistentVolume:
+    enabled: true
+    size: "10Gi"
+```
+
+This creates a complete development environment with:
+
+* runtime access
+* Python data science tools
+* Persistent storage
+* Security configurations
+* Network policies
 
 ## Maintainers
 
@@ -91,7 +117,6 @@ helm template test . -f ci/ci-values.yaml
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity for pod assignment </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity |
 | autoscaling | object | `{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":80}` | Autoscaling with CPU or memory utilization percentage </br> Ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/ |
-| domain | string | `"kdl.local"` | String to set domain to deploy |
 | extraContainers | list | `[]` | Configure extra containers |
 | fullnameOverride | string | `""` | String to fully override kdl-user-tools.fullname template |
 | imagePullSecrets | list | `[]` | Specifies the secrets to use for pulling images from private registries Leave empty if no secrets are required E.g. imagePullSecrets:   - name: myRegistryKeySecretName |

@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ include "kdl-user-tools.name" . }}
+  name: {{ include "kdl-user-tools.fullname" . }}
   labels:
     {{- include "kdl-user-tools.labels" . | nindent 4 }}
 spec:
@@ -11,7 +11,7 @@ spec:
   {{- else }}
   podSelector:
     matchLabels:
-      {{- include "kdl-user-tools.selectorlabels" . | nindent 6 }}
+      {{- include "kdl-user-tools.selectorLabels" . | nindent 6 }}
   {{- end }}
 
   {{- if .Values.networkPolicy.policyTypes }}

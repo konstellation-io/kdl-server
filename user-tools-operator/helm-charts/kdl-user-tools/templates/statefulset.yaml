@@ -1,15 +1,16 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "kdl-user-tools.name" . }}
+  name: {{ include "kdl-user-tools.fullname" . }}
   labels:
     {{- include "kdl-user-tools.labels" . | nindent 4 }}
 spec:
-  serviceName: {{ include "kdl-user-tools.name" . }}
+  serviceName: {{ include "kdl-user-tools.fullname" . }}
   podManagementPolicy: {{ .Values.podManagementPolicy | default "OrderedReady" }}
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
+  minReadySeconds: {{ .Values.minReadySeconds | default 0 }}
   updateStrategy:
     type: {{ .Values.updateStrategy.type | default "RollingUpdate" }}
     {{- if eq (.Values.updateStrategy.type | default "RollingUpdate") "OnDelete" }}
@@ -191,10 +192,10 @@ spec:
         {{- end }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       volumes:
-        - name: kubeconfig
+        - name: kubeconfig-tpl-configmap
           configMap:
-            name: kubeconfig-{{ include "kdl-user-tools.name" . }}
-        {{ if .Values.sharedVolume.enabled -}}
+            name: kubeconfig-tpl-configmap
+        {{- if .Values.sharedVolume.enabled }}
         - name: {{ .Values.sharedVolume.name }}
           persistentVolumeClaim:
             claimName: {{ .Values.sharedVolume.name }}
@@ -206,12 +207,6 @@ spec:
             items:
             - key: KDL_USER_PRIVATE_SSH_KEY
               path: id_rsa
-        - name: {{ .Values.usernameSlug }}-ssh-pub
-          secret:
-            secretName: {{ .Values.usernameSlug }}-ssh-keys
-            items:
-            - key: KDL_USER_PUBLIC_SSH_KEY
-              path: authorized_keys
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -228,7 +223,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.topologySpreadConstraints }}
-      {{- $_ := include "kdl-user-tools.patchTopologySpreadConstraintsFilebrowser" $ }}
+      {{- $_ := include "kdl-user-tools.patchTopologySpreadConstraintsUserTools" $ }}
       topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -236,14 +231,6 @@ spec:
   volumeClaimTemplates:
     - metadata:
         name: data
-        labels:
-          {{- with .Values.persistentVolume.labels }}
-          {{- toYaml . | nindent 8 }}
-          {{- end }}
-        {{- with .Values.persistentVolume.annotations }}
-        annotations:
-          {{- toYaml . | nindent 8 }}
-        {{- end }}
       spec:
         accessModes:
           {{- range .Values.persistentVolume.accessModes }}
@@ -258,10 +245,6 @@ spec:
         {{- end }}
         {{- if .Values.persistentVolume.volumeBindingMode }}
         volumeBindingMode: {{ .Values.persistentVolume.volumeBindingMode | quote }}
-        {{- end }}
-        {{- with .Values.persistentVolume.selector }}
-        selector:
-          {{- toYaml . | nindent 8 }}
         {{- end }}
         resources:
           requests:

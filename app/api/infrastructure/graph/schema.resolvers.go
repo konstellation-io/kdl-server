@@ -100,11 +100,11 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 		ProjectID:   input.ID,
 		Name:        input.Name,
 		Description: input.Description,
-		Owner:       loggedUser,
 		URL:         &input.Repository.URL,
 		Username:    &input.Repository.Username,
 		Credential:  input.Repository.Credential,
 		AuthMethod:  input.Repository.AuthMethod,
+		Owner:       loggedUser,
 	}
 
 	createdProject, err := r.projects.Create(ctx, opts)
@@ -193,20 +193,6 @@ func (r *mutationResolver) AddAPIToken(ctx context.Context, input *model.APIToke
 // RemoveAPIToken is the resolver for the removeApiToken field.
 func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error) {
 	return nil, entity.ErrNotImplemented
-}
-
-// SetActiveUserTools is the resolver for the setActiveUserTools field.
-func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error) {
-	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
-
-	if input.Active {
-		u, err := r.users.StartTools(ctx, email, input.RuntimeID, input.CapabilitiesID)
-		return &u, err
-	}
-
-	u, err := r.users.StopTools(ctx, email)
-
-	return &u, err
 }
 
 // CreationDate is the resolver for the creationDate field.
@@ -310,15 +296,17 @@ func (r *queryResolver) QualityProjectDesc(ctx context.Context, description stri
 	panic(entity.ErrNotImplemented) // implemented in knowledge galaxy server
 }
 
-// Runtimes is the resolver for the runtimes field.
-func (r *queryResolver) Runtimes(ctx context.Context) ([]entity.Runtime, error) {
+// RunningCapability is the resolver for the runningCapability field.
+func (r *queryResolver) RunningCapability(ctx context.Context) (*model.Capability, error) {
 	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
 
 	user, err := r.users.GetByEmail(ctx, email)
 	if err != nil {
-		return nil, err
+		return &model.Capability{}, err
 	}
-	return r.runtimes.GetRuntimes(ctx, user.Username)
+
+	capabilities, err := r.capabilities.GetRunningCapability(ctx, user.Username)
+	return capabilities, err
 }
 
 // RunningRuntime is the resolver for the runningRuntime field.
@@ -337,38 +325,9 @@ func (r *queryResolver) RunningRuntime(ctx context.Context) (*entity.Runtime, er
 func (r *queryResolver) Runtimes(ctx context.Context) ([]entity.Runtime, error) {
 	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
 
-// RunningCapability is the resolver for the runningCapability field.
-func (r *queryResolver) RunningCapability(ctx context.Context) (*model.Capability, error) {
-	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
-
 	user, err := r.users.GetByEmail(ctx, email)
 	if err != nil {
-		return &model.Capability{}, err
-	}
-
-	capabilities, err := r.capabilities.GetRunningCapability(ctx, user.Username)
-	return capabilities, err
-}
-
-// Kubeconfig is the resolver for the kubeconfig field.
-func (r *queryResolver) Kubeconfig(ctx context.Context) (string, error) {
-	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
-
-	user, err := r.users.GetByEmail(ctx, email)
-	if err != nil {
-		return "", err
-	}
-
-	k, err := r.users.GetKubeconfig(ctx, user.Username)
-
-	return k, err
-}
-
-// URL is the resolver for the url field.
-func (r *repositoryResolver) URL(ctx context.Context, obj *entity.Repository) (string, error) {
-	switch obj.Type {
-	case entity.RepositoryTypeExternal:
-		return obj.ExternalRepoURL, nil
+		return nil, err
 	}
 	return r.runtimes.GetRuntimes(ctx, user.Username)
 }
@@ -392,11 +351,6 @@ func (r *sSHKeyResolver) LastActivity(ctx context.Context, obj *entity.SSHKey) (
 	lastActivity := obj.LastActivity.Format(time.RFC3339)
 
 	return &lastActivity, nil
-}
-
-// Gitea is the resolver for the gitea field.
-func (r *toolUrlsResolver) Gitea(ctx context.Context, obj *entity.ToolUrls) (string, error) {
-	panic(fmt.Errorf("not implemented: Gitea - gitea"))
 }
 
 // CreationDate is the resolver for the creationDate field.
@@ -435,9 +389,6 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 // SSHKey returns generated.SSHKeyResolver implementation.
 func (r *Resolver) SSHKey() generated.SSHKeyResolver { return &sSHKeyResolver{r} }
 
-// ToolUrls returns generated.ToolUrlsResolver implementation.
-func (r *Resolver) ToolUrls() generated.ToolUrlsResolver { return &toolUrlsResolver{r} }
-
 // User returns generated.UserResolver implementation.
 func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
 
@@ -446,5 +397,4 @@ type mutationResolver struct{ *Resolver }
 type projectResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type sSHKeyResolver struct{ *Resolver }
-type toolUrlsResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }

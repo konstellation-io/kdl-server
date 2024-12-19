@@ -151,13 +151,6 @@ input CreateProjectInput {
 input RepositoryInput {
   url: String!
   username: String!
-  credential: String!
-  authMethod: RepositoryAuthMethod!
-}
-
-enum RepositoryAuthMethod {
-  PASSWORD
-  TOKEN
 }
 
 input DeleteProjectInput {

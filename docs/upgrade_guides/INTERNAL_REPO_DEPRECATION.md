@@ -9,6 +9,10 @@ When a new KDL version containing this commit (you can tell so if this upgrade g
   type SetBoolFieldInput
   type AddUserInput
   enum RepositoryType
+  enum RepositoryAuthMethod
+
+  RepositoryInput.credential
+  RepositoryInput.authMethod
 
 - These are the structures in the graphql.schema that have been changed:
   input RepositoryInput
@@ -33,6 +37,9 @@ db.projects.updateMany(
     },
     {
       $unset: "repo_type"
+    },
+    {
+      $unset: "auth_method"
     }
   ]
 );

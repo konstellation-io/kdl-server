@@ -16,7 +16,7 @@ exports[`When data is ready should render without crashing 1`] = `
           <div
             class="formSelect _2rBeV _1z7Bn"
           >
-
+            
             <div
               class="_Z0bIQ"
             >
@@ -50,7 +50,7 @@ exports[`When data is ready should render without crashing 1`] = `
           <div
             class="_2rBeV _1z7Bn"
           >
-
+            
             <div
               class="_Z0bIQ"
             >

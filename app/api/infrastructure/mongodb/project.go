@@ -25,16 +25,15 @@ type memberDTO struct {
 }
 
 type projectDTO struct {
-	ID                 string                      `bson:"_id"`
-	Archived           bool                        `bson:"archived"`
-	Name               string                      `bson:"name"`
-	Description        string                      `bson:"description"`
-	CreationDate       time.Time                   `bson:"creation_date"`
-	LastActivationDate string                      `bson:"last_activation_date"`
-	RepoName           string                      `bson:"repo_name"`
-	AuthMethod         entity.RepositoryAuthMethod `bson:"auth_method"`
-	URL                string                      `bson:"url"`
-	Members            []memberDTO                 `bson:"members"`
+	ID                 string      `bson:"_id"`
+	Archived           bool        `bson:"archived"`
+	Name               string      `bson:"name"`
+	Description        string      `bson:"description"`
+	CreationDate       time.Time   `bson:"creation_date"`
+	LastActivationDate string      `bson:"last_activation_date"`
+	RepoName           string      `bson:"repo_name"`
+	URL                string      `bson:"url"`
+	Members            []memberDTO `bson:"members"`
 }
 
 type ProjectRepo struct {
@@ -244,7 +243,6 @@ func (m *ProjectRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 		CreationDate:       p.CreationDate,
 		LastActivationDate: p.LastActivationDate,
 		RepoName:           p.Repository.RepoName,
-		AuthMethod:         p.Repository.AuthMethod,
 		URL:                p.Repository.URL,
 		Archived:           p.Archived,
 	}
@@ -286,9 +284,8 @@ func (m *ProjectRepo) dtoToEntity(dto projectDTO) entity.Project {
 		CreationDate:       dto.CreationDate,
 		LastActivationDate: dto.LastActivationDate,
 		Repository: entity.Repository{
-			AuthMethod: dto.AuthMethod,
-			URL:        dto.URL,
-			RepoName:   dto.RepoName,
+			URL:      dto.URL,
+			RepoName: dto.RepoName,
 		},
 		Archived: dto.Archived,
 	}

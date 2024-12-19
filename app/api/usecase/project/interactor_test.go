@@ -89,8 +89,6 @@ func TestInteractor_Create(t *testing.T) {
 
 	url := "https://github.com/org/repo.git"
 	username := "username"
-	token := "token"
-	authMethod := entity.RepositoryAuthToken
 
 	ctx := context.Background()
 	now := time.Now().UTC()
@@ -133,8 +131,6 @@ func TestInteractor_Create(t *testing.T) {
 		Description: projectDesc,
 		URL:         &url,
 		Username:    &username,
-		Credential:  token,
-		AuthMethod:  authMethod,
 		Owner:       entity.User{ID: ownerUserID, Username: ownerUsername},
 	})
 

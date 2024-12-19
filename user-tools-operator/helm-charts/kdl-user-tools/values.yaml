@@ -353,8 +353,8 @@ vscodeRuntime:
 
   # -- Environment variables to configure application
   env: {}
-    # MINIO_ACCESS_KEY: ""
-    # MINIO_SECRET_KEY: ""
+    # AWS_ACCESS_KEY: ""
+    # AWS_SECRET_KEY: ""
     # MINIO_ENDPOINT: ""
 
   # -- Variables from secrets

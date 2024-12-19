@@ -102,8 +102,6 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 		Description: input.Description,
 		URL:         &input.Repository.URL,
 		Username:    &input.Repository.Username,
-		Credential:  input.Repository.Credential,
-		AuthMethod:  input.Repository.AuthMethod,
 		Owner:       loggedUser,
 	}
 

@@ -57,10 +57,8 @@ type RemoveUsersInput struct {
 }
 
 type RepositoryInput struct {
-	URL        string                      `json:"url"`
-	Username   string                      `json:"username"`
-	Credential string                      `json:"credential"`
-	AuthMethod entity.RepositoryAuthMethod `json:"authMethod"`
+	URL      string `json:"url"`
+	Username string `json:"username"`
 }
 
 type SetActiveUserToolsInput struct {

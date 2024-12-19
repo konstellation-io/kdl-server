@@ -330,12 +330,12 @@ repoCloner:
 # </br> Ref: https://github.com/konstellation-io/konstellation-runtimes
 vscodeRuntime:
   image:
-    # The repository of the image
-    repository: "replaced-by-kdl-api"
+    # The repository of the image (replaced-by-kdl-api)
+    repository: "konstellation/kdl-py"
     # The pull policy for the image
     pullPolicy: IfNotPresent
-    # The image tag
-    tag: "replaced-by-kdl-api"
+    # The image tag (replaced-by-kdl-api)
+    tag: "3.9"
 
   # -- Mountpath where mount data
   homePath: "/home/coder"

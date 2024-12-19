@@ -6,20 +6,30 @@ import (
 	"context"
 	"testing"
 
-	"github.com/go-logr/zapr"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+
+	"github.com/go-logr/zapr"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go/modules/k3s"
 	"go.uber.org/zap"
 	v1 "k8s.io/api/core/v1"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
 const (
-	namespace = "kdl-test"
+	namespace            = "kdl-test"
+	releaseName          = "kdl"
+	kdlprojectGroup      = "kdl.konstellation.io"
+	kdlprojectResource   = "kdlprojects"
+	kdlprojectVersion    = "v1"
+	kdlprojectAPIVersion = kdlprojectGroup + "/" + kdlprojectVersion
 )
 
 type testSuite struct {
@@ -67,18 +77,78 @@ func (s *testSuite) SetupSuite() {
 	logger := zapr.NewLogger(zapLog)
 
 	cfg := config.Config{
+		ReleaseName: releaseName,
 		Kubernetes: config.KubernetesConfig{
 			IsInsideCluster: true,
 			Namespace:       namespace,
 		},
 	}
 
+	// Create a clientset for CRD operations
+	apiExtensionsClient, err := apiextensionsclient.NewForConfig(restcfg)
+	s.Require().NoError(err)
+
+	dynamicClient, err := dynamic.NewForConfig(restcfg)
+	s.Require().NoError(err)
+
+	kdlprojectRes := dynamicClient.Resource(schema.GroupVersionResource{
+		Group:    kdlprojectGroup,
+		Version:  kdlprojectVersion,
+		Resource: kdlprojectResource,
+	})
+
+	// Define the CRD
+	crd := &apiextensionsv1.CustomResourceDefinition{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "kdlprojects.kdl.konstellation.io", // Format: plural.group
+		},
+		Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+			Group: "kdl.konstellation.io",
+			Names: apiextensionsv1.CustomResourceDefinitionNames{
+				Plural:   "kdlprojects",    // Plural name
+				Singular: "kdlproject",     // Singular name
+				Kind:     "KDLProject",     // Kind
+				ListKind: "KDLProjectList", // List kind
+			},
+			Scope: apiextensionsv1.NamespaceScoped, // Namespace scoped
+			Versions: []apiextensionsv1.CustomResourceDefinitionVersion{
+				{
+					Name:    "v1", // Version name
+					Served:  true, // Whether the version is served
+					Storage: true, // Whether it is the storage version
+					Schema: &apiextensionsv1.CustomResourceValidation{
+						OpenAPIV3Schema: &apiextensionsv1.JSONSchemaProps{
+							Type: "object",
+							Properties: map[string]apiextensionsv1.JSONSchemaProps{
+								"spec": {
+									Type: "object",
+									Properties: map[string]apiextensionsv1.JSONSchemaProps{
+										"projectId": {
+											Type: "string",
+										},
+									},
+									Required: []string{"projectId"}, // Mark as required
+								},
+							},
+							Required: []string{"spec"}, // Spec is required
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// Create the CRD in the cluster
+	_, err = apiExtensionsClient.ApiextensionsV1().CustomResourceDefinitions().Create(context.TODO(), crd, metav1.CreateOptions{})
+	s.Require().NoError(err)
+
+	// Create the client
 	s.Client = k8s.New(
 		logger,
 		cfg,
 		s.Clientset,
 		nil,
-		nil,
+		kdlprojectRes,
 	)
 }
 
@@ -92,5 +162,8 @@ func (s *testSuite) TearDownTest() {
 	s.Require().NoError(err)
 
 	err = s.Clientset.CoreV1().ServiceAccounts(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{})
+	s.Require().NoError(err)
+
+	err = s.Clientset.CoreV1().ConfigMaps(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{})
 	s.Require().NoError(err)
 }

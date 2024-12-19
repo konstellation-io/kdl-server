@@ -19,6 +19,7 @@ type Config struct {
 	Port            string `yaml:"port" envconfig:"KDL_SERVER_PORT"`
 	StaticFilesPath string `yaml:"staticFilesPath" envconfig:"KDL_SERVER_STATIC_FILES_PATH"`
 	BaseDomainName  string `envconfig:"BASE_DOMAIN_NAME"`
+	ReleaseName     string `envconfig:"RELEASE_NAME"`
 	TLS             struct {
 		Enabled bool `envconfig:"TLS_ENABLED"`
 	}

@@ -1,0 +1,27 @@
+{{- if .Values.filebrowser.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "kdl-project.filebrowser.name" . }}
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "0"
+  labels:
+    {{- include "kdl-project.filebrowserLabels" . | nindent 4 }}
+data:
+  entrypoint.sh: |
+    #!/bin/sh
+    /filebrowser config init
+    /filebrowser config set --auth.method=noauth
+    /filebrowser users add kdladmin not_used_pass \
+      --perm.admin=false   \
+      --perm.download=true \
+      --perm.create=true   \
+      --perm.delete=true   \
+      --perm.execute=false \
+      --perm.modify=true   \
+      --perm.rename=true   \
+      --perm.share=false   \
+      --lockPassword=true
+    /filebrowser
+{{- end }}

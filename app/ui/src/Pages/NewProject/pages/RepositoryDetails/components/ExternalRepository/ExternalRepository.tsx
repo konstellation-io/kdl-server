@@ -15,20 +15,20 @@ type Props = {
 
 const authMethods = [RepositoryAuthMethod.PASSWORD, RepositoryAuthMethod.TOKEN];
 
-function ExternalRepository({ showErrors }: Props) {
+function Repository({ showErrors }: Props) {
   const project = useReactiveVar(newProject);
-  const { updateValue, updateError, clearError } = useNewProject('externalRepository');
+  const { updateValue, updateError, clearError } = useNewProject('repository');
 
   if (!project) return <SpinnerCircular />;
 
   const {
     values: { url, credential, username, authMethod },
     errors: { url: urlError, credential: credentialError, username: usernameError, authMethod: authMethodError },
-  } = project.externalRepository;
+  } = project.repository;
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.title}>Your external repository</h3>
+      <h3 className={styles.title}>Your repository</h3>
       <div className={styles.formContainer} data-testid={'externalRepositoryInputs'}>
         <TextInput
           label="url"
@@ -100,4 +100,4 @@ function ExternalRepository({ showErrors }: Props) {
   );
 }
 
-export default ExternalRepository;
+export default Repository;

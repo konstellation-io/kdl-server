@@ -1,4 +1,4 @@
-import { RepositoryAuthMethod, RepositoryType } from 'Graphql/types/globalTypes';
+import { RepositoryAuthMethod } from 'Graphql/types/globalTypes';
 
 export interface InformationValues {
   id: string;
@@ -13,43 +13,23 @@ export interface InformationErrors {
 }
 
 export interface RepositoryValues {
-  type: RepositoryType | null;
-}
-
-export interface RepositoryErrors {
-  type: string;
-}
-
-export interface ExternalRepositoryValues {
   url: string;
   username: string;
   credential: string;
   authMethod: RepositoryAuthMethod;
 }
 
-export interface ExternalRepositoryErrors {
+export interface RepositoryErrors {
+  type: string;
   url: string;
   username: string;
   credential: string;
-  authMethod: string;
+  authMethod: RepositoryAuthMethod;
 }
 
-export interface InternalRepositoryValues {
-  slug: string;
-}
-
-export interface InternalRepositoryErrors {
-  slug: string;
-}
-
-export interface NewProject_ExternalRepository {
-  values: ExternalRepositoryValues;
-  errors: ExternalRepositoryErrors;
-}
-
-export interface NewProject_InternalRepository {
-  values: InternalRepositoryValues;
-  errors: InternalRepositoryErrors;
+export interface NewProject_Repository {
+  values: RepositoryValues;
+  errors: RepositoryErrors;
 }
 
 export interface NewProject_Information {
@@ -65,5 +45,4 @@ export interface NewProject_Repository {
 export interface NewProject {
   information: NewProject_Information;
   repository: NewProject_Repository;
-  externalRepository: NewProject_ExternalRepository;
 }

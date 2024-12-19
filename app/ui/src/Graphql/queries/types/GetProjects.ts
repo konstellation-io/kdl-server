@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { RepositoryType, AccessLevel } from "./../../types/globalTypes";
+import { AccessLevel } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL query operation: GetProjects
@@ -11,7 +11,6 @@ import { RepositoryType, AccessLevel } from "./../../types/globalTypes";
 
 export interface GetProjects_projects_repository {
   __typename: "Repository";
-  type: RepositoryType;
   url: string;
   error: string | null;
 }

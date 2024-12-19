@@ -10,7 +10,6 @@ export default gql`
       creationDate
       lastActivationDate
       repository {
-        type
         url
         error
       }

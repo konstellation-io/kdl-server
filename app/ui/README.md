@@ -7,6 +7,7 @@ You can access contributing documentation [here](./docs/contributing.md).
 To initialize the development environment:
 
 1. Run the mock-server
+- The mock-server uses the same graphql schema as the real server, but it returns mock data. To update the schema check "Other scripts" section.
 ```bash
 # Go to kdl-server/app/ui/mock-server
 cd mock-server
@@ -90,7 +91,7 @@ yarn audit:fix
 
 ## Available Scripts
 
-* Regenerate all `interfaces`, `types` and `enums` for the graphql queries and schema used.
+* Regenerate all `interfaces`, `types` and `enums` for the graphql queries and schema used. This schema is used to generate types for the frontend and is used by the real backend and mock-server (without doing anything in the mock-server code).
 ```bash
 yarn gen:types
 ```

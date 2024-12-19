@@ -1,5 +1,5 @@
 import * as React from 'react';
-import ExternalRepository from './components/ExternalRepository/ExternalRepository';
+import Repository from './components/ExternalRepository/ExternalRepository';
 
 type Props = {
   showErrors: boolean;
@@ -8,7 +8,7 @@ type Props = {
 function RepositoryDetails({ showErrors }: Props) {
   return (
     <div>
-      <ExternalRepository showErrors={showErrors} />
+      <Repository showErrors={showErrors} />
     </div>
   );
 }

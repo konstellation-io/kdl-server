@@ -16,7 +16,6 @@ export interface RepositoryValues {
 }
 
 export interface RepositoryErrors {
-  type: string;
   url: string;
   username: string;
 }

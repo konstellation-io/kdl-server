@@ -37,7 +37,6 @@ export const initialNewProject: NewProject = {
     errors: {
       url: 'This field is mandatory',
       username: 'This field is mandatory',
-      type: 'Repo type is wrong',
     },
   },
 };

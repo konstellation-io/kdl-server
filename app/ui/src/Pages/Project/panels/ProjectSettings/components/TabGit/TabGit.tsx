@@ -1,7 +1,4 @@
-import RepositoryTypeComponent, {
-  LOCATION,
-  SIZE,
-} from 'Pages/NewProject/pages/Repository/components/RepositoryTypeComponent/RepositoryTypeComponent';
+import RepositoryIcon, { LOCATION, SIZE } from 'Pages/NewProject/pages/RepositoryIcon/RepositoryIcon';
 
 import { ErrorMessage, SpinnerCircular } from 'kwc';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
@@ -27,7 +24,7 @@ function TabGit({ project }: Props) {
   return (
     <div className={styles.container} data-testid="tabGit">
       <div className={styles.repoType}>
-        <RepositoryTypeComponent squareLocation={LOCATION.OUT} size={SIZE.TINY} shouldAnimate={false} />
+        <RepositoryIcon squareLocation={LOCATION.OUT} size={SIZE.TINY} shouldAnimate={false} />
       </div>
       <div className={styles.url}>
         <p>{repository.url}</p>

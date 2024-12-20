@@ -1,7 +1,4 @@
-import RepositoryIcon, {
-  LOCATION,
-  SIZE,
-} from 'Pages/NewProject/pages/RepositoryIcon/RepositoryIcon';
+import RepositoryIcon, { LOCATION, SIZE } from 'Pages/NewProject/pages/RepositoryIcon/RepositoryIcon';
 
 import { ErrorMessage, SpinnerCircular } from 'kwc';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';

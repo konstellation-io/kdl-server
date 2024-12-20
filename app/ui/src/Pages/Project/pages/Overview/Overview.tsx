@@ -1,8 +1,5 @@
 import { ErrorMessage, SpinnerCircular } from 'kwc';
-import RepositoryIcon, {
-  LOCATION,
-  SIZE,
-} from 'Pages/NewProject/pages/RepositoryIcon/RepositoryIcon';
+import RepositoryIcon, { LOCATION, SIZE } from 'Pages/NewProject/pages/RepositoryIcon/RepositoryIcon';
 
 import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';

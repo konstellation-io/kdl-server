@@ -373,7 +373,7 @@ exports[`Project component Component match snapshot 1`] = `
               <div
                 className="repoType"
               >
-                <Memo(RepositoryTypeComponent)
+                <Memo(RepositoryIcon)
                   customSize={38}
                   shouldAnimate={false}
                   squareLocation="out"
@@ -400,7 +400,7 @@ exports[`Project component Component match snapshot 1`] = `
                       className="s1"
                     />
                   </div>
-                </Memo(RepositoryTypeComponent)>
+                </Memo(RepositoryIcon)>
               </div>
             </div>
           </Square>

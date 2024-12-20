@@ -1,8 +1,8 @@
 import { ErrorMessage, SpinnerCircular } from 'kwc';
-import RepositoryTypeComponent, {
+import RepositoryIcon, {
   LOCATION,
   SIZE,
-} from 'Pages/NewProject/pages/Repository/components/RepositoryTypeComponent/RepositoryTypeComponent';
+} from 'Pages/NewProject/pages/RepositoryIcon/RepositoryIcon';
 
 import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
@@ -69,7 +69,7 @@ function Overview({ openedProject }: Props) {
             <IconLaunch className={cx(styles.settingIcon, 'icon-small')} />
           </div>
           <div className={styles.repoType}>
-            <RepositoryTypeComponent squareLocation={LOCATION.OUT} size={SIZE.TINY} shouldAnimate={false} />
+            <RepositoryIcon squareLocation={LOCATION.OUT} size={SIZE.TINY} shouldAnimate={false} />
           </div>
         </div>
         <div

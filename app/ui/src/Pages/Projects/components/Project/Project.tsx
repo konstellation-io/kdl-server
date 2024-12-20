@@ -2,9 +2,9 @@ import { AccessLevel } from 'Graphql/types/globalTypes';
 import ROUTE, { buildRoute } from 'Constants/routes';
 import React, { FC } from 'react';
 import { capitalize } from 'lodash';
-import RepositoryTypeComponent, {
+import RepositoryIcon, {
   LOCATION,
-} from 'Pages/NewProject/pages/Repository/components/RepositoryTypeComponent/RepositoryTypeComponent';
+} from 'Pages/NewProject/pages/RepositoryIcon/RepositoryIcon';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { Link } from 'react-router-dom';
@@ -107,7 +107,7 @@ const Band: FC<BaseProps> = ({ project }) => (
 const Square: FC<BaseProps> = ({ project }) => (
   <div className={styles.square}>
     <div className={styles.repoType}>
-      <RepositoryTypeComponent
+      <RepositoryIcon
         squareLocation={LOCATION.OUT}
         customSize={38}
         shouldAnimate={false}

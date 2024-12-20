@@ -16,7 +16,7 @@ import useUnloadPrompt from 'Hooks/useUnloadPrompt/useUnloadPrompt';
 import { newProject } from 'Graphql/client/cache';
 import SidebarTop from 'Components/Layout/Page/DefaultPage/SidebarTop';
 import SidebarInformation from './pages/SidebarComponents/Information/SidebarInformation';
-import SidebarExternalRepository from './pages/SidebarComponents/SidebarExternalRepository/SidebarExternalRepository';
+import SidebarRepository from './pages/SidebarComponents/SidebarRepository/SidebarRepository';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 
 enum Steps {
@@ -155,7 +155,7 @@ function NewProject() {
       case StepNames.INFORMATION:
         return <SidebarInformation />;
       case StepNames.DETAILS:
-        return <SidebarExternalRepository />;
+        return <SidebarRepository />;
       default:
         return <></>;
     }

@@ -59,8 +59,8 @@ check_requirements() {
   MICROK8S_VERSION_MAJOR=$(echo "${MICROK8S_VERSION}" | cut -d '.' -f 1)
   MICROK8S_VERSION_MINOR=$(echo "${MICROK8S_VERSION}" | cut -d '.' -f 2)
 
-  [ "$MICROK8S_VERSION_MAJOR" = "v1" ] || { REQUIREMENTS_OK=0 && echo "Required version 1.23.+ of microk8s"; }
-  [ "$MICROK8S_VERSION_MINOR" -ge "23" ] || { REQUIREMENTS_OK=0 && echo "Required version 1.23.+ of microk8s"; }
+  [ "$MICROK8S_VERSION_MAJOR" = "v1" ] || { REQUIREMENTS_OK=0 && echo "Required version 1.26.+ of microk8s"; }
+  [ "$MICROK8S_VERSION_MINOR" -ge "26" ] || { REQUIREMENTS_OK=0 && echo "Required version 1.26.+ of microk8s"; }
 
   ENVSUBT_INSTALLED=$(cmd_installed envsubst)
   [ "$ENVSUBT_INSTALLED" = "1" ] || { REQUIREMENTS_OK=0 && echo_warning "Missing gettext installation"; }

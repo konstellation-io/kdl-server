@@ -1,54 +1,56 @@
 resources:
-    - apiVersion: batch/v1
-      kind: Job
-      metadata:
-        name: mongodb-initial-data
-      spec:
-        template:
-            spec:
-                initContainers:
-                    - name: wait-for-mongodb
-                      image: busybox
-                      command:
-                        - /bin/sh
-                        - -c
-                      args:
-                        - |
-                          until nc -zv mongodb 27017 > /dev/null; do
-                            sleep 10
-                          done
-                          echo "MongoDB is up and running!"
-                containers:
-                    - name: mongodb-insert
-                      image: bitnami/mongodb:7.0.15
-                      command:
-                        - /bin/sh
-                        - -c
-                      args:
-                        - |
-                          mongosh "mongodb://kdl:123456@mongodb:27017/kdl?authSource=kdl&authMechanism=SCRAM-SHA-256" --eval '
-                          db.runtimes.insertOne({
-                            "name": "Python 3.10 CPU - test initial data",
-                            "desc": "(test) Runtime with Python 3.10 for CPU workloads",
-                            "labels": [
-                              "Python 3.10",
-                              "Ubuntu 22.04",
-                              "CPU",
-                              "test-initial-data"
-                            ],
-                            "docker_image": "konstellation/kdl-py",
-                            "docker_tag": "3.10-cpu"
-                          });
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: mongodb-initial-data
+    spec:
+      template:
+        spec:
+          initContainers:
+            - name: wait-for-mongodb
+              image: busybox
+              command:
+                - /bin/sh
+                - -c
+              args:
+                - |
+                  until nc -zv mongodb-svc.mongodb 27017 > /dev/null; do
+                    sleep 10
+                  done
+                  echo "MongoDB is up and running!"
+          containers:
+            - name: mongodb-insert
+              image: mongodb/mongodb-community-server:7.0.15-ubi8
+              command:
+                - /bin/sh
+                - -c
+              args:
+                - |
+                  mongosh "mongodb://{{ .Values.mongodb_user }}:{{ .Values.mongodb_password }}@mongodb-svc.mongodb:27017/kdl?directConnection=true" --eval '
+                  disableTelemetry();
 
-                          db.capabilities.insertOne({
-                            "_id": "test_initial_data",
-                            "name": "test_initial_data",
-                            "node_selectors": {
-                              "kubernetes.io/os": "linux"
-                            },
-                            "tolerations": [],
-                            "affinities": {}
-                          });
-                          '
-                restartPolicy: Never
-        backoffLimit: 1
+                  db.runtimes.insertOne({
+                    "name": "Python 3.10 CPU - test initial data",
+                    "desc": "(test) Runtime with Python 3.10 for CPU workloads",
+                    "labels": [
+                      "Python 3.10",
+                      "Ubuntu 22.04",
+                      "CPU",
+                      "test-initial-data"
+                    ],
+                    "docker_image": "konstellation/kdl-py",
+                    "docker_tag": "3.10-cpu"
+                  });
+
+                  db.capabilities.insertOne({
+                    "_id": "test_initial_data",
+                    "name": "test_initial_data",
+                    "node_selectors": {
+                      "kubernetes.io/os": "linux"
+                    },
+                    "tolerations": [],
+                    "affinities": {}
+                  });
+                  '
+          restartPolicy: Never
+      backoffLimit: 1

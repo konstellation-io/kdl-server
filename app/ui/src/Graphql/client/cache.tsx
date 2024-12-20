@@ -31,12 +31,6 @@ export const initialNewProject: NewProject = {
   },
   repository: {
     values: {
-      type: null,
-    },
-    errors: { type: 'Please choose a repo type' },
-  },
-  externalRepository: {
-    values: {
       url: '',
       username: '',
     },

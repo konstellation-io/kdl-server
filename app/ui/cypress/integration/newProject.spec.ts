@@ -72,11 +72,11 @@ const createProject = (name: string, id: string, customResponse?: Object) => {
   // Go to the next step
   cy.getByTestId('nextButton').click();
 
-  cy.getByTestId('externalRepositoryInputs').find('input').eq(0).type('http://test.com');
-  cy.getByTestId('externalRepositoryInputs').find('input').eq(1).type('username-test');
+  cy.getByTestId('repositoryDetailsInputs').find('input').eq(0).type('http://test.com');
+  cy.getByTestId('repositoryDetailsInputs').find('input').eq(1).type('username-test');
   cy.contains('TOKEN').click();
 
-  cy.getByTestId('externalRepositoryInputs').find('input').eq(2).type('token-test');
+  cy.getByTestId('repositoryDetailsInputs').find('input').eq(2).type('token-test');
 
   // Go to the next step
   cy.getByTestId('nextButton').click();

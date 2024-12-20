@@ -1,3 +1,16 @@
+environments:
+  default:
+    values:
+      - keycloak_admin_password: "a123456"
+      - keycloak_admin_user: "kdladmin"
+      - minio_access_key: "minio"
+      - minio_secret_key: "minio123"
+      - mongodb_password: "123456"
+      - mongodb_user: "kdl"
+      - mongodb_version: "7.0.15"
+
+---
+
 helmDefaults:
   createNamespace: true
   atomic: false
@@ -12,10 +25,9 @@ templates:
     # Valid values are "Error", "Warn", "Info", "Debug". The default is "Error"
     # Use "Debug" to make missing files errors invisible at the default log level(--log-level=INFO)
     missingFileHandler: Warn
-    namespace: kdl
     values:
-    - "values/{{`{{ .Release.Name }}`}}/values.yaml.gotmpl"
-    - "values/{{`{{ .Release.Name }}`}}/values.yaml"
+      - "values/{{`{{ .Release.Name }}`}}/values.yaml.gotmpl"
+      - "values/{{`{{ .Release.Name }}`}}/values.yaml"
 
 repositories:
   - name: bedag
@@ -24,6 +36,8 @@ repositories:
     url: https://charts.jetstack.io
   - name: minio
     url: https://charts.min.io/
+  - name: mongodb
+    url: https://mongodb.github.io/helm-charts
 
 releases:
   # ref: https://github.com/cert-manager/cert-manager/blob/v1.16.1/deploy/charts/cert-manager/values.yaml
@@ -32,39 +46,65 @@ releases:
     version: v1.16.1
     namespace: cert-manager
     inherit:
-    - template: default
+      - template: default
 
   - name: cert-manager-clusterissuers
     chart: bedag/raw
     version: 2.0.0
     namespace: cert-manager
     needs:
-    - cert-manager
+      - cert-manager
     inherit:
-    - template: default
+      - template: default
 
-  - name: "initial-resources"
-    <<: *default
+  - name: initial-resources
     chart: bedag/raw
     version: 2.0.0
+    namespace: kdl
+    inherit:
+      - template: default
 
-  - name: "kdl-local"
-    <<: *default
+  # ref: https://github.com/mongodb/helm-charts/blob/community-operator-0.11.0/charts/community-operator/values.yaml
+  - name: mongodb-community-operator
+    chart: mongodb/community-operator
+    version: 0.11.0
+    namespace: mongodb-operator
+    inherit:
+      - template: default
+
+  - name: mongodb-database
+    chart: bedag/raw
+    version: 2.0.0
+    namespace: mongodb
+    needs:
+      - mongodb-operator/mongodb-community-operator
+    inherit:
+      - template: default
+
+  - name: kdl-local
     chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
     version: 6.1.0
+    namespace: kdl
     needs:
-    - kdl/initial-resources
+      - kdl/initial-resources
+      - mongodb/mongodb-database
+    inherit:
+      - template: default
 
-  - name: "mongodb-initial-data"
-    <<: *default
+  - name: mongodb-initial-data
     chart: bedag/raw
     version: 2.0.0
+    namespace: mongodb
     needs:
-    - kdl/kdl-local
+      - kdl/kdl-local
+    inherit:
+      - template: default
 
-  - name: "keycloak-initial-data"
-    <<: *default
+  - name: keycloak-initial-data
     chart: bedag/raw
     version: 2.0.0
+    namespace: kdl
     needs:
-    - kdl/kdl-local
+      - kdl/kdl-local
+    inherit:
+      - template: default

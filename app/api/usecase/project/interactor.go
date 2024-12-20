@@ -25,15 +25,12 @@ var (
 
 // CreateProjectOption options when creating project.
 type CreateProjectOption struct {
-	ProjectID              string
-	Name                   string
-	Description            string
-	RepoType               entity.RepositoryType
-	ExternalRepoURL        *string
-	ExternalRepoUsername   *string
-	ExternalRepoCredential string
-	ExternalRepoAuthMethod entity.RepositoryAuthMethod
-	Owner                  entity.User
+	ProjectID   string
+	Name        string
+	Description string
+	URL         *string
+	Username    *string
+	Owner       entity.User
 }
 
 // DeleteProjectOption options when deleting a project.
@@ -76,26 +73,12 @@ func (c CreateProjectOption) Validate() error {
 		return fmt.Errorf("%w: project description cannot be null", ErrCreateProjectValidation)
 	}
 
-	if !c.RepoType.IsValid() {
-		return fmt.Errorf("%w: invalid repository type", ErrCreateProjectValidation)
+	if kdlutil.IsNilOrEmpty(c.URL) {
+		return fmt.Errorf("%w: repository URL cannot be null", ErrCreateProjectValidation)
 	}
 
-	if c.RepoType == entity.RepositoryTypeExternal {
-		if kdlutil.IsNilOrEmpty(c.ExternalRepoURL) {
-			return fmt.Errorf("%w: external repository URL cannot be null", ErrCreateProjectValidation)
-		}
-
-		if kdlutil.IsNilOrEmpty(c.ExternalRepoUsername) {
-			return fmt.Errorf("%w: external repository username cannot be null", ErrCreateProjectValidation)
-		}
-
-		if !c.ExternalRepoAuthMethod.IsValid() {
-			return fmt.Errorf("%w: invalid repository authentication method", ErrCreateProjectValidation)
-		}
-
-		if c.ExternalRepoCredential == "" {
-			return fmt.Errorf("%w: external repository token cannot be null", ErrCreateProjectValidation)
-		}
+	if kdlutil.IsNilOrEmpty(c.Username) {
+		return fmt.Errorf("%w: repository username cannot be null", ErrCreateProjectValidation)
 	}
 
 	return nil
@@ -162,9 +145,8 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 
 	// Set project repository
 	project.Repository = entity.Repository{
-		Type:            entity.RepositoryTypeExternal,
-		ExternalRepoURL: *opt.ExternalRepoURL,
-		RepoName:        opt.ProjectID,
+		URL:      *opt.URL,
+		RepoName: opt.ProjectID,
 	}
 
 	// Create a k8s KDLProject containing a MLFLow instance

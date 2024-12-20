@@ -1,6 +1,6 @@
-import { validateMandatoryField, validateUrl } from './ExternalRepositoryUtils';
+import { validateMandatoryField, validateUrl } from './RepositoryDetailsUtils';
 
-describe('ExternalRepositoryUtils', () => {
+describe('RepositoryDetailsUtils', () => {
   describe('validateUrl', () => {
     it.each`
       url                         | expected

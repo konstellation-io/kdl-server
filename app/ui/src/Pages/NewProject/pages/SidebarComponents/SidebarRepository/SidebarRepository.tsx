@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styles from '../SidebarComponents.module.scss';
 
-const SidebarExternalRepository = () => (
+const SidebarRepository = () => (
   <div className={styles.sidebar}>
     <p className={styles.line}>In this page you can set up the external repository information.</p>
     <p className={styles.line}>
@@ -15,4 +15,4 @@ const SidebarExternalRepository = () => (
   </div>
 );
 
-export default SidebarExternalRepository;
+export default SidebarRepository;

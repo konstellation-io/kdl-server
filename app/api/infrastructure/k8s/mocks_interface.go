@@ -164,6 +164,21 @@ func (mr *MockClientInterfaceMockRecorder) GetCapabilitiesIDFromUserTools(ctx, u
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCapabilitiesIDFromUserTools", reflect.TypeOf((*MockClientInterface)(nil).GetCapabilitiesIDFromUserTools), ctx, username)
 }
 
+// GetConfigMap mocks base method.
+func (m *MockClientInterface) GetConfigMap(ctx context.Context, name string) (*v1.ConfigMap, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetConfigMap", ctx, name)
+	ret0, _ := ret[0].(*v1.ConfigMap)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetConfigMap indicates an expected call of GetConfigMap.
+func (mr *MockClientInterfaceMockRecorder) GetConfigMap(ctx, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConfigMap", reflect.TypeOf((*MockClientInterface)(nil).GetConfigMap), ctx, name)
+}
+
 // GetRuntimeIDFromUserTools mocks base method.
 func (m *MockClientInterface) GetRuntimeIDFromUserTools(ctx context.Context, username string) (string, error) {
 	m.ctrl.T.Helper()

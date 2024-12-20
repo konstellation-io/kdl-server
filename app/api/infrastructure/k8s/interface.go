@@ -30,4 +30,5 @@ type ClientInterface interface {
 	DeleteUserServiceAccount(ctx context.Context, usernameSlug string) error
 	GetUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error)
 	GetUserKubeconfig(ctx context.Context, usernameSlug string) ([]byte, error)
+	GetConfigMap(ctx context.Context, name string) (*v1.ConfigMap, error)
 }

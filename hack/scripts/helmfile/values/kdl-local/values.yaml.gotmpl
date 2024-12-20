@@ -155,7 +155,7 @@ minio:
   persistence:
     enabled: true
     storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-    existingClaim: "kdl-local-claim"
+    existingClaim: "shared-volume"
     size: 1Gi
     accessMode: ReadWriteMany
 
@@ -259,26 +259,70 @@ projectOperator:
     tag: latest
     pullPolicy: Always
 
-  mlflow:
-    image:
-      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-mlflow
-      tag: latest
-      pullPolicy: Always
-    volume:
-      storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-    ingress:
-      className: "public"
+  templateCustomResource: |
+    apiVersion: kdl.konstellation.io/v1
+    kind: KDLProject
+    metadata:
+      name: kdlproject-to-be-replaced
+      namespace: kdl-to-be-replaced
+    spec:
+      domain: {{ requiredEnv "DOMAIN" | quote }}
+      projectId: kdlproject-id-to-be-replaced
+      mlflow:
+        image:
+          repository: konstellation/kdl-mlflow
+          pullPolicy: IfNotPresent
+          tag: "0.14.18"
 
-  filebrowser:
-    image:
-      repository: filebrowser/filebrowser
-      pullPolicy: IfNotPresent
-      tag: v2
+        # Ingress configuration
+        ingress:
+          enabled: true
+          tls:
+            enabled: true
+          className: public
+          annotations:
+            cert-manager.io/cluster-issuer: selfsigned-clusterissuer
+            nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+
+        # Persistent storage configuration
+        persistentVolume:
+          enabled: true
+          size: "1Gi"
+          accessModes:
+            - ReadWriteOnce
+          storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+
+        # Environment variables
+        env:
+          MLFLOW_S3_ENDPOINT_URL: "http://minio.kdl:9000"
+          MLFLOW_TRACKING_URI: "sqlite3:///database.db"
+          ARTIFACTS_BUCKET: "nanana"
+          AWS_ACCESS_KEY_ID: "minio"
+          AWS_SECRET_ACCESS_KEY: "minio123"
+
+      filebrowser:
+        image:
+          repository: filebrowser/filebrowser
+          pullPolicy: IfNotPresent
+          tag: "v2"
+
+        # Volume configuration
+        volumes:
+          - name: received-data
+            persistentVolumeClaim:
+              claimName: shared-volume
+
+        env:
+          FB_ADDRESS: 0.0.0.0
+          FB_PORT: 9696
+          FB_DATABASE: /database.db
+          FB_LOG: stdout
+          FB_ROOT: /srv
 
 sharedVolume:
   enabled: true
 
-  name: kdl-local
+  name: shared-volume
   storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
 userToolsOperator:

@@ -141,6 +141,19 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 		return entity.User{}, err
 	}
 
+	// Create a MinIO access key
+	user.MinioAccessKey.AccessKey, err = kdlutil.GenerateRandomString(20)
+	if err != nil {
+		i.logger.Error(err, "Error creating an MinIO access key", "username", username)
+		return entity.User{}, err
+	}
+
+	user.MinioAccessKey.SecretKey, err = kdlutil.GenerateRandomString(40)
+	if err != nil {
+		i.logger.Error(err, "Error creating an MinIO secret key", "username", username)
+		return entity.User{}, err
+	}
+
 	return i.repo.Get(ctx, insertedID)
 }
 

@@ -23,18 +23,24 @@ type APIToken struct {
 	Token        string
 }
 
+type MinioAccessKey struct {
+	AccessKey string
+	SecretKey string
+}
+
 // User entity definition.
 type User struct {
-	ID           string
-	Email        string
-	Username     string
-	Sub          string
-	Deleted      bool
-	CreationDate time.Time
-	AccessLevel  AccessLevel
-	SSHKey       SSHKey
-	LastActivity *time.Time
-	APITokens    []APIToken
+	ID             string
+	Email          string
+	Username       string
+	Sub            string
+	Deleted        bool
+	CreationDate   time.Time
+	AccessLevel    AccessLevel
+	SSHKey         SSHKey
+	LastActivity   *time.Time
+	APITokens      []APIToken
+	MinioAccessKey MinioAccessKey
 }
 
 func (u User) UsernameSlug() string {

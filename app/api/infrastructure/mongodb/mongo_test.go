@@ -140,6 +140,10 @@ var userExamples = map[string]entity.User{
 			Private:      "privateKey1",
 			CreationDate: testTimeExample,
 		},
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: "accessKey1",
+			SecretKey: "secretKey1",
+		},
 	},
 	"user2": {
 		ID:           primitive.NewObjectID().Hex(),

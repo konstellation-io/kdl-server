@@ -1,5 +1,3 @@
-import { RepositoryAuthMethod } from 'Graphql/types/globalTypes';
-
 export interface InformationValues {
   id: string;
   name: string;
@@ -15,16 +13,11 @@ export interface InformationErrors {
 export interface RepositoryValues {
   url: string;
   username: string;
-  credential: string;
-  authMethod: RepositoryAuthMethod;
 }
 
 export interface RepositoryErrors {
-  type: string;
   url: string;
   username: string;
-  credential: string;
-  authMethod: RepositoryAuthMethod;
 }
 
 export interface NewProject_Repository {

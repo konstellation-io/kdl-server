@@ -22,88 +22,15 @@ filebrowser:
     ci.konstellation.io/tested: "true"
     ci.konstellation.io/version: "v1"
 
-  nodeSelector:
-    kubernetes.io/role: worker
-    node-type: application
-
-  tolerations:
-    - key: "workload-type"
-      operator: "Equal"
-      value: "ci"
-      effect: "NoSchedule"
-    - key: "node-role"
-      operator: "Exists"
-      effect: "NoSchedule"
-
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: kubernetes.io/arch
-                operator: In
-                values:
-                  - amd64
-                  - arm64
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
-          podAffinityTerm:
-            labelSelector:
-              matchLabels:
-                app.kubernetes.io/name: filebrowser
-            topologyKey: kubernetes.io/hostname
-
-  topologySpreadConstraints:
-    - maxSkew: 1
-      topologyKey: topology.kubernetes.io/zone
-      whenUnsatisfiable: DoNotSchedule
-      labelSelector:
-        matchLabels:
-          app.kubernetes.io/name: filebrowser
-
   serviceAccount:
     create: true
     automount: true
-    annotations:
-      iam.gke.io/gcp-service-account: "filebrowser@my-project.iam.gserviceaccount.com"
 
   env:
     FB_ADDRESS: "0.0.0.0"
     FB_DATABASE: "/database.db"
     FB_LOG: "stdout"
-    FB_PORT: "9696"
     FB_ROOT: "/srv"
-    FB_BASEURL: ""
-    FB_NOAUTH: "false"
-    FB_USERNAME: "admin"
-
-  envFromSecrets:
-    FB_PASSWORD:
-      name: filebrowser-credentials
-      key: admin-password
-
-  secrets:
-    - name: filebrowser-credentials
-      data:
-        admin-password: "changeme123!"
-
-  securityContext:
-    capabilities:
-      drop:
-        - ALL
-    readOnlyRootFilesystem: true
-    runAsNonRoot: true
-    runAsUser: 1000
-    runAsGroup: 1000
-
-  resources:
-    limits:
-      cpu: 500m
-      memory: 512Mi
-    requests:
-      cpu: 200m
-      memory: 256Mi
 
   livenessProbe:
     enabled: true
@@ -127,23 +54,12 @@ filebrowser:
       path: /
       port: 9696
 
-  volumes:
-    - name: filebrowser-data
-      persistentVolumeClaim:
-        claimName: filebrowser-data
-    - name: filebrowser-database
-      persistentVolumeClaim:
-        claimName: filebrowser-db
-
-  volumeMounts:
-    - name: filebrowser-data
-      mountPath: "/srv"
-    - name: filebrowser-database
-      mountPath: "/database.db"
-      subPath: "database.db"
+  # volumeMounts:
+  #   - name: received-data
+  #     mountPath: "/srv"
 
 mlflow:
-  enabled: true
+  enabled: false
   image:
     repository: konstellation/kdl-mlflow
     pullPolicy: IfNotPresent

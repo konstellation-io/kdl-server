@@ -13,11 +13,6 @@ export enum AccessLevel {
   VIEWER = "VIEWER",
 }
 
-export enum RepositoryAuthMethod {
-  PASSWORD = "PASSWORD",
-  TOKEN = "TOKEN",
-}
-
 export interface AddMembersInput {
   projectId: string;
   userIds: string[];
@@ -51,8 +46,6 @@ export interface RemoveMembersInput {
 export interface RepositoryInput {
   url: string;
   username: string;
-  credential: string;
-  authMethod: RepositoryAuthMethod;
 }
 
 export interface SetActiveUserToolsInput {

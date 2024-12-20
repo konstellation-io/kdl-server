@@ -92,7 +92,6 @@ const LowerBg: FC<BaseProps> = ({ project }) => (
 
 const Band: FC<BaseProps> = ({ project }) => (
   <div className={styles.band}>
-    {/* <div className={styles.label}>{capitalize(project.repository?.type)}</div> */}
     <div className={styles.otherLabels}>
       {project.archived && (
         <div className={styles.labelArchived} data-testid="projectArchived">
@@ -109,7 +108,6 @@ const Square: FC<BaseProps> = ({ project }) => (
   <div className={styles.square}>
     <div className={styles.repoType}>
       <RepositoryTypeComponent
-        // squareLocation={project.repository?.type === RepositoryType.EXTERNAL ? LOCATION.OUT : LOCATION.IN}
         squareLocation={LOCATION.OUT}
         customSize={38}
         shouldAnimate={false}

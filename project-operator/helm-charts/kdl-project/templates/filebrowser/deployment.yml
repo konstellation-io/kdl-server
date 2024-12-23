@@ -114,6 +114,8 @@ spec:
               value: /filebrowser/{{ .Values.projectId }}
             - name: FB_PORT
               value: {{ .Values.filebrowser.env.FB_PORT | default (int .Values.filebrowser.service.targetPort | default .Values.filebrowser.service.port) | quote }}
+            - name: AWS_S3_BUCKET
+              value: {{ .Values.projectId | quote }}
             # Variables from secrets have precedence
             {{- $envList := dict }}
             {{- if .Values.filebrowser.envFromSecrets }}

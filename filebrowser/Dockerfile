@@ -1,8 +1,8 @@
-ARG BASE_S3FUSE_IMAGE=efrecon/s3fs:1.94
-ARG BASE_FILEBROWSER_IMAGE=filebrowser/filebrowser:v2
+ARG BASE_S3FUSE_IMAGE_VERSION=1.94
+ARG BASE_FILEBROWSER_IMAGE_VERSION=v2
 
-FROM efrecon/s3fs:${BASE_S3FUSE_IMAGE} AS s3fs
-FROM filebrowser/filebrowser:${BASE_FILEBROWSER_IMAGE}
+FROM efrecon/s3fs:${BASE_S3FUSE_IMAGE_VERSION} AS s3fs
+FROM filebrowser/filebrowser:${BASE_FILEBROWSER_IMAGE_VERSION}
 
 COPY --from=s3fs /usr/bin/s3fs /usr/bin/s3fs
 COPY --from=s3fs /usr/local/bin/*.sh /usr/local/bin/

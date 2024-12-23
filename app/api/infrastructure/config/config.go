@@ -36,9 +36,9 @@ type Config struct {
 		Enabled bool   `envconfig:"KNOWLEDGE_GALAXY_ENABLED"`
 		URL     string `envconfig:"KNOWLEDGE_GALAXY_URL"`
 	}
-	UserToolsKubeconfig struct {
-		Enabled           bool   `envconfig:"USER_TOOLS_KUBECONFIG_DOWNLOAD_ENABLED"`
-		ExternalServerURL string `envconfig:"USER_TOOLS_KUBECONFIG_EXTERNAL_SERVER_URL"`
+	Kubeconfig struct {
+		Enabled           bool   `envconfig:"KUBECONFIG_DOWNLOAD_ENABLED"`
+		ExternalServerURL string `envconfig:"KUBECONFIG_EXTERNAL_SERVER_URL"`
 	}
 	Labels struct {
 		Common struct {

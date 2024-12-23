@@ -247,7 +247,7 @@ func (i *Interactor) AreToolsRunning(ctx context.Context, username string) (bool
 
 // IsKubeconfigActive checks if the kubeconfig is active.
 func (i *Interactor) IsKubeconfigActive() bool {
-	return i.cfg.UserToolsKubeconfig.Enabled
+	return i.cfg.Kubeconfig.Enabled
 }
 
 // FindByIDs retrieves the users for the given identifiers.

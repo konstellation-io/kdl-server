@@ -122,11 +122,11 @@ minio:
   mode: standalone
 
   ingress:
-    enabled: true
+    enabled: false
     ingressClassName: public
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+      nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
     path: /
     hosts:
       - minio.{{ requiredEnv "DOMAIN" }}
@@ -140,7 +140,7 @@ minio:
     ingressClassName: public
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+      nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
     path: /
     hosts:
       - minio-console.{{ requiredEnv "DOMAIN" }}
@@ -256,8 +256,8 @@ projectOperator:
 
   image:
     repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-project-operator
-    tag: latest
     pullPolicy: Always
+    tag: latest
 
   templateCustomResource: |
     apiVersion: kdl.konstellation.io/v1
@@ -270,11 +270,10 @@ projectOperator:
       projectId: kdlproject-id-to-be-replaced
       mlflow:
         image:
-          repository: konstellation/kdl-mlflow
+          repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-mlflow
           pullPolicy: IfNotPresent
-          tag: "0.14.18"
+          tag: latest
 
-        # Ingress configuration
         ingress:
           enabled: true
           tls:
@@ -282,9 +281,8 @@ projectOperator:
           className: public
           annotations:
             cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-            nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+            nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
 
-        # Persistent storage configuration
         persistentVolume:
           enabled: true
           size: "1Gi"
@@ -292,32 +290,67 @@ projectOperator:
             - ReadWriteOnce
           storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
-        # Environment variables
         env:
-          MLFLOW_S3_ENDPOINT_URL: "http://minio.kdl:9000"
-          MLFLOW_TRACKING_URI: "sqlite3:///database.db"
           ARTIFACTS_BUCKET: "nanana"
           AWS_ACCESS_KEY_ID: "minio"
           AWS_SECRET_ACCESS_KEY: "minio123"
+          MLFLOW_S3_ENDPOINT_URL: "http://minio.kdl:9000"
+          MLFLOW_TRACKING_URI: "sqlite:///database.db"
 
       filebrowser:
         image:
-          repository: filebrowser/filebrowser
+          repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-filebrowser
           pullPolicy: IfNotPresent
-          tag: "v2"
+          tag: latest
 
-        # Volume configuration
-        volumes:
-          - name: received-data
-            persistentVolumeClaim:
-              claimName: shared-volume
+        podSecurityContext:
+          fsGroup: 1000
+
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
 
         env:
-          FB_ADDRESS: 0.0.0.0
-          FB_PORT: 9696
+          AWS_S3_ACCESS_KEY_ID: "minio"
+          AWS_S3_MOUNT: "/srv"
+          AWS_S3_SECRET_ACCESS_KEY: "minio123"
+          AWS_S3_URL: "http://minio:9000"
+          FB_ADDRESS: "0.0.0.0"
           FB_DATABASE: /database.db
           FB_LOG: stdout
           FB_ROOT: /srv
+          S3FS_ARGS: >-
+            -o use_path_request_style
+            -o use_cache=/cache
+            -o ensure_diskfree=2048
+            -o max_stat_cache_size=100000
+            -o stat_cache_expire=300
+            -o enable_noobj_cache
+            -o dbglevel=warn
+            -o multipart_size=52
+            -o parallel_count=32
+            -o max_dirty_data=512
+            -o multireq_max=30
+            -o complement_stat
+            -o notsup_compat_dir
+            -o enable_content_md5
+            -o ro
+
+        volumes:
+          - name: cache-volume
+            emptyDir: {}
+          - name: fuse-device
+            hostPath:
+              path: /dev/fuse
+              type: CharDevice
+
+        volumeMounts:
+          - name: cache-volume
+            mountPath: /cache
+          - name: fuse-device
+            mountPath: /dev/fuse
 
 sharedVolume:
   enabled: true

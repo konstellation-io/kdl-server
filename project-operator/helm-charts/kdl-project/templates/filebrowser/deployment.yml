@@ -104,8 +104,6 @@ spec:
             {{- end }}
           {{- end }}
           envFrom:
-            - configMapRef:
-                name: {{ include "kdl-project.filebrowser.name" . }}
             {{- if .Values.filebrowser.envFromFiles }}
             {{- tpl (toYaml .Values.filebrowser.envFromFiles) . | nindent 12 }}
             {{- end }}
@@ -157,9 +155,6 @@ spec:
             - name: filebrowser-config
               mountPath: /entrypoint.sh
               subPath: entrypoint.sh
-            - name: received-data
-              mountPath: /srv
-              subPath: {{ .Values.projectId }}
           {{- with .Values.filebrowser.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -172,7 +167,7 @@ spec:
       volumes:
         - name: filebrowser-config
           configMap:
-            name: {{ include "kdl-project.filebrowser.name" . }}
+            name: {{ .Values.projectId }}-filebrowser-config
             defaultMode: 0777
       {{- with .Values.filebrowser.volumes }}
         {{- toYaml . | nindent 8 }}

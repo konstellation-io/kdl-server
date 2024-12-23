@@ -19,6 +19,7 @@ build_docker_images() {
   build_user_tools_operator
   build_vscode
   build_repo_cloner
+  build_filebrowser
   build_mlflow
   build_kg
 }
@@ -41,6 +42,10 @@ build_vscode() {
 
 build_repo_cloner() {
   build_image kdl-repo-cloner repo-cloner
+}
+
+build_filebrowser() {
+  build_image kdl-filebrowser filebrowser
 }
 
 build_mlflow() {

@@ -37,6 +37,8 @@ spec:
         - name: mlflow
           image: {{ .Values.mlflow.image.repository }}:{{ .Values.mlflow.image.tag }}
           imagePullPolicy: {{ .Values.mlflow.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.mlflow.securityContext | nindent 12 }}
           command:
             - mlflow
           args:
@@ -148,14 +150,14 @@ spec:
             - name: mlflow-tracking
               mountPath: /mlflow/tracking
             {{- end }}
-            {{- with .Values.mlflow.volumeMounts }}
-              {{- toYaml . | nindent 12 }}
-            {{- end }}
+          {{- with .Values.mlflow.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           resources:
             {{- toYaml .Values.mlflow.resources | nindent 12 }}
-        {{- if .Values.mlflow.extraContainers }}
-          {{- toYaml .Values.mlflow.extraContainers | nindent 8 }}
-        {{- end }}
+      {{- if .Values.mlflow.extraContainers }}
+        {{- toYaml .Values.mlflow.extraContainers | nindent 8 }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ .Values.mlflow.terminationGracePeriodSeconds }}
       volumes:
         {{- if .Values.mlflow.persistentVolume.enabled }}

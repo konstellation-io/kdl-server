@@ -396,3 +396,13 @@ vscodeRuntime:
     #       - "/bin/sh"
     #       - "-c"
     #       - "ssh-keyscan -H keycloak >> /app/.ssh/known_hosts"
+
+  # -- Resources limits and requested
+  # </br> Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi

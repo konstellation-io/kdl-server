@@ -47,6 +47,8 @@ spec:
         - name: repo-cloner
           image: {{ .Values.repoCloner.image.repository }}:{{ .Values.repoCloner.image.tag }}
           imagePullPolicy: {{ .Values.repoCloner.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.repoCloner.securityContext | nindent 12 }}
           {{- with .Values.repoCloner.command }}
           command: {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -110,12 +112,16 @@ spec:
               mountPath: {{ .Values.repoCloner.homePath }}/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
-            {{- with .Values.repoCloner.volumeMounts }}
-              {{- toYaml . | nindent 12 }}
-            {{- end }}
+          {{- with .Values.repoCloner.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.repoCloner.resources | nindent 12 }}
         - name: vscode-runtime
           image: {{ .Values.vscodeRuntime.image.repository }}:{{ .Values.vscodeRuntime.image.tag }}
           imagePullPolicy: {{ .Values.vscodeRuntime.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.vscodeRuntime.securityContext | nindent 12 }}
           {{- with .Values.vscodeRuntime.command }}
           command: {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -182,14 +188,14 @@ spec:
               mountPath: {{ .Values.vscodeRuntime.homePath }}/.ssh/id_rsa
               subPath: id_rsa
               readOnly: true
-            {{- with .Values.vscodeRuntime.volumeMounts }}
-              {{- toYaml . | nindent 12 }}
-            {{- end }}
+          {{- with .Values.vscodeRuntime.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-        {{- if .Values.extraContainers }}
-          {{- toYaml .Values.extraContainers | nindent 8 }}
-        {{- end }}
+            {{- toYaml .Values.vscodeRuntime.resources | nindent 12 }}
+      {{- if .Values.extraContainers }}
+        {{- toYaml .Values.extraContainers | nindent 8 }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       volumes:
         - name: kubeconfig-tpl-configmap

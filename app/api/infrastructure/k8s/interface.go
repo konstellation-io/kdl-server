@@ -15,7 +15,7 @@ type ClientInterface interface {
 	CreateSecret(ctx context.Context, name string, values, labels map[string]string) error
 	UpdateSecret(ctx context.Context, name string, values, labels map[string]string) error
 	GetSecret(ctx context.Context, name string) (map[string][]byte, error)
-	CreateUserToolsCR(ctx context.Context, username, runtimeID, runtimeImage, runtimeTag string, capabilities entity.Capabilities) error
+	CreateUserToolsCR(ctx context.Context, username string, data UserToolsData) error
 	DeleteUserToolsCR(ctx context.Context, username string) error
 	IsUserToolPODRunning(ctx context.Context, username string) (bool, error)
 	GetRuntimeIDFromUserTools(ctx context.Context, username string) (string, error)

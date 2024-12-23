@@ -13,6 +13,13 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 )
 
+type UserToolsData struct {
+	RuntimeID    string
+	RuntimeImage string
+	RuntimeTag   string
+	Capabilities entity.Capabilities
+}
+
 // DeleteUserToolsCR removes a given user tools custom resource from Kubernetes.
 func (k *Client) DeleteUserToolsCR(ctx context.Context, username string) error {
 	slugUsername := k.getSlugUsername(username)
@@ -22,7 +29,7 @@ func (k *Client) DeleteUserToolsCR(ctx context.Context, username string) error {
 
 	delPropagationFg := metav1.DeletePropagationForeground
 
-	err := k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Delete(ctx, resName, metav1.DeleteOptions{
+	err := k.kdlUserToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Delete(ctx, resName, metav1.DeleteOptions{
 		GracePeriodSeconds: &zero,
 		PropagationPolicy:  &delPropagationFg,
 	})
@@ -32,7 +39,7 @@ func (k *Client) DeleteUserToolsCR(ctx context.Context, username string) error {
 		return err
 	}
 
-	result, err := k.userToolsRes.
+	result, err := k.kdlUserToolsRes.
 		Namespace(k.cfg.Kubernetes.Namespace).
 		Patch(ctx, resName, types.MergePatchType, []byte("{\"metadata\":{\"finalizers\":[]}}"), metav1.PatchOptions{})
 
@@ -45,16 +52,130 @@ func (k *Client) DeleteUserToolsCR(ctx context.Context, username string) error {
 	return k.waitUserToolsDeleted(ctx, resName)
 }
 
+func (k *Client) updateUserToolsTemplate(
+	crd *map[string]interface{},
+	slugUsername, resName, username string,
+	data UserToolsData,
+) (*map[string]interface{}, error) {
+	crdToUpdate := *crd
+	// update metadata.name and metadata.namespace in the CRD object
+	metadata, ok := crdToUpdate["metadata"].(map[string]interface{})
+
+	if !ok {
+		return nil, errCRDNoMetadata
+	}
+
+	metadata["name"] = resName
+	metadata["namespace"] = k.cfg.Kubernetes.Namespace
+	// update metadata.labels.app in the CRD object
+	labels, ok := metadata["labels"].(map[string]interface{})
+
+	if !ok {
+		return nil, errCRDNoMetadata
+	}
+
+	labels["app"] = resName
+
+	// update spec.username and spec.usernameSlug in the CRD object
+	spec, ok := crdToUpdate["spec"].(map[string]interface{})
+	if !ok {
+		return nil, errCRDNoSpec
+	}
+
+	spec["username"] = username
+	spec["usernameSlug"] = slugUsername
+
+	// update spec.vscodeRuntime.image.repository and spec.vscodeRuntime.image.tag in the CRD object
+	vscodeRuntime, ok := spec["vscodeRuntime"].(map[string]interface{})
+	if !ok {
+		return nil, errCRDNoSpecVscodeRuntime
+	}
+
+	vscodeRuntimeImage, ok := vscodeRuntime["image"].(map[string]interface{})
+	if !ok {
+		return nil, errCRDNoSpecVscodeRuntimeImage
+	}
+
+	vscodeRuntimeImage["repository"] = data.RuntimeImage
+	vscodeRuntimeImage["tag"] = data.RuntimeTag
+	// FUTURE: update spec.vscodeRuntime.env.MINIO_ACCESS_KEY and spec.vscodeRuntime.env.MINIO_SECRET_KEY with minIO values for the user
+
+	if data.Capabilities.ID != "" {
+		if err := data.Capabilities.Validate(); err != nil {
+			return nil, err
+		}
+
+		// update spec.nodeSelector in the CRD object
+		if !data.Capabilities.IsNodeSelectorsEmpty() {
+			spec["nodeSelector"] = data.Capabilities.GetNodeSelectors()
+		}
+
+		// update spec.tolerations in the CRD object
+		if !data.Capabilities.IsTolerationsEmpty() {
+			spec["tolerations"] = data.Capabilities.GetTolerations()
+		}
+
+		// update spec.affinity in the CRD object
+		if !data.Capabilities.IsAffinitiesEmpty() {
+			spec["affinity"] = data.Capabilities.GetAffinities()
+		}
+	}
+
+	// update spec.podLabels.runtimeId and spec.podLabels.capabilityId in the CRD object
+	podLabels, ok := spec["podLabels"].(map[string]interface{})
+	if !ok {
+		return nil, errCRDNoSpecPodLabels
+	}
+
+	if data.RuntimeID != "" {
+		podLabels["runtimeId"] = data.RuntimeID
+	}
+
+	if data.Capabilities.ID != "" {
+		podLabels["capabilityId"] = data.Capabilities.ID
+	}
+
+	return &crdToUpdate, nil
+}
+
 // CreateUserToolsCR creates the user tools Custom Resource in Kubernetes.
-func (k *Client) CreateUserToolsCR(ctx context.Context, username, runtimeID, runtimeImage, runtimeTag string,
-	capabilities entity.Capabilities) error {
+func (k *Client) CreateUserToolsCR(
+	ctx context.Context,
+	username string,
+	data UserToolsData,
+) error {
 	slugUsername := k.getSlugUsername(username)
 	resName := fmt.Sprintf("usertools-%s", slugUsername)
+	configMapKdlProjectName := k.cfg.ReleaseName + "-user-tools-template"
 
-	err := k.createUserToolsDefinition(ctx, username, slugUsername, resName, runtimeID, runtimeImage, runtimeTag, capabilities)
+	configMap, err := k.GetConfigMap(ctx, configMapKdlProjectName)
 	if err != nil {
 		return err
 	}
+
+	// get the CRD template converted from yaml to go object from the ConfigMap
+	crd, err := k.getCrdTemplateFromConfigMap(configMap)
+	if err != nil {
+		return err
+	}
+
+	// update the CRD object with correct values
+	crdUpdated, err := k.updateUserToolsTemplate(&crd, slugUsername, resName, username, data)
+	if err != nil {
+		return err
+	}
+
+	definition := &unstructured.Unstructured{
+		Object: *crdUpdated,
+	}
+
+	_, err = k.kdlUserToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
+	if err != nil {
+		k.logger.Error(err, "Error creating user tools")
+		return err
+	}
+
+	k.logger.Info("Created CRD KDLUserTools object", "resName", resName)
 
 	return k.waitUserToolsRunning(ctx, resName)
 }
@@ -139,165 +260,6 @@ func (k *Client) getUserToolsResName(slugUsername string) string {
 
 func (k *Client) userToolsPODLabelSelector(resName string) string {
 	return fmt.Sprintf("app.kubernetes.io/instance=%s", resName)
-}
-
-// createUserToolsDefinition creates a new Custom Resource of type UserTools for the given user.
-func (k *Client) createUserToolsDefinition(ctx context.Context, username, usernameSlug, resName, runtimeID,
-	runtimeImage, runtimeTag string, capabilities entity.Capabilities) error {
-	serviceAccountName := k.getUserServiceAccountName(usernameSlug)
-
-	ingressAnnotations, err := k.getK8sMap(k.cfg.UserToolsIngress.Annotations)
-	if err != nil {
-		return fmt.Errorf("error getting ingress annotations: %w", err)
-	}
-
-	definition, err := k.getUserToolsDefinition(
-		ingressAnnotations,
-		resName,
-		username,
-		usernameSlug,
-		runtimeID,
-		runtimeImage,
-		runtimeTag,
-		serviceAccountName,
-		capabilities,
-	)
-
-	if err != nil {
-		k.logger.Error(err, "Error building tools")
-		return err
-	}
-
-	k.logger.Info("Creating users tools")
-	_, err = k.userToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
-
-	if err != nil {
-		k.logger.Error(err, "Error creating user tools")
-		return err
-	}
-
-	return nil
-}
-
-func (k *Client) getUserToolsDefinition(
-	ingressAnnotations map[string]interface{},
-	resName, username, usernameSlug, runtimeID, runtimeImage, runtimeTag, serviceAccountName string,
-	capabilities entity.Capabilities,
-) (*unstructured.Unstructured, error) {
-	tlsConfig := map[string]interface{}{
-		"enabled": k.cfg.TLS.Enabled,
-	}
-
-	if k.cfg.UserToolsIngress.TLS.SecretName != nil {
-		tlsConfig["secretName"] = &k.cfg.UserToolsIngress.TLS.SecretName
-	}
-
-	vscodeRuntime := map[string]interface{}{
-		"runtimeId": runtimeID,
-		"image": map[string]string{
-			"repository": runtimeImage,
-			"tag":        runtimeTag,
-			"pullPolicy": k.cfg.UserToolsVsCodeRuntime.Image.PullPolicy,
-		},
-	}
-
-	spec := map[string]interface{}{
-		"domain": k.cfg.BaseDomainName,
-		"ingress": map[string]interface{}{
-			"annotations": ingressAnnotations,
-			"className":   k.cfg.UserToolsIngress.ClassName,
-		},
-		"username":     username,
-		"usernameSlug": usernameSlug,
-		"storage": map[string]string{
-			"size":      k.cfg.Storage.Size,
-			"className": k.cfg.Storage.ClassName,
-		},
-		"sharedVolume": map[string]string{
-			"name": k.cfg.SharedVolume.Name,
-		},
-		"tls": tlsConfig,
-		"vscode": map[string]interface{}{
-			"enabled": k.cfg.VSCode.Enabled,
-			"image": map[string]string{
-				"repository": k.cfg.VSCode.Image.Repository,
-				"tag":        k.cfg.VSCode.Image.Tag,
-				"pullPolicy": k.cfg.VSCode.Image.PullPolicy,
-			},
-		},
-		"repoCloner": map[string]interface{}{
-			"image": map[string]string{
-				"repository": k.cfg.RepoCloner.Image.Repository,
-				"tag":        k.cfg.RepoCloner.Image.Tag,
-				"pullPolicy": k.cfg.RepoCloner.Image.PullPolicy,
-			},
-			"mongodbURI": k.cfg.MongoDB.URI,
-		},
-		"oauth2Proxy": map[string]interface{}{
-			"image": map[string]string{
-				"repository": k.cfg.UserToolsOAuth2Proxy.Image.Repository,
-				"tag":        k.cfg.UserToolsOAuth2Proxy.Image.Tag,
-				"pullPolicy": k.cfg.UserToolsOAuth2Proxy.Image.PullPolicy,
-			},
-		},
-		"kubeconfig": map[string]interface{}{
-			"enabled":           k.cfg.UserToolsKubeconfig.Enabled,
-			"externalServerUrl": k.cfg.UserToolsKubeconfig.ExternalServerURL,
-		},
-		"serviceAccountName": serviceAccountName,
-	}
-
-	err := k.loadCapabilites(spec, vscodeRuntime, capabilities)
-	if err != nil {
-		return nil, err
-	}
-
-	spec["vscodeRuntime"] = vscodeRuntime
-
-	definition := &unstructured.Unstructured{
-		Object: map[string]interface{}{
-			"kind":       "UserTools",
-			"apiVersion": userToolsAPIVersion,
-			"metadata": map[string]interface{}{
-				"name":      resName,
-				"namespace": k.cfg.Kubernetes.Namespace,
-				"labels": map[string]interface{}{
-					"app": resName,
-				},
-			},
-			"spec": spec,
-		},
-	}
-
-	return definition, nil
-}
-
-func (k *Client) loadCapabilites(
-	spec map[string]interface{},
-	vscodeRuntime map[string]interface{},
-	capabilities entity.Capabilities,
-) error {
-	if capabilities.ID != "" {
-		if err := capabilities.Validate(); err != nil {
-			return err
-		}
-
-		if !capabilities.IsNodeSelectorsEmpty() {
-			spec["nodeSelector"] = capabilities.GetNodeSelectors()
-		}
-
-		if !capabilities.IsTolerationsEmpty() {
-			spec["tolerations"] = capabilities.GetTolerations()
-		}
-
-		if !capabilities.IsAffinitiesEmpty() {
-			spec["affinity"] = capabilities.GetAffinities()
-		}
-
-		vscodeRuntime["capabilityId"] = capabilities.ID
-	}
-
-	return nil
 }
 
 // Returns a watcher for the UserTools.

@@ -20,16 +20,23 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
 const (
-	namespace            = "kdl-test"
-	releaseName          = "kdl"
-	kdlprojectGroup      = "kdl.konstellation.io"
-	kdlprojectResource   = "kdlprojects"
-	kdlprojectVersion    = "v1"
-	kdlprojectAPIVersion = kdlprojectGroup + "/" + kdlprojectVersion
+	namespace   = "kdl-test"
+	releaseName = "kdl"
+
+	kdlUserToolsGroup      = "kdl.konstellation.io"
+	kdlUserToolsResource   = "kdlusertools"
+	kdlUserToolsVersion    = "v1"
+	kdlUserToolsAPIVersion = kdlUserToolsGroup + "/" + kdlUserToolsVersion
+
+	kdlProjectGroup      = "kdl.konstellation.io"
+	kdlProjectResource   = "kdlprojects"
+	kdlProjectVersion    = "v1"
+	kdlProjectAPIVersion = kdlProjectGroup + "/" + kdlProjectVersion
 )
 
 type testSuite struct {
@@ -41,6 +48,99 @@ type testSuite struct {
 
 func TestSuite(t *testing.T) {
 	suite.Run(t, new(testSuite))
+}
+
+func (s *testSuite) defineCRD(restcfg *rest.Config) {
+	// Create a clientset for CRD operations
+	apiExtensionsClient, err := apiextensionsclient.NewForConfig(restcfg)
+	s.Require().NoError(err)
+
+	// Define the CRD for KDLUserTools
+	crdKdlUserTools := &apiextensionsv1.CustomResourceDefinition{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "kdlusertools.kdl.konstellation.io", // Format: plural.group
+		},
+		Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+			Group: "kdl.konstellation.io",
+			Names: apiextensionsv1.CustomResourceDefinitionNames{
+				Plural:   "kdlusertools",
+				Singular: "kdlusertool",
+				Kind:     "KDLUserTools",
+				ListKind: "KDLUserToolsList",
+			},
+			Scope: apiextensionsv1.NamespaceScoped,
+			Versions: []apiextensionsv1.CustomResourceDefinitionVersion{
+				{
+					Name:    "v1",
+					Served:  true,
+					Storage: true,
+					Schema: &apiextensionsv1.CustomResourceValidation{
+						OpenAPIV3Schema: &apiextensionsv1.JSONSchemaProps{
+							Type: "object",
+							Properties: map[string]apiextensionsv1.JSONSchemaProps{
+								"spec": {
+									Type: "object",
+									Properties: map[string]apiextensionsv1.JSONSchemaProps{
+										"username":     {Type: "string"},
+										"usernameSlug": {Type: "string"},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// Create the CRD KDLUserTools in the cluster
+	_, err = apiExtensionsClient.ApiextensionsV1().CustomResourceDefinitions().Create(context.TODO(), crdKdlUserTools, metav1.CreateOptions{})
+	s.Require().NoError(err)
+
+	// Define the CRD for KDLProject
+	crdKdlProject := &apiextensionsv1.CustomResourceDefinition{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "kdlprojects.kdl.konstellation.io", // Format: plural.group
+		},
+		Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+			Group: "kdl.konstellation.io",
+			Names: apiextensionsv1.CustomResourceDefinitionNames{
+				Plural:   "kdlprojects",
+				Singular: "kdlproject",
+				Kind:     "KDLProject",
+				ListKind: "KDLProjectList",
+			},
+			Scope: apiextensionsv1.NamespaceScoped,
+			Versions: []apiextensionsv1.CustomResourceDefinitionVersion{
+				{
+					Name:    "v1",
+					Served:  true,
+					Storage: true,
+					Schema: &apiextensionsv1.CustomResourceValidation{
+						OpenAPIV3Schema: &apiextensionsv1.JSONSchemaProps{
+							Type: "object",
+							Properties: map[string]apiextensionsv1.JSONSchemaProps{
+								"spec": {
+									Type: "object",
+									Properties: map[string]apiextensionsv1.JSONSchemaProps{
+										"projectId": {
+											Type: "string",
+										},
+									},
+									Required: []string{"projectId"},
+								},
+							},
+							Required: []string{"spec"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// Create the CRD KDLProject in the cluster
+	_, err = apiExtensionsClient.ApiextensionsV1().CustomResourceDefinitions().Create(context.TODO(), crdKdlProject, metav1.CreateOptions{})
+	s.Require().NoError(err)
 }
 
 func (s *testSuite) SetupSuite() {
@@ -84,71 +184,30 @@ func (s *testSuite) SetupSuite() {
 		},
 	}
 
-	// Create a clientset for CRD operations
-	apiExtensionsClient, err := apiextensionsclient.NewForConfig(restcfg)
-	s.Require().NoError(err)
-
 	dynamicClient, err := dynamic.NewForConfig(restcfg)
 	s.Require().NoError(err)
 
-	kdlprojectRes := dynamicClient.Resource(schema.GroupVersionResource{
-		Group:    kdlprojectGroup,
-		Version:  kdlprojectVersion,
-		Resource: kdlprojectResource,
+	kdlUserToolsRes := dynamicClient.Resource(schema.GroupVersionResource{
+		Group:    kdlUserToolsGroup,
+		Version:  kdlUserToolsVersion,
+		Resource: kdlUserToolsResource,
 	})
 
-	// Define the CRD
-	crd := &apiextensionsv1.CustomResourceDefinition{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "kdlprojects.kdl.konstellation.io", // Format: plural.group
-		},
-		Spec: apiextensionsv1.CustomResourceDefinitionSpec{
-			Group: "kdl.konstellation.io",
-			Names: apiextensionsv1.CustomResourceDefinitionNames{
-				Plural:   "kdlprojects",    // Plural name
-				Singular: "kdlproject",     // Singular name
-				Kind:     "KDLProject",     // Kind
-				ListKind: "KDLProjectList", // List kind
-			},
-			Scope: apiextensionsv1.NamespaceScoped, // Namespace scoped
-			Versions: []apiextensionsv1.CustomResourceDefinitionVersion{
-				{
-					Name:    "v1", // Version name
-					Served:  true, // Whether the version is served
-					Storage: true, // Whether it is the storage version
-					Schema: &apiextensionsv1.CustomResourceValidation{
-						OpenAPIV3Schema: &apiextensionsv1.JSONSchemaProps{
-							Type: "object",
-							Properties: map[string]apiextensionsv1.JSONSchemaProps{
-								"spec": {
-									Type: "object",
-									Properties: map[string]apiextensionsv1.JSONSchemaProps{
-										"projectId": {
-											Type: "string",
-										},
-									},
-									Required: []string{"projectId"}, // Mark as required
-								},
-							},
-							Required: []string{"spec"}, // Spec is required
-						},
-					},
-				},
-			},
-		},
-	}
+	kdlProjectRes := dynamicClient.Resource(schema.GroupVersionResource{
+		Group:    kdlProjectGroup,
+		Version:  kdlProjectVersion,
+		Resource: kdlProjectResource,
+	})
 
-	// Create the CRD in the cluster
-	_, err = apiExtensionsClient.ApiextensionsV1().CustomResourceDefinitions().Create(context.TODO(), crd, metav1.CreateOptions{})
-	s.Require().NoError(err)
+	s.defineCRD(restcfg)
 
 	// Create the client
 	s.Client = k8s.New(
 		logger,
 		cfg,
 		s.Clientset,
-		nil,
-		kdlprojectRes,
+		kdlUserToolsRes,
+		kdlProjectRes,
 	)
 }
 

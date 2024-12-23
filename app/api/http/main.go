@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
@@ -123,7 +124,14 @@ func startHTTPServer(
 ) {
 	const apiQueryPath = "/api/query"
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers}))
+	srv := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers}))
+	srv.AddTransport(transport.Websocket{
+		KeepAlivePingInterval: 30 * time.Second,
+	})
+	srv.AddTransport(transport.GET{})
+	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.MultipartForm{})
+
 	pg := playground.Handler("GraphQL playground", apiQueryPath)
 	fs := http.FileServer(http.Dir(staticFilesPath))
 
@@ -139,9 +147,9 @@ func startHTTPServer(
 	server := &http.Server{
 		Addr:         ":" + port,
 		Handler:      nil,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  15 * time.Second,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  30 * time.Second,
 	}
 
 	err := server.ListenAndServe()

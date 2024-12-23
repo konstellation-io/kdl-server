@@ -12,8 +12,8 @@ import (
 
 // ClientInterface defines all operation related to Kubernetes.
 type ClientInterface interface {
-	CreateSecret(ctx context.Context, name string, values map[string]string) error
-	UpdateSecret(ctx context.Context, name string, values map[string]string) error
+	CreateSecret(ctx context.Context, name string, values, labels map[string]string) error
+	UpdateSecret(ctx context.Context, name string, values, labels map[string]string) error
 	GetSecret(ctx context.Context, name string) (map[string][]byte, error)
 	CreateUserToolsCR(ctx context.Context, username, runtimeID, runtimeImage, runtimeTag string, capabilities entity.Capabilities) error
 	DeleteUserToolsCR(ctx context.Context, username string) error
@@ -30,4 +30,5 @@ type ClientInterface interface {
 	DeleteUserServiceAccount(ctx context.Context, usernameSlug string) error
 	GetUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error)
 	GetUserKubeconfig(ctx context.Context, usernameSlug string) ([]byte, error)
+	GetConfigMap(ctx context.Context, name string) (*v1.ConfigMap, error)
 }

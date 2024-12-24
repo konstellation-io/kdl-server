@@ -67,14 +67,6 @@ func (k *Client) updateUserToolsTemplate(
 
 	metadata["name"] = resName
 	metadata["namespace"] = k.cfg.Kubernetes.Namespace
-	// update metadata.labels.app in the CRD object
-	labels, ok := metadata["labels"].(map[string]interface{})
-
-	if !ok {
-		return nil, errCRDNoMetadata
-	}
-
-	labels["app"] = resName
 
 	// update spec.username and spec.usernameSlug in the CRD object
 	spec, ok := crdToUpdate["spec"].(map[string]interface{})

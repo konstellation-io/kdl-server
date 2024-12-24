@@ -375,9 +375,6 @@ userToolsOperator:
       name: kdlusertools-to-be-replaced
       namespace: kdlusertools-to-be-replaced
     spec:
-      username: "replaced-by-kdl-api"
-      usernameSlug: "replaced-by-kdl-api"
-
       sharedVolume:
         enabled: false
 
@@ -388,30 +385,12 @@ userToolsOperator:
       repoCloner:
         image:
           repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-repo-cloner
-          pullPolicy: Always
-          tag: latest
 
-      # must be declared
       vscodeRuntime:
-        image:
-          # The repository of the image (replaced-by-kdl-api)
-          repository: "konstellation/kdl-py"
-          # The image tag (replaced-by-kdl-api)
-          tag: "3.9"
-
         env:
           AWS_ACCESS_KEY: "{{ .Values.minio_access_key }}"
           AWS_SECRET_KEY: "{{ .Values.minio_secret_key }}"
           MINIO_ENDPOINT: "minio:9000"
 
-      # must be declared
-      podLabels: {}
-
       persistentVolume:
-        enabled: true
         storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-
-      # must be declared
-      nodeSelector: {}
-      tolerations: []
-      affinity: {}

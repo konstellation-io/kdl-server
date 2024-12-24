@@ -60,6 +60,7 @@ filebrowser:
 
 mlflow:
   enabled: false
+  
   image:
     repository: konstellation/kdl-mlflow
     pullPolicy: IfNotPresent

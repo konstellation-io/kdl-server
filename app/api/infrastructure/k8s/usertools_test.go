@@ -17,7 +17,7 @@ const (
 	runtimeID                        = "test-runtime-id"
 	runtimeImage                     = "test-runtime-image"
 	runtimeTag                       = "test-runtime-tag"
-	configMapKdlUserToolTemplateName = "kdl-user-tools-template"
+	configMapKdlUserToolTemplateName = "kdl-server-user-tools-template"
 )
 
 var data = k8s.UserToolsData{

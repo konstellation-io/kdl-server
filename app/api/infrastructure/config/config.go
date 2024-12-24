@@ -21,7 +21,7 @@ type Config struct {
 	ReleaseName           string `envconfig:"RELEASE_NAME"`
 	StaticFilesPath       string `yaml:"staticFilesPath" envconfig:"KDL_SERVER_STATIC_FILES_PATH"`
 	VSCodeURL             string `envconfig:"USER_TOOLS_VSCODE_URL"`
-	MongoDB struct {
+	MongoDB               struct {
 		URI    string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
 		DBName string `yaml:"dbName" envconfig:"KDL_SERVER_MONGODB_NAME"`
 	} `yaml:"mongodb"`

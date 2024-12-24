@@ -146,7 +146,7 @@ func (k *Client) CreateUserToolsCR(
 ) error {
 	slugUsername := k.getSlugUsername(username)
 	resName := fmt.Sprintf("usertools-%s", slugUsername)
-	configMapKdlProjectName := k.cfg.ReleaseName + "-user-tools-template"
+	configMapKdlProjectName := k.cfg.ReleaseName + "-server-user-tools-template"
 
 	configMap, err := k.GetConfigMap(ctx, configMapKdlProjectName)
 	if err != nil {

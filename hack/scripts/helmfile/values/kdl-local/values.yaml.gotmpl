@@ -375,8 +375,20 @@ userToolsOperator:
       name: kdlusertools-to-be-replaced
       namespace: kdlusertools-to-be-replaced
     spec:
+      username: replaced-by-kdl-api
+      usernameSlug: replaced-by-kdl-api
+
       sharedVolume:
         enabled: false
+
+      podLabels: {}
+
+      persistentVolume:
+        enabled: true
+        size: "1Gi"
+        accessModes:
+          - ReadWriteOnce
+        storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
       kubeconfig:
         enabled: {{ requiredEnv "KUBECONFIG_ENABLED" }}
@@ -385,12 +397,23 @@ userToolsOperator:
       repoCloner:
         image:
           repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-repo-cloner
+          pullPolicy: IfNotPresent
+          tag: "latest"
+
+        env:
+          KDL_SERVER_MONGODB_URI: "mongodb://{{ .Values.mongodb_user }}:{{ .Values.mongodb_password }}@mongodb-svc.mongodb:27017/{{ .Values.mongodb_user }}?authSource={{ .Values.mongodb_user }}&authMechanism=SCRAM-SHA-256"
 
       vscodeRuntime:
+        image:
+          repository: konstellation/kdl-py
+          pullPolicy: IfNotPresent
+          tag: "3.9"
+
         env:
           AWS_ACCESS_KEY: "{{ .Values.minio_access_key }}"
           AWS_SECRET_KEY: "{{ .Values.minio_secret_key }}"
           MINIO_ENDPOINT: "minio:9000"
 
-      persistentVolume:
-        storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+      nodeSelector: {}
+      tolerations: []
+      affinity: {}

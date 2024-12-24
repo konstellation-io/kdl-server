@@ -200,7 +200,7 @@ spec:
       volumes:
         - name: kubeconfig-tpl-configmap
           configMap:
-            name: {{ include "kdl-user-tools.fullname" . }}-kubeconfig-tpl-configmap
+            name: {{ include "kdl-user-tools.fullname" . }}-kubeconfig
         {{- if .Values.sharedVolume.enabled }}
         - name: {{ .Values.sharedVolume.name }}
           persistentVolumeClaim:

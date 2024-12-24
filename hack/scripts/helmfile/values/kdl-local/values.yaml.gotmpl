@@ -264,7 +264,7 @@ projectOperator:
     kind: KDLProject
     metadata:
       name: kdlproject-to-be-replaced
-      namespace: kdl-to-be-replaced
+      namespace: kdlproject-to-be-replaced
     spec:
       domain: {{ requiredEnv "DOMAIN" | quote }}
       projectId: kdlproject-id-to-be-replaced
@@ -291,9 +291,8 @@ projectOperator:
           storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
         env:
-          ARTIFACTS_BUCKET: "nanana"
-          AWS_ACCESS_KEY_ID: "minio"
-          AWS_SECRET_ACCESS_KEY: "minio123"
+          AWS_ACCESS_KEY_ID: "{{ .Values.minio_access_key }}"
+          AWS_SECRET_ACCESS_KEY: "{{ .Values.minio_secret_key }}"
           MLFLOW_S3_ENDPOINT_URL: "http://minio.kdl:9000"
           MLFLOW_TRACKING_URI: "sqlite:///database.db"
 
@@ -369,12 +368,50 @@ userToolsOperator:
   storage:
     storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
-  repoCloner:
-    image:
-      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-repo-cloner
-      tag: latest
-      pullPolicy: Always
+  templateCustomResource: |
+    apiVersion: kdl.konstellation.io/v1
+    kind: KDLUserTools
+    metadata:
+      name: kdlusertools-to-be-replaced
+      namespace: kdlusertools-to-be-replaced
+    spec:
+      username: "replaced-by-kdl-api"
+      usernameSlug: "replaced-by-kdl-api"
 
-  kubeconfig:
-    enabled: {{ requiredEnv "KUBECONFIG_ENABLED" }}
-    externalServerUrl: {{ env "EXTERNAL_SERVER_URL" | quote }}
+      sharedVolume:
+        enabled: false
+
+      kubeconfig:
+        enabled: {{ requiredEnv "KUBECONFIG_ENABLED" }}
+        externalServerUrl: {{ env "EXTERNAL_SERVER_URL" | quote }}
+
+      repoCloner:
+        image:
+          repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-repo-cloner
+          pullPolicy: Always
+          tag: latest
+
+      # must be declared
+      vscodeRuntime:
+        image:
+          # The repository of the image (replaced-by-kdl-api)
+          repository: "konstellation/kdl-py"
+          # The image tag (replaced-by-kdl-api)
+          tag: "3.9"
+
+        env:
+          AWS_ACCESS_KEY: "{{ .Values.minio_access_key }}"
+          AWS_SECRET_KEY: "{{ .Values.minio_secret_key }}"
+          MINIO_ENDPOINT: "minio:9000"
+
+      # must be declared
+      podLabels: {}
+
+      persistentVolume:
+        enabled: true
+        storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+
+      # must be declared
+      nodeSelector: {}
+      tolerations: []
+      affinity: {}

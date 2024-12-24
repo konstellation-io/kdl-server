@@ -1,0 +1,20 @@
+# KDLUserTools
+
+=== Access information ===
+To access your VSCode development environment:
+
+1. Wait for the StatefulSet to be ready:
+   $ kubectl get sts -n {{ .Release.Namespace }} {{ include "kdl-user-tools.fullname" . }}
+
+2. Verify all pods are running:
+   $ kubectl get pods -n {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "kdl-user-tools.name" . }}"
+
+3. Connect to your VSCode runtime:
+   $ kubectl exec -it -n {{ .Release.Namespace }} {{ include "kdl-user-tools.fullname" . }}-0 -c vscode-runtime -- bash
+
+=== Security notice ===
+* Do not share your access credentials with others
+* Always follow security best practices when handling sensitive data
+* Regularly commit and push your work to prevent data loss
+
+Visit https://github.com/konstellation-io/kdl-server for documentation and updates.

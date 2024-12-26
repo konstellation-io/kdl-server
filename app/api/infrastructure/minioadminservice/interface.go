@@ -4,8 +4,8 @@ import "context"
 
 //go:generate mockgen -source=${GOFILE} -destination=mocks_${GOFILE} -package=${GOPACKAGE}
 
-// MinioAdminService defines all Minio admin operations.
-type MinioAdminService interface {
+// MinioAdminInterface defines all Minio admin operations.
+type MinioAdminInterface interface {
 	CreateUser(ctx context.Context, accessKey, secretKey string) error
 	DeleteUser(ctx context.Context, accessKey string) error
 	AssignPolicy(ctx context.Context, accessKey, policyName string) error

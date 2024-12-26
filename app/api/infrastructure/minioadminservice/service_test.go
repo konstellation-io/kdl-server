@@ -30,7 +30,7 @@ type TestSuite struct {
 	container   *tcminio.MinioContainer
 	adminClient *madmin.AdminClient
 	client      *minio.Client
-	service     minioadminservice.MinioAdminService
+	service     minioadminservice.MinioAdminInterface
 }
 
 func TestMinioAdminServiceTestSuite(t *testing.T) {

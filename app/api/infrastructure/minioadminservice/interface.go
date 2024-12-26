@@ -8,6 +8,7 @@ import "context"
 type MinioAdminService interface {
 	CreateUser(ctx context.Context, accessKey, secretKey string) error
 	DeleteUser(ctx context.Context, accessKey string) error
-	AssociateUserWithPolicy(ctx context.Context, accessKey, policyName string) error
+	AssignPolicy(ctx context.Context, accessKey, policyName string) error
 	UpdatePolicy(ctx context.Context, policyName string, bucketNames []string) error
+	DeletePolicy(ctx context.Context, policyName string) error
 }

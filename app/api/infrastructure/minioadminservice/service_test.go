@@ -128,7 +128,7 @@ func (s *TestSuite) TestAssignProject() {
 	err = s.service.UpdatePolicy(ctx, "policy1", []string{"project1"})
 	s.Require().NoError(err)
 
-	err = s.service.AssociateUserWithPolicy(ctx, "foo", "policy1")
+	err = s.service.AssignPolicy(ctx, "foo", "policy1")
 	s.Require().NoError(err)
 
 	// User login
@@ -160,4 +160,49 @@ func (s *TestSuite) TestAssignProject() {
 	s.Require().NoError(err)
 	s.Len(objects, 1)
 	s.Equal("hello.txt", objects[0].Key)
+}
+
+func (s *TestSuite) TestBucketNotAllowed() {
+	ctx := context.Background()
+
+	err := s.service.CreateUser(ctx, "foo", "foo12345678")
+	s.Require().NoError(err)
+
+	err = s.service.UpdatePolicy(ctx, "policy1", []string{"project2"})
+	s.Require().NoError(err)
+
+	err = s.service.AssignPolicy(ctx, "foo", "policy1")
+	s.Require().NoError(err)
+
+	// User login
+	endpoint, err := s.container.ConnectionString(ctx)
+	s.Require().NoError(err)
+
+	client, err := minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4("foo", "foo12345678", ""),
+		Secure: false,
+	})
+	s.Require().NoError(err)
+
+	// List objects shall fail
+	objectCh := client.ListObjects(ctx, "project1", minio.ListObjectsOptions{})
+	object := <-objectCh
+	s.Require().Error(object.Err)
+}
+
+func (s *TestSuite) TestDeletePolicy() {
+	ctx := context.Background()
+
+	err := s.service.UpdatePolicy(ctx, "policy1", []string{"project1"})
+	s.Require().NoError(err)
+
+	err = s.service.DeletePolicy(ctx, "policy1")
+	s.Require().NoError(err)
+
+	policies, err := s.adminClient.ListCannedPolicies(ctx)
+	s.Require().NoError(err)
+	for policy := range policies {
+		s.Require().NotEqual(policy, "policy1")
+	}
+
 }

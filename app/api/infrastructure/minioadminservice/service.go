@@ -3,6 +3,7 @@ package minioadminservice
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"text/template"
 
@@ -14,6 +15,8 @@ import (
 
 //go:embed templates/policy.go.tmpl
 var policyTemplate string
+
+var errEmptyBucketList = errors.New("the bucket list is empty")
 
 type minioAdminService struct {
 	logger logr.Logger
@@ -36,7 +39,7 @@ func (m *minioAdminService) CreateUser(ctx context.Context, accessKey, secretKey
 	return m.client.AddUser(ctx, accessKey, secretKey)
 }
 
-func (m *minioAdminService) AssociateUserWithPolicy(ctx context.Context, accessKey, policyName string) error {
+func (m *minioAdminService) AssignPolicy(ctx context.Context, accessKey, policyName string) error {
 	m.logger.Info("Associating user to policy", "accessKey", accessKey, "policyName", policyName)
 
 	return m.client.SetPolicy(ctx, policyName, accessKey, false)
@@ -52,6 +55,10 @@ func (m *minioAdminService) UpdatePolicy(ctx context.Context, policyName string,
 	tmpl, err := template.New("policy").Parse(policyTemplate)
 	if err != nil {
 		return fmt.Errorf("failed to parse policy template: %w", err)
+	}
+
+	if len(bucketNames) == 0 {
+		return errEmptyBucketList
 	}
 
 	var policyBuffer bytes.Buffer
@@ -70,4 +77,13 @@ func (m *minioAdminService) UpdatePolicy(ctx context.Context, policyName string,
 	m.logger.Info("Updating policy", "policyName", policyName)
 
 	return m.client.AddCannedPolicy(ctx, policyName, policyBuffer.Bytes())
+}
+
+func (m *minioAdminService) DeletePolicy(ctx context.Context, policyName string) error {
+	err := m.client.RemoveCannedPolicy(ctx, policyName)
+	if err != nil {
+		return fmt.Errorf("failed to parse policy template: %w", err)
+	}
+
+	return err
 }

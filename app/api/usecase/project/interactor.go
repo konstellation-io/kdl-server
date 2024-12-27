@@ -10,6 +10,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioadminservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
@@ -103,33 +104,39 @@ func (c CreateProjectOption) Validate() error {
 
 // interactor implements the UseCase interface.
 type interactor struct {
-	logger           logr.Logger
-	projectRepo      Repository
-	userActivityRepo UserActivityRepo
-	clock            clock.Clock
-	minioService     minioservice.MinioService
-	k8sClient        k8s.ClientInterface
+	logger            logr.Logger
+	projectRepo       Repository
+	userActivityRepo  UserActivityRepo
+	clock             clock.Clock
+	minioService      minioservice.MinioService
+	minioAdminService minioadminservice.MinioAdminInterface
+	k8sClient         k8s.ClientInterface
+	randomGenerator   kdlutil.RandomGenerator
 }
 
 // InteractorDeps encapsulates all project interactor dependencies.
 type InteractorDeps struct {
-	Logger           logr.Logger
-	Repo             Repository
-	UserActivityRepo UserActivityRepo
-	Clock            clock.Clock
-	MinioService     minioservice.MinioService
-	K8sClient        k8s.ClientInterface
+	Logger            logr.Logger
+	Repo              Repository
+	UserActivityRepo  UserActivityRepo
+	Clock             clock.Clock
+	MinioService      minioservice.MinioService
+	MinioAdminService minioadminservice.MinioAdminInterface
+	K8sClient         k8s.ClientInterface
+	RandomGenerator   kdlutil.RandomGenerator
 }
 
 // NewInteractor is a constructor function.
 func NewInteractor(deps *InteractorDeps) UseCase {
 	return &interactor{
-		logger:           deps.Logger,
-		projectRepo:      deps.Repo,
-		userActivityRepo: deps.UserActivityRepo,
-		clock:            deps.Clock,
-		minioService:     deps.MinioService,
-		k8sClient:        deps.K8sClient,
+		logger:            deps.Logger,
+		projectRepo:       deps.Repo,
+		userActivityRepo:  deps.UserActivityRepo,
+		clock:             deps.Clock,
+		minioService:      deps.MinioService,
+		minioAdminService: deps.MinioAdminService,
+		k8sClient:         deps.K8sClient,
+		randomGenerator:   deps.RandomGenerator,
 	}
 }
 
@@ -149,6 +156,12 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 	}
 
 	now := i.clock.Now()
+
+	// Generate a secret key for the Minio project user
+	secretKey, err := i.randomGenerator.GenerateRandomString(20)
+	if err != nil {
+		return entity.Project{}, err
+	}
 
 	project := entity.NewProject(opt.ProjectID, opt.Name, opt.Description)
 	project.CreationDate = now
@@ -181,6 +194,24 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 
 	// Create Minio folders
 	err = i.minioService.CreateProjectDirs(ctx, opt.ProjectID)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	// Create Minio project user
+	err = i.minioAdminService.CreateUser(ctx, opt.ProjectID, secretKey)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	// Create Minio policy for the project user
+	err = i.minioAdminService.UpdatePolicy(ctx, opt.ProjectID, []string{opt.ProjectID})
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	// Assign Minio project policy to project user
+	err = i.minioAdminService.AssignPolicy(ctx, opt.ProjectID, opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err
 	}

@@ -20,9 +20,11 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioadminservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/mongodb"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
@@ -43,12 +45,21 @@ func main() {
 
 	realClock := clock.NewRealClock()
 	sshHelper := sshhelper.NewGenerator(logger)
+	randomGenerator := kdlutil.NewRandomGenerator()
 
 	minioService, err := minioservice.NewMinioService(
 		logger, cfg.Minio.Endpoint, cfg.Minio.AccessKey, cfg.Minio.SecretKey,
 	)
 	if err != nil {
 		logger.Error(err, "Error connecting to Minio")
+		os.Exit(1)
+	}
+
+	minioAdminService, err := minioadminservice.NewMinioAdminService(
+		logger, cfg.Minio.Endpoint, cfg.Minio.AccessKey, cfg.Minio.SecretKey,
+	)
+	if err != nil {
+		logger.Error(err, "Error connecting to Minio for administration")
 		os.Exit(1)
 	}
 
@@ -87,12 +98,14 @@ func main() {
 	}
 
 	projectDeps := &project.InteractorDeps{
-		Logger:           logger,
-		Repo:             projectRepo,
-		Clock:            realClock,
-		MinioService:     minioService,
-		K8sClient:        k8sClient,
-		UserActivityRepo: userActivityRepo,
+		Logger:            logger,
+		Repo:              projectRepo,
+		Clock:             realClock,
+		MinioService:      minioService,
+		MinioAdminService: minioAdminService,
+		K8sClient:         k8sClient,
+		UserActivityRepo:  userActivityRepo,
+		RandomGenerator:   randomGenerator,
 	}
 
 	projectInteractor := project.NewInteractor(projectDeps)

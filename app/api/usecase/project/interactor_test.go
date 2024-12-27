@@ -15,8 +15,10 @@ import (
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioadminservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
@@ -31,12 +33,14 @@ type projectSuite struct {
 }
 
 type projectMocks struct {
-	repo             *project.MockRepository
-	userActivityRepo *project.MockUserActivityRepo
-	clock            *clock.MockClock
-	minioService     *minioservice.MockMinioService
-	k8sClient        *k8s.MockClientInterface
-	logger           logr.Logger
+	repo              *project.MockRepository
+	userActivityRepo  *project.MockUserActivityRepo
+	clock             *clock.MockClock
+	minioService      *minioservice.MockMinioService
+	minioAdminService *minioadminservice.MockMinioAdminInterface
+	k8sClient         *k8s.MockClientInterface
+	logger            logr.Logger
+	randomGenerator   *kdlutil.MockRandomGenerator
 }
 
 func newProjectSuite(t *testing.T) *projectSuite {
@@ -45,7 +49,9 @@ func newProjectSuite(t *testing.T) *projectSuite {
 	userActivityRepo := project.NewMockUserActivityRepo(ctrl)
 	clockMock := clock.NewMockClock(ctrl)
 	minioService := minioservice.NewMockMinioService(ctrl)
+	minioAdminService := minioadminservice.NewMockMinioAdminInterface(ctrl)
 	k8sClient := k8s.NewMockClientInterface(ctrl)
+	randomGenerator := kdlutil.NewMockRandomGenerator(ctrl)
 
 	zapLog, err := zap.NewDevelopment()
 	require.NoError(t, err)
@@ -53,12 +59,14 @@ func newProjectSuite(t *testing.T) *projectSuite {
 	logger := zapr.NewLogger(zapLog)
 
 	deps := &project.InteractorDeps{
-		Logger:           logger,
-		Repo:             repo,
-		UserActivityRepo: userActivityRepo,
-		Clock:            clockMock,
-		MinioService:     minioService,
-		K8sClient:        k8sClient,
+		Logger:            logger,
+		Repo:              repo,
+		UserActivityRepo:  userActivityRepo,
+		Clock:             clockMock,
+		MinioService:      minioService,
+		MinioAdminService: minioAdminService,
+		K8sClient:         k8sClient,
+		RandomGenerator:   randomGenerator,
 	}
 	interactor := project.NewInteractor(deps)
 
@@ -66,25 +74,28 @@ func newProjectSuite(t *testing.T) *projectSuite {
 		ctrl:       ctrl,
 		interactor: interactor,
 		mocks: projectMocks{
-			logger:           logger,
-			repo:             repo,
-			userActivityRepo: userActivityRepo,
-			clock:            clockMock,
-			minioService:     minioService,
-			k8sClient:        k8sClient,
+			logger:            logger,
+			repo:              repo,
+			userActivityRepo:  userActivityRepo,
+			clock:             clockMock,
+			minioService:      minioService,
+			minioAdminService: minioAdminService,
+			k8sClient:         k8sClient,
+			randomGenerator:   randomGenerator,
 		},
 	}
 }
 
-func TestInteractor_CreateExternal(t *testing.T) {
+func TestInteractor_Create(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
 	const (
-		projectName   = "The Project Y"
-		projectDesc   = "The Project Y Description"
-		ownerUserID   = "user.1234"
-		ownerUsername = "john"
+		projectName           = "The Project Y"
+		projectDesc           = "The Project Y Description"
+		projectMinioSecretKey = "projectY123"
+		ownerUserID           = "user.1234"
+		ownerUsername         = "john"
 	)
 
 	externalRepoURL := "https://github.com/org/repo.git"
@@ -128,6 +139,10 @@ func TestInteractor_CreateExternal(t *testing.T) {
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(testProjectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(expectedProject, nil)
+	s.mocks.randomGenerator.EXPECT().GenerateRandomString(20).Return(projectMinioSecretKey, nil)
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, testProjectID, projectMinioSecretKey).Return(nil)
+	s.mocks.minioAdminService.EXPECT().UpdatePolicy(ctx, testProjectID, []string{testProjectID}).Return(nil)
+	s.mocks.minioAdminService.EXPECT().AssignPolicy(ctx, testProjectID, testProjectID).Return(nil)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
 		ProjectID:              testProjectID,

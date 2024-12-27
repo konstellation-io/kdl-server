@@ -25,3 +25,18 @@ func GenerateRandomString(n int) (string, error) {
 
 	return string(ret), nil
 }
+
+//go:generate mockgen -source=${GOFILE} -destination=mocks_${GOFILE} -package=${GOPACKAGE}
+type RandomGenerator interface {
+	GenerateRandomString(n int) (string, error)
+}
+
+type RandomGeneratorImplementation struct{}
+
+func NewRandomGenerator() *RandomGeneratorImplementation {
+	return &RandomGeneratorImplementation{}
+}
+
+func (r *RandomGeneratorImplementation) GenerateRandomString(n int) (string, error) {
+	return GenerateRandomString(n)
+}

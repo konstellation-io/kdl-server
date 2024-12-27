@@ -109,13 +109,19 @@ func (s *TestSuite) SetupTest() {
 func (s *TestSuite) TestCreateUser() {
 	ctx := context.Background()
 
-	err := s.service.CreateUser(ctx, "foo", "foo12345678")
+	const (
+		// # gitleaks ignore
+		username string = "171e78c8-c35e-429b-b6e9-21cf6eadae0b"
+		password string = "-i2YaLei0ohwayaes_hz" // #gitleaks:allow
+	)
+
+	err := s.service.CreateUser(ctx, username, password)
 	s.Require().NoError(err)
 
 	users, err := s.adminClient.ListUsers(ctx)
 	s.Require().NoError(err)
 	s.Len(users, 1)
-	_, ok := users["foo"]
+	_, ok := users[username]
 	s.Require().True(ok)
 }
 

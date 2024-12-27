@@ -13,6 +13,7 @@ import (
 	"gotest.tools/v3/assert"
 
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioadminservice"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 
@@ -22,6 +23,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
@@ -35,14 +37,16 @@ type userSuite struct {
 }
 
 type userMocks struct {
-	repo             *user.MockRepository
-	runtimeRepo      *runtime.MockRepository
-	capabilitiesRepo *capabilities.MockRepository
-	sshGenerator     *sshhelper.MockSSHKeyGenerator
-	clock            *clock.MockClock
-	k8sClientMock    *k8s.MockClientInterface
-	logger           logr.Logger
-	cfg              config.Config
+	repo              *user.MockRepository
+	runtimeRepo       *runtime.MockRepository
+	capabilitiesRepo  *capabilities.MockRepository
+	sshGenerator      *sshhelper.MockSSHKeyGenerator
+	clock             *clock.MockClock
+	k8sClientMock     *k8s.MockClientInterface
+	logger            logr.Logger
+	cfg               config.Config
+	minioAdminService *minioadminservice.MockMinioAdminInterface
+	randomGenerator   *kdlutil.MockRandomGenerator
 }
 
 func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
@@ -53,6 +57,8 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	clockMock := clock.NewMockClock(ctrl)
 	sshGenerator := sshhelper.NewMockSSHKeyGenerator(ctrl)
 	k8sClientMock := k8s.NewMockClientInterface(ctrl)
+	minioAdminService := minioadminservice.NewMockMinioAdminInterface(ctrl)
+	randomGenerator := kdlutil.NewMockRandomGenerator(ctrl)
 
 	zapLog, err := zap.NewDevelopment()
 	require.NoError(t, err)
@@ -64,20 +70,22 @@ func newUserSuite(t *testing.T, cfg *config.Config) *userSuite {
 	}
 
 	interactor := user.NewInteractor(logger, *cfg, repo, repoRuntimes, repoCapabilities, sshGenerator,
-		clockMock, k8sClientMock)
+		clockMock, k8sClientMock, minioAdminService, randomGenerator)
 
 	return &userSuite{
 		ctrl:       ctrl,
 		interactor: interactor,
 		mocks: userMocks{
-			logger:           logger,
-			cfg:              *cfg,
-			repo:             repo,
-			runtimeRepo:      repoRuntimes,
-			capabilitiesRepo: repoCapabilities,
-			sshGenerator:     sshGenerator,
-			clock:            clockMock,
-			k8sClientMock:    k8sClientMock,
+			logger:            logger,
+			cfg:               *cfg,
+			repo:              repo,
+			runtimeRepo:       repoRuntimes,
+			capabilitiesRepo:  repoCapabilities,
+			sshGenerator:      sshGenerator,
+			clock:             clockMock,
+			k8sClientMock:     k8sClientMock,
+			minioAdminService: minioAdminService,
+			randomGenerator:   randomGenerator,
 		},
 	}
 }
@@ -87,13 +95,15 @@ func TestInteractor_Create(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const (
-		id            = "user.1234"
-		email         = "user@email.com"
-		username      = "user"
-		sub           = "f6717d2b-ac1f-40da-ade6-00037512933b"
-		accessLevel   = entity.AccessLevelAdmin
-		publicSSHKey  = "test-ssh-key-public"
-		privateSSHKey = "test-ssh-key-private"
+		id             = "user.1234"
+		email          = "user@email.com"
+		username       = "user"
+		sub            = "f6717d2b-ac1f-40da-ade6-00037512933b"
+		accessLevel    = entity.AccessLevelAdmin
+		publicSSHKey   = "test-ssh-key-public"
+		privateSSHKey  = "test-ssh-key-private"
+		minioAccessKey = "user-user"
+		minioSecretKey = "test-minio-secret-key" // #nosec G101
 	)
 
 	ctx := context.Background()
@@ -131,6 +141,8 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
+	s.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(minioSecretKey, nil)
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, minioAccessKey, minioSecretKey).Return(nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
 

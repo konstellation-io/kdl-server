@@ -13,6 +13,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioadminservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
@@ -26,14 +27,16 @@ var (
 )
 
 type Interactor struct {
-	logger           logr.Logger
-	cfg              config.Config
-	repo             Repository
-	repoRuntimes     runtime.Repository
-	repoCapabilities capabilities.Repository
-	sshGenerator     sshhelper.SSHKeyGenerator
-	clock            clock.Clock
-	k8sClient        k8s.ClientInterface
+	logger            logr.Logger
+	cfg               config.Config
+	repo              Repository
+	repoRuntimes      runtime.Repository
+	repoCapabilities  capabilities.Repository
+	sshGenerator      sshhelper.SSHKeyGenerator
+	clock             clock.Clock
+	k8sClient         k8s.ClientInterface
+	minioAdminService minioadminservice.MinioAdminInterface
+	randomGenerator   kdlutil.RandomGenerator
 }
 
 // Interactor implements the UseCase interface.
@@ -49,16 +52,20 @@ func NewInteractor(
 	sshGenerator sshhelper.SSHKeyGenerator,
 	c clock.Clock,
 	k8sClient k8s.ClientInterface,
+	minioAdminService minioadminservice.MinioAdminInterface,
+	randomGenerator kdlutil.RandomGenerator,
 ) UseCase {
 	return &Interactor{
-		logger:           logger,
-		cfg:              cfg,
-		repo:             repo,
-		repoRuntimes:     repoRuntimes,
-		repoCapabilities: repoCapabilities,
-		sshGenerator:     sshGenerator,
-		clock:            c,
-		k8sClient:        k8sClient,
+		logger:            logger,
+		cfg:               cfg,
+		repo:              repo,
+		repoRuntimes:      repoRuntimes,
+		repoCapabilities:  repoCapabilities,
+		sshGenerator:      sshGenerator,
+		clock:             c,
+		k8sClient:         k8sClient,
+		minioAdminService: minioAdminService,
+		randomGenerator:   randomGenerator,
 	}
 }
 
@@ -141,16 +148,17 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 		return entity.User{}, err
 	}
 
-	// Create a MinIO access key
-	user.MinioAccessKey.AccessKey, err = kdlutil.GenerateRandomString(20)
+	user.MinioAccessKey.SecretKey, err = i.randomGenerator.GenerateRandomString(40)
 	if err != nil {
-		i.logger.Error(err, "Error creating an MinIO access key", "username", username)
+		i.logger.Error(err, "Error creating an MinIO secret key", "username", username)
 		return entity.User{}, err
 	}
 
-	user.MinioAccessKey.SecretKey, err = kdlutil.GenerateRandomString(40)
+	user.MinioAccessKey.AccessKey = fmt.Sprintf("user-%s", user.UsernameSlug())
+
+	err = i.minioAdminService.CreateUser(ctx, user.MinioAccessKey.AccessKey, user.MinioAccessKey.SecretKey)
 	if err != nil {
-		i.logger.Error(err, "Error creating an MinIO secret key", "username", username)
+		i.logger.Error(err, "Error creating  an MinIO user", "accessKey", user.MinioAccessKey.AccessKey)
 		return entity.User{}, err
 	}
 

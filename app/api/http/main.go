@@ -91,7 +91,7 @@ func main() {
 	}
 
 	userInteractor := user.NewInteractor(logger, cfg, userRepo, runtimeRepo, capabilitiesRepo,
-		sshHelper, realClock, k8sClient)
+		sshHelper, realClock, k8sClient, minioAdminService, randomGenerator)
 
 	if err = userInteractor.SynchronizeServiceAccountsForUsers(); err != nil {
 		logger.Error(err, "Unexpected error creating serviceAccount for users")

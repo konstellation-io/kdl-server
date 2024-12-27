@@ -23,11 +23,6 @@ type APIToken struct {
 	Token        string
 }
 
-type MinioAccessKey struct {
-	AccessKey string
-	SecretKey string
-}
-
 // User entity definition.
 type User struct {
 	ID             string

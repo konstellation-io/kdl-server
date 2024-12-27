@@ -102,7 +102,7 @@ func TestInteractor_Create(t *testing.T) {
 		accessLevel    = entity.AccessLevelAdmin
 		publicSSHKey   = "test-ssh-key-public"
 		privateSSHKey  = "test-ssh-key-private"
-		minioAccessKey = "user-user"
+		minioAccessKey = "user-user"             // derived from username
 		minioSecretKey = "test-minio-secret-key" // #nosec G101
 	)
 

@@ -80,6 +80,10 @@ var projectExamples = map[string]entity.Project{
 				AddedDate:   testTimeExample,
 			},
 		},
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: "project-project1",
+			SecretKey: "accessKey1",
+		},
 	},
 	"project2": {
 		ID:                 "2",
@@ -103,6 +107,10 @@ var projectExamples = map[string]entity.Project{
 				AccessLevel: entity.AccessLevelAdmin,
 				AddedDate:   testTimeExample,
 			},
+		},
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: "project-project2",
+			SecretKey: "accessKey2",
 		},
 	},
 }

@@ -16,6 +16,7 @@ type Project struct {
 	Error              *string
 	Repository         Repository
 	Members            []Member
+	MinioAccessKey     MinioAccessKey
 }
 
 // NewProject is a constructor function.

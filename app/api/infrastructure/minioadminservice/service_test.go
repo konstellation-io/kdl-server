@@ -112,7 +112,7 @@ func (s *TestSuite) TestCreateUser() {
 	const (
 		// # gitleaks ignore
 		username string = "171e78c8-c35e-429b-b6e9-21cf6eadae0b"
-		password string = "-i2YaLei0ohwayaes_hz" // #gitleaks:allow
+		password string = "-i2YaLei0ohwayaes_hz" // gitleaks:allow
 	)
 
 	err := s.service.CreateUser(ctx, username, password)

@@ -125,6 +125,27 @@ func (s *TestSuite) TestCreateUser() {
 	s.Require().True(ok)
 }
 
+func (s *TestSuite) TestDeleteUser() {
+	ctx := context.Background()
+
+	err := s.service.CreateUser(ctx, "foo", "foo12345678")
+	s.Require().NoError(err)
+
+	err = s.service.DeleteUser(ctx, "foo")
+	s.Require().NoError(err)
+
+	users, err := s.adminClient.ListUsers(ctx)
+	s.Require().NoError(err)
+	s.Len(users, 0)
+}
+func (s *TestSuite) TestDeleteUserIdempotence() {
+	ctx := context.Background()
+
+	err := s.service.DeleteUser(ctx, "nonexistent")
+	s.Require().NoError(err)
+
+}
+
 func (s *TestSuite) TestAssignProject() {
 	ctx := context.Background()
 
@@ -210,5 +231,13 @@ func (s *TestSuite) TestDeletePolicy() {
 	for policy := range policies {
 		s.Require().NotEqual(policy, "policy1")
 	}
+
+}
+
+func (s *TestSuite) TestDeletePolicyIdempotence() {
+	ctx := context.Background()
+
+	err := s.service.DeletePolicy(ctx, "nonexistent")
+	s.Require().NoError(err)
 
 }

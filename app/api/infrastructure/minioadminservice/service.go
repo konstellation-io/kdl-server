@@ -51,7 +51,16 @@ func (m *MinioAdminService) AssignPolicy(ctx context.Context, accessKey, policyN
 func (m *MinioAdminService) DeleteUser(ctx context.Context, accessKey string) error {
 	m.logger.Info("Deleting uses", "accessKey", accessKey)
 
-	return m.client.RemoveUser(ctx, accessKey)
+	err := m.client.RemoveUser(ctx, accessKey)
+	if err != nil {
+		target := madmin.ErrorResponse{}
+
+		if errors.As(err, &target) && target.Code == "XMinioAdminNoSuchUser" {
+			return nil // ignore error for idempotence
+		}
+	}
+
+	return err
 }
 
 func (m *MinioAdminService) UpdatePolicy(ctx context.Context, policyName string, bucketNames []string) error {

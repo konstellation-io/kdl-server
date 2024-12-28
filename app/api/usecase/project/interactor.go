@@ -157,8 +157,11 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 
 	now := i.clock.Now()
 
+	// Generate an access key for the Minio project user
+	accessKey := fmt.Sprintf("project-%s", opt.ProjectID)
+
 	// Generate a secret key for the Minio project user
-	secretKey, err := i.randomGenerator.GenerateRandomString(20)
+	secretKey, err := i.randomGenerator.GenerateRandomString(40)
 	if err != nil {
 		return entity.Project{}, err
 	}
@@ -171,6 +174,10 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 			AccessLevel: entity.AccessLevelAdmin,
 			AddedDate:   now,
 		},
+	}
+	project.MinioAccessKey = entity.MinioAccessKey{
+		AccessKey: accessKey,
+		SecretKey: secretKey,
 	}
 
 	// Set project repository
@@ -199,19 +206,19 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 	}
 
 	// Create Minio project user
-	err = i.minioAdminService.CreateUser(ctx, opt.ProjectID, secretKey)
+	err = i.minioAdminService.CreateUser(ctx, accessKey, secretKey)
 	if err != nil {
 		return entity.Project{}, err
 	}
 
 	// Create Minio policy for the project user
-	err = i.minioAdminService.UpdatePolicy(ctx, opt.ProjectID, []string{opt.ProjectID})
+	err = i.minioAdminService.UpdatePolicy(ctx, accessKey, []string{opt.ProjectID})
 	if err != nil {
 		return entity.Project{}, err
 	}
 
 	// Assign Minio project policy to project user
-	err = i.minioAdminService.AssignPolicy(ctx, opt.ProjectID, opt.ProjectID)
+	err = i.minioAdminService.AssignPolicy(ctx, accessKey, accessKey)
 	if err != nil {
 		return entity.Project{}, err
 	}

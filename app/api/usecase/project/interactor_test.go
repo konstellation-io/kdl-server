@@ -93,6 +93,7 @@ func TestInteractor_Create(t *testing.T) {
 	const (
 		projectName           = "The Project Y"
 		projectDesc           = "The Project Y Description"
+		projectMinioAccessKey = "project-test-project" // derived from project ID
 		projectMinioSecretKey = "projectY123"
 		ownerUserID           = "user.1234"
 		ownerUsername         = "john"
@@ -120,6 +121,10 @@ func TestInteractor_Create(t *testing.T) {
 		ExternalRepoURL: externalRepoURL,
 		RepoName:        testProjectID,
 	}
+	createProject.MinioAccessKey = entity.MinioAccessKey{
+		AccessKey: projectMinioAccessKey,
+		SecretKey: projectMinioSecretKey,
+	}
 
 	expectedProject := entity.Project{
 		ID:           testProjectID,
@@ -131,6 +136,10 @@ func TestInteractor_Create(t *testing.T) {
 			ExternalRepoURL: externalRepoURL,
 			RepoName:        testProjectID,
 		},
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: projectMinioAccessKey,
+			SecretKey: projectMinioSecretKey,
+		},
 	}
 
 	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, testProjectID).Return(nil)
@@ -139,10 +148,10 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(testProjectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(expectedProject, nil)
-	s.mocks.randomGenerator.EXPECT().GenerateRandomString(20).Return(projectMinioSecretKey, nil)
-	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, testProjectID, projectMinioSecretKey).Return(nil)
-	s.mocks.minioAdminService.EXPECT().UpdatePolicy(ctx, testProjectID, []string{testProjectID}).Return(nil)
-	s.mocks.minioAdminService.EXPECT().AssignPolicy(ctx, testProjectID, testProjectID).Return(nil)
+	s.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(projectMinioSecretKey, nil)
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, projectMinioAccessKey, projectMinioSecretKey).Return(nil)
+	s.mocks.minioAdminService.EXPECT().UpdatePolicy(ctx, projectMinioAccessKey, []string{testProjectID}).Return(nil)
+	s.mocks.minioAdminService.EXPECT().AssignPolicy(ctx, projectMinioAccessKey, projectMinioAccessKey).Return(nil)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
 		ProjectID:              testProjectID,

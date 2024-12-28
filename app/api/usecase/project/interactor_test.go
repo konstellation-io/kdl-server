@@ -457,6 +457,10 @@ func TestInteractor_Delete(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
+	const (
+		accessKey = "project-test-project"
+	)
+
 	monkey.Patch(time.Now, func() time.Time {
 		return time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
 	})
@@ -510,6 +514,9 @@ func TestInteractor_Delete(t *testing.T) {
 	s.mocks.k8sClient.EXPECT().DeleteKDLProjectCR(ctx, testProjectID).Return(nil)
 	s.mocks.repo.EXPECT().DeleteOne(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().DeleteBucket(ctx, testProjectID).Return(expectedMinioBackup, nil)
+	s.mocks.minioAdminService.EXPECT().DeletePolicy(ctx, accessKey).Return(nil)
+	s.mocks.minioAdminService.EXPECT().DeleteUser(ctx, accessKey).Return(nil)
+
 	s.mocks.userActivityRepo.EXPECT().Create(ctx, userActivity).Return(nil)
 
 	result, err := s.interactor.Delete(ctx, project.DeleteProjectOption{

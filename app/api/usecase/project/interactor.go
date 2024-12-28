@@ -300,6 +300,19 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 		return nil, err
 	}
 
+	// Determine policy/user name
+	accessKey := fmt.Sprintf("project-%s", projectID)
+
+	err = i.minioAdminService.DeletePolicy(ctx, accessKey)
+	if err != nil {
+		return nil, err
+	}
+
+	err = i.minioAdminService.DeleteUser(ctx, accessKey)
+	if err != nil {
+		return nil, err
+	}
+
 	err = i.projectRepo.DeleteOne(ctx, projectID)
 	if err != nil {
 		return nil, err

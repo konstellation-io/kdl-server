@@ -2,21 +2,18 @@ package k8s
 
 import (
 	"context"
-	"errors"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-var errCRDNoSpec = errors.New("CRD does not have a 'spec' field")
-var errCRDNoSpecMlflow = errors.New("CRD does not have a 'spec.mlflow' field")
-var errCRDNoSpecMlflowEnv = errors.New("CRD does not have a 'spec.mlflow.env' field")
-var errCRDNoMetadata = errors.New("CRD does not have a 'metadata' field")
+func (k *Client) getConfigMapTemplateNameProject() string {
+	return k.cfg.ReleaseName + "-server-project-template"
+}
 
 func (k *Client) CreateKDLProjectCR(ctx context.Context, projectID string) error {
 	// get the CRD template from the ConfigMap
-	configMapKdlProjectName := k.cfg.ReleaseName + "-server-project-template"
-	configMap, err := k.GetConfigMap(ctx, configMapKdlProjectName)
+	configMap, err := k.GetConfigMap(ctx, k.getConfigMapTemplateNameProject())
 
 	if err != nil {
 		return err
@@ -65,13 +62,11 @@ func (k *Client) CreateKDLProjectCR(ctx context.Context, projectID string) error
 	// CRD object is now updated and ready to be created
 	k.logger.Info("Creating kdl project")
 
-	_, err = k.kdlprojectRes.Namespace(k.cfg.Kubernetes.Namespace).Create(
-		ctx,
-		&unstructured.Unstructured{
-			Object: crd,
-		},
-		metav1.CreateOptions{},
-	)
+	definition := &unstructured.Unstructured{
+		Object: crd,
+	}
+
+	_, err = k.kdlProjectRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
 	if err != nil {
 		return err
 	}
@@ -84,7 +79,7 @@ func (k *Client) CreateKDLProjectCR(ctx context.Context, projectID string) error
 func (k *Client) DeleteKDLProjectCR(ctx context.Context, projectID string) error {
 	k.logger.Info("Attempting to delete KDL Project CR in k8s", "projectName", projectID)
 
-	err := k.kdlprojectRes.Namespace(k.cfg.Kubernetes.Namespace).Delete(ctx, projectID, *metav1.NewDeleteOptions(0))
+	err := k.kdlProjectRes.Namespace(k.cfg.Kubernetes.Namespace).Delete(ctx, projectID, *metav1.NewDeleteOptions(0))
 	if err == nil {
 		k.logger.Info("KDL Project CR correctly deleted in k8s", "projectName", projectID)
 	}

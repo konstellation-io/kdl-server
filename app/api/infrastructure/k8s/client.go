@@ -15,35 +15,35 @@ import (
 )
 
 const (
-	userToolsGroup      = "kdl.konstellation.io"
-	userToolsResource   = "usertools"
-	userToolsVersion    = "v1alpha1"
-	userToolsAPIVersion = userToolsGroup + "/" + userToolsVersion
+	kdlUserToolsGroup      = "kdl.konstellation.io"
+	kdlUserToolsResource   = "kdlusertools"
+	kdlUserToolsVersion    = "v1"
+	kdlUserToolsAPIVersion = kdlUserToolsGroup + "/" + kdlUserToolsVersion
 
-	kdlprojectGroup      = "kdl.konstellation.io"
-	kdlprojectResource   = "kdlprojects"
-	kdlprojectVersion    = "v1"
-	kdlprojectAPIVersion = kdlprojectGroup + "/" + kdlprojectVersion
+	kdlProjectGroup      = "kdl.konstellation.io"
+	kdlProjectResource   = "kdlprojects"
+	kdlProjectVersion    = "v1"
+	kdlProjectAPIVersion = kdlProjectGroup + "/" + kdlProjectVersion
 )
 
 var _ ClientInterface = (*Client)(nil)
 
 type Client struct {
-	logger        logr.Logger
-	cfg           config.Config
-	clientset     *kubernetes.Clientset
-	userToolsRes  dynamic.NamespaceableResourceInterface
-	kdlprojectRes dynamic.NamespaceableResourceInterface
+	logger          logr.Logger
+	cfg             config.Config
+	clientset       *kubernetes.Clientset
+	kdlUserToolsRes dynamic.NamespaceableResourceInterface
+	kdlProjectRes   dynamic.NamespaceableResourceInterface
 }
 
-func New(logger logr.Logger, cfg config.Config, clientset *kubernetes.Clientset, userToolsRes,
-	kdlprojectRes dynamic.NamespaceableResourceInterface) *Client {
+func New(logger logr.Logger, cfg config.Config, clientset *kubernetes.Clientset, kdlUserToolsRes,
+	kdlProjectRes dynamic.NamespaceableResourceInterface) *Client {
 	return &Client{
-		logger:        logger,
-		cfg:           cfg,
-		clientset:     clientset,
-		userToolsRes:  userToolsRes,
-		kdlprojectRes: kdlprojectRes,
+		logger:          logger,
+		cfg:             cfg,
+		clientset:       clientset,
+		kdlUserToolsRes: kdlUserToolsRes,
+		kdlProjectRes:   kdlProjectRes,
 	}
 }
 
@@ -60,18 +60,19 @@ func NewK8sClient(logger logr.Logger, cfg config.Config) (ClientInterface, error
 		return nil, err
 	}
 
-	userToolsRes := dynamicClient.Resource(schema.GroupVersionResource{
-		Group:    userToolsGroup,
-		Version:  userToolsVersion,
-		Resource: userToolsResource,
+	kdlUserToolsRes := dynamicClient.Resource(schema.GroupVersionResource{
+		Group:    kdlUserToolsGroup,
+		Version:  kdlUserToolsVersion,
+		Resource: kdlUserToolsResource,
 	})
 
-	kdlprojectRes := dynamicClient.Resource(schema.GroupVersionResource{
-		Group:    kdlprojectGroup,
-		Version:  kdlprojectVersion,
-		Resource: kdlprojectResource,
+	kdlProjectRes := dynamicClient.Resource(schema.GroupVersionResource{
+		Group:    kdlProjectGroup,
+		Version:  kdlProjectVersion,
+		Resource: kdlProjectResource,
 	})
-	c := New(logger, cfg, clientset, userToolsRes, kdlprojectRes)
+
+	c := New(logger, cfg, clientset, kdlUserToolsRes, kdlProjectRes)
 
 	return c, nil
 }

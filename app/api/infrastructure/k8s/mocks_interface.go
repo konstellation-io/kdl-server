@@ -94,17 +94,17 @@ func (mr *MockClientInterfaceMockRecorder) CreateUserServiceAccount(ctx, usernam
 }
 
 // CreateUserToolsCR mocks base method.
-func (m *MockClientInterface) CreateUserToolsCR(ctx context.Context, username, runtimeID, runtimeImage, runtimeTag string, capabilities entity.Capabilities) error {
+func (m *MockClientInterface) CreateUserToolsCR(ctx context.Context, username string, data UserToolsData) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUserToolsCR", ctx, username, runtimeID, runtimeImage, runtimeTag, capabilities)
+	ret := m.ctrl.Call(m, "CreateUserToolsCR", ctx, username, data)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateUserToolsCR indicates an expected call of CreateUserToolsCR.
-func (mr *MockClientInterfaceMockRecorder) CreateUserToolsCR(ctx, username, runtimeID, runtimeImage, runtimeTag, capabilities interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) CreateUserToolsCR(ctx, username, data interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).CreateUserToolsCR), ctx, username, runtimeID, runtimeImage, runtimeTag, capabilities)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).CreateUserToolsCR), ctx, username, data)
 }
 
 // DeleteKDLProjectCR mocks base method.

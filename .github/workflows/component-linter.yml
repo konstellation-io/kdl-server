@@ -16,6 +16,7 @@ jobs:
         directory:
           - app
           - cleaner
+          - filebrowser
           - mlflow
           - project-operator
           - repo-cloner

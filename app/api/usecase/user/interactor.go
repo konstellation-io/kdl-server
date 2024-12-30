@@ -178,7 +178,7 @@ func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, ca
 		}
 	}
 
-	var rID, rImage, rTag string
+	var data = k8s.UserToolsData{}
 
 	if runtimeID != nil {
 		r, err := i.repoRuntimes.Get(ctx, *runtimeID)
@@ -186,28 +186,26 @@ func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, ca
 			return entity.User{}, err
 		}
 
-		rID = r.ID
-		rImage = r.DockerImage
-		rTag = r.DockerTag
-		i.logger.Info("Runtime with docker image", "runtimeId", rID, "image", rImage, "tag", rTag)
+		data.RuntimeID = r.ID
+		data.RuntimeImage = r.DockerImage
+		data.RuntimeTag = r.DockerTag
+		i.logger.Info("Runtime with docker image", "runtimeId", r.ID, "image", r.DockerImage, "tag", r.DockerTag)
 	} else {
-		rID = "default"
-		rImage = i.cfg.UserToolsVsCodeRuntime.Image.Repository
-		rTag = i.cfg.UserToolsVsCodeRuntime.Image.Tag
-		i.logger.Info("Using default runtime image", "image", rImage, "tag", rTag)
+		i.logger.Info("No runtime ID provided, using default runtime values")
 	}
 
-	retrievedCapabilities := entity.Capabilities{}
 	if capabilitiesID != nil {
-		retrievedCapabilities, err = i.repoCapabilities.Get(ctx, *capabilitiesID)
+		data.Capabilities, err = i.repoCapabilities.Get(ctx, *capabilitiesID)
 		if err != nil {
 			return entity.User{}, err
 		}
+	} else {
+		i.logger.Info("No capabilities ID provided, using default capabilities values")
 	}
 
 	i.logger.Info("Creating user tools for user", "email", email)
 
-	err = i.k8sClient.CreateUserToolsCR(ctx, user.Username, rID, rImage, rTag, retrievedCapabilities)
+	err = i.k8sClient.CreateUserToolsCR(ctx, user.Username, data)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -249,7 +247,7 @@ func (i *Interactor) AreToolsRunning(ctx context.Context, username string) (bool
 
 // IsKubeconfigActive checks if the kubeconfig is active.
 func (i *Interactor) IsKubeconfigActive() bool {
-	return i.cfg.UserToolsKubeconfig.Enabled
+	return i.cfg.Kubeconfig.Enabled
 }
 
 // FindByIDs retrieves the users for the given identifiers.

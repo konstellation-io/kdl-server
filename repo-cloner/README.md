@@ -24,44 +24,25 @@ The service can be configured through environment variables and/or a YAML config
 
 MongoDB Configuration:
 
-| Variable                | YAML Path                | Description                           | Default                                        |
-|-------------------------|--------------------------|---------------------------------------|------------------------------------------------|
-| `KDL_SERVER_MONGODB_URI`| `mongodb.uri`            | MongoDB connection string             | `mongodb://admin:123456@localhost:27017/admin` |
-| `DB_NAME`               | `mongodb.dbName`         | Database name                         | `kdl`                                          |
-| `PROJECT_COLL_NAME`     | `mongodb.projectCollName`| Projects collection name              | `projects`                                     |
-| `USER_COLL_NAME`        | `mongodb.userCollName`   | Users collection name                 | `users`                                        |
+| Variable                | Description                           | Default                                        |
+|-------------------------|---------------------------------------|------------------------------------------------|
+| `KDL_SERVER_MONGODB_URI`| MongoDB connection string             | `mongodb://admin:123456@localhost:27017/admin` |
+| `DB_NAME`               | Database name                         | `kdl`                                          |
 
 General Configuration:
 
-| Variable                 | YAML Path              | Description                           | Default                                      |
-|--------------------------|------------------------|---------------------------------------|----------------------------------------------|
-| `KDL_USER_NAME`          |                        | Username for repository operations    |                                              |
-| `REPOS_PATH`             | `reposPath`            | Repository storage location           | `/home/kdl/repos/`                           |
-| `PEM_FILE`               | `pemFile`              | SSH private key path                  | `/home/kdl/.ssh/id_rsa`                      |
-| `PEM_FILE_PASSWORD`      | `pemFilePassword`      | SSH key password if encrypted         |                                              |
-| `CHECK_FREQUENCY_SECONDS`| `checkFrequencySeconds`| Repository check interval in seconds  | `10`                                         |
+| Variable                 |  Description                          | Default                                   |
+|--------------------------|---------------------------------------|----------------------------------------------|
+| `KDL_USER_NAME`          | Username for repository operations    |                                              |
+| `REPOS_PATH`             | Repository storage location           | `/home/kdl/repos/`                           |
+| `PEM_FILE`               | SSH private key path                  | `/home/kdl/.ssh/id_rsa`                      |
+| `PEM_FILE_PASSWORD`      | SSH key password if encrypted         |                                              |
+| `CHECK_FREQUENCY_SECONDS`| Repository check interval in seconds  | `10`                                         |
 
 ### Configuration
 
-The service supports two configuration methods that can be used together:
-
-1. Environment variables: set any of the above environment variables directly.
-2. YAML configuration: provide a `config.yml` file with the following structure:
-
-```yaml
-mongodb:
-  uri: mongodb://admin:123456@localhost:27017/admin
-  dbName: kdl
-  projectCollName: projects
-  userCollName: users
-reposPath: /home/kdl/repos/
-pemFile: /home/kdl/.ssh/id_rsa
-pemFilePassword: ""
-checkFrequencySeconds: 10
-```
-
-> [!NOTE]
-> Environment variables take precedence over YAML configuration when both are provided.
+The service supports configuration by Environment variables: set any of the
+above environment variables directly.
 
 ## Storage
 

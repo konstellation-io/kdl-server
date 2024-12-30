@@ -130,6 +130,10 @@ func (k *Client) updateUserToolsTemplate(
 	return &crdToUpdate, nil
 }
 
+func (k *Client) getConfigMapTemplateNameUserTools() string {
+	return k.cfg.ReleaseName + "-server-user-tools-template"
+}
+
 // CreateUserToolsCR creates the user tools Custom Resource in Kubernetes.
 func (k *Client) CreateUserToolsCR(
 	ctx context.Context,
@@ -138,9 +142,8 @@ func (k *Client) CreateUserToolsCR(
 ) error {
 	slugUsername := k.getSlugUsername(username)
 	resName := fmt.Sprintf("usertools-%s", slugUsername)
-	configMapKdlProjectName := k.cfg.ReleaseName + "-server-user-tools-template"
 
-	configMap, err := k.GetConfigMap(ctx, configMapKdlProjectName)
+	configMap, err := k.GetConfigMap(ctx, k.getConfigMapTemplateNameUserTools())
 	if err != nil {
 		return err
 	}

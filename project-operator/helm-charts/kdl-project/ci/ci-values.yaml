@@ -54,13 +54,9 @@ filebrowser:
       path: /
       port: 9696
 
-  # volumeMounts:
-  #   - name: received-data
-  #     mountPath: "/srv"
-
 mlflow:
   enabled: false
-  
+
   image:
     repository: konstellation/kdl-mlflow
     pullPolicy: IfNotPresent

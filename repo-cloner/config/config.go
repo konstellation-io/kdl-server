@@ -1,46 +1,40 @@
 package config
 
 import (
-	"log"
-	"os"
+	"fmt"
+	"reflect"
 
 	"github.com/kelseyhightower/envconfig"
-	"gopkg.in/yaml.v3"
 )
 
 // Config holds the configuration values of the application.
 type Config struct {
 	MongoDB struct {
-		URI              string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
-		DBName           string `yaml:"dbName" envconfig:"DB_NAME"`
-		ProjectsCollName string `yaml:"projectCollName" envconfig:"PROJECT_COLL_NAME"`
-		UsersCollName    string `yaml:"userCollName" envconfig:"USER_COLL_NAME"`
+		URI    string `envconfig:"KDL_SERVER_MONGODB_URI"`
+		DBName string `envconfig:"DB_NAME"`
 	}
 	UsrName               string `envconfig:"KDL_USER_NAME"`
-	ReposPath             string `yaml:"reposPath" envconfig:"REPOS_PATH"`
-	PemFile               string `yaml:"pemFile" envconfig:"PEM_FILE"`
-	PemFilePassword       string `yaml:"pemFilePassword" envconfig:"PEM_FILE_PASSWORD"`
-	CheckFrequencySeconds int    `yaml:"checkFrequencySeconds" envconfig:"CHECK_FREQUENCY_SECONDS"`
+	ReposPath             string `envconfig:"REPOS_PATH"`
+	PemFile               string `envconfig:"PEM_FILE"`
+	PemFilePassword       string `envconfig:"PEM_FILE_PASSWORD"`
+	CheckFrequencySeconds int    `envconfig:"CHECK_FREQUENCY_SECONDS"`
 }
 
 // NewConfig will read the config.yml file and override values with env vars.
 func NewConfig() Config {
-	f, err := os.Open("config.yml")
-	if err != nil {
-		log.Fatalf("Error opening config.yml: %s", err)
-	}
-
 	cfg := Config{}
-	decoder := yaml.NewDecoder(f)
 
-	err = decoder.Decode(&cfg)
-	if err != nil {
-		log.Fatalf("Error loading config.yml: %s", err)
-	}
-
-	err = envconfig.Process("", &cfg)
+	err := envconfig.Process("", &cfg)
 	if err != nil {
 		panic(err)
+	}
+
+	v := reflect.ValueOf(cfg)
+	for i := 0; i < v.NumField(); i++ {
+		field := v.Field(i)
+		if field.Interface() == reflect.Zero(field.Type()).Interface() {
+			panic(fmt.Sprintf("field %s cannot be empty", v.Type().Field(i).Name))
+		}
 	}
 
 	return cfg

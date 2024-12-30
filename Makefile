@@ -54,3 +54,11 @@ test-api: ## Executes api tests
 .PHONY: coverage-api
 coverage-api: ## Executes api tests, generates coverage and opens the browser
 	cd app/api && go test ./... --tags=integration,unit -v -cover -coverprofile=coverage.out && go tool cover -html=coverage.out && rm coverage.out && cd -
+
+.PHONY: test-repo-cloner
+test-repo-cloner: ## Executes repo-cloner tests
+	cd repo-cloner && go test ./... --tags=integration,unit -v && cd -
+
+.PHONY: coverage-repo-cloner
+coverage-repo-cloner: ## Executes repo-cloner tests, generates coverage and opens the browser
+	cd repo-cloner && go test ./... --tags=integration,unit -v -cover -coverprofile=coverage.out && go tool cover -html=coverage.out && rm coverage.out && cd -

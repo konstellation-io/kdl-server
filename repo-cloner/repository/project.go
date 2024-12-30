@@ -13,6 +13,8 @@ import (
 	"github.com/konstellation-io/kdl-server/repo-cloner/config"
 )
 
+const projectCollName = "projects"
+
 type ProjectMongoDBRepo struct {
 	collection *mongo.Collection
 	logger     logr.Logger
@@ -27,7 +29,7 @@ type Project struct {
 }
 
 func NewProjectMongoDBRepo(cfg config.Config, logger logr.Logger, client *mongo.Client) *ProjectMongoDBRepo {
-	collection := client.Database(cfg.MongoDB.DBName).Collection(cfg.MongoDB.ProjectsCollName)
+	collection := client.Database(cfg.MongoDB.DBName).Collection(projectCollName)
 	return &ProjectMongoDBRepo{cfg: cfg, logger: logger, collection: collection}
 }
 

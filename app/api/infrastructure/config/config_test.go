@@ -62,6 +62,11 @@ func (s *configTestSuite) TestConfig() {
 	s.Require().Equal("external_server_url", cfg.Kubeconfig.ExternalServerURL)
 	s.Require().Equal("app_release", cfg.Labels.Common.AppRelease)
 	s.Require().Equal("chart_release", cfg.Labels.Common.ChartRelease)
+
+	// Unset the env vars
+	for k := range envs {
+		_ = os.Unsetenv(k)
+	}
 }
 
 func (s *configTestSuite) TestConfig_MissingEnvironment() {

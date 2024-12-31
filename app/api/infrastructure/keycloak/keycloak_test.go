@@ -36,18 +36,15 @@ func TestKeycloakSuite(t *testing.T) {
 func (s *KeycloakSuite) SetupSuite() {
 	ctx := context.Background()
 
-	absFilePath, err := filepath.Abs("./testdata")
+	absFilePath, err := filepath.Abs("./testdata/realm-export.json")
 	s.Require().NoError(err)
 
-	// r, err := os.Open(absFilePath)
-	// s.Require().NoError(err)
-	// defer r.Close()
-
 	req := testcontainers.ContainerRequest{
-		Image: "quay.io/keycloak/keycloak:latest",
+		Image: "quay.io/keycloak/keycloak:26.0",
 		Cmd: []string{
 			"start-dev",
 			"--import-realm",
+			"--verbose",
 		},
 		ExposedPorts: []string{"8080/tcp"},
 		WaitingFor:   wait.ForLog("Listening on:"),
@@ -57,10 +54,9 @@ func (s *KeycloakSuite) SetupSuite() {
 		},
 		Files: []testcontainers.ContainerFile{
 			{
-				//Reader:            r,
-				HostFilePath:      absFilePath, // will be discarded internally
-				ContainerFilePath: "/opt/keycloak/data/import",
-				FileMode:          0o700,
+				HostFilePath:      absFilePath,
+				ContainerFilePath: "/opt/keycloak/data/import/realm-export.json",
+				FileMode:          0o777,
 			},
 		},
 		Mounts: testcontainers.ContainerMounts{
@@ -70,12 +66,6 @@ func (s *KeycloakSuite) SetupSuite() {
 				},
 				Target: "/opt/keycloak/data/import",
 			},
-			// {
-			// 	Source: testcontainers.DockerBindMountSource{
-			// 		HostPath: absFilePath,
-			// 	},
-			// 	Target: "/opt/keycloak/data/import",
-			// },
 		},
 	}
 
@@ -84,15 +74,6 @@ func (s *KeycloakSuite) SetupSuite() {
 		Started:          true,
 	})
 	s.Require().NoError(err)
-
-	// keycloakContainer, err := keycloak.Run(ctx,
-	// 	"quay.io/keycloak/keycloak:21.1",
-	// 	testcontainers.WithWaitStrategy(wait.ForLog("Listening on:")),
-	// 	keycloak.WithContextPath("/auth"),
-	// 	keycloak.WithRealmImportFile("./testdata/realm-export.json"),
-	// 	keycloak.WithAdminUsername(_adminUser),
-	// 	keycloak.WithAdminPassword(_adminPassword),
-	// )
 
 	keycloakEndpoint, err := keycloakContainer.PortEndpoint(ctx, "8080/tcp", "http")
 	s.Require().NoError(err)
@@ -124,70 +105,70 @@ func (s *KeycloakSuite) SetupTest() {
 }
 
 func (s *KeycloakSuite) TearDownTest() {
-	ctx := context.Background()
+	// ctx := context.Background()
 
-	testUser := s.getTestUser()
-	testUser.Attributes = &map[string][]string{}
+	// testUser := s.getTestUser()
+	// testUser.Attributes = &map[string][]string{}
 
-	err := s.keycloakClient.UpdateUser(
-		ctx,
-		s.keycloakService.token.AccessToken,
-		s.cfg.RealmKey,
-		*testUser,
-	)
-	s.Require().NoError(err)
+	// err := s.keycloakClient.UpdateUser(
+	// 	ctx,
+	// 	s.keycloakService.token.AccessToken,
+	// 	s.cfg.RealmKey,
+	// 	*testUser,
+	// )
+	// s.Require().NoError(err)
 
-	groups, err := s.keycloakClient.GetGroups(
-		ctx,
-		s.keycloakService.token.AccessToken,
-		s.cfg.RealmKey,
-		gocloak.GetGroupsParams{},
-	)
-	s.Require().NoError(err)
+	// groups, err := s.keycloakClient.GetGroups(
+	// 	ctx,
+	// 	s.keycloakService.token.AccessToken,
+	// 	s.cfg.RealmKey,
+	// 	gocloak.GetGroupsParams{},
+	// )
+	// s.Require().NoError(err)
 
-	for _, group := range groups {
-		s.keycloakClient.DeleteGroup(
-			ctx,
-			s.keycloakService.token.AccessToken,
-			s.cfg.RealmKey,
-			*group.ID,
-		)
-		s.Require().NoError(err)
-	}
+	// for _, group := range groups {
+	// 	s.keycloakClient.DeleteGroup(
+	// 		ctx,
+	// 		s.keycloakService.token.AccessToken,
+	// 		s.cfg.RealmKey,
+	// 		*group.ID,
+	// 	)
+	// 	s.Require().NoError(err)
+	// }
 
-	users, err := s.keycloakClient.GetUsers(
-		ctx,
-		s.keycloakService.token.AccessToken,
-		s.cfg.RealmKey,
-		gocloak.GetUsersParams{},
-	)
+	// users, err := s.keycloakClient.GetUsers(
+	// 	ctx,
+	// 	s.keycloakService.token.AccessToken,
+	// 	s.cfg.RealmKey,
+	// 	gocloak.GetUsersParams{},
+	// )
 
-	s.Require().NoError(err)
+	// s.Require().NoError(err)
 
-	for _, user := range users {
-		if *user.Username != _testUsername {
-			err = s.keycloakClient.DeleteUser(
-				ctx,
-				s.keycloakService.token.AccessToken,
-				s.cfg.RealmKey,
-				*user.ID,
-			)
-			s.Require().NoError(err)
-		}
-	}
+	// for _, user := range users {
+	// 	if *user.Username != _testUsername {
+	// 		err = s.keycloakClient.DeleteUser(
+	// 			ctx,
+	// 			s.keycloakService.token.AccessToken,
+	// 			s.cfg.RealmKey,
+	// 			*user.ID,
+	// 		)
+	// 		s.Require().NoError(err)
+	// 	}
+	// }
 }
 
-func (s *KeycloakSuite) getTestUser() *gocloak.User {
-	users, err := s.keycloakClient.GetUsers(
-		context.Background(),
-		s.keycloakService.token.AccessToken,
-		s.cfg.RealmKey,
-		gocloak.GetUsersParams{},
-	)
-	s.Require().NoError(err)
+// func (s *KeycloakSuite) getTestUser() *gocloak.User {
+// 	users, err := s.keycloakClient.GetUsers(
+// 		context.Background(),
+// 		s.keycloakService.token.AccessToken,
+// 		s.cfg.RealmKey,
+// 		gocloak.GetUsersParams{},
+// 	)
+// 	s.Require().NoError(err)
 
-	return users[0]
-}
+// 	return users[0]
+// }
 
 func (s *KeycloakSuite) TestRefreshToken_NotExpiredToken() {
 	// GIVEN the recently obtained token through setup test
@@ -252,13 +233,13 @@ func (s *KeycloakSuite) TestRefreshToken_ExpiredRefreshTokenWithError() {
 	s.keycloakService.refreshTokenExpiresAt = time.Now().Add(-time.Hour)
 
 	// WHEN refreshing the token with invalid credentials
-	s.cfg.AdminPasswordKey = "invalid"
+	s.keycloakService.cfg.AdminPasswordKey = "invalid"
 	err := s.keycloakService.refreshToken(ctx)
 
 	// THEN an error prompts
 	s.Require().Error(err)
 
-	s.cfg.AdminPasswordKey = _adminPassword
+	s.keycloakService.cfg.AdminPasswordKey = _adminPassword
 }
 
 func (s *KeycloakSuite) TestDeleteUser() {
@@ -266,13 +247,11 @@ func (s *KeycloakSuite) TestDeleteUser() {
 		ctx          = context.Background()
 		userName     = "user-to-delete"
 		testPassword = "test-password"
-		groupName    = "test-group"
 	)
 
 	_, err := s.keycloakClient.CreateUser(ctx, s.keycloakService.token.AccessToken, s.cfg.RealmKey, gocloak.User{
 		Username:      gocloak.StringP(userName),
 		EmailVerified: gocloak.BoolP(true),
-		Groups:        &[]string{groupName},
 		Enabled:       gocloak.BoolP(true),
 		Credentials: &[]gocloak.CredentialRepresentation{
 			{
@@ -282,10 +261,18 @@ func (s *KeycloakSuite) TestDeleteUser() {
 	})
 	s.Require().NoError(err)
 
+	users, err := s.keycloakClient.GetUsers(ctx,
+		s.keycloakService.token.AccessToken,
+		s.cfg.RealmKey,
+		gocloak.GetUsersParams{Username: gocloak.StringP(userName)},
+	)
+	s.Require().NoError(err)
+	s.NotEmpty(users)
+
 	err = s.keycloakService.DeleteUser(ctx, userName)
 	s.Require().NoError(err)
 
-	users, err := s.keycloakClient.GetUsers(ctx,
+	users, err = s.keycloakClient.GetUsers(ctx,
 		s.keycloakService.token.AccessToken,
 		s.cfg.RealmKey,
 		gocloak.GetUsersParams{Username: gocloak.StringP(userName)},

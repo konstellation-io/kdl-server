@@ -1,11 +1,11 @@
 package config
 
 import (
-	"log"
+	"fmt"
 	"os"
+	"reflect"
 
 	"github.com/kelseyhightower/envconfig"
-	"gopkg.in/yaml.v3"
 )
 
 type KubernetesConfig struct {
@@ -15,17 +15,17 @@ type KubernetesConfig struct {
 
 // Config holds the configuration values of the application.
 type Config struct {
-	Port                  string `yaml:"port" envconfig:"KDL_SERVER_PORT"`
+	Port                  string `envconfig:"KDL_SERVER_PORT"`
 	ProjectMLFlowURL      string `envconfig:"PROJECT_MLFLOW_URL"`
 	ProjectFilebrowserURL string `envconfig:"PROJECT_FILEBROWSER_URL"`
 	ReleaseName           string `envconfig:"RELEASE_NAME"`
-	StaticFilesPath       string `yaml:"staticFilesPath" envconfig:"KDL_SERVER_STATIC_FILES_PATH"`
+	StaticFilesPath       string `envconfig:"KDL_SERVER_STATIC_FILES_PATH"`
 	VSCodeURL             string `envconfig:"USER_TOOLS_VSCODE_URL"`
 	MongoDB               struct {
-		URI    string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
-		DBName string `yaml:"dbName" envconfig:"KDL_SERVER_MONGODB_NAME"`
-	} `yaml:"mongodb"`
-	Kubernetes KubernetesConfig `yaml:"kubernetes"`
+		URI    string `envconfig:"KDL_SERVER_MONGODB_URI"`
+		DBName string `envconfig:"KDL_SERVER_MONGODB_NAME"`
+	}
+	Kubernetes KubernetesConfig
 	Minio      struct {
 		Endpoint  string `envconfig:"MINIO_ENDPOINT"`
 		AccessKey string `envconfig:"MINIO_ACCESS_KEY"`
@@ -49,22 +49,19 @@ type Config struct {
 
 // NewConfig will read the config.yml file and override values with env vars.
 func NewConfig() Config {
-	f, err := os.Open("config.yml")
-	if err != nil {
-		log.Fatalf("Error opening config.yml: %s", err)
-	}
-
 	cfg := Config{}
-	decoder := yaml.NewDecoder(f)
 
-	err = decoder.Decode(&cfg)
-	if err != nil {
-		log.Fatalf("Error loading config.yml: %s", err)
-	}
-
-	err = envconfig.Process("", &cfg)
+	err := envconfig.Process("", &cfg)
 	if err != nil {
 		panic(err)
+	}
+
+	v := reflect.ValueOf(cfg)
+	for i := 0; i < v.NumField(); i++ {
+		field := v.Field(i)
+		if field.Interface() == reflect.Zero(field.Type()).Interface() {
+			panic(fmt.Sprintf("field %s cannot be empty", v.Type().Field(i).Name))
+		}
 	}
 
 	if os.Getenv("KDL_ENV") == "dev" {

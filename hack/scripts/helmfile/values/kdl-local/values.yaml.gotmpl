@@ -15,6 +15,7 @@ image:
 env:
   KDL_SERVER_MONGODB_URI: "mongodb://{{ .Values.mongodb_user }}:{{ .Values.mongodb_password }}@mongodb-svc.mongodb:27017/{{ .Values.mongodb_user }}?authSource={{ .Values.mongodb_user }}&authMechanism=SCRAM-SHA-256"
   KDL_SERVER_PORT: "8080"
+  KDL_SERVER_STATIC_FILES_PATH: "../public"
   KUBECONFIG_DOWNLOAD_ENABLED: {{ requiredEnv "KUBECONFIG_ENABLED" }}
   KUBECONFIG_EXTERNAL_SERVER_URL: {{ env "EXTERNAL_SERVER_URL" | quote }}
   MINIO_ACCESS_KEY: "{{ .Values.minio_access_key }}"

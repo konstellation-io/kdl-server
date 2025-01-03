@@ -17,14 +17,16 @@ func (k *Client) GetConfigMap(ctx context.Context, name string) (*v1.ConfigMap, 
 	return configmap, nil
 }
 
-func (k *Client) CreateConfigMapWatcher(ctx context.Context) (watch.Interface, error) {
-	labelSelector := "kdl-server/component=server"
+func (k *Client) getLabelSelector() string {
+	return "kdl-server/component=server"
+}
 
-	k.logger.Info("Creating watcher for Configmap templates for project and user tools", "label", labelSelector)
+func (k *Client) CreateConfigMapWatcher(ctx context.Context) (watch.Interface, error) {
+	k.logger.Info("Creating watcher for Configmap templates for project and user tools", "label", k.getLabelSelector())
 
 	opts := metav1.ListOptions{
 		TypeMeta:      metav1.TypeMeta{},
-		LabelSelector: labelSelector,
+		LabelSelector: k.getLabelSelector(),
 		FieldSelector: "",
 	}
 

@@ -36,43 +36,48 @@ docker build \
 
 ### Environment variables
 
+> [!IMPORTANT]
+> All environment variables need to be defined, expect the ones
+> with a default value. Environment variables are defined in helm chart have
+> more priority than the ones by default.
+
 #### KDL server
 
-| Environment variable             | Description                                   | Default value                                                          |
-|----------------------------------|-----------------------------------------------|------------------------------------------------------------------------|
-| `RELEASE_NAME`                   | Release name for the KDL server               | `kdl-local`                                                            |
-| `KDL_SERVER_MONGODB_NAME`        | MongoDB Database name for the KDL server      |                                                                        |
-| `KDL_SERVER_MONGODB_URI`         | MongoDB URI for the KDL server                |                                                                        |
-| `KDL_SERVER_PORT`                | Port for the KDL API                          | `8080`                                                                 |
-| `KDL_SERVER_STATIC_FILES_PATH`   | Path for the static files of the KDL server   |                                                                        |
-| `POD_NAMESPACE`                  | Namespace for the KDL server                  |                                                                        |
-| `PROJECT_FILEBROWSER_URL`        | URL for the File Browser service              | `http://kdlapp.kdl.local/filebrowser/PROJECT_ID/`                      |
-| `PROJECT_MLFLOW_URL`             | URL for the MLflow service                    | `http://kdlapp.kdl.local/mlflow/PROJECT_ID/`                           |
-| `USER_TOOLS_VSCODE_URL`          | URL for the VScode service                    | `http://USERNAME-code.kdl.local/?folder=/home/coder/repos/REPO_FOLDER` |
-| `KUBECONFIG_DOWNLOAD_ENABLED`    | Enable kubeconfig download for the User Tools | `false`                                                                |
-| `KUBECONFIG_EXTERNAL_SERVER_URL` | URL for the kubeconfig download service       |                                                                        |
+| Environment variable             | Description                                   | Default value |
+|----------------------------------|-----------------------------------------------|---------------|
+| `RELEASE_NAME`                   | Release name for the KDL server               |               |
+| `KDL_SERVER_MONGODB_NAME`        | MongoDB Database name for the KDL server      | `kdl`         |
+| `KDL_SERVER_MONGODB_URI`         | MongoDB URI for the KDL server                |               |
+| `KDL_SERVER_PORT`                | Port for the KDL API                          | `8080`        |
+| `KDL_SERVER_STATIC_FILES_PATH`   | Path for the static files of the KDL server   | `../public`   |
+| `POD_NAMESPACE`                  | Namespace for the KDL server                  |               |
+| `PROJECT_FILEBROWSER_URL`        | URL for the File Browser service              |               |
+| `PROJECT_MLFLOW_URL`             | URL for the MLflow service                    |               |
+| `USER_TOOLS_VSCODE_URL`          | URL for the VScode service                    |               |
+| `KUBECONFIG_DOWNLOAD_ENABLED`    | Enable kubeconfig download for the User Tools | `false`       |
+| `KUBECONFIG_EXTERNAL_SERVER_URL` | URL for the kubeconfig download service       |               |
 
 #### KnowledgeGalaxy
 
-| Environment variable       | Description                                | Default value                                     |
-|----------------------------|--------------------------------------------|---------------------------------------------------|
-| `KNOWLEDGE_GALAXY_URL`     | URL for the Knowledge Galaxy service       | `http://kdlapp.kdl.local/kg/projects/PROJECT_ID/` |
-| `KNOWLEDGE_GALAXY_ENABLED` | Enable Knowledge Galaxy for the KDL server | `false`                                           |
+| Environment variable       | Description                                | Default value |
+|----------------------------|--------------------------------------------|---------------|
+| `KNOWLEDGE_GALAXY_URL`     | URL for the Knowledge Galaxy service       |               |
+| `KNOWLEDGE_GALAXY_ENABLED` | Enable Knowledge Galaxy for the KDL server | `false`       |
 
 #### MinIO
 
-| Environment variable | Description                            | Default value       |
-|----------------------|----------------------------------------|---------------------|
-| `MINIO_ACCESS_KEY`   | Access key for the Minio service       |                     |
-| `MINIO_ENDPOINT`     | URL for the Minio service              | `http://minio:9000` |
-| `MINIO_SECRET_KEY`   | Secret key for the Minio service       |                     |
+| Environment variable | Description                            | Default value |
+|----------------------|----------------------------------------|---------------|
+| `MINIO_ACCESS_KEY`   | Access key for the Minio service       |               |
+| `MINIO_ENDPOINT`     | URL for the Minio service              |               |
+| `MINIO_SECRET_KEY`   | Secret key for the Minio service       |               |
 
 #### Labels
 
-| Environment variable          | Default value | Description                                                                  |
-|-------------------------------|---------------|------------------------------------------------------------------------------|
-| `LABELS_COMMON_APP_RELEASE`   | `1.38.0`      | Release version for the common app labels and Service account creation       |
-| `LABELS_COMMON_CHART_RELEASE` |               | Chart release version for the common app labels and Service account creation |
+| Environment variable          | Description                                                                  | Default value |
+|-------------------------------|------------------------------------------------------------------------------|---------------|
+| `LABELS_COMMON_APP_RELEASE`   | Release version for the common app labels and Service account creation       |               |
+| `LABELS_COMMON_CHART_RELEASE` | Chart release version for the common app labels and Service account creation |               |
 
 ## Local deployment
 

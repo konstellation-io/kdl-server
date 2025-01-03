@@ -15,15 +15,15 @@ type KubernetesConfig struct {
 
 // Config holds the configuration values of the application.
 type Config struct {
-	Port                  string `envconfig:"KDL_SERVER_PORT"`
+	Port                  string `envconfig:"KDL_SERVER_PORT" default:"8080"`
 	ProjectMLFlowURL      string `envconfig:"PROJECT_MLFLOW_URL"`
 	ProjectFilebrowserURL string `envconfig:"PROJECT_FILEBROWSER_URL"`
 	ReleaseName           string `envconfig:"RELEASE_NAME"`
-	StaticFilesPath       string `envconfig:"KDL_SERVER_STATIC_FILES_PATH"`
+	StaticFilesPath       string `envconfig:"KDL_SERVER_STATIC_FILES_PATH" default:"../public"`
 	VSCodeURL             string `envconfig:"USER_TOOLS_VSCODE_URL"`
 	MongoDB               struct {
 		URI    string `envconfig:"KDL_SERVER_MONGODB_URI"`
-		DBName string `envconfig:"KDL_SERVER_MONGODB_NAME"`
+		DBName string `envconfig:"KDL_SERVER_MONGODB_NAME" default:"kdl"`
 	}
 	Kubernetes KubernetesConfig
 	Minio      struct {
@@ -32,11 +32,11 @@ type Config struct {
 		SecretKey string `envconfig:"MINIO_SECRET_KEY"`
 	}
 	Kg struct {
-		Enabled bool   `envconfig:"KNOWLEDGE_GALAXY_ENABLED"`
+		Enabled bool   `envconfig:"KNOWLEDGE_GALAXY_ENABLED" default:"false"`
 		URL     string `envconfig:"KNOWLEDGE_GALAXY_URL"`
 	}
 	Kubeconfig struct {
-		Enabled           bool   `envconfig:"KUBECONFIG_DOWNLOAD_ENABLED"`
+		Enabled           bool   `envconfig:"KUBECONFIG_DOWNLOAD_ENABLED" default:"false"`
 		ExternalServerURL string `envconfig:"KUBECONFIG_EXTERNAL_SERVER_URL"`
 	}
 	Labels struct {

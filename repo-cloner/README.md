@@ -66,7 +66,6 @@ Advanced configuration with SSH key and config file:
 ```bash
 docker run \
   --user 1000:1000 \
-  -v ./config.yml:/app/config.yml \
   -e "KDL_USER_NAME=developer" \
   -v /path/to/ssh/key:/home/kdl/.ssh/id_rsa \
   -v /path/to/repos:/home/kdl/repos \

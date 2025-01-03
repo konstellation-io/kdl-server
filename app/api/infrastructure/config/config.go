@@ -47,7 +47,7 @@ type Config struct {
 	}
 }
 
-// NewConfig will read the config.yml file and override values with env vars.
+// NewConfig will read the values from env vars.
 func NewConfig() Config {
 	cfg := Config{}
 

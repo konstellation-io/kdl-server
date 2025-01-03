@@ -57,7 +57,7 @@ RUN apk update                          && \
 WORKDIR /app
 
 # copy binary and config
-COPY --from=builder --chown=${UID}:${GID} /app/repo-cloner /app/config.yml ./
+COPY --from=builder --chown=${UID}:${GID} /app/repo-cloner ./
 
 USER ${USER}
 

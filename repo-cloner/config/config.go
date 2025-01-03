@@ -20,7 +20,7 @@ type Config struct {
 	CheckFrequencySeconds int    `envconfig:"CHECK_FREQUENCY_SECONDS"`
 }
 
-// NewConfig will read the config.yml file and override values with env vars.
+// NewConfig will read the values from env vars.
 func NewConfig() Config {
 	cfg := Config{}
 

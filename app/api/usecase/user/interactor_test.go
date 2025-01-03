@@ -8,25 +8,32 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
+	"github.com/golang/mock/gomock"
 	"github.com/gosimple/slug"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 	"gotest.tools/v3/assert"
-
-	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
-
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/require"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
 
-var errUnexpected = errors.New("some error")
+const templateConfigMap = "template-name"
+
+var (
+	errUnexpected    = errors.New("some error")
+	errUpdatingCrd   = errors.New("error updating crd")
+	errNoConfigMap   = errors.New("no configmap")
+	errListUsertools = errors.New("error listing usertools")
+)
 
 type userSuite struct {
 	ctrl       *gomock.Controller
@@ -799,5 +806,285 @@ func TestInteractor_SynchronizeServiceAccountsForUsers(t *testing.T) {
 	// WHEN the CreateMissingServiceAccountsForUsers is called
 	err := s.interactor.SynchronizeServiceAccountsForUsers()
 
+	require.NoError(t, err)
+}
+
+func TestInteractor_UpdateKDLUserTools(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	crd := map[string]interface{}{}
+	data := k8s.UserToolsData{}
+
+	listKDLUserTools := []unstructured.Unstructured{
+		{
+			Object: map[string]interface{}{
+				"metadata": map[string]interface{}{
+					"name": "kdlusertools-v1",
+				},
+				"spec": map[string]interface{}{
+					"podLabels": map[string]interface{}{
+						"runtimeId":    "12345",
+						"capabilityId": "54321",
+					},
+				},
+			},
+		},
+	}
+
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return(listKDLUserTools, nil)
+	s.mocks.k8sClientMock.EXPECT().UpdateUserToolsCR(ctx, "kdlusertools-v1", data, &crd).Return(nil)
+
+	err := s.interactor.UpdateKDLUserTools(ctx)
+	require.NoError(t, err)
+}
+
+func TestInteractor_UpdateKDLUserTools_UpdateKDLUserToolsCR_Error(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	crd := map[string]interface{}{}
+	data := k8s.UserToolsData{}
+
+	listKDLUserTools := []unstructured.Unstructured{
+		{
+			Object: map[string]interface{}{
+				"metadata": map[string]interface{}{
+					"name": "kdlusertools-v1",
+				},
+				"spec": map[string]interface{}{
+					"podLabels": map[string]interface{}{
+						"runtimeId":    "12345",
+						"capabilityId": "54321",
+					},
+				},
+			},
+		},
+	}
+
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return(listKDLUserTools, nil)
+	s.mocks.runtimeRepo.EXPECT().Get(ctx, "12345").Return(entity.Runtime{}, nil)
+	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, "54321").Return(entity.Capabilities{}, nil)
+	s.mocks.k8sClientMock.EXPECT().UpdateUserToolsCR(ctx, "kdlusertools-v1", data, &crd).Return(errUpdatingCrd)
+
+	// even if there is an error updating the CRD,
+	// the function should return no error to allow updating the next CRD
+	err := s.interactor.UpdateKDLUserTools(ctx)
+	require.NoError(t, err)
+}
+func TestInteractor_UpdateKDLUserTools_NoSpec(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	listKDLUserTools := []unstructured.Unstructured{
+		{
+			Object: map[string]interface{}{
+				"metadata": map[string]interface{}{
+					"name": "kdlusertools-v1",
+				},
+			},
+		},
+	}
+
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return(listKDLUserTools, nil)
+
+	// even if there is an error updating the CRD,
+	// the function should return no error to allow updating the next CRD
+	err := s.interactor.UpdateKDLUserTools(ctx)
+	require.NoError(t, err)
+}
+
+func TestInteractor_UpdateKDLUserTools_NoPodLabels(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	listKDLUserTools := []unstructured.Unstructured{
+		{
+			Object: map[string]interface{}{
+				"metadata": map[string]interface{}{
+					"name": "kdlusertools-v1",
+				},
+				"spec": map[string]interface{}{},
+			},
+		},
+	}
+
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return(listKDLUserTools, nil)
+
+	// even if there is an error updating the CRD,
+	// the function should return no error to allow updating the next CRD
+	err := s.interactor.UpdateKDLUserTools(ctx)
+	require.NoError(t, err)
+}
+
+func TestInteractor_UpdateKDLUserTools_NoRuntimeId(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	listKDLUserTools := []unstructured.Unstructured{
+		{
+			Object: map[string]interface{}{
+				"metadata": map[string]interface{}{
+					"name": "kdlusertools-v1",
+				},
+				"spec": map[string]interface{}{
+					"podLabels": map[string]interface{}{},
+				},
+			},
+		},
+	}
+
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return(listKDLUserTools, nil)
+
+	// even if there is an error updating the CRD,
+	// the function should return no error to allow updating the next CRD
+	err := s.interactor.UpdateKDLUserTools(ctx)
+	require.NoError(t, err)
+}
+
+func TestInteractor_UpdateKDLUserTools_NoCapabilityId(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	listKDLUserTools := []unstructured.Unstructured{
+		{
+			Object: map[string]interface{}{
+				"metadata": map[string]interface{}{
+					"name": "kdlusertools-v1",
+				},
+				"spec": map[string]interface{}{
+					"podLabels": map[string]interface{}{
+						"runtimeId": "12345",
+					},
+				},
+			},
+		},
+	}
+
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return(listKDLUserTools, nil)
+
+	// even if there is an error updating the CRD,
+	// the function should return no error to allow updating the next CRD
+	err := s.interactor.UpdateKDLUserTools(ctx)
+	require.NoError(t, err)
+}
+
+func TestInteractor_UpdateKDLUserTools_NoConfigmap(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(nil, errNoConfigMap)
+
+	err := s.interactor.UpdateKDLUserTools(ctx)
+	require.Error(t, err)
+}
+
+func TestInteractor_UpdateKDLUserTools_CDRTemplate_ErrorNoTemplate(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{}
+
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+
+	err := s.interactor.UpdateKDLUserTools(ctx)
+	require.Error(t, err)
+}
+
+func TestInteractor_UpdateKDLUserTools_ListKDLUserToolsNameCR_Error(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return(nil, errListUsertools)
+
+	err := s.interactor.UpdateKDLUserTools(ctx)
+	require.Error(t, err)
+}
+
+func TestInteractor_UpdateKDLUserTools_ListKDLUserToolsNameCR_EmptyList(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return([]unstructured.Unstructured{}, nil)
+
+	err := s.interactor.UpdateKDLUserTools(ctx)
 	require.NoError(t, err)
 }

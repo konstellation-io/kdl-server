@@ -379,3 +379,75 @@ func (i *Interactor) GetKubeconfig(ctx context.Context, username string) (string
 
 	return kubeConfTxt, nil
 }
+
+// Get the CRD template from the ConfigMap and update all the KDL UserTools in the namespace.
+func (i *Interactor) UpdateKDLUserTools(ctx context.Context) error {
+	configMap, err := i.k8sClient.GetConfigMap(ctx, i.k8sClient.GetConfigMapTemplateNameUserTools())
+	if err != nil {
+		return err
+	}
+
+	// get the CRD template converted from yaml to go object from the ConfigMap
+	crd, err := kdlutil.GetCrdTemplateFromConfigMap(configMap)
+	if err != nil {
+		return err
+	}
+
+	// get all the KDL UserTools in the namespace and iterate over to update them
+	kdlUserTools, err := i.k8sClient.ListUserToolsCR(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, userTool := range kdlUserTools {
+		resourceName := userTool.GetName()
+
+		spec, ok := userTool.Object["spec"].(map[string]interface{})
+		if !ok {
+			i.logger.Info("Error getting spec from KDL UserTools CR", "userToolName", userTool.GetName())
+			continue
+		}
+
+		podLabels, ok := spec["podLabels"].(map[string]interface{})
+		if !ok {
+			i.logger.Info("Error getting spec.podLabels from KDL UserTools CR", "userToolName", userTool.GetName())
+			continue
+		}
+
+		runtimeID, ok := podLabels["runtimeId"].(string)
+		if !ok || runtimeID == "" {
+			i.logger.Info("Runtime ID provided is not valid, skipping user tools update", "userToolName", resourceName)
+			continue
+		}
+
+		capabilitiesID, ok := podLabels["capabilityId"].(string)
+		if !ok || capabilitiesID == "" {
+			i.logger.Info("Capability ID provided is not valid, skipping user tools update", "userToolName", resourceName)
+			continue
+		}
+
+		r, err := i.repoRuntimes.Get(ctx, runtimeID)
+		if err != nil {
+			i.logger.Error(err, "Error getting runtime", "runtimeID", runtimeID)
+			continue
+		}
+
+		var data = k8s.UserToolsData{}
+		data.RuntimeID = r.ID
+		data.RuntimeImage = r.DockerImage
+		data.RuntimeTag = r.DockerTag
+
+		data.Capabilities, err = i.repoCapabilities.Get(ctx, capabilitiesID)
+		if err != nil {
+			i.logger.Error(err, "Error getting capability", "capabilitiesID", capabilitiesID)
+			continue
+		}
+
+		err = i.k8sClient.UpdateUserToolsCR(ctx, resourceName, data, &crd)
+		if err != nil {
+			i.logger.Error(err, "Error updating KDL UserTools CR in k8s", "userToolName", resourceName)
+		}
+	}
+
+	return nil
+}

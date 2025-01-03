@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
@@ -26,6 +27,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/configmap"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
@@ -100,6 +102,14 @@ func main() {
 	runtimeInteractor := runtime.NewInteractor(logger, k8sClient, runtimeRepo)
 
 	capabilitiesInteractor := capabilities.NewInteractor(logger, cfg, capabilitiesRepo, k8sClient)
+
+	configMapWatcher := configmap.NewInteractor(logger, cfg, k8sClient, projectInteractor, userInteractor)
+	go func() {
+		err = configMapWatcher.WatchConfigMapTemplates(context.Background())
+		if err != nil {
+			logger.Error(err, "Error watching ConfigMaps")
+		}
+	}()
 
 	resolvers := graph.NewResolver(
 		logger,

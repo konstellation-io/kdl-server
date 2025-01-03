@@ -284,3 +284,32 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 
 	return &p, nil
 }
+
+func (i *interactor) UpdateKDLProjects(ctx context.Context) error {
+	// get the CRD template from the ConfigMap
+	configMap, err := i.k8sClient.GetConfigMap(ctx, i.k8sClient.GetConfigMapTemplateNameProject())
+	if err != nil {
+		return err
+	}
+	// get the CRD template converted from yaml to go object from the ConfigMap
+	crd, err := kdlutil.GetCrdTemplateFromConfigMap(configMap)
+	if err != nil {
+		return err
+	}
+
+	// get all the KDL Projects in the namespace and iterate over to update them
+	kdlProjectName, err := i.k8sClient.ListKDLProjectsNameCR(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, pID := range kdlProjectName {
+		// NOTE: update method below to add a new struct with extra data to update into CRD
+		err = i.k8sClient.UpdateKDLProjectsCR(ctx, pID, &crd)
+		if err != nil {
+			i.logger.Error(err, "Error updating KDL Project CR in k8s", "projectName", pID)
+		}
+	}
+
+	return nil
+}

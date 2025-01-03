@@ -6,6 +6,7 @@ import (
 
 	"github.com/gosimple/slug"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -130,7 +131,7 @@ func (k *Client) updateUserToolsTemplate(
 	return &crdToUpdate, nil
 }
 
-func (k *Client) getConfigMapTemplateNameUserTools() string {
+func (k *Client) GetConfigMapTemplateNameUserTools() string {
 	return k.cfg.ReleaseName + "-server-user-tools-template"
 }
 
@@ -143,13 +144,13 @@ func (k *Client) CreateUserToolsCR(
 	slugUsername := k.getSlugUsername(username)
 	resName := fmt.Sprintf("usertools-%s", slugUsername)
 
-	configMap, err := k.GetConfigMap(ctx, k.getConfigMapTemplateNameUserTools())
+	configMap, err := k.GetConfigMap(ctx, k.GetConfigMapTemplateNameUserTools())
 	if err != nil {
 		return err
 	}
 
 	// get the CRD template converted from yaml to go object from the ConfigMap
-	crd, err := k.getCrdTemplateFromConfigMap(configMap)
+	crd, err := kdlutil.GetCrdTemplateFromConfigMap(configMap)
 	if err != nil {
 		return err
 	}
@@ -255,6 +256,69 @@ func (k *Client) getUserToolsResName(slugUsername string) string {
 
 func (k *Client) userToolsPODLabelSelector(resName string) string {
 	return fmt.Sprintf("app.kubernetes.io/instance=%s", resName)
+}
+
+func (k *Client) ListUserToolsCR(ctx context.Context) ([]unstructured.Unstructured, error) {
+	kdlUserTools, err := k.kdlUserToolsRes.Namespace(k.cfg.Kubernetes.Namespace).List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return kdlUserTools.Items, nil
+}
+
+func (k *Client) GetUserToolsCR(ctx context.Context, resourceName string) (*unstructured.Unstructured, error) {
+	object, err := k.kdlUserToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Get(ctx, resourceName, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return object, nil
+}
+
+func (k *Client) UpdateUserToolsCR(ctx context.Context, resourceName string, data UserToolsData, crd *map[string]interface{}) error {
+	existingKDLUserTool, err := k.GetUserToolsCR(ctx, resourceName)
+	if err != nil {
+		return err
+	}
+
+	spec, ok := existingKDLUserTool.Object["spec"].(map[string]interface{})
+	if !ok {
+		return errCRDNoSpec
+	}
+
+	username, ok := spec["username"].(string)
+	if !ok {
+		return errCDRNoSpecUsername
+	}
+
+	slugUsername := k.getSlugUsername(username)
+
+	// update the CRD object with correct values
+	crdUpdated, err := k.updateUserToolsTemplate(crd, slugUsername, resourceName, username, data)
+	if err != nil {
+		return err
+	}
+
+	// to update current CRD object, we need to get the existing CRD object and update the spec field
+	specValue, ok := (*crdUpdated)["spec"]
+	if !ok {
+		return errCRDNoSpec
+	}
+
+	existingKDLUserTool.Object["spec"] = specValue
+
+	// CRD object is now updated and ready to be created
+	k.logger.Info("Updating KDL User Tools CR in k8s", "username", username)
+
+	_, err = k.kdlUserToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Update(ctx, existingKDLUserTool, metav1.UpdateOptions{})
+	if err != nil {
+		return err
+	}
+
+	k.logger.Info("Updated KDL User Tools CR in k8s", "username", username)
+
+	return nil
 }
 
 // Returns a watcher for the UserTools.

@@ -4,6 +4,8 @@ import (
 	"context"
 
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/watch"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 )
@@ -17,11 +19,17 @@ type ClientInterface interface {
 	GetSecret(ctx context.Context, name string) (map[string][]byte, error)
 	CreateUserToolsCR(ctx context.Context, username string, data UserToolsData) error
 	DeleteUserToolsCR(ctx context.Context, username string) error
+	UpdateUserToolsCR(ctx context.Context, resourceName string, data UserToolsData, crd *map[string]interface{}) error
+	ListUserToolsCR(ctx context.Context) ([]unstructured.Unstructured, error)
+	GetUserToolsCR(ctx context.Context, username string) (*unstructured.Unstructured, error)
 	IsUserToolPODRunning(ctx context.Context, username string) (bool, error)
 	GetRuntimeIDFromUserTools(ctx context.Context, username string) (string, error)
 	GetCapabilitiesIDFromUserTools(ctx context.Context, username string) (string, error)
 	CreateKDLProjectCR(ctx context.Context, projectID string) error
 	DeleteKDLProjectCR(ctx context.Context, projectID string) error
+	UpdateKDLProjectsCR(ctx context.Context, projectID string, crd *map[string]interface{}) error
+	ListKDLProjectsNameCR(ctx context.Context) ([]string, error)
+	GetKDLProjectCR(ctx context.Context, name string) (*unstructured.Unstructured, error)
 	CreateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error
 	UpdateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error
 	GetUserSSHKeySecret(ctx context.Context, usernameSlug string) ([]byte, error)
@@ -31,4 +39,7 @@ type ClientInterface interface {
 	GetUserServiceAccount(ctx context.Context, usernameSlug string) (*v1.ServiceAccount, error)
 	GetUserKubeconfig(ctx context.Context, usernameSlug string) ([]byte, error)
 	GetConfigMap(ctx context.Context, name string) (*v1.ConfigMap, error)
+	GetConfigMapTemplateNameProject() string
+	GetConfigMapTemplateNameUserTools() string
+	CreateConfigMapWatcher(ctx context.Context) (watch.Interface, error)
 }

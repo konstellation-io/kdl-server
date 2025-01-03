@@ -88,16 +88,7 @@ func main() {
 		logger.Error(err, "Unexpected error creating serviceAccount for users")
 	}
 
-	projectDeps := &project.InteractorDeps{
-		Logger:           logger,
-		Repo:             projectRepo,
-		Clock:            realClock,
-		MinioService:     minioService,
-		K8sClient:        k8sClient,
-		UserActivityRepo: userActivityRepo,
-	}
-
-	projectInteractor := project.NewInteractor(projectDeps)
+	projectInteractor := project.NewInteractor(logger, k8sClient, minioService, realClock, projectRepo, userActivityRepo)
 
 	runtimeInteractor := runtime.NewInteractor(logger, k8sClient, runtimeRepo)
 

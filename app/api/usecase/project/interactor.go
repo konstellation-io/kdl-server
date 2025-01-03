@@ -111,25 +111,22 @@ type interactor struct {
 	k8sClient        k8s.ClientInterface
 }
 
-// InteractorDeps encapsulates all project interactor dependencies.
-type InteractorDeps struct {
-	Logger           logr.Logger
-	Repo             Repository
-	UserActivityRepo UserActivityRepo
-	Clock            clock.Clock
-	MinioService     minioservice.MinioService
-	K8sClient        k8s.ClientInterface
-}
-
 // NewInteractor is a constructor function.
-func NewInteractor(deps *InteractorDeps) UseCase {
+func NewInteractor(
+	logger logr.Logger,
+	k8sClient k8s.ClientInterface,
+	minioService minioservice.MinioService,
+	realClock clock.Clock,
+	projectRepo Repository,
+	userActivityRepo UserActivityRepo,
+) UseCase {
 	return &interactor{
-		logger:           deps.Logger,
-		projectRepo:      deps.Repo,
-		userActivityRepo: deps.UserActivityRepo,
-		clock:            deps.Clock,
-		minioService:     deps.MinioService,
-		k8sClient:        deps.K8sClient,
+		logger:           logger,
+		projectRepo:      projectRepo,
+		userActivityRepo: userActivityRepo,
+		clock:            realClock,
+		minioService:     minioService,
+		k8sClient:        k8sClient,
 	}
 }
 

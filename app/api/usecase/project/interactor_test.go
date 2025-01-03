@@ -52,15 +52,7 @@ func newProjectSuite(t *testing.T) *projectSuite {
 
 	logger := zapr.NewLogger(zapLog)
 
-	deps := &project.InteractorDeps{
-		Logger:           logger,
-		Repo:             repo,
-		UserActivityRepo: userActivityRepo,
-		Clock:            clockMock,
-		MinioService:     minioService,
-		K8sClient:        k8sClient,
-	}
-	interactor := project.NewInteractor(deps)
+	interactor := project.NewInteractor(logger, k8sClient, minioService, clockMock, repo, userActivityRepo)
 
 	return &projectSuite{
 		ctrl:       ctrl,

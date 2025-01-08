@@ -45,3 +45,26 @@ func (s *testSuite) TestGetConfigMap() {
 	s.Require().NotNil(configMap)
 	s.Require().Equal(configMapName, configMap.Name)
 }
+
+func (s *testSuite) TestCreateConfigMapWatcher() {
+	// Arrange a configmap
+	_, err := s.Clientset.CoreV1().ConfigMaps(namespace).Create(
+		context.Background(), &v1.ConfigMap{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: configMapName,
+				Labels: map[string]string{
+					"kdl-server/component": "server",
+				},
+			},
+			Data: map[string]string{
+				configMapDataKey: configMapDataValue,
+			},
+		},
+		metav1.CreateOptions{},
+	)
+	s.Require().NoError(err)
+
+	watcher, err := s.Client.CreateConfigMapWatcher(context.Background())
+	s.Require().NoError(err)
+	s.Require().NotNil(watcher)
+}

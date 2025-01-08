@@ -59,7 +59,7 @@ function NewProject() {
   const data: { [key in StepNames.INFORMATION | StepNames.DETAILS]?: any } = useReactiveVar(newProject);
 
   const stepsWithData: (StepNames.INFORMATION | StepNames.DETAILS)[] = useMemo(() => {
-    return [StepNames.INFORMATION];
+    return [StepNames.INFORMATION, StepNames.DETAILS];
   }, []);
 
   // We want to execute this on on component mount and unmount

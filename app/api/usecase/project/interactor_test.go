@@ -565,7 +565,7 @@ func TestInteractor_UpdateKDLProjects(t *testing.T) {
 	crd := map[string]interface{}{}
 	listCrd := []string{"kdlprojects-v1", "kdlprojects-v2"}
 
-	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
 	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
 	s.mocks.k8sClient.EXPECT().ListKDLProjectsNameCR(ctx).Return(listCrd, nil)
 	s.mocks.k8sClient.EXPECT().UpdateKDLProjectsCR(ctx, listCrd[0], &crd).Return(nil)
@@ -589,7 +589,7 @@ func TestInteractor_UpdateKDLProjects_UpdateKDLProjectsCR_Error(t *testing.T) {
 	crd := map[string]interface{}{}
 	listCrd := []string{"kdlprojects-v1"}
 
-	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
 	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
 	s.mocks.k8sClient.EXPECT().ListKDLProjectsNameCR(ctx).Return(listCrd, nil)
 	s.mocks.k8sClient.EXPECT().UpdateKDLProjectsCR(ctx, listCrd[0], &crd).Return(errUpdatingCrd)
@@ -606,7 +606,7 @@ func TestInteractor_UpdateKDLProjects_NoConfigmap(t *testing.T) {
 
 	ctx := context.Background()
 
-	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
 	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(nil, errNoConfigMap)
 
 	err := s.interactor.UpdateKDLProjects(ctx)
@@ -620,7 +620,7 @@ func TestInteractor_UpdateKDLProjects_CDRTemplate_ErrorNoTemplate(t *testing.T) 
 	ctx := context.Background()
 	configMap := v1.ConfigMap{}
 
-	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
 	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
 
 	err := s.interactor.UpdateKDLProjects(ctx)
@@ -638,7 +638,7 @@ func TestInteractor_UpdateKDLProjects_ListKDLProjectsNameCR_Error(t *testing.T) 
 	}
 	configMap.Data["template"] = ""
 
-	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
 	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
 	s.mocks.k8sClient.EXPECT().ListKDLProjectsNameCR(ctx).Return(nil, errListProjects)
 
@@ -657,7 +657,7 @@ func TestInteractor_UpdateKDLProjects_ListKDLProjectsNameCR_EmptyList(t *testing
 	}
 	configMap.Data["template"] = ""
 
-	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
 	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
 	s.mocks.k8sClient.EXPECT().ListKDLProjectsNameCR(ctx).Return([]string{}, nil)
 

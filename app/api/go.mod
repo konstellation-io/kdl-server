@@ -4,7 +4,7 @@ go 1.23.2
 
 require (
 	bou.ke/monkey v1.0.2
-	github.com/99designs/gqlgen v0.17.62
+	github.com/99designs/gqlgen v0.17.63
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-logr/logr v1.4.2
 	github.com/go-logr/zapr v1.3.0

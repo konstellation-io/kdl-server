@@ -39,14 +39,14 @@ func NewInteractor(
 }
 
 func (i *interactor) updateCRDObjects(ctx context.Context, configMapName string) {
-	if configMapName == i.k8sClient.GetConfigMapTemplateNameProject() {
+	if configMapName == i.k8sClient.GetConfigMapTemplateNameKDLProject() {
 		err := i.project.UpdateKDLProjects(ctx)
 		if err != nil {
 			i.logger.Error(err, "Error updating KDLProjects")
 		}
 	}
 
-	if configMapName == i.k8sClient.GetConfigMapTemplateNameUserTools() {
+	if configMapName == i.k8sClient.GetConfigMapTemplateNameKDLUserTools() {
 		err := i.user.UpdateKDLUserTools(ctx)
 		if err != nil {
 			i.logger.Error(err, "Error updating KDLUserTools")

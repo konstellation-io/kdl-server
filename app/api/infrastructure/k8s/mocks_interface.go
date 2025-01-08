@@ -67,6 +67,20 @@ func (mr *MockClientInterfaceMockRecorder) CreateKDLProjectCR(ctx, projectID int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKDLProjectCR", reflect.TypeOf((*MockClientInterface)(nil).CreateKDLProjectCR), ctx, projectID)
 }
 
+// CreateKDLUserToolsCR mocks base method.
+func (m *MockClientInterface) CreateKDLUserToolsCR(ctx context.Context, username string, data UserToolsData) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateKDLUserToolsCR", ctx, username, data)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateKDLUserToolsCR indicates an expected call of CreateKDLUserToolsCR.
+func (mr *MockClientInterfaceMockRecorder) CreateKDLUserToolsCR(ctx, username, data interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKDLUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).CreateKDLUserToolsCR), ctx, username, data)
+}
+
 // CreateSecret mocks base method.
 func (m *MockClientInterface) CreateSecret(ctx context.Context, name string, values, labels map[string]string) error {
 	m.ctrl.T.Helper()
@@ -108,20 +122,6 @@ func (m *MockClientInterface) CreateUserServiceAccount(ctx context.Context, user
 func (mr *MockClientInterfaceMockRecorder) CreateUserServiceAccount(ctx, usernameSlug interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserServiceAccount", reflect.TypeOf((*MockClientInterface)(nil).CreateUserServiceAccount), ctx, usernameSlug)
-}
-
-// CreateUserToolsCR mocks base method.
-func (m *MockClientInterface) CreateUserToolsCR(ctx context.Context, username string, data UserToolsData) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUserToolsCR", ctx, username, data)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CreateUserToolsCR indicates an expected call of CreateUserToolsCR.
-func (mr *MockClientInterfaceMockRecorder) CreateUserToolsCR(ctx, username, data interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).CreateUserToolsCR), ctx, username, data)
 }
 
 // DeleteKDLProjectCR mocks base method.
@@ -196,32 +196,32 @@ func (mr *MockClientInterfaceMockRecorder) GetConfigMap(ctx, name interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConfigMap", reflect.TypeOf((*MockClientInterface)(nil).GetConfigMap), ctx, name)
 }
 
-// GetConfigMapTemplateNameProject mocks base method.
-func (m *MockClientInterface) GetConfigMapTemplateNameProject() string {
+// GetConfigMapTemplateNameKDLProject mocks base method.
+func (m *MockClientInterface) GetConfigMapTemplateNameKDLProject() string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetConfigMapTemplateNameProject")
+	ret := m.ctrl.Call(m, "GetConfigMapTemplateNameKDLProject")
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// GetConfigMapTemplateNameProject indicates an expected call of GetConfigMapTemplateNameProject.
-func (mr *MockClientInterfaceMockRecorder) GetConfigMapTemplateNameProject() *gomock.Call {
+// GetConfigMapTemplateNameKDLProject indicates an expected call of GetConfigMapTemplateNameKDLProject.
+func (mr *MockClientInterfaceMockRecorder) GetConfigMapTemplateNameKDLProject() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConfigMapTemplateNameProject", reflect.TypeOf((*MockClientInterface)(nil).GetConfigMapTemplateNameProject))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConfigMapTemplateNameKDLProject", reflect.TypeOf((*MockClientInterface)(nil).GetConfigMapTemplateNameKDLProject))
 }
 
-// GetConfigMapTemplateNameUserTools mocks base method.
-func (m *MockClientInterface) GetConfigMapTemplateNameUserTools() string {
+// GetConfigMapTemplateNameKDLUserTools mocks base method.
+func (m *MockClientInterface) GetConfigMapTemplateNameKDLUserTools() string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetConfigMapTemplateNameUserTools")
+	ret := m.ctrl.Call(m, "GetConfigMapTemplateNameKDLUserTools")
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// GetConfigMapTemplateNameUserTools indicates an expected call of GetConfigMapTemplateNameUserTools.
-func (mr *MockClientInterfaceMockRecorder) GetConfigMapTemplateNameUserTools() *gomock.Call {
+// GetConfigMapTemplateNameKDLUserTools indicates an expected call of GetConfigMapTemplateNameKDLUserTools.
+func (mr *MockClientInterfaceMockRecorder) GetConfigMapTemplateNameKDLUserTools() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConfigMapTemplateNameUserTools", reflect.TypeOf((*MockClientInterface)(nil).GetConfigMapTemplateNameUserTools))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConfigMapTemplateNameKDLUserTools", reflect.TypeOf((*MockClientInterface)(nil).GetConfigMapTemplateNameKDLUserTools))
 }
 
 // GetKDLProjectCR mocks base method.
@@ -237,6 +237,21 @@ func (m *MockClientInterface) GetKDLProjectCR(ctx context.Context, name string) 
 func (mr *MockClientInterfaceMockRecorder) GetKDLProjectCR(ctx, name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKDLProjectCR", reflect.TypeOf((*MockClientInterface)(nil).GetKDLProjectCR), ctx, name)
+}
+
+// GetKDLUserToolsCR mocks base method.
+func (m *MockClientInterface) GetKDLUserToolsCR(ctx context.Context, username string) (*unstructured.Unstructured, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetKDLUserToolsCR", ctx, username)
+	ret0, _ := ret[0].(*unstructured.Unstructured)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetKDLUserToolsCR indicates an expected call of GetKDLUserToolsCR.
+func (mr *MockClientInterfaceMockRecorder) GetKDLUserToolsCR(ctx, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKDLUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).GetKDLUserToolsCR), ctx, username)
 }
 
 // GetRuntimeIDFromUserTools mocks base method.
@@ -329,21 +344,6 @@ func (mr *MockClientInterfaceMockRecorder) GetUserServiceAccount(ctx, usernameSl
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserServiceAccount", reflect.TypeOf((*MockClientInterface)(nil).GetUserServiceAccount), ctx, usernameSlug)
 }
 
-// GetUserToolsCR mocks base method.
-func (m *MockClientInterface) GetUserToolsCR(ctx context.Context, username string) (*unstructured.Unstructured, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserToolsCR", ctx, username)
-	ret0, _ := ret[0].(*unstructured.Unstructured)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetUserToolsCR indicates an expected call of GetUserToolsCR.
-func (mr *MockClientInterfaceMockRecorder) GetUserToolsCR(ctx, username interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).GetUserToolsCR), ctx, username)
-}
-
 // IsUserToolPODRunning mocks base method.
 func (m *MockClientInterface) IsUserToolPODRunning(ctx context.Context, username string) (bool, error) {
 	m.ctrl.T.Helper()
@@ -374,19 +374,19 @@ func (mr *MockClientInterfaceMockRecorder) ListKDLProjectsNameCR(ctx interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListKDLProjectsNameCR", reflect.TypeOf((*MockClientInterface)(nil).ListKDLProjectsNameCR), ctx)
 }
 
-// ListUserToolsCR mocks base method.
-func (m *MockClientInterface) ListUserToolsCR(ctx context.Context) ([]unstructured.Unstructured, error) {
+// ListKDLUserToolsCR mocks base method.
+func (m *MockClientInterface) ListKDLUserToolsCR(ctx context.Context) ([]unstructured.Unstructured, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListUserToolsCR", ctx)
+	ret := m.ctrl.Call(m, "ListKDLUserToolsCR", ctx)
 	ret0, _ := ret[0].([]unstructured.Unstructured)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListUserToolsCR indicates an expected call of ListUserToolsCR.
-func (mr *MockClientInterfaceMockRecorder) ListUserToolsCR(ctx interface{}) *gomock.Call {
+// ListKDLUserToolsCR indicates an expected call of ListKDLUserToolsCR.
+func (mr *MockClientInterfaceMockRecorder) ListKDLUserToolsCR(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).ListUserToolsCR), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListKDLUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).ListKDLUserToolsCR), ctx)
 }
 
 // UpdateKDLProjectsCR mocks base method.
@@ -401,6 +401,20 @@ func (m *MockClientInterface) UpdateKDLProjectsCR(ctx context.Context, projectID
 func (mr *MockClientInterfaceMockRecorder) UpdateKDLProjectsCR(ctx, projectID, crd interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateKDLProjectsCR", reflect.TypeOf((*MockClientInterface)(nil).UpdateKDLProjectsCR), ctx, projectID, crd)
+}
+
+// UpdateKDLUserToolsCR mocks base method.
+func (m *MockClientInterface) UpdateKDLUserToolsCR(ctx context.Context, resourceName string, data UserToolsData, crd *map[string]interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateKDLUserToolsCR", ctx, resourceName, data, crd)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateKDLUserToolsCR indicates an expected call of UpdateKDLUserToolsCR.
+func (mr *MockClientInterfaceMockRecorder) UpdateKDLUserToolsCR(ctx, resourceName, data, crd interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateKDLUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).UpdateKDLUserToolsCR), ctx, resourceName, data, crd)
 }
 
 // UpdateSecret mocks base method.
@@ -429,18 +443,4 @@ func (m *MockClientInterface) UpdateUserSSHKeySecret(ctx context.Context, user e
 func (mr *MockClientInterfaceMockRecorder) UpdateUserSSHKeySecret(ctx, user, public, private interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserSSHKeySecret", reflect.TypeOf((*MockClientInterface)(nil).UpdateUserSSHKeySecret), ctx, user, public, private)
-}
-
-// UpdateUserToolsCR mocks base method.
-func (m *MockClientInterface) UpdateUserToolsCR(ctx context.Context, resourceName string, data UserToolsData, crd *map[string]interface{}) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateUserToolsCR", ctx, resourceName, data, crd)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UpdateUserToolsCR indicates an expected call of UpdateUserToolsCR.
-func (mr *MockClientInterfaceMockRecorder) UpdateUserToolsCR(ctx, resourceName, data, crd interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).UpdateUserToolsCR), ctx, resourceName, data, crd)
 }

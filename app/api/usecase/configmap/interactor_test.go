@@ -80,20 +80,20 @@ func TestInteractor_WatchConfigMapTemplates(t *testing.T) {
 
 	s.mocks.k8sClient.EXPECT().CreateConfigMapWatcher(gomock.Any()).Return(watcher, nil)
 
-	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameProject().Return(templateKDLProjectConfigMap)
-	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateKDLUserToolsConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateKDLProjectConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateKDLUserToolsConfigMap)
 	s.mocks.projectUseCase.EXPECT().UpdateKDLProjects(gomock.Any()).Return(nil)
 
-	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameProject().Return(templateKDLProjectConfigMap)
-	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateKDLUserToolsConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateKDLProjectConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateKDLUserToolsConfigMap)
 	s.mocks.projectUseCase.EXPECT().UpdateKDLProjects(gomock.Any()).Return(errUnexpected)
 
-	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameProject().Return(templateKDLProjectConfigMap)
-	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateKDLUserToolsConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateKDLProjectConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateKDLUserToolsConfigMap)
 	s.mocks.userUseCase.EXPECT().UpdateKDLUserTools(gomock.Any()).Return(nil)
 
-	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameProject().Return(templateKDLProjectConfigMap)
-	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateKDLUserToolsConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateKDLProjectConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateKDLUserToolsConfigMap)
 	s.mocks.userUseCase.EXPECT().UpdateKDLUserTools(gomock.Any()).Return(errUnexpected)
 
 	go func() {

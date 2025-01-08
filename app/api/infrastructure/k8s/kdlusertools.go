@@ -131,12 +131,12 @@ func (k *Client) updateUserToolsTemplate(
 	return &crdToUpdate, nil
 }
 
-func (k *Client) GetConfigMapTemplateNameUserTools() string {
+func (k *Client) GetConfigMapTemplateNameKDLUserTools() string {
 	return k.cfg.ReleaseName + "-server-user-tools-template"
 }
 
-// CreateUserToolsCR creates the user tools Custom Resource in Kubernetes.
-func (k *Client) CreateUserToolsCR(
+// CreateKDLUserToolsCR creates the user tools Custom Resource in Kubernetes.
+func (k *Client) CreateKDLUserToolsCR(
 	ctx context.Context,
 	username string,
 	data UserToolsData,
@@ -144,7 +144,7 @@ func (k *Client) CreateUserToolsCR(
 	slugUsername := k.getSlugUsername(username)
 	resName := fmt.Sprintf("usertools-%s", slugUsername)
 
-	configMap, err := k.GetConfigMap(ctx, k.GetConfigMapTemplateNameUserTools())
+	configMap, err := k.GetConfigMap(ctx, k.GetConfigMapTemplateNameKDLUserTools())
 	if err != nil {
 		return err
 	}
@@ -258,7 +258,7 @@ func (k *Client) userToolsPODLabelSelector(resName string) string {
 	return fmt.Sprintf("app.kubernetes.io/instance=%s", resName)
 }
 
-func (k *Client) ListUserToolsCR(ctx context.Context) ([]unstructured.Unstructured, error) {
+func (k *Client) ListKDLUserToolsCR(ctx context.Context) ([]unstructured.Unstructured, error) {
 	kdlUserTools, err := k.kdlUserToolsRes.Namespace(k.cfg.Kubernetes.Namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, err
@@ -267,7 +267,7 @@ func (k *Client) ListUserToolsCR(ctx context.Context) ([]unstructured.Unstructur
 	return kdlUserTools.Items, nil
 }
 
-func (k *Client) GetUserToolsCR(ctx context.Context, resourceName string) (*unstructured.Unstructured, error) {
+func (k *Client) GetKDLUserToolsCR(ctx context.Context, resourceName string) (*unstructured.Unstructured, error) {
 	object, err := k.kdlUserToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Get(ctx, resourceName, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
@@ -276,8 +276,8 @@ func (k *Client) GetUserToolsCR(ctx context.Context, resourceName string) (*unst
 	return object, nil
 }
 
-func (k *Client) UpdateUserToolsCR(ctx context.Context, resourceName string, data UserToolsData, crd *map[string]interface{}) error {
-	existingKDLUserTool, err := k.GetUserToolsCR(ctx, resourceName)
+func (k *Client) UpdateKDLUserToolsCR(ctx context.Context, resourceName string, data UserToolsData, crd *map[string]interface{}) error {
+	existingKDLUserTool, err := k.GetKDLUserToolsCR(ctx, resourceName)
 	if err != nil {
 		return err
 	}

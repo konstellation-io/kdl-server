@@ -284,7 +284,7 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 
 func (i *interactor) UpdateKDLProjects(ctx context.Context) error {
 	// get the CRD template from the ConfigMap
-	configMap, err := i.k8sClient.GetConfigMap(ctx, i.k8sClient.GetConfigMapTemplateNameProject())
+	configMap, err := i.k8sClient.GetConfigMap(ctx, i.k8sClient.GetConfigMapTemplateNameKDLProject())
 	if err != nil {
 		return err
 	}

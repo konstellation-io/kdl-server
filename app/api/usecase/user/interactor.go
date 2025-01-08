@@ -205,7 +205,7 @@ func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, ca
 
 	i.logger.Info("Creating user tools for user", "email", email)
 
-	err = i.k8sClient.CreateUserToolsCR(ctx, user.Username, data)
+	err = i.k8sClient.CreateKDLUserToolsCR(ctx, user.Username, data)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -382,7 +382,7 @@ func (i *Interactor) GetKubeconfig(ctx context.Context, username string) (string
 
 // Get the CRD template from the ConfigMap and update all the KDL UserTools in the namespace.
 func (i *Interactor) UpdateKDLUserTools(ctx context.Context) error {
-	configMap, err := i.k8sClient.GetConfigMap(ctx, i.k8sClient.GetConfigMapTemplateNameUserTools())
+	configMap, err := i.k8sClient.GetConfigMap(ctx, i.k8sClient.GetConfigMapTemplateNameKDLUserTools())
 	if err != nil {
 		return err
 	}
@@ -394,7 +394,7 @@ func (i *Interactor) UpdateKDLUserTools(ctx context.Context) error {
 	}
 
 	// get all the KDL UserTools in the namespace and iterate over to update them
-	kdlUserTools, err := i.k8sClient.ListUserToolsCR(ctx)
+	kdlUserTools, err := i.k8sClient.ListKDLUserToolsCR(ctx)
 	if err != nil {
 		return err
 	}
@@ -443,7 +443,7 @@ func (i *Interactor) UpdateKDLUserTools(ctx context.Context) error {
 			continue
 		}
 
-		err = i.k8sClient.UpdateUserToolsCR(ctx, resourceName, data, &crd)
+		err = i.k8sClient.UpdateKDLUserToolsCR(ctx, resourceName, data, &crd)
 		if err != nil {
 			i.logger.Error(err, "Error updating KDL UserTools CR in k8s", "userToolName", resourceName)
 		}

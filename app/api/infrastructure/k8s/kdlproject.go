@@ -9,7 +9,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
-func (k *Client) GetConfigMapTemplateNameProject() string {
+func (k *Client) GetConfigMapTemplateNameKDLProject() string {
 	return k.cfg.ReleaseName + "-server-project-template"
 }
 
@@ -54,7 +54,7 @@ func (k *Client) updateKDLProjectTemplate(projectID string, crd *map[string]inte
 
 func (k *Client) CreateKDLProjectCR(ctx context.Context, projectID string) error {
 	// get the CRD template from the ConfigMap
-	configMap, err := k.GetConfigMap(ctx, k.GetConfigMapTemplateNameProject())
+	configMap, err := k.GetConfigMap(ctx, k.GetConfigMapTemplateNameKDLProject())
 
 	if err != nil {
 		return err

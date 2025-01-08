@@ -312,7 +312,7 @@ func TestInteractor_StartTools(t *testing.T) {
 	s.mocks.runtimeRepo.EXPECT().Get(ctx, runtimeID).Return(expectedRuntime, nil)
 	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capability.ID).Return(capability, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
-	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, data).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, username, data).Return(nil)
 
 	returnedUser, err := s.interactor.StartTools(ctx, email, &runtimeID, &capability.ID)
 
@@ -355,7 +355,7 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 
 	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capability.ID).Return(capability, nil)
 	// AND the CR creation does not return any error
-	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, data).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, username, data).Return(nil)
 
 	// WHEN the tools are started
 	returnedUser, err := s.interactor.StartTools(ctx, email, nil, &capability.ID)
@@ -418,7 +418,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 
 	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capability.ID).Return(capability, nil)
 	// AND the CR creation does not return any error
-	s.mocks.k8sClientMock.EXPECT().CreateUserToolsCR(ctx, username, data).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, username, data).Return(nil)
 
 	// WHEN the tools are started
 	returnedUser, err := s.interactor.StartTools(ctx, email, &runtimeID, &capability.ID)
@@ -839,10 +839,12 @@ func TestInteractor_UpdateKDLUserTools(t *testing.T) {
 		},
 	}
 
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
 	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return(listKDLUserTools, nil)
-	s.mocks.k8sClientMock.EXPECT().UpdateUserToolsCR(ctx, "kdlusertools-v1", data, &crd).Return(nil)
+	s.mocks.runtimeRepo.EXPECT().Get(ctx, "12345").Return(entity.Runtime{}, nil)
+	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, "54321").Return(entity.Capabilities{}, nil)
+	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
+	s.mocks.k8sClientMock.EXPECT().UpdateKDLUserToolsCR(ctx, "kdlusertools-v1", data, &crd).Return(nil)
 
 	err := s.interactor.UpdateKDLUserTools(ctx)
 	require.NoError(t, err)
@@ -878,12 +880,12 @@ func TestInteractor_UpdateKDLUserTools_UpdateKDLUserToolsCR_Error(t *testing.T) 
 		},
 	}
 
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
 	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return(listKDLUserTools, nil)
+	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
 	s.mocks.runtimeRepo.EXPECT().Get(ctx, "12345").Return(entity.Runtime{}, nil)
 	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, "54321").Return(entity.Capabilities{}, nil)
-	s.mocks.k8sClientMock.EXPECT().UpdateUserToolsCR(ctx, "kdlusertools-v1", data, &crd).Return(errUpdatingCrd)
+	s.mocks.k8sClientMock.EXPECT().UpdateKDLUserToolsCR(ctx, "kdlusertools-v1", data, &crd).Return(errUpdatingCrd)
 
 	// even if there is an error updating the CRD,
 	// the function should return no error to allow updating the next CRD
@@ -911,9 +913,9 @@ func TestInteractor_UpdateKDLUserTools_NoSpec(t *testing.T) {
 		},
 	}
 
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
 	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return(listKDLUserTools, nil)
+	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
 
 	// even if there is an error updating the CRD,
 	// the function should return no error to allow updating the next CRD
@@ -943,9 +945,9 @@ func TestInteractor_UpdateKDLUserTools_NoPodLabels(t *testing.T) {
 		},
 	}
 
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
 	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return(listKDLUserTools, nil)
+	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
 
 	// even if there is an error updating the CRD,
 	// the function should return no error to allow updating the next CRD
@@ -977,9 +979,9 @@ func TestInteractor_UpdateKDLUserTools_NoRuntimeId(t *testing.T) {
 		},
 	}
 
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
 	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return(listKDLUserTools, nil)
+	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
 
 	// even if there is an error updating the CRD,
 	// the function should return no error to allow updating the next CRD
@@ -1013,9 +1015,9 @@ func TestInteractor_UpdateKDLUserTools_NoCapabilityId(t *testing.T) {
 		},
 	}
 
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
 	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return(listKDLUserTools, nil)
+	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
 
 	// even if there is an error updating the CRD,
 	// the function should return no error to allow updating the next CRD
@@ -1029,7 +1031,7 @@ func TestInteractor_UpdateKDLUserTools_NoConfigmap(t *testing.T) {
 
 	ctx := context.Background()
 
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
 	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(nil, errNoConfigMap)
 
 	err := s.interactor.UpdateKDLUserTools(ctx)
@@ -1044,7 +1046,7 @@ func TestInteractor_UpdateKDLUserTools_CDRTemplate_ErrorNoTemplate(t *testing.T)
 
 	configMap := v1.ConfigMap{}
 
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
 	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
 
 	err := s.interactor.UpdateKDLUserTools(ctx)
@@ -1062,9 +1064,9 @@ func TestInteractor_UpdateKDLUserTools_ListKDLUserToolsNameCR_Error(t *testing.T
 	}
 	configMap.Data["template"] = ""
 
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
 	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return(nil, errListUsertools)
+	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(nil, errListUsertools)
 
 	err := s.interactor.UpdateKDLUserTools(ctx)
 	require.Error(t, err)
@@ -1081,9 +1083,9 @@ func TestInteractor_UpdateKDLUserTools_ListKDLUserToolsNameCR_EmptyList(t *testi
 	}
 	configMap.Data["template"] = ""
 
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameUserTools().Return(templateConfigMap)
+	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
 	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListUserToolsCR(ctx).Return([]unstructured.Unstructured{}, nil)
+	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return([]unstructured.Unstructured{}, nil)
 
 	err := s.interactor.UpdateKDLUserTools(ctx)
 	require.NoError(t, err)

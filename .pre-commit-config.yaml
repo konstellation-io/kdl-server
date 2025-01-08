@@ -32,3 +32,11 @@ repos:
   hooks:
     - id: helm-docs
       files: ^(project-operator|user-tools-operator)/.*(README\.md\.gotmpl|(Chart|requirements|values)\.yaml)$
+
+- repo: local
+  hooks:
+    - id: go-tidy-all-modules
+      name: go-tidy-all-modules
+      entry: hack/scripts/go_tidy_all_modules.sh
+      language: script
+      pass_filenames: false

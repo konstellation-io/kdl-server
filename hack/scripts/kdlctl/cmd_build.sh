@@ -28,23 +28,23 @@ build_server() {
 }
 
 build_project_operator() {
-  build_image project-operator project-operator
+  build_image kdl-project-operator project-operator
 }
 
 build_user_tools_operator() {
-  build_image user-tools-operator user-tools-operator
+  build_image kdl-user-tools-operator user-tools-operator
 }
 
 build_vscode() {
-  build_image vscode vscode
+  build_image kdl-vscode vscode
 }
 
 build_repo_cloner() {
-  build_image repo-cloner repo-cloner
+  build_image kdl-repo-cloner repo-cloner
 }
 
 build_mlflow() {
-  build_image mlflow mlflow
+  build_image kdl-mlflow mlflow
 }
 
 build_kg() {
@@ -58,7 +58,7 @@ build_kg() {
       return
     fi
 
-    build_image knowledge-galaxy $KNOWLEDGE_GALAXY_PATH
+    build_image kdl-knowledge-galaxy $KNOWLEDGE_GALAXY_PATH
 }
 
 build_image() {

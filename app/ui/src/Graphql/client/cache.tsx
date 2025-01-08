@@ -10,7 +10,6 @@ import { PanelInfo } from './models/Panel';
 import { SettingsTab } from './models/SettingsTab';
 import { GetRuntimes_runtimes } from '../queries/types/GetRuntimes';
 import { GetCapabilities_capabilities } from '../queries/types/GetCapabilities';
-import { RepositoryAuthMethod } from '../types/globalTypes';
 
 type ToolName = keyof GetUserTools_project_toolUrls;
 
@@ -32,22 +31,12 @@ export const initialNewProject: NewProject = {
   },
   repository: {
     values: {
-      type: null,
-    },
-    errors: { type: 'Please choose a repo type' },
-  },
-  externalRepository: {
-    values: {
       url: '',
       username: '',
-      credential: '',
-      authMethod: RepositoryAuthMethod.TOKEN,
     },
     errors: {
       url: 'This field is mandatory',
-      credential: 'This field is mandatory',
       username: 'This field is mandatory',
-      authMethod: 'This field is mandatory',
     },
   },
 };

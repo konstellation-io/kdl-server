@@ -3,11 +3,10 @@ import RepositoryTypeComponent, {
   SIZE,
 } from 'Pages/NewProject/pages/Repository/components/RepositoryTypeComponent/RepositoryTypeComponent';
 
-import { ErrorMessage, SpinnerCircular } from 'kwc';
+import { ErrorMessage } from 'kwc';
 import CopyToClipboard from 'Components/CopyToClipboard/CopyToClipboard';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
-import React, { useEffect } from 'react';
-import { RepositoryType } from 'Graphql/types/globalTypes';
+import React from 'react';
 import styles from './TabGit.module.scss';
 import { useQuery } from '@apollo/client';
 import GetMeQuery from 'Graphql/queries/getMe';
@@ -20,21 +19,13 @@ function TabGit({ project }: Props) {
   const { repository } = project;
   const { data: loading, error } = useQuery<GetMe>(GetMeQuery);
 
-  // if (loading) return <SpinnerCircular />;
   if (!repository || error) return <ErrorMessage />;
-
-  // const isExternal = repository.type === RepositoryType.EXTERNAL;
-
-  useEffect(() => {
-    console.log('Data', loading);
-    //eslint-disable-next-line
-  }, []);
 
   return (
     <div className={styles.container} data-testid="tabGit">
       <div className={styles.repoType}>
         <RepositoryTypeComponent squareLocation={LOCATION.IN} size={SIZE.TINY} shouldAnimate={false} />
-        <p className={styles.repoTypeName}>{`${repository.type} REPOSITORY`}</p>
+        <p className={styles.repoTypeName}>REPOSITORY URL</p>
       </div>
       <div className={styles.url}>
         <p>{repository.url}</p>

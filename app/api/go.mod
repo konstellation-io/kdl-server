@@ -4,7 +4,7 @@ go 1.23.2
 
 require (
 	bou.ke/monkey v1.0.2
-	github.com/99designs/gqlgen v0.17.61
+	github.com/99designs/gqlgen v0.17.63
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-logr/logr v1.4.2
 	github.com/go-logr/zapr v1.3.0
@@ -15,7 +15,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/testcontainers/testcontainers-go v0.34.0
 	github.com/testcontainers/testcontainers-go/modules/k3s v0.34.0
-	github.com/vektah/gqlparser/v2 v2.5.20
+	github.com/vektah/gqlparser/v2 v2.5.21
 	go.mongodb.org/mongo-driver v1.17.1
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.31.0
@@ -116,7 +116,7 @@ require (
 	golang.org/x/term v0.27.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.7.0 // indirect
-	google.golang.org/protobuf v1.35.2 // indirect
+	google.golang.org/protobuf v1.36.1 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect

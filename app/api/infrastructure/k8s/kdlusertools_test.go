@@ -14,6 +14,7 @@ import (
 
 const (
 	username                         = "test.username"
+	resName                          = "usertools-test-username"
 	runtimeID                        = "test-runtime-id"
 	runtimeImage                     = "test-runtime-image"
 	runtimeTag                       = "test-runtime-tag"
@@ -47,7 +48,7 @@ var dataWithCapabilities = k8s.UserToolsData{
 	},
 }
 
-func (s *testSuite) TestCreateUserToolsCR_and_DeleteUserToolsCR() {
+func (s *testSuite) createKDLUserToolsConfigMapTemplate() {
 	yamlContent := `
 apiVersion: kdl.konstellation.io/v1
 kind: KDLUserTools
@@ -61,8 +62,8 @@ spec:
   usernameSlug: my-demo-username-slug
   vscodeRuntime:
     image:
-       repository: my-demo-repository
-       tag: my-demo-tag
+      repository: my-demo-repository
+      tag: my-demo-tag
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -82,7 +83,10 @@ spec:
 		metav1.CreateOptions{},
 	)
 	s.Require().NoError(err)
+}
 
+func (s *testSuite) TestCreateKDLUserToolsCR_and_DeleteUserToolsCR() {
+	s.createKDLUserToolsConfigMapTemplate()
 	// create go routine to cancel the context in 5 seconds. Risk of flaky test
 	ctx, cancelCreateUserToolCR := context.WithCancel(context.Background())
 	go func() {
@@ -90,7 +94,7 @@ spec:
 		cancelCreateUserToolCR()
 	}()
 
-	err = s.Client.CreateUserToolsCR(ctx, username, dataWithCapabilities)
+	err := s.Client.CreateKDLUserToolsCR(ctx, username, dataWithCapabilities)
 	s.Require().NoError(err)
 
 	// Delete the CR
@@ -105,12 +109,12 @@ spec:
 	s.Require().NoError(err)
 }
 
-func (s *testSuite) TestCreateUserToolsCR_NoConfigMap() {
-	err := s.Client.CreateUserToolsCR(context.Background(), username, data)
+func (s *testSuite) TestCreateKDLUserToolsCR_NoConfigMap() {
+	err := s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
 	s.Require().Error(err)
 }
 
-func (s *testSuite) TestCreateUserToolsCR_ConfigMapWithoutTemplate() {
+func (s *testSuite) TestCreateKDLUserToolsCR_ConfigMapWithoutTemplate() {
 	_, err := s.Clientset.CoreV1().ConfigMaps(namespace).Create(
 		context.Background(), &v1.ConfigMap{
 			ObjectMeta: metav1.ObjectMeta{
@@ -121,11 +125,11 @@ func (s *testSuite) TestCreateUserToolsCR_ConfigMapWithoutTemplate() {
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateUserToolsCR(context.Background(), username, data)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
 	s.Require().Error(err)
 }
 
-func (s *testSuite) TestCreateUserToolsCR_TemplateWithoutMetadata() {
+func (s *testSuite) TestCreateKDLUserToolsCR_TemplateWithoutMetadata() {
 	yamlContent := `
 apiVersion: kdl.konstellation.io/v1
 kind: KDLUserTools
@@ -143,11 +147,11 @@ kind: KDLUserTools
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateUserToolsCR(context.Background(), username, data)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
 	s.Require().Error(err)
 }
 
-func (s *testSuite) TestCreateUserToolsCR_TemplateWithoutMetadataLabels() {
+func (s *testSuite) TestCreateKDLUserToolsCR_TemplateWithoutMetadataLabels() {
 	yamlContent := `
 apiVersion: kdl.konstellation.io/v1
 kind: KDLUserTools
@@ -168,11 +172,11 @@ metadata:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateUserToolsCR(context.Background(), username, data)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
 	s.Require().Error(err)
 }
 
-func (s *testSuite) TestCreateUserToolsCR_TemplateWithoutSpec() {
+func (s *testSuite) TestCreateKDLUserToolsCR_TemplateWithoutSpec() {
 	yamlContent := `
 apiVersion: kdl.konstellation.io/v1
 kind: KDLUserTools
@@ -195,11 +199,11 @@ metadata:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateUserToolsCR(context.Background(), username, data)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
 	s.Require().Error(err)
 }
 
-func (s *testSuite) TestCreateUserToolsCR_TemplateWithoutVscodeRuntime() {
+func (s *testSuite) TestCreateKDLUserToolsCR_TemplateWithoutVscodeRuntime() {
 	yamlContent := `
 apiVersion: kdl.konstellation.io/v1
 kind: KDLUserTools
@@ -225,11 +229,11 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateUserToolsCR(context.Background(), username, data)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
 	s.Require().Error(err)
 }
 
-func (s *testSuite) TestCreateUserToolsCR_TemplateWithoutVscodeRuntimeImage() {
+func (s *testSuite) TestCreateKDLUserToolsCR_TemplateWithoutVscodeRuntimeImage() {
 	yamlContent := `
 apiVersion: kdl.konstellation.io/v1
 kind: KDLUserTools
@@ -256,11 +260,11 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateUserToolsCR(context.Background(), username, data)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
 	s.Require().Error(err)
 }
 
-func (s *testSuite) TestCreateUserToolsCR_TemplateWithoutSpecNodeSelector() {
+func (s *testSuite) TestCreateKDLUserToolsCR_TemplateWithoutSpecNodeSelector() {
 	yamlContent := `
 apiVersion: kdl.konstellation.io/v1
 kind: KDLUserTools
@@ -290,11 +294,11 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateUserToolsCR(context.Background(), username, dataWithCapabilities)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, dataWithCapabilities)
 	s.Require().Error(err)
 }
 
-func (s *testSuite) TestCreateUserToolsCR_TemplateWithoutSpecTolerations() {
+func (s *testSuite) TestCreateKDLUserToolsCR_TemplateWithoutSpecTolerations() {
 	yamlContent := `
 apiVersion: kdl.konstellation.io/v1
 kind: KDLUserTools
@@ -325,11 +329,11 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateUserToolsCR(context.Background(), username, dataWithCapabilities)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, dataWithCapabilities)
 	s.Require().Error(err)
 }
 
-func (s *testSuite) TestCreateUserToolsCR_TemplateWithoutAffinity() {
+func (s *testSuite) TestCreateKDLUserToolsCR_TemplateWithoutAffinity() {
 	yamlContent := `
 apiVersion: kdl.konstellation.io/v1
 kind: KDLUserTools
@@ -361,11 +365,11 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateUserToolsCR(context.Background(), username, dataWithCapabilities)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, dataWithCapabilities)
 	s.Require().Error(err)
 }
 
-func (s *testSuite) TestCreateUserToolsCR_TemplateWithoutSpecPodLabels() {
+func (s *testSuite) TestCreateKDLUserToolsCR_TemplateWithoutSpecPodLabels() {
 	yamlContent := `
 apiVersion: kdl.konstellation.io/v1
 kind: KDLUserTools
@@ -398,6 +402,125 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateUserToolsCR(context.Background(), username, data)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
 	s.Require().Error(err)
+}
+
+func (s *testSuite) TestListKDLUserToolsCR() {
+	s.createKDLUserToolsConfigMapTemplate()
+	// create go routine to cancel the context in 5 seconds. Risk of flaky test
+	ctx, cancelCreateUserToolCR := context.WithCancel(context.Background())
+	go func() {
+		<-time.After(5 * time.Second)
+		cancelCreateUserToolCR()
+	}()
+
+	err := s.Client.CreateKDLUserToolsCR(ctx, username, dataWithCapabilities)
+	s.Require().NoError(err)
+
+	// List the CR
+	list, err := s.Client.ListKDLUserToolsCR(context.Background())
+	s.Require().NoError(err)
+	s.Require().Len(list, 1)
+
+	// Delete the CR
+	// create go routine to cancel the context in 5 seconds. Risk of flaky test
+	ctx, cancelDeleteUserToolsCR := context.WithCancel(context.Background())
+	go func() {
+		<-time.After(5 * time.Second)
+		cancelDeleteUserToolsCR()
+	}()
+
+	err = s.Client.DeleteUserToolsCR(ctx, username)
+	s.Require().NoError(err)
+}
+
+func (s *testSuite) TestListKDLUserToolsCR_Empty() {
+	// List the CR
+	list, err := s.Client.ListKDLUserToolsCR(context.Background())
+	s.Require().NoError(err)
+	s.Require().Len(list, 0)
+}
+
+func (s *testSuite) TestGetKDLUserToolsCR() {
+	s.createKDLUserToolsConfigMapTemplate()
+	// create go routine to cancel the context in 5 seconds. Risk of flaky test
+	ctx, cancelCreateUserToolCR := context.WithCancel(context.Background())
+	go func() {
+		<-time.After(5 * time.Second)
+		cancelCreateUserToolCR()
+	}()
+
+	err := s.Client.CreateKDLUserToolsCR(ctx, username, dataWithCapabilities)
+	s.Require().NoError(err)
+
+	// Get the CR
+	item, err := s.Client.GetKDLUserToolsCR(context.Background(), resName)
+	s.Require().NoError(err)
+	s.Require().NotNil(item)
+
+	// Delete the CR
+	// create go routine to cancel the context in 5 seconds. Risk of flaky test
+	ctx, cancelDeleteUserToolsCR := context.WithCancel(context.Background())
+	go func() {
+		<-time.After(5 * time.Second)
+		cancelDeleteUserToolsCR()
+	}()
+
+	err = s.Client.DeleteUserToolsCR(ctx, username)
+	s.Require().NoError(err)
+}
+
+func (s *testSuite) TestGetKDLUserToolsCR_Empty() {
+	// Get the CR
+	item, err := s.Client.GetKDLUserToolsCR(context.Background(), resName)
+	s.Require().Error(err)
+	s.Require().Nil(item)
+}
+
+func (s *testSuite) TestUpdateKDLUserToolsCR() {
+	s.createKDLUserToolsConfigMapTemplate()
+	// create go routine to cancel the context in 5 seconds. Risk of flaky test
+	ctx, cancelCreateUserToolCR := context.WithCancel(context.Background())
+	go func() {
+		<-time.After(5 * time.Second)
+		cancelCreateUserToolCR()
+	}()
+
+	err := s.Client.CreateKDLUserToolsCR(ctx, username, dataWithCapabilities)
+	s.Require().NoError(err)
+
+	// Update the CR
+	crd := map[string]interface{}{
+		"spec": map[string]interface{}{
+			"username":     "new-username",
+			"usernameSlug": "new-username-slug",
+			"vscodeRuntime": map[string]interface{}{
+				"image": map[string]interface{}{
+					"repository": "new-repo",
+					"tag":        "new-tag",
+				},
+			},
+			"podLabels": map[string]interface{}{
+				"runtimeId":    "new-runtime-id",
+				"capabilityId": "new-capabilities-id",
+			},
+		},
+		"metadata": map[string]interface{}{
+			"name": "new-res-name",
+		},
+	}
+	err = s.Client.UpdateKDLUserToolsCR(context.Background(), resName, data, &crd)
+	s.Require().NoError(err)
+
+	// Delete the CR
+	// create go routine to cancel the context in 5 seconds. Risk of flaky test
+	ctx, cancelDeleteUserToolsCR := context.WithCancel(context.Background())
+	go func() {
+		<-time.After(5 * time.Second)
+		cancelDeleteUserToolsCR()
+	}()
+
+	err = s.Client.DeleteUserToolsCR(ctx, username)
+	s.Require().NoError(err)
 }

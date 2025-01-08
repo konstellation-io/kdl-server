@@ -16,7 +16,7 @@ function TabGit({ project }: Props) {
   const { repository } = project;
   const { data: loading, error } = useQuery<GetMe>(GetMeQuery);
 
-  if (!repository || error) return <ErrorMessage />;
+  if (!repository || error || !loading) return <ErrorMessage />;
 
   return (
     <div className={styles.container} data-testid="tabGit">

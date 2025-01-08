@@ -8,6 +8,10 @@ COPY --from=s3fs /usr/bin/s3fs /usr/bin/s3fs
 COPY --from=s3fs /usr/local/bin/*.sh /usr/local/bin/
 COPY --from=s3fs /etc/fuse.conf /etc/fuse.conf
 
+ARG USER=filebrowser
+ARG UID=1000
+ARG GID=1000
+
 # s3fs dependencies
 RUN apk add --no-cache              \
     fuse                            \
@@ -17,10 +21,12 @@ RUN apk add --no-cache              \
     libstdc++                       \
     tini                         && \
     mkdir -p /srv                && \
-    # Create non-root user
-    addgroup -g 1000 filebrowser && \
-    adduser -D -u 1000 -G filebrowser filebrowser && \
-    chown -R filebrowser:filebrowser /srv
+    # create non-root user
+    addgroup -g ${GID} ${USER}   && \
+    adduser -D -u ${UID}            \
+      -G ${USER} ${USER}         && \
+    # set up app directory
+    chown -R ${UID}:${GID} /srv
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

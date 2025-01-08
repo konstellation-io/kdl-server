@@ -9,6 +9,10 @@ updates:
     - enhancement
     - dependency-management
     - devops-team
+  groups:
+    github-actions:
+      patterns:
+        - "*"
 
 - package-ecosystem: gomod
   directories:
@@ -22,7 +26,11 @@ updates:
     - enhancement
     - dependency-management
     - develop-team
-
+  groups:
+    golang-dependencies:
+      patterns:
+        - "*"
+        
 - package-ecosystem: docker
   directories:
     - "/app"
@@ -36,3 +44,7 @@ updates:
     - dependency-management
     - develop-team
     - devops-team
+  groups:
+    docker-updates:
+      patterns:
+        - "*"

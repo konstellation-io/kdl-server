@@ -77,7 +77,7 @@ func newProjectSuite(t *testing.T) *projectSuite {
 	}
 }
 
-func TestInteractor_CreateExternal(t *testing.T) {
+func TestInteractor_Create(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
@@ -88,10 +88,8 @@ func TestInteractor_CreateExternal(t *testing.T) {
 		ownerUsername = "john"
 	)
 
-	externalRepoURL := "https://github.com/org/repo.git"
-	externalRepoUsername := "username"
-	externalRepoToken := "token"
-	externalAuthMethod := entity.RepositoryAuthToken
+	url := "https://github.com/org/repo.git"
+	username := "username"
 
 	ctx := context.Background()
 	now := time.Now().UTC()
@@ -106,9 +104,8 @@ func TestInteractor_CreateExternal(t *testing.T) {
 		},
 	}
 	createProject.Repository = entity.Repository{
-		Type:            entity.RepositoryTypeExternal,
-		ExternalRepoURL: externalRepoURL,
-		RepoName:        testProjectID,
+		URL:      url,
+		RepoName: testProjectID,
 	}
 
 	expectedProject := entity.Project{
@@ -117,9 +114,8 @@ func TestInteractor_CreateExternal(t *testing.T) {
 		Description:  projectDesc,
 		CreationDate: now,
 		Repository: entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: externalRepoURL,
-			RepoName:        testProjectID,
+			URL:      url,
+			RepoName: testProjectID,
 		},
 	}
 
@@ -131,15 +127,12 @@ func TestInteractor_CreateExternal(t *testing.T) {
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(expectedProject, nil)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
-		ProjectID:              testProjectID,
-		Name:                   projectName,
-		Description:            projectDesc,
-		RepoType:               entity.RepositoryTypeExternal,
-		ExternalRepoURL:        &externalRepoURL,
-		ExternalRepoUsername:   &externalRepoUsername,
-		ExternalRepoCredential: externalRepoToken,
-		ExternalRepoAuthMethod: externalAuthMethod,
-		Owner:                  entity.User{ID: ownerUserID, Username: ownerUsername},
+		ProjectID:   testProjectID,
+		Name:        projectName,
+		Description: projectDesc,
+		URL:         &url,
+		Username:    &username,
+		Owner:       entity.User{ID: ownerUserID, Username: ownerUsername},
 	})
 
 	require.NoError(t, err)
@@ -198,7 +191,6 @@ func TestInteractor_AddMembers(t *testing.T) {
 	p.ID = testProjectID
 	p.Members = []entity.Member{adminMember}
 	p.Repository = entity.Repository{
-		Type:     entity.RepositoryTypeInternal,
 		RepoName: "repo-A",
 	}
 
@@ -259,7 +251,6 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 		{UserID: usersToRemove[1].ID},
 	}
 	p.Repository = entity.Repository{
-		Type:     entity.RepositoryTypeInternal,
 		RepoName: "projectRepo-A",
 	}
 
@@ -343,7 +334,6 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 		{UserID: usersToUpd[1].ID},
 	}
 	p.Repository = entity.Repository{
-		Type:     entity.RepositoryTypeInternal,
 		RepoName: "projectRepo-A",
 	}
 
@@ -453,9 +443,8 @@ func TestInteractor_Delete(t *testing.T) {
 		Description:  "The Project Y Description",
 		CreationDate: now,
 		Repository: entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: "https://github.com/org/repo.git",
-			RepoName:        testProjectID,
+			URL:      "https://github.com/org/repo.git",
+			RepoName: testProjectID,
 		},
 		Members: []entity.Member{
 			{
@@ -516,9 +505,8 @@ func TestInteractor_Delete_NotAdminUser(t *testing.T) {
 		Description:  "The Project Y Description",
 		CreationDate: now,
 		Repository: entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: "https://github.com/org/repo.git",
-			RepoName:        testProjectID,
+			URL:      "https://github.com/org/repo.git",
+			RepoName: testProjectID,
 		},
 	}
 

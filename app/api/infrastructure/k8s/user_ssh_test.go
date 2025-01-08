@@ -10,8 +10,7 @@ import (
 )
 
 const (
-	userSSHName = "user"
-	//nolint:gosec //this is a test
+	userSSHName   = "user"
 	secretSSHName = "user-ssh-keys"
 )
 

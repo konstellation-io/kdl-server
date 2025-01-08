@@ -1,10 +1,8 @@
-import { AccessLevel, RepositoryType } from 'Graphql/types/globalTypes';
+import { AccessLevel } from 'Graphql/types/globalTypes';
 import ROUTE, { buildRoute } from 'Constants/routes';
 import React, { FC } from 'react';
 import { capitalize } from 'lodash';
-import RepositoryTypeComponent, {
-  LOCATION,
-} from 'Pages/NewProject/pages/Repository/components/RepositoryTypeComponent/RepositoryTypeComponent';
+import RepositoryIcon, { LOCATION } from 'Pages/NewProject/pages/RepositoryIcon/RepositoryIcon';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { Link } from 'react-router-dom';
@@ -92,7 +90,6 @@ const LowerBg: FC<BaseProps> = ({ project }) => (
 
 const Band: FC<BaseProps> = ({ project }) => (
   <div className={styles.band}>
-    <div className={styles.label}>{capitalize(project.repository?.type)}</div>
     <div className={styles.otherLabels}>
       {project.archived && (
         <div className={styles.labelArchived} data-testid="projectArchived">
@@ -108,11 +105,7 @@ const Band: FC<BaseProps> = ({ project }) => (
 const Square: FC<BaseProps> = ({ project }) => (
   <div className={styles.square}>
     <div className={styles.repoType}>
-      <RepositoryTypeComponent
-        squareLocation={project.repository?.type === RepositoryType.EXTERNAL ? LOCATION.OUT : LOCATION.IN}
-        customSize={38}
-        shouldAnimate={false}
-      />
+      <RepositoryIcon squareLocation={LOCATION.OUT} customSize={38} shouldAnimate={false} />
     </div>
   </div>
 );

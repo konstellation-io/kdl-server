@@ -2,10 +2,10 @@ ARG MLFOW_IMAGE=v2.18.0
 
 FROM ghcr.io/mlflow/mlflow:${MLFOW_IMAGE}
 
-# Maintainer of the Dockerfile
+# maintainer of the Dockerfile
 LABEL maintainer="Intelygenz - Konstellation Team"
 
-# Set build arguments
+# set build arguments
 ARG USER="mlflow"
 ARG UID="1000"
 ARG GID="1000"
@@ -13,12 +13,12 @@ ENV PIP_NO_CACHE_DIR=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+WORKDIR /mlflow/tracking
+
 # non-root user
 RUN groupadd -r -g ${GID} ${USER} && \
-    useradd -l -r -u ${UID} -g ${USER} -m -s /sbin/nologin ${USER}
-
-WORKDIR /mlflow/tracking
-RUN chown -R ${UID}:${GID} /mlflow && \
+    useradd -l -r -u ${UID} -g ${USER} -m -s /sbin/nologin ${USER} && \
+    chown -R ${UID}:${GID} /mlflow && \
     chown -R ${UID}:${GID} /home/${USER}
 
 # packages to use sqlite
@@ -39,5 +39,6 @@ RUN pip install --no-cache-dir --user \
 # ENV AWS_ACCESS_KEY_ID
 # ENV AWS_SECRET_ACCESS_KEY
 # ENV MLFLOW_S3_ENDPOINT_URL
+# ENV MLFLOW_TRACKING_URI
 
-CMD ["mlflow", "server", "--backend-store-uri", "sqlite:///mlflow.db", "--default-artifact-root", "s3://${ARTIFACTS_BUCKET}", "--host", "0.0.0.0"]
+CMD ["mlflow", "server", "--backend-store-uri", "${MLFLOW_TRACKING_URI}", "--default-artifact-root", "s3://${ARTIFACTS_BUCKET}", "--host", "0.0.0.0"]

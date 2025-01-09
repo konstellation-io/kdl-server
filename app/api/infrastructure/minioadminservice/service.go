@@ -49,7 +49,7 @@ func (m *MinioAdminService) AssignPolicy(ctx context.Context, accessKey, policyN
 }
 
 func (m *MinioAdminService) DeleteUser(ctx context.Context, accessKey string) error {
-	m.logger.Info("Deleting uses", "accessKey", accessKey)
+	m.logger.Info("Deleting user", "accessKey", accessKey)
 
 	err := m.client.RemoveUser(ctx, accessKey)
 	if err != nil {
@@ -64,13 +64,13 @@ func (m *MinioAdminService) DeleteUser(ctx context.Context, accessKey string) er
 }
 
 func (m *MinioAdminService) UpdatePolicy(ctx context.Context, policyName string, bucketNames []string) error {
+	if len(bucketNames) == 0 {
+		return errEmptyBucketList
+	}
+
 	tmpl, err := template.New("policy").Parse(policyTemplate)
 	if err != nil {
 		return fmt.Errorf("failed to parse policy template: %w", err)
-	}
-
-	if len(bucketNames) == 0 {
-		return errEmptyBucketList
 	}
 
 	var policyBuffer bytes.Buffer
@@ -86,10 +86,17 @@ func (m *MinioAdminService) UpdatePolicy(ctx context.Context, policyName string,
 
 	m.logger.Info("Updating policy", "policyName", policyName)
 
-	return m.client.AddCannedPolicy(ctx, policyName, policyBuffer.Bytes())
+	err = m.client.AddCannedPolicy(ctx, policyName, policyBuffer.Bytes())
+	if err != nil {
+		return fmt.Errorf("failed to add policy %s: %w", policyName, err)
+	}
+
+	return err
 }
 
 func (m *MinioAdminService) DeletePolicy(ctx context.Context, policyName string) error {
+	m.logger.Info("Deleting policy", "policyName", policyName)
+
 	err := m.client.RemoveCannedPolicy(ctx, policyName)
 	if err != nil {
 		return fmt.Errorf("failed to remove policy %s: %w", policyName, err)

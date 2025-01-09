@@ -16,7 +16,7 @@ microk8s_start() {
   MICROK8S_STATUS=$(microk8s status)
   case "$MICROK8S_STATUS" in
     *"is running"*)
-      echo_check "Microk8s already running"
+      echo_check "microk8s already running"
 
       microk8s_enable_addons
       microk8s_wait_for_registry
@@ -62,7 +62,7 @@ microk8s_kubeconfig() {
 }
 
 microk8s_install_vm() {
-  echo_info "Installing Microk8s VM..."
+  echo_info "Installing microk8s VM..."
   microk8s install --cpu ${MICROK8S_CPUS} --mem ${MICROK8S_MEMORY} --disk ${MICROK8S_DISK} --channel ${MICROK8S_CHANNEL}
 }
 

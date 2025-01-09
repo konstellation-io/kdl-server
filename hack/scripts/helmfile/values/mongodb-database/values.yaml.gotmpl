@@ -1,0 +1,95 @@
+resources:
+  - kind: Role
+    apiVersion: rbac.authorization.k8s.io/v1
+    metadata:
+      name: mongodb-database
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - secrets
+        verbs:
+          - get
+      - apiGroups:
+          - ""
+        resources:
+          - pods
+        verbs:
+          - patch
+          - delete
+          - get
+
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: mongodb-database
+
+  - kind: RoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1
+    metadata:
+      name: mongodb-database
+    subjects:
+      - kind: ServiceAccount
+        name: mongodb-database
+    roleRef:
+      kind: Role
+      name: mongodb-database
+      apiGroup: rbac.authorization.k8s.io
+
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: mongodb-passwords
+    type: Opaque
+    data:
+      admin-password: {{ .Values.mongodb_password | b64enc | quote }}
+      kdl-password: {{ .Values.mongodb_password | b64enc | quote }}
+
+  - apiVersion: mongodbcommunity.mongodb.com/v1
+    kind: MongoDBCommunity
+    metadata:
+      name: mongodb
+    spec:
+      members: 1
+      type: ReplicaSet
+      version: {{ .Values.mongodb_version }}
+      security:
+        authentication:
+          modes: ["SCRAM"]
+      users:
+        - name: admin
+          db: admin
+          passwordSecretRef:
+            name: mongodb-passwords
+            key: admin-password
+          roles:
+            - name: root
+              db: admin
+          scramCredentialsSecretName: mongodb-admin
+        - name: {{ .Values.mongodb_user }}
+          db: kdl
+          passwordSecretRef:
+            name: mongodb-passwords
+            key: kdl-password
+          roles:
+            - name: root
+              db: kdl
+            - name: readWrite
+              db: kdl
+            - name: dbAdmin
+              db: kdl
+            - name: userAdmin
+              db: kdl
+          scramCredentialsSecretName: mongodb-kdl
+      statefulSet:
+        spec:
+          volumeClaimTemplates:
+            - metadata:
+                name: data-volume
+              spec:
+                accessModes:
+                  - "ReadWriteOnce"
+                resources:
+                  requests:
+                    storage: 1Gi
+                storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}

@@ -1,63 +1,106 @@
-# Build API.
-FROM golang:1.23.2-alpine3.20 as api-builder
-# 1.18
+###
+# build app-api
+###
+FROM golang:1.23.2-alpine3.20 AS api-builder
 
-# Pass Hadolint
-LABEL maintainer="Builder"
-
-ENV CGO_ENABLED=0
+# environment variables
+ENV CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64 \
+    GO111MODULE=on
 
 WORKDIR /app
 
-# Only reinstall go deps if go.* has changed
+# copy dependencies code
 COPY api/go.* ./
 
-RUN go mod download
+# download dependencies
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download && \
+    go mod verify
 
+# copy source code
 COPY api .
 
-RUN go build -o kdl-server http/main.go
+# -ldflags="-s -w -extldflags '-static'": Optimizes binary size by removing debug info
+# and ensures all C dependencies are included in the binary for better portability
+# -trimpath: Removes build system paths to improve security and reproducibility
+RUN go build \
+    -ldflags="-s -w \
+    -extldflags '-static'" \
+    -trimpath \
+    -o kdl-server http/main.go
 
-# Build UI
-FROM node:14 as ui-builder
-
-# Pass Hadolint
-LABEL maintainer="Builder"
+###
+# build app-ui
+###
+FROM node:16 AS ui-builder
 
 ENV SASS_PATH=src
 
 WORKDIR /app
 
-COPY ui/package.* ui/yarn* ./
+# copy packages to cache dependencies
+COPY ui/package.json ui/yarn.lock ./
 
+# install dependencies
 RUN mkdir -p cypress/plugins && \
-        yarn install
+    yarn install --frozen-lockfile
 
+# copy source files
 COPY ui/ .
 
+# build ui
 RUN yarn build
 
-# Create APP image
-FROM alpine:3.15
+###
+# final image
+###
+FROM alpine:3.20.0
 
-# Maintainer of the Dockerfile
 LABEL maintainer="Intelygenz - Konstellation Team"
 
-ENV USER=kdl
+ARG USER=kdl
+ARG UID=1000
+ARG GID=1000
+ENV HOME=/home/${USER}
+
+# security updates, dependencies and user setup
+# hadolint ignore=DL3018
+RUN apk update                               && \
+    apk upgrade                              && \
+    apk add --no-cache                          \
+        openssh-client=9.7_p1-r4                \
+        libcap=2.70-r0                       && \
+    rm -rf /var/cache/apk/*                  && \
+    # create non-root user
+    addgroup -g ${GID} ${USER}               && \
+    adduser -D -g "" -h "${HOME}"               \
+        -s "/sbin/nologin"                      \
+        -u ${UID}                               \
+        -G ${USER} ${USER}                   && \
+    # setup application directories
+    mkdir -p /app /var/log/app               && \
+    chown -R ${UID}:${GID} /app /var/log/app && \
+    # setup SSH with secure permissions
+    mkdir -p ${HOME}/.ssh                    && \
+    chown -R ${UID}:${GID} ${HOME}/.ssh      && \
+    chmod 700 ${HOME}/.ssh
 
 WORKDIR /app
 
-RUN adduser --disabled-password --gecos "" --no-create-home --uid 1001 ${USER} && \
-        mkdir -p -mg=w /var/log/app && \
-        mkdir .ssh && chown -R ${USER}:0 .ssh
+# copy from app-api and app-ui stages
+COPY --from=api-builder --chown=${USER}:${USER} /app/kdl-server ./
+COPY --from=ui-builder --chown=${USER}:${USER} /app/build/ /public
 
-COPY --from=api-builder --chown=kdl:0 /app/kdl-server /app/config.yml ./
-COPY --from=ui-builder --chown=kdl:0 /app/build/ /public
+RUN setcap 'cap_net_bind_service=+ep' /app/kdl-server
 
-# openssh-client is needed to clone git repositories using ssh on project creation
-RUN apk add -U --no-cache ca-certificates openssh-client libcap && \
-        setcap 'cap_net_bind_service=+ep' /app/kdl-server
-
+# switch to non-root user
 USER ${USER}
 
-CMD ["sh","-c","/app/kdl-server 2>&1 | tee -a /var/log/app/app.log"]
+# use proper entrypoint script
+COPY --chown=${USER}:${USER} docker-entrypoint.sh /app/
+RUN chmod +x /app/docker-entrypoint.sh
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["/app/kdl-server"]

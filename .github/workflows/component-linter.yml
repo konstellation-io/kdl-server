@@ -15,12 +15,11 @@ jobs:
       matrix:
         directory:
           - app
-          - cleaner
+          - filebrowser
           - mlflow
           - project-operator
           - repo-cloner
           - user-tools-operator
-          - vscode
 
     steps:
       - name: Checkout

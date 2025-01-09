@@ -30,7 +30,7 @@ const Section: FC<SectionProps> = ({ title, children }) => (
 );
 
 function Summary() {
-  const { information, externalRepository } = useReactiveVar(newProject);
+  const { information, repository } = useReactiveVar(newProject);
   const { name, description, id } = information.values;
 
   return (
@@ -46,8 +46,8 @@ function Summary() {
           <div className={styles.repository}>
             <div className={styles.urlContainer}>
               <IconLink className="icon-regular" />
-              <p className={styles.url}>{externalRepository.values.url}</p>
-              <CopyToClipboard>{externalRepository.values.url}</CopyToClipboard>
+              <p className={styles.url}>{repository.values.url}</p>
+              <CopyToClipboard>{repository.values.url}</CopyToClipboard>
             </div>
           </div>
         </Field>

@@ -157,7 +157,6 @@ The following is the list of supported component:
 
 * `api`
 * `ui`
-* `cleaner`
 * `mlflow`
 * `project-operator`
 * `repo-cloner`

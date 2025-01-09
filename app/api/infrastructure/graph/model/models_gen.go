@@ -11,13 +11,6 @@ type AddMembersInput struct {
 	UserIds   []string `json:"userIds"`
 }
 
-type AddUserInput struct {
-	Email       string             `json:"email"`
-	Username    string             `json:"username"`
-	Password    string             `json:"password"`
-	AccessLevel entity.AccessLevel `json:"accessLevel"`
-}
-
 type APITokenInput struct {
 	UserID string  `json:"userId"`
 	Name   *string `json:"name,omitempty"`
@@ -38,13 +31,6 @@ type CreateProjectInput struct {
 
 type DeleteProjectInput struct {
 	ID string `json:"id"`
-}
-
-type ExternalRepositoryInput struct {
-	URL        string                      `json:"url"`
-	Username   string                      `json:"username"`
-	Credential string                      `json:"credential"`
-	AuthMethod entity.RepositoryAuthMethod `json:"authMethod"`
 }
 
 type Mutation struct {
@@ -71,24 +57,14 @@ type RemoveUsersInput struct {
 }
 
 type RepositoryInput struct {
-	Type     entity.RepositoryType    `json:"type"`
-	External *ExternalRepositoryInput `json:"external,omitempty"`
+	URL      string `json:"url"`
+	Username string `json:"username"`
 }
 
 type SetActiveUserToolsInput struct {
 	Active         bool    `json:"active"`
 	RuntimeID      *string `json:"runtimeId,omitempty"`
 	CapabilitiesID *string `json:"capabilitiesId,omitempty"`
-}
-
-type SetBoolFieldInput struct {
-	ID    string `json:"id"`
-	Value bool   `json:"value"`
-}
-
-type Topic struct {
-	Name      string  `json:"name"`
-	Relevance float64 `json:"relevance"`
 }
 
 type UpdateAccessLevelInput struct {

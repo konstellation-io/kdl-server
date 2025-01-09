@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
@@ -25,6 +27,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/configmap"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
@@ -85,20 +88,19 @@ func main() {
 		logger.Error(err, "Unexpected error creating serviceAccount for users")
 	}
 
-	projectDeps := &project.InteractorDeps{
-		Logger:           logger,
-		Repo:             projectRepo,
-		Clock:            realClock,
-		MinioService:     minioService,
-		K8sClient:        k8sClient,
-		UserActivityRepo: userActivityRepo,
-	}
-
-	projectInteractor := project.NewInteractor(projectDeps)
+	projectInteractor := project.NewInteractor(logger, k8sClient, minioService, realClock, projectRepo, userActivityRepo)
 
 	runtimeInteractor := runtime.NewInteractor(logger, k8sClient, runtimeRepo)
 
 	capabilitiesInteractor := capabilities.NewInteractor(logger, cfg, capabilitiesRepo, k8sClient)
+
+	configMapWatcher := configmap.NewInteractor(logger, cfg, k8sClient, projectInteractor, userInteractor)
+	go func() {
+		err = configMapWatcher.WatchConfigMapTemplates(context.Background())
+		if err != nil {
+			logger.Error(err, "Error watching ConfigMaps")
+		}
+	}()
 
 	resolvers := graph.NewResolver(
 		logger,
@@ -123,7 +125,14 @@ func startHTTPServer(
 ) {
 	const apiQueryPath = "/api/query"
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers}))
+	srv := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers}))
+	srv.AddTransport(transport.Websocket{
+		KeepAlivePingInterval: 30 * time.Second,
+	})
+	srv.AddTransport(transport.GET{})
+	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.MultipartForm{})
+
 	pg := playground.Handler("GraphQL playground", apiQueryPath)
 	fs := http.FileServer(http.Dir(staticFilesPath))
 
@@ -139,9 +148,9 @@ func startHTTPServer(
 	server := &http.Server{
 		Addr:         ":" + port,
 		Handler:      nil,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  15 * time.Second,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  30 * time.Second,
 	}
 
 	err := server.ListenAndServe()

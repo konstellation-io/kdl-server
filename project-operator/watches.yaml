@@ -1,5 +1,5 @@
 ---
 - version: v1
-  group: project.konstellation.io
+  group: kdl.konstellation.io
   kind: KDLProject
-  chart: helm-charts/kdlproject
+  chart: helm-charts/kdl-project

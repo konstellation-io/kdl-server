@@ -4,7 +4,7 @@
 
 * Reads configuration from `ConfigMaps`
 * Creates `KDLProject` and `UserTools` CRD manifests based on:
-  * [`usertools.go`](https://github.com/konstellation-io/kdl-server/blob/main/app/api/infrastructure/k8s/usertools.go) structure
+  * [`kdlusertools.go`](https://github.com/konstellation-io/kdl-server/blob/main/app/api/infrastructure/k8s/kdlusertools.go) structure
   * [`kdlproject.go`](https://github.com/konstellation-io/kdl-server/blob/main/app/api/infrastructure/k8s/kdlproject.go) structure
 
 ## 2. KDL operators

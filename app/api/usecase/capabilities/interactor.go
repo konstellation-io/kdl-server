@@ -7,7 +7,6 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
-
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 )
 

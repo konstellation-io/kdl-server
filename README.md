@@ -10,7 +10,6 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 | ----------- | ----- | --------- | ---------------------- | --------- | -------- |
 | app-api     | [![api-report-bugs-badge]][api-report-bugs-link] | [![api-report-coverage-badge]][api-report-coverage-link] | [![api-report-maintain-badge]][api-report-maintain-link] | [![go-report][api-report-badge]][api-report-link] | [![api-report-security-badge]][api-report-security-link] |
 | app-ui      | [![ui-report-bugs-badge]][ui-report-bugs-link] | [![ui-report-coverage-badge]][ui-report-coverage-link] | [![ui-report-maintain-badge]][ui-report-maintain-link] | - | [![ui-report-security-badge]][ui-report-security-link] |
-| cleaner     | [![cleaner-report-bugs-badge]][cleaner-report-bugs-link] | [![cleaner-report-coverage-badge]][cleaner-report-coverage-link] | [![cleaner-report-maintain-badge]][cleaner-report-maintain-link] | [![go-report][api-report-badge]][cleaner-report-link] | [![cleaner-report-security-badge]][cleaner-report-security-link] |
 | repo-cloner | [![repo-cloner-report-bugs-badge]][repo-cloner-report-bugs-link] | [![repo-cloner-report-coverage-badge]][repo-cloner-report-coverage-link] | [![repo-cloner-report-maintain-badge]][repo-cloner-report-maintain-link] | [![go-report][repo-cloner-report-badge]][repo-cloner-report-link] | [![repo-cloner-report-security-badge]][repo-cloner-report-security-link] |
 
 [api-report-bugs-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_app-api&metric=bugs
@@ -31,15 +30,6 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 [ui-report-maintain-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_app-ui
 [ui-report-security-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_app-ui&metric=security_rating
 [ui-report-security-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_app-ui
-[cleaner-report-bugs-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_cleaner&metric=bugs
-[cleaner-report-bugs-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_cleaner
-[cleaner-report-coverage-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_cleaner&metric=coverage
-[cleaner-report-coverage-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_cleaner
-[cleaner-report-maintain-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_cleaner&metric=sqale_rating
-[cleaner-report-maintain-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_cleaner
-[cleaner-report-security-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_cleaner&metric=security_rating
-[cleaner-report-security-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_cleaner
-[cleaner-report-link]: https://goreportcard.com/report/github.com/konstellation-io/kdl-server/cleaner
 [repo-cloner-report-bugs-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_repo-cloner&metric=bugs
 [repo-cloner-report-bugs-link]: https://sonarcloud.io/summary/new_code?id=kdl-server_repo-cloner
 [repo-cloner-report-coverage-badge]: https://sonarcloud.io/api/project_badges/measure?project=kdl-server_repo-cloner&metric=coverage
@@ -55,7 +45,6 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 
 * `app-api`: main component of the application, providing API access for other components and managing interactions with `MongoDB`.
 * `app-ui`: web application offering the interface for data scientists.
-* `cleaner`: (*DEPRECATED*) currently unused, potentially slated for deprecation.
 * `project-operator`: Kubernetes operator listening to `KAI Lab API`, on new project creation in the UI, it deploys a project-specific pod with `mlflow` and `filebrowser`.
 * `repo-cloner`: in-house solution that clones all accessible repositories into the user's `user-tools` pod.
 * `user-tools-operator`: Kubernetes operator monitoring `KAI Lab API`, each time a user starts or changes runtime in the UI, this operator deploys a pod with a `runtime` containers based on selected image.

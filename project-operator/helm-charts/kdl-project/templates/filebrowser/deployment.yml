@@ -1,0 +1,192 @@
+{{ if .Values.filebrowser.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kdl-project.filebrowser.name" . }}
+  labels:
+    {{- include "kdl-project.filebrowserLabels" . | nindent 4 }}
+spec:
+  {{- if not .Values.filebrowser.autoscaling.enabled }}
+  replicas: {{ .Values.filebrowser.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "kdl-project.selectorFilebrowserLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+      {{- with .Values.filebrowser.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "kdl-project.filebrowserLabels" . | nindent 8 }}
+        {{- with .Values.filebrowser.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      imagePullSecrets:
+        {{- toYaml .Values.filebrowser.imagePullSecrets | nindent 8 }}
+      serviceAccountName: {{ include "kdl-project.filebrowserServiceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.filebrowser.podSecurityContext | nindent 8 }}
+      {{- with .Values.filebrowser.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: filebrowser
+          image: {{ .Values.filebrowser.image.repository }}:{{ .Values.filebrowser.image.tag }}
+          imagePullPolicy: {{ .Values.filebrowser.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.filebrowser.securityContext | nindent 12 }}
+          {{- with .Values.filebrowser.command }}
+          command: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.filebrowser.args }}
+          args: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.filebrowser.env.FB_PORT | default (int .Values.filebrowser.service.targetPort | default .Values.filebrowser.service.port) }}
+              protocol: TCP
+            {{- range $port := .Values.filebrowser.service.extraPorts }}
+            - name: {{ $port.name }}
+              containerPort: {{ $port.targetPort }}
+              protocol: TCP
+            {{- end }}
+          {{- with .Values.filebrowser.lifecycle }}
+          lifecycle:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.filebrowser.livenessProbe.enabled }}
+          livenessProbe:
+            {{- if .Values.filebrowser.livenessProbeCustom }}
+            {{- toYaml .Values.filebrowser.livenessProbeCustom | nindent 12 }}
+            {{- else }}
+            httpGet:
+              path: /filebrowser/{{ .Values.projectId }}
+              port: {{ .Values.filebrowser.env.FB_PORT | default (int .Values.filebrowser.service.targetPort | default .Values.filebrowser.service.port) }}
+            failureThreshold: {{ .Values.filebrowser.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.filebrowser.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.filebrowser.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.filebrowser.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.filebrowser.livenessProbe.timeoutSeconds }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.filebrowser.readinessProbe.enabled }}
+          readinessProbe:
+            {{- if .Values.filebrowser.readinessProbeCustom }}
+            {{- toYaml .Values.filebrowser.readinessProbeCustom | nindent 12 }}
+            {{- else }}
+            httpGet:
+              path: /filebrowser/{{ .Values.projectId }}
+              port: {{ .Values.filebrowser.env.FB_PORT | default (int .Values.filebrowser.service.targetPort | default .Values.filebrowser.service.port) }}
+            failureThreshold: {{ .Values.filebrowser.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.filebrowser.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.filebrowser.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.filebrowser.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.filebrowser.readinessProbe.timeoutSeconds }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.filebrowser.startupProbe.enabled }}
+          startupProbe:
+            {{- if .Values.filebrowser.startupProbeCustom }}
+            {{- toYaml .Values.filebrowser.startupProbeCustom | nindent 12 }}
+            {{- else }}
+            httpGet:
+              path: /filebrowser/{{ .Values.projectId }}
+              port: {{ .Values.filebrowser.env.FB_PORT | default (int .Values.filebrowser.service.targetPort | default .Values.filebrowser.service.port) }}
+            failureThreshold: {{ .Values.filebrowser.startupProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.filebrowser.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.filebrowser.startupProbe.periodSeconds }}
+            successThreshold: {{ .Values.filebrowser.startupProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.filebrowser.startupProbe.timeoutSeconds }}
+            {{- end }}
+          {{- end }}
+          envFrom:
+            {{- if .Values.filebrowser.envFromFiles }}
+            {{- tpl (toYaml .Values.filebrowser.envFromFiles) . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: FB_BASEURL
+              value: /filebrowser/{{ .Values.projectId }}
+            - name: FB_PORT
+              value: {{ .Values.filebrowser.env.FB_PORT | default (int .Values.filebrowser.service.targetPort | default .Values.filebrowser.service.port) | quote }}
+            - name: AWS_S3_BUCKET
+              value: {{ .Values.projectId | quote }}
+            # Variables from secrets have precedence
+            {{- $envList := dict }}
+            {{- if .Values.filebrowser.envFromSecrets }}
+            {{- range $key, $value := .Values.filebrowser.envFromSecrets }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables from configmap have precedence
+            {{- if .Values.filebrowser.envFromConfigMap }}
+            {{- range $key, $value := .Values.filebrowser.envFromConfigMap }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables in plain text if they were not already added from secrets
+            {{- if .Values.filebrowser.env }}
+            {{- range $key, $value := .Values.filebrowser.env }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+          volumeMounts:
+            - name: filebrowser-config
+              mountPath: /entrypoint.sh
+              subPath: entrypoint.sh
+          {{- with .Values.filebrowser.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.filebrowser.resources | nindent 12 }}
+      {{- if .Values.filebrowser.extraContainers }}
+        {{- toYaml .Values.filebrowser.extraContainers | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.filebrowser.terminationGracePeriodSeconds }}
+      volumes:
+        - name: filebrowser-config
+          configMap:
+            name: {{ .Values.projectId }}-filebrowser-config
+            defaultMode: 0777
+      {{- with .Values.filebrowser.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.filebrowser.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.filebrowser.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.filebrowser.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.filebrowser.topologySpreadConstraints }}
+      {{- $_ := include "kdl-project.patchTopologySpreadConstraintsFilebrowser" $ }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

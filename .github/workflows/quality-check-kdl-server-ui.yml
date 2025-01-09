@@ -26,7 +26,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ vars.NODE_VERSION_UI_TESTS }}
           cache: yarn
@@ -53,7 +53,7 @@ jobs:
             ./app/ui/test-report.xml
 
       - name: UI Run e2e tests
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@v6
         with:
           browser: chrome
           tag: node-${{ vars.NODE_VERSION_UI_TESTS }}

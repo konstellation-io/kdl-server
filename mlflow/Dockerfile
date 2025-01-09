@@ -38,7 +38,7 @@ RUN pip install --no-cache-dir --user \
 # ENV ARTIFACTS_BUCKET
 # ENV AWS_ACCESS_KEY_ID
 # ENV AWS_SECRET_ACCESS_KEY
+# ENV MLFLOW_BACKEND_STORE_URI
 # ENV MLFLOW_S3_ENDPOINT_URL
-# ENV MLFLOW_TRACKING_URI
 
-CMD ["mlflow", "server", "--backend-store-uri", "${MLFLOW_TRACKING_URI}", "--default-artifact-root", "s3://${ARTIFACTS_BUCKET}", "--host", "0.0.0.0"]
+CMD ["mlflow", "server", "--backend-store-uri", "${MLFLOW_BACKEND_STORE_URI}", "--default-artifact-root", "s3://${ARTIFACTS_BUCKET}", "--host", "0.0.0.0"]

@@ -12,6 +12,8 @@ import (
 	"github.com/konstellation-io/kdl-server/repo-cloner/config"
 )
 
+const userCollName = "users"
+
 type User struct {
 	Username string             `bson:"username"`
 	Email    string             `bson:"email"`
@@ -26,7 +28,7 @@ type UserMongoDBRepo struct {
 
 // NewUserMongoDBRepo implements user.Repository interface.
 func NewUserMongoDBRepo(cfg config.Config, logger logr.Logger, client *mongo.Client) *UserMongoDBRepo {
-	collection := client.Database(cfg.MongoDB.DBName).Collection(cfg.MongoDB.UsersCollName)
+	collection := client.Database(cfg.MongoDB.DBName).Collection(userCollName)
 	return &UserMongoDBRepo{cfg: cfg, logger: logger, collection: collection}
 }
 

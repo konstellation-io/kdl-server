@@ -5,7 +5,7 @@
 name: "[Releases] Create"
 
 env:
-  COMPONENTS: "app,mlflow,project-operator,repo-cloner,user-tools-operator"
+  COMPONENTS: "app,mlflow,filebrowser,project-operator,repo-cloner,user-tools-operator"
 
 on:
   workflow_dispatch:
@@ -17,6 +17,7 @@ on:
         options:
           - all
           - kdl-app
+          - filebrowser
           - mlflow
           - project-operator
           - repo-cloner

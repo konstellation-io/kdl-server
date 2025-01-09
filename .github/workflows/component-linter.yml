@@ -15,6 +15,7 @@ jobs:
       matrix:
         directory:
           - app
+          - filebrowser
           - mlflow
           - project-operator
           - repo-cloner

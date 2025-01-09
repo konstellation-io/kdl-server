@@ -1,42 +1,69 @@
 # MLFlow Tracking Server
 
-This repo hold the creation of Docker image to run MLFlow Tracking Server.
+Docker image for `MLflow Tracking Server`, part of the `Science Toolkit` ecosystem for data scientists.
 
-This component is part of a toolkit used to simplify the data scientists daily work.
-For more details check out the [Science Toolkit documentation][1] and [Docker Hub][2]
+## Security features
 
-## Inputs
+* Non-root user (`mlflow`) execution with configurable UID/GID (default `1000:1000`)
+* Python security optimizations
+* Proper permission handling
 
-The following inputs must be provided:
+## Configuration
 
-| **Variable**         | **Description**                 |
-|----------------------|---------------------------------|
-| AWS_ACCESS_KEY_ID  | AWS credentials  |
-| AWS_SECRET_ACCESS_KEY  | AWS credentials  |
-| MLFLOW_S3_ENDPOINT_URL | AWS S3 Endpoint where [Min.io][3] bucket can be reached |
-| ARTIFACTS_BUCKET  | AWS S3 bucket name where artifacts are stored  |
+### Build arguments
 
-## Outputs
+| Variable      | Description        | Default   |
+|---------------|--------------------|-----------|
+| `MLFOW_IMAGE` | MLflow version tag | `v2.18.0` |
+| `USER`        | Non-root user name | `mlflow`  |
+| `UID`         | User ID            | `1000`    |
+| `GID`         | Group ID           | `1000`    |
 
-The following outputs are generated for
+### Environment variables
 
-- Artifacts are stored in a [Min.io][3] bucket
-- Logs in the local directory `/mlflow/tracking`. If you want to persist the log folder you need to mount an external volume in this path.
+| Variable                 | Description                  | Required |
+|--------------------------|------------------------------|----------|
+| `AWS_ACCESS_KEY_ID`      | AWS credentials              | `Yes`    |
+| `AWS_SECRET_ACCESS_KEY`  | AWS credentials              | `Yes`    |
+| `MLFLOW_S3_ENDPOINT_URL` | MinIO S3 endpoint URL        | `Yes`    |
+| `ARTIFACTS_BUCKET`       | S3 bucket name for artifacts | `Yes`    |
 
-## How to run it locally
+## Storage
+
+* Artifacts: stored in MinIO bucket set in `ARTIFACTS_BUCKET`
+* Tracking data: SQLite database in `/mlflow/tracking`
+* User home: `/home/mlflow`
+
+## Local deployment
+
+Basic usage:
 
 ```bash
 docker run -p 5000:5000 \
-        -e "MLFLOW_S3_ENDPOINT_URL=http://my_minio.url" 
-        -e "AWS_ACCESS_KEY_ID=user" 
-        -e "AWS_SECRET_ACCESS_KEY=pass" 
-        -e "ARTIFACTS_BUCKET=mlflow-artifacts" 
-        konstellation/mlflow:latest
+  -e "ARTIFACTS_BUCKET=mlflow-artifacts" \
+  -e "AWS_ACCESS_KEY_ID=user" \
+  -e "AWS_SECRET_ACCESS_KEY=pass" \
+  -e "MLFLOW_S3_ENDPOINT_URL=http://my_minio.url" \
+  konstellation/kdl-mlflow:latest
 ```
 
-After that, the MLFlow Tracking server will be available opening a browser the URL [http://localhost:5000][4].
+With persistence and custom user:
 
-[1]: (https://konstellation-io.github.io/science-toolkit/)
-[2]: (https://hub.docker.com/r/konstellation/mlflow)
-[3]: (https://min.io/)
-[4]: (http://localhost:5000)
+```bash
+docker run -p 5000:5000 \
+  --user 1000:1000 \
+  -e "ARTIFACTS_BUCKET=mlflow-artifacts" \
+  -e "AWS_ACCESS_KEY_ID=user" \
+  -e "AWS_SECRET_ACCESS_KEY=pass" \
+  -e "MLFLOW_S3_ENDPOINT_URL=http://my_minio.url" \
+  -v /path/to/data:/mlflow/tracking \
+  konstellation/kdl-mlflow:latest
+```
+
+Access the UI at [http://localhost:5000](http://localhost:5000)
+
+## Documentation
+
+* [Science Toolkit docs](https://konstellation-io.github.io/science-toolkit/)
+* [Docker Hub](https://hub.docker.com/r/konstellation/mlflow)
+* [MinIO](https://min.io/)

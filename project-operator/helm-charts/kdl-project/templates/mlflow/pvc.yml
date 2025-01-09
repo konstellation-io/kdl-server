@@ -1,0 +1,38 @@
+{{- if and .Values.mlflow.enabled .Values.mlflow.persistentVolume.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "kdl-project.mlflow.name" . }}
+  {{- if .Values.mlflow.persistentVolume.annotations }}
+  annotations:
+{{ toYaml .Values.mlflow.persistentVolume.annotations | indent 4 }}
+  {{- end }}
+  labels:
+    {{- include "kdl-project.mlflowLabels" . | nindent 4 }}
+    {{- with .Values.mlflow.persistentVolume.labels }}
+       {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  accessModes:
+{{ toYaml .Values.mlflow.persistentVolume.accessModes | indent 4 }}
+{{- if .Values.mlflow.persistentVolume.storageClass }}
+{{- if (eq "-" .Values.mlflow.persistentVolume.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.mlflow.persistentVolume.storageClass }}"
+{{- end }}
+{{- end }}
+{{- if .Values.mlflow.persistentVolume.volumeBindingMode }}
+  volumeBindingMode: "{{ .Values.mlflow.persistentVolume.volumeBindingMode }}"
+{{- end }}
+  resources:
+    requests:
+      storage: "{{ .Values.mlflow.persistentVolume.size }}"
+{{- if .Values.mlflow.persistentVolume.selector }}
+  selector:
+  {{- toYaml .Values.mlflow.persistentVolume.selector | nindent 4 }}
+{{- end }}
+{{- if .Values.mlflow.persistentVolume.volumeName }}
+  volumeName: "{{ .Values.mlflow.persistentVolume.volumeName }}"
+{{- end }}
+{{- end }}

@@ -29,7 +29,7 @@ enum Steps {
 enum StepNames {
   INFORMATION = 'information',
   REPOSITORY = 'repository',
-  DETAILS = 'repository details',
+  REPOSITORY_DETAILS = 'repository details',
   SUMMARY = 'summary',
 }
 
@@ -39,7 +39,7 @@ const stepperSteps = [
     Component: Information,
   },
   {
-    id: StepNames.DETAILS,
+    id: StepNames.REPOSITORY,
     Component: RepositoryDetails,
   },
   {
@@ -56,10 +56,10 @@ function NewProject() {
   const [isPromptEnabled, setIsPromptEnabled] = useState(false);
 
   const { enableUnloadPrompt, disableUnloadPrompt } = useUnloadPrompt();
-  const data: { [key in StepNames.INFORMATION | StepNames.DETAILS]?: any } = useReactiveVar(newProject);
+  const data: { [key in StepNames.INFORMATION | StepNames.REPOSITORY]?: any } = useReactiveVar(newProject);
 
-  const stepsWithData: (StepNames.INFORMATION | StepNames.DETAILS)[] = useMemo(() => {
-    return [StepNames.INFORMATION, StepNames.DETAILS];
+  const stepsWithData: (StepNames.INFORMATION | StepNames.REPOSITORY)[] = useMemo(() => {
+    return [StepNames.INFORMATION, StepNames.REPOSITORY];
   }, []);
 
   // We want to execute this on on component mount and unmount
@@ -153,7 +153,7 @@ function NewProject() {
     switch (step) {
       case StepNames.INFORMATION:
         return <SidebarInformation />;
-      case StepNames.DETAILS:
+      case StepNames.REPOSITORY:
         return <SidebarRepository />;
       default:
         return <></>;

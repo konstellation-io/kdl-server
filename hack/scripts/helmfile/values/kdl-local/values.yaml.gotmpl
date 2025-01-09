@@ -252,7 +252,7 @@ projectOperator:
       mlflow:
         image:
           repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-mlflow
-          pullPolicy: IfNotPresent
+          pullPolicy: Always
           tag: latest
 
         ingress:
@@ -275,12 +275,11 @@ projectOperator:
           AWS_ACCESS_KEY_ID: "{{ .Values.minio_access_key }}"
           AWS_SECRET_ACCESS_KEY: "{{ .Values.minio_secret_key }}"
           MLFLOW_S3_ENDPOINT_URL: "http://minio.kdl:9000"
-          MLFLOW_TRACKING_URI: "sqlite:///database.db"
 
       filebrowser:
         image:
           repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-filebrowser
-          pullPolicy: IfNotPresent
+          pullPolicy: Always
           tag: latest
 
         podSecurityContext:
@@ -375,7 +374,7 @@ userToolsOperator:
       repoCloner:
         image:
           repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-repo-cloner
-          pullPolicy: IfNotPresent
+          pullPolicy: Always
           tag: "latest"
 
         env:
@@ -384,7 +383,7 @@ userToolsOperator:
       vscodeRuntime:
         image:
           repository: konstellation/kdl-py
-          pullPolicy: IfNotPresent
+          pullPolicy: Always
           tag: "3.9"
 
         env:

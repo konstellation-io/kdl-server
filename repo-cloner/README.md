@@ -24,20 +24,20 @@ The service can be configured through environment variables and/or a YAML config
 
 MongoDB Configuration:
 
-| Variable                | Description                           | Default                                        |
-|-------------------------|---------------------------------------|------------------------------------------------|
-| `KDL_SERVER_MONGODB_URI`| MongoDB connection string             | `mongodb://admin:123456@localhost:27017/admin` |
-| `DB_NAME`               | Database name                         | `kdl`                                          |
+| Variable                | Description                           | Default |
+|-------------------------|---------------------------------------|---------|
+| `KDL_SERVER_MONGODB_URI`| MongoDB connection string             |         |
+| `DB_NAME`               | Database name                         | `kdl`   |
 
 General Configuration:
 
-| Variable                 |  Description                          | Default                                   |
-|--------------------------|---------------------------------------|----------------------------------------------|
-| `KDL_USER_NAME`          | Username for repository operations    |                                              |
-| `REPOS_PATH`             | Repository storage location           | `/home/kdl/repos/`                           |
-| `PEM_FILE`               | SSH private key path                  | `/home/kdl/.ssh/id_rsa`                      |
-| `PEM_FILE_PASSWORD`      | SSH key password if encrypted         |                                              |
-| `CHECK_FREQUENCY_SECONDS`| Repository check interval in seconds  | `10`                                         |
+| Variable                 |  Description                             | Default                 |
+|--------------------------|------------------------------------------|-------------------------|
+| `KDL_USER_NAME`          | Username for repository operations       |                         |
+| `REPOS_PATH`             | Repository storage location              | `/home/kdl/repos/`      |
+| `PEM_FILE`               | SSH private key path                     | `/home/kdl/.ssh/id_rsa` |
+| `PEM_FILE_PASSWORD`      | SSH key password if encrypted (optional) |                         |
+| `CHECK_FREQUENCY_SECONDS`| Repository check interval in seconds     | `10`                    |
 
 ### Configuration
 

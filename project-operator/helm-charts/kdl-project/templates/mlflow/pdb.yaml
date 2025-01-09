@@ -1,0 +1,18 @@
+{{- if and .Values.mlflow.enabled .Values.mlflow.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "kdl-project.mlflow.name" . }}
+  labels:
+    {{- include "kdl-project.mlflowLabels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "kdl-project.selectorMlflowLabels" . | nindent 6 }}
+  {{- if .Values.mlflow.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.mlflow.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if .Values.mlflow.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.mlflow.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+{{- end }}

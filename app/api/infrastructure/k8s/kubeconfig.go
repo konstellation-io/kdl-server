@@ -46,7 +46,7 @@ apiVersion: v1
 clusters:
 - cluster:
     certificate-authority-data: ` + base64.StdEncoding.EncodeToString(ca) + `
-    server: ` + k.cfg.UserToolsKubeconfig.ExternalServerURL + `
+    server: ` + k.cfg.Kubeconfig.ExternalServerURL + `
   name: konstellation
 contexts:
 - context:

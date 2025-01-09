@@ -8,7 +8,7 @@ repos:
     - id: check-symlinks
     - id: end-of-file-fixer
     - id: check-yaml
-      exclude: ^(project-operator|user-tools-operator)/
+      exclude: ^(project-operator|user-tools-operator|hack/scripts/helmfile/helmfile.yaml)/
 
 - repo: https://github.com/zricethezav/gitleaks
   rev: v8.21.2
@@ -19,7 +19,7 @@ repos:
   rev: v0.5.1
   hooks:
     - id: golangci-lint
-      args: ['--config', '.github/.golangci.yml', 'app/api/...', 'cleaner/...', 'repo-cloner/...']
+      args: ['--config', '.github/.golangci.yml', 'app/api/...', 'repo-cloner/...']
 
 - repo: https://github.com/gruntwork-io/pre-commit
   rev: v0.1.24

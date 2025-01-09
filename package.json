@@ -3,11 +3,11 @@
   "private": true,
   "workspaces": [
     "app",
+    "filebrowser",
     "mlflow",
     "project-operator",
     "repo-cloner",
-    "user-tools-operator",
-    "vscode"
+    "user-tools-operator"
   ],
   "devDependencies": {
     "semantic-release-monorepo": "^8.0.2",

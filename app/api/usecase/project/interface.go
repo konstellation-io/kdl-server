@@ -37,4 +37,5 @@ type UseCase interface {
 	UpdateMembers(ctx context.Context, opt UpdateMembersOption) (entity.Project, error)
 	Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error)
 	Delete(ctx context.Context, opt DeleteProjectOption) (*entity.Project, error)
+	UpdateKDLProjects(ctx context.Context) error
 }

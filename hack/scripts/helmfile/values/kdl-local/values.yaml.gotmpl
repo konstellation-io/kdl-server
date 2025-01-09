@@ -1,11 +1,7 @@
 global:
   serverName: "local-server"
   domain: {{ requiredEnv "DOMAIN" | quote }}
-
-  ingress:
-    tls:
-      enabled: true
-      secretName: {{ requiredEnv "DOMAIN" }}-tls-secret
+  enableHttps: true
 
 image:
   repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-server
@@ -28,10 +24,6 @@ readyChecker:
     port: 27017
   - name: keycloak
     port: 80
-
-service:
-  type: ClusterIP
-  port: 80
 
 # -- Keycloak subchart deployment
 # </br> Ref: https://github.com/konstellation-io/helm-charts/blob/konstellation-base-1.0.2/charts/konstellation-base/values.yaml
@@ -318,7 +310,7 @@ projectOperator:
           AWS_S3_SECRET_ACCESS_KEY: "minio123"
           AWS_S3_URL: "http://minio:9000"
           FB_ADDRESS: "0.0.0.0"
-          FB_DATABASE: /database.db
+          FB_DATABASE: "/home/filebrowser/database.db"
           FB_LOG: stdout
           FB_ROOT: /srv
           S3FS_ARGS: >-

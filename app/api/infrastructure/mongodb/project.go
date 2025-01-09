@@ -36,6 +36,8 @@ type projectDTO struct {
 	AuthMethod         entity.RepositoryAuthMethod `bson:"auth_method"`
 	ExternalRepoURL    string                      `bson:"external_repo_url"`
 	Members            []memberDTO                 `bson:"members"`
+	MinioAccessKey     string                      `bson:"minio_access_key"`
+	MinioSecretKey     string                      `bson:"minio_secret_key"`
 }
 
 type ProjectRepo struct {
@@ -249,6 +251,8 @@ func (m *ProjectRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 		AuthMethod:         p.Repository.AuthMethod,
 		ExternalRepoURL:    p.Repository.ExternalRepoURL,
 		Archived:           p.Archived,
+		MinioAccessKey:     p.MinioAccessKey.AccessKey,
+		MinioSecretKey:     p.MinioAccessKey.SecretKey,
 	}
 
 	memberDTOS, err := m.membersToDTOs(p.Members)
@@ -294,6 +298,10 @@ func (m *ProjectRepo) dtoToEntity(dto projectDTO) entity.Project {
 			RepoName:        dto.RepoName,
 		},
 		Archived: dto.Archived,
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: dto.MinioAccessKey,
+			SecretKey: dto.MinioSecretKey,
+		},
 	}
 
 	p.Members = make([]entity.Member, len(dto.Members))

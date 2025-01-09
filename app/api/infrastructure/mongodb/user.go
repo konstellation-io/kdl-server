@@ -32,6 +32,8 @@ type userDTO struct {
 	PublicSSHKey       string             `bson:"public_ssh_key"`
 	PrivateSSHKey      string             `bson:"private_ssh_key"`
 	SSHKeyCreationDate time.Time          `bson:"ssh_key_creation_date"`
+	MinioAccessKey     string             `bson:"minio_access_key"`
+	MinioSecretKey     string             `bson:"minio_secret_key"`
 }
 
 type UserRepo struct {
@@ -284,6 +286,8 @@ func (m *UserRepo) entityToDTO(u entity.User) (userDTO, error) {
 		SSHKeyCreationDate: u.SSHKey.CreationDate,
 		CreationDate:       u.CreationDate,
 		Deleted:            u.Deleted,
+		MinioAccessKey:     u.MinioAccessKey.AccessKey,
+		MinioSecretKey:     u.MinioAccessKey.SecretKey,
 	}
 
 	if u.ID != "" {
@@ -312,6 +316,10 @@ func (m *UserRepo) dtoToEntity(dto userDTO) entity.User {
 			CreationDate: dto.SSHKeyCreationDate,
 		},
 		Deleted: dto.Deleted,
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: dto.MinioAccessKey,
+			SecretKey: dto.MinioSecretKey,
+		},
 	}
 }
 

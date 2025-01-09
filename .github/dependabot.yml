@@ -17,7 +17,6 @@ updates:
 - package-ecosystem: gomod
   directories:
     - "/app/api"
-    - "/cleaner"
     - "/repo-cloner"
   schedule:
     interval: monthly

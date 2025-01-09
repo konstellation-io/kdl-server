@@ -1,0 +1,32 @@
+{{- if and .Values.filebrowser.enabled .Values.filebrowser.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "kdl-project.filebrowser.name" . }}
+  labels:
+    {{- include "kdl-project.filebrowserLabels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "kdl-project.filebrowser.name" . }}
+  minReplicas: {{ .Values.filebrowser.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.filebrowser.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.filebrowser.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.filebrowser.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.filebrowser.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.filebrowser.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

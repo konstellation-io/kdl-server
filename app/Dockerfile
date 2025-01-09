@@ -90,7 +90,7 @@ RUN apk update                               && \
 WORKDIR /app
 
 # copy from app-api and app-ui stages
-COPY --from=api-builder --chown=${USER}:${USER} /app/kdl-server /app/config.yml ./
+COPY --from=api-builder --chown=${USER}:${USER} /app/kdl-server ./
 COPY --from=ui-builder --chown=${USER}:${USER} /app/build/ /public
 
 RUN setcap 'cap_net_bind_service=+ep' /app/kdl-server

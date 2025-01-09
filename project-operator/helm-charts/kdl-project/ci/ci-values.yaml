@@ -1,0 +1,245 @@
+####
+## THESE VALUES ONLY USE TO MAKE HELM DIFF
+## OR HELM TEMPLATE
+####
+
+projectId: data-science-platform
+domain: kdl.local
+
+filebrowser:
+  enabled: true
+  image:
+    repository: filebrowser/filebrowser
+    pullPolicy: IfNotPresent
+    tag: "v2"
+
+  podLabels:
+    ci: "true"
+    environment: "testing"
+    component: "filebrowser"
+
+  podAnnotations:
+    ci.konstellation.io/tested: "true"
+    ci.konstellation.io/version: "v1"
+
+  serviceAccount:
+    create: true
+    automount: true
+
+  env:
+    FB_ADDRESS: "0.0.0.0"
+    FB_DATABASE: "/database.db"
+    FB_LOG: "stdout"
+    FB_ROOT: "/srv"
+
+  livenessProbe:
+    enabled: true
+    failureThreshold: 3
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+    httpGet:
+      path: /
+      port: 9696
+
+  readinessProbe:
+    enabled: true
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+    httpGet:
+      path: /
+      port: 9696
+
+mlflow:
+  enabled: false
+
+  image:
+    repository: konstellation/kdl-mlflow
+    pullPolicy: IfNotPresent
+    tag: "latest"
+
+  podLabels:
+    ci: "true"
+    environment: "testing"
+    component: "mlflow"
+
+  podAnnotations:
+    ci.konstellation.io/tested: "true"
+    ci.konstellation.io/version: "v1"
+
+  nodeSelector:
+    kubernetes.io/role: worker
+    node-type: ml-workload
+
+  tolerations:
+    - key: "workload-type"
+      operator: "Equal"
+      value: "ml"
+      effect: "NoSchedule"
+    - key: "gpu-workload"
+      operator: "Exists"
+      effect: "NoSchedule"
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                  - amd64
+              - key: node.kubernetes.io/instance-type
+                operator: In
+                values:
+                  - c5.xlarge
+                  - c5.2xlarge
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: mlflow
+            topologyKey: kubernetes.io/hostname
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: mlflow
+          topologyKey: failure-domain.beta.kubernetes.io/zone
+
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: DoNotSchedule
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: mlflow
+    - maxSkew: 2
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: mlflow
+
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    tls:
+      enabled: true
+    hosts: []
+
+  serviceAccount:
+    create: true
+    automount: true
+    annotations:
+      iam.gke.io/gcp-service-account: "mlflow@my-project.iam.gserviceaccount.com"
+
+  env:
+    MLFLOW_PORT: "5000"
+    MLFLOW_HOST: "0.0.0.0"
+    ARTIFACTS_BUCKET: "mlflow-artifacts"
+    BACKEND_STORE_URI: "postgresql://mlflow:mlflow@postgresql:5432/mlflow"
+    MLFLOW_TRACKING_URI: "http://localhost:5000"
+    MLFLOW_S3_ENDPOINT_URL: "http://minio:9000"
+    DEFAULT_ARTIFACT_ROOT: "s3://mlflow-artifacts/"
+
+  envFromSecrets:
+    AWS_ACCESS_KEY_ID:
+      name: mlflow-minio-credentials
+      key: access-key
+    AWS_SECRET_ACCESS_KEY:
+      name: mlflow-minio-credentials
+      key: secret-key
+    DB_PASSWORD:
+      name: mlflow-db-credentials
+      key: password
+
+  secrets:
+    - name: mlflow-minio-credentials
+      data:
+        access-key: "minio"
+        secret-key: "minio123"
+    - name: mlflow-db-credentials
+      data:
+        password: "mlflow123"
+
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 5000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+      port: 5000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
+
+  persistentVolume:
+    enabled: true
+    size: 10Gi
+    accessModes:
+      - ReadWriteOnce
+    storageClass: "standard"
+
+  networkPolicy:
+    enabled: true
+    policyTypes:
+      - Ingress
+      - Egress
+    ingress:
+      - from:
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: jupyter
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: airflow
+        ports:
+          - protocol: TCP
+            port: 5000
+    egress:
+      - to:
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: postgresql
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: minio
+        ports:
+          - protocol: TCP
+            port: 5432
+          - protocol: TCP
+            port: 9000

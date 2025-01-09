@@ -53,7 +53,7 @@ func (m *MinioAdminService) DeleteUser(ctx context.Context, accessKey string) er
 
 	err := m.client.RemoveUser(ctx, accessKey)
 	if err != nil {
-		target := madmin.ErrorResponse{}
+		var target madmin.ErrorResponse
 
 		if errors.As(err, &target) && target.Code == "XMinioAdminNoSuchUser" {
 			return nil // ignore error for idempotence

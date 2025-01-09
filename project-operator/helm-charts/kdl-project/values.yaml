@@ -61,7 +61,7 @@ filebrowser:
     # AWS_S3_SECRET_ACCESS_KEY: "xxx"
     # AWS_S3_URL: "http://minio:9000"
     FB_ADDRESS: "0.0.0.0"
-    FB_DATABASE: /database.db
+    FB_DATABASE: /home/filebrowser/database.db
     FB_LOG: stdout
     FB_ROOT: /srv
     # S3FS_ARGS: >-

@@ -97,13 +97,6 @@ keycloak:
       subPath: initial-realm.json
       readOnly: true
 
-knowledgeGalaxy:
-  enabled: false
-
-  image:
-    repository: {{ requiredEnv "KNOWLEDGE_GALAXY_IMAGE_REPOSITORY" | quote }}
-    tag: {{ env "KNOWLEDGE_GALAXY_IMAGE_TAG" | quote }}
-
 # -- MinIO subchart deployment
 # </br> Ref: https://github.com/minio/minio/blob/RELEASE.2021-10-13T00-23-17Z/helm/minio/values.yaml
 minio:
@@ -155,11 +148,6 @@ minio:
   resources:
     requests:
       memory: 1Gi
-
-# -- MongoDB subchart deployment
-# </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/mongodb/values.yaml
-mongodb:
-  enabled: false
 
 # -- OAuth2-Proxy subchart deployment
 # </br> Ref: https://github.com/oauth2-proxy/manifests/blob/main/helm/oauth2-proxy/values.yaml
@@ -357,9 +345,6 @@ userToolsOperator:
     repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-user-tools-operator
     tag: latest
     pullPolicy: Always
-
-  storage:
-    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
   templateCustomResource: |
     apiVersion: kdl.konstellation.io/v1

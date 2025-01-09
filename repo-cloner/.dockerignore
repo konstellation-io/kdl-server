@@ -1,4 +1,25 @@
+# development files
+.git
+.gitignore
 .dockerignore
 Dockerfile
 README.md
 Makefile
+sonar-project.properties
+package.json
+
+# test files
+**/*_test.go
+**/test/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# build artifacts
+bin/
+dist/
+*.exe
+*.log

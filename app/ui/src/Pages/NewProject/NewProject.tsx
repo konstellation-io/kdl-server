@@ -56,6 +56,7 @@ function NewProject() {
   const [isPromptEnabled, setIsPromptEnabled] = useState(false);
 
   const { enableUnloadPrompt, disableUnloadPrompt } = useUnloadPrompt();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const data: { [key in StepNames.INFORMATION | StepNames.DETAILS]?: any } = useReactiveVar(newProject);
 
   const stepsWithData: (StepNames.INFORMATION | StepNames.DETAILS)[] = useMemo(() => {

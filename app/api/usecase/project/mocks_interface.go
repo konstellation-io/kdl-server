@@ -343,6 +343,20 @@ func (mr *MockUseCaseMockRecorder) Update(ctx, opt interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUseCase)(nil).Update), ctx, opt)
 }
 
+// UpdateKDLProjects mocks base method.
+func (m *MockUseCase) UpdateKDLProjects(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateKDLProjects", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateKDLProjects indicates an expected call of UpdateKDLProjects.
+func (mr *MockUseCaseMockRecorder) UpdateKDLProjects(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateKDLProjects", reflect.TypeOf((*MockUseCase)(nil).UpdateKDLProjects), ctx)
+}
+
 // UpdateMembers mocks base method.
 func (m *MockUseCase) UpdateMembers(ctx context.Context, opt UpdateMembersOption) (entity.Project, error) {
 	m.ctrl.T.Helper()

@@ -1,0 +1,48 @@
+{{- if and .Values.mlflow.enabled .Values.mlflow.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "kdl-project.mlflow.name" . }}
+  labels:
+    {{- include "kdl-project.mlflowLabels" . | nindent 4 }}
+spec:
+  {{- if and (not .Values.mlflow.networkPolicy.policyTypes) (not .Values.mlflow.networkPolicy.ingress) (not .Values.mlflow.networkPolicy.egress) }}
+  podSelector: {}
+  {{- else }}
+  podSelector:
+    matchLabels:
+      {{- include "kdl-project.selectorMlflowLabels" . | nindent 6 }}
+  {{- end }}
+
+  {{- if .Values.mlflow.networkPolicy.policyTypes }}
+  {{- with .Values.mlflow.networkPolicy.policyTypes }}
+  policyTypes:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- else }}
+  policyTypes:
+    - Ingress
+    - Egress
+  {{- end }}
+
+  {{- if .Values.mlflow.networkPolicy.ingress }}
+  {{- with .Values.mlflow.networkPolicy.ingress }}
+  ingress:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- else }}
+  ingress:
+  - {}
+  {{- end }}
+
+  {{- if .Values.mlflow.networkPolicy.egress }}
+  {{- with .Values.mlflow.networkPolicy.egress }}
+  egress:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- else }}
+  egress:
+  - {}
+  {{- end }}
+
+{{- end }}

@@ -1,0 +1,35 @@
+{{- if and .Values.mlflow.enabled .Values.mlflow.ingress.enabled -}}
+{{- $fullName := include "kdl-project.mlflow.name" . -}}
+{{- $svcPort := .Values.mlflow.service.port -}}
+{{- if and .Values.mlflow.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.mlflow.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.mlflow.ingress.annotations "kubernetes.io/ingress.class" .Values.mlflow.ingress.className}}
+  {{- end }}
+{{- end }}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "kdl-project.mlflowLabels" . | nindent 4 }}
+  annotations:
+    {{- with .Values.mlflow.ingress.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if and .Values.mlflow.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.mlflow.ingress.className }}
+  {{- end }}
+  {{- if or .Values.mlflow.ingress.tls.enabled .Values.mlflow.ingress.tls }}
+  tls:
+    {{- include "kdl-project.mlflow.tls" . | nindent 4 }}
+  {{- end }}
+  rules:
+  {{- include "kdl-project.mlflow.hosts" . | nindent 4 }}
+{{- end }}

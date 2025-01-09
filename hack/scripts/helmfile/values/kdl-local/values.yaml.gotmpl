@@ -1,11 +1,7 @@
 global:
   serverName: "local-server"
   domain: {{ requiredEnv "DOMAIN" | quote }}
-
-  ingress:
-    tls:
-      enabled: true
-      secretName: {{ requiredEnv "DOMAIN" }}-tls-secret
+  enableHttps: true
 
 image:
   repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-server
@@ -14,7 +10,8 @@ image:
 
 env:
   KDL_SERVER_MONGODB_URI: "mongodb://{{ .Values.mongodb_user }}:{{ .Values.mongodb_password }}@mongodb-svc.mongodb:27017/{{ .Values.mongodb_user }}?authSource={{ .Values.mongodb_user }}&authMechanism=SCRAM-SHA-256"
-  KDL_SERVER_PORT: "8080"
+  KUBECONFIG_DOWNLOAD_ENABLED: {{ requiredEnv "KUBECONFIG_ENABLED" }}
+  KUBECONFIG_EXTERNAL_SERVER_URL: {{ env "EXTERNAL_SERVER_URL" | quote }}
   MINIO_ACCESS_KEY: "{{ .Values.minio_access_key }}"
   MINIO_ENDPOINT: "minio:9000"
   MINIO_SECRET_KEY: "{{ .Values.minio_secret_key }}"
@@ -27,10 +24,6 @@ readyChecker:
     port: 27017
   - name: keycloak
     port: 80
-
-service:
-  type: ClusterIP
-  port: 80
 
 # -- Keycloak subchart deployment
 # </br> Ref: https://github.com/konstellation-io/helm-charts/blob/konstellation-base-1.0.2/charts/konstellation-base/values.yaml
@@ -104,13 +97,6 @@ keycloak:
       subPath: initial-realm.json
       readOnly: true
 
-knowledgeGalaxy:
-  enabled: false
-
-  image:
-    repository: {{ requiredEnv "KNOWLEDGE_GALAXY_IMAGE_REPOSITORY" | quote }}
-    tag: {{ env "KNOWLEDGE_GALAXY_IMAGE_TAG" | quote }}
-
 # -- MinIO subchart deployment
 # </br> Ref: https://github.com/minio/minio/blob/RELEASE.2021-10-13T00-23-17Z/helm/minio/values.yaml
 minio:
@@ -122,11 +108,11 @@ minio:
   mode: standalone
 
   ingress:
-    enabled: true
+    enabled: false
     ingressClassName: public
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+      nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
     path: /
     hosts:
       - minio.{{ requiredEnv "DOMAIN" }}
@@ -140,7 +126,7 @@ minio:
     ingressClassName: public
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-      nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
+      nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
     path: /
     hosts:
       - minio-console.{{ requiredEnv "DOMAIN" }}
@@ -155,18 +141,13 @@ minio:
   persistence:
     enabled: true
     storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-    existingClaim: "kdl-local-claim"
+    existingClaim: "shared-volume"
     size: 1Gi
     accessMode: ReadWriteMany
 
   resources:
     requests:
       memory: 1Gi
-
-# -- MongoDB subchart deployment
-# </br> Ref: https://github.com/bitnami/charts/blob/main/bitnami/mongodb/values.yaml
-mongodb:
-  enabled: false
 
 # -- OAuth2-Proxy subchart deployment
 # </br> Ref: https://github.com/oauth2-proxy/manifests/blob/main/helm/oauth2-proxy/values.yaml
@@ -256,29 +237,105 @@ projectOperator:
 
   image:
     repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-project-operator
-    tag: latest
     pullPolicy: Always
+    tag: latest
 
-  mlflow:
-    image:
-      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-mlflow
-      tag: latest
-      pullPolicy: Always
-    volume:
-      storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-    ingress:
-      className: "public"
+  templateCustomResource: |
+    apiVersion: kdl.konstellation.io/v1
+    kind: KDLProject
+    metadata:
+      name: kdlproject-to-be-replaced
+      namespace: kdlproject-to-be-replaced
+    spec:
+      domain: {{ requiredEnv "DOMAIN" | quote }}
+      projectId: kdlproject-id-to-be-replaced
+      mlflow:
+        image:
+          repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-mlflow
+          pullPolicy: IfNotPresent
+          tag: latest
 
-  filebrowser:
-    image:
-      repository: filebrowser/filebrowser
-      pullPolicy: IfNotPresent
-      tag: v2
+        ingress:
+          enabled: true
+          tls:
+            enabled: true
+          className: public
+          annotations:
+            cert-manager.io/cluster-issuer: selfsigned-clusterissuer
+            nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
+
+        persistentVolume:
+          enabled: true
+          size: "1Gi"
+          accessModes:
+            - ReadWriteOnce
+          storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+
+        env:
+          AWS_ACCESS_KEY_ID: "{{ .Values.minio_access_key }}"
+          AWS_SECRET_ACCESS_KEY: "{{ .Values.minio_secret_key }}"
+          MLFLOW_S3_ENDPOINT_URL: "http://minio.kdl:9000"
+          MLFLOW_TRACKING_URI: "sqlite:///database.db"
+
+      filebrowser:
+        image:
+          repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-filebrowser
+          pullPolicy: IfNotPresent
+          tag: latest
+
+        podSecurityContext:
+          fsGroup: 1000
+
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+
+        env:
+          AWS_S3_ACCESS_KEY_ID: "minio"
+          AWS_S3_MOUNT: "/srv"
+          AWS_S3_SECRET_ACCESS_KEY: "minio123"
+          AWS_S3_URL: "http://minio:9000"
+          FB_ADDRESS: "0.0.0.0"
+          FB_DATABASE: "/home/filebrowser/database.db"
+          FB_LOG: stdout
+          FB_ROOT: /srv
+          S3FS_ARGS: >-
+            -o use_path_request_style
+            -o use_cache=/cache
+            -o ensure_diskfree=2048
+            -o max_stat_cache_size=100000
+            -o stat_cache_expire=300
+            -o enable_noobj_cache
+            -o dbglevel=warn
+            -o multipart_size=52
+            -o parallel_count=32
+            -o max_dirty_data=512
+            -o multireq_max=30
+            -o complement_stat
+            -o notsup_compat_dir
+            -o enable_content_md5
+            -o ro
+
+        volumes:
+          - name: cache-volume
+            emptyDir: {}
+          - name: fuse-device
+            hostPath:
+              path: /dev/fuse
+              type: CharDevice
+
+        volumeMounts:
+          - name: cache-volume
+            mountPath: /cache
+          - name: fuse-device
+            mountPath: /dev/fuse
 
 sharedVolume:
   enabled: true
 
-  name: kdl-local
+  name: shared-volume
   storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
 userToolsOperator:
@@ -289,26 +346,52 @@ userToolsOperator:
     tag: latest
     pullPolicy: Always
 
-  storage:
-    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+  templateCustomResource: |
+    apiVersion: kdl.konstellation.io/v1
+    kind: KDLUserTools
+    metadata:
+      name: kdlusertools-to-be-replaced
+      namespace: kdlusertools-to-be-replaced
+    spec:
+      username: replaced-by-kdl-api
+      usernameSlug: replaced-by-kdl-api
 
-  repoCloner:
-    image:
-      repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-repo-cloner
-      tag: latest
-      pullPolicy: Always
+      sharedVolume:
+        enabled: false
 
-  vscode:
-    enabled: false
+      podLabels: {}
 
-    image:
-      epository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-vscode
-      tag: latest
-      pullPolicy: Always
+      persistentVolume:
+        enabled: true
+        size: "1Gi"
+        accessModes:
+          - ReadWriteOnce
+        storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
-  ingress:
-    className: "public"
+      kubeconfig:
+        enabled: {{ requiredEnv "KUBECONFIG_ENABLED" }}
+        externalServerUrl: {{ env "EXTERNAL_SERVER_URL" | quote }}
 
-  kubeconfig:
-    enabled: {{ requiredEnv "KUBECONFIG_ENABLED" }}
-    externalServerUrl: {{ env "EXTERNAL_SERVER_URL" | quote }}
+      repoCloner:
+        image:
+          repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-repo-cloner
+          pullPolicy: IfNotPresent
+          tag: "latest"
+
+        env:
+          KDL_SERVER_MONGODB_URI: "mongodb://{{ .Values.mongodb_user }}:{{ .Values.mongodb_password }}@mongodb-svc.mongodb:27017/{{ .Values.mongodb_user }}?authSource={{ .Values.mongodb_user }}&authMechanism=SCRAM-SHA-256"
+
+      vscodeRuntime:
+        image:
+          repository: konstellation/kdl-py
+          pullPolicy: IfNotPresent
+          tag: "3.9"
+
+        env:
+          AWS_ACCESS_KEY: "{{ .Values.minio_access_key }}"
+          AWS_SECRET_KEY: "{{ .Values.minio_secret_key }}"
+          MINIO_ENDPOINT: "minio:9000"
+
+      nodeSelector: {}
+      tolerations: []
+      affinity: {}

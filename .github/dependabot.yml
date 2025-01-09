@@ -9,9 +9,30 @@ updates:
     - enhancement
     - dependency-management
     - devops-team
+  groups:
+    github-actions:
+      patterns:
+        - "*"
+
 - package-ecosystem: gomod
   directories:
     - "/app/api"
+    - "/repo-cloner"
+  schedule:
+    interval: monthly
+  open-pull-requests-limit: 10
+  labels:
+    - enhancement
+    - dependency-management
+    - develop-team
+  groups:
+    golang-dependencies:
+      patterns:
+        - "*"
+        
+- package-ecosystem: docker
+  directories:
+    - "/app"
     - "/cleaner"
     - "/repo-cloner"
   schedule:
@@ -21,3 +42,8 @@ updates:
     - enhancement
     - dependency-management
     - develop-team
+    - devops-team
+  groups:
+    docker-updates:
+      patterns:
+        - "*"

@@ -240,15 +240,9 @@ projectOperator:
     pullPolicy: Always
     tag: latest
 
-  templateCustomResource: |
-    apiVersion: kdl.konstellation.io/v1
-    kind: KDLProject
-    metadata:
-      name: kdlproject-to-be-replaced
-      namespace: kdlproject-to-be-replaced
+  templateCustomResource:
     spec:
       domain: {{ requiredEnv "DOMAIN" | quote }}
-      projectId: kdlproject-id-to-be-replaced
       mlflow:
         image:
           repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-mlflow
@@ -274,7 +268,7 @@ projectOperator:
         env:
           AWS_ACCESS_KEY_ID: "{{ .Values.minio_access_key }}"
           AWS_SECRET_ACCESS_KEY: "{{ .Values.minio_secret_key }}"
-          MLFLOW_S3_ENDPOINT_URL: "http://minio.kdl:9000"
+          MLFLOW_S3_ENDPOINT_URL: "http://minio:9000"
 
       filebrowser:
         image:
@@ -282,54 +276,10 @@ projectOperator:
           pullPolicy: Always
           tag: latest
 
-        podSecurityContext:
-          fsGroup: 1000
-
-        securityContext:
-          privileged: true
-          capabilities:
-            add:
-              - SYS_ADMIN
-
         env:
-          AWS_S3_ACCESS_KEY_ID: "minio"
-          AWS_S3_MOUNT: "/srv"
-          AWS_S3_SECRET_ACCESS_KEY: "minio123"
+          AWS_S3_ACCESS_KEY_ID: "{{ .Values.minio_access_key }}"
+          AWS_S3_SECRET_ACCESS_KEY: "{{ .Values.minio_secret_key }}"
           AWS_S3_URL: "http://minio:9000"
-          FB_ADDRESS: "0.0.0.0"
-          FB_DATABASE: "/home/filebrowser/database.db"
-          FB_LOG: stdout
-          FB_ROOT: /srv
-          S3FS_ARGS: >-
-            -o use_path_request_style
-            -o use_cache=/cache
-            -o ensure_diskfree=2048
-            -o max_stat_cache_size=100000
-            -o stat_cache_expire=300
-            -o enable_noobj_cache
-            -o dbglevel=warn
-            -o multipart_size=52
-            -o parallel_count=32
-            -o max_dirty_data=512
-            -o multireq_max=30
-            -o complement_stat
-            -o notsup_compat_dir
-            -o enable_content_md5
-            -o ro
-
-        volumes:
-          - name: cache-volume
-            emptyDir: {}
-          - name: fuse-device
-            hostPath:
-              path: /dev/fuse
-              type: CharDevice
-
-        volumeMounts:
-          - name: cache-volume
-            mountPath: /cache
-          - name: fuse-device
-            mountPath: /dev/fuse
 
 sharedVolume:
   enabled: true
@@ -345,26 +295,9 @@ userToolsOperator:
     tag: latest
     pullPolicy: Always
 
-  templateCustomResource: |
-    apiVersion: kdl.konstellation.io/v1
-    kind: KDLUserTools
-    metadata:
-      name: kdlusertools-to-be-replaced
-      namespace: kdlusertools-to-be-replaced
+  templateCustomResource:
     spec:
-      username: replaced-by-kdl-api
-      usernameSlug: replaced-by-kdl-api
-
-      sharedVolume:
-        enabled: false
-
-      podLabels: {}
-
       persistentVolume:
-        enabled: true
-        size: "1Gi"
-        accessModes:
-          - ReadWriteOnce
         storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
       kubeconfig:
@@ -381,16 +314,7 @@ userToolsOperator:
           KDL_SERVER_MONGODB_URI: "mongodb://{{ .Values.mongodb_user }}:{{ .Values.mongodb_password }}@mongodb-svc.mongodb:27017/{{ .Values.mongodb_user }}?authSource={{ .Values.mongodb_user }}&authMechanism=SCRAM-SHA-256"
 
       vscodeRuntime:
-        image:
-          repository: konstellation/kdl-py
-          pullPolicy: Always
-          tag: "3.9"
-
         env:
           AWS_ACCESS_KEY: "{{ .Values.minio_access_key }}"
           AWS_SECRET_KEY: "{{ .Values.minio_secret_key }}"
           MINIO_ENDPOINT: "minio:9000"
-
-      nodeSelector: {}
-      tolerations: []
-      affinity: {}

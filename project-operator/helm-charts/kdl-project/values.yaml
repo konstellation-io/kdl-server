@@ -28,11 +28,11 @@ filebrowser:
   # The image configuration for the base service
   image:
     # The repository of the image
-    repository: filebrowser/filebrowser
+    repository: konstellation/kdl-filebrowser
     # The pull policy for the image
     pullPolicy: IfNotPresent
     # The image tag
-    tag: "v2"
+    tag: "latest"
 
   # -- Specifies the secrets to use for pulling images from private registries
   # Leave empty if no secrets are required
@@ -56,10 +56,30 @@ filebrowser:
 
   # -- Environment variables to configure application
   env:
+    # AWS_S3_ACCESS_KEY_ID: "xxx"
+    # AWS_S3_MOUNT: "/srv"
+    # AWS_S3_SECRET_ACCESS_KEY: "xxx"
+    # AWS_S3_URL: "http://minio:9000"
     FB_ADDRESS: "0.0.0.0"
-    FB_DATABASE: /database.db
+    FB_DATABASE: /home/filebrowser/database.db
     FB_LOG: stdout
     FB_ROOT: /srv
+    # S3FS_ARGS: >-
+    #   -o use_path_request_style
+    #   -o use_cache=/cache
+    #   -o ensure_diskfree=2048
+    #   -o max_stat_cache_size=100000
+    #   -o stat_cache_expire=300
+    #   -o enable_noobj_cache
+    #   -o dbglevel=warn
+    #   -o multipart_size=52
+    #   -o parallel_count=32
+    #   -o max_dirty_data=512
+    #   -o multireq_max=30
+    #   -o complement_stat
+    #   -o notsup_compat_dir
+    #   -o enable_content_md5
+    #   -o ro
 
   # -- Variables from secrets
   envFromSecrets: {}
@@ -247,18 +267,16 @@ filebrowser:
   # </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
   # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   podSecurityContext: {}
-    # fsGroup: 2000
+    # fsGroup: 1000
 
   # -- Defines privilege and access control settings for a Container
   # </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
   # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   securityContext: {}
+    # privileged: true
     # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
+    #   add:
+    #     - SYS_ADMIN
 
   # -- Resources limits and requested
   # </br> Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
@@ -291,19 +309,19 @@ filebrowser:
   # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
   # </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#create-a-pod-that-has-access-to-the-secret-data-through-a-volume
   volumes: []
-  # - name: received-data
-  #   persistentVolumeClaim:
-  #     claimName: received-data-claim
-  # - name: foo
-  #   secret:
-  #     secretName: mysecret
-  #     optional: false
+    # - name: cache-volume
+    #   emptyDir: {}
+    # - name: fuse-device
+    #   hostPath:
+    #     path: /dev/fuse
+    #     type: CharDevice
 
   # -- Additional volumeMounts on the output Deployment definition
   volumeMounts: []
-  # - name: foo
-  #   mountPath: "/etc/foo"
-  #   readOnly: true
+    # - name: cache-volume
+    #   mountPath: /cache
+    # - name: fuse-device
+    #   mountPath: /dev/fuse
 
   # -- Node labels for pod assignment
   # </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
@@ -368,10 +386,10 @@ mlflow:
   # ref: https://mlflow.org/docs/latest/cli.html?highlight=Environment_variables#mlflow-server
   env:
     # ARTIFACTS_BUCKET: mlflow-artifacts
-    # AWS_ACCESS_KEY_ID: minio
-    # AWS_SECRET_ACCESS_KEY: minio123
+    # AWS_ACCESS_KEY_ID: xxx
+    # AWS_SECRET_ACCESS_KEY: xxx
     # MLFLOW_S3_ENDPOINT_URL: "http://kdl-server-minio:9000"
-    MLFLOW_BACKEND_STORE_URI: "sqlite:///mlflow.db"
+    MLFLOW_BACKEND_STORE_URI: "sqlite:////home/mlflow/database.db"
     MLFLOW_HOST: "0.0.0.0"
     MLFLOW_PORT: "5000"
 

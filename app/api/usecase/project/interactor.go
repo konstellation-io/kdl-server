@@ -26,15 +26,12 @@ var (
 
 // CreateProjectOption options when creating project.
 type CreateProjectOption struct {
-	ProjectID              string
-	Name                   string
-	Description            string
-	RepoType               entity.RepositoryType
-	ExternalRepoURL        *string
-	ExternalRepoUsername   *string
-	ExternalRepoCredential string
-	ExternalRepoAuthMethod entity.RepositoryAuthMethod
-	Owner                  entity.User
+	ProjectID   string
+	Name        string
+	Description string
+	URL         *string
+	Username    *string
+	Owner       entity.User
 }
 
 // DeleteProjectOption options when deleting a project.
@@ -77,26 +74,12 @@ func (c CreateProjectOption) Validate() error {
 		return fmt.Errorf("%w: project description cannot be null", ErrCreateProjectValidation)
 	}
 
-	if !c.RepoType.IsValid() {
-		return fmt.Errorf("%w: invalid repository type", ErrCreateProjectValidation)
+	if kdlutil.IsNilOrEmpty(c.URL) {
+		return fmt.Errorf("%w: repository URL cannot be null", ErrCreateProjectValidation)
 	}
 
-	if c.RepoType == entity.RepositoryTypeExternal {
-		if kdlutil.IsNilOrEmpty(c.ExternalRepoURL) {
-			return fmt.Errorf("%w: external repository URL cannot be null", ErrCreateProjectValidation)
-		}
-
-		if kdlutil.IsNilOrEmpty(c.ExternalRepoUsername) {
-			return fmt.Errorf("%w: external repository username cannot be null", ErrCreateProjectValidation)
-		}
-
-		if !c.ExternalRepoAuthMethod.IsValid() {
-			return fmt.Errorf("%w: invalid repository authentication method", ErrCreateProjectValidation)
-		}
-
-		if c.ExternalRepoCredential == "" {
-			return fmt.Errorf("%w: external repository token cannot be null", ErrCreateProjectValidation)
-		}
+	if kdlutil.IsNilOrEmpty(c.Username) {
+		return fmt.Errorf("%w: repository username cannot be null", ErrCreateProjectValidation)
 	}
 
 	return nil
@@ -114,29 +97,26 @@ type interactor struct {
 	randomGenerator   kdlutil.RandomGenerator
 }
 
-// InteractorDeps encapsulates all project interactor dependencies.
-type InteractorDeps struct {
-	Logger            logr.Logger
-	Repo              Repository
-	UserActivityRepo  UserActivityRepo
-	Clock             clock.Clock
-	MinioService      minioservice.MinioService
-	MinioAdminService minioadminservice.MinioAdminInterface
-	K8sClient         k8s.ClientInterface
-	RandomGenerator   kdlutil.RandomGenerator
-}
-
 // NewInteractor is a constructor function.
-func NewInteractor(deps *InteractorDeps) UseCase {
+func NewInteractor(
+	logger logr.Logger,
+	k8sClient k8s.ClientInterface,
+	minioService minioservice.MinioService,
+	minioAdminService minioadminservice.MinioAdminInterface,
+	realClock clock.Clock,
+	projectRepo Repository,
+	userActivityRepo UserActivityRepo,
+	randomGenerator kdlutil.RandomGenerator,
+) UseCase {
 	return &interactor{
-		logger:            deps.Logger,
-		projectRepo:       deps.Repo,
-		userActivityRepo:  deps.UserActivityRepo,
-		clock:             deps.Clock,
-		minioService:      deps.MinioService,
-		minioAdminService: deps.MinioAdminService,
-		k8sClient:         deps.K8sClient,
-		randomGenerator:   deps.RandomGenerator,
+		logger:            logger,
+		projectRepo:       projectRepo,
+		userActivityRepo:  userActivityRepo,
+		clock:             realClock,
+		minioService:      minioService,
+		minioAdminService: minioAdminService,
+		k8sClient:         k8sClient,
+		randomGenerator:   randomGenerator,
 	}
 }
 
@@ -184,9 +164,8 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 
 	// Set project repository
 	project.Repository = entity.Repository{
-		Type:            entity.RepositoryTypeExternal,
-		ExternalRepoURL: *opt.ExternalRepoURL,
-		RepoName:        opt.ProjectID,
+		URL:      *opt.URL,
+		RepoName: opt.ProjectID,
 	}
 
 	// Create a k8s KDLProject containing a MLFLow instance
@@ -336,4 +315,33 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 	i.logger.Info("Project with successfully deleted", "projectID", projectID)
 
 	return &p, nil
+}
+
+func (i *interactor) UpdateKDLProjects(ctx context.Context) error {
+	// get the CRD template from the ConfigMap
+	configMap, err := i.k8sClient.GetConfigMap(ctx, i.k8sClient.GetConfigMapTemplateNameKDLProject())
+	if err != nil {
+		return err
+	}
+	// get the CRD template converted from yaml to go object from the ConfigMap
+	crd, err := kdlutil.GetCrdTemplateFromConfigMap(configMap)
+	if err != nil {
+		return err
+	}
+
+	// get all the KDL Projects in the namespace and iterate over to update them
+	kdlProjectName, err := i.k8sClient.ListKDLProjectsNameCR(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, pID := range kdlProjectName {
+		// NOTE: update method below to add a new struct with extra data to update into CRD
+		err = i.k8sClient.UpdateKDLProjectsCR(ctx, pID, &crd)
+		if err != nil {
+			i.logger.Error(err, "Error updating KDL Project CR in k8s", "projectName", pID)
+		}
+	}
+
+	return nil
 }

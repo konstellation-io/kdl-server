@@ -1,9 +1,9 @@
 {
-  "name": "cleaner",
+  "name": "filebrowser",
   "version": "1.0.0",
   "private": true,
   "release": {
-    "tagFormat": "cleaner-v${version}",
+    "tagFormat": "filebrowser-v${version}",
     "extends": "semantic-release-monorepo",
     "branches": [
       "main",

@@ -199,7 +199,7 @@ func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, ca
 		}
 	}
 
-	var rID, rImage, rTag string
+	var data = k8s.UserToolsData{}
 
 	if runtimeID != nil {
 		r, err := i.repoRuntimes.Get(ctx, *runtimeID)
@@ -207,28 +207,26 @@ func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, ca
 			return entity.User{}, err
 		}
 
-		rID = r.ID
-		rImage = r.DockerImage
-		rTag = r.DockerTag
-		i.logger.Info("Runtime with docker image", "runtimeId", rID, "image", rImage, "tag", rTag)
+		data.RuntimeID = r.ID
+		data.RuntimeImage = r.DockerImage
+		data.RuntimeTag = r.DockerTag
+		i.logger.Info("Runtime with docker image", "runtimeId", r.ID, "image", r.DockerImage, "tag", r.DockerTag)
 	} else {
-		rID = "default"
-		rImage = i.cfg.UserToolsVsCodeRuntime.Image.Repository
-		rTag = i.cfg.UserToolsVsCodeRuntime.Image.Tag
-		i.logger.Info("Using default runtime image", "image", rImage, "tag", rTag)
+		i.logger.Info("No runtime ID provided, using default runtime values")
 	}
 
-	retrievedCapabilities := entity.Capabilities{}
 	if capabilitiesID != nil {
-		retrievedCapabilities, err = i.repoCapabilities.Get(ctx, *capabilitiesID)
+		data.Capabilities, err = i.repoCapabilities.Get(ctx, *capabilitiesID)
 		if err != nil {
 			return entity.User{}, err
 		}
+	} else {
+		i.logger.Info("No capabilities ID provided, using default capabilities values")
 	}
 
 	i.logger.Info("Creating user tools for user", "email", email)
 
-	err = i.k8sClient.CreateUserToolsCR(ctx, user.Username, rID, rImage, rTag, retrievedCapabilities)
+	err = i.k8sClient.CreateKDLUserToolsCR(ctx, user.Username, data)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -270,7 +268,7 @@ func (i *Interactor) AreToolsRunning(ctx context.Context, username string) (bool
 
 // IsKubeconfigActive checks if the kubeconfig is active.
 func (i *Interactor) IsKubeconfigActive() bool {
-	return i.cfg.UserToolsKubeconfig.Enabled
+	return i.cfg.Kubeconfig.Enabled
 }
 
 // FindByIDs retrieves the users for the given identifiers.
@@ -401,4 +399,76 @@ func (i *Interactor) GetKubeconfig(ctx context.Context, username string) (string
 	kubeConfTxt = strings.TrimPrefix(kubeConfTxt, "\n")
 
 	return kubeConfTxt, nil
+}
+
+// Get the CRD template from the ConfigMap and update all the KDL UserTools in the namespace.
+func (i *Interactor) UpdateKDLUserTools(ctx context.Context) error {
+	configMap, err := i.k8sClient.GetConfigMap(ctx, i.k8sClient.GetConfigMapTemplateNameKDLUserTools())
+	if err != nil {
+		return err
+	}
+
+	// get the CRD template converted from yaml to go object from the ConfigMap
+	crd, err := kdlutil.GetCrdTemplateFromConfigMap(configMap)
+	if err != nil {
+		return err
+	}
+
+	// get all the KDL UserTools in the namespace and iterate over to update them
+	kdlUserTools, err := i.k8sClient.ListKDLUserToolsCR(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, userTool := range kdlUserTools {
+		resourceName := userTool.GetName()
+
+		spec, ok := userTool.Object["spec"].(map[string]interface{})
+		if !ok {
+			i.logger.Info("Error getting spec from KDL UserTools CR", "userToolName", userTool.GetName())
+			continue
+		}
+
+		podLabels, ok := spec["podLabels"].(map[string]interface{})
+		if !ok {
+			i.logger.Info("Error getting spec.podLabels from KDL UserTools CR", "userToolName", userTool.GetName())
+			continue
+		}
+
+		runtimeID, ok := podLabels["runtimeId"].(string)
+		if !ok || runtimeID == "" {
+			i.logger.Info("Runtime ID provided is not valid, skipping user tools update", "userToolName", resourceName)
+			continue
+		}
+
+		capabilitiesID, ok := podLabels["capabilityId"].(string)
+		if !ok || capabilitiesID == "" {
+			i.logger.Info("Capability ID provided is not valid, skipping user tools update", "userToolName", resourceName)
+			continue
+		}
+
+		r, err := i.repoRuntimes.Get(ctx, runtimeID)
+		if err != nil {
+			i.logger.Error(err, "Error getting runtime", "runtimeID", runtimeID)
+			continue
+		}
+
+		var data = k8s.UserToolsData{}
+		data.RuntimeID = r.ID
+		data.RuntimeImage = r.DockerImage
+		data.RuntimeTag = r.DockerTag
+
+		data.Capabilities, err = i.repoCapabilities.Get(ctx, capabilitiesID)
+		if err != nil {
+			i.logger.Error(err, "Error getting capability", "capabilitiesID", capabilitiesID)
+			continue
+		}
+
+		err = i.k8sClient.UpdateKDLUserToolsCR(ctx, resourceName, data, &crd)
+		if err != nil {
+			i.logger.Error(err, "Error updating KDL UserTools CR in k8s", "userToolName", resourceName)
+		}
+	}
+
+	return nil
 }

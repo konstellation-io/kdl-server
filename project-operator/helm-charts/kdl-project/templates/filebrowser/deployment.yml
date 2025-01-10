@@ -104,8 +104,6 @@ spec:
             {{- end }}
           {{- end }}
           envFrom:
-            - configMapRef:
-                name: {{ include "kdl-project.filebrowser.name" . }}
             {{- if .Values.filebrowser.envFromFiles }}
             {{- tpl (toYaml .Values.filebrowser.envFromFiles) . | nindent 12 }}
             {{- end }}
@@ -114,6 +112,8 @@ spec:
               value: /filebrowser/{{ .Values.projectId }}
             - name: FB_PORT
               value: {{ .Values.filebrowser.env.FB_PORT | default (int .Values.filebrowser.service.targetPort | default .Values.filebrowser.service.port) | quote }}
+            - name: AWS_S3_BUCKET
+              value: {{ .Values.projectId | quote }}
             # Variables from secrets have precedence
             {{- $envList := dict }}
             {{- if .Values.filebrowser.envFromSecrets }}
@@ -155,9 +155,6 @@ spec:
             - name: filebrowser-config
               mountPath: /entrypoint.sh
               subPath: entrypoint.sh
-            - name: received-data
-              mountPath: /srv
-              subPath: {{ .Values.projectId }}
           {{- with .Values.filebrowser.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -170,7 +167,7 @@ spec:
       volumes:
         - name: filebrowser-config
           configMap:
-            name: {{ include "kdl-project.filebrowser.name" . }}
+            name: {{ .Values.projectId }}-filebrowser-config
             defaultMode: 0777
       {{- with .Values.filebrowser.volumes }}
         {{- toYaml . | nindent 8 }}

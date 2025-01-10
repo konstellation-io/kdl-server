@@ -2,6 +2,7 @@ package project_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 	"gotest.tools/v3/assert"
+	v1 "k8s.io/api/core/v1"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
@@ -23,7 +25,14 @@ import (
 )
 
 const (
-	testProjectID = "test-project"
+	testProjectID     = "test-project"
+	templateConfigMap = "template-name-project"
+)
+
+var (
+	errUpdatingCrd  = errors.New("error updating crd")
+	errNoConfigMap  = errors.New("no configmap")
+	errListProjects = errors.New("error listing projects")
 )
 
 type projectSuite struct {
@@ -58,17 +67,7 @@ func newProjectSuite(t *testing.T) *projectSuite {
 
 	logger := zapr.NewLogger(zapLog)
 
-	deps := &project.InteractorDeps{
-		Logger:            logger,
-		Repo:              repo,
-		UserActivityRepo:  userActivityRepo,
-		Clock:             clockMock,
-		MinioService:      minioService,
-		MinioAdminService: minioAdminService,
-		K8sClient:         k8sClient,
-		RandomGenerator:   randomGenerator,
-	}
-	interactor := project.NewInteractor(deps)
+	interactor := project.NewInteractor(logger, k8sClient, minioService, minioAdminService, clockMock, repo, userActivityRepo, randomGenerator)
 
 	return &projectSuite{
 		ctrl:       ctrl,
@@ -99,10 +98,8 @@ func TestInteractor_Create(t *testing.T) {
 		ownerUsername         = "john"
 	)
 
-	externalRepoURL := "https://github.com/org/repo.git"
-	externalRepoUsername := "username"
-	externalRepoToken := "token"
-	externalAuthMethod := entity.RepositoryAuthToken
+	url := "https://github.com/org/repo.git"
+	username := "username"
 
 	ctx := context.Background()
 	now := time.Now().UTC()
@@ -117,9 +114,8 @@ func TestInteractor_Create(t *testing.T) {
 		},
 	}
 	createProject.Repository = entity.Repository{
-		Type:            entity.RepositoryTypeExternal,
-		ExternalRepoURL: externalRepoURL,
-		RepoName:        testProjectID,
+		URL:      url,
+		RepoName: testProjectID,
 	}
 	createProject.MinioAccessKey = entity.MinioAccessKey{
 		AccessKey: projectMinioAccessKey,
@@ -132,9 +128,8 @@ func TestInteractor_Create(t *testing.T) {
 		Description:  projectDesc,
 		CreationDate: now,
 		Repository: entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: externalRepoURL,
-			RepoName:        testProjectID,
+			URL:      url,
+			RepoName: testProjectID,
 		},
 		MinioAccessKey: entity.MinioAccessKey{
 			AccessKey: projectMinioAccessKey,
@@ -154,15 +149,12 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.minioAdminService.EXPECT().AssignPolicy(ctx, projectMinioAccessKey, projectMinioAccessKey).Return(nil)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
-		ProjectID:              testProjectID,
-		Name:                   projectName,
-		Description:            projectDesc,
-		RepoType:               entity.RepositoryTypeExternal,
-		ExternalRepoURL:        &externalRepoURL,
-		ExternalRepoUsername:   &externalRepoUsername,
-		ExternalRepoCredential: externalRepoToken,
-		ExternalRepoAuthMethod: externalAuthMethod,
-		Owner:                  entity.User{ID: ownerUserID, Username: ownerUsername},
+		ProjectID:   testProjectID,
+		Name:        projectName,
+		Description: projectDesc,
+		URL:         &url,
+		Username:    &username,
+		Owner:       entity.User{ID: ownerUserID, Username: ownerUsername},
 	})
 
 	require.NoError(t, err)
@@ -221,7 +213,6 @@ func TestInteractor_AddMembers(t *testing.T) {
 	p.ID = testProjectID
 	p.Members = []entity.Member{adminMember}
 	p.Repository = entity.Repository{
-		Type:     entity.RepositoryTypeInternal,
 		RepoName: "repo-A",
 	}
 
@@ -282,7 +273,6 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 		{UserID: usersToRemove[1].ID},
 	}
 	p.Repository = entity.Repository{
-		Type:     entity.RepositoryTypeInternal,
 		RepoName: "projectRepo-A",
 	}
 
@@ -366,7 +356,6 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 		{UserID: usersToUpd[1].ID},
 	}
 	p.Repository = entity.Repository{
-		Type:     entity.RepositoryTypeInternal,
 		RepoName: "projectRepo-A",
 	}
 
@@ -480,9 +469,8 @@ func TestInteractor_Delete(t *testing.T) {
 		Description:  "The Project Y Description",
 		CreationDate: now,
 		Repository: entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: "https://github.com/org/repo.git",
-			RepoName:        testProjectID,
+			URL:      "https://github.com/org/repo.git",
+			RepoName: testProjectID,
 		},
 		Members: []entity.Member{
 			{
@@ -546,9 +534,8 @@ func TestInteractor_Delete_NotAdminUser(t *testing.T) {
 		Description:  "The Project Y Description",
 		CreationDate: now,
 		Repository: entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: "https://github.com/org/repo.git",
-			RepoName:        testProjectID,
+			URL:      "https://github.com/org/repo.git",
+			RepoName: testProjectID,
 		},
 	}
 
@@ -579,4 +566,118 @@ func TestInteractor_Delete_ProjectNoExists(t *testing.T) {
 		ProjectID:  testProjectID,
 	})
 	require.Error(t, err)
+}
+
+func TestInteractor_UpdateKDLProjects(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	crd := map[string]interface{}{}
+	listCrd := []string{"kdlprojects-v1", "kdlprojects-v2"}
+
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClient.EXPECT().ListKDLProjectsNameCR(ctx).Return(listCrd, nil)
+	s.mocks.k8sClient.EXPECT().UpdateKDLProjectsCR(ctx, listCrd[0], &crd).Return(nil)
+	s.mocks.k8sClient.EXPECT().UpdateKDLProjectsCR(ctx, listCrd[1], &crd).Return(nil)
+
+	err := s.interactor.UpdateKDLProjects(ctx)
+	require.NoError(t, err)
+}
+
+func TestInteractor_UpdateKDLProjects_UpdateKDLProjectsCR_Error(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	crd := map[string]interface{}{}
+	listCrd := []string{"kdlprojects-v1"}
+
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClient.EXPECT().ListKDLProjectsNameCR(ctx).Return(listCrd, nil)
+	s.mocks.k8sClient.EXPECT().UpdateKDLProjectsCR(ctx, listCrd[0], &crd).Return(errUpdatingCrd)
+
+	// even if there is an error updating the CRD,
+	// the function should return no error to allow updating the next CRD
+	err := s.interactor.UpdateKDLProjects(ctx)
+	require.NoError(t, err)
+}
+
+func TestInteractor_UpdateKDLProjects_NoConfigmap(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(nil, errNoConfigMap)
+
+	err := s.interactor.UpdateKDLProjects(ctx)
+	require.Error(t, err)
+}
+
+func TestInteractor_UpdateKDLProjects_CDRTemplate_ErrorNoTemplate(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+	configMap := v1.ConfigMap{}
+
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+
+	err := s.interactor.UpdateKDLProjects(ctx)
+	require.Error(t, err)
+}
+
+func TestInteractor_UpdateKDLProjects_ListKDLProjectsNameCR_Error(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClient.EXPECT().ListKDLProjectsNameCR(ctx).Return(nil, errListProjects)
+
+	err := s.interactor.UpdateKDLProjects(ctx)
+	require.Error(t, err)
+}
+
+func TestInteractor_UpdateKDLProjects_ListKDLProjectsNameCR_EmptyList(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClient.EXPECT().ListKDLProjectsNameCR(ctx).Return([]string{}, nil)
+
+	err := s.interactor.UpdateKDLProjects(ctx)
+	require.NoError(t, err)
 }

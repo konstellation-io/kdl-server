@@ -14,7 +14,7 @@ const (
 	configMapKdlProjectName = "kdl-server-project-template"
 )
 
-func (s *testSuite) TestCreateKDLProjectCR_and_DeleteKDLProjectCR() {
+func (s *testSuite) createKDLProjectConfigMapTemplate() {
 	yamlContent := `
 apiVersion: kdl.konstellation.io/v1
 kind: KDLProject
@@ -42,8 +42,12 @@ spec:
 		metav1.CreateOptions{},
 	)
 	s.Require().NoError(err)
+}
 
-	err = s.Client.CreateKDLProjectCR(context.Background(), projectID)
+func (s *testSuite) TestCreateKDLProjectCR_and_DeleteKDLProjectCR() {
+	s.createKDLProjectConfigMapTemplate()
+
+	err := s.Client.CreateKDLProjectCR(context.Background(), projectID)
 	s.Require().NoError(err)
 
 	// Delete the CR
@@ -171,5 +175,97 @@ spec:
 	s.Require().NoError(err)
 
 	err = s.Client.CreateKDLProjectCR(context.Background(), projectID)
+	s.Require().Error(err)
+}
+
+func (s *testSuite) TestListKDLProjectsNameCR() {
+	// Arrange by creating the CR
+	s.createKDLProjectConfigMapTemplate()
+	err := s.Client.CreateKDLProjectCR(context.Background(), projectID)
+	s.Require().NoError(err)
+
+	// Assert the CR exists
+	projects, err := s.Client.ListKDLProjectsNameCR(context.Background())
+	s.Require().NoError(err)
+	s.Require().Len(projects, 1)
+	s.Require().Equal(projectID, projects[0])
+
+	// Delete the CR
+	err = s.Client.DeleteKDLProjectCR(context.Background(), projectID)
+	s.Require().NoError(err)
+}
+
+func (s *testSuite) TestListKDLProjectsNameCR_EmptyList() {
+	// Assert the CR does not exist
+	projects, err := s.Client.ListKDLProjectsNameCR(context.Background())
+	s.Require().NoError(err)
+	s.Require().Len(projects, 0)
+}
+
+func (s *testSuite) TestGetKDLProjectCR() {
+	// Arrange by creating the CR
+	s.createKDLProjectConfigMapTemplate()
+	err := s.Client.CreateKDLProjectCR(context.Background(), projectID)
+	s.Require().NoError(err)
+
+	// Assert the CR exists
+	crd, err := s.Client.GetKDLProjectCR(context.Background(), projectID)
+	s.Require().NoError(err)
+	s.Require().NotNil(crd)
+
+	// Delete the CR
+	err = s.Client.DeleteKDLProjectCR(context.Background(), projectID)
+	s.Require().NoError(err)
+}
+
+func (s *testSuite) TestGetKDLProjectCR_Empty() {
+	// Assert the CR does not exist
+	crd, err := s.Client.GetKDLProjectCR(context.Background(), projectID)
+	s.Require().Error(err)
+	s.Require().Nil(crd)
+}
+
+func (s *testSuite) TestUpdateKDLProjectsCR() {
+	// Arrange by creating the CR
+	s.createKDLProjectConfigMapTemplate()
+	err := s.Client.CreateKDLProjectCR(context.Background(), projectID)
+	s.Require().NoError(err)
+
+	// Update the CR
+	crd := map[string]interface{}{
+		"spec": map[string]interface{}{
+			"projectId": "my-demo-projectId",
+			"mlflow": map[string]interface{}{
+				"env": map[string]interface{}{
+					"ARTIFACTS_BUCKET": "my-demo-bucket",
+				},
+			},
+		},
+		"metadata": map[string]interface{}{
+			"name":      "my-demo-name",
+			"namespace": "my-demo-namespace",
+		},
+	}
+	err = s.Client.UpdateKDLProjectsCR(context.Background(), projectID, &crd)
+	s.Require().NoError(err)
+
+	// Delete the CR
+	err = s.Client.DeleteKDLProjectCR(context.Background(), projectID)
+	s.Require().NoError(err)
+}
+
+func (s *testSuite) TestUpdateKDLProjectsCR_WithoutSpec() {
+	// Assert the CR does not exist
+	crd := map[string]interface{}{}
+	err := s.Client.UpdateKDLProjectsCR(context.Background(), projectID, &crd)
+	s.Require().Error(err)
+}
+
+func (s *testSuite) TestUpdateKDLProjectsCR_WithoutCRD() {
+	// Assert the CR does not exist
+	crd := map[string]interface{}{
+		"spec": map[string]interface{}{},
+	}
+	err := s.Client.UpdateKDLProjectsCR(context.Background(), projectID, &crd)
 	s.Require().Error(err)
 }

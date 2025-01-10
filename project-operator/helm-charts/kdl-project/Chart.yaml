@@ -3,7 +3,7 @@ type: application
 name: kdl-project
 description: A Helm chart to deploy KDL projects
 version: 1.0.0
-appVersion: 1.37.0
+appVersion: 1.38.0
 sources:
   - https://github.com/konstellation-io/kdl-server
 home: https://www.konstellation.io

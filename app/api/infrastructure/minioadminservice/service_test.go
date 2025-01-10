@@ -152,7 +152,7 @@ func (s *TestSuite) TestAssignProject() {
 	err := s.service.CreateUser(ctx, "foo", "foo12345678")
 	s.Require().NoError(err)
 
-	err = s.service.UpdatePolicy(ctx, "policy1", []string{"project1"})
+	err = s.service.CreatePolicy(ctx, "policy1", "project1")
 	s.Require().NoError(err)
 
 	err = s.service.AssignPolicy(ctx, "foo", "policy1")
@@ -195,7 +195,7 @@ func (s *TestSuite) TestBucketNotAllowed() {
 	err := s.service.CreateUser(ctx, "foo", "foo12345678")
 	s.Require().NoError(err)
 
-	err = s.service.UpdatePolicy(ctx, "policy1", []string{"project2"})
+	err = s.service.CreatePolicy(ctx, "policy1", "project2")
 	s.Require().NoError(err)
 
 	err = s.service.AssignPolicy(ctx, "foo", "policy1")
@@ -220,7 +220,7 @@ func (s *TestSuite) TestBucketNotAllowed() {
 func (s *TestSuite) TestDeletePolicy() {
 	ctx := context.Background()
 
-	err := s.service.UpdatePolicy(ctx, "policy1", []string{"project1"})
+	err := s.service.CreatePolicy(ctx, "policy1", "project1")
 	s.Require().NoError(err)
 
 	err = s.service.DeletePolicy(ctx, "policy1")

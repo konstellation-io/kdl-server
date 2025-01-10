@@ -48,6 +48,20 @@ func (mr *MockMinioAdminInterfaceMockRecorder) AssignPolicy(ctx, accessKey, poli
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AssignPolicy", reflect.TypeOf((*MockMinioAdminInterface)(nil).AssignPolicy), ctx, accessKey, policyName)
 }
 
+// CreatePolicy mocks base method.
+func (m *MockMinioAdminInterface) CreatePolicy(ctx context.Context, policyName, bucketName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreatePolicy", ctx, policyName, bucketName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreatePolicy indicates an expected call of CreatePolicy.
+func (mr *MockMinioAdminInterfaceMockRecorder) CreatePolicy(ctx, policyName, bucketName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePolicy", reflect.TypeOf((*MockMinioAdminInterface)(nil).CreatePolicy), ctx, policyName, bucketName)
+}
+
 // CreateUser mocks base method.
 func (m *MockMinioAdminInterface) CreateUser(ctx context.Context, accessKey, secretKey string) error {
 	m.ctrl.T.Helper()
@@ -88,18 +102,4 @@ func (m *MockMinioAdminInterface) DeleteUser(ctx context.Context, accessKey stri
 func (mr *MockMinioAdminInterfaceMockRecorder) DeleteUser(ctx, accessKey interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockMinioAdminInterface)(nil).DeleteUser), ctx, accessKey)
-}
-
-// UpdatePolicy mocks base method.
-func (m *MockMinioAdminInterface) UpdatePolicy(ctx context.Context, policyName string, bucketNames []string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdatePolicy", ctx, policyName, bucketNames)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UpdatePolicy indicates an expected call of UpdatePolicy.
-func (mr *MockMinioAdminInterfaceMockRecorder) UpdatePolicy(ctx, policyName, bucketNames interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePolicy", reflect.TypeOf((*MockMinioAdminInterface)(nil).UpdatePolicy), ctx, policyName, bucketNames)
 }

@@ -145,7 +145,7 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(expectedProject, nil)
 	s.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(projectMinioSecretKey, nil)
 	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, projectMinioAccessKey, projectMinioSecretKey).Return(nil)
-	s.mocks.minioAdminService.EXPECT().UpdatePolicy(ctx, projectMinioAccessKey, []string{testProjectID}).Return(nil)
+	s.mocks.minioAdminService.EXPECT().CreatePolicy(ctx, projectMinioAccessKey, testProjectID).Return(nil)
 	s.mocks.minioAdminService.EXPECT().AssignPolicy(ctx, projectMinioAccessKey, projectMinioAccessKey).Return(nil)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{

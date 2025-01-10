@@ -9,6 +9,6 @@ type MinioAdminInterface interface {
 	CreateUser(ctx context.Context, accessKey, secretKey string) error
 	DeleteUser(ctx context.Context, accessKey string) error
 	AssignPolicy(ctx context.Context, accessKey, policyName string) error
-	UpdatePolicy(ctx context.Context, policyName string, bucketNames []string) error
+	CreatePolicy(ctx context.Context, policyName, bucketName string) error
 	DeletePolicy(ctx context.Context, policyName string) error
 }

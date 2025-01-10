@@ -193,7 +193,7 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 	}
 
 	// Create Minio policy for the project user
-	err = i.minioAdminService.UpdatePolicy(ctx, accessKey, []string{opt.ProjectID})
+	err = i.minioAdminService.CreatePolicy(ctx, accessKey, opt.ProjectID)
 	if err != nil {
 		return entity.Project{}, err
 	}

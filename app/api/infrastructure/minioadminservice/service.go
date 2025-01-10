@@ -16,8 +16,6 @@ import (
 //go:embed templates/policy.go.tmpl
 var policyTemplate string
 
-var errEmptyBucketList = errors.New("the bucket list is empty")
-
 type MinioAdminService struct {
 	logger logr.Logger
 	client *madmin.AdminClient
@@ -63,22 +61,14 @@ func (m *MinioAdminService) DeleteUser(ctx context.Context, accessKey string) er
 	return err
 }
 
-func (m *MinioAdminService) UpdatePolicy(ctx context.Context, policyName string, bucketNames []string) error {
-	if len(bucketNames) == 0 {
-		return errEmptyBucketList
-	}
-
+func (m *MinioAdminService) CreatePolicy(ctx context.Context, policyName, bucketName string) error {
 	tmpl, err := template.New("policy").Parse(policyTemplate)
 	if err != nil {
 		return fmt.Errorf("failed to parse policy template: %w", err)
 	}
 
 	var policyBuffer bytes.Buffer
-	err = tmpl.Execute(&policyBuffer, struct {
-		Buckets []string
-	}{
-		Buckets: bucketNames,
-	})
+	err = tmpl.Execute(&policyBuffer, struct{ BucketName string }{BucketName: bucketName})
 
 	if err != nil {
 		return fmt.Errorf("failed to apply policy template: %w", err)

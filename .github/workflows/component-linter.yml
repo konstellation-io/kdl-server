@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "[${{ matrix.directory }}] Pass hadolint"
         uses: hadolint/hadolint-action@v3.1.0

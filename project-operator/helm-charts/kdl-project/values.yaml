@@ -61,7 +61,7 @@ filebrowser:
     # AWS_S3_SECRET_ACCESS_KEY: "xxx"
     # AWS_S3_URL: "http://minio:9000"
     FB_ADDRESS: "0.0.0.0"
-    FB_DATABASE: /database.db
+    FB_DATABASE: /home/filebrowser/database.db
     FB_LOG: stdout
     FB_ROOT: /srv
     # S3FS_ARGS: >-
@@ -389,7 +389,7 @@ mlflow:
     # AWS_ACCESS_KEY_ID: xxx
     # AWS_SECRET_ACCESS_KEY: xxx
     # MLFLOW_S3_ENDPOINT_URL: "http://kdl-server-minio:9000"
-    MLFLOW_BACKEND_STORE_URI: "sqlite:///mlflow.db"
+    MLFLOW_BACKEND_STORE_URI: "sqlite:////home/mlflow/database.db"
     MLFLOW_HOST: "0.0.0.0"
     MLFLOW_PORT: "5000"
 

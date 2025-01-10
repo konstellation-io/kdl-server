@@ -31,20 +31,13 @@ RUN apk add --no-cache                 \
     adduser -D -u ${UID}               \
       -G ${USER} ${USER}            && \
     # set up app directory
-    chown -R ${UID}:${GID} /srv     && \
-    # create default credentials file
-    touch /etc/passwd-s3fs          && \
-    chown ${USER}:${USER} /etc/passwd-s3fs && \
-    chmod 600 /etc/passwd-s3fs
+    chown -R ${UID}:${GID} /srv
 
 # switch to non-root user
 USER ${USER}
 
-# use proper entrypoint script
-COPY --chown=${USER}:${USER} entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
 VOLUME ["/srv"]
 EXPOSE 9696
 
+# entrypoint create when project-operator deploy release
 ENTRYPOINT ["tini", "-g", "--", "/entrypoint.sh"]

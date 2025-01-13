@@ -95,11 +95,11 @@ func (c *UserRepoCloner) cloneRepo(project repository.Project) {
 	destPath := c.getRepoPath(project)
 	repoURL := ""
 
-	repoURL = strings.Replace(project.ExternalRepoURL, "https://", "ssh://git@", 1)
+	repoURL = strings.Replace(project.URL, "https://", "ssh://git@", 1)
 
-	hostname, err := utils.GetRepoHostnameFromURL(project.ExternalRepoURL)
+	hostname, err := utils.GetRepoHostnameFromURL(project.URL)
 	if err != nil {
-		c.logger.Error(err, "Error getting the repository hostname from URL", "RepoURL", project.ExternalRepoURL)
+		c.logger.Error(err, "Error getting the repository hostname from URL", "RepoURL", project.URL)
 		return
 	}
 

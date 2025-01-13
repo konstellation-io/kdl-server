@@ -1,0 +1,26 @@
+{{- if and .Values.mlflow.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kdl-project.mlflow.name" . }}
+  labels:
+    {{- include "kdl-project.mlflowLabels" . | nindent 4 }}
+spec:
+  type: {{ .Values.mlflow.service.type }}
+  ports:
+    - port: {{ .Values.mlflow.service.port }}
+      targetPort: {{ .Values.mlflow.env.MLFLOW_PORT | default (int .Values.mlflow.service.targetPort | default .Values.mlflow.service.port) }}
+      protocol: TCP
+      name: http
+      {{- if and (eq "NodePort" .Values.mlflow.service.type) .Values.mlflow.service.nodePort }}
+      nodePort: {{ .Values.mlflow.service.nodePort }}
+      {{- end }}
+    {{- range $port := .Values.mlflow.service.extraPorts }}
+    - name: {{ $port.name }}
+      port: {{ $port.port }}
+      targetPort: {{ $port.targetPort }}
+      protocol: TCP
+    {{- end }}
+  selector:
+    {{- include "kdl-project.selectorMlflowLabels" . | nindent 4 }}
+{{- end }}

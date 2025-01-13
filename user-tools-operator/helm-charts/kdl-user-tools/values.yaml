@@ -1,0 +1,408 @@
+# Default values for kdl-user-tools
+# This is a YAML-formatted file
+# Declare variables to be passed into your templates
+
+# -- String to partially override kdl-user-tools.fullname template (will maintain the release name)
+nameOverride: ""
+
+# -- String to fully override kdl-user-tools.fullname template
+fullnameOverride: ""
+
+# -- String from KDL API
+username: "replaced-by-kdl-api"
+
+# -- String from KDL API used slug replacer
+# </br> Ref: https://pkg.go.dev/github.com/gosimple/slug
+usernameSlug: "replaced-by-kdl-api"
+
+# -- String to set external volume to use on user-tools workspace
+sharedVolume:
+  # -- Enable or disable sharedVolume use
+  enabled: false
+  name: ""
+
+# -- If enabled, users will be able to download a kubeconfig file, so they can attach an
+# external terminal/IDE to the vscodeRuntime running inside.
+kubeconfig:
+  enabled: false
+
+  ## External cluster address to be able to connect to it from the outside.
+  # externalServerUrl: https://192.168.0.21:16443
+
+# -- Number of replicas
+# Specifies the number of replicas for the service
+replicaCount: 1
+
+# -- Specifies the secrets to use for pulling images from private registries
+# Leave empty if no secrets are required
+# E.g.
+# imagePullSecrets:
+#   - name: myRegistryKeySecretName
+imagePullSecrets: []
+
+# -- This feature can be used to upgrade the container images, resource requests and/or limits,
+# labels, and annotations of the Pods
+# </br> Ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
+updateStrategy:
+  # -- StatefulSet update strategy policy
+  # Valid values: "RollingUpdate" or "OnDelete"
+  type: RollingUpdate
+
+  # Specific configuration for RollingUpdate
+  # Only applies if type: RollingUpdate
+  rollingUpdate:
+    # Maximum number of pods that can be scheduled above the desired number of pods
+    # during an update
+    partition: 0
+    # Maximum number of pods that can be unavailable during the update
+    maxUnavailable: 1
+
+# -- Minimum number of seconds for which a newly created pod should be ready without any
+# containers crashing
+minReadySeconds: 0
+
+# -- Ordering options for updates
+# Valid values: "OrderedReady" or "Parallel"
+podManagementPolicy: OrderedReady
+
+# -- Enable creation of ServiceAccount
+# </br> Ref: https://kubernetes.io/docs/concepts/security/service-accounts/
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# -- Configure extra containers
+extraContainers: []
+  # - name: project-proxy
+  #   image: nginx:alpine
+  #   command: ['sh', '-c', 'echo "Hello, World!"']
+
+# -- Configure additional containers
+# </br> Ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+initContainers:
+  - name: create-kubeconfig
+    image: alpine/k8s:1.31.2
+    imagePullPolicy: IfNotPresent
+    command:
+      - sh
+      - /generate-kubeconfig.sh
+    volumeMounts:
+      - name: data
+        mountPath: /home/coder
+      - name: kubeconfig-tpl-configmap
+        mountPath: /kubeconfig.tpl
+        subPath: kubeconfig.tpl
+      - name: kubeconfig-tpl-configmap
+        mountPath: /generate-kubeconfig.sh
+        subPath: generate-kubeconfig.sh
+  - name: create-ssh-folder
+    image: busybox:stable
+    imagePullPolicy: IfNotPresent
+    command:
+    - sh
+    - -c
+    - mkdir -p /home/kdl/.ssh && chown 1000:1000 /home/kdl/.ssh
+    volumeMounts:
+      - name: data
+        mountPath: /home/kdl
+
+# -- NetworkPolicy configuration
+# </br> Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+networkPolicy:
+  # -- Enable or disable NetworkPolicy
+  enabled: false
+  # -- Policy types
+  policyTypes: []
+    # - Ingress
+    # - Egress
+  ingress: []
+    # - from:
+    #   - ipBlock:
+    #       cidr: 172.17.0.0/16
+    #       except:
+    #       - 172.17.1.0/24
+    #   - namespaceSelector:
+    #       matchLabels:
+    #         project: myproject
+    #   - podSelector:
+    #       matchLabels:
+    #         role: frontend
+    #   ports:
+    #   - protocol: TCP
+    #     port: 6379
+  egress: []
+    # - to:
+    #   - ipBlock:
+    #       cidr: 10.0.0.0/24
+    #   ports:
+    #   - protocol: TCP
+    #     port: 5978
+
+# -- Configure Pod termination grace period
+# </br> Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination
+terminationGracePeriodSeconds: 30
+
+# -- Configure annotations on Pods
+podAnnotations: {}
+
+# -- Configure labels on Pods
+podLabels: {}
+  # runtimeId: "replaced-by-kdl-apiaaaa"
+  # capabilityId: "replaced-by-kdl-apiaaaa"
+
+# -- Defines privilege and access control settings for a Pod
+# </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+# </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+podSecurityContext:
+  fsGroup: 1000
+
+# -- Defines privilege and access control settings for a Container
+# </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+# </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# -- Resources limits and requested
+# </br> Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# -- Pod Disruption Budget
+# </br> Ref: https://kubernetes.io/docs/reference/kubernetes-api/policy-resources/pod-disruption-budget-v1/
+podDisruptionBudget:
+  enabled: false
+  maxUnavailable: 1
+  minAvailable:
+
+# -- Autoscaling with CPU or memory utilization percentage
+# </br> Ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# -- Persistent Volume configuration
+# </br> Ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+persistentVolume:
+  # -- Enable or disable persistence
+  enabled: true
+
+  # -- Persistent Volume access modes
+  # Must match those of existing PV or dynamic provisioner
+  # </br> Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+  accessModes:
+    - ReadWriteOnce
+
+  # -- Persistent Volume size
+  size: 1Gi
+
+  # -- Persistent Volume Storage Class
+  # If defined, storageClassName: <storageClass>
+  # If set to "-", storageClassName: "", which disables dynamic provisioning
+  # If undefined (the default) or set to null, no storageClassName spec is
+  #   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  #   GKE, AWS & OpenStack)
+  storageClass: ""
+
+# -- Additional volumes on the output Deployment definition
+# </br> Ref: https://kubernetes.io/docs/concepts/storage/volumes/
+# </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
+# </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#create-a-pod-that-has-access-to-the-secret-data-through-a-volume
+volumes: []
+# - name: received-data
+#   persistentVolumeClaim:
+#     claimName: received-data-claim
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# -- Node labels for pod assignment
+# </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+nodeSelector: {}
+
+# -- Tolerations for pod assignment
+# </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+tolerations: []
+
+# -- Affinity for pod assignment
+# </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}
+
+# -- Control how Pods are spread across your cluster
+# </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#example-multiple-topologyspreadconstraints
+topologySpreadConstraints: []
+# - maxSkew: 1
+#   topologyKey: zone
+#   whenUnsatisfiable: DoNotSchedule
+
+# -- Module cloning external repositories of the projects in which the user participates. This way they are available
+# for code-server to be able to work with it.
+# </br> Ref: https://github.com/konstellation-io/kdl-server/tree/main/repo-cloner
+repoCloner:
+  image:
+    # The repository of the image
+    repository: konstellation/kdl-repo-cloner
+    # The pull policy for the image
+    pullPolicy: IfNotPresent
+    # The image tag
+    tag: "latest"
+
+  # -- Mountpath where mount data
+  homePath: "/home/kdl"
+
+  # -- Configure args
+  # </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
+  args: []
+    # - -c
+    # - /entrypoint.sh
+
+  # -- Configure command
+  # </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
+  command: []
+    # - /bin/sh
+
+  # -- Environment variables to configure application
+  env: {}
+    # KDL_SERVER_MONGODB_URI: "mongodb://user:pass@mongodb:27017/db?authSource=user&authMechanism=SCRAM-SHA-256"
+
+  # -- Variables from secrets
+  envFromSecrets: {}
+    # MY_VARIABLE:
+    #   name: <name-secret>
+    #   key: secret_key
+
+  # -- Variables from configMap
+  envFromConfigMap: {}
+    # MY_VARIABLE:
+    #   name: <name-configmap>
+    #   key: key
+
+  # -- Load all variables from files
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables
+  envFromFiles: []
+    # - secretRef:
+    #     name: <name-secret>
+    # - configMapRef:
+    #     name: <name-configmap>
+
+  # -- Additional volumeMounts on the output Deployment definition
+  volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
+  # -- Configure lifecycle hooks
+  # </br> Ref: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
+  # </br> Ref: https://learnk8s.io/graceful-shutdown
+  lifecycle: {}
+    # preStop:
+    #   exec:
+    #     command: ["sh", "-c", "sleep 10"]
+    # postStart:
+    #   exec:
+    #     command:
+    #       - "/bin/sh"
+    #       - "-c"
+    #       - "ssh-keyscan -H keycloak >> /app/.ssh/known_hosts"
+
+# -- Runtime refers to a pre-configured containerized environment, equipped with the tools,
+# libraries, and dependencies which data scientists need to develop, test and deploy models.
+# </br> Ref: https://github.com/konstellation-io/konstellation-runtimes
+vscodeRuntime:
+  image:
+    # The repository of the image (replaced-by-kdl-api)
+    repository: "konstellation/kdl-py"
+    # The pull policy for the image
+    pullPolicy: IfNotPresent
+    # The image tag (replaced-by-kdl-api)
+    tag: "3.9"
+
+  # -- Mountpath where mount data
+  homePath: "/home/coder"
+
+  # -- Configure args
+  # </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
+  args:
+    - "-c"
+    - "trap : TERM INT; sleep infinity & wait"
+
+  # -- Configure command
+  # </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
+  command:
+    - /bin/bash
+
+  # -- Environment variables to configure application
+  env: {}
+    # AWS_ACCESS_KEY: ""
+    # AWS_SECRET_KEY: ""
+    # MINIO_ENDPOINT: ""
+
+  # -- Variables from secrets
+  envFromSecrets: {}
+    # MY_VARIABLE:
+    #   name: <name-secret>
+    #   key: secret_key
+
+  # -- Variables from configMap
+  envFromConfigMap: {}
+    # MY_VARIABLE:
+    #   name: <name-configmap>
+    #   key: key
+
+  # -- Load all variables from files
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables
+  envFromFiles: []
+    # - secretRef:
+    #     name: <name-secret>
+    # - configMapRef:
+    #     name: <name-configmap>
+
+  # -- Additional volumeMounts on the output Deployment definition
+  volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
+  # -- Configure lifecycle hooks
+  # </br> Ref: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
+  # </br> Ref: https://learnk8s.io/graceful-shutdown
+  lifecycle: {}
+    # preStop:
+    #   exec:
+    #     command: ["sh", "-c", "sleep 10"]
+    # postStart:
+    #   exec:
+    #     command:
+    #       - "/bin/sh"
+    #       - "-c"
+    #       - "ssh-keyscan -H keycloak >> /app/.ssh/known_hosts"
+
+  # -- Resources limits and requested
+  # </br> Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi

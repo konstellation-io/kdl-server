@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -72,7 +72,7 @@ jobs:
             org.opencontainers.image.vendor=Konstellation
           tags: |
             type=raw,value=${{ env.TAG_NAME_FIXED }}
-            type=raw,value=latest
+            type=raw,value=latest,enable=${{ env.TAG_NAME_FIXED != 'develop' }}
             type=sha,enable=false
 
       - name: Set up QEMU

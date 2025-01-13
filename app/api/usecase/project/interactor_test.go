@@ -2,6 +2,7 @@ package project_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 	"gotest.tools/v3/assert"
+	v1 "k8s.io/api/core/v1"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
@@ -21,7 +23,14 @@ import (
 )
 
 const (
-	testProjectID = "test-project"
+	testProjectID     = "test-project"
+	templateConfigMap = "template-name-project"
+)
+
+var (
+	errUpdatingCrd  = errors.New("error updating crd")
+	errNoConfigMap  = errors.New("no configmap")
+	errListProjects = errors.New("error listing projects")
 )
 
 type projectSuite struct {
@@ -52,15 +61,7 @@ func newProjectSuite(t *testing.T) *projectSuite {
 
 	logger := zapr.NewLogger(zapLog)
 
-	deps := &project.InteractorDeps{
-		Logger:           logger,
-		Repo:             repo,
-		UserActivityRepo: userActivityRepo,
-		Clock:            clockMock,
-		MinioService:     minioService,
-		K8sClient:        k8sClient,
-	}
-	interactor := project.NewInteractor(deps)
+	interactor := project.NewInteractor(logger, k8sClient, minioService, clockMock, repo, userActivityRepo)
 
 	return &projectSuite{
 		ctrl:       ctrl,
@@ -536,4 +537,118 @@ func TestInteractor_Delete_ProjectNoExists(t *testing.T) {
 		ProjectID:  testProjectID,
 	})
 	require.Error(t, err)
+}
+
+func TestInteractor_UpdateKDLProjects(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	crd := map[string]interface{}{}
+	listCrd := []string{"kdlprojects-v1", "kdlprojects-v2"}
+
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClient.EXPECT().ListKDLProjectsNameCR(ctx).Return(listCrd, nil)
+	s.mocks.k8sClient.EXPECT().UpdateKDLProjectsCR(ctx, listCrd[0], &crd).Return(nil)
+	s.mocks.k8sClient.EXPECT().UpdateKDLProjectsCR(ctx, listCrd[1], &crd).Return(nil)
+
+	err := s.interactor.UpdateKDLProjects(ctx)
+	require.NoError(t, err)
+}
+
+func TestInteractor_UpdateKDLProjects_UpdateKDLProjectsCR_Error(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	crd := map[string]interface{}{}
+	listCrd := []string{"kdlprojects-v1"}
+
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClient.EXPECT().ListKDLProjectsNameCR(ctx).Return(listCrd, nil)
+	s.mocks.k8sClient.EXPECT().UpdateKDLProjectsCR(ctx, listCrd[0], &crd).Return(errUpdatingCrd)
+
+	// even if there is an error updating the CRD,
+	// the function should return no error to allow updating the next CRD
+	err := s.interactor.UpdateKDLProjects(ctx)
+	require.NoError(t, err)
+}
+
+func TestInteractor_UpdateKDLProjects_NoConfigmap(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(nil, errNoConfigMap)
+
+	err := s.interactor.UpdateKDLProjects(ctx)
+	require.Error(t, err)
+}
+
+func TestInteractor_UpdateKDLProjects_CDRTemplate_ErrorNoTemplate(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+	configMap := v1.ConfigMap{}
+
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+
+	err := s.interactor.UpdateKDLProjects(ctx)
+	require.Error(t, err)
+}
+
+func TestInteractor_UpdateKDLProjects_ListKDLProjectsNameCR_Error(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClient.EXPECT().ListKDLProjectsNameCR(ctx).Return(nil, errListProjects)
+
+	err := s.interactor.UpdateKDLProjects(ctx)
+	require.Error(t, err)
+}
+
+func TestInteractor_UpdateKDLProjects_ListKDLProjectsNameCR_EmptyList(t *testing.T) {
+	s := newProjectSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	configMap := v1.ConfigMap{
+		Data: map[string]string{},
+	}
+	configMap.Data["template"] = ""
+
+	s.mocks.k8sClient.EXPECT().GetConfigMapTemplateNameKDLProject().Return(templateConfigMap)
+	s.mocks.k8sClient.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
+	s.mocks.k8sClient.EXPECT().ListKDLProjectsNameCR(ctx).Return([]string{}, nil)
+
+	err := s.interactor.UpdateKDLProjects(ctx)
+	require.NoError(t, err)
 }

@@ -37,6 +37,12 @@ export interface GetProjects_projects_members {
   addedDate: string;
 }
 
+export interface GetProjects_projects_minioAccessKey {
+  __typename: "MinioAccessKey";
+  accessKey: string;
+  secretKey: string;
+}
+
 export interface GetProjects_projects {
   __typename: "Project";
   id: string;
@@ -51,6 +57,7 @@ export interface GetProjects_projects {
   error: string | null;
   toolUrls: GetProjects_projects_toolUrls;
   members: GetProjects_projects_members[];
+  minioAccessKey: GetProjects_projects_minioAccessKey;
 }
 
 export interface GetProjects {

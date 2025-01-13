@@ -39,9 +39,9 @@ func NewKeycloakUserRegistry(client *gocloak.GoCloak, cfg config.KeycloakConfig)
 
 	token, err := client.LoginAdmin(
 		ctx,
-		cfg.AdminUserKey,
+		cfg.AdminUser,
 		cfg.AdminPasswordKey,
-		cfg.MasterRealmKey,
+		cfg.MasterRealm,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("login with admin user: %w", err)
@@ -72,9 +72,9 @@ func (ur *service) refreshToken(ctx context.Context) error {
 		token, err = ur.client.RefreshToken(
 			ctx,
 			ur.token.RefreshToken,
-			ur.cfg.AdminClientIDKey,
+			ur.cfg.AdminClientID,
 			"",
-			ur.cfg.MasterRealmKey,
+			ur.cfg.MasterRealm,
 		)
 		if err != nil {
 			return fmt.Errorf("refreshing token: %w", err)
@@ -82,9 +82,9 @@ func (ur *service) refreshToken(ctx context.Context) error {
 	} else {
 		token, err = ur.client.LoginAdmin(
 			ctx,
-			ur.cfg.AdminUserKey,
+			ur.cfg.AdminUser,
 			ur.cfg.AdminPasswordKey,
-			ur.cfg.MasterRealmKey,
+			ur.cfg.MasterRealm,
 		)
 		if err != nil {
 			return fmt.Errorf("login with admin user: %w", err)
@@ -98,15 +98,15 @@ func (ur *service) refreshToken(ctx context.Context) error {
 	return nil
 }
 
-func (ur *service) DeleteUser(ctx context.Context, name string) error {
+func (ur *service) DeleteUser(ctx context.Context, username string) error {
 	err := ur.refreshToken(ctx)
 	if err != nil {
 		return err
 	}
 
 	users, err := ur.client.GetUsers(
-		ctx, ur.token.AccessToken, ur.cfg.RealmKey,
-		gocloak.GetUsersParams{Username: gocloak.StringP(name)},
+		ctx, ur.token.AccessToken, ur.cfg.Realm,
+		gocloak.GetUsersParams{Username: gocloak.StringP(username)},
 	)
 	if err != nil {
 		return err
@@ -118,7 +118,7 @@ func (ur *service) DeleteUser(ctx context.Context, name string) error {
 
 	userID := *users[0].ID
 
-	err = ur.client.DeleteUser(ctx, ur.token.AccessToken, ur.cfg.RealmKey, userID)
+	err = ur.client.DeleteUser(ctx, ur.token.AccessToken, ur.cfg.Realm, userID)
 	if err != nil {
 		return fmt.Errorf("deleting Keycloak user %q: %w", userID, err)
 	}

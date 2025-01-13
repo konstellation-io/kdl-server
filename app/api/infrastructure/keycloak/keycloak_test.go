@@ -83,12 +83,12 @@ func (s *KeycloakSuite) SetupSuite() {
 	s.keycloakClient = WithClient(keycloakEndpoint)
 
 	s.cfg = config.KeycloakConfig{
-		AdminUserKey:     _adminUser,
+		AdminUser:        _adminUser,
 		AdminPasswordKey: _adminPassword,
-		AdminClientIDKey: "admin-cli",
-		MasterRealmKey:   "master",
-		RealmKey:         "example",
-		URLKey:           keycloakEndpoint,
+		AdminClientID:    "admin-cli",
+		MasterRealm:      "master",
+		Realm:            "example",
+		URL:              keycloakEndpoint,
 	}
 }
 
@@ -183,7 +183,7 @@ func (s *KeycloakSuite) TestDeleteUser() {
 		testPassword = "test-password"
 	)
 
-	_, err := s.keycloakClient.CreateUser(ctx, s.keycloakService.token.AccessToken, s.cfg.RealmKey, gocloak.User{
+	_, err := s.keycloakClient.CreateUser(ctx, s.keycloakService.token.AccessToken, s.cfg.Realm, gocloak.User{
 		Username:      gocloak.StringP(userName),
 		EmailVerified: gocloak.BoolP(true),
 		Enabled:       gocloak.BoolP(true),
@@ -197,7 +197,7 @@ func (s *KeycloakSuite) TestDeleteUser() {
 
 	users, err := s.keycloakClient.GetUsers(ctx,
 		s.keycloakService.token.AccessToken,
-		s.cfg.RealmKey,
+		s.cfg.Realm,
 		gocloak.GetUsersParams{Username: gocloak.StringP(userName)},
 	)
 	s.Require().NoError(err)
@@ -208,7 +208,7 @@ func (s *KeycloakSuite) TestDeleteUser() {
 
 	users, err = s.keycloakClient.GetUsers(ctx,
 		s.keycloakService.token.AccessToken,
-		s.cfg.RealmKey,
+		s.cfg.Realm,
 		gocloak.GetUsersParams{Username: gocloak.StringP(userName)},
 	)
 	s.Require().NoError(err)

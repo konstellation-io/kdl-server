@@ -9,12 +9,12 @@ import (
 )
 
 type KeycloakConfig struct {
-	AdminUserKey     string `envconfig:"KEYCLOAK_ADMIN_USER"`
+	AdminUser        string `envconfig:"KEYCLOAK_ADMIN_USER"`
 	AdminPasswordKey string `envconfig:"KEYCLOAK_PASSWORD_KEY"`
-	AdminClientIDKey string `envconfig:"KEYCLOAK_ADMIN_CLIENT_ID"`
-	MasterRealmKey   string `envconfig:"KEYCLOAK_MASTER_REALM"`
-	RealmKey         string `envconfig:"KEYCLOAK_REALM"`
-	URLKey           string `envconfig:"KEYCLOAK_URL"`
+	AdminClientID    string `envconfig:"KEYCLOAK_ADMIN_CLIENT_ID"`
+	MasterRealm      string `envconfig:"KEYCLOAK_MASTER_REALM"`
+	Realm            string `envconfig:"KEYCLOAK_REALM"`
+	URL              string `envconfig:"KEYCLOAK_URL"`
 }
 
 type KubernetesConfig struct {

@@ -11,7 +11,11 @@ import useProjectFilters from 'Graphql/client/hooks/useProjectFilters';
 import { useQuery, useReactiveVar } from '@apollo/client';
 
 import GetProjectsQuery from 'Graphql/queries/getProjects';
+import GetMeQuery from 'Graphql/queries/getMe';
+import { GetMe } from 'Graphql/queries/types/GetMe';
 import { projectFilters } from 'Graphql/client/cache';
+
+import { AccessLevel } from 'Graphql/types/globalTypes';
 
 export type ProjectAdmins = {
   projectName: string;
@@ -22,6 +26,7 @@ function Projects() {
   const [showProjectAdmins, setShowProjectAdmins] = useState<ProjectAdmins | null>(null);
 
   const { data, error, loading } = useQuery<GetProjects>(GetProjectsQuery);
+  const { data: dataMe, error: errorMe, loading: loadingMe } = useQuery<GetMe>(GetMeQuery);
   const filters = useReactiveVar(projectFilters);
 
   const { filterProjects, sortProjects } = useProjectFilters();
@@ -31,6 +36,8 @@ function Projects() {
   let projects = filterProjects(data.projects, filters);
   projects = sortProjects(projects, filters.order);
 
+  const canAccessUsers = dataMe?.me?.accessLevel === AccessLevel.ADMIN;
+
   return (
     <>
       <ProjectsBar />
@@ -39,7 +46,7 @@ function Projects() {
           ...projects.map((project) => (
             <Project key={project.id} project={project} showAdmins={setShowProjectAdmins} />
           )),
-          <AddProject key="add-project" />,
+          canAccessUsers && <AddProject key="add-project" />,
         ]}
       </div>
       {showProjectAdmins !== null && (

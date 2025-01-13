@@ -49,27 +49,10 @@ type Config struct {
 		Enabled           bool   `envconfig:"KUBECONFIG_DOWNLOAD_ENABLED" default:"false"`
 		ExternalServerURL string `envconfig:"KUBECONFIG_EXTERNAL_SERVER_URL"`
 	}
-	UserToolsOAuth2Proxy struct {
-		Image struct {
-			Repository string `envconfig:"USER_TOOLS_OAUTH2_PROXY_IMG_REPO"`
-			Tag        string `envconfig:"USER_TOOLS_OAUTH2_PROXY_IMG_TAG"`
-			PullPolicy string `envconfig:"USER_TOOLS_OAUTH2_PROXY_IMG_PULLPOLICY"`
-		}
-	}
-	UserToolsVsCodeRuntime struct {
-		Image struct {
-			Repository string `envconfig:"USER_TOOLS_VSCODE_RUNTIME_IMG_REPO"`
-			Tag        string `envconfig:"USER_TOOLS_VSCODE_RUNTIME_IMG_TAG"`
-			PullPolicy string `envconfig:"USER_TOOLS_VSCODE_RUNTIME_IMG_PULLPOLICY"`
-		}
-	}
-	VSCode struct {
-		URL     string `envconfig:"USER_TOOLS_VSCODE_URL"`
-		Enabled bool   `envconfig:"USER_TOOLS_VSCODE_ENABLED"`
-		Image   struct {
-			Repository string `envconfig:"VSCODE_IMG_REPO"`
-			Tag        string `envconfig:"VSCODE_IMG_TAG"`
-			PullPolicy string `envconfig:"VSCODE_IMG_PULLPOLICY"`
+	Labels struct {
+		Common struct {
+			AppRelease   string `envconfig:"LABELS_COMMON_APP_RELEASE"`
+			ChartRelease string `envconfig:"LABELS_COMMON_CHART_RELEASE"`
 		}
 	}
 }

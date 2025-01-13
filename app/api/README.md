@@ -92,6 +92,19 @@ In order to develop in a local environment there are several things to consider:
 
 ## Development
 
+### GraphQL
+
+The GraphQL schema is defined in the `../graphql/schema.graphqls` file. The
+schema is used to generate the Go code for the GraphQL server. To generate the
+code execute:
+
+```console
+go generate ./...
+```
+
+Configuration for the code generation is defined in the `gqlgen.yml` It is well
+documented and can be customized to fit the needs of the project.
+
 ### Running tests
 
 To create new tests install [GoMock](https://github.com/golang/mock). Mocks used on tests are generated with **mockgen**, when you need a new mock, add the following:

@@ -27,7 +27,7 @@ export default gql`
       members {
         ...MemberFields
       }
-      minioAccessKey{
+      minioAccessKey {
         accessKey
         secretKey
       }

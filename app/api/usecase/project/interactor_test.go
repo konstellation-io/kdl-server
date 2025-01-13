@@ -233,6 +233,8 @@ func TestInteractor_AddMembers(t *testing.T) {
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().AddMembers(ctx, p.ID, newMembers).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
+	s.mocks.minioAdminService.EXPECT().JoinProject(ctx, "user-a", testProjectID).Return(nil)
+	s.mocks.minioAdminService.EXPECT().JoinProject(ctx, "user-b", testProjectID).Return(nil)
 
 	p, err := s.interactor.AddMembers(ctx, project.AddMembersOption{
 		ProjectID:  p.ID,
@@ -283,6 +285,8 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 
 	s.mocks.repo.EXPECT().RemoveMembers(ctx, p.ID, usersToRemove).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
+	s.mocks.minioAdminService.EXPECT().LeaveProject(ctx, "user-a", testProjectID).Return(nil)
+	s.mocks.minioAdminService.EXPECT().LeaveProject(ctx, "user-b", testProjectID).Return(nil)
 
 	p, err := s.interactor.RemoveMembers(ctx, project.RemoveMembersOption{
 		ProjectID:  p.ID,

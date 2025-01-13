@@ -102,6 +102,9 @@ code execute:
 go generate ./...
 ```
 
+Configuration for the code generation is defined in the `gqlgen.yml` It is well
+documented and can be customized to fit the needs of the project.
+
 ### Running tests
 
 To create new tests install [GoMock](https://github.com/golang/mock). Mocks used on tests are generated with **mockgen**, when you need a new mock, add the following:

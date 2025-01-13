@@ -144,9 +144,8 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(testProjectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(expectedProject, nil)
 	s.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(projectMinioSecretKey, nil)
-	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, projectMinioAccessKey, projectMinioSecretKey).Return(nil)
-	s.mocks.minioAdminService.EXPECT().CreatePolicy(ctx, projectMinioAccessKey, testProjectID).Return(nil)
-	s.mocks.minioAdminService.EXPECT().AssignPolicy(ctx, projectMinioAccessKey, projectMinioAccessKey).Return(nil)
+	s.mocks.minioAdminService.EXPECT().CreateProjectUser(ctx, testProjectID, projectMinioSecretKey).Return(projectMinioAccessKey, nil)
+	s.mocks.minioAdminService.EXPECT().CreateProjectPolicy(ctx, testProjectID).Return(nil)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
 		ProjectID:   testProjectID,
@@ -502,7 +501,7 @@ func TestInteractor_Delete(t *testing.T) {
 	s.mocks.k8sClient.EXPECT().DeleteKDLProjectCR(ctx, testProjectID).Return(nil)
 	s.mocks.repo.EXPECT().DeleteOne(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().DeleteBucket(ctx, testProjectID).Return(expectedMinioBackup, nil)
-	s.mocks.minioAdminService.EXPECT().DeletePolicy(ctx, accessKey).Return(nil)
+	s.mocks.minioAdminService.EXPECT().DeleteProjectPolicy(ctx, accessKey).Return(nil)
 	s.mocks.minioAdminService.EXPECT().DeleteUser(ctx, accessKey).Return(nil)
 
 	s.mocks.userActivityRepo.EXPECT().Create(ctx, userActivity).Return(nil)

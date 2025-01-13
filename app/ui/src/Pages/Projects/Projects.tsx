@@ -36,11 +36,11 @@ function Projects() {
   let projects = filterProjects(data.projects, filters);
   projects = sortProjects(projects, filters.order);
 
-  const canAccessUsers = dataMe?.me?.accessLevel === AccessLevel.ADMIN;
+  const canAccessUsers = dataMe?.me?.accessLevel != AccessLevel.VIEWER;
 
   return (
     <>
-      <ProjectsBar />
+      <ProjectsBar canAccessUser={canAccessUsers} />
       <div className={styles.container}>
         {[
           ...projects.map((project) => (

@@ -42,8 +42,8 @@ type UserRepo struct {
 // UserRepo implements the user.Repository interface.
 var _ user.Repository = (*UserRepo)(nil)
 
-func NewUserRepo(logger logr.Logger, client *mongo.Client, dbName string) *UserRepo {
-	collection := client.Database(dbName).Collection(userCollName)
+func NewUserRepo(logger logr.Logger, mongo *mongodbutils.MongoDB, dbName string) *UserRepo {
+	collection := mongo.CreateCollection(dbName, userCollName)
 	return &UserRepo{logger, collection}
 }
 

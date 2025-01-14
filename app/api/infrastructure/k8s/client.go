@@ -104,3 +104,13 @@ func newKubernetesConfig(cfg config.Config) *rest.Config {
 
 	return kubeConfig
 }
+
+func (k *Client) CheckConnection() bool {
+	_, err := k.clientset.Discovery().ServerVersion()
+	if err != nil {
+		k.logger.Error(err, "Error checking connection to k8s")
+		return false
+	}
+
+	return true
+}

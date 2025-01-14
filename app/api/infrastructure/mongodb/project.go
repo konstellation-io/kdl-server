@@ -44,8 +44,8 @@ type ProjectRepo struct {
 // projectRepo implements the capabilities.Repository interface.
 var _ project.Repository = (*ProjectRepo)(nil)
 
-func NewProjectRepo(logger logr.Logger, client *mongo.Client, dbName string) *ProjectRepo {
-	collection := client.Database(dbName).Collection(projectCollName)
+func NewProjectRepo(logger logr.Logger, mongo *mongodbutils.MongoDB, dbName string) *ProjectRepo {
+	collection := mongo.CreateCollection(dbName, projectCollName)
 	return &ProjectRepo{logger, collection}
 }
 

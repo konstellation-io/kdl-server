@@ -6,5 +6,5 @@ import "context"
 
 // Service defines all Keycloak operations.
 type Service interface {
-	DeleteUser(ctx context.Context, username string) error
+	DeleteUser(ctx context.Context, userEmail string) error
 }

@@ -181,11 +181,13 @@ func (s *KeycloakSuite) TestDeleteUser() {
 	var (
 		ctx          = context.Background()
 		userName     = "user-to-delete"
+		userEmail    = "test@email.com"
 		testPassword = "test-password"
 	)
 
 	_, err := s.keycloakClient.CreateUser(ctx, s.keycloakService.token.AccessToken, s.cfg.Realm, gocloak.User{
 		Username:      gocloak.StringP(userName),
+		Email:         gocloak.StringP(userEmail),
 		EmailVerified: gocloak.BoolP(true),
 		Enabled:       gocloak.BoolP(true),
 		Credentials: &[]gocloak.CredentialRepresentation{
@@ -199,19 +201,29 @@ func (s *KeycloakSuite) TestDeleteUser() {
 	users, err := s.keycloakClient.GetUsers(ctx,
 		s.keycloakService.token.AccessToken,
 		s.cfg.Realm,
-		gocloak.GetUsersParams{Username: gocloak.StringP(userName)},
+		gocloak.GetUsersParams{Email: gocloak.StringP(userEmail)},
 	)
 	s.Require().NoError(err)
 	s.NotEmpty(users)
 
-	err = s.keycloakService.DeleteUser(ctx, userName)
+	err = s.keycloakService.DeleteUser(ctx, userEmail)
 	s.Require().NoError(err)
 
 	users, err = s.keycloakClient.GetUsers(ctx,
 		s.keycloakService.token.AccessToken,
 		s.cfg.Realm,
-		gocloak.GetUsersParams{Username: gocloak.StringP(userName)},
+		gocloak.GetUsersParams{Email: gocloak.StringP(userEmail)},
 	)
 	s.Require().NoError(err)
 	s.Empty(users)
+}
+
+func (s *KeycloakSuite) TestDeleteUser_NotFound() {
+	var (
+		ctx       = context.Background()
+		userEmail = "non-existing-user"
+	)
+
+	err := s.keycloakService.DeleteUser(ctx, userEmail)
+	s.Require().ErrorIs(err, ErrUserNotFound)
 }

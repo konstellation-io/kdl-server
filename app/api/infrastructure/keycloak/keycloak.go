@@ -98,7 +98,7 @@ func (ur *ServiceImplementation) refreshToken(ctx context.Context) error {
 	return nil
 }
 
-func (ur *ServiceImplementation) DeleteUser(ctx context.Context, username string) error {
+func (ur *ServiceImplementation) DeleteUser(ctx context.Context, userEmail string) error {
 	err := ur.refreshToken(ctx)
 	if err != nil {
 		return err
@@ -106,7 +106,7 @@ func (ur *ServiceImplementation) DeleteUser(ctx context.Context, username string
 
 	users, err := ur.client.GetUsers(
 		ctx, ur.token.AccessToken, ur.cfg.Realm,
-		gocloak.GetUsersParams{Username: gocloak.StringP(username)},
+		gocloak.GetUsersParams{Email: gocloak.StringP(userEmail)},
 	)
 	if err != nil {
 		return err

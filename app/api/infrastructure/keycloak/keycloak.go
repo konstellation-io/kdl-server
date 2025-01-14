@@ -14,10 +14,10 @@ var (
 	ErrUserNotFound = errors.New("user not found")
 )
 
-var _ Service = (*service)(nil)
+var _ Service = (*ServiceImplementation)(nil)
 
-// service implements the KeycloakService interface.
-type service struct {
+// ServiceImplementation implements the KeycloakService interface.
+type ServiceImplementation struct {
 	cfg                   config.KeycloakConfig
 	client                *gocloak.GoCloak
 	token                 *gocloak.JWT
@@ -33,7 +33,7 @@ func WithClient(endpoint string) *gocloak.GoCloak {
 	return client
 }
 
-func NewKeycloakUserRegistry(client *gocloak.GoCloak, cfg config.KeycloakConfig) (*service, error) {
+func NewKeycloakServiceImplementation(client *gocloak.GoCloak, cfg config.KeycloakConfig) (*ServiceImplementation, error) {
 	ctx := context.Background()
 	now := time.Now()
 
@@ -47,7 +47,7 @@ func NewKeycloakUserRegistry(client *gocloak.GoCloak, cfg config.KeycloakConfig)
 		return nil, fmt.Errorf("login with admin user: %w", err)
 	}
 
-	return &service{
+	return &ServiceImplementation{
 		cfg:                   cfg,
 		client:                client,
 		token:                 token,
@@ -56,7 +56,7 @@ func NewKeycloakUserRegistry(client *gocloak.GoCloak, cfg config.KeycloakConfig)
 	}, nil
 }
 
-func (ur *service) refreshToken(ctx context.Context) error {
+func (ur *ServiceImplementation) refreshToken(ctx context.Context) error {
 	now := time.Now()
 
 	if now.Before(ur.tokenExpiresAt) {
@@ -98,7 +98,7 @@ func (ur *service) refreshToken(ctx context.Context) error {
 	return nil
 }
 
-func (ur *service) DeleteUser(ctx context.Context, username string) error {
+func (ur *ServiceImplementation) DeleteUser(ctx context.Context, username string) error {
 	err := ur.refreshToken(ctx)
 	if err != nil {
 		return err

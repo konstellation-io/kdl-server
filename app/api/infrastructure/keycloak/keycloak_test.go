@@ -1,6 +1,6 @@
 //go:build integration
 
-package keycloak
+package keycloak //nolint:testpackage // Some functions in keycloak package must remain private
 
 import (
 	"context"
@@ -19,13 +19,14 @@ const (
 	_adminUser     = "admin"
 	_adminPassword = "admin"
 	_testUsername  = "user"
+	_invalidKey    = "invalid"
 )
 
 type KeycloakSuite struct {
 	suite.Suite
 	cfg               config.KeycloakConfig
 	keycloakContainer testcontainers.Container
-	keycloakService   *service
+	keycloakService   *ServiceImplementation
 	keycloakClient    *gocloak.GoCloak
 }
 
@@ -98,7 +99,7 @@ func (s *KeycloakSuite) TearDownSuite() {
 }
 
 func (s *KeycloakSuite) SetupTest() {
-	keycloakUserRegistry, err := NewKeycloakUserRegistry(s.keycloakClient, s.cfg)
+	keycloakUserRegistry, err := NewKeycloakServiceImplementation(s.keycloakClient, s.cfg)
 	s.Require().NoError(err)
 
 	s.keycloakService = keycloakUserRegistry
@@ -153,7 +154,7 @@ func (s *KeycloakSuite) TestRefreshToken_ExpiredTokenWithError() {
 	s.keycloakService.tokenExpiresAt = time.Now().Add(-time.Hour)
 
 	// WHEN refreshing the token with invalid credentials
-	s.keycloakService.token.RefreshToken = "invalid"
+	s.keycloakService.token.RefreshToken = _invalidKey
 	err := s.keycloakService.refreshToken(ctx)
 
 	// THEN an error prompts
@@ -167,7 +168,7 @@ func (s *KeycloakSuite) TestRefreshToken_ExpiredRefreshTokenWithError() {
 	s.keycloakService.refreshTokenExpiresAt = time.Now().Add(-time.Hour)
 
 	// WHEN refreshing the token with invalid credentials
-	s.keycloakService.cfg.AdminPasswordKey = "invalid"
+	s.keycloakService.cfg.AdminPasswordKey = _invalidKey
 	err := s.keycloakService.refreshToken(ctx)
 
 	// THEN an error prompts

@@ -27,8 +27,9 @@ import GetMembersQuery from 'Graphql/queries/getProjectMembers';
 
 type Props = {
   projectId: string;
+  hasAccess: boolean;
 };
-function TabMembers({ projectId }: Props) {
+function TabMembers({ projectId, hasAccess }: Props) {
   const { data: dataMe } = useQuery<GetMe>(GetMeQuery);
 
   const [selectedMembers, setSelectedMembers] = useState<GetProjectMembers_project_members[]>([]);
@@ -93,7 +94,7 @@ function TabMembers({ projectId }: Props) {
 
   return (
     <div className={styles.container} data-testid="tabMembers">
-      {canManageMembers && (
+      {canManageMembers && hasAccess && (
         <>
           <AddMembers projectId={projectId} users={dataUsers.users} members={dataMembers.project.members} />
           <ManageMembers
@@ -114,6 +115,7 @@ function TabMembers({ projectId }: Props) {
             onInfoClick={openDetails}
             onChangeMemberLevel={updateMembersAccessLevel}
             onCheckClick={handleCheckClick}
+            hasAccess={hasAccess}
           />
         ))}
       </div>

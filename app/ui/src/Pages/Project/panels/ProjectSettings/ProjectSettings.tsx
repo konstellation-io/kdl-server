@@ -13,6 +13,10 @@ import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { useReactiveVar } from '@apollo/client';
 import { openedSettingTab } from 'Graphql/client/cache';
 import useSettingTabs from 'Graphql/client/hooks/useSettingTabs';
+import { useQuery } from '@apollo/client';
+import { GetMe } from 'Graphql/queries/types/GetMe';
+import GetMeQuery from 'Graphql/queries/getMe';
+import { AccessLevel } from 'Graphql/types/globalTypes';
 
 type Props = {
   project: GetProjects_projects;
@@ -20,6 +24,14 @@ type Props = {
 function ProjectSettings({ project }: Props) {
   const openedTab = useReactiveVar(openedSettingTab);
   const { updateSettingTab } = useSettingTabs();
+
+  const { data, loading, error } = useQuery<GetMe>(GetMeQuery);
+
+  const hasAccess = data?.me.accessLevel != AccessLevel.VIEWER;
+
+  React.useEffect(() => {
+    console.log('Has Access? ', hasAccess);
+  }, [hasAccess]);
 
   if (!project.repository) return <ErrorMessage />;
 
@@ -33,22 +45,24 @@ function ProjectSettings({ project }: Props) {
           <Tab>INFO</Tab>
           <Tab>GIT</Tab>
           <Tab data-testid="tabMembers">MEMBERS</Tab>
-          <Tab className={cx('react-tabs__tab', 'danger-tab')}>DANGER ZONE</Tab>
+          {hasAccess && <Tab className={cx('react-tabs__tab', 'danger-tab')}>DANGER ZONE</Tab>}
         </TabList>
 
         <div className={styles.tabContent}>
           <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
-            <TabInfo project={project} />
+            <TabInfo project={project} hasAccess={hasAccess} />
           </TabPanel>
           <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
             <TabGit project={project} />
           </TabPanel>
           <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
-            <TabMembers projectId={project.id} />
+            <TabMembers projectId={project.id} hasAccess={hasAccess} />
           </TabPanel>
-          <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
-            <TabDangerZone projectId={project.id} projectName={project.name} />
-          </TabPanel>
+          {hasAccess && (
+            <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
+              <TabDangerZone projectId={project.id} projectName={project.name} />
+            </TabPanel>
+          )}
         </div>
       </Tabs>
     </div>

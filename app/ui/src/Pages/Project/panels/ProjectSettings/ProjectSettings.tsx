@@ -29,10 +29,6 @@ function ProjectSettings({ project }: Props) {
 
   const hasAccess = data?.me.accessLevel != AccessLevel.VIEWER;
 
-  React.useEffect(() => {
-    console.log('Has Access? ', hasAccess);
-  }, [hasAccess]);
-
   if (!project.repository) return <ErrorMessage />;
 
   return (

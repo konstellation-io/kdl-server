@@ -152,13 +152,13 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 
 	user.MinioAccessKey.SecretKey, err = i.randomGenerator.GenerateRandomString(40)
 	if err != nil {
-		i.logger.Error(err, "Error creating an MinIO secret key", "username", username)
+		i.logger.Error(err, "Error creating a MinIO secret key", "username", username)
 		return entity.User{}, err
 	}
 
 	user.MinioAccessKey.AccessKey, err = i.minioAdminService.CreateUser(ctx, slug, user.MinioAccessKey.SecretKey)
 	if err != nil {
-		i.logger.Error(err, "Error creating  an MinIO user", "accessKey", user.MinioAccessKey.AccessKey)
+		i.logger.Error(err, "Error creating a MinIO user", "accessKey", user.MinioAccessKey.AccessKey)
 		return entity.User{}, err
 	}
 

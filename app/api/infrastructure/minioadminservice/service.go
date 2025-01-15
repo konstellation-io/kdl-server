@@ -43,6 +43,10 @@ func (m *MinioAdminService) getProjectAccessKey(projectName string) string {
 }
 
 func (m *MinioAdminService) CreateUser(ctx context.Context, userSlug, secretKey string) (string, error) {
+	if userSlug == "" {
+		return "", errEmptySlug
+	}
+
 	accessKey := m.getUserAccessKey(userSlug)
 
 	m.logger.Info("Creating user", "userSlug", userSlug, "accessKey", accessKey)
@@ -138,12 +142,12 @@ func (m *MinioAdminService) DeleteProjectPolicy(ctx context.Context, projectName
 	return err
 }
 
-func (m *MinioAdminService) joinLeaveProject(ctx context.Context, userSlug, projectName string, join bool) error {
+func (m *MinioAdminService) updateProjectMembership(ctx context.Context, userSlug, projectName string, remove bool) error {
 	accessKey := m.getUserAccessKey(userSlug)
 
 	return m.client.UpdateGroupMembers(ctx, madmin.GroupAddRemove{
 		Group:    projectName,
-		IsRemove: !join,
+		IsRemove: remove,
 		Members:  []string{accessKey},
 	})
 }
@@ -151,7 +155,7 @@ func (m *MinioAdminService) joinLeaveProject(ctx context.Context, userSlug, proj
 func (m *MinioAdminService) JoinProject(ctx context.Context, userSlug, projectName string) error {
 	m.logger.Info("Adding user to project group", "userSlug", userSlug, "projectName", projectName)
 
-	err := m.joinLeaveProject(ctx, userSlug, projectName, true)
+	err := m.updateProjectMembership(ctx, userSlug, projectName, false)
 	if err != nil {
 		return fmt.Errorf("failed to add user %s to group %s: %w", userSlug, projectName, err)
 	}
@@ -171,7 +175,7 @@ func (m *MinioAdminService) JoinProject(ctx context.Context, userSlug, projectNa
 func (m *MinioAdminService) LeaveProject(ctx context.Context, userSlug, projectName string) error {
 	m.logger.Info("Removing user from project group", "userSlug", userSlug, "projectName", projectName)
 
-	err := m.joinLeaveProject(ctx, userSlug, projectName, false)
+	err := m.updateProjectMembership(ctx, userSlug, projectName, true)
 	if err != nil {
 		return fmt.Errorf("failed to remove user %s from group %s: %w", userSlug, projectName, err)
 	}

@@ -43,11 +43,6 @@ func (r *mutationResolver) RegenerateSSHKey(ctx context.Context) (*entity.User, 
 	return &loggedUser, nil
 }
 
-// RemoveUsers is the resolver for the removeUsers field.
-func (r *mutationResolver) RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error) {
-	return nil, entity.ErrNotImplemented
-}
-
 // SetActiveUserTools is the resolver for the setActiveUserTools field.
 func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error) {
 	email := ctx.Value(middleware.LoggedUserEmailKey).(string)

@@ -52,10 +52,6 @@ type RemoveMembersInput struct {
 	UserIds   []string `json:"userIds"`
 }
 
-type RemoveUsersInput struct {
-	UserIds []string `json:"userIds"`
-}
-
 type RepositoryInput struct {
 	URL      string `json:"url"`
 	Username string `json:"username"`

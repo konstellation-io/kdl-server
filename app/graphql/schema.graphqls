@@ -20,7 +20,6 @@ type Query {
 
 type Mutation {
   regenerateSSHKey: User!
-  removeUsers(input: RemoveUsersInput!): [User!]!
   setActiveUserTools(input: SetActiveUserToolsInput!): User!
   updateAccessLevel(input: UpdateAccessLevelInput!): [User!]!
 
@@ -118,10 +117,6 @@ type Runtime {
   dockerImage: String!
   dockerTag: String!
   runtimePod: String!
-}
-
-input RemoveUsersInput {
-  userIds: [ID!]!
 }
 
 input SetActiveUserToolsInput {

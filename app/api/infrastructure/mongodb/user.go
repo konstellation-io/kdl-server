@@ -44,8 +44,8 @@ type UserRepo struct {
 // UserRepo implements the user.Repository interface.
 var _ user.Repository = (*UserRepo)(nil)
 
-func NewUserRepo(logger logr.Logger, client *mongo.Client, dbName string) *UserRepo {
-	collection := client.Database(dbName).Collection(userCollName)
+func NewUserRepo(logger logr.Logger, mongo *mongodbutils.MongoDB, dbName string) *UserRepo {
+	collection := mongo.CreateCollection(dbName, userCollName)
 	return &UserRepo{logger, collection}
 }
 
@@ -219,6 +219,10 @@ func (m *UserRepo) UpdateUsername(ctx context.Context, email, username string) e
 
 func (m *UserRepo) UpdateDeleted(ctx context.Context, username string, deleted bool) error {
 	return m.updateUserFields(ctx, username, bson.M{"deleted": deleted})
+}
+
+func (m *UserRepo) UpdateLastActivity(ctx context.Context, username string, lastActivity time.Time) error {
+	return m.updateUserFields(ctx, username, bson.M{"lastActivity": lastActivity})
 }
 
 func (m *UserRepo) updateUserFields(ctx context.Context, username string, fields bson.M) error {

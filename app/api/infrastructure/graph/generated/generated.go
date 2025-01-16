@@ -84,7 +84,6 @@ type ComplexityRoot struct {
 		RegenerateSSHKey   func(childComplexity int) int
 		RemoveAPIToken     func(childComplexity int, input *model.RemoveAPITokenInput) int
 		RemoveMembers      func(childComplexity int, input model.RemoveMembersInput) int
-		RemoveUsers        func(childComplexity int, input model.RemoveUsersInput) int
 		SetActiveUserTools func(childComplexity int, input model.SetActiveUserToolsInput) int
 		UpdateAccessLevel  func(childComplexity int, input model.UpdateAccessLevelInput) int
 		UpdateMembers      func(childComplexity int, input model.UpdateMembersInput) int
@@ -173,7 +172,6 @@ type MemberResolver interface {
 }
 type MutationResolver interface {
 	RegenerateSSHKey(ctx context.Context) (*entity.User, error)
-	RemoveUsers(ctx context.Context, input model.RemoveUsersInput) ([]entity.User, error)
 	SetActiveUserTools(ctx context.Context, input model.SetActiveUserToolsInput) (*entity.User, error)
 	UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]entity.User, error)
 	AddMembers(ctx context.Context, input model.AddMembersInput) (*entity.Project, error)
@@ -403,18 +401,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.RemoveMembers(childComplexity, args["input"].(model.RemoveMembersInput)), true
-
-	case "Mutation.removeUsers":
-		if e.complexity.Mutation.RemoveUsers == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_removeUsers_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.RemoveUsers(childComplexity, args["input"].(model.RemoveUsersInput)), true
 
 	case "Mutation.setActiveUserTools":
 		if e.complexity.Mutation.SetActiveUserTools == nil {
@@ -838,7 +824,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDeleteProjectInput,
 		ec.unmarshalInputRemoveApiTokenInput,
 		ec.unmarshalInputRemoveMembersInput,
-		ec.unmarshalInputRemoveUsersInput,
 		ec.unmarshalInputRepositoryInput,
 		ec.unmarshalInputSetActiveUserToolsInput,
 		ec.unmarshalInputUpdateAccessLevelInput,
@@ -963,7 +948,6 @@ type Query {
 
 type Mutation {
   regenerateSSHKey: User!
-  removeUsers(input: RemoveUsersInput!): [User!]!
   setActiveUserTools(input: SetActiveUserToolsInput!): User!
   updateAccessLevel(input: UpdateAccessLevelInput!): [User!]!
 
@@ -1068,10 +1052,6 @@ type Runtime {
   dockerImage: String!
   dockerTag: String!
   runtimePod: String!
-}
-
-input RemoveUsersInput {
-  userIds: [ID!]!
 }
 
 input SetActiveUserToolsInput {
@@ -1305,34 +1285,6 @@ func (ec *executionContext) field_Mutation_removeMembers_argsInput(
 	}
 
 	var zeroVal model.RemoveMembersInput
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Mutation_removeUsers_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_removeUsers_argsInput(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Mutation_removeUsers_argsInput(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (model.RemoveUsersInput, error) {
-	if _, ok := rawArgs["input"]; !ok {
-		var zeroVal model.RemoveUsersInput
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNRemoveUsersInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRemoveUsersInput(ctx, tmp)
-	}
-
-	var zeroVal model.RemoveUsersInput
 	return zeroVal, nil
 }
 
@@ -2248,81 +2200,6 @@ func (ec *executionContext) fieldContext_Mutation_regenerateSSHKey(_ context.Con
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_removeUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_removeUsers(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RemoveUsers(rctx, fc.Args["input"].(model.RemoveUsersInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]entity.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚕgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUserᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_removeUsers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "username":
-				return ec.fieldContext_User_username(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "creationDate":
-				return ec.fieldContext_User_creationDate(ctx, field)
-			case "accessLevel":
-				return ec.fieldContext_User_accessLevel(ctx, field)
-			case "lastActivity":
-				return ec.fieldContext_User_lastActivity(ctx, field)
-			case "apiTokens":
-				return ec.fieldContext_User_apiTokens(ctx, field)
-			case "isKubeconfigEnabled":
-				return ec.fieldContext_User_isKubeconfigEnabled(ctx, field)
-			case "sshKey":
-				return ec.fieldContext_User_sshKey(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_removeUsers_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -7607,33 +7484,6 @@ func (ec *executionContext) unmarshalInputRemoveMembersInput(ctx context.Context
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputRemoveUsersInput(ctx context.Context, obj any) (model.RemoveUsersInput, error) {
-	var it model.RemoveUsersInput
-	asMap := map[string]any{}
-	for k, v := range obj.(map[string]any) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"userIds"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "userIds":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIds"))
-			data, err := ec.unmarshalNID2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.UserIds = data
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputRepositoryInput(ctx context.Context, obj any) (model.RepositoryInput, error) {
 	var it model.RepositoryInput
 	asMap := map[string]any{}
@@ -8125,13 +7975,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "regenerateSSHKey":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_regenerateSSHKey(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "removeUsers":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_removeUsers(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -9821,11 +9664,6 @@ func (ec *executionContext) marshalNQualityProjectDesc2ᚖgithubᚗcomᚋkonstel
 
 func (ec *executionContext) unmarshalNRemoveMembersInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRemoveMembersInput(ctx context.Context, v any) (model.RemoveMembersInput, error) {
 	res, err := ec.unmarshalInputRemoveMembersInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNRemoveUsersInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐRemoveUsersInput(ctx context.Context, v any) (model.RemoveUsersInput, error) {
-	res, err := ec.unmarshalInputRemoveUsersInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

@@ -1,7 +1,6 @@
 package k8s
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 
@@ -48,7 +47,7 @@ func New(logger logr.Logger, cfg config.Config, clientset *kubernetes.Clientset,
 }
 
 func NewK8sClient(logger logr.Logger, cfg config.Config) (ClientInterface, error) {
-	kubeConfig := newKubernetesConfig(cfg)
+	kubeConfig := newKubernetesConfig(logger, cfg)
 
 	clientset, err := kubernetes.NewForConfig(kubeConfig)
 	if err != nil {
@@ -77,21 +76,21 @@ func NewK8sClient(logger logr.Logger, cfg config.Config) (ClientInterface, error
 	return c, nil
 }
 
-func newKubernetesConfig(cfg config.Config) *rest.Config {
+func newKubernetesConfig(logger logr.Logger, cfg config.Config) *rest.Config {
 	if cfg.Kubernetes.IsInsideCluster {
 		// retrieve k8 config from the cluster service
-		log.Printf("Creating K8s config in-cluster")
+		logger.Info("Creating K8s config in-cluster")
 
 		kubeConfig, err := rest.InClusterConfig()
 		if err != nil {
-			log.Fatalf("fatal error kubernetes config: %s", err)
+			logger.Error(err, "fatal error kubernetes config")
 		}
 
 		return kubeConfig
 	}
 
 	// retrieve k8 config from the LOCAL KUBECONFIG file
-	log.Printf("Creating K8s config from local .kube/config")
+	logger.Info("Creating K8s config from local .kube/config")
 
 	// NOTE: It works only with the default user's config, not even the exported KUBECONFIG value
 	kubeConfigPath := filepath.Join(os.Getenv("HOME"), ".kube", "config")
@@ -99,8 +98,18 @@ func newKubernetesConfig(cfg config.Config) *rest.Config {
 	// use the current context in kubeConfigPath
 	kubeConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
 	if err != nil {
-		log.Fatalf("fatal error kubernetes config: %s", err)
+		logger.Error(err, "fatal error kubernetes config")
 	}
 
 	return kubeConfig
+}
+
+func (k *Client) CheckConnection() bool {
+	_, err := k.clientset.Discovery().ServerVersion()
+	if err != nil {
+		k.logger.Error(err, "Error checking connection to k8s")
+		return false
+	}
+
+	return true
 }

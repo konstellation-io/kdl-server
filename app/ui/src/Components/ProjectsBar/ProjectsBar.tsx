@@ -7,15 +7,21 @@ import * as React from 'react';
 import styles from './ProjectsBar.module.scss';
 import ROUTE from 'Constants/routes';
 
-const ProjectsBar = () => (
+type Props = {
+  canAccessUser: boolean;
+};
+
+const ProjectsBar = ({ canAccessUser }: Props) => (
   <div className={styles.container}>
     <Left className={styles.left}>
       <ProjectsFilter />
       <ProjectsOrder />
     </Left>
-    <Right>
-      <Button label="Add project" Icon={IconAdd} className={styles.addProjectButton} to={ROUTE.NEW_PROJECT} />
-    </Right>
+    {canAccessUser && (
+      <Right>
+        <Button label="Add project" Icon={IconAdd} className={styles.addProjectButton} to={ROUTE.NEW_PROJECT} />
+      </Right>
+    )}
   </div>
 );
 

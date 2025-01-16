@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 	"regexp"
 
@@ -8,6 +9,8 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
+
+var errProjectAuth = errors.New("request to auth a project failed")
 
 type AuthController struct {
 	logger      logr.Logger
@@ -28,7 +31,7 @@ func (a *AuthController) HandleProjectAuth(res http.ResponseWriter, req *http.Re
 	originalURI := req.Header.Get("X-Original-URI")
 
 	if email == "" {
-		a.logger.Info("Email not found in \"X-Forwarded-Email\" header")
+		a.logger.Error(errProjectAuth, "Header X-Forwarded-Email is empty")
 		res.WriteHeader(http.StatusUnauthorized)
 
 		return
@@ -38,7 +41,7 @@ func (a *AuthController) HandleProjectAuth(res http.ResponseWriter, req *http.Re
 	matches := projectIDRegExp.FindAllStringSubmatch(originalURI, 1)
 
 	if !projectIDRegExp.MatchString(originalURI) {
-		a.logger.Info("Project ID not found in \"X-Original-URI\" header", "originalURI", originalURI)
+		a.logger.Error(errProjectAuth, "Header X-Original-URI does not match the expected format", "X-Original-URI", originalURI)
 		res.WriteHeader(http.StatusUnauthorized)
 
 		return
@@ -48,7 +51,7 @@ func (a *AuthController) HandleProjectAuth(res http.ResponseWriter, req *http.Re
 
 	p, err := a.projectRepo.Get(req.Context(), projectID)
 	if err != nil {
-		a.logger.Error(err, "HandleProjectAuth: Error getting project", "projectId", projectID)
+		a.logger.Error(err, "Get project from db", "projectId", projectID)
 		res.WriteHeader(http.StatusUnauthorized)
 
 		return
@@ -56,14 +59,14 @@ func (a *AuthController) HandleProjectAuth(res http.ResponseWriter, req *http.Re
 
 	u, err := a.userRepo.GetByEmail(req.Context(), email)
 	if err != nil {
-		a.logger.Error(err, "HandleProjectAuth: Error getting user", "email", email)
+		a.logger.Error(err, "Get user from db", "email", email)
 		res.WriteHeader(http.StatusUnauthorized)
 
 		return
 	}
 
 	if !p.HasMember(u.ID) {
-		a.logger.Info("HandleProjectAuth: This user is not a member of the project", "user", u.ID, "project", projectID)
+		a.logger.Error(errProjectAuth, "User is not a member of the project", "userId", u.ID, "projectId", projectID)
 		res.WriteHeader(http.StatusForbidden)
 
 		return

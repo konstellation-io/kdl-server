@@ -31,6 +31,7 @@ function Routes() {
   if (error) return <ErrorMessage />;
 
   const canAccessUsers = data.me.accessLevel === AccessLevel.ADMIN;
+  const canAccessViewer = data.me.accessLevel === AccessLevel.VIEWER;
 
   return (
     <Router history={history}>
@@ -47,8 +48,8 @@ function Routes() {
 
         <Route exact path={ROUTE.USER_SSH_KEY} component={UserSshKey} />
 
-        <Route exact path={ROUTE.NEW_PROJECT} component={NewProject} />
-        <Route exact path={ROUTE.PROJECT_CREATION} component={ProjectCreation} />
+        {!canAccessViewer && <Route exact path={ROUTE.NEW_PROJECT} component={NewProject} />}
+        {!canAccessViewer && <Route exact path={ROUTE.PROJECT_CREATION} component={ProjectCreation} />}
 
         <Route exact path={ROUTE.PROJECTS} component={Projects} />
         <Route path={ROUTE.PROJECT} component={Project} />

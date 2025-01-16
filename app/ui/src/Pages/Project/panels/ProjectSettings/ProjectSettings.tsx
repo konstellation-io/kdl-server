@@ -34,8 +34,8 @@ function ProjectSettings({ project }: Props) {
           <Tab>INFO</Tab>
           <Tab>GIT</Tab>
           <Tab>MinIO</Tab>
-          <Tab data-testid="tabMembers">MEMBERS</Tab>
-          <Tab className={cx('react-tabs__tab', 'danger-tab')}>DANGER ZONE</Tab>
+          <Tab data-testid="tabMembers">USERS</Tab>
+          <Tab className={cx('react-tabs__tab', 'danger-tab')}>ADMIN</Tab>
         </TabList>
 
         <div className={styles.tabContent}>

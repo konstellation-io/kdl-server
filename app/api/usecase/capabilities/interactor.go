@@ -2,17 +2,11 @@ package capabilities
 
 import (
 	"context"
-	"errors"
 
 	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/model"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
-)
-
-var (
-	ErrStopUserTools   = errors.New("cannot stop uninitialized user tools")
-	ErrUserToolsActive = errors.New("it is not possible to regenerate SSH keys with the usertools active")
 )
 
 type interactor struct {

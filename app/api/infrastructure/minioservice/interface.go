@@ -6,6 +6,7 @@ import "context"
 
 // MinioService defines all Minio operations.
 type MinioService interface {
+	CheckConnection() bool
 	CreateBucket(ctx context.Context, bucketName string) error
 	CreateProjectDirs(ctx context.Context, bucketName string) error
 	DeleteBucket(ctx context.Context, bucketName string) (string, error)

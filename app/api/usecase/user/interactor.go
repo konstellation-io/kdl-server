@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/go-logr/logr"
@@ -21,8 +20,9 @@ import (
 )
 
 var (
-	ErrStopUserTools   = errors.New("cannot stop uninitialized user tools")
-	ErrUserToolsActive = errors.New("it is not possible to regenerate SSH keys with the usertools active")
+	ErrStopUserTools        = errors.New("cannot stop uninitialized user tools")
+	ErrUserToolsActive      = errors.New("it is not possible to regenerate SSH keys with the usertools active")
+	errCreatingKDLUserTools = errors.New("error creating CRD KDLUserTools ")
 )
 
 type Interactor struct {
@@ -72,7 +72,6 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 	// extract username from email
 	username := kdlutil.GetUsernameFromEmail(email)
 
-	fmt.Println("Creating user", "username", username, "email", email)
 	i.logger.Info("Creating user", "username", username, "email", email)
 
 	// Check if the user already exists
@@ -285,6 +284,17 @@ func (i *Interactor) UpdateSub(ctx context.Context, user entity.User, sub string
 	return i.repo.GetByUsername(ctx, user.Username)
 }
 
+// UpdateLastActivity updates the lastActivity for the given user.
+func (i *Interactor) UpdateLastActivity(ctx context.Context, user entity.User) (entity.User, error) {
+	i.logger.Info("Updating user lastActivity", "username", user.Username)
+
+	if err := i.repo.UpdateLastActivity(ctx, user.Username, i.clock.Now()); err != nil {
+		return entity.User{}, err
+	}
+
+	return i.repo.GetByUsername(ctx, user.Username)
+}
+
 // RegenerateSSHKeys generate new SSH key pair for the given user.
 // - Check if user exists. (if no, returns ErrUserNotFound error)
 // - Check if userTools are Running. (if yes, returns ErrUserNotFound error)
@@ -404,25 +414,25 @@ func (i *Interactor) UpdateKDLUserTools(ctx context.Context) error {
 
 		spec, ok := userTool.Object["spec"].(map[string]interface{})
 		if !ok {
-			i.logger.Info("Error getting spec from KDL UserTools CR", "userToolName", userTool.GetName())
+			i.logger.Error(errCreatingKDLUserTools, "Missing spec from KDL UserTools CR", "userToolName", userTool.GetName())
 			continue
 		}
 
 		podLabels, ok := spec["podLabels"].(map[string]interface{})
 		if !ok {
-			i.logger.Info("Error getting spec.podLabels from KDL UserTools CR", "userToolName", userTool.GetName())
+			i.logger.Error(errCreatingKDLUserTools, "Missing spec.podLabels from KDL UserTools CR", "userToolName", userTool.GetName())
 			continue
 		}
 
 		runtimeID, ok := podLabels["runtimeId"].(string)
 		if !ok || runtimeID == "" {
-			i.logger.Info("Runtime ID provided is not valid, skipping user tools update", "userToolName", resourceName)
+			i.logger.Error(errCreatingKDLUserTools, "Runtime ID provided is not valid, skipping user tools update", "userToolName", resourceName)
 			continue
 		}
 
 		capabilitiesID, ok := podLabels["capabilityId"].(string)
 		if !ok || capabilitiesID == "" {
-			i.logger.Info("Capability ID provided is not valid, skipping user tools update", "userToolName", resourceName)
+			i.logger.Error(errCreatingKDLUserTools, "Capability ID provided is not valid, skipping user tools update", "userToolName", resourceName)
 			continue
 		}
 

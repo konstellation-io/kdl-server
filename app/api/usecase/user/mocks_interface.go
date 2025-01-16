@@ -7,6 +7,7 @@ package user
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	gomock "github.com/golang/mock/gomock"
 	entity "github.com/konstellation-io/kdl-server/app/api/entity"
@@ -194,6 +195,20 @@ func (m *MockRepository) UpdateEmail(ctx context.Context, userID, email string) 
 func (mr *MockRepositoryMockRecorder) UpdateEmail(ctx, userID, email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEmail", reflect.TypeOf((*MockRepository)(nil).UpdateEmail), ctx, userID, email)
+}
+
+// UpdateLastActivity mocks base method.
+func (m *MockRepository) UpdateLastActivity(ctx context.Context, userID string, lastActivity time.Time) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateLastActivity", ctx, userID, lastActivity)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateLastActivity indicates an expected call of UpdateLastActivity.
+func (mr *MockRepositoryMockRecorder) UpdateLastActivity(ctx, userID, lastActivity interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateLastActivity", reflect.TypeOf((*MockRepository)(nil).UpdateLastActivity), ctx, userID, lastActivity)
 }
 
 // UpdateSSHKey mocks base method.
@@ -466,6 +481,21 @@ func (m *MockUseCase) UpdateKDLUserTools(ctx context.Context) error {
 func (mr *MockUseCaseMockRecorder) UpdateKDLUserTools(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateKDLUserTools", reflect.TypeOf((*MockUseCase)(nil).UpdateKDLUserTools), ctx)
+}
+
+// UpdateLastActivity mocks base method.
+func (m *MockUseCase) UpdateLastActivity(ctx context.Context, user entity.User) (entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateLastActivity", ctx, user)
+	ret0, _ := ret[0].(entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateLastActivity indicates an expected call of UpdateLastActivity.
+func (mr *MockUseCaseMockRecorder) UpdateLastActivity(ctx, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateLastActivity", reflect.TypeOf((*MockUseCase)(nil).UpdateLastActivity), ctx, user)
 }
 
 // UpdateSub mocks base method.

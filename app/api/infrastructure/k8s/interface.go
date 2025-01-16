@@ -14,6 +14,7 @@ import (
 
 // ClientInterface defines all operation related to Kubernetes.
 type ClientInterface interface {
+	CheckConnection() bool
 	CreateSecret(ctx context.Context, name string, values, labels map[string]string) error
 	UpdateSecret(ctx context.Context, name string, values, labels map[string]string) error
 	GetSecret(ctx context.Context, name string) (map[string][]byte, error)

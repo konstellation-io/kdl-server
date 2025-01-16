@@ -173,7 +173,7 @@ func (k *Client) CreateKDLUserToolsCR(
 		Object: *crdUpdated,
 	}
 
-	_, err = k.kdlUserToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
+	_, err = k.kdlUserToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{FieldValidation: "Strict"})
 	if err != nil {
 		k.logger.Error(err, "Error creating user tools")
 		return err

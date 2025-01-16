@@ -89,12 +89,49 @@ func (s *testSuite) defineCRD(restcfg *rest.Config) {
 										"vscodeRuntime": {
 											Type: "object",
 											Properties: map[string]apiextensionsv1.JSONSchemaProps{
+												"image": {
+													Type: "object",
+													Properties: map[string]apiextensionsv1.JSONSchemaProps{
+														"repository": {Type: "string"},
+														"tag":        {Type: "string"},
+													},
+												},
 												"env": {
 													Type:                   "object",
 													Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
 													XPreserveUnknownFields: &preserve,
 												},
 											},
+										},
+										"affinity": {
+											Type:                   "object",
+											Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
+											XPreserveUnknownFields: &preserve,
+										},
+										"nodeSelector": {
+											Type:                   "object",
+											Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
+											XPreserveUnknownFields: &preserve,
+										},
+										"tolerations": {
+											Type: "array",
+											Items: &apiextensionsv1.JSONSchemaPropsOrArray{
+												Schema: &apiextensionsv1.JSONSchemaProps{
+													Type: "object",
+													Properties: map[string]apiextensionsv1.JSONSchemaProps{
+														"effect":            {Type: "string"},
+														"key":               {Type: "string"},
+														"operator":          {Type: "string"},
+														"tolerationSeconds": {Type: "integer"},
+														"value":             {Type: "string"},
+													},
+												},
+											},
+										},
+										"podLabels": {
+											Type:                   "object",
+											Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
+											XPreserveUnknownFields: &preserve,
 										},
 									},
 								},

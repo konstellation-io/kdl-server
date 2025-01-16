@@ -247,9 +247,7 @@ func (s *TestSuite) SetupTest() {
 
 func (s *TestSuite) TearDownTest() {
 	err := s.mongoClient.DropDatabase(dbName)
-	if err != nil {
-		fmt.Println("Error dropping database: %w", err)
-	}
+	s.Require().NoError(err)
 }
 
 func (s *TestSuite) TestCapabilitiesGet_OK() {

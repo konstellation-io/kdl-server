@@ -219,6 +219,10 @@ func (m *UserRepo) UpdateDeleted(ctx context.Context, username string, deleted b
 	return m.updateUserFields(ctx, username, bson.M{"deleted": deleted})
 }
 
+func (m *UserRepo) UpdateLastActivity(ctx context.Context, username string, lastActivity time.Time) error {
+	return m.updateUserFields(ctx, username, bson.M{"lastActivity": lastActivity})
+}
+
 func (m *UserRepo) updateUserFields(ctx context.Context, username string, fields bson.M) error {
 	m.logger.Info("Updating user", "username", username, "fields", fields)
 

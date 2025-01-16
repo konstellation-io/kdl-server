@@ -47,17 +47,23 @@ func AuthMiddleware(next http.Handler, userUsecase user.UseCase) http.Handler {
 
 		user, err := userUsecase.GetByEmail(r.Context(), email)
 		if errors.Is(err, entity.ErrUserNotFound) {
-			_, err = userUsecase.Create(r.Context(), email, sub, entity.AccessLevelViewer)
+			user, err = userUsecase.Create(r.Context(), email, sub, entity.AccessLevelViewer)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
 		} else if user.Sub != sub {
-			_, err = userUsecase.UpdateSub(r.Context(), user, sub)
+			user, err = userUsecase.UpdateSub(r.Context(), user, sub)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
+		}
+
+		_, err = userUsecase.UpdateLastActivity(r.Context(), user)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 
 		// only truth is the email

@@ -41,9 +41,11 @@ const (
 
 type testSuite struct {
 	suite.Suite
-	Container *k3s.K3sContainer
-	Client    *k8s.Client
-	Clientset *kubernetes.Clientset
+	Container       *k3s.K3sContainer
+	Client          *k8s.Client
+	Clientset       *kubernetes.Clientset
+	kdlUserToolsRes dynamic.NamespaceableResourceInterface
+	kdlProjectRes   dynamic.NamespaceableResourceInterface
 }
 
 func TestSuite(t *testing.T) {
@@ -56,6 +58,7 @@ func (s *testSuite) defineCRD(restcfg *rest.Config) {
 	s.Require().NoError(err)
 
 	// Define the CRD for KDLUserTools
+	preserve := true
 	crdKdlUserTools := &apiextensionsv1.CustomResourceDefinition{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "kdlusertools.kdl.konstellation.io", // Format: plural.group
@@ -83,6 +86,16 @@ func (s *testSuite) defineCRD(restcfg *rest.Config) {
 									Properties: map[string]apiextensionsv1.JSONSchemaProps{
 										"username":     {Type: "string"},
 										"usernameSlug": {Type: "string"},
+										"vscodeRuntime": {
+											Type: "object",
+											Properties: map[string]apiextensionsv1.JSONSchemaProps{
+												"env": {
+													Type:                   "object",
+													Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
+													XPreserveUnknownFields: &preserve,
+												},
+											},
+										},
 									},
 								},
 							},
@@ -187,13 +200,13 @@ func (s *testSuite) SetupSuite() {
 	dynamicClient, err := dynamic.NewForConfig(restcfg)
 	s.Require().NoError(err)
 
-	kdlUserToolsRes := dynamicClient.Resource(schema.GroupVersionResource{
+	s.kdlUserToolsRes = dynamicClient.Resource(schema.GroupVersionResource{
 		Group:    kdlUserToolsGroup,
 		Version:  kdlUserToolsVersion,
 		Resource: kdlUserToolsResource,
 	})
 
-	kdlProjectRes := dynamicClient.Resource(schema.GroupVersionResource{
+	s.kdlProjectRes = dynamicClient.Resource(schema.GroupVersionResource{
 		Group:    kdlProjectGroup,
 		Version:  kdlProjectVersion,
 		Resource: kdlProjectResource,
@@ -206,8 +219,8 @@ func (s *testSuite) SetupSuite() {
 		logger,
 		cfg,
 		s.Clientset,
-		kdlUserToolsRes,
-		kdlProjectRes,
+		s.kdlUserToolsRes,
+		s.kdlProjectRes,
 	)
 }
 
@@ -225,4 +238,7 @@ func (s *testSuite) TearDownTest() {
 
 	err = s.Clientset.CoreV1().ConfigMaps(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{})
 	s.Require().NoError(err)
+
+	//err = s.kdlUserToolsRes.DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{})
+	//s.Require().NoError(err)
 }

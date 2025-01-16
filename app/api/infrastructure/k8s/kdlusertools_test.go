@@ -15,6 +15,8 @@ import (
 const (
 	username                         = "test.username"
 	resName                          = "usertools-test-username"
+	minioAccessKey                   = "user-test-username"
+	minioSecretKey                   = "username123"
 	runtimeID                        = "test-runtime-id"
 	runtimeImage                     = "test-runtime-image"
 	runtimeTag                       = "test-runtime-tag"
@@ -45,6 +47,10 @@ var dataWithCapabilities = k8s.UserToolsData{
 			},
 		},
 		Affinities: map[string]interface{}{"key": "value"},
+	},
+	MinioAccessKey: entity.MinioAccessKey{
+		AccessKey: minioAccessKey,
+		SecretKey: minioSecretKey,
 	},
 }
 
@@ -97,6 +103,17 @@ func (s *testSuite) TestCreateKDLUserToolsCR_and_DeleteUserToolsCR() {
 
 	err := s.Client.CreateKDLUserToolsCR(ctx, username, dataWithCapabilities)
 	s.Require().NoError(err)
+
+	// Retrieve the Custom Resource
+	resource, err := s.kdlUserToolsRes.Namespace(namespace).Get(context.Background(), resName, metav1.GetOptions{})
+	s.Require().NoError(err)
+
+	// Check its data
+	spec := resource.Object["spec"].(map[string]interface{})
+	vscodeRuntime := spec["vscodeRuntime"].(map[string]interface{})
+	env := vscodeRuntime["env"].(map[string]interface{})
+	s.Require().Equal(minioAccessKey, env["AWS_ACCESS_KEY"])
+	s.Require().Equal(minioSecretKey, env["AWS_SECRET_KEY"])
 
 	// Delete the CR
 	// create go routine to cancel the context in 5 seconds. Risk of flaky test

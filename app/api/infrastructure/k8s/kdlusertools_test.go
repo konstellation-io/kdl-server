@@ -64,6 +64,7 @@ spec:
     image:
       repository: my-demo-repository
       tag: my-demo-tag
+    env: {}
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -280,6 +281,7 @@ spec:
     image:
        repository: my-demo-repository
        tag: my-demo-tag
+    env: {}
 `
 	_, err := s.Clientset.CoreV1().ConfigMaps(namespace).Create(
 		context.Background(), &v1.ConfigMap{
@@ -314,6 +316,7 @@ spec:
     image:
        repository: my-demo-repository
        tag: my-demo-tag
+    env: {}
   nodeSelector: {}
 `
 	_, err := s.Clientset.CoreV1().ConfigMaps(namespace).Create(
@@ -349,6 +352,7 @@ spec:
     image:
        repository: my-demo-repository
        tag: my-demo-tag
+    env: {}
   nodeSelector: {}
   tolerations: []
 `
@@ -385,6 +389,7 @@ spec:
     image:
        repository: my-demo-repository
        tag: my-demo-tag
+    env: {}
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -500,6 +505,7 @@ func (s *testSuite) TestUpdateKDLUserToolsCR() {
 					"repository": "new-repo",
 					"tag":        "new-tag",
 				},
+				"env": map[string]interface{}{},
 			},
 			"podLabels": map[string]interface{}{
 				"runtimeId":    "new-runtime-id",

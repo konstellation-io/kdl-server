@@ -76,7 +76,7 @@ spec:
   affinity: {}
   podLabels:
     runtimeId: my-demo-runtime-id
-    capabilitiesId: my-demo-capabilities-id
+    capabilityId: my-demo-capabilities-id
 `
 	_, err := s.Clientset.CoreV1().ConfigMaps(namespace).Create(
 		context.Background(), &v1.ConfigMap{
@@ -111,9 +111,23 @@ func (s *testSuite) TestCreateKDLUserToolsCR_and_DeleteUserToolsCR() {
 	// Check its data
 	spec := resource.Object["spec"].(map[string]interface{})
 	vscodeRuntime := spec["vscodeRuntime"].(map[string]interface{})
+	image := vscodeRuntime["image"].(map[string]interface{})
 	env := vscodeRuntime["env"].(map[string]interface{})
+	podLabels := spec["podLabels"].(map[string]interface{})
+	affinity := spec["affinity"].(map[string]interface{})
+	tolerations := spec["tolerations"].([]interface{})
+	toleration := tolerations[0].(map[string]interface{})
+	s.Require().Equal(runtimeImage, image["repository"])
+	s.Require().Equal(runtimeTag, image["tag"])
+	s.Require().Equal(runtimeID, podLabels["runtimeId"])
+	s.Require().Equal("test-capability-id", podLabels["capabilityId"])
 	s.Require().Equal(minioAccessKey, env["AWS_ACCESS_KEY"])
 	s.Require().Equal(minioSecretKey, env["AWS_SECRET_KEY"])
+	s.Require().Equal("value", affinity["key"])
+	s.Require().Equal("Equal", toleration["operator"])
+	s.Require().Equal("value1", toleration["value"])
+	s.Require().Equal("NoExecute", toleration["effect"])
+	s.Require().Equal(int64(100), toleration["tolerationSeconds"])
 
 	// Delete the CR
 	// create go routine to cancel the context in 5 seconds. Risk of flaky test

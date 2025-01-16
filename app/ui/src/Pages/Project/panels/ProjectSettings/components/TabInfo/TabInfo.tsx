@@ -1,6 +1,6 @@
 import { Button, TextInput } from 'kwc';
 import { PANEL_SIZE, PANEL_THEME } from 'Components/Layout/Panel/Panel';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import usePanel, { PanelType } from 'Graphql/client/hooks/usePanel';
 
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
@@ -12,8 +12,9 @@ import { toast } from 'react-toastify';
 
 type Props = {
   project: GetProjects_projects;
+  hasAccess: Boolean;
 };
-function TabInfo({ project }: Props) {
+function TabInfo({ project, hasAccess }: Props) {
   const { updateProjectName } = useProject({
     onUpdateCompleted: () => toast.info('The project name has been updated'),
   });
@@ -32,7 +33,8 @@ function TabInfo({ project }: Props) {
         formValue={newName}
         onChange={(value: string) => setNewName(value)}
         onBlur={() => updateProjectName(project.id, newName)}
-        showClearButton
+        showClearButton={hasAccess ? true : false}
+        disabled={hasAccess ? false : true}
       />
       <div className={styles.projectIdWrapper}>
         <span className={styles.projectIdLabel}>PROJECT ID</span>
@@ -40,9 +42,11 @@ function TabInfo({ project }: Props) {
       </div>
       <div className={styles.description}>
         <p className={styles.title}>ABSTRACT</p>
-        <div className={styles.button} data-testid="editAbstract">
-          <Button label="" Icon={IconEdit} onClick={openPanel} />
-        </div>
+        {hasAccess && (
+          <div className={styles.button} data-testid="editAbstract">
+            <Button label="" Icon={IconEdit} onClick={openPanel} />
+          </div>
+        )}
         <div className={styles.content}>{project.description}</div>
       </div>
     </div>

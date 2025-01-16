@@ -287,6 +287,17 @@ func (i *Interactor) UpdateSub(ctx context.Context, user entity.User, sub string
 	return i.repo.GetByUsername(ctx, user.Username)
 }
 
+// UpdateLastActivity updates the lastActivity for the given user.
+func (i *Interactor) UpdateLastActivity(ctx context.Context, user entity.User) (entity.User, error) {
+	i.logger.Info("Updating user lastActivity", "username", user.Username)
+
+	if err := i.repo.UpdateLastActivity(ctx, user.Username, i.clock.Now()); err != nil {
+		return entity.User{}, err
+	}
+
+	return i.repo.GetByUsername(ctx, user.Username)
+}
+
 // RegenerateSSHKeys generate new SSH key pair for the given user.
 // - Check if user exists. (if no, returns ErrUserNotFound error)
 // - Check if userTools are Running. (if yes, returns ErrUserNotFound error)

@@ -7,6 +7,7 @@ import TabDangerZone from './components/TabDangerZone/TabDangerZone';
 import TabGit from './components/TabGit/TabGit';
 import TabInfo from './components/TabInfo/TabInfo';
 import TabMembers from './components/TabMembers/TabMembers';
+import TabMinio from './components/TabMinio/TabMinio';
 import cx from 'classnames';
 import styles from './ProjectSettings.module.scss';
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
@@ -32,6 +33,7 @@ function ProjectSettings({ project }: Props) {
         <TabList>
           <Tab>INFO</Tab>
           <Tab>GIT</Tab>
+          <Tab>MinIO</Tab>
           <Tab data-testid="tabMembers">MEMBERS</Tab>
           <Tab className={cx('react-tabs__tab', 'danger-tab')}>DANGER ZONE</Tab>
         </TabList>
@@ -42,6 +44,9 @@ function ProjectSettings({ project }: Props) {
           </TabPanel>
           <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
             <TabGit project={project} />
+          </TabPanel>
+          <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
+            <TabMinio project={project} />
           </TabPanel>
           <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
             <TabMembers projectId={project.id} />

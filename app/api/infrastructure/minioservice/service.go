@@ -34,6 +34,11 @@ func NewMinioService(logger logr.Logger, url, accessKey, secretKey string) (Mini
 	return &minioService{logger: logger, client: client}, nil
 }
 
+// CheckConnection checks if connection to minio is ok.
+func (m *minioService) CheckConnection() bool {
+	return m.client.IsOnline()
+}
+
 // CreateBucket creates a new bucket in Minio.
 func (m *minioService) CreateBucket(ctx context.Context, bucketName string) error {
 	exists, err := m.client.BucketExists(context.Background(), bucketName)

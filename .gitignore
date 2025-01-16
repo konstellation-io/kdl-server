@@ -40,6 +40,8 @@ out/
 *.out
 *.so
 *.test
+go.work
+go.work.sum
 
 ########
 # MACOSX

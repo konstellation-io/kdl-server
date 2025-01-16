@@ -20,7 +20,7 @@
   @include font-body;
   display: flex;
   align-items: center;
-  margin-top: $grid-unit;
+  margin-top: 1 - $grid-unit;
 }
 
 .fieldLabel {

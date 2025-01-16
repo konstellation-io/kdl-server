@@ -38,6 +38,7 @@ $tab-height: 3.5 * $grid-unit;
       border-radius: 0;
       text-align: center;
       transition: background-color ease 0.4s, color ease 0.4s;
+      margin-bottom: $grid-unit;
 
       &--selected {
         background-color: palette(lowlight, 900);

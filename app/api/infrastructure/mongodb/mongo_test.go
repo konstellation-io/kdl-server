@@ -11,13 +11,12 @@ import (
 	"bou.ke/monkey"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
 
 	"github.com/go-logr/zapr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/mongodb"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -156,7 +155,7 @@ var userExamples = map[string]entity.User{
 type TestSuite struct {
 	suite.Suite
 	mongoDBContainer testcontainers.Container
-	mongoClient      *mongo.Client
+	mongoClient      *mongodbutils.MongoDB
 	capabilitiesRepo *mongodb.CapabilitiesRepo
 	projectRepo      *mongodb.ProjectRepo
 	runtimeRepo      *mongodb.RuntimeRepo
@@ -199,7 +198,7 @@ func (s *TestSuite) SetupSuite() {
 
 	port := p.Int()
 	uri := fmt.Sprintf("mongodb://%v:%v@%v:%v/", rootUsername, rootPassword, host, port) // NOSONAR not used in secure contexts
-	mongoClient, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
+	mongoClient, err := mongodbutils.NewMongoDB(logger, uri)
 	s.Require().NoError(err)
 
 	s.mongoDBContainer = mongoDBContainer
@@ -247,7 +246,7 @@ func (s *TestSuite) SetupTest() {
 }
 
 func (s *TestSuite) TearDownTest() {
-	err := s.mongoClient.Database(dbName).Drop(context.Background())
+	err := s.mongoClient.DropDatabase(dbName)
 	s.Require().NoError(err)
 }
 
@@ -757,7 +756,7 @@ func (s *TestSuite) TestUserUpdateSub_OK() {
 }
 
 func (s *TestSuite) TestUserEnsureIndexes_OK() {
-	collection := s.mongoClient.Database(dbName).Collection(userCollName)
+	collection := s.mongoClient.CreateCollection(dbName, userCollName)
 	indexView := collection.Indexes()
 
 	cursor, err := indexView.List(context.Background())

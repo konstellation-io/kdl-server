@@ -94,8 +94,6 @@ The main goal of KAI Lab is to provide a user-friendly environment for Data Scie
 
 Install our [tools](docs/tools.md) and follow the [kdlctl](hack/README.md) guide to deploy your local environment.
 
-*Note: If you use MacOS you have to set the environment variable `GOARCH=amd64` in order that the golang lint works properly.*
-
 ## GitFlow
 
 We use the GitFlow branching model. Read more about it [here](docs/gitflow.md).

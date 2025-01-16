@@ -45,4 +45,5 @@ type UseCase interface {
 	RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error)
 	GetKubeconfig(ctx context.Context, username string) (string, error)
 	SynchronizeServiceAccountsForUsers() error
+	UpdateKDLUserTools(ctx context.Context) error
 }

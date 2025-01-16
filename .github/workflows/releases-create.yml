@@ -5,7 +5,7 @@
 name: "[Releases] Create"
 
 env:
-  COMPONENTS: "app,cleaner,mlflow,project-operator,repo-cloner,user-tools-operator"
+  COMPONENTS: "app,mlflow,filebrowser,project-operator,repo-cloner,user-tools-operator"
 
 on:
   workflow_dispatch:
@@ -17,7 +17,7 @@ on:
         options:
           - all
           - kdl-app
-          - cleaner
+          - filebrowser
           - mlflow
           - project-operator
           - repo-cloner
@@ -34,14 +34,14 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           fetch-tags: true
           persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ vars.NODE_VERSION }}
 
@@ -64,7 +64,7 @@ jobs:
     if: github.event_name != 'workflow_dispatch'
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -88,7 +88,7 @@ jobs:
           echo "CHANGED_COMPONENTS=$COMPONENTS_LIST" >> $GITHUB_ENV
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ vars.NODE_VERSION }}
 

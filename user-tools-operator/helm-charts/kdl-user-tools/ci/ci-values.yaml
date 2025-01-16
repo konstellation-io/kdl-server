@@ -1,0 +1,153 @@
+####
+## THESE VALUES ONLY USE TO MAKE HELM DIFF
+## OR HELM TEMPLATE
+####
+
+# User identification
+username: "john.doe"
+usernameSlug: "john-doe"  # Slugified version for resource naming
+
+# Shared volume configuration
+sharedVolume:
+  enabled: true
+  name: "shared-workspace"
+
+# External IDE connection configuration
+kubeconfig:
+  enabled: true
+  externalServerUrl: "https://k8s.example.com:6443"
+
+# Deployment configuration
+replicaCount: 1
+podManagementPolicy: "OrderedReady"
+
+# Service account configuration
+serviceAccount:
+  create: true
+  automount: true
+  annotations:
+    kubernetes.io/example-annotation: "value"
+
+# Security settings
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Storage configuration
+persistentVolume:
+  enabled: true
+  size: "10Gi"
+  accessModes:
+    - ReadWriteOnce
+  storageClass: "standard"
+
+# Network policies
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: kdl-server
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: default
+      ports:
+        - protocol: TCP
+          port: 443
+
+# Resource management
+resources:
+  limits:
+    cpu: "2"
+    memory: "4Gi"
+  requests:
+    cpu: "500m"
+    memory: "1Gi"
+
+# High availability configuration
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+
+# Repository cloner configuration
+repoCloner:
+  image:
+    repository: konstellation/kdl-repo-cloner
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  homePath: "/home/kdl"
+
+  command:
+    - /bin/sh
+  args:
+    - -c
+    - /entrypoint.sh
+
+  env:
+    KDL_SERVER_MONGODB_URI: "mongodb://user:pass@mongodb:27017/db?authSource=user&authMechanism=SCRAM-SHA-256"
+
+# VSCode runtime configuration
+vscodeRuntime:
+  image:
+    repository: konstellation/python-ds-runtime
+    tag: "3.9"
+    pullPolicy: IfNotPresent
+
+  homePath: "/home/coder"
+
+  command:
+    - /bin/bash
+  args:
+    - "-c"
+    - "trap : TERM INT; sleep infinity & wait"
+
+  env:
+    MINIO_ACCESS_KEY: "minio"
+    MINIO_SECRET_KEY: "minio123"
+    MINIO_ENDPOINT: "http://minio:9000"
+
+# Node scheduling
+nodeSelector:
+  kubernetes.io/os: linux
+
+tolerations:
+  - key: "dedicated"
+    operator: "Equal"
+    value: "data-science"
+    effect: "NoSchedule"
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: gpu
+              operator: In
+              values:
+                - "true"
+
+# Pod spreading
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: DoNotSchedule
+    labelSelector:
+      matchLabels:
+        app: kdlusertools

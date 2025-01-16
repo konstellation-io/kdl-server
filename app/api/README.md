@@ -36,112 +36,48 @@ docker build \
 
 ### Environment variables
 
+> [!IMPORTANT]
+> All environment variables need to be defined, expect the ones
+> with a default value. Environment variables are defined in helm chart have
+> more priority than the ones by default.
+
 #### KDL server
 
-| Environment variable           | Description                                 | Default value  |
-|--------------------------------|---------------------------------------------|----------------|
-| `BASE_DOMAIN_NAME`             | Base domain name for the KDL server         | `kdl.local`    |
-| `KDL_SERVER_MONGODB_NAME`      | MongoDB Database name for the KDL server    |                |
-| `KDL_SERVER_MONGODB_URI`       | MongoDB URI for the KDL server              |                |
-| `KDL_SERVER_PORT`              | Port for the KDL API                        | `8080`         |
-| `KDL_SERVER_STATIC_FILES_PATH` | Path for the static files of the KDL server |                |
-| `POD_NAMESPACE`                | Namespace for the KDL server                |                |
-| `SHARED_VOLUME`                | Shared volume for the KDL server            |                |
-| `TLS_ENABLED`                  | Enable TLS for the KDL server               | `true`         |
+| Environment variable             | Description                                   | Default value |
+|----------------------------------|-----------------------------------------------|---------------|
+| `RELEASE_NAME`                   | Release name for the KDL server               |               |
+| `KDL_SERVER_MONGODB_NAME`        | MongoDB Database name for the KDL server      | `kdl`         |
+| `KDL_SERVER_MONGODB_URI`         | MongoDB URI for the KDL server                |               |
+| `KDL_SERVER_PORT`                | Port for the KDL API                          | `8080`        |
+| `KDL_SERVER_STATIC_FILES_PATH`   | Path for the static files of the KDL server   | `../public`   |
+| `POD_NAMESPACE`                  | Namespace for the KDL server                  |               |
+| `PROJECT_FILEBROWSER_URL`        | URL for the File Browser service              |               |
+| `PROJECT_MLFLOW_URL`             | URL for the MLflow service                    |               |
+| `USER_TOOLS_VSCODE_URL`          | URL for the VScode service                    |               |
+| `KUBECONFIG_DOWNLOAD_ENABLED`    | Enable kubeconfig download for the User Tools | `false`       |
+| `KUBECONFIG_EXTERNAL_SERVER_URL` | URL for the kubeconfig download service       |               |
 
 #### KnowledgeGalaxy
 
-| Environment variable       | Description                                | Default value                                     |
-|----------------------------|--------------------------------------------|---------------------------------------------------|
-| `KNOWLEDGE_GALAXY_URL`     | URL for the Knowledge Galaxy service       | `http://kdlapp.kdl.local/kg/projects/PROJECT_ID/` |
-| `KNOWLEDGE_GALAXY_ENABLED` | Enable Knowledge Galaxy for the KDL server | `false`                                           |
+| Environment variable       | Description                                | Default value |
+|----------------------------|--------------------------------------------|---------------|
+| `KNOWLEDGE_GALAXY_URL`     | URL for the Knowledge Galaxy service       |               |
+| `KNOWLEDGE_GALAXY_ENABLED` | Enable Knowledge Galaxy for the KDL server | `false`       |
 
 #### MinIO
 
-| Environment variable | Description                            | Default value       |
-|----------------------|----------------------------------------|---------------------|
-| `MINIO_ACCESS_KEY`   | Access key for the Minio service       |                     |
-| `MINIO_ENDPOINT`     | URL for the Minio service              | `http://minio:9000` |
-| `MINIO_SECRET_KEY`   | Secret key for the Minio service       |                     |
+| Environment variable | Description                            | Default value |
+|----------------------|----------------------------------------|---------------|
+| `MINIO_ACCESS_KEY`   | Access key for the Minio service       |               |
+| `MINIO_ENDPOINT`     | URL for the Minio service              |               |
+| `MINIO_SECRET_KEY`   | Secret key for the Minio service       |               |
 
-### Filebrowser
+#### Labels
 
-| Environment variable                 | Description                                        | Default value                                     |
-|--------------------------------------|----------------------------------------------------|---------------------------------------------------|
-| `PROJECT_FILEBROWSER_AFFINITY`       | Encoded affinity for the File Browser service      | `{}`                                              |
-| `PROJECT_FILEBROWSER_IMG_PULLPOLICY` | Pull policy for the File Browser image             | `IfNotPresent`                                    |
-| `PROJECT_FILEBROWSER_IMG_REPO`       | Repository for the File Browser image              | `filebrowser/filebrowser`                         |
-| `PROJECT_FILEBROWSER_IMG_TAG`        | Tag for the File Browser image                     | `v2`                                              |
-| `PROJECT_FILEBROWSER_NODESELECTOR`   | Encoded node selector for the File Browser service | `{}`                                              |
-| `PROJECT_FILEBROWSER_TOLERATIONS`    | Encoded tolerations for the File Browser service   | `[]`                                              |
-| `PROJECT_FILEBROWSER_URL`            | URL for the File Browser service                   | `http://kdlapp.kdl.local/filebrowser/PROJECT_ID/` |
-
-### MLflow
-
-| Environment variable                         | Description                                        | Default value                                |
-|----------------------------------------------|----------------------------------------------------|----------------------------------------------|
-| `PROJECT_MLFLOW_AFFINITY`                    | Encoded affinity for the MLflow service            | `{}`                                         |
-| `PROJECT_MLFLOW_ENCODED_INGRESS_ANNOTATIONS` | Encoded ingress annotations for the MLflow service | `{}`                                         |
-| `PROJECT_MLFLOW_IMG_PULLPOLICY`              | Pull policy for the MLflow image                   | `IfNotPresent`                               |
-| `PROJECT_MLFLOW_IMG_REPO`                    | Repository for the MLflow image                    | `konstellation/kdl-mlflow`                   |
-| `PROJECT_MLFLOW_IMG_TAG`                     | Tag for the MLflow image                           | `v0.13.5`                                    |
-| `PROJECT_MLFLOW_INGRESS_CLASS_NAME`          | Ingress class name for the MLflow service          | `nginx`                                      |
-| `PROJECT_MLFLOW_INGRESS_TLS_SECRET_NAME`     | TLS secret name for the MLflow service             |                                              |
-| `PROJECT_MLFLOW_NODESELECTOR`                | Encoded node selector for the MLflow service       | `{}`                                         |
-| `PROJECT_MLFLOW_STORAGE_CLASS_NAME`          | Storage class name for the MLflow service          | `standard`                                   |
-| `PROJECT_MLFLOW_STORAGE_SIZE`                | Storage size for the MLflow service                | `1Gi`                                        |
-| `PROJECT_MLFLOW_TOLERATIONS`                 | Encoded tolerations for the MLflow service         | `[]`                                         |
-| `PROJECT_MLFLOW_URL`                         | URL for the MLflow service                         | `http://kdlapp.kdl.local/mlflow/PROJECT_ID/` |
-
-### oauth2-proxy
-
-| Environment variable          | Description                            | Default value                       |
-|-------------------------------|----------------------------------------|-------------------------------------|
-| `OAUTH2_PROXY_IMG_PULLPOLICY` | Pull policy for the oauth2-proxy image | `IfNotPresent`                      |
-| `OAUTH2_PROXY_IMG_REPO`       | Repository for the oauth2-proxy image  | `quay.io/oauth2-proxy/oauth2-proxy` |
-| `OAUTH2_PROXY_IMG_TAG`        | Tag for the oauth2-proxy image         | `v7.0.1-amd64`                      |
-
-### VScode
-
-| Environment variable    | Description                      | Default value              |
-|-------------------------|----------------------------------|----------------------------|
-| `VSCODE_IMG_PULLPOLICY` | Pull policy for the VScode image | `IfNotPresent`             |
-| `VSCODE_IMG_REPO`       | Repository for the VScode image  | `konstellation/kdl-vscode` |
-| `VSCODE_IMG_TAG`        | Tag for the VScode image         | `v0.15.0`                  |
-
-### repo-cloner
-
-| Environment variable         | Description                           | Default value                   |
-|------------------------------|---------------------------------------|---------------------------------|
-| `REPO_CLONER_IMG_PULLPOLICY` | Pull policy for the repo-cloner image | `IfNotPresent`                  |
-| `REPO_CLONER_IMG_REPO`       | Repository for the repo-cloner image  | `konstellation/kdl-repo-cloner` |
-| `REPO_CLONER_IMG_TAG`        | Tag for the repo-cloner image         | `0.18.0`                        |
-
-### user-tools-operator
-
-| Environment variable                        | Description                                            | Default value                                                          |
-|---------------------------------------------|--------------------------------------------------------|------------------------------------------------------------------------|
-| `USER_TOOLS_ENCODED_INGRESS_ANNOTATIONS`    | Encoded ingress annotations for the User Tools service | `{}`                                                                   |
-| `USER_TOOLS_INGRESS_CLASS_NAME`             | Ingress class name for the User Tools service          | `nginx`                                                                |
-| `USER_TOOLS_KUBECONFIG_DOWNLOAD_ENABLED`    | Enable kubeconfig download for the User Tools service  | `false`                                                                |
-| `USER_TOOLS_KUBECONFIG_EXTERNAL_SERVER_URL` | URL for the kubeconfig download service                |                                                                        |
-| `USER_TOOLS_OAUTH2_PROXY_IMG_PULLPOLICY`    | Pull policy for the VScode image                       | `IfNotPresent`                                                         |
-| `USER_TOOLS_OAUTH2_PROXY_IMG_REPO`          | Repository for the oauth2-proxy image                  | `quay.io/oauth2-proxy/oauth2-proxy`                                    |
-| `USER_TOOLS_OAUTH2_PROXY_IMG_TAG`           | Tag for the oauth2-proxy image                         | `v7.0.1-amd64`                                                         |
-| `USER_TOOLS_STORAGE_CLASSNAME`              | Storage class name for the User Tools service          | `standard`                                                             |
-| `USER_TOOLS_STORAGE_SIZE`                   | Storage size for the User Tools service                | `10Gi`                                                                 |
-| `USER_TOOLS_TLS_SECRET_NAME`                | TLS secret name for the User Tools service             |                                                                        |
-| `USER_TOOLS_VSCODE_RUNTIME_IMG_PULLPOLICY`  | Pull policy for the VScode Runtime image               | `IfNotPresent`                                                         |
-| `USER_TOOLS_VSCODE_RUNTIME_IMG_REPO`        | Repository for the VScode Runtime image                | `konstellation/kdl-py`                                                 |
-| `USER_TOOLS_VSCODE_RUNTIME_IMG_TAG`         | Tag for the VScode Runtime image                       | `3.9`                                                                  |
-| `USER_TOOLS_VSCODE_URL`                     | URL for the VScode service                             | `http://USERNAME-code.kdl.local/?folder=/home/coder/repos/REPO_FOLDER` |
-
-### Labels
-
-| Environment variable          | Default value | Description                                                                  |
-|-------------------------------|---------------|------------------------------------------------------------------------------|
-| `LABELS_COMMON_APP_RELEASE`   | `1.38.0`      | Release version for the common app labels and Service account creation       |
-| `LABELS_COMMON_CHART_RELEASE` |               | Chart release version for the common app labels and Service account creation |
+| Environment variable          | Description                                                                  | Default value |
+|-------------------------------|------------------------------------------------------------------------------|---------------|
+| `LABELS_COMMON_APP_RELEASE`   | Release version for the common app labels and Service account creation       |               |
+| `LABELS_COMMON_CHART_RELEASE` | Chart release version for the common app labels and Service account creation |               |
 
 ## Local deployment
 

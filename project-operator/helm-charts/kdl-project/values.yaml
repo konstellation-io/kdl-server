@@ -1,0 +1,727 @@
+# Default values for kdl-project
+# This is a YAML-formatted file
+# Declare variables to be passed into your templates
+
+# -- String to partially override kdl-project.fullname template (will maintain the release name)
+nameOverride: ""
+
+# -- String to fully override kdl-project.fullname template
+fullnameOverride: ""
+
+# -- String unique to identify KDL project
+projectId: my-project
+
+# -- String to set domain to deploy
+domain: kdl.local
+
+# -- Filebrowser sevice
+# </br> Ref: https://filebrowser.org
+filebrowser:
+  # -- Enable or disable fllebrowser
+  enabled: true
+
+  # -- Number of replicas
+  # Specifies the number of replicas for the service
+  replicaCount: 1
+
+  # -- Image registry
+  # The image configuration for the base service
+  image:
+    # The repository of the image
+    repository: konstellation/kdl-filebrowser
+    # The pull policy for the image
+    pullPolicy: IfNotPresent
+    # The image tag
+    tag: "latest"
+
+  # -- Specifies the secrets to use for pulling images from private registries
+  # Leave empty if no secrets are required
+  # E.g.
+  # imagePullSecrets:
+  #   - name: myRegistryKeySecretName
+  imagePullSecrets: []
+
+  # -- Enable creation of ServiceAccount
+  # </br> Ref: https://kubernetes.io/docs/concepts/security/service-accounts/
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Automatically mount a ServiceAccount's API credentials?
+    automount: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  # -- Environment variables to configure application
+  env:
+    # AWS_S3_ACCESS_KEY_ID: "xxx"
+    # AWS_S3_MOUNT: "/srv"
+    # AWS_S3_SECRET_ACCESS_KEY: "xxx"
+    # AWS_S3_URL: "http://minio:9000"
+    FB_ADDRESS: "0.0.0.0"
+    FB_DATABASE: /home/filebrowser/database.db
+    FB_LOG: stdout
+    FB_ROOT: /srv
+    # S3FS_ARGS: >-
+    #   -o use_path_request_style
+    #   -o use_cache=/cache
+    #   -o ensure_diskfree=2048
+    #   -o max_stat_cache_size=100000
+    #   -o stat_cache_expire=300
+    #   -o enable_noobj_cache
+    #   -o dbglevel=warn
+    #   -o multipart_size=52
+    #   -o parallel_count=32
+    #   -o max_dirty_data=512
+    #   -o multireq_max=30
+    #   -o complement_stat
+    #   -o notsup_compat_dir
+    #   -o enable_content_md5
+    #   -o ro
+
+  # -- Variables from secrets
+  envFromSecrets: {}
+    # MY_VARIABLE:
+    #   name: <name-secret>
+    #   key: secret_key
+
+  # -- Variables from configMap
+  envFromConfigMap: {}
+    # MY_VARIABLE:
+    #   name: <name-configmap>
+    #   key: key
+
+  # -- Load all variables from files
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables
+  envFromFiles: []
+    # - secretRef:
+    #     name: <name-secret>
+    # - configMapRef:
+    #     name: <name-configmap>
+
+  # -- Configure extra containers
+  extraContainers: []
+    # - name: project-proxy
+    #   image: nginx:alpine
+    #   command: ['sh', '-c', 'echo "Hello, World!"']
+
+  # -- Configure additional containers
+  # </br> Ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  initContainers: []
+    # - name: my-container
+    #   image: busybox
+    #   command: ['sh', '-c', 'echo "Hello, World!"']
+
+  # -- Configure args
+  # </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
+  args:
+    - -c
+    - /entrypoint.sh
+
+  # -- Configure command
+  # </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
+  command:
+    - /bin/sh
+
+  # -- Kubernetes service to expose Pod
+  # </br> Ref: https://kubernetes.io/docs/concepts/services-networking/service/
+  service:
+    # -- Kubernetes Service type. Allowed values: NodePort, LoadBalancer or ClusterIP
+    type: ClusterIP
+    # -- Kubernetes Service port
+    port: 9696
+    # -- Kubernetes Service health check path
+    # healthPath: ""
+    # -- NodePort port (only when type is NodePort)
+    # nodePort: 32000
+    # -- Pod expose port
+    # targetPort: 8080
+    # -- Pod extra ports
+    # extraPorts:
+    # - name: metrics
+    #   port: 9080
+    #   targetPort: 9080
+
+  # -- NetworkPolicy configuration
+  # </br> Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  networkPolicy:
+    # -- Enable or disable NetworkPolicy
+    enabled: false
+    # -- Policy types
+    policyTypes: []
+      # - Ingress
+      # - Egress
+    ingress: []
+      # - from:
+      #   - ipBlock:
+      #       cidr: 172.17.0.0/16
+      #       except:
+      #       - 172.17.1.0/24
+      #   - namespaceSelector:
+      #       matchLabels:
+      #         project: myproject
+      #   - podSelector:
+      #       matchLabels:
+      #         role: frontend
+      #   ports:
+      #   - protocol: TCP
+      #     port: 6379
+    egress: []
+      # - to:
+      #   - ipBlock:
+      #       cidr: 10.0.0.0/24
+      #   ports:
+      #   - protocol: TCP
+      #     port: 5978
+
+  # -- Configure lifecycle hooks
+  # </br> Ref: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
+  # </br> Ref: https://learnk8s.io/graceful-shutdown
+  lifecycle: {}
+    # preStop:
+    #   exec:
+    #     command: ["sh", "-c", "sleep 10"]
+    # postStart:
+    #   exec:
+    #     command:
+    #       - "/bin/sh"
+    #       - "-c"
+    #       - "ssh-keyscan -H keycloak >> /app/.ssh/known_hosts"
+
+  # -- Configure Pod termination grace period
+  # </br> Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination
+  terminationGracePeriodSeconds: 30
+
+  # -- Configure liveness checker
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-startup-probes
+  livenessProbe:
+    enabled: false
+    failureThreshold: 3
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+
+  # -- Custom livenessProbe
+  livenessProbeCustom: {}
+    # httpGet:
+    #   path: /dashboard
+    #   port: 4000
+    # failureThreshold: 3
+    # initialDelaySeconds: 200
+    # periodSeconds: 30
+    # successThreshold: 1
+    # timeoutSeconds: 5
+
+  # -- Configure readinessProbe checker
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-startup-probes
+  readinessProbe:
+    enabled: false
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+
+  # -- Custom readinessProbe
+  readinessProbeCustom: {}
+    # httpGet:
+    #   path: /dashboard
+    #   port: 4000
+    # failureThreshold: 3
+    # initialDelaySeconds: 200
+    # periodSeconds: 30
+    # successThreshold: 1
+    # timeoutSeconds: 5
+
+  # -- Configure startupProbe checker
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-startup-probes
+  startupProbe:
+    enabled: false
+    failureThreshold: 30
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+
+  # -- Custom startupProbe
+  startupProbeCustom: {}
+    # httpGet:
+    #   path: /dashboard
+    #   port: 4000
+    # failureThreshold: 3
+    # initialDelaySeconds: 200
+    # periodSeconds: 30
+    # successThreshold: 1
+    # timeoutSeconds: 5
+
+  # -- Configure annotations on Pods
+  podAnnotations: {}
+
+  # -- Configure labels on Pods
+  podLabels: {}
+
+  # -- Defines privilege and access control settings for a Pod
+  # </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  podSecurityContext: {}
+    # fsGroup: 1000
+
+  # -- Defines privilege and access control settings for a Container
+  # </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  securityContext: {}
+    # privileged: true
+    # capabilities:
+    #   add:
+    #     - SYS_ADMIN
+
+  # -- Resources limits and requested
+  # </br> Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  # -- Pod Disruption Budget
+  # </br> Ref: https://kubernetes.io/docs/reference/kubernetes-api/policy-resources/pod-disruption-budget-v1/
+  podDisruptionBudget:
+    enabled: false
+    maxUnavailable: 1
+    minAvailable:
+
+  # -- Autoscaling with CPU or memory utilization percentage
+  # </br> Ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  # -- Additional volumes on the output Deployment definition
+  # </br> Ref: https://kubernetes.io/docs/concepts/storage/volumes/
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
+  # </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#create-a-pod-that-has-access-to-the-secret-data-through-a-volume
+  volumes: []
+    # - name: cache-volume
+    #   emptyDir: {}
+    # - name: fuse-device
+    #   hostPath:
+    #     path: /dev/fuse
+    #     type: CharDevice
+
+  # -- Additional volumeMounts on the output Deployment definition
+  volumeMounts: []
+    # - name: cache-volume
+    #   mountPath: /cache
+    # - name: fuse-device
+    #   mountPath: /dev/fuse
+
+  # -- Node labels for pod assignment
+  # </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+  nodeSelector: {}
+
+  # -- Tolerations for pod assignment
+  # </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  tolerations: []
+
+  # -- Affinity for pod assignment
+  # </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+  # -- Control how Pods are spread across your cluster
+  # </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#example-multiple-topologyspreadconstraints
+  topologySpreadConstraints: []
+  # - maxSkew: 1
+  #   topologyKey: zone
+  #   whenUnsatisfiable: DoNotSchedule
+
+# -- MLflow sevice
+# </br> Ref: https://mlflow.org/docs/latest/index.html
+mlflow:
+  # -- Enable or disable mlflow
+  enabled: true
+
+  # -- Number of replicas
+  # Specifies the number of replicas for the service
+  replicaCount: 1
+
+  # -- Image registry
+  # The image configuration for the base service
+  image:
+    # The repository of the image
+    repository: konstellation/kdl-mlflow
+    # The pull policy for the image
+    pullPolicy: IfNotPresent
+    # The image tag
+    tag: "latest"
+
+  # -- Specifies the secrets to use for pulling images from private registries
+  # Leave empty if no secrets are required
+  # E.g.
+  # imagePullSecrets:
+  #   - name: myRegistryKeySecretName
+  imagePullSecrets: []
+
+  # -- Enable creation of ServiceAccount
+  # </br> Ref: https://kubernetes.io/docs/concepts/security/service-accounts/
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Automatically mount a ServiceAccount's API credentials?
+    automount: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  # -- Environment variables to configure application
+  # ref: https://mlflow.org/docs/latest/cli.html?highlight=Environment_variables#mlflow-server
+  env:
+    # ARTIFACTS_BUCKET: mlflow-artifacts
+    # AWS_ACCESS_KEY_ID: xxx
+    # AWS_SECRET_ACCESS_KEY: xxx
+    # MLFLOW_S3_ENDPOINT_URL: "http://kdl-server-minio:9000"
+    MLFLOW_BACKEND_STORE_URI: "sqlite:////home/mlflow/database.db"
+    MLFLOW_HOST: "0.0.0.0"
+    MLFLOW_PORT: "5000"
+
+  # -- Variables from secrets
+  envFromSecrets: {}
+    # MY_VARIABLE:
+    #   name: <name-secret>
+    #   key: secret_key
+
+  # -- Variables from configMap
+  envFromConfigMap: {}
+    # MY_VARIABLE:
+    #   name: <name-configmap>
+    #   key: key
+
+  # -- Load all variables from files
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables
+  envFromFiles: []
+    # - secretRef:
+    #     name: <name-secret>
+    # - configMapRef:
+    #     name: <name-configmap>
+
+  # -- Configure extra containers
+  extraContainers: []
+    # - name: project-proxy
+    #   image: nginx:alpine
+    #   command: ['sh', '-c', 'echo "Hello, World!"']
+
+  # -- Configure additional containers
+  # </br> Ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  initContainers: []
+    # - name: my-container
+    #   image: busybox
+    #   command: ['sh', '-c', 'echo "Hello, World!"']
+
+  # -- Configure args
+  # </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
+  args: []
+    # - -c
+    # - echo "Hello, World!"
+
+  # -- Configure command
+  # </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/
+  command: []
+    # - echo
+    # - "Hello, World!"
+
+  # -- Kubernetes service to expose Pod
+  # </br> Ref: https://kubernetes.io/docs/concepts/services-networking/service/
+  service:
+    # -- Kubernetes Service type. Allowed values: NodePort, LoadBalancer or ClusterIP
+    type: ClusterIP
+    # -- Kubernetes Service port
+    port: 5000
+    # -- Kubernetes Service health check path
+    # healthPath: ""
+    # -- NodePort port (only when type is NodePort)
+    # nodePort: 32000
+    # -- Pod expose port
+    # targetPort: 8080
+    # -- Pod extra ports
+    # extraPorts:
+    # - name: metrics
+    #   port: 9080
+    #   targetPort: 9080
+
+  # -- Ingress configuration to expose app
+  # </br> Ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+      # cert-manager.io/issuer: your-issuer
+    hosts: []
+      # - host: mlflow.example.com
+      #   paths:
+      #     - path: /
+      #       pathType: ImplementationSpecific
+    tls:
+      # Enable automatic TLS certificate generation
+      enabled: false
+      # Additional custom TLS configurations
+      extraTLS: []
+        # - secretName: mlflow-tls-custom
+        #   hosts:
+        #     - mlflow.example.com
+
+  # -- NetworkPolicy configuration
+  # </br> Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  networkPolicy:
+    # -- Enable or disable NetworkPolicy
+    enabled: false
+    # -- Policy types
+    policyTypes: []
+      # - Ingress
+      # - Egress
+    ingress: []
+      # - from:
+      #   - ipBlock:
+      #       cidr: 172.17.0.0/16
+      #       except:
+      #       - 172.17.1.0/24
+      #   - namespaceSelector:
+      #       matchLabels:
+      #         project: myproject
+      #   - podSelector:
+      #       matchLabels:
+      #         role: frontend
+      #   ports:
+      #   - protocol: TCP
+      #     port: 6379
+    egress: []
+      # - to:
+      #   - ipBlock:
+      #       cidr: 10.0.0.0/24
+      #   ports:
+      #   - protocol: TCP
+      #     port: 5978
+
+  # -- Configure lifecycle hooks
+  # </br> Ref: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
+  # </br> Ref: https://learnk8s.io/graceful-shutdown
+  lifecycle: {}
+    # preStop:
+    #   exec:
+    #     command: ["sh", "-c", "sleep 10"]
+    # postStart:
+    #   exec:
+    #     command:
+    #       - "/bin/sh"
+    #       - "-c"
+    #       - "ssh-keyscan -H keycloak >> /app/.ssh/known_hosts"
+
+  # -- Configure Pod termination grace period
+  # </br> Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination
+  terminationGracePeriodSeconds: 30
+
+  # -- Configure liveness checker
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-startup-probes
+  livenessProbe:
+    enabled: false
+    failureThreshold: 3
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+
+  # -- Custom livenessProbe
+  livenessProbeCustom: {}
+    # httpGet:
+    #   path: /dashboard
+    #   port: 4000
+    # failureThreshold: 3
+    # initialDelaySeconds: 200
+    # periodSeconds: 30
+    # successThreshold: 1
+    # timeoutSeconds: 5
+
+  # -- Configure readinessProbe checker
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-startup-probes
+  readinessProbe:
+    enabled: false
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+
+  # -- Custom readinessProbe
+  readinessProbeCustom: {}
+    # httpGet:
+    #   path: /dashboard
+    #   port: 4000
+    # failureThreshold: 3
+    # initialDelaySeconds: 200
+    # periodSeconds: 30
+    # successThreshold: 1
+    # timeoutSeconds: 5
+
+  # -- Configure startupProbe checker
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-startup-probes
+  startupProbe:
+    enabled: false
+    failureThreshold: 30
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+
+  # -- Custom startupProbe
+  startupProbeCustom: {}
+    # httpGet:
+    #   path: /dashboard
+    #   port: 4000
+    # failureThreshold: 3
+    # initialDelaySeconds: 200
+    # periodSeconds: 30
+    # successThreshold: 1
+    # timeoutSeconds: 5
+
+  # -- Configure annotations on Pods
+  podAnnotations: {}
+
+  # -- Configure labels on Pods
+  podLabels: {}
+
+  # -- Defines privilege and access control settings for a Pod
+  # </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  # -- Defines privilege and access control settings for a Container
+  # </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  # -- Resources limits and requested
+  # </br> Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  # -- Pod Disruption Budget
+  # </br> Ref: https://kubernetes.io/docs/reference/kubernetes-api/policy-resources/pod-disruption-budget-v1/
+  podDisruptionBudget:
+    enabled: false
+    maxUnavailable: 1
+    minAvailable:
+
+  # -- Autoscaling with CPU or memory utilization percentage
+  # </br> Ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  # -- Additional volumes on the output Deployment definition
+  # </br> Ref: https://kubernetes.io/docs/concepts/storage/volumes/
+  # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
+  # </br> Ref: https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#create-a-pod-that-has-access-to-the-secret-data-through-a-volume
+  volumes: []
+  # - name: received-data
+  #   persistentVolumeClaim:
+  #     claimName: received-data-claim
+  # - name: foo
+  #   secret:
+  #     secretName: mysecret
+  #     optional: false
+
+  # -- Additional volumeMounts on the output Deployment definition
+  volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
+  # -- Persistent Volume configuration
+  # </br> Ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+  persistentVolume:
+    # -- Enable or disable persistence
+    enabled: true
+
+    # -- Persistent Volume access modes
+    # Must match those of existing PV or dynamic provisioner
+    # </br> Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+    accessModes:
+      - ReadWriteOnce
+
+    # -- Persistent Volume annotations
+    annotations: {}
+
+    # -- Persistent Volume labels
+    labels: {}
+
+    # -- Persistent Volume size
+    size: 1Gi
+
+    # -- Persistent Volume Storage Class
+    # If defined, storageClassName: <storageClass>
+    # If set to "-", storageClassName: "", which disables dynamic provisioning
+    # If undefined (the default) or set to null, no storageClassName spec is
+    #   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    #   GKE, AWS & OpenStack)
+    storageClass: ""
+
+    # -- Persistent Volume Binding Mode
+    # If defined, volumeBindingMode: <volumeBindingMode>
+    # If undefined (the default) or set to null, no volumeBindingMode spec is
+    # set, choosing the default mode.
+    volumeBindingMode: ""
+
+    # -- Persistent Volume Claim Selector
+    # Useful if Persistent Volumes have been provisioned in advance
+    # </br> Ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector
+    selector: {}
+      # matchLabels:
+      #   release: "stable"
+      # matchExpressions:
+      #   - { key: environment, operator: In, values: [ dev ] }
+
+    # -- Persistent Volume Name
+    # Useful if Persistent Volumes have been provisioned in advance and you want to use a specific one
+    volumeName: ""
+
+  # -- Node labels for pod assignment
+  # </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+  nodeSelector: {}
+
+  # -- Tolerations for pod assignment
+  # </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  tolerations: []
+
+  # -- Affinity for pod assignment
+  # </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+
+  # -- Control how Pods are spread across your cluster
+  # </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#example-multiple-topologyspreadconstraints
+  topologySpreadConstraints: []
+  # - maxSkew: 1
+  #   topologyKey: zone
+  #   whenUnsatisfiable: DoNotSchedule

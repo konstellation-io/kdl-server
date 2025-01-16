@@ -1,5 +1,4 @@
 import { memberMe, member1, member2 } from './member';
-import { RepositoryType } from '../../Graphql/types/globalTypes';
 
 const toolUrls = {
   knowledgeGalaxy: 'https://knowledgeGalaxy',
@@ -16,7 +15,6 @@ export const project1 = {
   creationDate: '2020-02-02',
   lastActivationDate: '2020-02-02',
   repository: {
-    type: RepositoryType.EXTERNAL,
     url: 'https://my-super-url.com',
     error: false,
   },

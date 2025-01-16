@@ -25,6 +25,7 @@ type Props = {
   selected: boolean;
   canBeSelected?: boolean;
   canManageMembers?: boolean;
+  hasAccess: boolean;
 };
 function Member({
   member,
@@ -34,6 +35,7 @@ function Member({
   selected,
   canBeSelected = false,
   canManageMembers = false,
+  hasAccess,
 }: Props) {
   return (
     <div
@@ -42,41 +44,43 @@ function Member({
         [styles.saveCheckSpace]: canManageMembers && !canBeSelected,
       })}
     >
-      {canBeSelected && canManageMembers && (
+      {canBeSelected && canManageMembers && hasAccess && (
         <Check
           className={cx(styles.check, { [styles.unselected]: !selected })}
           checked={selected}
           onChange={(isSelected) => canBeSelected && onCheckClick(member, isSelected)}
         />
       )}
-      <div className={styles.infoContainer} onClick={() => onInfoClick(member)}>
+      <div className={styles.infoContainer} onClick={() => (hasAccess ? onInfoClick(member) : null)}>
         <div className={styles.leftWrapper}>
           <Gravatar email={member.user.email} size={24} style={gravatarStyle} />
           <p className={styles.email}>{member.user.email}</p>
         </div>
-        <div className={styles.rightWrapper}>
-          {canManageMembers ? (
-            <div onClick={(e) => e.stopPropagation()} data-testid="roleSelector">
-              <Select
-                className={styles.accessLevelSelector}
-                options={Object.keys(AccessLevel)}
-                formSelectedOption={member.accessLevel}
-                valuesMapper={mapAccessLevel}
-                height={30}
-                onChange={(newLevel: AccessLevel) => onChangeMemberLevel([member.user.id], newLevel)}
-                disabled={!canBeSelected}
-                hideError
-              />
+        {hasAccess && (
+          <div className={styles.rightWrapper}>
+            {canManageMembers ? (
+              <div onClick={(e) => e.stopPropagation()} data-testid="roleSelector">
+                <Select
+                  className={styles.accessLevelSelector}
+                  options={Object.keys(AccessLevel)}
+                  formSelectedOption={member.accessLevel}
+                  valuesMapper={mapAccessLevel}
+                  height={30}
+                  onChange={(newLevel: AccessLevel) => onChangeMemberLevel([member.user.id], newLevel)}
+                  disabled={!canBeSelected}
+                  hideError
+                />
+              </div>
+            ) : (
+              <span className={styles.accessLevel} onClick={() => onInfoClick(member)}>
+                {mapAccessLevel[member.accessLevel]}
+              </span>
+            )}
+            <div className={styles.button}>
+              <IconOpen className="icon-small" />
             </div>
-          ) : (
-            <span className={styles.accessLevel} onClick={() => onInfoClick(member)}>
-              {mapAccessLevel[member.accessLevel]}
-            </span>
-          )}
-          <div className={styles.button}>
-            <IconOpen className="icon-small" />
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

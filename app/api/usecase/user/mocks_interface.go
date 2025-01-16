@@ -469,6 +469,20 @@ func (mr *MockUseCaseMockRecorder) UpdateAccessLevel(ctx, userIDs, level interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccessLevel", reflect.TypeOf((*MockUseCase)(nil).UpdateAccessLevel), ctx, userIDs, level)
 }
 
+// UpdateKDLUserTools mocks base method.
+func (m *MockUseCase) UpdateKDLUserTools(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateKDLUserTools", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateKDLUserTools indicates an expected call of UpdateKDLUserTools.
+func (mr *MockUseCaseMockRecorder) UpdateKDLUserTools(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateKDLUserTools", reflect.TypeOf((*MockUseCase)(nil).UpdateKDLUserTools), ctx)
+}
+
 // UpdateLastActivity mocks base method.
 func (m *MockUseCase) UpdateLastActivity(ctx context.Context, user entity.User) (entity.User, error) {
 	m.ctrl.T.Helper()

@@ -1,0 +1,258 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "kdl-user-tools.fullname" . }}
+  labels:
+    {{- include "kdl-user-tools.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "kdl-user-tools.fullname" . }}
+  podManagementPolicy: {{ .Values.podManagementPolicy | default "OrderedReady" }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  minReadySeconds: {{ .Values.minReadySeconds | default 0 }}
+  updateStrategy:
+    type: {{ .Values.updateStrategy.type | default "RollingUpdate" }}
+    {{- if eq (.Values.updateStrategy.type | default "RollingUpdate") "OnDelete" }}
+    rollingUpdate: null
+    {{- else if .Values.updateStrategy.rollingUpdate }}
+    rollingUpdate:
+      {{- toYaml .Values.updateStrategy.rollingUpdate | nindent 6 }}
+    {{- end }}
+  selector:
+    matchLabels:
+      {{- include "kdl-user-tools.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "kdl-user-tools.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      serviceAccountName: {{ include "kdl-user-tools.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: repo-cloner
+          image: {{ .Values.repoCloner.image.repository }}:{{ .Values.repoCloner.image.tag }}
+          imagePullPolicy: {{ .Values.repoCloner.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.repoCloner.securityContext | nindent 12 }}
+          {{- with .Values.repoCloner.command }}
+          command: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.repoCloner.args }}
+          args: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          lifecycle:
+            {{- with .Values.repoCloner.lifecycle }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.repoCloner.envFromFiles }}
+            {{- tpl (toYaml .Values.repoCloner.envFromFiles) . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: KDL_USER_NAME
+              value: {{ .Values.username | quote }}
+            # Variables from secrets have precedence
+            {{- $envList := dict }}
+            {{- if .Values.repoCloner.envFromSecrets }}
+            {{- range $key, $value := .Values.repoCloner.envFromSecrets }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables from configmap have precedence
+            {{- if .Values.repoCloner.envFromConfigMap }}
+            {{- range $key, $value := .Values.repoCloner.envFromConfigMap }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables in plain text if they were not already added from secrets
+            {{- if .Values.repoCloner.env }}
+            {{- range $key, $value := .Values.repoCloner.env }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+          volumeMounts:
+            {{- if .Values.persistentVolume.enabled }}
+            - name: data
+              mountPath: {{ .Values.repoCloner.homePath }}
+            {{- end }}
+            - name: {{ .Values.usernameSlug }}-ssh-keys-vol
+              mountPath: {{ .Values.repoCloner.homePath }}/.ssh/id_rsa
+              subPath: id_rsa
+              readOnly: true
+          {{- with .Values.repoCloner.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.repoCloner.resources | nindent 12 }}
+        - name: vscode-runtime
+          image: {{ .Values.vscodeRuntime.image.repository }}:{{ .Values.vscodeRuntime.image.tag }}
+          imagePullPolicy: {{ .Values.vscodeRuntime.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.vscodeRuntime.securityContext | nindent 12 }}
+          {{- with .Values.vscodeRuntime.command }}
+          command: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.vscodeRuntime.args }}
+          args: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          lifecycle:
+            {{- with .Values.vscodeRuntime.lifecycle }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.vscodeRuntime.envFromFiles }}
+            {{- tpl (toYaml .Values.vscodeRuntime.envFromFiles) . | nindent 12 }}
+            {{- end }}
+          env:
+            # Variables from secrets have precedence
+            {{- $envList := dict }}
+            {{- if .Values.vscodeRuntime.envFromSecrets }}
+            {{- range $key, $value := .Values.vscodeRuntime.envFromSecrets }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables from configmap have precedence
+            {{- if .Values.vscodeRuntime.envFromConfigMap }}
+            {{- range $key, $value := .Values.vscodeRuntime.envFromConfigMap }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $value.name }}
+                  key: {{ $value.key | default $key }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            # Variables in plain text if they were not already added from secrets
+            {{- if .Values.vscodeRuntime.env }}
+            {{- range $key, $value := .Values.vscodeRuntime.env }}
+            {{- if not (hasKey $envList $key) }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- $_ := set $envList $key true }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+          volumeMounts:
+            {{- if .Values.persistentVolume.enabled }}
+            - name: data
+              mountPath: {{ .Values.vscodeRuntime.homePath }}
+            {{- end }}
+            {{- if .Values.sharedVolume.enabled }}
+            - name: {{ .Values.sharedVolume.name }}
+              mountPath: {{ .Values.vscodeRuntime.homePath }}/shared-storage
+              readOnly: false
+            {{- end }}
+            - name: {{ .Values.usernameSlug }}-ssh-keys-vol
+              mountPath: {{ .Values.vscodeRuntime.homePath }}/.ssh/id_rsa
+              subPath: id_rsa
+              readOnly: true
+          {{- with .Values.vscodeRuntime.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.vscodeRuntime.resources | nindent 12 }}
+      {{- if .Values.extraContainers }}
+        {{- toYaml .Values.extraContainers | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      volumes:
+        - name: kubeconfig-tpl-configmap
+          configMap:
+            name: {{ include "kdl-user-tools.fullname" . }}-kubeconfig
+        {{- if .Values.sharedVolume.enabled }}
+        - name: {{ .Values.sharedVolume.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.sharedVolume.name }}
+            readOnly: false
+        {{- end }}
+        - name: {{ .Values.usernameSlug }}-ssh-keys-vol
+          secret:
+            secretName: {{ .Values.usernameSlug }}-ssh-keys
+            items:
+            - key: KDL_USER_PRIVATE_SSH_KEY
+              path: id_rsa
+      {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      {{- $_ := include "kdl-user-tools.patchTopologySpreadConstraintsUserTools" $ }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- if .Values.persistentVolume.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          {{- range .Values.persistentVolume.accessModes }}
+          - {{ . | quote }}
+          {{- end }}
+        {{- if .Values.persistentVolume.storageClass }}
+        {{- if (eq "-" .Values.persistentVolume.storageClass) }}
+        storageClassName: ""
+        {{- else }}
+        storageClassName: {{ .Values.persistentVolume.storageClass | quote }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.persistentVolume.volumeBindingMode }}
+        volumeBindingMode: {{ .Values.persistentVolume.volumeBindingMode | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.persistentVolume.size | quote }}
+  {{- end }}

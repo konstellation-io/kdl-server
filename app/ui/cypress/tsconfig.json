@@ -4,15 +4,25 @@
     "*/*.ts"
   ],
   "exclude": [
-    "node_modules/*/*.*", "**/*.spec.js", "**/*.spec.ts", "**/*.spec.tsx", "**/*.d.ts", "cypress/*"
+    "node_modules/*/*.*",
+    "**/*.spec.js",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.d.ts",
+    "cypress/*"
   ],
-  "types":["node"],
+  "types": [
+    "node"
+  ],
   "jsx": "react-jsx",
   "moduleResolution": "node",
   "compilerOptions": {
     "noEmit": false,
     "isolatedModules": false,
-    "types": ["cypress", "node"],
+    "types": [
+      "cypress",
+      "node"
+    ],
     "paths": {
       "@/*": [
         "./src/*"

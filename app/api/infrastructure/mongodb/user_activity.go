@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
@@ -35,8 +36,8 @@ type UserActivityRepo struct {
 // UserActivityRepo implements the project.UserActivityRepo interface.
 var _ project.UserActivityRepo = (*UserActivityRepo)(nil)
 
-func NewUserActivityRepo(logger logr.Logger, client *mongo.Client, dbName string) *UserActivityRepo {
-	collection := client.Database(dbName).Collection(userActivityCollName)
+func NewUserActivityRepo(logger logr.Logger, mongo *mongodbutils.MongoDB, dbName string) *UserActivityRepo {
+	collection := mongo.CreateCollection(dbName, userActivityCollName)
 
 	return &UserActivityRepo{
 		logger,

@@ -4,6 +4,7 @@ package user
 
 import (
 	"context"
+	"time"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 )
@@ -24,6 +25,7 @@ type Repository interface {
 	UpdateEmail(ctx context.Context, userID, email string) error
 	UpdateUsername(ctx context.Context, email, userID string) error
 	UpdateDeleted(ctx context.Context, userID string, deleted bool) error
+	UpdateLastActivity(ctx context.Context, userID string, lastActivity time.Time) error
 }
 
 // UseCase interface to manage all operations related with users.
@@ -31,6 +33,7 @@ type UseCase interface {
 	Create(ctx context.Context, email, sub string, accessLevel entity.AccessLevel) (entity.User, error)
 	UpdateSub(ctx context.Context, user entity.User, sub string) (entity.User, error)
 	UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error)
+	UpdateLastActivity(ctx context.Context, user entity.User) (entity.User, error)
 	FindAll(ctx context.Context) ([]entity.User, error)
 	GetByEmail(ctx context.Context, email string) (entity.User, error)
 	StartTools(ctx context.Context, email string, runtimeID *string, capabilitiesID *string) (entity.User, error)

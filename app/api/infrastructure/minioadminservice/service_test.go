@@ -74,18 +74,20 @@ func (s *TestSuite) TearDownTest() {
 	ctx := context.Background()
 
 	for _, group := range []string{"project1", "project2"} {
-		s.adminClient.UpdateGroupMembers(ctx, madmin.GroupAddRemove{
+		err := s.adminClient.UpdateGroupMembers(ctx, madmin.GroupAddRemove{
 			Group:    group,
 			IsRemove: true,
 			Members:  []string{"user-foo"},
 		})
+		s.Require().NoError(err)
 
 		// a call to this method on an empty group removes it
-		s.adminClient.UpdateGroupMembers(ctx, madmin.GroupAddRemove{
+		err = s.adminClient.UpdateGroupMembers(ctx, madmin.GroupAddRemove{
 			Group:    group,
 			IsRemove: true,
 			Members:  []string{},
 		})
+		s.Require().NoError(err)
 	}
 
 	users, err := s.adminClient.ListUsers(ctx)
@@ -106,7 +108,6 @@ func (s *TestSuite) TearDownTest() {
 	s.Require().NoError(err)
 	err = s.client.RemoveBucket(ctx, "project1")
 	s.Require().NoError(err)
-
 }
 
 func (s *TestSuite) SetupTest() {
@@ -152,7 +153,7 @@ func (s *TestSuite) TestDeleteUser() {
 
 	users, err := s.adminClient.ListUsers(ctx)
 	s.Require().NoError(err)
-	s.Len(users, 0)
+	s.Empty(users)
 }
 
 func (s *TestSuite) TestCreateProjectUser() {
@@ -199,7 +200,7 @@ func (s *TestSuite) TestDeleteProjectUser() {
 
 	users, err := s.adminClient.ListUsers(ctx)
 	s.Require().NoError(err)
-	s.Len(users, 0)
+	s.Empty(users)
 }
 
 func (s *TestSuite) TestDeleteUserIdempotence() {
@@ -207,7 +208,6 @@ func (s *TestSuite) TestDeleteUserIdempotence() {
 
 	err := s.service.DeleteUser(ctx, "nonexistent")
 	s.Require().NoError(err)
-
 }
 
 func (s *TestSuite) TestAssignProject() {
@@ -294,10 +294,10 @@ func (s *TestSuite) TestDeletePolicy() {
 
 	policies, err := s.adminClient.ListCannedPolicies(ctx)
 	s.Require().NoError(err)
-	for policy := range policies {
-		s.Require().NotEqual(policy, "project1")
-	}
 
+	for policy := range policies {
+		s.Require().NotEqual("project1", policy)
+	}
 }
 
 func (s *TestSuite) TestDeletePolicyIdempotence() {
@@ -305,5 +305,4 @@ func (s *TestSuite) TestDeletePolicyIdempotence() {
 
 	err := s.service.DeleteProjectPolicy(ctx, "nonexistent")
 	s.Require().NoError(err)
-
 }

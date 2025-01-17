@@ -19,7 +19,7 @@ repos:
   rev: v0.5.1
   hooks:
     - id: golangci-lint
-      args: ['--config', '.github/.golangci.yml', 'app/api/...', 'repo-cloner/...']
+      args: ['--config', '.github/.golangci.yml', "--build-tags=integration,unit",  'app/api/...', 'repo-cloner/...']
 
 - repo: https://github.com/gruntwork-io/pre-commit
   rev: v0.1.24

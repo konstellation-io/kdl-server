@@ -32,8 +32,8 @@ type CapabilitiesRepo struct {
 // capabilitiesRepo implements the capabilities.Repository interface.
 var _ capabilities.Repository = (*CapabilitiesRepo)(nil)
 
-func NewCapabilitiesRepo(logger logr.Logger, client *mongo.Client, dbName string) *CapabilitiesRepo {
-	collection := client.Database(dbName).Collection(capabilitiesCollName)
+func NewCapabilitiesRepo(logger logr.Logger, mongo *mongodbutils.MongoDB, dbName string) *CapabilitiesRepo {
+	collection := mongo.CreateCollection(dbName, capabilitiesCollName)
 	return &CapabilitiesRepo{logger, collection}
 }
 

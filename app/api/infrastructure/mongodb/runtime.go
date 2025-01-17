@@ -35,8 +35,8 @@ type RuntimeRepo struct {
 // RuntimeRepo implements the runtime.Repository interface.
 var _ runtime.Repository = (*RuntimeRepo)(nil)
 
-func NewRuntimeRepo(logger logr.Logger, client *mongo.Client, dbName string) *RuntimeRepo {
-	collection := client.Database(dbName).Collection(runtimesCollName)
+func NewRuntimeRepo(logger logr.Logger, mongo *mongodbutils.MongoDB, dbName string) *RuntimeRepo {
+	collection := mongo.CreateCollection(dbName, runtimesCollName)
 	return &RuntimeRepo{logger, collection}
 }
 

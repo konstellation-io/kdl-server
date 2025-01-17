@@ -38,6 +38,20 @@ func (m *MockClientInterface) EXPECT() *MockClientInterfaceMockRecorder {
 	return m.recorder
 }
 
+// CheckConnection mocks base method.
+func (m *MockClientInterface) CheckConnection() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckConnection")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// CheckConnection indicates an expected call of CheckConnection.
+func (mr *MockClientInterfaceMockRecorder) CheckConnection() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckConnection", reflect.TypeOf((*MockClientInterface)(nil).CheckConnection))
+}
+
 // CreateConfigMapWatcher mocks base method.
 func (m *MockClientInterface) CreateConfigMapWatcher(ctx context.Context) (watch.Interface, error) {
 	m.ctrl.T.Helper()

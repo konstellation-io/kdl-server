@@ -15,10 +15,11 @@ import (
 )
 
 type UserToolsData struct {
-	RuntimeID    string
-	RuntimeImage string
-	RuntimeTag   string
-	Capabilities entity.Capabilities
+	RuntimeID      string
+	RuntimeImage   string
+	RuntimeTag     string
+	Capabilities   entity.Capabilities
+	MinioAccessKey entity.MinioAccessKey
 }
 
 // DeleteUserToolsCR removes a given user tools custom resource from Kubernetes.
@@ -91,7 +92,14 @@ func (k *Client) updateUserToolsTemplate(
 
 	vscodeRuntimeImage["repository"] = data.RuntimeImage
 	vscodeRuntimeImage["tag"] = data.RuntimeTag
-	// FUTURE: update spec.vscodeRuntime.env.MINIO_ACCESS_KEY and spec.vscodeRuntime.env.MINIO_SECRET_KEY with minIO values for the user
+
+	env, ok := vscodeRuntime["env"].(map[string]interface{})
+	if !ok {
+		return nil, errCRDNoSpecVscodeRuntimeEnv
+	}
+
+	env["AWS_ACCESS_KEY"] = data.MinioAccessKey.AccessKey
+	env["AWS_SECRET_KEY"] = data.MinioAccessKey.SecretKey
 
 	if data.Capabilities.ID != "" {
 		if err := data.Capabilities.Validate(); err != nil {
@@ -165,7 +173,7 @@ func (k *Client) CreateKDLUserToolsCR(
 		Object: *crdUpdated,
 	}
 
-	_, err = k.kdlUserToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
+	_, err = k.kdlUserToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{FieldValidation: "Strict"})
 	if err != nil {
 		k.logger.Error(err, "Error creating user tools")
 		return err

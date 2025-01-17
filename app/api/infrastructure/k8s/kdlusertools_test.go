@@ -15,6 +15,8 @@ import (
 const (
 	username                         = "test.username"
 	resName                          = "usertools-test-username"
+	minioAccessKey                   = "user-test-username"
+	minioSecretKey                   = "username123"
 	runtimeID                        = "test-runtime-id"
 	runtimeImage                     = "test-runtime-image"
 	runtimeTag                       = "test-runtime-tag"
@@ -46,6 +48,10 @@ var dataWithCapabilities = k8s.UserToolsData{
 		},
 		Affinities: map[string]interface{}{"key": "value"},
 	},
+	MinioAccessKey: entity.MinioAccessKey{
+		AccessKey: minioAccessKey,
+		SecretKey: minioSecretKey,
+	},
 }
 
 func (s *testSuite) createKDLUserToolsConfigMapTemplate() {
@@ -64,12 +70,13 @@ spec:
     image:
       repository: my-demo-repository
       tag: my-demo-tag
+    env: {}
   nodeSelector: {}
   tolerations: []
   affinity: {}
   podLabels:
     runtimeId: my-demo-runtime-id
-    capabilitiesId: my-demo-capabilities-id
+    capabilityId: my-demo-capabilities-id
 `
 	_, err := s.Clientset.CoreV1().ConfigMaps(namespace).Create(
 		context.Background(), &v1.ConfigMap{
@@ -96,6 +103,31 @@ func (s *testSuite) TestCreateKDLUserToolsCR_and_DeleteUserToolsCR() {
 
 	err := s.Client.CreateKDLUserToolsCR(ctx, username, dataWithCapabilities)
 	s.Require().NoError(err)
+
+	// Retrieve the Custom Resource
+	resource, err := s.kdlUserToolsRes.Namespace(namespace).Get(context.Background(), resName, metav1.GetOptions{})
+	s.Require().NoError(err)
+
+	// Check its data
+	spec := resource.Object["spec"].(map[string]interface{})
+	vscodeRuntime := spec["vscodeRuntime"].(map[string]interface{})
+	image := vscodeRuntime["image"].(map[string]interface{})
+	env := vscodeRuntime["env"].(map[string]interface{})
+	podLabels := spec["podLabels"].(map[string]interface{})
+	affinity := spec["affinity"].(map[string]interface{})
+	tolerations := spec["tolerations"].([]interface{})
+	toleration := tolerations[0].(map[string]interface{})
+	s.Require().Equal(runtimeImage, image["repository"])
+	s.Require().Equal(runtimeTag, image["tag"])
+	s.Require().Equal(runtimeID, podLabels["runtimeId"])
+	s.Require().Equal("test-capability-id", podLabels["capabilityId"])
+	s.Require().Equal(minioAccessKey, env["AWS_ACCESS_KEY"])
+	s.Require().Equal(minioSecretKey, env["AWS_SECRET_KEY"])
+	s.Require().Equal("value", affinity["key"])
+	s.Require().Equal("Equal", toleration["operator"])
+	s.Require().Equal("value1", toleration["value"])
+	s.Require().Equal("NoExecute", toleration["effect"])
+	s.Require().Equal(int64(100), toleration["tolerationSeconds"])
 
 	// Delete the CR
 	// create go routine to cancel the context in 5 seconds. Risk of flaky test
@@ -280,6 +312,7 @@ spec:
     image:
        repository: my-demo-repository
        tag: my-demo-tag
+    env: {}
 `
 	_, err := s.Clientset.CoreV1().ConfigMaps(namespace).Create(
 		context.Background(), &v1.ConfigMap{
@@ -314,6 +347,7 @@ spec:
     image:
        repository: my-demo-repository
        tag: my-demo-tag
+    env: {}
   nodeSelector: {}
 `
 	_, err := s.Clientset.CoreV1().ConfigMaps(namespace).Create(
@@ -349,6 +383,7 @@ spec:
     image:
        repository: my-demo-repository
        tag: my-demo-tag
+    env: {}
   nodeSelector: {}
   tolerations: []
 `
@@ -385,6 +420,7 @@ spec:
     image:
        repository: my-demo-repository
        tag: my-demo-tag
+    env: {}
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -500,6 +536,7 @@ func (s *testSuite) TestUpdateKDLUserToolsCR() {
 					"repository": "new-repo",
 					"tag":        "new-tag",
 				},
+				"env": map[string]interface{}{},
 			},
 			"podLabels": map[string]interface{}{
 				"runtimeId":    "new-runtime-id",

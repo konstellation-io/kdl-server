@@ -97,6 +97,9 @@ type interactor struct {
 	randomGenerator   kdlutil.RandomGenerator
 }
 
+// Assure implementation adheres to interface.
+var _ UseCase = (*interactor)(nil)
+
 // NewInteractor is a constructor function.
 func NewInteractor(
 	logger logr.Logger,

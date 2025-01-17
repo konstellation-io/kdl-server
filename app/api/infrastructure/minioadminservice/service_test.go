@@ -74,20 +74,18 @@ func (s *TestSuite) TearDownTest() {
 	ctx := context.Background()
 
 	for _, group := range []string{"project1", "project2"} {
-		err := s.adminClient.UpdateGroupMembers(ctx, madmin.GroupAddRemove{
+		_ = s.adminClient.UpdateGroupMembers(ctx, madmin.GroupAddRemove{
 			Group:    group,
 			IsRemove: true,
 			Members:  []string{"user-foo"},
 		})
-		s.Require().NoError(err)
 
 		// a call to this method on an empty group removes it
-		err = s.adminClient.UpdateGroupMembers(ctx, madmin.GroupAddRemove{
+		_ = s.adminClient.UpdateGroupMembers(ctx, madmin.GroupAddRemove{
 			Group:    group,
 			IsRemove: true,
 			Members:  []string{},
 		})
-		s.Require().NoError(err)
 	}
 
 	users, err := s.adminClient.ListUsers(ctx)

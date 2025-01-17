@@ -52,7 +52,7 @@ func TestSuite(t *testing.T) {
 	suite.Run(t, new(testSuite))
 }
 
-func (s *testSuite) defineCRD(restcfg *rest.Config) {
+func (s *testSuite) defineCRDKDLUserTools(restcfg *rest.Config) {
 	// Create a clientset for CRD operations
 	apiExtensionsClient, err := apiextensionsclient.NewForConfig(restcfg)
 	s.Require().NoError(err)
@@ -145,6 +145,12 @@ func (s *testSuite) defineCRD(restcfg *rest.Config) {
 
 	// Create the CRD KDLUserTools in the cluster
 	_, err = apiExtensionsClient.ApiextensionsV1().CustomResourceDefinitions().Create(context.TODO(), crdKdlUserTools, metav1.CreateOptions{})
+	s.Require().NoError(err)
+}
+
+func (s *testSuite) defineCRDKDLProject(restcfg *rest.Config) {
+	// Create a clientset for CRD operations
+	apiExtensionsClient, err := apiextensionsclient.NewForConfig(restcfg)
 	s.Require().NoError(err)
 
 	// Define the CRD for KDLProject
@@ -249,7 +255,8 @@ func (s *testSuite) SetupSuite() {
 		Resource: kdlProjectResource,
 	})
 
-	s.defineCRD(restcfg)
+	s.defineCRDKDLProject(restcfg)
+	s.defineCRDKDLUserTools(restcfg)
 
 	// Create the client
 	s.Client = k8s.New(

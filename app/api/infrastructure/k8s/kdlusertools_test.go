@@ -109,14 +109,15 @@ func (s *testSuite) TestCreateKDLUserToolsCR_and_DeleteUserToolsCR() {
 	s.Require().NoError(err)
 
 	// Check its data
-	spec := resource.Object["spec"].(map[string]interface{})
-	vscodeRuntime := spec["vscodeRuntime"].(map[string]interface{})
-	image := vscodeRuntime["image"].(map[string]interface{})
-	env := vscodeRuntime["env"].(map[string]interface{})
-	podLabels := spec["podLabels"].(map[string]interface{})
-	affinity := spec["affinity"].(map[string]interface{})
-	tolerations := spec["tolerations"].([]interface{})
-	toleration := tolerations[0].(map[string]interface{})
+	spec, _ := resource.Object["spec"].(map[string]interface{})
+	vscodeRuntime, _ := spec["vscodeRuntime"].(map[string]interface{})
+	image, _ := vscodeRuntime["image"].(map[string]interface{})
+	env, _ := vscodeRuntime["env"].(map[string]interface{})
+	podLabels, _ := spec["podLabels"].(map[string]interface{})
+	affinity, _ := spec["affinity"].(map[string]interface{})
+	tolerations, _ := spec["tolerations"].([]interface{})
+	toleration, _ := tolerations[0].(map[string]interface{})
+
 	s.Require().Equal(runtimeImage, image["repository"])
 	s.Require().Equal(runtimeTag, image["tag"])
 	s.Require().Equal(runtimeID, podLabels["runtimeId"])

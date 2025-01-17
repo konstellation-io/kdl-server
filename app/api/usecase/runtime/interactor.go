@@ -15,6 +15,9 @@ type interactor struct {
 	repo      Repository
 }
 
+// Assure implementation adheres to interface.
+var _ UseCase = (*interactor)(nil)
+
 // NewInteractor factory function.
 func NewInteractor(
 	logger logr.Logger,

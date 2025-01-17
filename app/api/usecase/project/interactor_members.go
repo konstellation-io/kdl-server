@@ -75,7 +75,9 @@ func (i *interactor) AddMembers(ctx context.Context, opt AddMembersOption) (enti
 	// Add new members to the project on MinIO
 	for _, u := range opt.Users {
 		err = i.minioAdminService.JoinProject(ctx, u.UsernameSlug(), opt.ProjectID)
-		return entity.Project{}, fmt.Errorf("%w: user ID=%s", err, u.ID)
+		if err != nil {
+			return entity.Project{}, fmt.Errorf("%w: user ID=%s", err, u.ID)
+		}
 	}
 
 	// Store new members into the DataBase

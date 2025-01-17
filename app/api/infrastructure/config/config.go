@@ -8,6 +8,15 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
+type KeycloakConfig struct {
+	AdminUser        string `envconfig:"KEYCLOAK_ADMIN_USER"`
+	AdminPasswordKey string `envconfig:"KEYCLOAK_PASSWORD_KEY"`
+	AdminClientID    string `envconfig:"KEYCLOAK_ADMIN_CLIENT_ID"`
+	MasterRealm      string `envconfig:"KEYCLOAK_MASTER_REALM"`
+	Realm            string `envconfig:"KEYCLOAK_REALM"`
+	URL              string `envconfig:"KEYCLOAK_URL"`
+}
+
 type KubernetesConfig struct {
 	Namespace       string `envconfig:"POD_NAMESPACE"`
 	IsInsideCluster bool   `default:"true"`
@@ -24,6 +33,7 @@ type Config struct {
 		URI    string `envconfig:"KDL_SERVER_MONGODB_URI"`
 		DBName string `envconfig:"KDL_SERVER_MONGODB_NAME" default:"kdl"`
 	}
+	Keycloak   KeycloakConfig
 	Kubernetes KubernetesConfig
 	Minio      struct {
 		Endpoint  string `envconfig:"MINIO_ENDPOINT"`

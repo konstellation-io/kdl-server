@@ -11,7 +11,6 @@ enum ROUTE {
   PROJECT_TOOL = '/projects/:projectId/tool',
   PROJECT_TOOL_FILEBROWSER = '/projects/:projectId/tool/filebrowser',
   PROJECT_TOOL_MLFLOW = '/projects/:projectId/tool/mlflow',
-  PROJECT_TOOL_VSCODE = '/projects/:projectId/tool/vscode',
   PROJECT_TOOL_KG = '/projects/:projectId/tool/kg',
   NEW_PROJECT = '/new-project',
   PROJECT_CREATION = '/new-project/create',

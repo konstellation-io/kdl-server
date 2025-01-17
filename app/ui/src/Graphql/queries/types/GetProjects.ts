@@ -20,7 +20,6 @@ export interface GetProjects_projects_toolUrls {
   knowledgeGalaxy: string;
   filebrowser: string;
   mlflow: string;
-  vscode: string;
 }
 
 export interface GetProjects_projects_members_user {

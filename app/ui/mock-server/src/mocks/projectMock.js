@@ -22,6 +22,10 @@ function buildProject(_, index) {
       vscode: 'https://code.visualstudio.com/',
       mlflow: 'https://mlflow.org/',
     },
+    minioAccessKey: {
+      accessKey: casual.uuid,
+      secretKey: casual.uuid,
+    },
   };
 }
 

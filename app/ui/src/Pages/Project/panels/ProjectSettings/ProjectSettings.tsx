@@ -41,6 +41,7 @@ function ProjectSettings({ project }: Props) {
         <TabList>
           <Tab>INFO</Tab>
           <Tab>GIT</Tab>
+          <Tab>MINIO</Tab>
           <Tab data-testid="tabMembers">USERS</Tab>
           {hasAccess && <Tab className={cx('react-tabs__tab', 'danger-tab')}>ADMIN</Tab>}
         </TabList>

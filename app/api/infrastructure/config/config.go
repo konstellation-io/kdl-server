@@ -29,7 +29,6 @@ type Config struct {
 	ProjectFilebrowserURL string `envconfig:"PROJECT_FILEBROWSER_URL"`
 	ReleaseName           string `envconfig:"RELEASE_NAME"`
 	StaticFilesPath       string `envconfig:"KDL_SERVER_STATIC_FILES_PATH" default:"../public"`
-	VSCodeURL             string `envconfig:"USER_TOOLS_VSCODE_URL"`
 	MongoDB               struct {
 		URI    string `envconfig:"KDL_SERVER_MONGODB_URI"`
 		DBName string `envconfig:"KDL_SERVER_MONGODB_NAME" default:"kdl"`

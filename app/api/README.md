@@ -53,7 +53,6 @@ docker build \
 | `POD_NAMESPACE`                  | Namespace for the KDL server                  |               |
 | `PROJECT_FILEBROWSER_URL`        | URL for the File Browser service              |               |
 | `PROJECT_MLFLOW_URL`             | URL for the MLflow service                    |               |
-| `USER_TOOLS_VSCODE_URL`          | URL for the VScode service                    |               |
 | `KUBECONFIG_DOWNLOAD_ENABLED`    | Enable kubeconfig download for the User Tools | `false`       |
 | `KUBECONFIG_EXTERNAL_SERVER_URL` | URL for the kubeconfig download service       |               |
 | `KEYCLOAK_ADMIN_USER`            | Name of the admin user in keycloak            |               |

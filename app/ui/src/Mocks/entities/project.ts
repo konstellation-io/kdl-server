@@ -4,7 +4,6 @@ const toolUrls = {
   knowledgeGalaxy: 'https://knowledgeGalaxy',
   filebrowser: 'https://filebrowser',
   mlflow: 'https://mlflow',
-  vscode: 'https://vscode',
 };
 
 export const project1 = {

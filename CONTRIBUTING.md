@@ -163,7 +163,6 @@ The following is the list of supported component:
 * `project-operator`
 * `repo-cloner`
 * `user-tools`
-* `vscode`
 
 ### Subject
 

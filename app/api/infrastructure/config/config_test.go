@@ -20,7 +20,6 @@ var envs = map[string]string{
 	"PROJECT_FILEBROWSER_URL":        "filebrowser_url",
 	"RELEASE_NAME":                   "release_name",
 	"KDL_SERVER_STATIC_FILES_PATH":   "static_files_path",
-	"USER_TOOLS_VSCODE_URL":          "vscode_url",
 	"KDL_SERVER_MONGODB_URI":         "mongodb_uri",
 	"KDL_SERVER_MONGODB_NAME":        "mongodb_name",
 	"MINIO_ENDPOINT":                 "minio_endpoint",
@@ -57,7 +56,6 @@ func (s *configTestSuite) TestConfig() {
 	s.Require().Equal("filebrowser_url", cfg.ProjectFilebrowserURL)
 	s.Require().Equal("release_name", cfg.ReleaseName)
 	s.Require().Equal("static_files_path", cfg.StaticFilesPath)
-	s.Require().Equal("vscode_url", cfg.VSCodeURL)
 	s.Require().Equal("mongodb_uri", cfg.MongoDB.URI)
 	s.Require().Equal("mongodb_name", cfg.MongoDB.DBName)
 	s.Require().Equal("minio_endpoint", cfg.Minio.Endpoint)

@@ -59,9 +59,6 @@ function ProjectSettings({ project }: Props) {
           <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
             <TabMembers projectId={project.id} hasAccess={hasAccess} />
           </TabPanel>
-          <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
-            <TabDangerZone projectId={project.id} projectName={project.name} />
-          </TabPanel>
           {hasAccess && (
             <TabPanel className={styles.tab} selectedClassName={styles.selectedTab}>
               <TabDangerZone projectId={project.id} projectName={project.name} />

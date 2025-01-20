@@ -13,11 +13,12 @@ ENV PIP_NO_CACHE_DIR=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /home/${USER}/tracking
+WORKDIR /mlflow/tracking
 
 # non-root user
 RUN groupadd -r -g ${GID} ${USER} && \
     useradd -l -r -u ${UID} -g ${USER} -m -s /sbin/nologin ${USER} && \
+    chown -R ${UID}:${GID} /mlflow && \
     chown -R ${UID}:${GID} /home/${USER}
 
 # packages to use sqlite

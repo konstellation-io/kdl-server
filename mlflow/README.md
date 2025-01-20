@@ -1,4 +1,4 @@
-# MLFlow Tracking Server
+# MLflow Tracking Server
 
 Docker image for `MLflow Tracking Server`, part of the `Science Toolkit` ecosystem for data scientists.
 
@@ -21,16 +21,15 @@ Docker image for `MLflow Tracking Server`, part of the `Science Toolkit` ecosyst
 
 ### Environment variables
 
-| Variable                 | Description                  | Required |
-|--------------------------|------------------------------|----------|
-| `AWS_ACCESS_KEY_ID`      | AWS credentials              | `Yes`    |
-| `AWS_SECRET_ACCESS_KEY`  | AWS credentials              | `Yes`    |
-| `MLFLOW_S3_ENDPOINT_URL` | MinIO S3 endpoint URL        | `Yes`    |
-| `ARTIFACTS_BUCKET`       | S3 bucket name for artifacts | `Yes`    |
+| Variable                 | Description           | Required |
+|--------------------------|-----------------------|----------|
+| `AWS_ACCESS_KEY_ID`      | AWS credentials       | `Yes`    |
+| `AWS_SECRET_ACCESS_KEY`  | AWS credentials       | `Yes`    |
+| `MLFLOW_S3_ENDPOINT_URL` | MinIO S3 endpoint URL | `Yes`    |
 
 ## Storage
 
-* Artifacts: stored in MinIO bucket set in `ARTIFACTS_BUCKET`
+* Artifacts: stored in MinIO bucket set in `s3://<projectId>/<ARTIFACTS_DIR env>`
 * Tracking data: SQLite database in `/mlflow/tracking`
 * User home: `/home/mlflow`
 
@@ -40,7 +39,6 @@ Basic usage:
 
 ```bash
 docker run -p 5000:5000 \
-  -e "ARTIFACTS_BUCKET=mlflow-artifacts" \
   -e "AWS_ACCESS_KEY_ID=user" \
   -e "AWS_SECRET_ACCESS_KEY=pass" \
   -e "MLFLOW_S3_ENDPOINT_URL=http://my_minio.url" \
@@ -52,7 +50,6 @@ With persistence and custom user:
 ```bash
 docker run -p 5000:5000 \
   --user 1000:1000 \
-  -e "ARTIFACTS_BUCKET=mlflow-artifacts" \
   -e "AWS_ACCESS_KEY_ID=user" \
   -e "AWS_SECRET_ACCESS_KEY=pass" \
   -e "MLFLOW_S3_ENDPOINT_URL=http://my_minio.url" \
@@ -64,6 +61,5 @@ Access the UI at [http://localhost:5000](http://localhost:5000)
 
 ## Documentation
 
-* [Science Toolkit docs](https://konstellation-io.github.io/science-toolkit/)
-* [Docker Hub](https://hub.docker.com/r/konstellation/mlflow)
-* [MinIO](https://min.io/)
+* [Custom image](https://hub.docker.com/r/konstellation/kdl-mlflow)
+* [MLflow environment](https://mlflow.org/docs/latest/cli.html)

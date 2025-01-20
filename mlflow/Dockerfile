@@ -35,10 +35,5 @@ RUN pip install --no-cache-dir --user \
     boto3==1.35.76                    \
     psycopg2-binary==2.9.1
 
-# ENV ARTIFACTS_BUCKET
-# ENV AWS_ACCESS_KEY_ID
-# ENV AWS_SECRET_ACCESS_KEY
-# ENV MLFLOW_BACKEND_STORE_URI
-# ENV MLFLOW_S3_ENDPOINT_URL
-
-CMD ["mlflow", "server", "--backend-store-uri", "${MLFLOW_BACKEND_STORE_URI}", "--default-artifact-root", "s3://${ARTIFACTS_BUCKET}", "--host", "0.0.0.0"]
+# ref: https://mlflow.org/docs/latest/cli.html
+CMD ["mlflow", "server", "--host", "0.0.0.0"]

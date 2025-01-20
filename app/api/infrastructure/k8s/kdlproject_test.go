@@ -14,13 +14,15 @@ import (
 const (
 	projectID               = "test-project-id"
 	configMapKdlProjectName = "kdl-server-project-template"
+	projectMinioAccessKey   = "project-test-project-id"
+	projectMinioSecretKey   = "testproject123"
 )
 
 var projectData = k8s.ProjectData{
 	ProjectID: projectID,
 	MinioAccessKey: entity.MinioAccessKey{
-		AccessKey: minioAccessKey,
-		SecretKey: minioSecretKey,
+		AccessKey: projectMinioAccessKey,
+		SecretKey: projectMinioSecretKey,
 	},
 }
 
@@ -61,6 +63,23 @@ func (s *testSuite) TestCreateKDLProjectCR_and_DeleteKDLProjectCR() {
 
 	err := s.Client.CreateKDLProjectCR(context.Background(), projectData)
 	s.Require().NoError(err)
+
+	// Retrieve the Custom Resource
+	resource, err := s.kdlProjectRes.Namespace(namespace).Get(context.Background(), projectID, metav1.GetOptions{})
+	s.Require().NoError(err)
+
+	// Check its data
+	spec, _ := resource.Object["spec"].(map[string]interface{})
+	mlflow, _ := spec["mlflow"].(map[string]interface{})
+	mlflowEnv, _ := mlflow["env"].(map[string]interface{})
+	filebrowser, _ := spec["filebrowser"].(map[string]interface{})
+	filebrowserEnv, _ := filebrowser["env"].(map[string]interface{})
+
+	s.Require().Equal(projectID, spec["projectId"])
+	s.Require().Equal(projectMinioAccessKey, mlflowEnv["AWS_ACCESS_KEY_ID"])
+	s.Require().Equal(projectMinioSecretKey, mlflowEnv["AWS_SECRET_ACCESS_KEY"])
+	s.Require().Equal(projectMinioAccessKey, filebrowserEnv["AWS_S3_ACCESS_KEY_ID"])
+	s.Require().Equal(projectMinioSecretKey, filebrowserEnv["AWS_S3_SECRET_ACCESS_KEY"])
 
 	// Delete the CR
 	err = s.Client.DeleteKDLProjectCR(context.Background(), projectID)

@@ -43,8 +43,8 @@ func (k *Client) updateKDLProjectTemplate(data ProjectData, crd *map[string]inte
 	}
 
 	mlflowEnv["ARTIFACTS_BUCKET"] = data.ProjectID
-	mlflowEnv["AWS_S3_ACCESS_KEY_ID"] = data.MinioAccessKey.AccessKey
-	mlflowEnv["AWS_S3_SECRET_ACCESS_KEY"] = data.MinioAccessKey.SecretKey
+	mlflowEnv["AWS_ACCESS_KEY_ID"] = data.MinioAccessKey.AccessKey
+	mlflowEnv["AWS_SECRET_ACCESS_KEY"] = data.MinioAccessKey.SecretKey
 
 	// update metadata.name and metadata.namespace in the CRD object
 	metadata, ok := crdToUpdate["metadata"].(map[string]interface{})

@@ -108,7 +108,6 @@ type MinioAccessKey {
 type ToolUrls {
   knowledgeGalaxy: String!
   filebrowser: String!
-  vscode: String!
   mlflow: String!
 }
 

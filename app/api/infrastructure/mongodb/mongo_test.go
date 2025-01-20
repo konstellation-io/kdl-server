@@ -137,6 +137,7 @@ var userExamples = map[string]entity.User{
 		Sub:          "d5d70477-5192-4182-b80e-5d34550eb4fe",
 		Deleted:      false,
 		CreationDate: testTimeExample,
+		LastActivity: &testTimeExample,
 		AccessLevel:  entity.AccessLevelAdmin,
 		SSHKey: entity.SSHKey{
 			Public:       "publicKey1",
@@ -155,6 +156,7 @@ var userExamples = map[string]entity.User{
 		Sub:          "4c5c3da6-2847-4a8a-9f68-9532fe559b6d",
 		Deleted:      false,
 		CreationDate: testTimeExample,
+		LastActivity: &testTimeExample,
 		AccessLevel:  entity.AccessLevelAdmin,
 		SSHKey: entity.SSHKey{
 			Public:       "publicKey2",

@@ -28,6 +28,7 @@ type userDTO struct {
 	Email              string             `bson:"email"`
 	Sub                string             `bson:"sub"`
 	CreationDate       time.Time          `bson:"creation_date"`
+	LastActivity       time.Time          `bson:"last_activity"`
 	AccessLevel        string             `bson:"access_level"`
 	PublicSSHKey       string             `bson:"public_ssh_key"`
 	PrivateSSHKey      string             `bson:"private_ssh_key"`
@@ -222,7 +223,7 @@ func (m *UserRepo) UpdateDeleted(ctx context.Context, username string, deleted b
 }
 
 func (m *UserRepo) UpdateLastActivity(ctx context.Context, username string, lastActivity time.Time) error {
-	return m.updateUserFields(ctx, username, bson.M{"lastActivity": lastActivity})
+	return m.updateUserFields(ctx, username, bson.M{"last_activity": lastActivity})
 }
 
 func (m *UserRepo) updateUserFields(ctx context.Context, username string, fields bson.M) error {
@@ -289,6 +290,7 @@ func (m *UserRepo) entityToDTO(u entity.User) (userDTO, error) {
 		PublicSSHKey:       u.SSHKey.Public,
 		SSHKeyCreationDate: u.SSHKey.CreationDate,
 		CreationDate:       u.CreationDate,
+		LastActivity:       *u.LastActivity,
 		Deleted:            u.Deleted,
 		MinioAccessKey:     u.MinioAccessKey.AccessKey,
 		MinioSecretKey:     u.MinioAccessKey.SecretKey,
@@ -314,6 +316,7 @@ func (m *UserRepo) dtoToEntity(dto userDTO) entity.User {
 		Sub:          dto.Sub,
 		AccessLevel:  entity.AccessLevel(dto.AccessLevel),
 		CreationDate: dto.CreationDate,
+		LastActivity: &dto.LastActivity,
 		SSHKey: entity.SSHKey{
 			Public:       dto.PublicSSHKey,
 			Private:      dto.PrivateSSHKey,

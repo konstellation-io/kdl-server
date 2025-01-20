@@ -20,7 +20,6 @@ var envs = map[string]string{
 	"PROJECT_FILEBROWSER_URL":        "filebrowser_url",
 	"RELEASE_NAME":                   "release_name",
 	"KDL_SERVER_STATIC_FILES_PATH":   "static_files_path",
-	"USER_TOOLS_VSCODE_URL":          "vscode_url",
 	"KDL_SERVER_MONGODB_URI":         "mongodb_uri",
 	"KDL_SERVER_MONGODB_NAME":        "mongodb_name",
 	"MINIO_ENDPOINT":                 "minio_endpoint",
@@ -31,6 +30,12 @@ var envs = map[string]string{
 	"KUBECONFIG_EXTERNAL_SERVER_URL": "external_server_url",
 	"LABELS_COMMON_APP_RELEASE":      "app_release",
 	"LABELS_COMMON_CHART_RELEASE":    "chart_release",
+	"KEYCLOAK_ADMIN_USER":            "admin",
+	"KEYCLOAK_PASSWORD_KEY":          "admin",
+	"KEYCLOAK_ADMIN_CLIENT_ID":       "keycloak_client",
+	"KEYCLOAK_MASTER_REALM":          "master_realm",
+	"KEYCLOAK_REALM":                 "kdl",
+	"KEYCLOAK_URL":                   "keycloak_url",
 }
 
 func TestConfigSuite(t *testing.T) {
@@ -51,7 +56,6 @@ func (s *configTestSuite) TestConfig() {
 	s.Require().Equal("filebrowser_url", cfg.ProjectFilebrowserURL)
 	s.Require().Equal("release_name", cfg.ReleaseName)
 	s.Require().Equal("static_files_path", cfg.StaticFilesPath)
-	s.Require().Equal("vscode_url", cfg.VSCodeURL)
 	s.Require().Equal("mongodb_uri", cfg.MongoDB.URI)
 	s.Require().Equal("mongodb_name", cfg.MongoDB.DBName)
 	s.Require().Equal("minio_endpoint", cfg.Minio.Endpoint)
@@ -62,6 +66,12 @@ func (s *configTestSuite) TestConfig() {
 	s.Require().Equal("external_server_url", cfg.Kubeconfig.ExternalServerURL)
 	s.Require().Equal("app_release", cfg.Labels.Common.AppRelease)
 	s.Require().Equal("chart_release", cfg.Labels.Common.ChartRelease)
+	s.Require().Equal("admin", cfg.Keycloak.AdminUser)
+	s.Require().Equal("admin", cfg.Keycloak.AdminPasswordKey)
+	s.Require().Equal("keycloak_client", cfg.Keycloak.AdminClientID)
+	s.Require().Equal("master_realm", cfg.Keycloak.MasterRealm)
+	s.Require().Equal("kdl", cfg.Keycloak.Realm)
+	s.Require().Equal("keycloak_url", cfg.Keycloak.URL)
 
 	// Unset the env vars
 	for k := range envs {

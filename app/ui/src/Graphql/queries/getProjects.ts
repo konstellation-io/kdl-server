@@ -22,7 +22,6 @@ export default gql`
         knowledgeGalaxy
         filebrowser
         mlflow
-        vscode
       }
       members {
         ...MemberFields

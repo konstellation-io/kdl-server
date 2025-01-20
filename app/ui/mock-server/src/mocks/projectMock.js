@@ -19,7 +19,6 @@ function buildProject(_, index) {
     toolUrls: {
       knowledgeGalaxy: 'https://filebrowser.org/',
       filebrowser: 'https://filebrowser.org/',
-      vscode: 'https://code.visualstudio.com/',
       mlflow: 'https://mlflow.org/',
     },
     minioAccessKey: {

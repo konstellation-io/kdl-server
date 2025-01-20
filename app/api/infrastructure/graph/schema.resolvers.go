@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gosimple/slug"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/http/middleware"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/dataloader"
@@ -195,19 +194,6 @@ func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project)
 
 // ToolUrls is the resolver for the toolUrls field.
 func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*entity.ToolUrls, error) {
-	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
-
-	user, err := r.users.GetByEmail(ctx, email)
-	if err != nil {
-		return &entity.ToolUrls{}, err
-	}
-
-	slugUserName := slug.Make(user.Username)
-
-	folderName := obj.Repository.RepoName
-
-	vscodeWithUsername := strings.Replace(r.cfg.VSCodeURL, "USERNAME", slugUserName, 1)
-	vscodeWithUsernameAndFolder := strings.Replace(vscodeWithUsername, "REPO_FOLDER", folderName, 1)
 	mlflowWithProject := strings.Replace(r.cfg.ProjectMLFlowURL, "PROJECT_ID", obj.ID, 1)
 	filebrowserWithProject := strings.Replace(r.cfg.ProjectFilebrowserURL, "PROJECT_ID", obj.ID, 1)
 	kgWithProject := ""
@@ -219,7 +205,6 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 	return &entity.ToolUrls{
 		KnowledgeGalaxy: kgWithProject,
 		Filebrowser:     filebrowserWithProject,
-		VSCode:          vscodeWithUsernameAndFolder,
 		MLFlow:          mlflowWithProject,
 	}, nil
 }

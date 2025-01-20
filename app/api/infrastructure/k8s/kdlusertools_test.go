@@ -23,7 +23,7 @@ const (
 	configMapKdlUserToolTemplateName = "kdl-server-user-tools-template"
 )
 
-var data = k8s.UserToolsData{
+var userToolsData = k8s.UserToolsData{
 	RuntimeID:    runtimeID,
 	RuntimeImage: runtimeImage,
 	RuntimeTag:   runtimeTag,
@@ -143,7 +143,7 @@ func (s *testSuite) TestCreateKDLUserToolsCR_and_DeleteUserToolsCR() {
 }
 
 func (s *testSuite) TestCreateKDLUserToolsCR_NoConfigMap() {
-	err := s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
+	err := s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
 	s.Require().Error(err)
 }
 
@@ -158,7 +158,7 @@ func (s *testSuite) TestCreateKDLUserToolsCR_ConfigMapWithoutTemplate() {
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
 	s.Require().Error(err)
 }
 
@@ -180,7 +180,7 @@ kind: KDLUserTools
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
 	s.Require().Error(err)
 }
 
@@ -205,7 +205,7 @@ metadata:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
 	s.Require().Error(err)
 }
 
@@ -232,7 +232,7 @@ metadata:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
 	s.Require().Error(err)
 }
 
@@ -262,7 +262,7 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
 	s.Require().Error(err)
 }
 
@@ -293,7 +293,7 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
 	s.Require().Error(err)
 }
 
@@ -439,7 +439,7 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, data)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
 	s.Require().Error(err)
 }
 
@@ -548,7 +548,7 @@ func (s *testSuite) TestUpdateKDLUserToolsCR() {
 			"name": "new-res-name",
 		},
 	}
-	err = s.Client.UpdateKDLUserToolsCR(context.Background(), resName, data, &crd)
+	err = s.Client.UpdateKDLUserToolsCR(context.Background(), resName, userToolsData, &crd)
 	s.Require().NoError(err)
 
 	// Delete the CR

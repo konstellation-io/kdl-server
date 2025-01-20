@@ -68,17 +68,17 @@ func (mr *MockClientInterfaceMockRecorder) CreateConfigMapWatcher(ctx interface{
 }
 
 // CreateKDLProjectCR mocks base method.
-func (m *MockClientInterface) CreateKDLProjectCR(ctx context.Context, projectID string) error {
+func (m *MockClientInterface) CreateKDLProjectCR(ctx context.Context, data ProjectData) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateKDLProjectCR", ctx, projectID)
+	ret := m.ctrl.Call(m, "CreateKDLProjectCR", ctx, data)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateKDLProjectCR indicates an expected call of CreateKDLProjectCR.
-func (mr *MockClientInterfaceMockRecorder) CreateKDLProjectCR(ctx, projectID interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) CreateKDLProjectCR(ctx, data interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKDLProjectCR", reflect.TypeOf((*MockClientInterface)(nil).CreateKDLProjectCR), ctx, projectID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKDLProjectCR", reflect.TypeOf((*MockClientInterface)(nil).CreateKDLProjectCR), ctx, data)
 }
 
 // CreateKDLUserToolsCR mocks base method.

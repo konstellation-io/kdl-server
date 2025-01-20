@@ -385,11 +385,11 @@ mlflow:
   # -- Environment variables to configure application
   # ref: https://mlflow.org/docs/latest/cli.html?highlight=Environment_variables#mlflow-server
   env:
-    # ARTIFACTS_BUCKET: mlflow-artifacts
     # AWS_ACCESS_KEY_ID: xxx
     # AWS_SECRET_ACCESS_KEY: xxx
     # MLFLOW_S3_ENDPOINT_URL: "http://kdl-server-minio:9000"
-    MLFLOW_BACKEND_STORE_URI: "sqlite:////home/mlflow/database.db"
+    ARTIFACTS_DIR: mlflow-artifacts
+    MLFLOW_BACKEND_STORE_URI: "sqlite:////mlflow/tracking/mlflow.db"
     MLFLOW_HOST: "0.0.0.0"
     MLFLOW_PORT: "5000"
 
@@ -600,8 +600,8 @@ mlflow:
   # -- Defines privilege and access control settings for a Pod
   # </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
   # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-  podSecurityContext: {}
-    # fsGroup: 2000
+  podSecurityContext:
+    fsGroup: 1000
 
   # -- Defines privilege and access control settings for a Container
   # </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/

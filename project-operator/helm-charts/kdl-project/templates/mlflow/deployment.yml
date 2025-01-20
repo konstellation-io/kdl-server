@@ -147,8 +147,8 @@ spec:
             {{- end }}
           volumeMounts:
             {{- if .Values.mlflow.persistentVolume.enabled }}
-            - name: mlflow-tracking
-              mountPath: /mlflow/tracking
+            - name: mlflow
+              mountPath: /home/mlflow
             {{- end }}
           {{- with .Values.mlflow.volumeMounts }}
             {{- toYaml . | nindent 12 }}
@@ -161,7 +161,7 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.mlflow.terminationGracePeriodSeconds }}
       volumes:
         {{- if .Values.mlflow.persistentVolume.enabled }}
-        - name: mlflow-tracking
+        - name: mlflow
           persistentVolumeClaim:
             claimName: {{ include "kdl-project.mlflow.name" . }}
         {{- end }}

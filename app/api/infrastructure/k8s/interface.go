@@ -26,7 +26,7 @@ type ClientInterface interface {
 	IsUserToolPODRunning(ctx context.Context, username string) (bool, error)
 	GetRuntimeIDFromUserTools(ctx context.Context, username string) (string, error)
 	GetCapabilitiesIDFromUserTools(ctx context.Context, username string) (string, error)
-	CreateKDLProjectCR(ctx context.Context, projectID string) error
+	CreateKDLProjectCR(ctx context.Context, data ProjectData) error
 	DeleteKDLProjectCR(ctx context.Context, projectID string) error
 	UpdateKDLProjectsCR(ctx context.Context, projectID string, crd *map[string]interface{}) error
 	ListKDLProjectsNameCR(ctx context.Context) ([]string, error)

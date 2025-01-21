@@ -164,12 +164,6 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		RepoName: opt.ProjectID,
 	}
 
-	// Create a k8s KDLProject containing a MLFLow instance
-	err = i.k8sClient.CreateKDLProjectCR(ctx, opt.ProjectID)
-	if err != nil {
-		return entity.Project{}, err
-	}
-
 	// Create Minio bucket
 	err = i.minioService.CreateBucket(ctx, opt.ProjectID)
 	if err != nil {
@@ -195,6 +189,12 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 
 	// Create Minio policy for the project user
 	err = i.minioAdminService.CreateProjectPolicy(ctx, opt.ProjectID)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	// Create a k8s KDLProject containing a MLFLow instance
+	err = i.k8sClient.CreateKDLProjectCR(ctx, k8s.ProjectData{ProjectID: opt.ProjectID, MinioAccessKey: project.MinioAccessKey})
 	if err != nil {
 		return entity.Project{}, err
 	}

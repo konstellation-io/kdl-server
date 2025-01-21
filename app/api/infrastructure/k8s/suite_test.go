@@ -153,6 +153,7 @@ func (s *testSuite) defineCRDKDLProject(restcfg *rest.Config) {
 	apiExtensionsClient, err := apiextensionsclient.NewForConfig(restcfg)
 	s.Require().NoError(err)
 
+	preserve := true
 	// Define the CRD for KDLProject
 	crdKdlProject := &apiextensionsv1.CustomResourceDefinition{
 		ObjectMeta: metav1.ObjectMeta{
@@ -181,6 +182,26 @@ func (s *testSuite) defineCRDKDLProject(restcfg *rest.Config) {
 									Properties: map[string]apiextensionsv1.JSONSchemaProps{
 										"projectId": {
 											Type: "string",
+										},
+										"mlflow": {
+											Type: "object",
+											Properties: map[string]apiextensionsv1.JSONSchemaProps{
+												"env": {
+													Type:                   "object",
+													Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
+													XPreserveUnknownFields: &preserve,
+												},
+											},
+										},
+										"filebrowser": {
+											Type: "object",
+											Properties: map[string]apiextensionsv1.JSONSchemaProps{
+												"env": {
+													Type:                   "object",
+													Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
+													XPreserveUnknownFields: &preserve,
+												},
+											},
 										},
 									},
 									Required: []string{"projectId"},

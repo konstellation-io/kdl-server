@@ -137,7 +137,8 @@ func TestInteractor_Create(t *testing.T) {
 		},
 	}
 
-	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, testProjectID).Return(nil)
+	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx,
+		k8s.ProjectData{ProjectID: testProjectID, MinioAccessKey: createProject.MinioAccessKey}).Return(nil)
 	s.mocks.minioService.EXPECT().CreateBucket(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().CreateProjectDirs(ctx, testProjectID).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)

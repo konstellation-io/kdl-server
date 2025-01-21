@@ -5,6 +5,8 @@ package k8s_test
 import (
 	"context"
 
+	"github.com/konstellation-io/kdl-server/app/api/entity"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -12,7 +14,17 @@ import (
 const (
 	projectID               = "test-project-id"
 	configMapKdlProjectName = "kdl-server-project-template"
+	projectMinioAccessKey   = "project-test-project-id"
+	projectMinioSecretKey   = "testproject123"
 )
+
+var projectData = k8s.ProjectData{
+	ProjectID: projectID,
+	MinioAccessKey: entity.MinioAccessKey{
+		AccessKey: projectMinioAccessKey,
+		SecretKey: projectMinioSecretKey,
+	},
+}
 
 func (s *testSuite) createKDLProjectConfigMapTemplate() {
 	yamlContent := `
@@ -29,6 +41,8 @@ spec:
   mlflow:
     env:
       ARTIFACTS_BUCKET: my-demo-bucket
+  filebrowser:
+    env: {}
 `
 	_, err := s.Clientset.CoreV1().ConfigMaps(namespace).Create(
 		context.Background(), &v1.ConfigMap{
@@ -47,8 +61,25 @@ spec:
 func (s *testSuite) TestCreateKDLProjectCR_and_DeleteKDLProjectCR() {
 	s.createKDLProjectConfigMapTemplate()
 
-	err := s.Client.CreateKDLProjectCR(context.Background(), projectID)
+	err := s.Client.CreateKDLProjectCR(context.Background(), projectData)
 	s.Require().NoError(err)
+
+	// Retrieve the Custom Resource
+	resource, err := s.kdlProjectRes.Namespace(namespace).Get(context.Background(), projectID, metav1.GetOptions{})
+	s.Require().NoError(err)
+
+	// Check its data
+	spec, _ := resource.Object["spec"].(map[string]interface{})
+	mlflow, _ := spec["mlflow"].(map[string]interface{})
+	mlflowEnv, _ := mlflow["env"].(map[string]interface{})
+	filebrowser, _ := spec["filebrowser"].(map[string]interface{})
+	filebrowserEnv, _ := filebrowser["env"].(map[string]interface{})
+
+	s.Require().Equal(projectID, spec["projectId"])
+	s.Require().Equal(projectMinioAccessKey, mlflowEnv["AWS_ACCESS_KEY_ID"])
+	s.Require().Equal(projectMinioSecretKey, mlflowEnv["AWS_SECRET_ACCESS_KEY"])
+	s.Require().Equal(projectMinioAccessKey, filebrowserEnv["AWS_S3_ACCESS_KEY_ID"])
+	s.Require().Equal(projectMinioSecretKey, filebrowserEnv["AWS_S3_SECRET_ACCESS_KEY"])
 
 	// Delete the CR
 	err = s.Client.DeleteKDLProjectCR(context.Background(), projectID)
@@ -56,7 +87,7 @@ func (s *testSuite) TestCreateKDLProjectCR_and_DeleteKDLProjectCR() {
 }
 
 func (s *testSuite) TestCreateKDLProjectCR_NoConfigMap() {
-	err := s.Client.CreateKDLProjectCR(context.Background(), projectID)
+	err := s.Client.CreateKDLProjectCR(context.Background(), projectData)
 	s.Require().Error(err)
 }
 
@@ -84,7 +115,7 @@ metadata:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLProjectCR(context.Background(), projectID)
+	err = s.Client.CreateKDLProjectCR(context.Background(), projectData)
 	s.Require().Error(err)
 }
 
@@ -111,7 +142,7 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLProjectCR(context.Background(), projectID)
+	err = s.Client.CreateKDLProjectCR(context.Background(), projectData)
 	s.Require().Error(err)
 }
 
@@ -141,7 +172,7 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLProjectCR(context.Background(), projectID)
+	err = s.Client.CreateKDLProjectCR(context.Background(), projectData)
 	s.Require().Error(err)
 }
 
@@ -174,14 +205,14 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLProjectCR(context.Background(), projectID)
+	err = s.Client.CreateKDLProjectCR(context.Background(), projectData)
 	s.Require().Error(err)
 }
 
 func (s *testSuite) TestListKDLProjectsNameCR() {
 	// Arrange by creating the CR
 	s.createKDLProjectConfigMapTemplate()
-	err := s.Client.CreateKDLProjectCR(context.Background(), projectID)
+	err := s.Client.CreateKDLProjectCR(context.Background(), projectData)
 	s.Require().NoError(err)
 
 	// Assert the CR exists
@@ -205,7 +236,7 @@ func (s *testSuite) TestListKDLProjectsNameCR_EmptyList() {
 func (s *testSuite) TestGetKDLProjectCR() {
 	// Arrange by creating the CR
 	s.createKDLProjectConfigMapTemplate()
-	err := s.Client.CreateKDLProjectCR(context.Background(), projectID)
+	err := s.Client.CreateKDLProjectCR(context.Background(), projectData)
 	s.Require().NoError(err)
 
 	// Assert the CR exists
@@ -228,7 +259,7 @@ func (s *testSuite) TestGetKDLProjectCR_Empty() {
 func (s *testSuite) TestUpdateKDLProjectsCR() {
 	// Arrange by creating the CR
 	s.createKDLProjectConfigMapTemplate()
-	err := s.Client.CreateKDLProjectCR(context.Background(), projectID)
+	err := s.Client.CreateKDLProjectCR(context.Background(), projectData)
 	s.Require().NoError(err)
 
 	// Update the CR
@@ -239,6 +270,9 @@ func (s *testSuite) TestUpdateKDLProjectsCR() {
 				"env": map[string]interface{}{
 					"ARTIFACTS_BUCKET": "my-demo-bucket",
 				},
+			},
+			"filebrowser": map[string]interface{}{
+				"env": map[string]interface{}{},
 			},
 		},
 		"metadata": map[string]interface{}{

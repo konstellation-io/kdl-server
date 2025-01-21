@@ -167,7 +167,7 @@ function NewProject() {
       <>
         <Prompt
           when={isPromptEnabled}
-          message="You are going to leave this page. You'll lose your changes, please confirm."
+          message="You are going to leave this page. You'll lose your changes, ¿Are you sure?."
         />
         {isMounted && <SidebarTop>{getSideContent()}</SidebarTop>}
         <div className={styles.container}>

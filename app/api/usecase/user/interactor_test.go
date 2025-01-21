@@ -291,6 +291,7 @@ func TestInteractor_StartTools(t *testing.T) {
 
 	const (
 		username     = "john"
+		slugUsername = "john"
 		email        = "john@doe.com"
 		toolsRunning = false
 		runtimeImage = "konstellation/image"
@@ -310,6 +311,8 @@ func TestInteractor_StartTools(t *testing.T) {
 	runtimeID := "12345"
 
 	data := k8s.UserToolsData{
+		Username:     username,
+		SlugUsername: slugUsername,
 		RuntimeID:    runtimeID,
 		RuntimeImage: runtimeImage,
 		RuntimeTag:   runtimeTag,
@@ -324,7 +327,7 @@ func TestInteractor_StartTools(t *testing.T) {
 	s.mocks.runtimeRepo.EXPECT().Get(ctx, runtimeID).Return(expectedRuntime, nil)
 	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capability.ID).Return(capability, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
-	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, username, data).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, data).Return(nil)
 
 	returnedUser, err := s.interactor.StartTools(ctx, email, &runtimeID, &capability.ID)
 
@@ -339,6 +342,7 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 
 	const (
 		username     = "john"
+		slugUsername = "john"
 		email        = "john@doe.com"
 		toolsRunning = false
 	)
@@ -354,6 +358,8 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 	}
 
 	data := k8s.UserToolsData{
+		Username:     username,
+		SlugUsername: slugUsername,
 		Capabilities: capability,
 	}
 
@@ -367,7 +373,7 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 
 	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capability.ID).Return(capability, nil)
 	// AND the CR creation does not return any error
-	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, username, data).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, data).Return(nil)
 
 	// WHEN the tools are started
 	returnedUser, err := s.interactor.StartTools(ctx, email, nil, &capability.ID)
@@ -390,6 +396,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 
 	const (
 		username     = "john"
+		slugUsername = "john"
 		email        = "john@doe.com"
 		toolsRunning = true
 		dockerImage  = "image"
@@ -411,6 +418,8 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 	}
 
 	data := k8s.UserToolsData{
+		Username:     username,
+		SlugUsername: slugUsername,
 		RuntimeID:    runtimeID,
 		RuntimeImage: dockerImage,
 		RuntimeTag:   dockerTag,
@@ -430,7 +439,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 
 	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capability.ID).Return(capability, nil)
 	// AND the CR creation does not return any error
-	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, username, data).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, data).Return(nil)
 
 	// WHEN the tools are started
 	returnedUser, err := s.interactor.StartTools(ctx, email, &runtimeID, &capability.ID)

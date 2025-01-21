@@ -225,7 +225,10 @@ func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, ca
 
 	i.logger.Info("Creating user tools for user", "email", email)
 
-	err = i.k8sClient.CreateKDLUserToolsCR(ctx, user.Username, data)
+	data.Username = user.Username
+	data.SlugUsername = user.UsernameSlug()
+
+	err = i.k8sClient.CreateKDLUserToolsCR(ctx, data)
 	if err != nil {
 		return entity.User{}, err
 	}

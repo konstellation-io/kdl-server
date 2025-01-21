@@ -15,6 +15,8 @@ import (
 )
 
 type UserToolsData struct {
+	Username       string
+	SlugUsername   string
 	RuntimeID      string
 	RuntimeImage   string
 	RuntimeTag     string
@@ -56,7 +58,7 @@ func (k *Client) DeleteUserToolsCR(ctx context.Context, username string) error {
 
 func (k *Client) updateUserToolsTemplate(
 	crd *map[string]interface{},
-	slugUsername, resName, username string,
+	resName string,
 	data UserToolsData,
 ) (*map[string]interface{}, error) {
 	crdToUpdate := *crd
@@ -76,8 +78,8 @@ func (k *Client) updateUserToolsTemplate(
 		return nil, errCRDNoSpec
 	}
 
-	spec["username"] = username
-	spec["usernameSlug"] = slugUsername
+	spec["username"] = data.Username
+	spec["usernameSlug"] = data.SlugUsername
 
 	// update spec.vscodeRuntime.image.repository and spec.vscodeRuntime.image.tag in the CRD object
 	vscodeRuntime, ok := spec["vscodeRuntime"].(map[string]interface{})
@@ -146,11 +148,9 @@ func (k *Client) GetConfigMapTemplateNameKDLUserTools() string {
 // CreateKDLUserToolsCR creates the user tools Custom Resource in Kubernetes.
 func (k *Client) CreateKDLUserToolsCR(
 	ctx context.Context,
-	username string,
 	data UserToolsData,
 ) error {
-	slugUsername := k.getSlugUsername(username)
-	resName := fmt.Sprintf("usertools-%s", slugUsername)
+	resName := fmt.Sprintf("usertools-%s", data.SlugUsername)
 
 	configMap, err := k.GetConfigMap(ctx, k.GetConfigMapTemplateNameKDLUserTools())
 	if err != nil {
@@ -164,7 +164,7 @@ func (k *Client) CreateKDLUserToolsCR(
 	}
 
 	// update the CRD object with correct values
-	crdUpdated, err := k.updateUserToolsTemplate(&crd, slugUsername, resName, username, data)
+	crdUpdated, err := k.updateUserToolsTemplate(&crd, resName, data)
 	if err != nil {
 		return err
 	}
@@ -300,10 +300,8 @@ func (k *Client) UpdateKDLUserToolsCR(ctx context.Context, resourceName string, 
 		return errCDRNoSpecUsername
 	}
 
-	slugUsername := k.getSlugUsername(username)
-
 	// update the CRD object with correct values
-	crdUpdated, err := k.updateUserToolsTemplate(crd, slugUsername, resourceName, username, data)
+	crdUpdated, err := k.updateUserToolsTemplate(crd, resourceName, data)
 	if err != nil {
 		return err
 	}

@@ -18,7 +18,7 @@ type ClientInterface interface {
 	CreateSecret(ctx context.Context, name string, values, labels map[string]string) error
 	UpdateSecret(ctx context.Context, name string, values, labels map[string]string) error
 	GetSecret(ctx context.Context, name string) (map[string][]byte, error)
-	CreateKDLUserToolsCR(ctx context.Context, username string, data UserToolsData) error
+	CreateKDLUserToolsCR(ctx context.Context, data UserToolsData) error
 	DeleteUserToolsCR(ctx context.Context, username string) error
 	UpdateKDLUserToolsCR(ctx context.Context, resourceName string, data UserToolsData, crd *map[string]interface{}) error
 	ListKDLUserToolsCR(ctx context.Context) ([]unstructured.Unstructured, error)

@@ -14,6 +14,7 @@ import (
 
 const (
 	username                         = "test.username"
+	slugUsername                     = "test-username"
 	resName                          = "usertools-test-username"
 	minioAccessKey                   = "user-test-username"
 	minioSecretKey                   = "username123"
@@ -24,11 +25,15 @@ const (
 )
 
 var userToolsData = k8s.UserToolsData{
+	Username:     username,
+	SlugUsername: slugUsername,
 	RuntimeID:    runtimeID,
 	RuntimeImage: runtimeImage,
 	RuntimeTag:   runtimeTag,
 }
 var dataWithCapabilities = k8s.UserToolsData{
+	Username:     username,
+	SlugUsername: slugUsername,
 	RuntimeID:    runtimeID,
 	RuntimeImage: runtimeImage,
 	RuntimeTag:   runtimeTag,
@@ -101,7 +106,7 @@ func (s *testSuite) TestCreateKDLUserToolsCR_and_DeleteUserToolsCR() {
 		cancelCreateUserToolCR()
 	}()
 
-	err := s.Client.CreateKDLUserToolsCR(ctx, username, dataWithCapabilities)
+	err := s.Client.CreateKDLUserToolsCR(ctx, dataWithCapabilities)
 	s.Require().NoError(err)
 
 	// Retrieve the Custom Resource
@@ -143,7 +148,7 @@ func (s *testSuite) TestCreateKDLUserToolsCR_and_DeleteUserToolsCR() {
 }
 
 func (s *testSuite) TestCreateKDLUserToolsCR_NoConfigMap() {
-	err := s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
+	err := s.Client.CreateKDLUserToolsCR(context.Background(), userToolsData)
 	s.Require().Error(err)
 }
 
@@ -158,7 +163,7 @@ func (s *testSuite) TestCreateKDLUserToolsCR_ConfigMapWithoutTemplate() {
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), userToolsData)
 	s.Require().Error(err)
 }
 
@@ -180,7 +185,7 @@ kind: KDLUserTools
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), userToolsData)
 	s.Require().Error(err)
 }
 
@@ -205,7 +210,7 @@ metadata:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), userToolsData)
 	s.Require().Error(err)
 }
 
@@ -232,7 +237,7 @@ metadata:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), userToolsData)
 	s.Require().Error(err)
 }
 
@@ -262,7 +267,7 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), userToolsData)
 	s.Require().Error(err)
 }
 
@@ -293,7 +298,7 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), userToolsData)
 	s.Require().Error(err)
 }
 
@@ -328,7 +333,7 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, dataWithCapabilities)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), dataWithCapabilities)
 	s.Require().Error(err)
 }
 
@@ -364,7 +369,7 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, dataWithCapabilities)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), dataWithCapabilities)
 	s.Require().Error(err)
 }
 
@@ -401,7 +406,7 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, dataWithCapabilities)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), dataWithCapabilities)
 	s.Require().Error(err)
 }
 
@@ -439,7 +444,7 @@ spec:
 	)
 	s.Require().NoError(err)
 
-	err = s.Client.CreateKDLUserToolsCR(context.Background(), username, userToolsData)
+	err = s.Client.CreateKDLUserToolsCR(context.Background(), userToolsData)
 	s.Require().Error(err)
 }
 
@@ -452,7 +457,7 @@ func (s *testSuite) TestListKDLUserToolsCR() {
 		cancelCreateUserToolCR()
 	}()
 
-	err := s.Client.CreateKDLUserToolsCR(ctx, username, dataWithCapabilities)
+	err := s.Client.CreateKDLUserToolsCR(ctx, dataWithCapabilities)
 	s.Require().NoError(err)
 
 	// List the CR
@@ -488,7 +493,7 @@ func (s *testSuite) TestGetKDLUserToolsCR() {
 		cancelCreateUserToolCR()
 	}()
 
-	err := s.Client.CreateKDLUserToolsCR(ctx, username, dataWithCapabilities)
+	err := s.Client.CreateKDLUserToolsCR(ctx, dataWithCapabilities)
 	s.Require().NoError(err)
 
 	// Get the CR
@@ -524,7 +529,7 @@ func (s *testSuite) TestUpdateKDLUserToolsCR() {
 		cancelCreateUserToolCR()
 	}()
 
-	err := s.Client.CreateKDLUserToolsCR(ctx, username, dataWithCapabilities)
+	err := s.Client.CreateKDLUserToolsCR(ctx, dataWithCapabilities)
 	s.Require().NoError(err)
 
 	// Update the CR

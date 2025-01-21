@@ -82,17 +82,17 @@ func (mr *MockClientInterfaceMockRecorder) CreateKDLProjectCR(ctx, data interfac
 }
 
 // CreateKDLUserToolsCR mocks base method.
-func (m *MockClientInterface) CreateKDLUserToolsCR(ctx context.Context, username string, data UserToolsData) error {
+func (m *MockClientInterface) CreateKDLUserToolsCR(ctx context.Context, data UserToolsData) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateKDLUserToolsCR", ctx, username, data)
+	ret := m.ctrl.Call(m, "CreateKDLUserToolsCR", ctx, data)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateKDLUserToolsCR indicates an expected call of CreateKDLUserToolsCR.
-func (mr *MockClientInterfaceMockRecorder) CreateKDLUserToolsCR(ctx, username, data interface{}) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) CreateKDLUserToolsCR(ctx, data interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKDLUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).CreateKDLUserToolsCR), ctx, username, data)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateKDLUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).CreateKDLUserToolsCR), ctx, data)
 }
 
 // CreateSecret mocks base method.

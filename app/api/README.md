@@ -55,12 +55,21 @@ docker build \
 | `PROJECT_MLFLOW_URL`             | URL for the MLflow service                    |               |
 | `KUBECONFIG_DOWNLOAD_ENABLED`    | Enable kubeconfig download for the User Tools | `false`       |
 | `KUBECONFIG_EXTERNAL_SERVER_URL` | URL for the kubeconfig download service       |               |
-| `KEYCLOAK_ADMIN_USER`            | Name of the admin user in keycloak            |               |
-| `KEYCLOAK_PASSWORD_KEY`          | Password for the admin user in keycloak       |               |
-| `KEYCLOAK_ADMIN_CLIENT_ID`       | The name for the client that the admin uses   |               |
-| `KEYCLOAK_MASTER_REALM`          | Name of the master realm in keycloak          |               |
-| `KEYCLOAK_REALM`                 | The realm keycloak uses for KDL namespace     |               |
-| `KEYCLOAK_URL`                   | URL for the keycloak service                  |               |
+
+#### Keycloak
+
+Keycloak is used for authentication and authorization in the KDL server. The
+following environment variables are used to configure the connection to
+Keycloak. At the moment, Keycloak connection is optional in KDL server.
+
+| Environment variable             | Description                                 | Default value |
+|----------------------------------|---------------------------------------------|---------------|
+| `KEYCLOAK_ADMIN_USER`            | Name of the admin user in keycloak          |               |
+| `KEYCLOAK_PASSWORD_KEY`          | Password for the admin user in keycloak     |               |
+| `KEYCLOAK_ADMIN_CLIENT_ID`       | The name for the client that the admin uses |               |
+| `KEYCLOAK_MASTER_REALM`          | Name of the master realm in keycloak        |               |
+| `KEYCLOAK_REALM`                 | The realm keycloak uses for KDL namespace   |               |
+| `KEYCLOAK_URL`                   | URL for the keycloak service                |               |
 
 #### KnowledgeGalaxy
 

@@ -89,3 +89,29 @@ func (s *configTestSuite) TestConfig_MissingEnvironment() {
 	// Call the function and expect it to panic
 	config.NewConfig()
 }
+
+func (s *configTestSuite) TestConfig_KeycloakOptional() {
+	for k, v := range envs {
+		_ = os.Setenv(k, v)
+	}
+
+	// Unset the keycloak env vars
+	_ = os.Unsetenv("KEYCLOAK_ADMIN_USER")
+	_ = os.Unsetenv("KEYCLOAK_PASSWORD_KEY")
+	_ = os.Unsetenv("KEYCLOAK_ADMIN_CLIENT_ID")
+	_ = os.Unsetenv("KEYCLOAK_MASTER_REALM")
+	_ = os.Unsetenv("KEYCLOAK_REALM")
+	_ = os.Unsetenv("KEYCLOAK_URL")
+
+	// Call the function and expect it to panic
+	cfg := config.NewConfig()
+
+	// Check the values
+	s.Require().NotNil(cfg)
+	s.Require().Equal("", cfg.Keycloak.AdminUser)
+	s.Require().Equal("", cfg.Keycloak.AdminPasswordKey)
+	s.Require().Equal("", cfg.Keycloak.AdminClientID)
+	s.Require().Equal("", cfg.Keycloak.MasterRealm)
+	s.Require().Equal("", cfg.Keycloak.Realm)
+	s.Require().Equal("", cfg.Keycloak.URL)
+}

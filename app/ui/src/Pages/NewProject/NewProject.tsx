@@ -22,14 +22,12 @@ import useNewProject from 'Graphql/client/hooks/useNewProject';
 enum Steps {
   INFORMATION,
   REPOSITORY,
-  REPOSITORY_DETAILS,
   SUMMARY,
 }
 
 enum StepNames {
   INFORMATION = 'information',
   REPOSITORY = 'repository',
-  REPOSITORY_DETAILS = 'repository details',
   SUMMARY = 'summary',
 }
 

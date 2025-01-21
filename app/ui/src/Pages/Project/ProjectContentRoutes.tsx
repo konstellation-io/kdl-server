@@ -1,3 +1,4 @@
+import React from 'react';
 import ROUTE from 'Constants/routes';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
@@ -12,7 +13,6 @@ export interface ProjectRoute {
 }
 
 function ProjectContentRoutes({ openedProject }: ProjectRoute) {
-
   function redirectIfArchived() {
     return openedProject.archived && <Redirect from={ROUTE.PROJECT} to={ROUTE.PROJECTS} />;
   }

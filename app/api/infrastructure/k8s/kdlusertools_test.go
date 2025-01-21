@@ -4,6 +4,7 @@ package k8s_test
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
@@ -134,6 +135,30 @@ func (s *testSuite) TestCreateKDLUserToolsCR_and_DeleteUserToolsCR() {
 	s.Require().Equal("value1", toleration["value"])
 	s.Require().Equal("NoExecute", toleration["effect"])
 	s.Require().Equal(int64(100), toleration["tolerationSeconds"])
+
+	// Check the input data itself is stored as well
+	inputData, _ := spec["inputData"].(map[string]interface{})
+	inputUserName, _ := inputData["username"].(string)
+	inputSlugUserName, _ := inputData["slugUsername"].(string)
+	inputRuntimeID, _ := inputData["runtimeID"].(string)
+	inputRuntimeImage, _ := inputData["runtimeImage"].(string)
+	inputRuntimeTag, _ := inputData["runtimeTag"].(string)
+
+	s.Require().Equal(username, inputUserName)
+	s.Require().Equal(slugUsername, inputSlugUserName)
+	s.Require().Equal(runtimeID, inputRuntimeID)
+	s.Require().Equal(runtimeImage, inputRuntimeImage)
+	s.Require().Equal(runtimeTag, inputRuntimeTag)
+
+	var decodedMinioAccessKey entity.MinioAccessKey
+
+	inputMinioAccessKey, _ := inputData["minioAccessKey"].(string)
+
+	err = json.Unmarshal([]byte(inputMinioAccessKey), &decodedMinioAccessKey)
+	s.Require().NoError(err)
+
+	s.Require().Equal(minioAccessKey, decodedMinioAccessKey.AccessKey)
+	s.Require().Equal(minioSecretKey, decodedMinioAccessKey.SecretKey)
 
 	// Delete the CR
 	// create go routine to cancel the context in 5 seconds. Risk of flaky test

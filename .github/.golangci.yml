@@ -223,6 +223,7 @@ issues:
         - gochecknoglobals
         - gosec
         - mnd
+        - funlen # it's not common to fragment test functions
     # https://github.com/go-critic/go-critic/issues/926
     - linters:
         - gocritic

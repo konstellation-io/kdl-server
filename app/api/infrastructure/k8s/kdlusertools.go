@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/gosimple/slug"
@@ -22,6 +23,28 @@ type UserToolsData struct {
 	RuntimeTag     string
 	Capabilities   entity.Capabilities
 	MinioAccessKey entity.MinioAccessKey
+}
+
+func (k *Client) UserToolsDataToMap(data UserToolsData) (map[string]string, error) {
+	minioAccessKeyJSON, err := json.Marshal(data.MinioAccessKey)
+	if err != nil {
+		return nil, err
+	}
+
+	capabilitiesJSON, err := json.Marshal(data.Capabilities)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]string{
+		"username":       data.Username,
+		"slugUsername":   data.SlugUsername,
+		"runtimeID":      data.RuntimeID,
+		"runtimeImage":   data.RuntimeImage,
+		"runtimeTag":     data.RuntimeTag,
+		"capabilities":   string(capabilitiesJSON),
+		"minioAccessKey": string(minioAccessKeyJSON),
+	}, err
 }
 
 // DeleteUserToolsCR removes a given user tools custom resource from Kubernetes.
@@ -77,6 +100,13 @@ func (k *Client) updateUserToolsTemplate(
 	if !ok {
 		return nil, errCRDNoSpec
 	}
+
+	inputData, err := k.UserToolsDataToMap(data)
+	if err != nil {
+		return nil, errCRDCantEncodeInputData
+	}
+
+	spec["inputData"] = inputData
 
 	spec["username"] = data.Username
 	spec["usernameSlug"] = data.SlugUsername

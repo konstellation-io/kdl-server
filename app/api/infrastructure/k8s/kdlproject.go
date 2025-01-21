@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
@@ -13,6 +14,18 @@ import (
 type ProjectData struct {
 	ProjectID      string
 	MinioAccessKey entity.MinioAccessKey
+}
+
+func (k *Client) ProjectDataToMap(data ProjectData) (map[string]string, error) {
+	minioAccessKeyJSON, err := json.Marshal(data.MinioAccessKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]string{
+		"projectId":      data.ProjectID,
+		"minioAccessKey": string(minioAccessKeyJSON),
+	}, nil
 }
 
 func (k *Client) GetConfigMapTemplateNameKDLProject() string {
@@ -28,6 +41,12 @@ func (k *Client) updateKDLProjectTemplate(data ProjectData, crd *map[string]inte
 		return nil, errCRDNoSpec
 	}
 
+	inputData, err := k.ProjectDataToMap(data)
+	if err != nil {
+		return nil, errCRDCantEncodeInputData
+	}
+
+	spec["inputData"] = inputData
 	spec["projectId"] = data.ProjectID
 
 	// update spec.mlflow.env in the CRD object

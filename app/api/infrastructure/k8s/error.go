@@ -13,3 +13,4 @@ var errCRDNoSpecVscodeRuntime = errors.New("CRD does not have a 'spec.vscodeRunt
 var errCRDNoSpecVscodeRuntimeEnv = errors.New("CRD does not have a 'spec.vscodeRuntime.env' field")
 var errCRDNoSpecVscodeRuntimeImage = errors.New("CRD does not have a 'spec.vscodeRuntime.image' field")
 var errCRDNoSpecPodLabels = errors.New("CRD does not have a 'spec.podLabels' field")
+var errCRDCantEncodeInputData = errors.New("can't encode input data")

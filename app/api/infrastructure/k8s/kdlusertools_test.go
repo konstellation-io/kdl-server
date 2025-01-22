@@ -578,7 +578,7 @@ func (s *testSuite) TestUpdateKDLUserToolsCR() {
 			"name": "new-res-name",
 		},
 	}
-	err = s.Client.UpdateKDLUserToolsCR(context.Background(), resName, userToolsData, &crd)
+	err = s.Client.UpdateKDLUserToolsCR(context.Background(), resName, &crd)
 	s.Require().NoError(err)
 
 	// Delete the CR

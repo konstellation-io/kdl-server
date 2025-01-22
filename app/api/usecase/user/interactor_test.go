@@ -842,7 +842,6 @@ func TestInteractor_UpdateKDLUserTools(t *testing.T) {
 	configMap.Data["template"] = ""
 
 	crd := map[string]interface{}{}
-	data := k8s.UserToolsData{}
 
 	listKDLUserTools := []unstructured.Unstructured{
 		{
@@ -862,10 +861,8 @@ func TestInteractor_UpdateKDLUserTools(t *testing.T) {
 
 	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
 	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.runtimeRepo.EXPECT().Get(ctx, "12345").Return(entity.Runtime{}, nil)
-	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, "54321").Return(entity.Capabilities{}, nil)
 	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
-	s.mocks.k8sClientMock.EXPECT().UpdateKDLUserToolsCR(ctx, "kdlusertools-v1", data, &crd).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().UpdateKDLUserToolsCR(ctx, "kdlusertools-v1", &crd).Return(nil)
 
 	err := s.interactor.UpdateKDLUserTools(ctx)
 	require.NoError(t, err)
@@ -883,7 +880,6 @@ func TestInteractor_UpdateKDLUserTools_UpdateKDLUserToolsCR_Error(t *testing.T) 
 	configMap.Data["template"] = ""
 
 	crd := map[string]interface{}{}
-	data := k8s.UserToolsData{}
 
 	listKDLUserTools := []unstructured.Unstructured{
 		{
@@ -904,141 +900,7 @@ func TestInteractor_UpdateKDLUserTools_UpdateKDLUserToolsCR_Error(t *testing.T) 
 	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
 	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
 	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
-	s.mocks.runtimeRepo.EXPECT().Get(ctx, "12345").Return(entity.Runtime{}, nil)
-	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, "54321").Return(entity.Capabilities{}, nil)
-	s.mocks.k8sClientMock.EXPECT().UpdateKDLUserToolsCR(ctx, "kdlusertools-v1", data, &crd).Return(errUpdatingCrd)
-
-	// even if there is an error updating the CRD,
-	// the function should return no error to allow updating the next CRD
-	err := s.interactor.UpdateKDLUserTools(ctx)
-	require.NoError(t, err)
-}
-func TestInteractor_UpdateKDLUserTools_NoSpec(t *testing.T) {
-	s := newUserSuite(t)
-	defer s.ctrl.Finish()
-
-	ctx := context.Background()
-
-	configMap := v1.ConfigMap{
-		Data: map[string]string{},
-	}
-	configMap.Data["template"] = ""
-
-	listKDLUserTools := []unstructured.Unstructured{
-		{
-			Object: map[string]interface{}{
-				"metadata": map[string]interface{}{
-					"name": "kdlusertools-v1",
-				},
-			},
-		},
-	}
-
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
-	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
-
-	// even if there is an error updating the CRD,
-	// the function should return no error to allow updating the next CRD
-	err := s.interactor.UpdateKDLUserTools(ctx)
-	require.NoError(t, err)
-}
-
-func TestInteractor_UpdateKDLUserTools_NoPodLabels(t *testing.T) {
-	s := newUserSuite(t)
-	defer s.ctrl.Finish()
-
-	ctx := context.Background()
-
-	configMap := v1.ConfigMap{
-		Data: map[string]string{},
-	}
-	configMap.Data["template"] = ""
-
-	listKDLUserTools := []unstructured.Unstructured{
-		{
-			Object: map[string]interface{}{
-				"metadata": map[string]interface{}{
-					"name": "kdlusertools-v1",
-				},
-				"spec": map[string]interface{}{},
-			},
-		},
-	}
-
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
-	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
-
-	// even if there is an error updating the CRD,
-	// the function should return no error to allow updating the next CRD
-	err := s.interactor.UpdateKDLUserTools(ctx)
-	require.NoError(t, err)
-}
-
-func TestInteractor_UpdateKDLUserTools_NoRuntimeId(t *testing.T) {
-	s := newUserSuite(t)
-	defer s.ctrl.Finish()
-
-	ctx := context.Background()
-
-	configMap := v1.ConfigMap{
-		Data: map[string]string{},
-	}
-	configMap.Data["template"] = ""
-
-	listKDLUserTools := []unstructured.Unstructured{
-		{
-			Object: map[string]interface{}{
-				"metadata": map[string]interface{}{
-					"name": "kdlusertools-v1",
-				},
-				"spec": map[string]interface{}{
-					"podLabels": map[string]interface{}{},
-				},
-			},
-		},
-	}
-
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
-	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
-
-	// even if there is an error updating the CRD,
-	// the function should return no error to allow updating the next CRD
-	err := s.interactor.UpdateKDLUserTools(ctx)
-	require.NoError(t, err)
-}
-
-func TestInteractor_UpdateKDLUserTools_NoCapabilityId(t *testing.T) {
-	s := newUserSuite(t)
-	defer s.ctrl.Finish()
-
-	ctx := context.Background()
-
-	configMap := v1.ConfigMap{
-		Data: map[string]string{},
-	}
-	configMap.Data["template"] = ""
-
-	listKDLUserTools := []unstructured.Unstructured{
-		{
-			Object: map[string]interface{}{
-				"metadata": map[string]interface{}{
-					"name": "kdlusertools-v1",
-				},
-				"spec": map[string]interface{}{
-					"podLabels": map[string]interface{}{
-						"runtimeId": "12345",
-					},
-				},
-			},
-		},
-	}
-
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
-	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
+	s.mocks.k8sClientMock.EXPECT().UpdateKDLUserToolsCR(ctx, "kdlusertools-v1", &crd).Return(errUpdatingCrd)
 
 	// even if there is an error updating the CRD,
 	// the function should return no error to allow updating the next CRD

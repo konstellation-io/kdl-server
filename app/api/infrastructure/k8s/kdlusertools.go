@@ -373,7 +373,7 @@ func (k *Client) GetKDLUserToolsCR(ctx context.Context, resourceName string) (*u
 	return object, nil
 }
 
-func (k *Client) UpdateKDLUserToolsCR(ctx context.Context, resourceName string, _ UserToolsData, crd *map[string]interface{}) error {
+func (k *Client) UpdateKDLUserToolsCR(ctx context.Context, resourceName string, crd *map[string]interface{}) error {
 	// CRD object is now updated and ready to be created
 	k.logger.Info("Updating KDL User Tools CR in k8s", "resourceName", resourceName)
 

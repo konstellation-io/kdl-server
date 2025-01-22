@@ -581,6 +581,32 @@ func (s *testSuite) TestUpdateKDLUserToolsCR() {
 	err = s.Client.UpdateKDLUserToolsCR(context.Background(), resName, &crd)
 	s.Require().NoError(err)
 
+	// Retrieve the Custom Resource
+	resource, err := s.kdlUserToolsRes.Namespace(namespace).Get(context.Background(), resName, metav1.GetOptions{})
+	s.Require().NoError(err)
+
+	// Check the data is still there, in spite of the template update
+	spec, _ := resource.Object["spec"].(map[string]interface{})
+	vscodeRuntime, _ := spec["vscodeRuntime"].(map[string]interface{})
+	image, _ := vscodeRuntime["image"].(map[string]interface{})
+	env, _ := vscodeRuntime["env"].(map[string]interface{})
+	podLabels, _ := spec["podLabels"].(map[string]interface{})
+	affinity, _ := spec["affinity"].(map[string]interface{})
+	tolerations, _ := spec["tolerations"].([]interface{})
+	toleration, _ := tolerations[0].(map[string]interface{})
+
+	s.Require().Equal(runtimeImage, image["repository"])
+	s.Require().Equal(runtimeTag, image["tag"])
+	s.Require().Equal(runtimeID, podLabels["runtimeId"])
+	s.Require().Equal("test-capability-id", podLabels["capabilityId"])
+	s.Require().Equal(minioAccessKey, env["AWS_ACCESS_KEY"])
+	s.Require().Equal(minioSecretKey, env["AWS_SECRET_KEY"])
+	s.Require().Equal("value", affinity["key"])
+	s.Require().Equal("Equal", toleration["operator"])
+	s.Require().Equal("value1", toleration["value"])
+	s.Require().Equal("NoExecute", toleration["effect"])
+	s.Require().Equal(int64(100), toleration["tolerationSeconds"])
+
 	// Delete the CR
 	// create go routine to cancel the context in 5 seconds. Risk of flaky test
 	ctx, cancelDeleteUserToolsCR := context.WithCancel(context.Background())

@@ -14,7 +14,7 @@ enum ROUTE {
   PROJECT_TOOL_KG = '/projects/:projectId/tool/kg',
   NEW_PROJECT = '/new-project',
   PROJECT_CREATION = '/new-project/create',
-  LOGOUT = 'https://kdlapp.kdl.10.0.1.1.nip.io/oauth2/sign_out',
+  LOGOUT = '/oauth2/sign_out',
 }
 
 export type RouteProjectParams = {

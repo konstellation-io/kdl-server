@@ -158,6 +158,12 @@ oauth2proxy:
     enabled: true
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        if ($request_uri = "/oauth2/sign_out") {
+            return 302 "/oauth2/sign_out?rd=https%3A%2F%2Fkeycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl/protocol/openid-connect/logout?client_id=proxy%26post_logout_redirect_uri=https%3A%2F%2Fkdlapp.{{ requiredEnv "DOMAIN" }}/";
+        }
+      nginx.ingress.kubernetes.io/server-snippet: |
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
     className: public
     path: /
     pathType: ImplementationSpecific
@@ -176,7 +182,7 @@ oauth2proxy:
 
     configFile: |-
       cookie_csrf_per_request=true
-      cookie_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}", "keycloak.{{ requiredEnv "DOMAIN" }}"]
+      cookie_domains=[".{{ requiredEnv "DOMAIN" }}"]
       cookie_samesite="strict"
       cookie_secure=false
       email_domains="*"
@@ -193,7 +199,7 @@ oauth2proxy:
       skip_provider_button=true
       ssl_insecure_skip_verify=true
       upstreams=["http://kdl-local-server:80/", "http://127.0.0.1:9000/mlflow/", "http://127.0.0.1:9000/filebrowser/", "http://127.0.0.1:9000/kg/"]
-      whitelist_domains=["kdlapp.{{ requiredEnv "DOMAIN" }}"]
+      whitelist_domains=[".{{ requiredEnv "DOMAIN" }}"]
 
   extraContainers:
     - name: project-proxy

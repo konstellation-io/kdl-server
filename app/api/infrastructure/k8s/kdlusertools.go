@@ -47,6 +47,65 @@ func (k *Client) UserToolsDataToMap(data UserToolsData) (map[string]string, erro
 	}, err
 }
 
+func (k *Client) MapToUserToolsData(data map[string]interface{}) (UserToolsData, error) {
+	var capabilities entity.Capabilities
+
+	capStr, ok := data["capabilities"].(string)
+	if !ok {
+		return UserToolsData{}, errCRDCantDecodeInputData
+	}
+
+	if err := json.Unmarshal([]byte(capStr), &capabilities); err != nil {
+		return UserToolsData{}, errCRDCantDecodeInputData
+	}
+
+	var minioAccessKey entity.MinioAccessKey
+
+	minioStr, ok := data["minioAccessKey"].(string)
+	if !ok {
+		return UserToolsData{}, errCRDCantDecodeInputData
+	}
+
+	if err := json.Unmarshal([]byte(minioStr), &minioAccessKey); err != nil {
+		return UserToolsData{}, errCRDCantDecodeInputData
+	}
+
+	username, ok := data["username"].(string)
+	if !ok {
+		return UserToolsData{}, errCRDCantDecodeInputData
+	}
+
+	slugUsername, ok := data["slugUsername"].(string)
+	if !ok {
+		return UserToolsData{}, errCRDCantDecodeInputData
+	}
+
+	runtimeID, ok := data["runtimeID"].(string)
+	if !ok {
+		return UserToolsData{}, errCRDCantDecodeInputData
+	}
+
+	runtimeImage, ok := data["runtimeImage"].(string)
+	if !ok {
+		return UserToolsData{}, errCRDCantDecodeInputData
+	}
+
+	runtimeTag, ok := data["runtimeTag"].(string)
+	if !ok {
+		return UserToolsData{}, errCRDCantDecodeInputData
+	}
+
+	return UserToolsData{
+		Username:       username,
+		SlugUsername:   slugUsername,
+		RuntimeID:      runtimeID,
+		RuntimeImage:   runtimeImage,
+		RuntimeTag:     runtimeTag,
+		Capabilities:   capabilities,
+		MinioAccessKey: minioAccessKey,
+	}, nil
+}
+
 // DeleteUserToolsCR removes a given user tools custom resource from Kubernetes.
 func (k *Client) DeleteUserToolsCR(ctx context.Context, username string) error {
 	slugUsername := k.getSlugUsername(username)
@@ -314,24 +373,34 @@ func (k *Client) GetKDLUserToolsCR(ctx context.Context, resourceName string) (*u
 	return object, nil
 }
 
-func (k *Client) UpdateKDLUserToolsCR(ctx context.Context, resourceName string, data UserToolsData, crd *map[string]interface{}) error {
+func (k *Client) UpdateKDLUserToolsCR(ctx context.Context, resourceName string, _ UserToolsData, crd *map[string]interface{}) error {
+	// CRD object is now updated and ready to be created
+	k.logger.Info("Updating KDL User Tools CR in k8s", "resourceName", resourceName)
+
+	// Get existing CR
 	existingKDLUserTool, err := k.GetKDLUserToolsCR(ctx, resourceName)
 	if err != nil {
 		return err
 	}
 
-	spec, ok := existingKDLUserTool.Object["spec"].(map[string]interface{})
-	if !ok {
-		return errCRDNoSpec
+	// Recover the input data from the existing CR
+	existingSpec, _, err := unstructured.NestedMap(existingKDLUserTool.Object, "spec")
+	if err != nil {
+		return errCRDCantDecodeInputData
 	}
 
-	username, ok := spec["username"].(string)
+	inputDataMap, ok := existingSpec["inputData"].(map[string]interface{})
 	if !ok {
-		return errCDRNoSpecUsername
+		return errCRDCantDecodeInputData
 	}
 
-	// update the CRD object with correct values
-	crdUpdated, err := k.updateUserToolsTemplate(crd, resourceName, data)
+	inputData, err := k.MapToUserToolsData(inputDataMap)
+	if err != nil {
+		return errCRDCantDecodeInputData
+	}
+
+	// Re-apply the input data with the updated template
+	crdUpdated, err := k.updateUserToolsTemplate(crd, resourceName, inputData)
 	if err != nil {
 		return err
 	}
@@ -344,15 +413,12 @@ func (k *Client) UpdateKDLUserToolsCR(ctx context.Context, resourceName string, 
 
 	existingKDLUserTool.Object["spec"] = specValue
 
-	// CRD object is now updated and ready to be created
-	k.logger.Info("Updating KDL User Tools CR in k8s", "username", username)
-
 	_, err = k.kdlUserToolsRes.Namespace(k.cfg.Kubernetes.Namespace).Update(ctx, existingKDLUserTool, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
 
-	k.logger.Info("Updated KDL User Tools CR in k8s", "username", username)
+	k.logger.Info("Updated KDL User Tools CR in k8s", "resourceName", resourceName)
 
 	return nil
 }

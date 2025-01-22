@@ -272,6 +272,13 @@ func (s *testSuite) TestUpdateKDLProjectsCR() {
 	// Update the CR
 	crd := map[string]interface{}{
 		"spec": map[string]interface{}{
+			"inputData": map[string]interface{}{
+				"projectId": "my-demo-projectId",
+				"minioAccessKey": map[string]interface{}{
+					"AccessKey": "my-demo-accessKey",
+					"SecretKey": "my-demo-secretKey",
+				},
+			},
 			"projectId": "my-demo-projectId",
 			"mlflow": map[string]interface{}{
 				"env": map[string]interface{}{

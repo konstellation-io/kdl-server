@@ -36,7 +36,6 @@ function SettingsMenu() {
   }
 
   function goToLogout() {
-    console.log('Loggint out to: ', ROUTE.LOGOUT);
     window.location.href = ROUTE.LOGOUT;
   }
 

@@ -5,12 +5,12 @@ import (
 	"errors"
 	"time"
 
+	"github.com/go-logr/logr"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
@@ -175,6 +175,13 @@ func (m *ProjectRepo) UpdateDescription(ctx context.Context, projectID, descript
 // UpdateArchived changes the archived field for the given project.
 func (m *ProjectRepo) UpdateArchived(ctx context.Context, projectID string, archived bool) error {
 	return m.updateProjectFields(ctx, projectID, bson.M{"archived": archived})
+}
+
+func (m *ProjectRepo) UpdateMinioAccess(ctx context.Context, projectID, accessKey, secretKey string) error {
+	return m.updateProjectFields(ctx, projectID, bson.M{
+		"minio_access_key": accessKey,
+		"minio_secret_key": secretKey,
+	})
 }
 
 func (m *ProjectRepo) DeleteOne(ctx context.Context, projectID string) error {

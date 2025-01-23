@@ -21,9 +21,8 @@ import (
 )
 
 var (
-	ErrStopUserTools        = errors.New("cannot stop uninitialized user tools")
-	ErrUserToolsActive      = errors.New("it is not possible to regenerate SSH keys with the usertools active")
-	errCreatingKDLUserTools = errors.New("error creating CRD KDLUserTools ")
+	ErrStopUserTools   = errors.New("cannot stop uninitialized user tools")
+	ErrUserToolsActive = errors.New("it is not possible to regenerate SSH keys with the usertools active")
 )
 
 type Interactor struct {
@@ -225,7 +224,10 @@ func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, ca
 
 	i.logger.Info("Creating user tools for user", "email", email)
 
-	err = i.k8sClient.CreateKDLUserToolsCR(ctx, user.Username, data)
+	data.Username = user.Username
+	data.SlugUsername = user.UsernameSlug()
+
+	err = i.k8sClient.CreateKDLUserToolsCR(ctx, data)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -433,48 +435,7 @@ func (i *Interactor) UpdateKDLUserTools(ctx context.Context) error {
 	for _, userTool := range kdlUserTools {
 		resourceName := userTool.GetName()
 
-		spec, ok := userTool.Object["spec"].(map[string]interface{})
-		if !ok {
-			i.logger.Error(errCreatingKDLUserTools, "Missing spec from KDL UserTools CR", "userToolName", userTool.GetName())
-			continue
-		}
-
-		podLabels, ok := spec["podLabels"].(map[string]interface{})
-		if !ok {
-			i.logger.Error(errCreatingKDLUserTools, "Missing spec.podLabels from KDL UserTools CR", "userToolName", userTool.GetName())
-			continue
-		}
-
-		runtimeID, ok := podLabels["runtimeId"].(string)
-		if !ok || runtimeID == "" {
-			i.logger.Error(errCreatingKDLUserTools, "Runtime ID provided is not valid, skipping user tools update", "userToolName", resourceName)
-			continue
-		}
-
-		capabilitiesID, ok := podLabels["capabilityId"].(string)
-		if !ok || capabilitiesID == "" {
-			i.logger.Error(errCreatingKDLUserTools, "Capability ID provided is not valid, skipping user tools update", "userToolName", resourceName)
-			continue
-		}
-
-		r, err := i.repoRuntimes.Get(ctx, runtimeID)
-		if err != nil {
-			i.logger.Error(err, "Error getting runtime", "runtimeID", runtimeID)
-			continue
-		}
-
-		var data = k8s.UserToolsData{}
-		data.RuntimeID = r.ID
-		data.RuntimeImage = r.DockerImage
-		data.RuntimeTag = r.DockerTag
-
-		data.Capabilities, err = i.repoCapabilities.Get(ctx, capabilitiesID)
-		if err != nil {
-			i.logger.Error(err, "Error getting capability", "capabilitiesID", capabilitiesID)
-			continue
-		}
-
-		err = i.k8sClient.UpdateKDLUserToolsCR(ctx, resourceName, data, &crd)
+		err = i.k8sClient.UpdateKDLUserToolsCR(ctx, resourceName, &crd)
 		if err != nil {
 			i.logger.Error(err, "Error updating KDL UserTools CR in k8s", "userToolName", resourceName)
 		}

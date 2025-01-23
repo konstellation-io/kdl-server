@@ -81,6 +81,13 @@ func (s *testSuite) TestCreateKDLProjectCR_and_DeleteKDLProjectCR() {
 	s.Require().Equal(projectMinioAccessKey, filebrowserEnv["AWS_S3_ACCESS_KEY_ID"])
 	s.Require().Equal(projectMinioSecretKey, filebrowserEnv["AWS_S3_SECRET_ACCESS_KEY"])
 
+	// Check the input data itself is stored as well
+	minioAccessKeyJSON := "{\"AccessKey\":\"project-test-project-id\",\"SecretKey\":\"testproject123\"}"
+	inputData, _ := spec["inputData"].(map[string]interface{})
+	inputProjectID, _ := inputData["projectId"].(string)
+	s.Require().Equal(projectID, inputProjectID)
+	s.Require().Equal(minioAccessKeyJSON, inputData["minioAccessKey"])
+
 	// Delete the CR
 	err = s.Client.DeleteKDLProjectCR(context.Background(), projectID)
 	s.Require().NoError(err)
@@ -265,6 +272,13 @@ func (s *testSuite) TestUpdateKDLProjectsCR() {
 	// Update the CR
 	crd := map[string]interface{}{
 		"spec": map[string]interface{}{
+			"inputData": map[string]interface{}{
+				"projectId": "my-demo-projectId",
+				"minioAccessKey": map[string]interface{}{
+					"AccessKey": "my-demo-accessKey",
+					"SecretKey": "my-demo-secretKey",
+				},
+			},
 			"projectId": "my-demo-projectId",
 			"mlflow": map[string]interface{}{
 				"env": map[string]interface{}{

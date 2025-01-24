@@ -123,13 +123,14 @@ type ComplexityRoot struct {
 	}
 
 	Runtime struct {
-		Desc        func(childComplexity int) int
-		DockerImage func(childComplexity int) int
-		DockerTag   func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Labels      func(childComplexity int) int
-		Name        func(childComplexity int) int
-		RuntimePod  func(childComplexity int) int
+		Desc             func(childComplexity int) int
+		DockerImage      func(childComplexity int) int
+		DockerTag        func(childComplexity int) int
+		ID               func(childComplexity int) int
+		Labels           func(childComplexity int) int
+		Name             func(childComplexity int) int
+		RuntimePod       func(childComplexity int) int
+		RuntimePodStatus func(childComplexity int) int
 	}
 
 	SSHKey struct {
@@ -663,6 +664,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Runtime.RuntimePod(childComplexity), true
 
+	case "Runtime.runtimePodStatus":
+		if e.complexity.Runtime.RuntimePodStatus == nil {
+			break
+		}
+
+		return e.complexity.Runtime.RuntimePodStatus(childComplexity), true
+
 	case "SSHKey.creationDate":
 		if e.complexity.SSHKey.CreationDate == nil {
 			break
@@ -951,6 +959,7 @@ enum AccessLevel {
   ADMIN
 }
 
+
 type ApiToken {
   id: ID!
   name: String!
@@ -1010,6 +1019,15 @@ type Runtime {
   dockerImage: String!
   dockerTag: String!
   runtimePod: String!
+  runtimePodStatus: PodStatus!
+}
+
+enum PodStatus {
+  pending
+  running
+  succeeded
+  failed
+  unknown
 }
 
 input SetActiveUserToolsInput {
@@ -3895,6 +3913,8 @@ func (ec *executionContext) fieldContext_Query_runningRuntime(_ context.Context,
 				return ec.fieldContext_Runtime_dockerTag(ctx, field)
 			case "runtimePod":
 				return ec.fieldContext_Runtime_runtimePod(ctx, field)
+			case "runtimePodStatus":
+				return ec.fieldContext_Runtime_runtimePodStatus(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Runtime", field.Name)
 		},
@@ -3955,6 +3975,8 @@ func (ec *executionContext) fieldContext_Query_runtimes(_ context.Context, field
 				return ec.fieldContext_Runtime_dockerTag(ctx, field)
 			case "runtimePod":
 				return ec.fieldContext_Runtime_runtimePod(ctx, field)
+			case "runtimePodStatus":
+				return ec.fieldContext_Runtime_runtimePodStatus(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Runtime", field.Name)
 		},
@@ -4540,6 +4562,50 @@ func (ec *executionContext) fieldContext_Runtime_runtimePod(_ context.Context, f
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Runtime_runtimePodStatus(ctx context.Context, field graphql.CollectedField, obj *entity.Runtime) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Runtime_runtimePodStatus(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RuntimePodStatus, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entity.PodStatus)
+	fc.Result = res
+	return ec.marshalNPodStatus2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐPodStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Runtime_runtimePodStatus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Runtime",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type PodStatus does not have child fields")
 		},
 	}
 	return fc, nil
@@ -8348,6 +8414,11 @@ func (ec *executionContext) _Runtime(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "runtimePodStatus":
+			out.Values[i] = ec._Runtime_runtimePodStatus(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9288,6 +9359,22 @@ func (ec *executionContext) marshalNMember2ᚕgithubᚗcomᚋkonstellationᚑio�
 	}
 
 	return ret
+}
+
+func (ec *executionContext) unmarshalNPodStatus2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐPodStatus(ctx context.Context, v any) (entity.PodStatus, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := entity.PodStatus(tmp)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPodStatus2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐPodStatus(ctx context.Context, sel ast.SelectionSet, v entity.PodStatus) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalNProject2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx context.Context, sel ast.SelectionSet, v entity.Project) graphql.Marshaler {

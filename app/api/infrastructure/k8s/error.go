@@ -10,3 +10,4 @@ var errCRDNoSpecMlflowEnv = errors.New("CRD does not have a 'spec.mlflow.env' fi
 var errCRDNoSpecVscodeRuntime = errors.New("CRD does not have a 'spec.vscodeRuntime' field")
 var errCRDNoSpecVscodeRuntimeImage = errors.New("CRD does not have a 'spec.vscodeRuntime.image' field")
 var errCRDNoSpecPodLabels = errors.New("CRD does not have a 'spec.podLabels' field")
+var errNoPodFound = errors.New("no pod found")

@@ -203,8 +203,6 @@ func (k Client) getUserToolsPod(ctx context.Context, username string) (v1.Pod, e
 	resName := k.getUserToolsResName(slugUsername)
 	labelSelector := k.userToolsPODLabelSelector(resName)
 
-	k.logger.Info("Getting UserTools POD", "labelSelector", labelSelector)
-
 	list, err := k.getPodListForUser(ctx, labelSelector)
 	if err != nil {
 		return v1.Pod{}, err

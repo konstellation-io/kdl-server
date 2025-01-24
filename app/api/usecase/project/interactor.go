@@ -176,6 +176,12 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		return entity.Project{}, err
 	}
 
+	// Create Minio policy for the project user
+	err = i.minioAdminService.CreateProjectPolicy(ctx, opt.ProjectID)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
 	// Create Minio project user
 	accessKey, err := i.minioAdminService.CreateProjectUser(ctx, opt.ProjectID, secretKey)
 	if err != nil {
@@ -185,12 +191,6 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 	project.MinioAccessKey = entity.MinioAccessKey{
 		AccessKey: accessKey,
 		SecretKey: secretKey,
-	}
-
-	// Create Minio policy for the project user
-	err = i.minioAdminService.CreateProjectPolicy(ctx, opt.ProjectID)
-	if err != nil {
-		return entity.Project{}, err
 	}
 
 	// Create a k8s KDLProject containing a MLFLow instance

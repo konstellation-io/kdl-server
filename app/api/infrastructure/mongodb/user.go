@@ -5,12 +5,12 @@ import (
 	"errors"
 	"time"
 
+	"github.com/go-logr/logr"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
@@ -198,6 +198,13 @@ func (m *UserRepo) UpdateSSHKey(ctx context.Context, username string, sshKey ent
 
 func (m *UserRepo) UpdateEmail(ctx context.Context, username, email string) error {
 	return m.updateUserFields(ctx, username, bson.M{"email": email})
+}
+
+func (m *UserRepo) UpdateMinioAccess(ctx context.Context, username, accessKey, secretKey string) error {
+	return m.updateUserFields(ctx, username, bson.M{
+		"minio_access_key": accessKey,
+		"minio_secret_key": secretKey,
+	})
 }
 
 func (m *UserRepo) UpdateSub(ctx context.Context, username, sub string) error {

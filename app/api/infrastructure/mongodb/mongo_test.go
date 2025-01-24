@@ -23,14 +23,10 @@ import (
 )
 
 const (
-	dbName               = "kdl"
-	capabilitiesCollName = "capabilities"
-	projectCollName      = "projects"
-	runtimesCollName     = "runtimes"
-	userActivityCollName = "userActivity"
-	userCollName         = "users"
-	rootUsername         = "root"
-	rootPassword         = "root"
+	dbName       = "kdl"
+	userCollName = "users"
+	rootUsername = "root"
+	rootPassword = "root"
 )
 
 var (

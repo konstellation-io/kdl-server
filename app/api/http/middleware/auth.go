@@ -2,11 +2,7 @@ package middleware
 
 import (
 	"context"
-	"errors"
 	"net/http"
-
-	"github.com/konstellation-io/kdl-server/app/api/entity"
-	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
 
 type contextKey int
@@ -35,34 +31,13 @@ Example:
 
 	email := ctx.Value(middleware.LoggedUserEmailKey).(string).
 */
-func AuthMiddleware(next http.Handler, userUsecase user.UseCase) http.Handler {
+func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		email := r.Header.Get("X-Forwarded-Email")
 		sub := r.Header.Get("X-Forwarded-User")
 
 		if email == "" || sub == "" {
 			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		user, err := userUsecase.GetByEmail(r.Context(), email)
-		if errors.Is(err, entity.ErrUserNotFound) {
-			user, err = userUsecase.Create(r.Context(), email, sub, entity.AccessLevelViewer)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-		} else if user.Sub != sub {
-			user, err = userUsecase.UpdateSub(r.Context(), user, sub)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-		}
-
-		_, err = userUsecase.UpdateLastActivity(r.Context(), user)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 

@@ -34,26 +34,26 @@ func NewMinioAdminService(logger logr.Logger, endpoint, accessKey, secretKey str
 	return &MinioAdminService{logger: logger, client: client}, nil
 }
 
-func (m *MinioAdminService) getUserAccessKey(userSlug string) string {
-	return fmt.Sprintf("user-%s", userSlug)
+func (m *MinioAdminService) getUserAccessKey(email string) string {
+	return email
 }
 
 func (m *MinioAdminService) getProjectAccessKey(projectName string) string {
-	return fmt.Sprintf("project-%s", projectName)
+	return projectName
 }
 
-func (m *MinioAdminService) CreateUser(ctx context.Context, userSlug, secretKey string) (string, error) {
-	if userSlug == "" {
-		return "", errEmptySlug
+func (m *MinioAdminService) CreateUser(ctx context.Context, email, secretKey string) (string, error) {
+	if email == "" {
+		return "", errEmptyEmail
 	}
 
-	accessKey := m.getUserAccessKey(userSlug)
+	accessKey := m.getUserAccessKey(email)
 
-	m.logger.Info("Creating user", "userSlug", userSlug, "accessKey", accessKey)
+	m.logger.Info("Creating user", "email", email, "accessKey", accessKey)
 
 	err := m.client.AddUser(ctx, accessKey, secretKey)
 	if err != nil {
-		return "", fmt.Errorf("failed to create user %s, access key %s: %w", userSlug, accessKey, err)
+		return "", fmt.Errorf("failed to create user %s, access key %s: %w", email, accessKey, err)
 	}
 
 	return accessKey, nil
@@ -92,10 +92,10 @@ func (m *MinioAdminService) removeUser(ctx context.Context, accessKey string) er
 	return err
 }
 
-func (m *MinioAdminService) DeleteUser(ctx context.Context, userSlug string) error {
-	accessKey := m.getUserAccessKey(userSlug)
+func (m *MinioAdminService) DeleteUser(ctx context.Context, email string) error {
+	accessKey := m.getUserAccessKey(email)
 
-	m.logger.Info("Deleting user", "userSlug", userSlug, "accessKey", accessKey)
+	m.logger.Info("Deleting user", "email", email, "accessKey", accessKey)
 
 	return m.removeUser(ctx, accessKey)
 }
@@ -142,8 +142,8 @@ func (m *MinioAdminService) DeleteProjectPolicy(ctx context.Context, projectName
 	return err
 }
 
-func (m *MinioAdminService) updateProjectMembership(ctx context.Context, userSlug, projectName string, remove bool) error {
-	accessKey := m.getUserAccessKey(userSlug)
+func (m *MinioAdminService) updateProjectMembership(ctx context.Context, email, projectName string, remove bool) error {
+	accessKey := m.getUserAccessKey(email)
 
 	return m.client.UpdateGroupMembers(ctx, madmin.GroupAddRemove{
 		Group:    projectName,
@@ -152,12 +152,12 @@ func (m *MinioAdminService) updateProjectMembership(ctx context.Context, userSlu
 	})
 }
 
-func (m *MinioAdminService) JoinProject(ctx context.Context, userSlug, projectName string) error {
-	m.logger.Info("Adding user to project group", "userSlug", userSlug, "projectName", projectName)
+func (m *MinioAdminService) JoinProject(ctx context.Context, email, projectName string) error {
+	m.logger.Info("Adding user to project group", "email", email, "projectName", projectName)
 
-	err := m.updateProjectMembership(ctx, userSlug, projectName, false)
+	err := m.updateProjectMembership(ctx, email, projectName, false)
 	if err != nil {
-		return fmt.Errorf("failed to add user %s to group %s: %w", userSlug, projectName, err)
+		return fmt.Errorf("failed to add user %s to group %s: %w", email, projectName, err)
 	}
 
 	/* Adding group to policy. This has to be done after adding a user to group,
@@ -172,12 +172,12 @@ func (m *MinioAdminService) JoinProject(ctx context.Context, userSlug, projectNa
 	return err
 }
 
-func (m *MinioAdminService) LeaveProject(ctx context.Context, userSlug, projectName string) error {
-	m.logger.Info("Removing user from project group", "userSlug", userSlug, "projectName", projectName)
+func (m *MinioAdminService) LeaveProject(ctx context.Context, email, projectName string) error {
+	m.logger.Info("Removing user from project group", "email", email, "projectName", projectName)
 
-	err := m.updateProjectMembership(ctx, userSlug, projectName, true)
+	err := m.updateProjectMembership(ctx, email, projectName, true)
 	if err != nil {
-		return fmt.Errorf("failed to remove user %s from group %s: %w", userSlug, projectName, err)
+		return fmt.Errorf("failed to remove user %s from group %s: %w", email, projectName, err)
 	}
 
 	return err

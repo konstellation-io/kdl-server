@@ -2,4 +2,4 @@ package minioadminservice
 
 import "errors"
 
-var errEmptySlug = errors.New("user slug can not be empty")
+var errEmptyEmail = errors.New("user email can not be empty")

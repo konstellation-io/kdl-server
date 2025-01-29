@@ -68,7 +68,7 @@ func NewActivityVarsWithProjectAndUserID(projectID, userID string) []UserActivit
 	}
 }
 
-func NewActivityVarsCreateUser(userID string) []UserActivityVar {
+func NewActivityVarsWithUserID(userID string) []UserActivityVar {
 	return []UserActivityVar{
 		{
 			Key:   "USER_ID",

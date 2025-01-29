@@ -145,7 +145,7 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 	}
 
 	// Save user creation in user activity
-	createUserActVars := entity.NewActivityVarsCreateUser(insertedID)
+	createUserActVars := entity.NewActivityVarsWithUserID(insertedID)
 	createUserdAct := entity.UserActivity{
 		Date:   i.clock.Now(),
 		UserID: insertedID,

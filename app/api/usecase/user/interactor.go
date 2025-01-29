@@ -16,6 +16,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 )
 
@@ -29,6 +30,7 @@ type Interactor struct {
 	logger           logr.Logger
 	cfg              config.Config
 	repo             Repository
+	userActivityRepo project.UserActivityRepo
 	repoRuntimes     runtime.Repository
 	repoCapabilities capabilities.Repository
 	sshGenerator     sshhelper.SSHKeyGenerator
@@ -49,11 +51,13 @@ func NewInteractor(
 	sshGenerator sshhelper.SSHKeyGenerator,
 	c clock.Clock,
 	k8sClient k8s.ClientInterface,
+	userActivityRepo project.UserActivityRepo,
 ) UseCase {
 	return &Interactor{
 		logger:           logger,
 		cfg:              cfg,
 		repo:             repo,
+		userActivityRepo: userActivityRepo,
 		repoRuntimes:     repoRuntimes,
 		repoCapabilities: repoCapabilities,
 		sshGenerator:     sshGenerator,
@@ -137,6 +141,20 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 	_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
 	if err != nil {
 		i.logger.Error(err, "Error creating service account", "username", username)
+		return entity.User{}, err
+	}
+
+	// Save user creation in user activity
+	createUserActVars := entity.NewActivityVarsCreateUser(insertedID)
+	createUserdAct := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: insertedID,
+		Type:   entity.UserActivityTypeCreateUser,
+		Vars:   createUserActVars,
+	}
+
+	err = i.userActivityRepo.Create(ctx, createUserdAct)
+	if err != nil {
 		return entity.User{}, err
 	}
 

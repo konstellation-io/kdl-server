@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -187,10 +188,49 @@ func (i *interactor) GetByID(ctx context.Context, id string) (entity.Project, er
 	return i.projectRepo.Get(ctx, id)
 }
 
+// Save project info updated in user activity.
+func (i *interactor) SaveActivityVars(
+	ctx context.Context,
+	loggedUser entity.User,
+	actType entity.UserActivityType,
+	projectID, oldValue, newValue string,
+) error {
+	updateProjectInfoActVars := entity.NewActivityVarsProjectInfoUpdated(projectID, oldValue, newValue)
+	updateProjectInfoAct := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: loggedUser.ID,
+		Type:   actType,
+		Vars:   updateProjectInfoActVars,
+	}
+
+	err := i.userActivityRepo.Create(ctx, updateProjectInfoAct)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Update changes the desired information about a project.
 func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
+	p, _ := i.projectRepo.Get(ctx, opt.ProjectID)
+
 	if !kdlutil.IsNilOrEmpty(opt.Name) {
 		err := i.projectRepo.UpdateName(ctx, opt.ProjectID, *opt.Name)
+		if err != nil {
+			return entity.Project{}, err
+		}
+
+		// Save project name updated in user activity
+		err = i.SaveActivityVars(
+			ctx,
+			opt.LoggedUser,
+			entity.UserActivityProjectNameUpdated,
+			opt.ProjectID,
+			p.Name,
+			*opt.Name,
+		)
+
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -201,10 +241,37 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 		if err != nil {
 			return entity.Project{}, err
 		}
+
+		// Save project name updated in user activity
+		err = i.SaveActivityVars(
+			ctx,
+			opt.LoggedUser,
+			entity.UserActivityProjectDescriptionUpdated,
+			opt.ProjectID,
+			p.Description,
+			*opt.Description,
+		)
+
+		if err != nil {
+			return entity.Project{}, err
+		}
 	}
 
 	if opt.Archived != nil {
 		err := i.projectRepo.UpdateArchived(ctx, opt.ProjectID, *opt.Archived)
+		if err != nil {
+			return entity.Project{}, err
+		}
+
+		// Save project name updated in user activity
+		err = i.SaveActivityVars(
+			ctx, opt.LoggedUser,
+			entity.UserActivityProjectArchivedUpdated,
+			opt.ProjectID,
+			strconv.FormatBool(p.Archived),
+			strconv.FormatBool(*opt.Archived),
+		)
+
 		if err != nil {
 			return entity.Project{}, err
 		}

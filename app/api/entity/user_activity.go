@@ -1,17 +1,36 @@
 package entity
 
 import (
+	"slices"
 	"time"
 )
 
 type UserActivityType string
 
 const (
-	UserActivityTypeDeleteProject UserActivityType = "DELETE_PROJECT"
+	UserActivityTypeCreateUser            UserActivityType = "CREATE_USER"
+	UserActivityTypeUpdateUserAccessLevel UserActivityType = "UPDATE_USER_ACCESS_LEVEL"
+	UserActivityTypeDeleteProject         UserActivityType = "DELETE_PROJECT"
+	UserActivityTypeAddMember             UserActivityType = "ADD_MEMBER"
+	UserActivityTypeRemoveMember          UserActivityType = "REMOVE_MEMBER"
+	UserActivityProjectNameUpdated        UserActivityType = "PROJECT_NAME_UPDATED"
+	UserActivityProjectDescriptionUpdated UserActivityType = "PROJECT_DESCRIPTION_UPDATED"
+	UserActivityProjectArchivedUpdated    UserActivityType = "PROJECT_ARCHIVED_UPDATED"
 )
 
 func (e UserActivityType) IsValid() bool {
-	return e == UserActivityTypeDeleteProject
+	userActivityTypes := []UserActivityType{
+		UserActivityTypeCreateUser,
+		UserActivityTypeUpdateUserAccessLevel,
+		UserActivityTypeDeleteProject,
+		UserActivityTypeAddMember,
+		UserActivityTypeRemoveMember,
+		UserActivityProjectNameUpdated,
+		UserActivityProjectDescriptionUpdated,
+		UserActivityProjectArchivedUpdated,
+	}
+
+	return slices.Contains(userActivityTypes, e)
 }
 
 func (e UserActivityType) String() string {
@@ -32,6 +51,66 @@ func NewActivityVarsDeleteRepo(projectID, minioBackupBucket string) []UserActivi
 		{
 			Key:   "MINIO_BACKUP_BUCKET",
 			Value: minioBackupBucket,
+		},
+	}
+}
+
+func NewActivityVarsAddRemoveMember(projectID, userID string) []UserActivityVar {
+	return []UserActivityVar{
+		{
+			Key:   "PROJECT_ID",
+			Value: projectID,
+		},
+		{
+			Key:   "USER_ID",
+			Value: userID,
+		},
+	}
+}
+
+func NewActivityVarsCreateUser(userID string) []UserActivityVar {
+	return []UserActivityVar{
+		{
+			Key:   "USER_ID",
+			Value: userID,
+		},
+	}
+}
+
+func NewActivityVarsUpdateUserAccessLevel(projectID, userID, oldAccessLevel, newAccessLevel string) []UserActivityVar {
+	return []UserActivityVar{
+		{
+			Key:   "PROJECT_ID",
+			Value: projectID,
+		},
+		{
+			Key:   "USER_ID",
+			Value: userID,
+		},
+		{
+			Key:   "OLD_ACCESS_LEVEL",
+			Value: oldAccessLevel,
+		},
+		{
+			Key:   "NEW_ACCESS_LEVEL",
+			Value: newAccessLevel,
+		},
+	}
+}
+
+func NewActivityVarsProjectInfoUpdated(projectID, oldValue, newValue string) []UserActivityVar {
+	return []UserActivityVar{
+		{
+			Key:   "PROJECT_ID",
+			Value: projectID,
+		},
+		{
+			Key:   "OLD_VALUE",
+			Value: oldValue,
+		},
+		{
+			Key:   "NEW_VALUE",
+			Value: newValue,
 		},
 	}
 }

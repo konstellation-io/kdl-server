@@ -24,6 +24,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
 
@@ -38,6 +39,7 @@ type userMocks struct {
 	sshGenerator     *sshhelper.MockSSHKeyGenerator
 	clock            *clock.MockClock
 	k8sClient        *k8s.MockClientInterface
+	userActivityRepo *project.MockUserActivityRepo
 }
 
 type AuthMiddlewareTestSuite struct {
@@ -61,6 +63,7 @@ func (ts *AuthMiddlewareTestSuite) SetupSuite() {
 	ts.mocks.clock = clock.NewMockClock(ts.ctrl)
 	ts.mocks.sshGenerator = sshhelper.NewMockSSHKeyGenerator(ts.ctrl)
 	ts.mocks.k8sClient = k8s.NewMockClientInterface(ts.ctrl)
+	ts.mocks.userActivityRepo = project.NewMockUserActivityRepo(ts.ctrl)
 
 	zapLog, err := zap.NewDevelopment()
 	ts.Require().NoError(err)
@@ -70,7 +73,7 @@ func (ts *AuthMiddlewareTestSuite) SetupSuite() {
 	ts.mocks.cfg = config.Config{}
 
 	ts.interactor = user.NewInteractor(ts.mocks.logger, ts.mocks.cfg, ts.mocks.repo, ts.mocks.runtimeRepo,
-		ts.mocks.capabilitiesRepo, ts.mocks.sshGenerator, ts.mocks.clock, ts.mocks.k8sClient)
+		ts.mocks.capabilitiesRepo, ts.mocks.sshGenerator, ts.mocks.clock, ts.mocks.k8sClient, ts.mocks.userActivityRepo)
 }
 
 func (ts *AuthMiddlewareTestSuite) TestAuthMiddlewareNoEmailHeader() {

@@ -22,6 +22,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
@@ -50,6 +51,7 @@ type userMocks struct {
 	k8sClientMock    *k8s.MockClientInterface
 	logger           logr.Logger
 	cfg              config.Config
+	userActivityRepo *project.MockUserActivityRepo
 }
 
 func newUserSuite(t *testing.T) *userSuite {
@@ -60,6 +62,7 @@ func newUserSuite(t *testing.T) *userSuite {
 	clockMock := clock.NewMockClock(ctrl)
 	sshGenerator := sshhelper.NewMockSSHKeyGenerator(ctrl)
 	k8sClientMock := k8s.NewMockClientInterface(ctrl)
+	userActivityRepo := project.NewMockUserActivityRepo(ctrl)
 
 	zapLog, err := zap.NewDevelopment()
 	require.NoError(t, err)
@@ -69,7 +72,7 @@ func newUserSuite(t *testing.T) *userSuite {
 	cfg := &config.Config{}
 
 	interactor := user.NewInteractor(logger, *cfg, repo, repoRuntimes, repoCapabilities, sshGenerator,
-		clockMock, k8sClientMock)
+		clockMock, k8sClientMock, userActivityRepo)
 
 	return &userSuite{
 		ctrl:       ctrl,
@@ -78,6 +81,7 @@ func newUserSuite(t *testing.T) *userSuite {
 			logger:           logger,
 			cfg:              *cfg,
 			repo:             repo,
+			userActivityRepo: userActivityRepo,
 			runtimeRepo:      repoRuntimes,
 			capabilitiesRepo: repoCapabilities,
 			sshGenerator:     sshGenerator,
@@ -129,6 +133,13 @@ func TestInteractor_Create(t *testing.T) {
 		CreationDate: now,
 	}
 
+	expectedCreateUserActVars := []entity.UserActivityVar{
+		{
+			Key:   "USER_ID",
+			Value: id,
+		},
+	}
+
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
@@ -138,6 +149,16 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.userActivityRepo.EXPECT().Create(
+		ctx,
+		entity.UserActivity{
+			Date:   now,
+			UserID: id,
+			Type:   entity.UserActivityTypeCreateUser,
+			Vars:   expectedCreateUserActVars,
+		},
+	).Return(nil)
 
 	createdUser, err := s.interactor.Create(ctx, email, sub, accessLevel)
 

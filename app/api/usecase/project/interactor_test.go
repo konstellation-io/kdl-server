@@ -3,6 +3,7 @@ package project_test
 import (
 	"context"
 	"errors"
+	"strconv"
 	"testing"
 	"time"
 
@@ -207,10 +208,50 @@ func TestInteractor_AddMembers(t *testing.T) {
 	expectedProject := entity.NewProject(testProjectID, p.Name, p.Description)
 	expectedProject.Repository = p.Repository
 	expectedProject.Members = []entity.Member{adminMember, newMembers[0], newMembers[1]}
+	expectedAddMemberActVars := [][]entity.UserActivityVar{
+		{
+			{
+				Key:   "PROJECT_ID",
+				Value: p.ID,
+			},
+			{
+				Key:   "USER_ID",
+				Value: usersToAdd[0].ID,
+			},
+		},
+		{
+			{
+				Key:   "PROJECT_ID",
+				Value: p.ID,
+			},
+			{
+				Key:   "USER_ID",
+				Value: usersToAdd[1].ID,
+			},
+		},
+	}
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().AddMembers(ctx, p.ID, newMembers).Return(nil)
+	s.mocks.userActivityRepo.EXPECT().Create(
+		ctx,
+		entity.UserActivity{
+			Date:   now,
+			UserID: loggedUser.ID,
+			Type:   entity.UserActivityTypeAddMember,
+			Vars:   expectedAddMemberActVars[0],
+		},
+	).Return(nil)
+	s.mocks.userActivityRepo.EXPECT().Create(
+		ctx,
+		entity.UserActivity{
+			Date:   now,
+			UserID: loggedUser.ID,
+			Type:   entity.UserActivityTypeAddMember,
+			Vars:   expectedAddMemberActVars[1],
+		},
+	).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
 
 	p, err := s.interactor.AddMembers(ctx, project.AddMembersOption{
@@ -228,6 +269,7 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	ctx := context.Background()
+	now := time.Now().UTC()
 
 	loggedUser := entity.User{
 		ID:       "logged.user.1234",
@@ -257,10 +299,51 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 	expectedProject := entity.NewProject(testProjectID, p.Name, p.Description)
 	expectedProject.Repository = p.Repository
 	expectedProject.Members = []entity.Member{adminMember}
+	expectedRemoveMemberActVars := [][]entity.UserActivityVar{
+		{
+			{
+				Key:   "PROJECT_ID",
+				Value: p.ID,
+			},
+			{
+				Key:   "USER_ID",
+				Value: usersToRemove[0].ID,
+			},
+		},
+		{
+			{
+				Key:   "PROJECT_ID",
+				Value: p.ID,
+			},
+			{
+				Key:   "USER_ID",
+				Value: usersToRemove[1].ID,
+			},
+		},
+	}
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
 
 	s.mocks.repo.EXPECT().RemoveMembers(ctx, p.ID, usersToRemove).Return(nil)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.userActivityRepo.EXPECT().Create(
+		ctx,
+		entity.UserActivity{
+			Date:   now,
+			UserID: loggedUser.ID,
+			Type:   entity.UserActivityTypeRemoveMember,
+			Vars:   expectedRemoveMemberActVars[0],
+		},
+	).Return(nil)
+	s.mocks.userActivityRepo.EXPECT().Create(
+		ctx,
+		entity.UserActivity{
+			Date:   now,
+			UserID: loggedUser.ID,
+			Type:   entity.UserActivityTypeRemoveMember,
+			Vars:   expectedRemoveMemberActVars[1],
+		},
+	).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
 
 	p, err := s.interactor.RemoveMembers(ctx, project.RemoveMembersOption{
@@ -309,6 +392,7 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	ctx := context.Background()
+	now := time.Now().UTC()
 
 	const newAccessLevel = entity.AccessLevelManager
 
@@ -322,8 +406,8 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 	}
 
 	usersToUpd := []entity.User{
-		{ID: "userA", Username: "user_a"},
-		{ID: "userB", Username: "user_b"},
+		{ID: "userA", Username: "user_a", AccessLevel: entity.AccessLevelViewer},
+		{ID: "userB", Username: "user_b", AccessLevel: entity.AccessLevelViewer},
 	}
 
 	p := entity.NewProject(testProjectID, "project-x", "Project X")
@@ -340,10 +424,59 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 	expectedProject := entity.NewProject(testProjectID, p.Name, p.Description)
 	expectedProject.Repository = p.Repository
 	expectedProject.Members = []entity.Member{adminMember}
+	expectedUpdateMemberActVars := [][]entity.UserActivityVar{
+		{
+			{
+				Key: "PROJECT_ID", Value: p.ID,
+			},
+			{
+				Key: "USER_ID", Value: usersToUpd[0].ID,
+			},
+			{
+				Key: "OLD_ACCESS_LEVEL", Value: string(entity.AccessLevelViewer),
+			},
+			{
+				Key: "NEW_ACCESS_LEVEL", Value: string(newAccessLevel),
+			},
+		},
+		{
+			{
+				Key: "PROJECT_ID", Value: p.ID,
+			},
+			{
+				Key: "USER_ID", Value: usersToUpd[1].ID,
+			},
+			{
+				Key: "OLD_ACCESS_LEVEL", Value: string(entity.AccessLevelViewer),
+			},
+			{
+				Key: "NEW_ACCESS_LEVEL", Value: string(newAccessLevel),
+			},
+		},
+	}
 
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(p, nil)
 
 	s.mocks.repo.EXPECT().UpdateMembersAccessLevel(ctx, p.ID, usersToUpd, newAccessLevel).Return(nil)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.userActivityRepo.EXPECT().Create(
+		ctx,
+		entity.UserActivity{
+			Date:   now,
+			UserID: loggedUser.ID,
+			Type:   entity.UserActivityTypeUpdateUserAccessLevel,
+			Vars:   expectedUpdateMemberActVars[0],
+		},
+	).Return(nil)
+	s.mocks.userActivityRepo.EXPECT().Create(
+		ctx,
+		entity.UserActivity{
+			Date:   now,
+			UserID: loggedUser.ID,
+			Type:   entity.UserActivityTypeUpdateUserAccessLevel,
+			Vars:   expectedUpdateMemberActVars[1],
+		},
+	).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
 
 	p, err := s.interactor.UpdateMembers(ctx, project.UpdateMembersOption{
@@ -395,25 +528,97 @@ func TestInteractor_Update(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
-	newName := "The new project name"
-	newDesc := "the new description"
+	ctx := context.Background()
+	now := time.Now().UTC()
 
-	expectedProject := entity.Project{
-		ID:          testProjectID,
-		Name:        newName,
-		Description: newDesc,
+	oldName := "The old project name"
+	newName := "The new project name"
+	oldDesc := "The old description"
+	newDesc := "The new description"
+	oldArchived := false
+	newArchived := true
+
+	loggedUser := entity.User{
+		ID:          "logged-user",
+		AccessLevel: entity.AccessLevelAdmin,
 	}
 
-	ctx := context.Background()
+	originalProject := entity.Project{
+		ID:           testProjectID,
+		Name:         oldName,
+		Description:  oldDesc,
+		Archived:     oldArchived,
+		CreationDate: now,
+	}
+
+	expectedProject := originalProject
+	expectedProject.Name = newName
+	expectedProject.Description = newDesc
+	expectedProject.Archived = newArchived
+
+	expectedUpdateNameActVars := []entity.UserActivityVar{
+		{Key: "PROJECT_ID", Value: expectedProject.ID},
+		{Key: "OLD_VALUE", Value: oldName},
+		{Key: "NEW_VALUE", Value: newName},
+	}
+	expectedUpdateDescriptionActVars := []entity.UserActivityVar{
+		{Key: "PROJECT_ID", Value: expectedProject.ID},
+		{Key: "OLD_VALUE", Value: oldDesc},
+		{Key: "NEW_VALUE", Value: newDesc},
+	}
+	expectedUpdateArchivedActVars := []entity.UserActivityVar{
+		{Key: "PROJECT_ID", Value: expectedProject.ID},
+		{Key: "OLD_VALUE", Value: strconv.FormatBool(oldArchived)},
+		{Key: "NEW_VALUE", Value: strconv.FormatBool(newArchived)},
+	}
 
 	s.mocks.repo.EXPECT().UpdateName(ctx, testProjectID, newName).Return(nil)
+	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(originalProject, nil)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.userActivityRepo.EXPECT().Create(
+		ctx,
+		entity.UserActivity{
+			Date:   now,
+			UserID: loggedUser.ID,
+			Type:   entity.UserActivityProjectNameUpdated,
+			Vars:   expectedUpdateNameActVars,
+		},
+	).Return(nil)
+
 	s.mocks.repo.EXPECT().UpdateDescription(ctx, testProjectID, newDesc).Return(nil)
+	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(originalProject, nil)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.userActivityRepo.EXPECT().Create(
+		ctx,
+		entity.UserActivity{
+			Date:   now,
+			UserID: loggedUser.ID,
+			Type:   entity.UserActivityProjectDescriptionUpdated,
+			Vars:   expectedUpdateDescriptionActVars,
+		},
+	).Return(nil)
+
+	s.mocks.repo.EXPECT().UpdateArchived(ctx, testProjectID, newArchived).Return(nil)
+	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(originalProject, nil)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.userActivityRepo.EXPECT().Create(
+		ctx,
+		entity.UserActivity{
+			Date:   now,
+			UserID: loggedUser.ID,
+			Type:   entity.UserActivityProjectArchivedUpdated,
+			Vars:   expectedUpdateArchivedActVars,
+		},
+	).Return(nil)
+
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(expectedProject, nil)
 
 	result, err := s.interactor.Update(ctx, project.UpdateProjectOption{
 		ProjectID:   testProjectID,
 		Name:        &newName,
 		Description: &newDesc,
+		Archived:    &newArchived,
+		LoggedUser:  loggedUser,
 	})
 
 	require.NoError(t, err)

@@ -14,6 +14,7 @@ type UpdateProjectOption struct {
 	Name        *string
 	Description *string
 	Archived    *bool
+	LoggedUser  entity.User
 }
 
 // UpdateMembersOption options when updating a project member.
@@ -75,6 +76,7 @@ func (i *interactor) AddMembers(ctx context.Context, opt AddMembersOption) (enti
 	// Store new members into the DataBase
 	now := i.clock.Now()
 	newMembers := make([]entity.Member, len(opt.Users))
+	addMemberActVarsList := make([][]entity.UserActivityVar, len(opt.Users))
 
 	for idx, u := range opt.Users {
 		newMembers[idx] = entity.Member{
@@ -82,11 +84,27 @@ func (i *interactor) AddMembers(ctx context.Context, opt AddMembersOption) (enti
 			AccessLevel: MemberAccessLevelOnCreation,
 			AddedDate:   now,
 		}
+		addMemberActVarsList[idx] = entity.NewActivityVarsAddRemoveMember(opt.ProjectID, u.ID)
 	}
 
 	err = i.projectRepo.AddMembers(ctx, opt.ProjectID, newMembers)
 	if err != nil {
 		return entity.Project{}, err
+	}
+
+	// Save add members in user activity
+	for _, addMemberActVars := range addMemberActVarsList {
+		addMemberAct := entity.UserActivity{
+			Date:   now,
+			UserID: opt.LoggedUser.ID,
+			Type:   entity.UserActivityTypeAddMember,
+			Vars:   addMemberActVars,
+		}
+
+		err = i.userActivityRepo.Create(ctx, addMemberAct)
+		if err != nil {
+			return entity.Project{}, err
+		}
 	}
 
 	return i.projectRepo.Get(ctx, opt.ProjectID)
@@ -99,11 +117,15 @@ func (i *interactor) RemoveMembers(ctx context.Context, opt RemoveMembersOption)
 		return entity.Project{}, err
 	}
 
+	removeMemberActVarsList := make([][]entity.UserActivityVar, len(opt.Users))
+
 	// Check the members to remove exist into the project
-	for _, u := range opt.Users {
+	for idx, u := range opt.Users {
 		if ok, _ := i.getMember(u.ID, p.Members); !ok {
 			return entity.Project{}, fmt.Errorf("%w: user ID=%s", ErrMemberNotExists, u.ID)
 		}
+
+		removeMemberActVarsList[idx] = entity.NewActivityVarsAddRemoveMember(opt.ProjectID, u.ID)
 	}
 
 	// Check the logged user is admin in this project
@@ -125,6 +147,22 @@ func (i *interactor) RemoveMembers(ctx context.Context, opt RemoveMembersOption)
 	err = i.projectRepo.RemoveMembers(ctx, opt.ProjectID, opt.Users)
 	if err != nil {
 		return entity.Project{}, err
+	}
+
+	// Save remove members in user activity
+	now := i.clock.Now()
+	for _, removeMemberActVars := range removeMemberActVarsList {
+		removeMemberAct := entity.UserActivity{
+			Date:   now,
+			UserID: opt.LoggedUser.ID,
+			Type:   entity.UserActivityTypeRemoveMember,
+			Vars:   removeMemberActVars,
+		}
+
+		err = i.userActivityRepo.Create(ctx, removeMemberAct)
+		if err != nil {
+			return entity.Project{}, err
+		}
 	}
 
 	return i.projectRepo.Get(ctx, opt.ProjectID)
@@ -165,6 +203,33 @@ func (i *interactor) UpdateMembers(ctx context.Context, opt UpdateMembersOption)
 	err = i.projectRepo.UpdateMembersAccessLevel(ctx, opt.ProjectID, opt.Users, opt.AccessLevel)
 	if err != nil {
 		return entity.Project{}, err
+	}
+
+	// Save update members in user activity
+	now := i.clock.Now()
+
+	for _, u := range opt.Users {
+		if u.AccessLevel == opt.AccessLevel {
+			continue
+		}
+
+		updateUserAccessLevelActVars := entity.NewActivityVarsUpdateUserAccessLevel(
+			opt.ProjectID,
+			u.ID,
+			string(u.AccessLevel),
+			string(opt.AccessLevel),
+		)
+		updateUserAccessLevelAct := entity.UserActivity{
+			Date:   now,
+			UserID: opt.LoggedUser.ID,
+			Type:   entity.UserActivityTypeUpdateUserAccessLevel,
+			Vars:   updateUserAccessLevelActVars,
+		}
+
+		err = i.userActivityRepo.Create(ctx, updateUserAccessLevelAct)
+		if err != nil {
+			return entity.Project{}, err
+		}
 	}
 
 	return i.projectRepo.Get(ctx, opt.ProjectID)

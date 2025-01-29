@@ -35,15 +35,15 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 }
 
 // DeleteUser mocks base method.
-func (m *MockService) DeleteUser(ctx context.Context, username string) error {
+func (m *MockService) DeleteUser(ctx context.Context, userEmail string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteUser", ctx, username)
+	ret := m.ctrl.Call(m, "DeleteUser", ctx, userEmail)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteUser indicates an expected call of DeleteUser.
-func (mr *MockServiceMockRecorder) DeleteUser(ctx, username interface{}) *gomock.Call {
+func (mr *MockServiceMockRecorder) DeleteUser(ctx, userEmail interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockService)(nil).DeleteUser), ctx, username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockService)(nil).DeleteUser), ctx, userEmail)
 }

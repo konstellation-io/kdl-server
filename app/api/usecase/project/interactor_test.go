@@ -581,7 +581,7 @@ func TestInteractor_Update(t *testing.T) {
 		entity.UserActivity{
 			Date:   now,
 			UserID: loggedUser.ID,
-			Type:   entity.UserActivityProjectNameUpdated,
+			Type:   entity.UserActivityUpdateProjectName,
 			Vars:   expectedUpdateNameActVars,
 		},
 	).Return(nil)
@@ -593,7 +593,7 @@ func TestInteractor_Update(t *testing.T) {
 		entity.UserActivity{
 			Date:   now,
 			UserID: loggedUser.ID,
-			Type:   entity.UserActivityProjectDescriptionUpdated,
+			Type:   entity.UserActivityUpdateProjectDescription,
 			Vars:   expectedUpdateDescriptionActVars,
 		},
 	).Return(nil)
@@ -605,7 +605,7 @@ func TestInteractor_Update(t *testing.T) {
 		entity.UserActivity{
 			Date:   now,
 			UserID: loggedUser.ID,
-			Type:   entity.UserActivityProjectArchivedUpdated,
+			Type:   entity.UserActivityUpdateProjectArchived,
 			Vars:   expectedUpdateArchivedActVars,
 		},
 	).Return(nil)

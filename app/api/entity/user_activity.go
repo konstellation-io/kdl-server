@@ -13,9 +13,9 @@ const (
 	UserActivityTypeDeleteProject         UserActivityType = "DELETE_PROJECT"
 	UserActivityTypeAddMember             UserActivityType = "ADD_MEMBER"
 	UserActivityTypeRemoveMember          UserActivityType = "REMOVE_MEMBER"
-	UserActivityProjectNameUpdated        UserActivityType = "PROJECT_NAME_UPDATED"
-	UserActivityProjectDescriptionUpdated UserActivityType = "PROJECT_DESCRIPTION_UPDATED"
-	UserActivityProjectArchivedUpdated    UserActivityType = "PROJECT_ARCHIVED_UPDATED"
+	UserActivityUpdateProjectName         UserActivityType = "UPDATE_PROJECT_NAME"
+	UserActivityUpdateProjectDescription  UserActivityType = "UPDATE_PROJECT_DESCRIPTION"
+	UserActivityUpdateProjectArchived     UserActivityType = "UPDATE_PROJECT_ARCHIVED"
 )
 
 func (e UserActivityType) IsValid() bool {
@@ -25,9 +25,9 @@ func (e UserActivityType) IsValid() bool {
 		UserActivityTypeDeleteProject,
 		UserActivityTypeAddMember,
 		UserActivityTypeRemoveMember,
-		UserActivityProjectNameUpdated,
-		UserActivityProjectDescriptionUpdated,
-		UserActivityProjectArchivedUpdated,
+		UserActivityUpdateProjectName,
+		UserActivityUpdateProjectDescription,
+		UserActivityUpdateProjectArchived,
 	}
 
 	return slices.Contains(userActivityTypes, e)

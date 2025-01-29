@@ -55,7 +55,7 @@ func NewActivityVarsDeleteRepo(projectID, minioBackupBucket string) []UserActivi
 	}
 }
 
-func NewActivityVarsAddRemoveMember(projectID, userID string) []UserActivityVar {
+func NewActivityVarsWithProjectAndUserID(projectID, userID string) []UserActivityVar {
 	return []UserActivityVar{
 		{
 			Key:   "PROJECT_ID",
@@ -98,7 +98,7 @@ func NewActivityVarsUpdateUserAccessLevel(projectID, userID, oldAccessLevel, new
 	}
 }
 
-func NewActivityVarsProjectInfoUpdated(projectID, oldValue, newValue string) []UserActivityVar {
+func NewActivityVarsUpdateProjectInfo(projectID, oldValue, newValue string) []UserActivityVar {
 	return []UserActivityVar{
 		{
 			Key:   "PROJECT_ID",

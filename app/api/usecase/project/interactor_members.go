@@ -84,7 +84,7 @@ func (i *interactor) AddMembers(ctx context.Context, opt AddMembersOption) (enti
 			AccessLevel: MemberAccessLevelOnCreation,
 			AddedDate:   now,
 		}
-		addMemberActVarsList[idx] = entity.NewActivityVarsAddRemoveMember(opt.ProjectID, u.ID)
+		addMemberActVarsList[idx] = entity.NewActivityVarsWithProjectAndUserID(opt.ProjectID, u.ID)
 	}
 
 	err = i.projectRepo.AddMembers(ctx, opt.ProjectID, newMembers)
@@ -125,7 +125,7 @@ func (i *interactor) RemoveMembers(ctx context.Context, opt RemoveMembersOption)
 			return entity.Project{}, fmt.Errorf("%w: user ID=%s", ErrMemberNotExists, u.ID)
 		}
 
-		removeMemberActVarsList[idx] = entity.NewActivityVarsAddRemoveMember(opt.ProjectID, u.ID)
+		removeMemberActVarsList[idx] = entity.NewActivityVarsWithProjectAndUserID(opt.ProjectID, u.ID)
 	}
 
 	// Check the logged user is admin in this project

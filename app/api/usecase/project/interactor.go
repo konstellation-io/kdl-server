@@ -195,7 +195,7 @@ func (i *interactor) SaveUserActivity(
 	actType entity.UserActivityType,
 	projectID, oldValue, newValue string,
 ) error {
-	updateProjectInfoActVars := entity.NewActivityVarsProjectInfoUpdated(projectID, oldValue, newValue)
+	updateProjectInfoActVars := entity.NewActivityVarsUpdateProjectInfo(projectID, oldValue, newValue)
 	updateProjectInfoAct := entity.UserActivity{
 		Date:   i.clock.Now(),
 		UserID: loggedUser.ID,

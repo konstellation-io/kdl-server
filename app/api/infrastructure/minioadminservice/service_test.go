@@ -102,6 +102,8 @@ func (s *TestSuite) TearDownTest() {
 	for username := range users {
 		err = s.adminClient.RemoveUser(ctx, username)
 		s.Require().NoError(err)
+
+		_ = s.adminClient.RemoveCannedPolicy(ctx, username)
 	}
 
 	err = s.adminClient.RemoveCannedPolicy(ctx, testProjectName)

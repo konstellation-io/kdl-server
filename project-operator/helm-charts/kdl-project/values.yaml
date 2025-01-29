@@ -686,7 +686,7 @@ mlflow:
     # If undefined (the default) or set to null, no storageClassName spec is
     #   set, choosing the default provisioner.  (gp2 on AWS, standard on
     #   GKE, AWS & OpenStack)
-    storageClass: ""
+    storageClassName: ""
 
     # -- Persistent Volume Binding Mode
     # If defined, volumeBindingMode: <volumeBindingMode>

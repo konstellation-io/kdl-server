@@ -15,11 +15,11 @@ metadata:
 spec:
   accessModes:
 {{ toYaml .Values.mlflow.persistentVolume.accessModes | indent 4 }}
-{{- if .Values.mlflow.persistentVolume.storageClass }}
-{{- if (eq "-" .Values.mlflow.persistentVolume.storageClass) }}
+{{- if .Values.mlflow.persistentVolume.storageClassName }}
+{{- if (eq "-" .Values.mlflow.persistentVolume.storageClassName) }}
   storageClassName: ""
 {{- else }}
-  storageClassName: "{{ .Values.mlflow.persistentVolume.storageClass }}"
+  storageClassName: "{{ .Values.mlflow.persistentVolume.storageClassName }}"
 {{- end }}
 {{- end }}
 {{- if .Values.mlflow.persistentVolume.volumeBindingMode }}

@@ -297,7 +297,7 @@ func (m *UserRepo) entityToDTO(u entity.User) (userDTO, error) {
 		PublicSSHKey:       u.SSHKey.Public,
 		SSHKeyCreationDate: u.SSHKey.CreationDate,
 		CreationDate:       u.CreationDate,
-		LastActivity:       *u.LastActivity,
+		LastActivity:       u.LastActivity,
 		Deleted:            u.Deleted,
 		MinioAccessKey:     u.MinioAccessKey.AccessKey,
 		MinioSecretKey:     u.MinioAccessKey.SecretKey,
@@ -323,7 +323,7 @@ func (m *UserRepo) dtoToEntity(dto userDTO) entity.User {
 		Sub:          dto.Sub,
 		AccessLevel:  entity.AccessLevel(dto.AccessLevel),
 		CreationDate: dto.CreationDate,
-		LastActivity: &dto.LastActivity,
+		LastActivity: dto.LastActivity,
 		SSHKey: entity.SSHKey{
 			Public:       dto.PublicSSHKey,
 			Private:      dto.PrivateSSHKey,

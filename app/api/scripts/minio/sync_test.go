@@ -40,7 +40,7 @@ var (
 		Email:        "email1",
 		Username:     "user1",
 		Sub:          "d5d70477-5192-4182-b80e-5d34550eb4fe",
-		LastActivity: &testTimeExample,
+		LastActivity: testTimeExample,
 	}
 	projectEntity = entity.Project{
 		ID:          primitive.NewObjectID().Hex(),

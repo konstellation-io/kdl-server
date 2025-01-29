@@ -1,12 +1,15 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"reflect"
 
 	"github.com/kelseyhightower/envconfig"
 )
+
+var errFieldEmpty = errors.New("cannot be empty")
 
 type KeycloakConfig struct {
 	AdminUser        string `envconfig:"KEYCLOAK_ADMIN_USER"`
@@ -33,7 +36,7 @@ type Config struct {
 		URI    string `envconfig:"KDL_SERVER_MONGODB_URI"`
 		DBName string `envconfig:"KDL_SERVER_MONGODB_NAME" default:"kdl"`
 	}
-	Keycloak   KeycloakConfig
+	Keycloak   KeycloakConfig `optional:"true"`
 	Kubernetes KubernetesConfig
 	Minio      struct {
 		Endpoint  string `envconfig:"MINIO_ENDPOINT"`
@@ -56,6 +59,27 @@ type Config struct {
 	}
 }
 
+func (c *Config) Validate() error {
+	v := reflect.ValueOf(*c)
+	t := reflect.TypeOf(*c)
+
+	for i := 0; i < v.NumField(); i++ {
+		fieldType := t.Field(i)
+
+		optionalTag := fieldType.Tag.Get("optional")
+		if optionalTag == "true" {
+			continue
+		}
+
+		field := v.Field(i)
+		if field.Interface() == reflect.Zero(field.Type()).Interface() {
+			return fmt.Errorf("error in field %s: %w", v.Type().Field(i).Name, errFieldEmpty)
+		}
+	}
+
+	return nil
+}
+
 // NewConfig will read the values from env vars.
 func NewConfig() Config {
 	cfg := Config{}
@@ -65,12 +89,9 @@ func NewConfig() Config {
 		panic(err)
 	}
 
-	v := reflect.ValueOf(cfg)
-	for i := 0; i < v.NumField(); i++ {
-		field := v.Field(i)
-		if field.Interface() == reflect.Zero(field.Type()).Interface() {
-			panic(fmt.Sprintf("field %s cannot be empty", v.Type().Field(i).Name))
-		}
+	err = cfg.Validate()
+	if err != nil {
+		panic(err)
 	}
 
 	if os.Getenv("KDL_ENV") == "dev" {

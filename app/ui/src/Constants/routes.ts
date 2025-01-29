@@ -14,6 +14,7 @@ enum ROUTE {
   PROJECT_TOOL_KG = '/projects/:projectId/tool/kg',
   NEW_PROJECT = '/new-project',
   PROJECT_CREATION = '/new-project/create',
+  LOGOUT = '/oauth2/sign_out',
 }
 
 export type RouteProjectParams = {

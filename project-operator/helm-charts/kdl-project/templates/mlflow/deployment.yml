@@ -107,7 +107,7 @@ spec:
             {{- end }}
           env:
             - name: MLFLOW_DEFAULT_ARTIFACT_ROOT
-              value: "s3://{{ .Values.projectId }}"
+              value: "s3://{{ .Values.projectId }}/{{ .Values.mlflow.env.ARTIFACTS_DIR }}"
             # Variables from secrets have precedence
             {{- $envList := dict }}
             {{- if .Values.mlflow.envFromSecrets }}

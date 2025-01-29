@@ -8,9 +8,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
-var (
-	errFieldEmpty = errors.New("cannot be empty")
-)
+var errFieldEmpty = errors.New("cannot be empty")
 
 // Config holds the configuration values of the application.
 type Config struct {
@@ -39,7 +37,7 @@ func (c *Config) Validate() error {
 
 		field := v.Field(i)
 		if field.Interface() == reflect.Zero(field.Type()).Interface() {
-			return fmt.Errorf("error in field %s: %w cannot be empty", v.Type().Field(i).Name, errFieldEmpty)
+			return fmt.Errorf("error in field %s: %w", v.Type().Field(i).Name, errFieldEmpty)
 		}
 	}
 

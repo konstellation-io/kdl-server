@@ -66,6 +66,16 @@ func NewInteractor(
 	}
 }
 
+// Save user activity.
+func (i *Interactor) SaveUserActivity(ctx context.Context, userActivity entity.UserActivity) error {
+	err := i.userActivityRepo.Create(ctx, userActivity)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Create add a new user to the server.
 // - If the user already exists (email, username and sub must be unique) returns entity.ErrDuplicatedUser.
 // - Generates a new SSH public/private keys.
@@ -153,7 +163,7 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 		Vars:   createUserActVars,
 	}
 
-	err = i.userActivityRepo.Create(ctx, createUserdAct)
+	err = i.SaveUserActivity(ctx, createUserdAct)
 	if err != nil {
 		return entity.User{}, err
 	}

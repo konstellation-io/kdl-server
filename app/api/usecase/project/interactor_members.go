@@ -14,7 +14,7 @@ type UpdateProjectOption struct {
 	Name        *string
 	Description *string
 	Archived    *bool
-	LoggedUser  entity.User
+	UserID      string
 }
 
 // UpdateMembersOption options when updating a project member.
@@ -101,7 +101,7 @@ func (i *interactor) AddMembers(ctx context.Context, opt AddMembersOption) (enti
 			Vars:   addMemberActVars,
 		}
 
-		err = i.userActivityRepo.Create(ctx, addMemberAct)
+		err = i.SaveUserActivity(ctx, addMemberAct)
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -159,7 +159,7 @@ func (i *interactor) RemoveMembers(ctx context.Context, opt RemoveMembersOption)
 			Vars:   removeMemberActVars,
 		}
 
-		err = i.userActivityRepo.Create(ctx, removeMemberAct)
+		err = i.SaveUserActivity(ctx, removeMemberAct)
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -226,7 +226,7 @@ func (i *interactor) UpdateMembers(ctx context.Context, opt UpdateMembersOption)
 			Vars:   updateUserAccessLevelActVars,
 		}
 
-		err = i.userActivityRepo.Create(ctx, updateUserAccessLevelAct)
+		err = i.SaveUserActivity(ctx, updateUserAccessLevelAct)
 		if err != nil {
 			return entity.Project{}, err
 		}

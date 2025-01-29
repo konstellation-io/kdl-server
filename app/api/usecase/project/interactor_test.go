@@ -539,8 +539,7 @@ func TestInteractor_Update(t *testing.T) {
 	newArchived := true
 
 	loggedUser := entity.User{
-		ID:          "logged-user",
-		AccessLevel: entity.AccessLevelAdmin,
+		ID: "logged-user",
 	}
 
 	originalProject := entity.Project{
@@ -573,9 +572,9 @@ func TestInteractor_Update(t *testing.T) {
 	}
 
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(originalProject, nil)
+	s.mocks.clock.EXPECT().Now().Return(now)
 
 	s.mocks.repo.EXPECT().UpdateName(ctx, testProjectID, newName).Return(nil)
-	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.userActivityRepo.EXPECT().Create(
 		ctx,
 		entity.UserActivity{
@@ -587,7 +586,6 @@ func TestInteractor_Update(t *testing.T) {
 	).Return(nil)
 
 	s.mocks.repo.EXPECT().UpdateDescription(ctx, testProjectID, newDesc).Return(nil)
-	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.userActivityRepo.EXPECT().Create(
 		ctx,
 		entity.UserActivity{
@@ -599,7 +597,6 @@ func TestInteractor_Update(t *testing.T) {
 	).Return(nil)
 
 	s.mocks.repo.EXPECT().UpdateArchived(ctx, testProjectID, newArchived).Return(nil)
-	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.userActivityRepo.EXPECT().Create(
 		ctx,
 		entity.UserActivity{
@@ -617,7 +614,7 @@ func TestInteractor_Update(t *testing.T) {
 		Name:        &newName,
 		Description: &newDesc,
 		Archived:    &newArchived,
-		LoggedUser:  loggedUser,
+		UserID:      loggedUser.ID,
 	})
 
 	require.NoError(t, err)

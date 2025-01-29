@@ -177,7 +177,7 @@ func (r *mutationResolver) UpdateProject(ctx context.Context, input model.Update
 		Name:        input.Name,
 		Description: input.Description,
 		Archived:    input.Archived,
-		LoggedUser:  loggedUser,
+		UserID:      loggedUser.ID,
 	})
 
 	return &p, err

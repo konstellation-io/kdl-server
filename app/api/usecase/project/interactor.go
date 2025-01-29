@@ -188,22 +188,9 @@ func (i *interactor) GetByID(ctx context.Context, id string) (entity.Project, er
 	return i.projectRepo.Get(ctx, id)
 }
 
-// Save project info updated in user activity.
-func (i *interactor) SaveUserActivity(
-	ctx context.Context,
-	loggedUser entity.User,
-	actType entity.UserActivityType,
-	projectID, oldValue, newValue string,
-) error {
-	updateProjectInfoActVars := entity.NewActivityVarsUpdateProjectInfo(projectID, oldValue, newValue)
-	updateProjectInfoAct := entity.UserActivity{
-		Date:   i.clock.Now(),
-		UserID: loggedUser.ID,
-		Type:   actType,
-		Vars:   updateProjectInfoActVars,
-	}
-
-	err := i.userActivityRepo.Create(ctx, updateProjectInfoAct)
+// Save user activity.
+func (i *interactor) SaveUserActivity(ctx context.Context, userActivity entity.UserActivity) error {
+	err := i.userActivityRepo.Create(ctx, userActivity)
 	if err != nil {
 		return err
 	}
@@ -214,6 +201,10 @@ func (i *interactor) SaveUserActivity(
 // Update changes the desired information about a project.
 func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
 	p, _ := i.projectRepo.Get(ctx, opt.ProjectID)
+	userActivity := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: opt.UserID,
+	}
 
 	if !kdlutil.IsNilOrEmpty(opt.Name) {
 		err := i.projectRepo.UpdateName(ctx, opt.ProjectID, *opt.Name)
@@ -222,14 +213,9 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 		}
 
 		// Save project name updated in user activity
-		err = i.SaveUserActivity(
-			ctx,
-			opt.LoggedUser,
-			entity.UserActivityTypeUpdateProjectName,
-			opt.ProjectID,
-			p.Name,
-			*opt.Name,
-		)
+		userActivity.Type = entity.UserActivityTypeUpdateProjectName
+		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(opt.ProjectID, p.Name, *opt.Name)
+		err = i.SaveUserActivity(ctx, userActivity)
 
 		if err != nil {
 			return entity.Project{}, err
@@ -243,14 +229,9 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 		}
 
 		// Save project name updated in user activity
-		err = i.SaveUserActivity(
-			ctx,
-			opt.LoggedUser,
-			entity.UserActivityTypeUpdateProjectDescription,
-			opt.ProjectID,
-			p.Description,
-			*opt.Description,
-		)
+		userActivity.Type = entity.UserActivityTypeUpdateProjectDescription
+		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(opt.ProjectID, p.Description, *opt.Description)
+		err = i.SaveUserActivity(ctx, userActivity)
 
 		if err != nil {
 			return entity.Project{}, err
@@ -264,13 +245,13 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 		}
 
 		// Save project name updated in user activity
-		err = i.SaveUserActivity(
-			ctx, opt.LoggedUser,
-			entity.UserActivityTypeUpdateProjectArchived,
+		userActivity.Type = entity.UserActivityTypeUpdateProjectArchived
+		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(
 			opt.ProjectID,
 			strconv.FormatBool(p.Archived),
 			strconv.FormatBool(*opt.Archived),
 		)
+		err = i.SaveUserActivity(ctx, userActivity)
 
 		if err != nil {
 			return entity.Project{}, err

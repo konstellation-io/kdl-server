@@ -221,7 +221,7 @@ persistentVolume:
   # If undefined (the default) or set to null, no storageClassName spec is
   #   set, choosing the default provisioner.  (gp2 on AWS, standard on
   #   GKE, AWS & OpenStack)
-  storageClass: ""
+  storageClassName: ""
 
 # -- Additional volumes on the output Deployment definition
 # </br> Ref: https://kubernetes.io/docs/concepts/storage/volumes/

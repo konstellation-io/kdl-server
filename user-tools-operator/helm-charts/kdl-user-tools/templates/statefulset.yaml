@@ -242,11 +242,11 @@ spec:
           {{- range .Values.persistentVolume.accessModes }}
           - {{ . | quote }}
           {{- end }}
-        {{- if .Values.persistentVolume.storageClass }}
-        {{- if (eq "-" .Values.persistentVolume.storageClass) }}
+        {{- if .Values.persistentVolume.storageClassName }}
+        {{- if (eq "-" .Values.persistentVolume.storageClassName) }}
         storageClassName: ""
         {{- else }}
-        storageClassName: {{ .Values.persistentVolume.storageClass | quote }}
+        storageClassName: {{ .Values.persistentVolume.storageClassName | quote }}
         {{- end }}
         {{- end }}
         {{- if .Values.persistentVolume.volumeBindingMode }}

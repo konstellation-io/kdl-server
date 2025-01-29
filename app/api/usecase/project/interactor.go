@@ -225,7 +225,7 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 		err = i.SaveUserActivity(
 			ctx,
 			opt.LoggedUser,
-			entity.UserActivityUpdateProjectName,
+			entity.UserActivityTypeUpdateProjectName,
 			opt.ProjectID,
 			p.Name,
 			*opt.Name,
@@ -246,7 +246,7 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 		err = i.SaveUserActivity(
 			ctx,
 			opt.LoggedUser,
-			entity.UserActivityUpdateProjectDescription,
+			entity.UserActivityTypeUpdateProjectDescription,
 			opt.ProjectID,
 			p.Description,
 			*opt.Description,
@@ -266,7 +266,7 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 		// Save project name updated in user activity
 		err = i.SaveUserActivity(
 			ctx, opt.LoggedUser,
-			entity.UserActivityUpdateProjectArchived,
+			entity.UserActivityTypeUpdateProjectArchived,
 			opt.ProjectID,
 			strconv.FormatBool(p.Archived),
 			strconv.FormatBool(*opt.Archived),

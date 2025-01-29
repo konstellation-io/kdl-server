@@ -8,14 +8,14 @@ import (
 type UserActivityType string
 
 const (
-	UserActivityTypeCreateUser            UserActivityType = "CREATE_USER"
-	UserActivityTypeUpdateUserAccessLevel UserActivityType = "UPDATE_USER_ACCESS_LEVEL"
-	UserActivityTypeDeleteProject         UserActivityType = "DELETE_PROJECT"
-	UserActivityTypeAddMember             UserActivityType = "ADD_MEMBER"
-	UserActivityTypeRemoveMember          UserActivityType = "REMOVE_MEMBER"
-	UserActivityUpdateProjectName         UserActivityType = "UPDATE_PROJECT_NAME"
-	UserActivityUpdateProjectDescription  UserActivityType = "UPDATE_PROJECT_DESCRIPTION"
-	UserActivityUpdateProjectArchived     UserActivityType = "UPDATE_PROJECT_ARCHIVED"
+	UserActivityTypeCreateUser               UserActivityType = "CREATE_USER"
+	UserActivityTypeUpdateUserAccessLevel    UserActivityType = "UPDATE_USER_ACCESS_LEVEL"
+	UserActivityTypeDeleteProject            UserActivityType = "DELETE_PROJECT"
+	UserActivityTypeAddMember                UserActivityType = "ADD_MEMBER"
+	UserActivityTypeRemoveMember             UserActivityType = "REMOVE_MEMBER"
+	UserActivityTypeUpdateProjectName        UserActivityType = "UPDATE_PROJECT_NAME"
+	UserActivityTypeUpdateProjectDescription UserActivityType = "UPDATE_PROJECT_DESCRIPTION"
+	UserActivityTypeUpdateProjectArchived    UserActivityType = "UPDATE_PROJECT_ARCHIVED"
 )
 
 func (e UserActivityType) IsValid() bool {
@@ -25,9 +25,9 @@ func (e UserActivityType) IsValid() bool {
 		UserActivityTypeDeleteProject,
 		UserActivityTypeAddMember,
 		UserActivityTypeRemoveMember,
-		UserActivityUpdateProjectName,
-		UserActivityUpdateProjectDescription,
-		UserActivityUpdateProjectArchived,
+		UserActivityTypeUpdateProjectName,
+		UserActivityTypeUpdateProjectDescription,
+		UserActivityTypeUpdateProjectArchived,
 	}
 
 	return slices.Contains(userActivityTypes, e)

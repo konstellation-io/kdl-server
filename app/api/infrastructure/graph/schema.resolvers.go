@@ -338,7 +338,7 @@ func (r *userResolver) CreationDate(ctx context.Context, obj *entity.User) (stri
 
 // LastActivity is the resolver for the lastActivity field.
 func (r *userResolver) LastActivity(ctx context.Context, obj *entity.User) (*string, error) {
-	if obj.LastActivity == nil {
+	if obj.LastActivity.IsZero() {
 		return nil, nil
 	}
 

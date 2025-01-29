@@ -33,7 +33,7 @@ type User struct {
 	CreationDate time.Time
 	AccessLevel  AccessLevel
 	SSHKey       SSHKey
-	LastActivity *time.Time
+	LastActivity time.Time
 	APITokens    []APIToken
 }
 

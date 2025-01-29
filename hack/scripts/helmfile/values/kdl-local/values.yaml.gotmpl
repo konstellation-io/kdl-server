@@ -140,7 +140,7 @@ minio:
 
   persistence:
     enabled: true
-    storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+    storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
     existingClaim: "shared-volume"
     size: 1Gi
     accessMode: ReadWriteMany
@@ -236,7 +236,7 @@ postgresql:
     persistence:
       enabled: true
       size: 8Gi
-      storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+      storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
 projectOperator:
   enabled: true
@@ -269,7 +269,7 @@ projectOperator:
           size: "1Gi"
           accessModes:
             - ReadWriteOnce
-          storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+          storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
         env:
           AWS_ACCESS_KEY_ID: "{{ .Values.minio_access_key }}"
@@ -304,7 +304,7 @@ userToolsOperator:
   templateCustomResource:
     spec:
       persistentVolume:
-        storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+        storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
       kubeconfig:
         enabled: {{ requiredEnv "KUBECONFIG_ENABLED" }}

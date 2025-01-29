@@ -46,12 +46,12 @@ func NewInteractor(
 	logger logr.Logger,
 	cfg config.Config,
 	repo Repository,
+	userActivityRepo project.UserActivityRepo,
 	repoRuntimes runtime.Repository,
 	repoCapabilities capabilities.Repository,
 	sshGenerator sshhelper.SSHKeyGenerator,
 	c clock.Clock,
 	k8sClient k8s.ClientInterface,
-	userActivityRepo project.UserActivityRepo,
 ) UseCase {
 	return &Interactor{
 		logger:           logger,

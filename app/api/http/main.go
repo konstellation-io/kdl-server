@@ -109,8 +109,8 @@ func loadInteractors(
 	capabilitiesInteractor := capabilities.NewInteractor(logger, cfg, repos.capabilitiesRepo, k8sClient)
 	projectInteractor := project.NewInteractor(logger, k8sClient, minioService, realClock, repos.projectRepo, repos.userActivityRepo)
 	runtimeInteractor := runtime.NewInteractor(logger, k8sClient, repos.runtimeRepo)
-	userInteractor := user.NewInteractor(logger, cfg, repos.userRepo, repos.runtimeRepo, repos.capabilitiesRepo,
-		sshHelper, realClock, k8sClient, repos.userActivityRepo)
+	userInteractor := user.NewInteractor(logger, cfg, repos.userRepo, repos.userActivityRepo, repos.runtimeRepo, repos.capabilitiesRepo,
+		sshHelper, realClock, k8sClient)
 	configmapInteractor := configmap.NewInteractor(logger, cfg, k8sClient, projectInteractor, userInteractor)
 
 	return useCaseInteractors{

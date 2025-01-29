@@ -72,8 +72,8 @@ func (ts *AuthMiddlewareTestSuite) SetupSuite() {
 
 	ts.mocks.cfg = config.Config{}
 
-	ts.interactor = user.NewInteractor(ts.mocks.logger, ts.mocks.cfg, ts.mocks.repo, ts.mocks.runtimeRepo,
-		ts.mocks.capabilitiesRepo, ts.mocks.sshGenerator, ts.mocks.clock, ts.mocks.k8sClient, ts.mocks.userActivityRepo)
+	ts.interactor = user.NewInteractor(ts.mocks.logger, ts.mocks.cfg, ts.mocks.repo, ts.mocks.userActivityRepo,
+		ts.mocks.runtimeRepo, ts.mocks.capabilitiesRepo, ts.mocks.sshGenerator, ts.mocks.clock, ts.mocks.k8sClient)
 }
 
 func (ts *AuthMiddlewareTestSuite) TestAuthMiddlewareNoEmailHeader() {

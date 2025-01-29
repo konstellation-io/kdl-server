@@ -71,8 +71,8 @@ func newUserSuite(t *testing.T) *userSuite {
 
 	cfg := &config.Config{}
 
-	interactor := user.NewInteractor(logger, *cfg, repo, repoRuntimes, repoCapabilities, sshGenerator,
-		clockMock, k8sClientMock, userActivityRepo)
+	interactor := user.NewInteractor(logger, *cfg, repo, userActivityRepo, repoRuntimes, repoCapabilities,
+		sshGenerator, clockMock, k8sClientMock)
 
 	return &userSuite{
 		ctrl:       ctrl,

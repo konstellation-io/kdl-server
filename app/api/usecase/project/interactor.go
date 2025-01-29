@@ -189,7 +189,7 @@ func (i *interactor) GetByID(ctx context.Context, id string) (entity.Project, er
 }
 
 // Save project info updated in user activity.
-func (i *interactor) SaveActivityVars(
+func (i *interactor) SaveUserActivity(
 	ctx context.Context,
 	loggedUser entity.User,
 	actType entity.UserActivityType,
@@ -222,7 +222,7 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 		}
 
 		// Save project name updated in user activity
-		err = i.SaveActivityVars(
+		err = i.SaveUserActivity(
 			ctx,
 			opt.LoggedUser,
 			entity.UserActivityUpdateProjectName,
@@ -243,7 +243,7 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 		}
 
 		// Save project name updated in user activity
-		err = i.SaveActivityVars(
+		err = i.SaveUserActivity(
 			ctx,
 			opt.LoggedUser,
 			entity.UserActivityUpdateProjectDescription,
@@ -264,7 +264,7 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 		}
 
 		// Save project name updated in user activity
-		err = i.SaveActivityVars(
+		err = i.SaveUserActivity(
 			ctx, opt.LoggedUser,
 			entity.UserActivityUpdateProjectArchived,
 			opt.ProjectID,

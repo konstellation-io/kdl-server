@@ -572,8 +572,9 @@ func TestInteractor_Update(t *testing.T) {
 		{Key: "NEW_VALUE", Value: strconv.FormatBool(newArchived)},
 	}
 
-	s.mocks.repo.EXPECT().UpdateName(ctx, testProjectID, newName).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(originalProject, nil)
+
+	s.mocks.repo.EXPECT().UpdateName(ctx, testProjectID, newName).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.userActivityRepo.EXPECT().Create(
 		ctx,
@@ -586,7 +587,6 @@ func TestInteractor_Update(t *testing.T) {
 	).Return(nil)
 
 	s.mocks.repo.EXPECT().UpdateDescription(ctx, testProjectID, newDesc).Return(nil)
-	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(originalProject, nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.userActivityRepo.EXPECT().Create(
 		ctx,
@@ -599,7 +599,6 @@ func TestInteractor_Update(t *testing.T) {
 	).Return(nil)
 
 	s.mocks.repo.EXPECT().UpdateArchived(ctx, testProjectID, newArchived).Return(nil)
-	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(originalProject, nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.userActivityRepo.EXPECT().Create(
 		ctx,

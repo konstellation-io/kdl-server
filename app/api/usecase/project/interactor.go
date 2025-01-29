@@ -201,6 +201,7 @@ func (i *interactor) SaveUserActivity(ctx context.Context, userActivity entity.U
 // Update changes the desired information about a project.
 func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
 	p, _ := i.projectRepo.Get(ctx, opt.ProjectID)
+
 	userActivity := entity.UserActivity{
 		Date:   i.clock.Now(),
 		UserID: opt.UserID,
@@ -228,7 +229,7 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 			return entity.Project{}, err
 		}
 
-		// Save project name updated in user activity
+		// Save project description updated in user activity
 		userActivity.Type = entity.UserActivityTypeUpdateProjectDescription
 		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(opt.ProjectID, p.Description, *opt.Description)
 		err = i.SaveUserActivity(ctx, userActivity)
@@ -244,7 +245,7 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 			return entity.Project{}, err
 		}
 
-		// Save project name updated in user activity
+		// Save project archived updated in user activity
 		userActivity.Type = entity.UserActivityTypeUpdateProjectArchived
 		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(
 			opt.ProjectID,

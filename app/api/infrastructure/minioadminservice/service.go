@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/Masterminds/sprig/v3"
 	"github.com/go-logr/logr"
 	"github.com/minio/madmin-go/v2"
 
@@ -109,13 +110,13 @@ func (m *MinioAdminService) DeleteProjectUser(ctx context.Context, projectName s
 }
 
 func (m *MinioAdminService) CreateProjectPolicy(ctx context.Context, projectName string) error {
-	tmpl, err := template.New("policy").Parse(policyTemplate)
+	tmpl, err := template.New("policy").Funcs(sprig.FuncMap()).Parse(policyTemplate)
 	if err != nil {
 		return fmt.Errorf("failed to parse policy template: %w", err)
 	}
 
 	var policyBuffer bytes.Buffer
-	err = tmpl.Execute(&policyBuffer, struct{ BucketName string }{BucketName: projectName})
+	err = tmpl.Execute(&policyBuffer, struct{ BucketNames []string }{BucketNames: []string{projectName}})
 
 	if err != nil {
 		return fmt.Errorf("failed to apply policy template: %w", err)

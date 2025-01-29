@@ -5,8 +5,10 @@
             "Effect": "Allow",
             "Action": "s3:*",
             "Resource": [
-                "arn:aws:s3:::{{ .BucketName }}",
-                "arn:aws:s3:::{{ .BucketName }}/*"
+                {{- range $index, $bucket := .BucketNames }}
+                "arn:aws:s3:::{{ $bucket }}",
+                "arn:aws:s3:::{{ $bucket }}/*"{{- if ne (add $index 1) (len $.BucketNames) }},{{- end }}
+                {{- end }}
             ]
         }
     ]

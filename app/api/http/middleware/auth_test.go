@@ -164,7 +164,7 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	ts.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
 	ts.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
 	ts.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(minioSecretKey, nil)
-	ts.mocks.minioAdminService.EXPECT().CreateUser(ctx, u.UsernameSlug(), minioSecretKey).Return(minioAccessKey, nil)
+	ts.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, minioSecretKey).Return(minioAccessKey, nil)
 	ts.mocks.k8sClient.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 	ts.mocks.k8sClient.EXPECT().CreateUserServiceAccount(ctx, expectedUser.UsernameSlug())
 	ts.mocks.clock.EXPECT().Now().Return(now)

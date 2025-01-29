@@ -217,8 +217,8 @@ func TestInteractor_AddMembers(t *testing.T) {
 	}
 
 	usersToAdd := []entity.User{
-		{ID: "userA", Username: "user_a"},
-		{ID: "userB", Username: "user_b"},
+		{ID: "userA", Username: "user_a", Email: "user-a@example.com"},
+		{ID: "userB", Username: "user_b", Email: "user-b@example.com"},
 	}
 
 	newMembers := []entity.Member{
@@ -234,8 +234,8 @@ func TestInteractor_AddMembers(t *testing.T) {
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().AddMembers(ctx, p.ID, newMembers).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
-	s.mocks.minioAdminService.EXPECT().JoinProject(ctx, "user-a", testProjectID).Return(nil)
-	s.mocks.minioAdminService.EXPECT().JoinProject(ctx, "user-b", testProjectID).Return(nil)
+	s.mocks.minioAdminService.EXPECT().JoinProject(ctx, "user-a@example.com", testProjectID).Return(nil)
+	s.mocks.minioAdminService.EXPECT().JoinProject(ctx, "user-b@example.com", testProjectID).Return(nil)
 
 	p, err := s.interactor.AddMembers(ctx, project.AddMembersOption{
 		ProjectID:  p.ID,
@@ -263,8 +263,8 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 	}
 
 	usersToRemove := []entity.User{
-		{ID: "userA", Username: "user_a"},
-		{ID: "userB", Username: "user_b"},
+		{ID: "userA", Username: "user_a", Email: "user-a@example.com"},
+		{ID: "userB", Username: "user_b", Email: "user-b@example.com"},
 	}
 
 	p := entity.NewProject(testProjectID, "project-x", "Project X")
@@ -286,8 +286,8 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 
 	s.mocks.repo.EXPECT().RemoveMembers(ctx, p.ID, usersToRemove).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
-	s.mocks.minioAdminService.EXPECT().LeaveProject(ctx, "user-a", testProjectID).Return(nil)
-	s.mocks.minioAdminService.EXPECT().LeaveProject(ctx, "user-b", testProjectID).Return(nil)
+	s.mocks.minioAdminService.EXPECT().LeaveProject(ctx, "user-a@example.com", testProjectID).Return(nil)
+	s.mocks.minioAdminService.EXPECT().LeaveProject(ctx, "user-b@example.com", testProjectID).Return(nil)
 
 	p, err := s.interactor.RemoveMembers(ctx, project.RemoveMembersOption{
 		ProjectID:  p.ID,

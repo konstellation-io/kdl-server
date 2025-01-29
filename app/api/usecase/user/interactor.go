@@ -140,9 +140,7 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 	}
 
 	// Created a service account for the user
-	slug := user.UsernameSlug()
-
-	_, err = i.k8sClient.CreateUserServiceAccount(ctx, slug)
+	_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
 	if err != nil {
 		i.logger.Error(err, "Error creating service account", "username", username)
 		return entity.User{}, err
@@ -154,7 +152,7 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 		return entity.User{}, err
 	}
 
-	user.MinioAccessKey.AccessKey, err = i.minioAdminService.CreateUser(ctx, slug, user.MinioAccessKey.SecretKey)
+	user.MinioAccessKey.AccessKey, err = i.minioAdminService.CreateUser(ctx, user.Email, user.MinioAccessKey.SecretKey)
 	if err != nil {
 		i.logger.Error(err, "Error creating a MinIO user", "accessKey", user.MinioAccessKey.AccessKey)
 		return entity.User{}, err

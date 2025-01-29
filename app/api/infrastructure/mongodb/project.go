@@ -5,12 +5,12 @@ import (
 	"errors"
 	"time"
 
+	"github.com/go-logr/logr"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
@@ -34,6 +34,8 @@ type projectDTO struct {
 	RepoName           string      `bson:"repo_name"`
 	URL                string      `bson:"url"`
 	Members            []memberDTO `bson:"members"`
+	MinioAccessKey     string      `bson:"minio_access_key"`
+	MinioSecretKey     string      `bson:"minio_secret_key"`
 }
 
 type ProjectRepo struct {
@@ -175,6 +177,13 @@ func (m *ProjectRepo) UpdateArchived(ctx context.Context, projectID string, arch
 	return m.updateProjectFields(ctx, projectID, bson.M{"archived": archived})
 }
 
+func (m *ProjectRepo) UpdateMinioAccess(ctx context.Context, projectID, accessKey, secretKey string) error {
+	return m.updateProjectFields(ctx, projectID, bson.M{
+		"minio_access_key": accessKey,
+		"minio_secret_key": secretKey,
+	})
+}
+
 func (m *ProjectRepo) DeleteOne(ctx context.Context, projectID string) error {
 	filter := bson.M{
 		"_id": projectID,
@@ -245,6 +254,8 @@ func (m *ProjectRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 		RepoName:           p.Repository.RepoName,
 		URL:                p.Repository.URL,
 		Archived:           p.Archived,
+		MinioAccessKey:     p.MinioAccessKey.AccessKey,
+		MinioSecretKey:     p.MinioAccessKey.SecretKey,
 	}
 
 	memberDTOS, err := m.membersToDTOs(p.Members)
@@ -288,6 +299,10 @@ func (m *ProjectRepo) dtoToEntity(dto projectDTO) entity.Project {
 			RepoName: dto.RepoName,
 		},
 		Archived: dto.Archived,
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: dto.MinioAccessKey,
+			SecretKey: dto.MinioSecretKey,
+		},
 	}
 
 	p.Members = make([]entity.Member, len(dto.Members))

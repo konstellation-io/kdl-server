@@ -21,9 +21,11 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/graph/generated"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioadminservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/mongodb"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
@@ -34,9 +36,10 @@ import (
 )
 
 type deps struct {
-	minioService  minioservice.MinioService
-	k8sClient     k8s.ClientInterface
-	mongodbClient *mongodbutils.MongoDB
+	minioService      minioservice.MinioService
+	minioAdminService minioadminservice.MinioAdminInterface
+	k8sClient         k8s.ClientInterface
+	mongodbClient     *mongodbutils.MongoDB
 }
 
 func loadDependencies(logger logr.Logger, cfg config.Config) deps {
@@ -49,7 +52,15 @@ func loadDependencies(logger logr.Logger, cfg config.Config) deps {
 		os.Exit(1)
 	}
 
-	// Setting k8s client
+	// Setting minio admin service
+	minioAdminService, err := minioadminservice.NewMinioAdminService(
+		logger, cfg.Minio.Endpoint, cfg.Minio.AccessKey, cfg.Minio.SecretKey,
+	)
+	if err != nil {
+		logger.Error(err, "Error connecting to Minio for administration")
+		os.Exit(1)
+	}
+
 	k8sClient, err := k8s.NewK8sClient(logger, cfg)
 	if err != nil {
 		logger.Error(err, "Error creating k8s client")
@@ -64,9 +75,10 @@ func loadDependencies(logger logr.Logger, cfg config.Config) deps {
 	}
 
 	return deps{
-		minioService:  minioService,
-		k8sClient:     k8sClient,
-		mongodbClient: mongodbClient,
+		minioService:      minioService,
+		minioAdminService: minioAdminService,
+		k8sClient:         k8sClient,
+		mongodbClient:     mongodbClient,
 	}
 }
 
@@ -100,17 +112,24 @@ func loadInteractors(
 	logger logr.Logger,
 	cfg config.Config,
 	k8sClient k8s.ClientInterface,
-	minioService minioservice.MinioService,
+	dependencies deps,
 	repos dbRepos,
 ) useCaseInteractors {
 	realClock := clock.NewRealClock()
 	sshHelper := sshhelper.NewGenerator(logger)
+	randomGenerator := kdlutil.NewRandomGenerator()
 
 	capabilitiesInteractor := capabilities.NewInteractor(logger, cfg, repos.capabilitiesRepo, k8sClient)
-	projectInteractor := project.NewInteractor(logger, k8sClient, minioService, realClock, repos.projectRepo, repos.userActivityRepo)
+	projectInteractor := project.NewInteractor(
+		logger, k8sClient, dependencies.minioService, dependencies.minioAdminService, realClock, repos.projectRepo,
+		repos.userActivityRepo, randomGenerator,
+	)
 	runtimeInteractor := runtime.NewInteractor(logger, k8sClient, repos.runtimeRepo)
-	userInteractor := user.NewInteractor(logger, cfg, repos.userRepo, repos.userActivityRepo, repos.runtimeRepo, repos.capabilitiesRepo,
-		sshHelper, realClock, k8sClient)
+
+	userInteractor := user.NewInteractor(
+		logger, cfg, repos.userRepo, repos.userActivityRepo, repos.runtimeRepo, repos.capabilitiesRepo,
+		sshHelper, realClock, k8sClient, dependencies.minioAdminService, randomGenerator,
+	)
 	configmapInteractor := configmap.NewInteractor(logger, cfg, k8sClient, projectInteractor, userInteractor)
 
 	return useCaseInteractors{
@@ -139,7 +158,7 @@ func main() {
 	defer dependencies.mongodbClient.Disconnect()
 
 	repos := loadRepos(logger, cfg.MongoDB.DBName, dependencies.mongodbClient)
-	interactors := loadInteractors(logger, cfg, dependencies.k8sClient, dependencies.minioService, repos)
+	interactors := loadInteractors(logger, cfg, dependencies.k8sClient, dependencies, repos)
 
 	// Execute actions before starting the HTTP server
 	actionsBeforeStartingHTTPServer(logger, repos, interactors)

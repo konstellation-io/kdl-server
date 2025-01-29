@@ -11,10 +11,12 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/gosimple/slug v1.15.0
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/minio/madmin-go/v2 v2.2.1
 	github.com/minio/minio-go/v7 v7.0.83
 	github.com/stretchr/testify v1.10.0
 	github.com/testcontainers/testcontainers-go v0.34.0
 	github.com/testcontainers/testcontainers-go/modules/k3s v0.34.0
+	github.com/testcontainers/testcontainers-go/modules/minio v0.34.0
 	github.com/vektah/gqlparser/v2 v2.5.21
 	go.mongodb.org/mongo-driver v1.17.2
 	go.uber.org/zap v1.27.0
@@ -25,6 +27,13 @@ require (
 	k8s.io/apiextensions-apiserver v0.32.0
 	k8s.io/apimachinery v0.32.0
 	k8s.io/client-go v0.32.0
+)
+
+require (
+	github.com/philhofer/fwd v1.1.2 // indirect
+	github.com/prometheus/procfs v0.15.1 // indirect
+	github.com/secure-io/sio-go v0.3.1 // indirect
+	github.com/tinylib/msgp v1.1.8 // indirect
 )
 
 require (
@@ -71,7 +80,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.9 // indirect
-	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
+	github.com/lufia/plan9stats v0.0.0-20230110061619-bbe2e5e100de // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
@@ -90,7 +99,7 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
+	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/segmentio/ksuid v1.0.4 // indirect

@@ -11,6 +11,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioadminservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
@@ -87,30 +88,39 @@ func (c CreateProjectOption) Validate() error {
 
 // interactor implements the UseCase interface.
 type interactor struct {
-	logger           logr.Logger
-	projectRepo      Repository
-	userActivityRepo UserActivityRepo
-	clock            clock.Clock
-	minioService     minioservice.MinioService
-	k8sClient        k8s.ClientInterface
+	logger            logr.Logger
+	projectRepo       Repository
+	userActivityRepo  UserActivityRepo
+	clock             clock.Clock
+	minioService      minioservice.MinioService
+	minioAdminService minioadminservice.MinioAdminInterface
+	k8sClient         k8s.ClientInterface
+	randomGenerator   kdlutil.RandomGenerator
 }
+
+// Assure implementation adheres to interface.
+var _ UseCase = (*interactor)(nil)
 
 // NewInteractor is a constructor function.
 func NewInteractor(
 	logger logr.Logger,
 	k8sClient k8s.ClientInterface,
 	minioService minioservice.MinioService,
+	minioAdminService minioadminservice.MinioAdminInterface,
 	realClock clock.Clock,
 	projectRepo Repository,
 	userActivityRepo UserActivityRepo,
+	randomGenerator kdlutil.RandomGenerator,
 ) UseCase {
 	return &interactor{
-		logger:           logger,
-		projectRepo:      projectRepo,
-		userActivityRepo: userActivityRepo,
-		clock:            realClock,
-		minioService:     minioService,
-		k8sClient:        k8sClient,
+		logger:            logger,
+		projectRepo:       projectRepo,
+		userActivityRepo:  userActivityRepo,
+		clock:             realClock,
+		minioService:      minioService,
+		minioAdminService: minioAdminService,
+		k8sClient:         k8sClient,
+		randomGenerator:   randomGenerator,
 	}
 }
 
@@ -121,6 +131,8 @@ Depending on the repository type:
   - Create a k8s KDLProject containing a MLFLow instance
   - Create Minio bucket
   - Create Minio folders
+  - Create Minio project user
+  - Create Minio policy for the project user
 */
 func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
 	// Validate the creation input
@@ -130,6 +142,12 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 	}
 
 	now := i.clock.Now()
+
+	// Generate a secret key for the Minio project user
+	secretKey, err := i.randomGenerator.GenerateRandomString(40)
+	if err != nil {
+		return entity.Project{}, err
+	}
 
 	project := entity.NewProject(opt.ProjectID, opt.Name, opt.Description)
 	project.CreationDate = now
@@ -147,12 +165,6 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		RepoName: opt.ProjectID,
 	}
 
-	// Create a k8s KDLProject containing a MLFLow instance
-	err = i.k8sClient.CreateKDLProjectCR(ctx, opt.ProjectID)
-	if err != nil {
-		return entity.Project{}, err
-	}
-
 	// Create Minio bucket
 	err = i.minioService.CreateBucket(ctx, opt.ProjectID)
 	if err != nil {
@@ -161,6 +173,29 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 
 	// Create Minio folders
 	err = i.minioService.CreateProjectDirs(ctx, opt.ProjectID)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	// Create Minio policy for the project user
+	err = i.minioAdminService.CreateProjectPolicy(ctx, opt.ProjectID)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	// Create Minio project user
+	accessKey, err := i.minioAdminService.CreateProjectUser(ctx, opt.ProjectID, secretKey)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	project.MinioAccessKey = entity.MinioAccessKey{
+		AccessKey: accessKey,
+		SecretKey: secretKey,
+	}
+
+	// Create a k8s KDLProject containing a MLFLow instance
+	err = i.k8sClient.CreateKDLProjectCR(ctx, k8s.ProjectData{ProjectID: opt.ProjectID, MinioAccessKey: project.MinioAccessKey})
 	if err != nil {
 		return entity.Project{}, err
 	}
@@ -286,6 +321,19 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 	}
 
 	err = i.k8sClient.DeleteKDLProjectCR(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Determine policy/user name
+	accessKey := fmt.Sprintf("project-%s", projectID)
+
+	err = i.minioAdminService.DeleteProjectPolicy(ctx, accessKey)
+	if err != nil {
+		return nil, err
+	}
+
+	err = i.minioAdminService.DeleteUser(ctx, accessKey)
 	if err != nil {
 		return nil, err
 	}

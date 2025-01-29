@@ -18,8 +18,10 @@ import (
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioadminservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 )
 
@@ -41,12 +43,14 @@ type projectSuite struct {
 }
 
 type projectMocks struct {
-	repo             *project.MockRepository
-	userActivityRepo *project.MockUserActivityRepo
-	clock            *clock.MockClock
-	minioService     *minioservice.MockMinioService
-	k8sClient        *k8s.MockClientInterface
-	logger           logr.Logger
+	repo              *project.MockRepository
+	userActivityRepo  *project.MockUserActivityRepo
+	clock             *clock.MockClock
+	minioService      *minioservice.MockMinioService
+	minioAdminService *minioadminservice.MockMinioAdminInterface
+	k8sClient         *k8s.MockClientInterface
+	logger            logr.Logger
+	randomGenerator   *kdlutil.MockRandomGenerator
 }
 
 func newProjectSuite(t *testing.T) *projectSuite {
@@ -55,25 +59,29 @@ func newProjectSuite(t *testing.T) *projectSuite {
 	userActivityRepo := project.NewMockUserActivityRepo(ctrl)
 	clockMock := clock.NewMockClock(ctrl)
 	minioService := minioservice.NewMockMinioService(ctrl)
+	minioAdminService := minioadminservice.NewMockMinioAdminInterface(ctrl)
 	k8sClient := k8s.NewMockClientInterface(ctrl)
+	randomGenerator := kdlutil.NewMockRandomGenerator(ctrl)
 
 	zapLog, err := zap.NewDevelopment()
 	require.NoError(t, err)
 
 	logger := zapr.NewLogger(zapLog)
 
-	interactor := project.NewInteractor(logger, k8sClient, minioService, clockMock, repo, userActivityRepo)
+	interactor := project.NewInteractor(logger, k8sClient, minioService, minioAdminService, clockMock, repo, userActivityRepo, randomGenerator)
 
 	return &projectSuite{
 		ctrl:       ctrl,
 		interactor: interactor,
 		mocks: projectMocks{
-			logger:           logger,
-			repo:             repo,
-			userActivityRepo: userActivityRepo,
-			clock:            clockMock,
-			minioService:     minioService,
-			k8sClient:        k8sClient,
+			logger:            logger,
+			repo:              repo,
+			userActivityRepo:  userActivityRepo,
+			clock:             clockMock,
+			minioService:      minioService,
+			minioAdminService: minioAdminService,
+			k8sClient:         k8sClient,
+			randomGenerator:   randomGenerator,
 		},
 	}
 }
@@ -83,10 +91,12 @@ func TestInteractor_Create(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const (
-		projectName   = "The Project Y"
-		projectDesc   = "The Project Y Description"
-		ownerUserID   = "user.1234"
-		ownerUsername = "john"
+		projectName           = "The Project Y"
+		projectDesc           = "The Project Y Description"
+		projectMinioAccessKey = "project-test-project" // derived from project ID
+		projectMinioSecretKey = "projectY123"
+		ownerUserID           = "user.1234"
+		ownerUsername         = "john"
 	)
 
 	url := "https://github.com/org/repo.git"
@@ -108,6 +118,10 @@ func TestInteractor_Create(t *testing.T) {
 		URL:      url,
 		RepoName: testProjectID,
 	}
+	createProject.MinioAccessKey = entity.MinioAccessKey{
+		AccessKey: projectMinioAccessKey,
+		SecretKey: projectMinioSecretKey,
+	}
 
 	expectedProject := entity.Project{
 		ID:           testProjectID,
@@ -118,14 +132,22 @@ func TestInteractor_Create(t *testing.T) {
 			URL:      url,
 			RepoName: testProjectID,
 		},
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: projectMinioAccessKey,
+			SecretKey: projectMinioSecretKey,
+		},
 	}
 
-	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, testProjectID).Return(nil)
+	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx,
+		k8s.ProjectData{ProjectID: testProjectID, MinioAccessKey: createProject.MinioAccessKey}).Return(nil)
 	s.mocks.minioService.EXPECT().CreateBucket(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().CreateProjectDirs(ctx, testProjectID).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(testProjectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(expectedProject, nil)
+	s.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(projectMinioSecretKey, nil)
+	s.mocks.minioAdminService.EXPECT().CreateProjectUser(ctx, testProjectID, projectMinioSecretKey).Return(projectMinioAccessKey, nil)
+	s.mocks.minioAdminService.EXPECT().CreateProjectPolicy(ctx, testProjectID).Return(nil)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
 		ProjectID:   testProjectID,
@@ -253,6 +275,8 @@ func TestInteractor_AddMembers(t *testing.T) {
 		},
 	).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
+	s.mocks.minioAdminService.EXPECT().JoinProject(ctx, "user-a", testProjectID).Return(nil)
+	s.mocks.minioAdminService.EXPECT().JoinProject(ctx, "user-b", testProjectID).Return(nil)
 
 	p, err := s.interactor.AddMembers(ctx, project.AddMembersOption{
 		ProjectID:  p.ID,
@@ -345,6 +369,8 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 		},
 	).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
+	s.mocks.minioAdminService.EXPECT().LeaveProject(ctx, "user-a", testProjectID).Return(nil)
+	s.mocks.minioAdminService.EXPECT().LeaveProject(ctx, "user-b", testProjectID).Return(nil)
 
 	p, err := s.interactor.RemoveMembers(ctx, project.RemoveMembersOption{
 		ProjectID:  p.ID,
@@ -625,6 +651,10 @@ func TestInteractor_Delete(t *testing.T) {
 	s := newProjectSuite(t)
 	defer s.ctrl.Finish()
 
+	const (
+		accessKey = "project-test-project"
+	)
+
 	monkey.Patch(time.Now, func() time.Time {
 		return time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
 	})
@@ -677,6 +707,9 @@ func TestInteractor_Delete(t *testing.T) {
 	s.mocks.k8sClient.EXPECT().DeleteKDLProjectCR(ctx, testProjectID).Return(nil)
 	s.mocks.repo.EXPECT().DeleteOne(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().DeleteBucket(ctx, testProjectID).Return(expectedMinioBackup, nil)
+	s.mocks.minioAdminService.EXPECT().DeleteProjectPolicy(ctx, accessKey).Return(nil)
+	s.mocks.minioAdminService.EXPECT().DeleteUser(ctx, accessKey).Return(nil)
+
 	s.mocks.userActivityRepo.EXPECT().Create(ctx, userActivity).Return(nil)
 
 	result, err := s.interactor.Delete(ctx, project.DeleteProjectOption{

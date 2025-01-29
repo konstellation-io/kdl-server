@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 import { GetMe } from 'Graphql/queries/types/GetMe';
 import KeyIcon from '@material-ui/icons/VpnKey';
 import DescriptionIcon from '@material-ui/icons/Description';
+import ExitToApp from '@material-ui/icons/ExitToApp';
 import styles from './SettingsMenu.module.scss';
 import { useQuery, useReactiveVar } from '@apollo/client';
 import { CONFIG } from 'index';
@@ -32,6 +33,10 @@ function SettingsMenu() {
 
   function goToUserKubeconfig() {
     history.push(ROUTE.USER_KUBECONFIG);
+  }
+
+  function goToLogout() {
+    window.location.href = ROUTE.LOGOUT;
   }
 
   function SSHKeyButton() {
@@ -62,10 +67,24 @@ function SettingsMenu() {
     );
   }
 
+  function logoutButton() {
+    return (
+      <Button
+        label="Logout"
+        key="logout"
+        onClick={goToLogout}
+        Icon={ExitToApp}
+        className={styles.logoutButton}
+        align={BUTTON_ALIGN.LEFT}
+      />
+    );
+  }
+
   const optionToButton = {
     'user settings': UserSettingsSeparator,
     'ssh key': SSHKeyButton,
     kubeconfig: kubeconfigButton,
+    'log out': logoutButton,
     [CONFIG.RELEASE_VERSION]: ReleaseVersion,
   };
 

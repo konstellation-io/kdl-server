@@ -22,14 +22,12 @@ import useNewProject from 'Graphql/client/hooks/useNewProject';
 enum Steps {
   INFORMATION,
   REPOSITORY,
-  REPOSITORY_DETAILS,
   SUMMARY,
 }
 
 enum StepNames {
   INFORMATION = 'information',
   REPOSITORY = 'repository',
-  REPOSITORY_DETAILS = 'repository details',
   SUMMARY = 'summary',
 }
 
@@ -169,7 +167,7 @@ function NewProject() {
       <>
         <Prompt
           when={isPromptEnabled}
-          message="You are going to leave this page. You'll lose your changes, please confirm."
+          message="You are going to leave this page. You'll lose your changes, ¿Are you sure?."
         />
         {isMounted && <SidebarTop>{getSideContent()}</SidebarTop>}
         <div className={styles.container}>

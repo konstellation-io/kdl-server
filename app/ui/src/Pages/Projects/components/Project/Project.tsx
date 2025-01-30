@@ -11,6 +11,10 @@ import { formatDate } from 'Utils/format';
 import styles from './Project.module.scss';
 import { ProjectAdmins } from '../../Projects';
 
+import IconOpen from '@material-ui/icons/ArrowForward';
+
+import { Button } from 'kwc';
+
 type BaseProps = {
   project: GetProjects_projects;
 };
@@ -20,8 +24,13 @@ type Props = {
   project: GetProjects_projects;
 };
 
+function unarchiveProject() {
+  console.log('Unarchiving project');
+}
+
 function Project({ project, showAdmins }: Props) {
   const disabled = project.needAccess || project.archived;
+
   const Component = (
     <div
       data-testid="project"
@@ -95,6 +104,9 @@ const Band: FC<BaseProps> = ({ project }) => (
         <div className={styles.labelArchived} data-testid="projectArchived">
           Archived
         </div>
+      )}
+      {project.archived && (
+        <Button label="Unarchive" className={styles.labelUnarchive} primary onClick={unarchiveProject} />
       )}
       {project.needAccess && <div className={styles.labelNoAccess}>No Access</div>}
     </div>

@@ -19,7 +19,7 @@ $small-square-base: 30px;
   position: relative;
   margin: 0 0 2 * $grid-unit 5 * $grid-unit;
   flex-shrink: 0;
-  pointer-events: none;
+  // pointer-events: none;
 
   &.archived {
     .name,
@@ -178,6 +178,7 @@ $small-square-base: 30px;
     margin-right: auto;
 
     .labelArchived,
+    .labelUnarchive,
     .labelNoAccess {
       @include font-button;
 
@@ -199,6 +200,11 @@ $small-square-base: 30px;
     .labelNoAccess {
       color: font-color(lowlight);
       background-color: palette(base, 800);
+    }
+
+    .labelUnarchive{
+      height: $label-height !important;
+      background-color: palette(highlight);
     }
   }
 }
@@ -298,7 +304,7 @@ $small-square-base: 30px;
     position: absolute;
     display: flex;
     align-items: center;
-    pointer-events: none;
+    // pointer-events: none;
 
     transition: color ease 0.4s;
 
@@ -350,6 +356,7 @@ $small-square-base: 30px;
 
   .band {
     background-color: palette(base, 400);
+    pointer-events: all !important;
   }
 
   .name {

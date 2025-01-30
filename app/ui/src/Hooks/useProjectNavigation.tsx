@@ -83,9 +83,7 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
     const mainRoutes = mainRoutesConfig.map(buildRoutes);
 
     if (!CONFIG.KNOWLEDGE_GALAXY_ENABLED) {
-      projectToolsRoutes = projectToolsRoutes.map((r: RouteConfiguration) =>
-        r.id === 'knowledgeGalaxy' ? { ...r, disabled: true } : r,
-      );
+      projectToolsRoutes = projectToolsRoutes.filter((r: RouteConfiguration) => r.id !== 'knowledgeGalaxy');
     }
 
     return {
@@ -95,6 +93,10 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
       userToolsRoutes,
     };
   }, [buildRoutes, runtimeRunning, runtimeLoading]);
+}
+
+function removeEntryById(array: { id: any }[], id: any) {
+  return array.filter((item: { id: any }) => item.id !== id);
 }
 
 export default useProjectNavigation;

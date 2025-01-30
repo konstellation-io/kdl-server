@@ -92,7 +92,6 @@ func TestInteractor_Create(t *testing.T) {
 	const (
 		projectName           = "The Project Y"
 		projectDesc           = "The Project Y Description"
-		projectMinioAccessKey = "project-test-project" // derived from project ID
 		projectMinioSecretKey = "projectY123"
 		ownerUserID           = "user.1234"
 		ownerUsername         = "john"
@@ -118,7 +117,7 @@ func TestInteractor_Create(t *testing.T) {
 		RepoName: testProjectID,
 	}
 	createProject.MinioAccessKey = entity.MinioAccessKey{
-		AccessKey: projectMinioAccessKey,
+		AccessKey: testProjectID,
 		SecretKey: projectMinioSecretKey,
 	}
 
@@ -132,7 +131,7 @@ func TestInteractor_Create(t *testing.T) {
 			RepoName: testProjectID,
 		},
 		MinioAccessKey: entity.MinioAccessKey{
-			AccessKey: projectMinioAccessKey,
+			AccessKey: testProjectID,
 			SecretKey: projectMinioSecretKey,
 		},
 	}
@@ -145,7 +144,7 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(testProjectID, nil)
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(expectedProject, nil)
 	s.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(projectMinioSecretKey, nil)
-	s.mocks.minioAdminService.EXPECT().CreateProjectUser(ctx, testProjectID, projectMinioSecretKey).Return(projectMinioAccessKey, nil)
+	s.mocks.minioAdminService.EXPECT().CreateProjectUser(ctx, testProjectID, projectMinioSecretKey).Return(testProjectID, nil)
 	s.mocks.minioAdminService.EXPECT().CreateProjectPolicy(ctx, testProjectID).Return(nil)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{

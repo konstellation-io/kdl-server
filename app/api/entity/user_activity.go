@@ -8,20 +8,24 @@ import (
 type UserActivityType string
 
 const (
-	UserActivityTypeCreateUser               UserActivityType = "CREATE_USER"
-	UserActivityTypeUpdateUserAccessLevel    UserActivityType = "UPDATE_USER_ACCESS_LEVEL"
-	UserActivityTypeDeleteProject            UserActivityType = "DELETE_PROJECT"
-	UserActivityTypeAddMember                UserActivityType = "ADD_MEMBER"
-	UserActivityTypeRemoveMember             UserActivityType = "REMOVE_MEMBER"
-	UserActivityTypeUpdateProjectName        UserActivityType = "UPDATE_PROJECT_NAME"
-	UserActivityTypeUpdateProjectDescription UserActivityType = "UPDATE_PROJECT_DESCRIPTION"
-	UserActivityTypeUpdateProjectArchived    UserActivityType = "UPDATE_PROJECT_ARCHIVED"
+	UserActivityTypeCreateUser                   UserActivityType = "CREATE_USER"
+	UserActivityTypeUpdateUserAccessLevel        UserActivityType = "UPDATE_USER_ACCESS_LEVEL"
+	UserActivityTypeUpdateUserProjectAccessLevel UserActivityType = "UPDATE_USER_PROJECT_ACCESS_LEVEL"
+	UserActivityTypeCreateProject                UserActivityType = "CREATE_PROJECT"
+	UserActivityTypeDeleteProject                UserActivityType = "DELETE_PROJECT"
+	UserActivityTypeAddMember                    UserActivityType = "ADD_MEMBER"
+	UserActivityTypeRemoveMember                 UserActivityType = "REMOVE_MEMBER"
+	UserActivityTypeUpdateProjectName            UserActivityType = "UPDATE_PROJECT_NAME"
+	UserActivityTypeUpdateProjectDescription     UserActivityType = "UPDATE_PROJECT_DESCRIPTION"
+	UserActivityTypeUpdateProjectArchived        UserActivityType = "UPDATE_PROJECT_ARCHIVED"
 )
 
 func (e UserActivityType) IsValid() bool {
 	userActivityTypes := []UserActivityType{
 		UserActivityTypeCreateUser,
 		UserActivityTypeUpdateUserAccessLevel,
+		UserActivityTypeUpdateUserProjectAccessLevel,
+		UserActivityTypeCreateProject,
 		UserActivityTypeDeleteProject,
 		UserActivityTypeAddMember,
 		UserActivityTypeRemoveMember,
@@ -77,12 +81,8 @@ func NewActivityVarsWithUserID(userID string) []UserActivityVar {
 	}
 }
 
-func NewActivityVarsUpdateUserAccessLevel(projectID, userID, oldAccessLevel, newAccessLevel string) []UserActivityVar {
+func NewActivityVarsUpdateUserAccessLevel(userID, oldAccessLevel, newAccessLevel string) []UserActivityVar {
 	return []UserActivityVar{
-		{
-			Key:   "PROJECT_ID",
-			Value: projectID,
-		},
 		{
 			Key:   "USER_ID",
 			Value: userID,
@@ -96,6 +96,17 @@ func NewActivityVarsUpdateUserAccessLevel(projectID, userID, oldAccessLevel, new
 			Value: newAccessLevel,
 		},
 	}
+}
+
+func NewActivityVarsUpdateUserProjectAccessLevel(projectID, userID, oldAccessLevel, newAccessLevel string) []UserActivityVar {
+	actVars := []UserActivityVar{
+		{
+			Key:   "PROJECT_ID",
+			Value: projectID,
+		},
+	}
+
+	return append(actVars, NewActivityVarsUpdateUserAccessLevel(userID, oldAccessLevel, newAccessLevel)...)
 }
 
 func NewActivityVarsUpdateProjectInfo(projectID, oldValue, newValue string) []UserActivityVar {

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
-	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
@@ -114,6 +113,16 @@ func NewInteractor(
 	}
 }
 
+// Save user activity.
+func (i *interactor) SaveUserActivity(ctx context.Context, userActivity entity.UserActivity) error {
+	err := i.userActivityRepo.Create(ctx, userActivity)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 /*
 Create stores into the DB a new project.
 Depending on the repository type:
@@ -171,6 +180,19 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		return entity.Project{}, err
 	}
 
+	createRepoActVars := entity.NewActivityVarsWithProjectAndUserID(project.ID, opt.Owner.ID)
+	createRepoUserAct := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: opt.Owner.ID,
+		Type:   entity.UserActivityTypeCreateProject,
+		Vars:   createRepoActVars,
+	}
+
+	err = i.SaveUserActivity(ctx, createRepoUserAct)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
 	i.logger.Info("Created a new project", "projectName", project.Name, "projectID", insertedID)
 
 	return i.projectRepo.Get(ctx, insertedID)
@@ -186,16 +208,6 @@ func (i *interactor) FindAll(ctx context.Context) ([]entity.Project, error) {
 func (i *interactor) GetByID(ctx context.Context, id string) (entity.Project, error) {
 	i.logger.Info("Getting project by ID", "projectID", id)
 	return i.projectRepo.Get(ctx, id)
-}
-
-// Save user activity.
-func (i *interactor) SaveUserActivity(ctx context.Context, userActivity entity.UserActivity) error {
-	err := i.userActivityRepo.Create(ctx, userActivity)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // Update changes the desired information about a project.
@@ -296,13 +308,13 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 
 	deleteRepoActVars := entity.NewActivityVarsDeleteRepo(projectID, minioBackup)
 	deleteRepoUserAct := entity.UserActivity{
-		Date:   time.Now(),
+		Date:   i.clock.Now(),
 		UserID: opt.LoggedUser.ID,
 		Type:   entity.UserActivityTypeDeleteProject,
 		Vars:   deleteRepoActVars,
 	}
 
-	err = i.userActivityRepo.Create(ctx, deleteRepoUserAct)
+	err = i.SaveUserActivity(ctx, deleteRepoUserAct)
 	if err != nil {
 		return nil, err
 	}

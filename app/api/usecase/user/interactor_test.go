@@ -637,29 +637,65 @@ func TestInteractor_UpdateAccessLevel(t *testing.T) {
 	s := newUserSuite(t)
 	defer s.ctrl.Finish()
 
-	const (
-		id          = "user.1234"
-		username    = "john.doe"
-		email       = "john@doe.com"
-		accessLevel = entity.AccessLevelAdmin
-	)
+	const newAccessLevel = entity.AccessLevelManager
 
 	ctx := context.Background()
+	now := time.Now().UTC()
 
-	targetUser := entity.User{
-		ID:          id,
-		Username:    username,
-		Email:       email,
-		AccessLevel: accessLevel,
+	loggedUser := entity.User{
+		ID: "logged-user",
 	}
 
-	ids := []string{id}
-	users := []entity.User{targetUser}
+	users := []entity.User{
+		{ID: "userA", Username: "user_a", AccessLevel: entity.AccessLevelViewer},
+		{ID: "userB", Username: "user_b", AccessLevel: entity.AccessLevelViewer},
+	}
+	ids := []string{users[0].ID, users[1].ID}
 
-	s.mocks.repo.EXPECT().UpdateAccessLevel(ctx, ids, accessLevel).Return(nil)
+	actVars := [][]entity.UserActivityVar{
+		{
+			{
+				Key: "USER_ID", Value: users[0].ID,
+			},
+			{
+				Key: "OLD_ACCESS_LEVEL", Value: string(entity.AccessLevelViewer),
+			},
+			{
+				Key: "NEW_ACCESS_LEVEL", Value: string(newAccessLevel),
+			},
+		},
+		{
+			{
+				Key: "USER_ID", Value: users[1].ID,
+			},
+			{
+				Key: "OLD_ACCESS_LEVEL", Value: string(entity.AccessLevelViewer),
+			},
+			{
+				Key: "NEW_ACCESS_LEVEL", Value: string(newAccessLevel),
+			},
+		},
+	}
+
+	s.mocks.repo.EXPECT().UpdateAccessLevel(ctx, ids, newAccessLevel).Return(nil)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.repo.EXPECT().Get(ctx, ids[0]).Return(users[0], nil)
+	s.mocks.userActivityRepo.EXPECT().Create(ctx, entity.UserActivity{
+		Date:   now,
+		UserID: loggedUser.ID,
+		Type:   entity.UserActivityTypeUpdateUserAccessLevel,
+		Vars:   actVars[0],
+	}).Return(nil)
+	s.mocks.repo.EXPECT().Get(ctx, ids[1]).Return(users[1], nil)
+	s.mocks.userActivityRepo.EXPECT().Create(ctx, entity.UserActivity{
+		Date:   now,
+		UserID: loggedUser.ID,
+		Type:   entity.UserActivityTypeUpdateUserAccessLevel,
+		Vars:   actVars[1],
+	}).Return(nil)
 	s.mocks.repo.EXPECT().FindByIDs(ctx, ids).Return(users, nil).AnyTimes()
 
-	returnedUsers, err := s.interactor.UpdateAccessLevel(ctx, ids, accessLevel)
+	returnedUsers, err := s.interactor.UpdateAccessLevel(ctx, ids, newAccessLevel, loggedUser.ID)
 
 	require.NoError(t, err)
 	require.Equal(t, users, returnedUsers)

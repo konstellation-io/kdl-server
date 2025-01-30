@@ -24,7 +24,6 @@ show_usertools_help() {
 }
 
 recreate_usertools() {
-  # minikube_kubeconfig
 
   run kubectl -n "${NAMESPACE}" delete usertools usertools-kdladmin &
   run kubectl -n "${NAMESPACE}" patch usertools usertools-kdladmin -p '{"metadata":{"finalizers":[]}}' --type=merge

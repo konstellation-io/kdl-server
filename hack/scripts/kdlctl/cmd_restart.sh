@@ -28,7 +28,6 @@ show_restart_help() {
 }
 
 restart_kdl_pods() {
-  # minikube_kubeconfig
 
   POD_NAMES=$(kubectl -n "${NAMESPACE}" get pod -o custom-columns=":metadata.name" --no-headers | tr '\n' ' ')
 

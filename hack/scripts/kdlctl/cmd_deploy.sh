@@ -53,7 +53,6 @@ get_kubectl_dry_run() {
 }
 
 deploy_helm_chart() {
-  # minikube_kubeconfig
 
   export KNOWLEDGE_GALAXY_IMAGE_REPOSITORY="konstellation/knowledge-galaxy"
   if [ "$KNOWLEDGE_GALAXY_LOCAL" = "true" ]; then

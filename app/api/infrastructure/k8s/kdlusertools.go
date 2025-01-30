@@ -189,8 +189,8 @@ func (k *Client) updateUserToolsTemplate(
 		return nil, errCRDNoSpecVscodeRuntimeEnv
 	}
 
-	env["AWS_ACCESS_KEY"] = data.MinioAccessKey.AccessKey
-	env["AWS_SECRET_KEY"] = data.MinioAccessKey.SecretKey
+	env["AWS_ACCESS_KEY_ID"] = data.MinioAccessKey.AccessKey
+	env["AWS_SECRET_ACCESS_KEY"] = data.MinioAccessKey.SecretKey
 
 	if data.Capabilities.ID != "" {
 		if err := data.Capabilities.Validate(); err != nil {

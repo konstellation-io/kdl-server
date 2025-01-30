@@ -157,6 +157,12 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 		SSHKey:       sshKey,
 		CreationDate: now,
 	}
+	expectedActVars := []entity.UserActivityVar{
+		{
+			Key:   "USER_ID",
+			Value: id,
+		},
+	}
 
 	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
@@ -170,6 +176,16 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	ts.mocks.minioAdminService.EXPECT().CreateUser(ctx, u.UsernameSlug(), minioSecretKey).Return(minioAccessKey, nil)
 	ts.mocks.k8sClient.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 	ts.mocks.k8sClient.EXPECT().CreateUserServiceAccount(ctx, expectedUser.UsernameSlug())
+	ts.mocks.clock.EXPECT().Now().Return(now)
+	ts.mocks.userActivityRepo.EXPECT().Create(
+		ctx,
+		entity.UserActivity{
+			Date:   now,
+			UserID: id,
+			Type:   entity.UserActivityTypeCreateUser,
+			Vars:   expectedActVars,
+		},
+	).Return(nil)
 	ts.mocks.clock.EXPECT().Now().Return(now)
 	ts.mocks.repo.EXPECT().UpdateLastActivity(ctx, expectedUser.Username, now).Return(nil)
 	ts.mocks.repo.EXPECT().GetByUsername(ctx, expectedUser.Username).Return(expectedUser, nil)

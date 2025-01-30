@@ -12,8 +12,8 @@ livenessProbe:
 readinessProbe:
   enabled: true
 
-  startupProbe:
-    enabled: true
+startupProbe:
+  enabled: true
 
 image:
   repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-server

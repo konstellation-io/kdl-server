@@ -19,7 +19,6 @@ $small-square-base: 30px;
   position: relative;
   margin: 0 0 2 * $grid-unit 5 * $grid-unit;
   flex-shrink: 0;
-  // pointer-events: none;
 
   &.archived {
     .name,
@@ -304,7 +303,6 @@ $small-square-base: 30px;
     position: absolute;
     display: flex;
     align-items: center;
-    // pointer-events: none;
 
     transition: color ease 0.4s;
 

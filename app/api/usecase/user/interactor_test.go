@@ -288,12 +288,13 @@ func TestInteractor_StartTools(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const (
-		username     = "john"
-		slugUsername = "john"
-		email        = "john@doe.com"
-		toolsRunning = false
-		runtimeImage = "konstellation/image"
-		runtimeTag   = "3.9"
+		username       = "john"
+		slugUsername   = "john"
+		email          = "john@doe.com"
+		toolsRunning   = false
+		runtimeImage   = "konstellation/image"
+		runtimeTag     = "3.9"
+		minioSecretKey = "john-doe-secret"
 	)
 
 	capability := entity.Capabilities{
@@ -315,10 +316,21 @@ func TestInteractor_StartTools(t *testing.T) {
 		RuntimeImage: runtimeImage,
 		RuntimeTag:   runtimeTag,
 		Capabilities: capability,
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: email,
+			SecretKey: minioSecretKey,
+		},
 	}
 
 	ctx := context.Background()
-	expectedUser := entity.User{Username: username, Email: email}
+	expectedUser := entity.User{
+		Username: username,
+		Email:    email,
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: email,
+			SecretKey: minioSecretKey,
+		},
+	}
 	expectedRuntime := entity.Runtime{ID: runtimeID, DockerImage: runtimeImage, DockerTag: runtimeTag}
 
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(expectedUser, nil)

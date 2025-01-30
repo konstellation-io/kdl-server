@@ -224,6 +224,7 @@ func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, ca
 
 	data.Username = user.Username
 	data.SlugUsername = user.UsernameSlug()
+	data.MinioAccessKey = user.MinioAccessKey
 
 	err = i.k8sClient.CreateKDLUserToolsCR(ctx, data)
 	if err != nil {

@@ -95,8 +95,4 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
   }, [buildRoutes, runtimeRunning, runtimeLoading]);
 }
 
-function removeEntryById(array: { id: any }[], id: any) {
-  return array.filter((item: { id: any }) => item.id !== id);
-}
-
 export default useProjectNavigation;

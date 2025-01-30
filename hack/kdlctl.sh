@@ -35,23 +35,6 @@ OS=$(uname)
 . ./scripts/kdlctl/cmd_login.sh
 . ./scripts/kdlctl/cmd_uninstall.sh
 
-# Variables depending on SO
-case ${OS} in
-"Linux")
-  HOST_IP=10.0.1.1
-  DOCKER_REGISTRY_HOST=localhost
-  ;;
-
-"Darwin")
-  # HOST_IP="$(minikube ip -p ${MINIKUBE_PROFILE} 2>/dev/null || minikube ip || false)"
-  # HOST_IP="$(minikube ip || false)"
-  # DOCKER_REGISTRY_HOST="${HOST_IP}:5000"
-  # DOCKER_REGISTRY_HOST="localhost:56654"
-  # Testing in ./scripts/kdlctl/cmd_build.sh #65
-  true
-  ;;
-esac
-
 check_requirements
 
 echo

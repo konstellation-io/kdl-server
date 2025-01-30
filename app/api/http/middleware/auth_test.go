@@ -124,7 +124,6 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 		accessLevel    = entity.AccessLevelViewer
 		publicSSHKey   = "test-ssh-key-public"
 		privateSSHKey  = "test-ssh-key-private"
-		minioAccessKey = "user-user" // derived from username
 		minioSecretKey = "secret123"
 	)
 
@@ -145,15 +144,15 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 		SSHKey:       sshKey,
 		CreationDate: now,
 	}
-	expectedUser := entity.User{
-		ID:           id,
-		Username:     username,
-		Email:        email,
-		Sub:          sub,
-		AccessLevel:  accessLevel,
-		SSHKey:       sshKey,
-		CreationDate: now,
+
+	userWithCredentials := u
+	userWithCredentials.MinioAccessKey = entity.MinioAccessKey{
+		AccessKey: email,
+		SecretKey: minioSecretKey,
 	}
+
+	expectedUser := userWithCredentials
+	expectedUser.ID = id
 
 	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
@@ -161,10 +160,10 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	ts.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.clock.EXPECT().Now().Return(now)
 	ts.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
-	ts.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
+	ts.mocks.repo.EXPECT().Create(ctx, userWithCredentials).Return(id, nil)
 	ts.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
 	ts.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(minioSecretKey, nil)
-	ts.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, minioSecretKey).Return(minioAccessKey, nil)
+	ts.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, minioSecretKey).Return(email, nil)
 	ts.mocks.k8sClient.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 	ts.mocks.k8sClient.EXPECT().CreateUserServiceAccount(ctx, expectedUser.UsernameSlug())
 	ts.mocks.clock.EXPECT().Now().Return(now)
@@ -190,13 +189,14 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound_CreateError() {
 	// Arrange
 	const (
-		id            = "user.1234"
-		email         = "user@email.com"
-		username      = "user"
-		sub           = "d5d70477-5192-4182-b80e-5d34550eb4fe"
-		accessLevel   = entity.AccessLevelViewer
-		publicSSHKey  = "test-ssh-key-public"
-		privateSSHKey = "test-ssh-key-private"
+		id             = "user.1234"
+		email          = "user@email.com"
+		username       = "user"
+		sub            = "d5d70477-5192-4182-b80e-5d34550eb4fe"
+		accessLevel    = entity.AccessLevelViewer
+		publicSSHKey   = "test-ssh-key-public"
+		privateSSHKey  = "test-ssh-key-private"
+		minioSecretKey = "secret123"
 	)
 
 	ctx := context.Background()
@@ -217,13 +217,23 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound_CreateErro
 		CreationDate: now,
 	}
 
+	userWithCredentials := u
+	userWithCredentials.MinioAccessKey = entity.MinioAccessKey{
+		AccessKey: email,
+		SecretKey: minioSecretKey,
+	}
+
 	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.clock.EXPECT().Now().Return(now)
 	ts.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
-	ts.mocks.repo.EXPECT().Create(ctx, u).Return(id, errUnexpected)
+	ts.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(minioSecretKey, nil)
+	ts.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, minioSecretKey).Return(email, nil)
+	ts.mocks.k8sClient.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
+	ts.mocks.k8sClient.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
+	ts.mocks.repo.EXPECT().Create(ctx, userWithCredentials).Return(id, errUnexpected)
 
 	// Act
 	handlerFunc := http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {})

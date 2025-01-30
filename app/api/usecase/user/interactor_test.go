@@ -107,7 +107,6 @@ func TestInteractor_Create(t *testing.T) {
 		accessLevel    = entity.AccessLevelAdmin
 		publicSSHKey   = "test-ssh-key-public"
 		privateSSHKey  = "test-ssh-key-private"
-		minioAccessKey = "user-user"             // derived from username
 		minioSecretKey = "test-minio-secret-key" // #nosec G101
 	)
 
@@ -129,27 +128,26 @@ func TestInteractor_Create(t *testing.T) {
 		CreationDate: now,
 	}
 
-	expectedUser := entity.User{
-		ID:           id,
-		Username:     username,
-		Sub:          sub,
-		Email:        email,
-		AccessLevel:  accessLevel,
-		SSHKey:       sshKey,
-		CreationDate: now,
+	userWithCredentials := u
+	userWithCredentials.MinioAccessKey = entity.MinioAccessKey{
+		AccessKey: email,
+		SecretKey: minioSecretKey,
 	}
+
+	expectedUser := userWithCredentials
+	expectedUser.ID = id
 
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
-	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
-	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
 	s.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(minioSecretKey, nil)
-	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, minioSecretKey).Return(minioAccessKey, nil)
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, minioSecretKey).Return(email, nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
+	s.mocks.repo.EXPECT().Create(ctx, userWithCredentials).Return(id, nil)
+	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
 
 	createdUser, err := s.interactor.Create(ctx, email, sub, accessLevel)
 

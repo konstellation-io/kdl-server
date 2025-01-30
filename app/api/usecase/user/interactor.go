@@ -125,14 +125,6 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 		SSHKey:       keys,
 	}
 
-	insertedID, err := i.repo.Create(ctx, user)
-	if err != nil {
-		i.logger.Error(err, "Error creating user", "username", username, "email", email)
-		return entity.User{}, err
-	}
-
-	i.logger.Info("The user was created", "username", user.Username, "userEmail", user.Email, "insertedID", insertedID)
-
 	err = i.k8sClient.CreateUserSSHKeySecret(ctx, user, keys.Public, keys.Private)
 	if err != nil {
 		i.logger.Error(err, "Error creating ssh key secret", "username", username)
@@ -157,6 +149,14 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 		i.logger.Error(err, "Error creating a MinIO user", "accessKey", user.MinioAccessKey.AccessKey)
 		return entity.User{}, err
 	}
+
+	insertedID, err := i.repo.Create(ctx, user)
+	if err != nil {
+		i.logger.Error(err, "Error creating user", "username", username, "email", email)
+		return entity.User{}, err
+	}
+
+	i.logger.Info("The user was created", "username", user.Username, "userEmail", user.Email, "insertedID", insertedID)
 
 	return i.repo.Get(ctx, insertedID)
 }

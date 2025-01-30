@@ -311,10 +311,37 @@ func (i *Interactor) GetByID(ctx context.Context, userID string) (entity.User, e
 }
 
 // UpdateAccessLevel update access level for the given identifiers.
-func (i *Interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error) {
+func (i *Interactor) UpdateAccessLevel(
+	ctx context.Context,
+	userIDs []string,
+	level entity.AccessLevel,
+	loggedUserID string,
+) ([]entity.User, error) {
 	// Update access level in our DataBase
 	if err := i.repo.UpdateAccessLevel(ctx, userIDs, level); err != nil {
 		return nil, err
+	}
+
+	userAct := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: loggedUserID,
+		Type:   entity.UserActivityTypeUpdateUserAccessLevel,
+	}
+
+	for _, userID := range userIDs {
+		// Save update user access level activity
+		u, err := i.GetByID(ctx, userID)
+
+		if err != nil {
+			return nil, err
+		}
+
+		userAct.Vars = entity.NewActivityVarsUpdateUserAccessLevel(userID, u.AccessLevel.String(), level.String())
+
+		err = i.SaveUserActivity(ctx, userAct)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return i.repo.FindByIDs(ctx, userIDs)

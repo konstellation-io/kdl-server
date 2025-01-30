@@ -33,7 +33,7 @@ type Repository interface {
 type UseCase interface {
 	Create(ctx context.Context, email, sub string, accessLevel entity.AccessLevel) (entity.User, error)
 	UpdateSub(ctx context.Context, user entity.User, sub string) (entity.User, error)
-	UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error)
+	UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel, loggedUserID string) ([]entity.User, error)
 	UpdateLastActivity(ctx context.Context, user entity.User) (entity.User, error)
 	FindAll(ctx context.Context) ([]entity.User, error)
 	GetByEmail(ctx context.Context, email string) (entity.User, error)

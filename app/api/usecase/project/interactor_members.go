@@ -229,7 +229,7 @@ func (i *interactor) UpdateMembers(ctx context.Context, opt UpdateMembersOption)
 			continue
 		}
 
-		updateUserAccessLevelActVars := entity.NewActivityVarsUpdateUserAccessLevel(
+		updateUserAccessLevelActVars := entity.NewActivityVarsUpdateUserProjectAccessLevel(
 			opt.ProjectID,
 			u.ID,
 			u.AccessLevel.String(),
@@ -238,7 +238,7 @@ func (i *interactor) UpdateMembers(ctx context.Context, opt UpdateMembersOption)
 		updateUserAccessLevelAct := entity.UserActivity{
 			Date:   now,
 			UserID: opt.LoggedUser.ID,
-			Type:   entity.UserActivityTypeUpdateUserAccessLevel,
+			Type:   entity.UserActivityTypeUpdateUserProjectAccessLevel,
 			Vars:   updateUserAccessLevelActVars,
 		}
 

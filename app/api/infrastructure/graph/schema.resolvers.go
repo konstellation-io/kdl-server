@@ -59,7 +59,12 @@ func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.S
 
 // UpdateAccessLevel is the resolver for the updateAccessLevel field.
 func (r *mutationResolver) UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]entity.User, error) {
-	return r.users.UpdateAccessLevel(ctx, input.UserIds, input.AccessLevel)
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.users.UpdateAccessLevel(ctx, input.UserIds, input.AccessLevel, loggedUser.ID)
 }
 
 // AddMembers is the resolver for the addMembers field.

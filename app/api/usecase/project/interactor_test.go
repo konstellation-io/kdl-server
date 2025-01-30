@@ -138,12 +138,30 @@ func TestInteractor_Create(t *testing.T) {
 		},
 	}
 
+	userActivity := entity.UserActivity{
+		Date:   now,
+		UserID: ownerUserID,
+		Type:   entity.UserActivityTypeCreateProject,
+		Vars: []entity.UserActivityVar{
+			{
+				Key:   "PROJECT_ID",
+				Value: testProjectID,
+			},
+			{
+				Key:   "USER_ID",
+				Value: ownerUserID,
+			},
+		},
+	}
+
+	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx,
 		k8s.ProjectData{ProjectID: testProjectID, MinioAccessKey: createProject.MinioAccessKey}).Return(nil)
 	s.mocks.minioService.EXPECT().CreateBucket(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().CreateProjectDirs(ctx, testProjectID).Return(nil)
-	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(testProjectID, nil)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.userActivityRepo.EXPECT().Create(ctx, userActivity).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(expectedProject, nil)
 	s.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(projectMinioSecretKey, nil)
 	s.mocks.minioAdminService.EXPECT().CreateProjectUser(ctx, testProjectID, projectMinioSecretKey).Return(projectMinioAccessKey, nil)
@@ -490,7 +508,7 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 		entity.UserActivity{
 			Date:   now,
 			UserID: loggedUser.ID,
-			Type:   entity.UserActivityTypeUpdateUserAccessLevel,
+			Type:   entity.UserActivityTypeUpdateUserProjectAccessLevel,
 			Vars:   expectedUpdateMemberActVars[0],
 		},
 	).Return(nil)
@@ -499,7 +517,7 @@ func TestInteractor_UpdateMembers(t *testing.T) {
 		entity.UserActivity{
 			Date:   now,
 			UserID: loggedUser.ID,
-			Type:   entity.UserActivityTypeUpdateUserAccessLevel,
+			Type:   entity.UserActivityTypeUpdateUserProjectAccessLevel,
 			Vars:   expectedUpdateMemberActVars[1],
 		},
 	).Return(nil)
@@ -688,7 +706,7 @@ func TestInteractor_Delete(t *testing.T) {
 	expectedMinioBackup := "minio-backup"
 
 	userActivity := entity.UserActivity{
-		Date:   time.Now(),
+		Date:   now,
 		UserID: loggedUser.ID,
 		Type:   entity.UserActivityTypeDeleteProject,
 		Vars: []entity.UserActivityVar{
@@ -709,7 +727,7 @@ func TestInteractor_Delete(t *testing.T) {
 	s.mocks.minioService.EXPECT().DeleteBucket(ctx, testProjectID).Return(expectedMinioBackup, nil)
 	s.mocks.minioAdminService.EXPECT().DeleteProjectPolicy(ctx, accessKey).Return(nil)
 	s.mocks.minioAdminService.EXPECT().DeleteUser(ctx, accessKey).Return(nil)
-
+	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.userActivityRepo.EXPECT().Create(ctx, userActivity).Return(nil)
 
 	result, err := s.interactor.Delete(ctx, project.DeleteProjectOption{

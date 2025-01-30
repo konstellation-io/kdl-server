@@ -317,7 +317,7 @@ func (i *Interactor) UpdateAccessLevel(
 	level entity.AccessLevel,
 	loggedUserID string,
 ) ([]entity.User, error) {
-	// Get all users by their IDs
+	// Get all users by their IDs to get the current access level
 	users, err := i.repo.FindByIDs(ctx, userIDs)
 	if err != nil {
 		return nil, err
@@ -336,10 +336,6 @@ func (i *Interactor) UpdateAccessLevel(
 
 	for _, u := range users {
 		// Save update user access level activity
-		if err != nil {
-			return nil, err
-		}
-
 		userAct.Vars = entity.NewActivityVarsUpdateUserAccessLevel(u.ID, u.AccessLevel.String(), level.String())
 
 		err = i.SaveUserActivity(ctx, userAct)

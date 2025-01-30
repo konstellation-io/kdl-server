@@ -31,19 +31,17 @@ func NewMongoDB(logger logr.Logger, uri string) (*MongoDB, error) {
 		return nil, err
 	}
 
+	logger.Info("MongoDB connected")
+
 	return &MongoDB{logger, client}, nil
 }
 
 func (m *MongoDB) Ping() bool {
-	m.logger.Info("MongoDB ping...")
-
 	err := m.client.Ping(context.Background(), readpref.Primary())
 	if err != nil {
-		m.logger.Info("MongoDB ping failed")
+		m.logger.Error(err, "MongoDB ping failed")
 		return false
 	}
-
-	m.logger.Info("MongoDB connected")
 
 	return true
 }
@@ -65,7 +63,7 @@ func (m *MongoDB) Disconnect() {
 		return
 	}
 
-	m.logger.Info("Connection to MongoDB closed.")
+	m.logger.Info("Connection to MongoDB closed")
 }
 
 // CreateCollection creates a new collection in the database.
@@ -75,7 +73,7 @@ func (m *MongoDB) CreateCollection(dbName, collName string) *mongo.Collection {
 
 // Drop database.
 func (m *MongoDB) DropDatabase(dbName string) error {
-	m.logger.Info("MongoDB drop database...")
+	m.logger.Info("MongoDB dropping database...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -85,7 +83,7 @@ func (m *MongoDB) DropDatabase(dbName string) error {
 		return err
 	}
 
-	m.logger.Info("Database dropped.")
+	m.logger.Info("Database dropped")
 
 	return nil
 }

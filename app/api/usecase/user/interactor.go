@@ -17,6 +17,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 )
 
@@ -29,6 +30,7 @@ type Interactor struct {
 	logger            logr.Logger
 	cfg               config.Config
 	repo              Repository
+	userActivityRepo  project.UserActivityRepo
 	repoRuntimes      runtime.Repository
 	repoCapabilities  capabilities.Repository
 	sshGenerator      sshhelper.SSHKeyGenerator
@@ -46,6 +48,7 @@ func NewInteractor(
 	logger logr.Logger,
 	cfg config.Config,
 	repo Repository,
+	userActivityRepo project.UserActivityRepo,
 	repoRuntimes runtime.Repository,
 	repoCapabilities capabilities.Repository,
 	sshGenerator sshhelper.SSHKeyGenerator,
@@ -58,6 +61,7 @@ func NewInteractor(
 		logger:            logger,
 		cfg:               cfg,
 		repo:              repo,
+		userActivityRepo:  userActivityRepo,
 		repoRuntimes:      repoRuntimes,
 		repoCapabilities:  repoCapabilities,
 		sshGenerator:      sshGenerator,
@@ -66,6 +70,16 @@ func NewInteractor(
 		minioAdminService: minioAdminService,
 		randomGenerator:   randomGenerator,
 	}
+}
+
+// Save user activity.
+func (i *Interactor) SaveUserActivity(ctx context.Context, userActivity entity.UserActivity) error {
+	err := i.userActivityRepo.Create(ctx, userActivity)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Create add a new user to the server.
@@ -157,6 +171,20 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 	user.MinioAccessKey.AccessKey, err = i.minioAdminService.CreateUser(ctx, slug, user.MinioAccessKey.SecretKey)
 	if err != nil {
 		i.logger.Error(err, "Error creating a MinIO user", "accessKey", user.MinioAccessKey.AccessKey)
+		return entity.User{}, err
+	}
+
+	// Save user creation in user activity
+	createUserActVars := entity.NewActivityVarsWithUserID(insertedID)
+	createUserAct := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: insertedID,
+		Type:   entity.UserActivityTypeCreateUser,
+		Vars:   createUserActVars,
+	}
+
+	err = i.SaveUserActivity(ctx, createUserAct)
+	if err != nil {
 		return entity.User{}, err
 	}
 
@@ -283,10 +311,37 @@ func (i *Interactor) GetByID(ctx context.Context, userID string) (entity.User, e
 }
 
 // UpdateAccessLevel update access level for the given identifiers.
-func (i *Interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error) {
+func (i *Interactor) UpdateAccessLevel(
+	ctx context.Context,
+	userIDs []string,
+	level entity.AccessLevel,
+	loggedUserID string,
+) ([]entity.User, error) {
+	// Get all users by their IDs to get the current access level
+	users, err := i.repo.FindByIDs(ctx, userIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	// Update access level in our DataBase
 	if err := i.repo.UpdateAccessLevel(ctx, userIDs, level); err != nil {
 		return nil, err
+	}
+
+	userAct := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: loggedUserID,
+		Type:   entity.UserActivityTypeUpdateUserAccessLevel,
+	}
+
+	for _, u := range users {
+		// Save update user access level activity
+		userAct.Vars = entity.NewActivityVarsUpdateUserAccessLevel(u.ID, u.AccessLevel.String(), level.String())
+
+		err = i.SaveUserActivity(ctx, userAct)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return i.repo.FindByIDs(ctx, userIDs)

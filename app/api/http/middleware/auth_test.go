@@ -26,6 +26,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
 
@@ -35,6 +36,7 @@ type userMocks struct {
 	logger            logr.Logger
 	cfg               config.Config
 	repo              *user.MockRepository
+	userActivityRepo  *project.MockUserActivityRepo
 	runtimeRepo       *runtime.MockRepository
 	capabilitiesRepo  *capabilities.MockRepository
 	sshGenerator      *sshhelper.MockSSHKeyGenerator
@@ -65,6 +67,7 @@ func (ts *AuthMiddlewareTestSuite) SetupSuite() {
 	ts.mocks.clock = clock.NewMockClock(ts.ctrl)
 	ts.mocks.sshGenerator = sshhelper.NewMockSSHKeyGenerator(ts.ctrl)
 	ts.mocks.k8sClient = k8s.NewMockClientInterface(ts.ctrl)
+	ts.mocks.userActivityRepo = project.NewMockUserActivityRepo(ts.ctrl)
 	ts.mocks.minioAdminService = minioadminservice.NewMockMinioAdminInterface(ts.ctrl)
 	ts.mocks.randomGenerator = kdlutil.NewMockRandomGenerator(ts.ctrl)
 
@@ -75,7 +78,7 @@ func (ts *AuthMiddlewareTestSuite) SetupSuite() {
 
 	ts.mocks.cfg = config.Config{}
 
-	ts.interactor = user.NewInteractor(ts.mocks.logger, ts.mocks.cfg, ts.mocks.repo, ts.mocks.runtimeRepo,
+	ts.interactor = user.NewInteractor(ts.mocks.logger, ts.mocks.cfg, ts.mocks.repo, ts.mocks.userActivityRepo, ts.mocks.runtimeRepo,
 		ts.mocks.capabilitiesRepo, ts.mocks.sshGenerator, ts.mocks.clock, ts.mocks.k8sClient, ts.mocks.minioAdminService,
 		ts.mocks.randomGenerator)
 }
@@ -154,6 +157,12 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 		SSHKey:       sshKey,
 		CreationDate: now,
 	}
+	expectedActVars := []entity.UserActivityVar{
+		{
+			Key:   "USER_ID",
+			Value: id,
+		},
+	}
 
 	ts.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	ts.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
@@ -167,6 +176,16 @@ func (ts *AuthMiddlewareTestSuite) TestMiddlewareAuthUsernameNotFound() {
 	ts.mocks.minioAdminService.EXPECT().CreateUser(ctx, u.UsernameSlug(), minioSecretKey).Return(minioAccessKey, nil)
 	ts.mocks.k8sClient.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 	ts.mocks.k8sClient.EXPECT().CreateUserServiceAccount(ctx, expectedUser.UsernameSlug())
+	ts.mocks.clock.EXPECT().Now().Return(now)
+	ts.mocks.userActivityRepo.EXPECT().Create(
+		ctx,
+		entity.UserActivity{
+			Date:   now,
+			UserID: id,
+			Type:   entity.UserActivityTypeCreateUser,
+			Vars:   expectedActVars,
+		},
+	).Return(nil)
 	ts.mocks.clock.EXPECT().Now().Return(now)
 	ts.mocks.repo.EXPECT().UpdateLastActivity(ctx, expectedUser.Username, now).Return(nil)
 	ts.mocks.repo.EXPECT().GetByUsername(ctx, expectedUser.Username).Return(expectedUser, nil)

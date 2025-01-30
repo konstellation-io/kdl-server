@@ -19,16 +19,16 @@ tidy: ## Run golangci-lint, goimports and gofmt
 create: ## Creates a complete local environment
 	cd hack && ./kdlctl.sh dev && cd -
 
-.PHONY: start-microk8s
-start-microk8s: ## Starts microk8s
+.PHONY: start
+start: ## Starts minikube
 	cd hack && ./kdlctl.sh start && cd -
 
-.PHONY: stop-microk8s
-stop-microk8s: ## Stops microk8s
+.PHONY: stop
+stop: ## Stops minikube
 	cd hack && ./kdlctl.sh stop && cd -
 
 .PHONY: build
-build: ## Builds docker images and pushes them to the microk8s registry
+build: ## Builds docker images and pushes them to the minikube registry
 	cd hack && ./kdlctl.sh build && cd -
 
 .PHONY: deploy
@@ -36,7 +36,7 @@ deploy: ## Deploys Helm charts
 	cd hack && ./kdlctl.sh deploy && cd -
 
 .PHONY: restart
-restart: ## Restarts kdl pods and microk8s (use after build)
+restart: ## Restarts kdl pods and minikube (use after build)
 	cd hack && ./kdlctl.sh restart && cd -
 
 .PHONY: refresh-certs
@@ -44,7 +44,7 @@ refresh-certs: ## Refreshes the certificates
 	cd hack && ./kdlctl.sh refresh-certs && cd -
 
 .PHONY: uninstall
-uninstall: ## Remove all microk8s resources
+uninstall: ## Remove all minikube resources
 	cd hack && ./kdlctl.sh uninstall && cd -
 
 .PHONY: test-api

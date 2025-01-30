@@ -1,7 +1,7 @@
 #!/bin/sh
 
 cmd_uninstall() {
-  microk8s_kubeconfig
+  # minikube_kubeconfig
 
   while true; do
     read -p "⚠️ Do you wish to uninstall KDL? CAUTION: all data will be permanently deleted. (y/n) " yn

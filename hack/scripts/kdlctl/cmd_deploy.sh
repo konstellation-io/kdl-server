@@ -2,11 +2,11 @@
 
 BUILD_DOCKER_IMAGES=0
 cmd_deploy() {
-  microk8s_start "$@"
+  minikube_start "$@"
 
   case $* in
-    --build)
-      BUILD_DOCKER_IMAGES=1
+  --build)
+    BUILD_DOCKER_IMAGES=1
     ;;
   esac
 
@@ -17,8 +17,8 @@ show_deploy_help() {
   echo "$(help_global_header "deploy")
 
     options:
-      --build  re-build all docker images before deploying on microk8s.
-      --gpu enables the GPU in MicroK8s
+      --build  re-build all docker images before deploying on minikube.
+      --gpu    enables the GPU in minikube
 
     $(help_global_options)
 "
@@ -37,32 +37,32 @@ deploy() {
 }
 
 get_kubectl_dry_run() {
-    act_version="$(kubectl version --client=true | sed 's/[^0-9.]*\([0-9.]*\).*/\1/' | head -1)"
-    req_version="1.30.0"
+  act_version="$(kubectl version --client=true | sed 's/[^0-9.]*\([0-9.]*\).*/\1/' | head -1)"
+  req_version="1.30.0"
 
-    # get the lowest version of the two compared
-    lowest_version=$(printf '%s\n' "${act_version}" "${req_version}" | sort -V | head -n1)
+  # get the lowest version of the two compared
+  lowest_version=$(printf '%s\n' "${act_version}" "${req_version}" | sort -V | head -n1)
 
-    # if minimum required is met, use newer parameter
-    if [ "$lowest_version" = "$req_version" ]; then
-      echo "--dry-run=client"
-      return
-    fi
+  # if minimum required is met, use newer parameter
+  if [ "$lowest_version" = "$req_version" ]; then
+    echo "--dry-run=client"
+    return
+  fi
 
-    echo "--dry-run"
+  echo "--dry-run"
 }
 
 deploy_helm_chart() {
-  microk8s_kubeconfig
+  # minikube_kubeconfig
 
   export KNOWLEDGE_GALAXY_IMAGE_REPOSITORY="konstellation/knowledge-galaxy"
-  if [ "$KNOWLEDGE_GALAXY_LOCAL" = "true"  ]; then
+  if [ "$KNOWLEDGE_GALAXY_LOCAL" = "true" ]; then
     export KNOWLEDGE_GALAXY_IMAGE_REPOSITORY="$IMAGE_REGISTRY/konstellation/kdl-knowledge-galaxy"
     export KNOWLEDGE_GALAXY_IMAGE_TAG="latest"
     echo_info "LOCAL KG"
   fi
   if [ "$KUBECONFIG_ENABLED" = "true" ] || [ ! -z "$KUBECONFIG" ]; then
-    export EXTERNAL_SERVER_URL=$(yq eval '.clusters[] | select (.name == "microk8s-cluster") | .cluster.server' ${KUBECONFIG})
+    export EXTERNAL_SERVER_URL=$(yq eval '.clusters[] | select (.name == "minikube-cluster") | .cluster.server' ${KUBECONFIG})
     echo_info "KDL Remote Development enabled"
   fi
   echo_info "📦 Applying helm chart..."

@@ -1,16 +1,16 @@
 #!/bin/sh
 
 cmd_usertools() {
-    TYPE=${1:-"recreate"}
+  TYPE=${1:-"recreate"}
 
-    if [ "$TYPE" = "recreate" ]; then
-      recreate_usertools
-    fi
+  if [ "$TYPE" = "recreate" ]; then
+    recreate_usertools
+  fi
 
-    if [ "$TYPE" = "microk8s" ]; then
-      microk8s_stop
-      microk8s_start "$@"
-    fi
+  if [ "$TYPE" = "minikube" ]; then
+    minikube_stop
+    minikube_start "$@"
+  fi
 }
 
 show_usertools_help() {
@@ -24,7 +24,7 @@ show_usertools_help() {
 }
 
 recreate_usertools() {
-  microk8s_kubeconfig
+  # minikube_kubeconfig
 
   run kubectl -n "${NAMESPACE}" delete usertools usertools-kdladmin &
   run kubectl -n "${NAMESPACE}" patch usertools usertools-kdladmin -p '{"metadata":{"finalizers":[]}}' --type=merge

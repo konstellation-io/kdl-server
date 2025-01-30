@@ -4,7 +4,7 @@ global:
   enableHttps: true
 
 image:
-  repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-server
+  repository: konstellation/kdl-server
   tag: latest
   pullPolicy: Always
 
@@ -242,7 +242,7 @@ projectOperator:
   enabled: true
 
   image:
-    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-project-operator
+    repository: konstellation/kdl-project-operator
     pullPolicy: Always
     tag: latest
 
@@ -251,7 +251,7 @@ projectOperator:
       domain: {{ requiredEnv "DOMAIN" | quote }}
       mlflow:
         image:
-          repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-mlflow
+          repository: konstellation/kdl-mlflow
           pullPolicy: Always
           tag: latest
 
@@ -278,7 +278,7 @@ projectOperator:
 
       filebrowser:
         image:
-          repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-filebrowser
+          repository: konstellation/kdl-filebrowser
           pullPolicy: Always
           tag: latest
 
@@ -297,7 +297,7 @@ userToolsOperator:
   enabled: true
 
   image:
-    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-user-tools-operator
+    repository: konstellation/kdl-user-tools-operator
     tag: latest
     pullPolicy: Always
 
@@ -312,7 +312,7 @@ userToolsOperator:
 
       repoCloner:
         image:
-          repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-repo-cloner
+          repository: konstellation/kdl-repo-cloner
           pullPolicy: Always
           tag: "latest"
 

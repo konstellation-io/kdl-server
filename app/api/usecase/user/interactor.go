@@ -12,6 +12,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioadminservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
@@ -21,21 +22,22 @@ import (
 )
 
 var (
-	ErrStopUserTools        = errors.New("cannot stop uninitialized user tools")
-	ErrUserToolsActive      = errors.New("it is not possible to regenerate SSH keys with the usertools active")
-	errCreatingKDLUserTools = errors.New("error creating CRD KDLUserTools ")
+	ErrStopUserTools   = errors.New("cannot stop uninitialized user tools")
+	ErrUserToolsActive = errors.New("it is not possible to regenerate SSH keys with the usertools active")
 )
 
 type Interactor struct {
-	logger           logr.Logger
-	cfg              config.Config
-	repo             Repository
-	userActivityRepo project.UserActivityRepo
-	repoRuntimes     runtime.Repository
-	repoCapabilities capabilities.Repository
-	sshGenerator     sshhelper.SSHKeyGenerator
-	clock            clock.Clock
-	k8sClient        k8s.ClientInterface
+	logger            logr.Logger
+	cfg               config.Config
+	repo              Repository
+	userActivityRepo  project.UserActivityRepo
+	repoRuntimes      runtime.Repository
+	repoCapabilities  capabilities.Repository
+	sshGenerator      sshhelper.SSHKeyGenerator
+	clock             clock.Clock
+	k8sClient         k8s.ClientInterface
+	minioAdminService minioadminservice.MinioAdminInterface
+	randomGenerator   kdlutil.RandomGenerator
 }
 
 // Interactor implements the UseCase interface.
@@ -52,17 +54,21 @@ func NewInteractor(
 	sshGenerator sshhelper.SSHKeyGenerator,
 	c clock.Clock,
 	k8sClient k8s.ClientInterface,
+	minioAdminService minioadminservice.MinioAdminInterface,
+	randomGenerator kdlutil.RandomGenerator,
 ) UseCase {
 	return &Interactor{
-		logger:           logger,
-		cfg:              cfg,
-		repo:             repo,
-		userActivityRepo: userActivityRepo,
-		repoRuntimes:     repoRuntimes,
-		repoCapabilities: repoCapabilities,
-		sshGenerator:     sshGenerator,
-		clock:            c,
-		k8sClient:        k8sClient,
+		logger:            logger,
+		cfg:               cfg,
+		repo:              repo,
+		userActivityRepo:  userActivityRepo,
+		repoRuntimes:      repoRuntimes,
+		repoCapabilities:  repoCapabilities,
+		sshGenerator:      sshGenerator,
+		clock:             c,
+		k8sClient:         k8sClient,
+		minioAdminService: minioAdminService,
+		randomGenerator:   randomGenerator,
 	}
 }
 
@@ -148,22 +154,36 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 	}
 
 	// Created a service account for the user
-	_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
+	slug := user.UsernameSlug()
+
+	_, err = i.k8sClient.CreateUserServiceAccount(ctx, slug)
 	if err != nil {
 		i.logger.Error(err, "Error creating service account", "username", username)
 		return entity.User{}, err
 	}
 
+	user.MinioAccessKey.SecretKey, err = i.randomGenerator.GenerateRandomString(40)
+	if err != nil {
+		i.logger.Error(err, "Error creating a MinIO secret key", "username", username)
+		return entity.User{}, err
+	}
+
+	user.MinioAccessKey.AccessKey, err = i.minioAdminService.CreateUser(ctx, slug, user.MinioAccessKey.SecretKey)
+	if err != nil {
+		i.logger.Error(err, "Error creating a MinIO user", "accessKey", user.MinioAccessKey.AccessKey)
+		return entity.User{}, err
+	}
+
 	// Save user creation in user activity
 	createUserActVars := entity.NewActivityVarsWithUserID(insertedID)
-	createUserdAct := entity.UserActivity{
+	createUserAct := entity.UserActivity{
 		Date:   i.clock.Now(),
 		UserID: insertedID,
 		Type:   entity.UserActivityTypeCreateUser,
 		Vars:   createUserActVars,
 	}
 
-	err = i.SaveUserActivity(ctx, createUserdAct)
+	err = i.SaveUserActivity(ctx, createUserAct)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -232,7 +252,10 @@ func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, ca
 
 	i.logger.Info("Creating user tools for user", "email", email)
 
-	err = i.k8sClient.CreateKDLUserToolsCR(ctx, user.Username, data)
+	data.Username = user.Username
+	data.SlugUsername = user.UsernameSlug()
+
+	err = i.k8sClient.CreateKDLUserToolsCR(ctx, data)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -467,48 +490,7 @@ func (i *Interactor) UpdateKDLUserTools(ctx context.Context) error {
 	for _, userTool := range kdlUserTools {
 		resourceName := userTool.GetName()
 
-		spec, ok := userTool.Object["spec"].(map[string]interface{})
-		if !ok {
-			i.logger.Error(errCreatingKDLUserTools, "Missing spec from KDL UserTools CR", "userToolName", userTool.GetName())
-			continue
-		}
-
-		podLabels, ok := spec["podLabels"].(map[string]interface{})
-		if !ok {
-			i.logger.Error(errCreatingKDLUserTools, "Missing spec.podLabels from KDL UserTools CR", "userToolName", userTool.GetName())
-			continue
-		}
-
-		runtimeID, ok := podLabels["runtimeId"].(string)
-		if !ok || runtimeID == "" {
-			i.logger.Error(errCreatingKDLUserTools, "Runtime ID provided is not valid, skipping user tools update", "userToolName", resourceName)
-			continue
-		}
-
-		capabilitiesID, ok := podLabels["capabilityId"].(string)
-		if !ok || capabilitiesID == "" {
-			i.logger.Error(errCreatingKDLUserTools, "Capability ID provided is not valid, skipping user tools update", "userToolName", resourceName)
-			continue
-		}
-
-		r, err := i.repoRuntimes.Get(ctx, runtimeID)
-		if err != nil {
-			i.logger.Error(err, "Error getting runtime", "runtimeID", runtimeID)
-			continue
-		}
-
-		var data = k8s.UserToolsData{}
-		data.RuntimeID = r.ID
-		data.RuntimeImage = r.DockerImage
-		data.RuntimeTag = r.DockerTag
-
-		data.Capabilities, err = i.repoCapabilities.Get(ctx, capabilitiesID)
-		if err != nil {
-			i.logger.Error(err, "Error getting capability", "capabilitiesID", capabilitiesID)
-			continue
-		}
-
-		err = i.k8sClient.UpdateKDLUserToolsCR(ctx, resourceName, data, &crd)
+		err = i.k8sClient.UpdateKDLUserToolsCR(ctx, resourceName, &crd)
 		if err != nil {
 			i.logger.Error(err, "Error updating KDL UserTools CR in k8s", "userToolName", resourceName)
 		}

@@ -26,6 +26,7 @@ type Repository interface {
 	UpdateUsername(ctx context.Context, email, userID string) error
 	UpdateDeleted(ctx context.Context, userID string, deleted bool) error
 	UpdateLastActivity(ctx context.Context, userID string, lastActivity time.Time) error
+	UpdateMinioAccess(ctx context.Context, username, accessKey, secretKey string) error
 }
 
 // UseCase interface to manage all operations related with users.

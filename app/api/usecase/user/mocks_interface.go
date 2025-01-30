@@ -211,6 +211,20 @@ func (mr *MockRepositoryMockRecorder) UpdateLastActivity(ctx, userID, lastActivi
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateLastActivity", reflect.TypeOf((*MockRepository)(nil).UpdateLastActivity), ctx, userID, lastActivity)
 }
 
+// UpdateMinioAccess mocks base method.
+func (m *MockRepository) UpdateMinioAccess(ctx context.Context, username, accessKey, secretKey string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateMinioAccess", ctx, username, accessKey, secretKey)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateMinioAccess indicates an expected call of UpdateMinioAccess.
+func (mr *MockRepositoryMockRecorder) UpdateMinioAccess(ctx, username, accessKey, secretKey interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMinioAccess", reflect.TypeOf((*MockRepository)(nil).UpdateMinioAccess), ctx, username, accessKey, secretKey)
+}
+
 // UpdateSSHKey mocks base method.
 func (m *MockRepository) UpdateSSHKey(ctx context.Context, username string, SSHKey entity.SSHKey) error {
 	m.ctrl.T.Helper()

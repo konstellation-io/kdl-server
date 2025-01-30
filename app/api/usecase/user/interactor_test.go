@@ -19,7 +19,9 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioadminservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
@@ -43,26 +45,30 @@ type userSuite struct {
 }
 
 type userMocks struct {
-	repo             *user.MockRepository
-	runtimeRepo      *runtime.MockRepository
-	capabilitiesRepo *capabilities.MockRepository
-	sshGenerator     *sshhelper.MockSSHKeyGenerator
-	clock            *clock.MockClock
-	k8sClientMock    *k8s.MockClientInterface
-	logger           logr.Logger
-	cfg              config.Config
-	userActivityRepo *project.MockUserActivityRepo
+	repo              *user.MockRepository
+	userActivityRepo  *project.MockUserActivityRepo
+	runtimeRepo       *runtime.MockRepository
+	capabilitiesRepo  *capabilities.MockRepository
+	sshGenerator      *sshhelper.MockSSHKeyGenerator
+	clock             *clock.MockClock
+	k8sClientMock     *k8s.MockClientInterface
+	logger            logr.Logger
+	cfg               config.Config
+	minioAdminService *minioadminservice.MockMinioAdminInterface
+	randomGenerator   *kdlutil.MockRandomGenerator
 }
 
 func newUserSuite(t *testing.T) *userSuite {
 	ctrl := gomock.NewController(t)
 	repo := user.NewMockRepository(ctrl)
+	userActivityRepo := project.NewMockUserActivityRepo(ctrl)
 	repoRuntimes := runtime.NewMockRepository(ctrl)
 	repoCapabilities := capabilities.NewMockRepository(ctrl)
 	clockMock := clock.NewMockClock(ctrl)
 	sshGenerator := sshhelper.NewMockSSHKeyGenerator(ctrl)
 	k8sClientMock := k8s.NewMockClientInterface(ctrl)
-	userActivityRepo := project.NewMockUserActivityRepo(ctrl)
+	minioAdminService := minioadminservice.NewMockMinioAdminInterface(ctrl)
+	randomGenerator := kdlutil.NewMockRandomGenerator(ctrl)
 
 	zapLog, err := zap.NewDevelopment()
 	require.NoError(t, err)
@@ -71,22 +77,24 @@ func newUserSuite(t *testing.T) *userSuite {
 
 	cfg := &config.Config{}
 
-	interactor := user.NewInteractor(logger, *cfg, repo, userActivityRepo, repoRuntimes, repoCapabilities,
-		sshGenerator, clockMock, k8sClientMock)
+	interactor := user.NewInteractor(logger, *cfg, repo, userActivityRepo, repoRuntimes, repoCapabilities, sshGenerator,
+		clockMock, k8sClientMock, minioAdminService, randomGenerator)
 
 	return &userSuite{
 		ctrl:       ctrl,
 		interactor: interactor,
 		mocks: userMocks{
-			logger:           logger,
-			cfg:              *cfg,
-			repo:             repo,
-			userActivityRepo: userActivityRepo,
-			runtimeRepo:      repoRuntimes,
-			capabilitiesRepo: repoCapabilities,
-			sshGenerator:     sshGenerator,
-			clock:            clockMock,
-			k8sClientMock:    k8sClientMock,
+			logger:            logger,
+			cfg:               *cfg,
+			repo:              repo,
+			userActivityRepo:  userActivityRepo,
+			runtimeRepo:       repoRuntimes,
+			capabilitiesRepo:  repoCapabilities,
+			sshGenerator:      sshGenerator,
+			clock:             clockMock,
+			k8sClientMock:     k8sClientMock,
+			minioAdminService: minioAdminService,
+			randomGenerator:   randomGenerator,
 		},
 	}
 }
@@ -96,13 +104,15 @@ func TestInteractor_Create(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const (
-		id            = "user.1234"
-		email         = "user@email.com"
-		username      = "user"
-		sub           = "f6717d2b-ac1f-40da-ade6-00037512933b"
-		accessLevel   = entity.AccessLevelAdmin
-		publicSSHKey  = "test-ssh-key-public"
-		privateSSHKey = "test-ssh-key-private"
+		id             = "user.1234"
+		email          = "user@email.com"
+		username       = "user"
+		sub            = "f6717d2b-ac1f-40da-ade6-00037512933b"
+		accessLevel    = entity.AccessLevelAdmin
+		publicSSHKey   = "test-ssh-key-public"
+		privateSSHKey  = "test-ssh-key-private"
+		minioAccessKey = "user-user"             // derived from username
+		minioSecretKey = "test-minio-secret-key" // #nosec G101
 	)
 
 	ctx := context.Background()
@@ -147,6 +157,8 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
 	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
+	s.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(minioSecretKey, nil)
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, u.UsernameSlug(), minioSecretKey).Return(minioAccessKey, nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
 	s.mocks.clock.EXPECT().Now().Return(now)
@@ -300,6 +312,7 @@ func TestInteractor_StartTools(t *testing.T) {
 
 	const (
 		username     = "john"
+		slugUsername = "john"
 		email        = "john@doe.com"
 		toolsRunning = false
 		runtimeImage = "konstellation/image"
@@ -319,6 +332,8 @@ func TestInteractor_StartTools(t *testing.T) {
 	runtimeID := "12345"
 
 	data := k8s.UserToolsData{
+		Username:     username,
+		SlugUsername: slugUsername,
 		RuntimeID:    runtimeID,
 		RuntimeImage: runtimeImage,
 		RuntimeTag:   runtimeTag,
@@ -333,7 +348,7 @@ func TestInteractor_StartTools(t *testing.T) {
 	s.mocks.runtimeRepo.EXPECT().Get(ctx, runtimeID).Return(expectedRuntime, nil)
 	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capability.ID).Return(capability, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
-	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, username, data).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, data).Return(nil)
 
 	returnedUser, err := s.interactor.StartTools(ctx, email, &runtimeID, &capability.ID)
 
@@ -348,6 +363,7 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 
 	const (
 		username     = "john"
+		slugUsername = "john"
 		email        = "john@doe.com"
 		toolsRunning = false
 	)
@@ -363,6 +379,8 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 	}
 
 	data := k8s.UserToolsData{
+		Username:     username,
+		SlugUsername: slugUsername,
 		Capabilities: capability,
 	}
 
@@ -376,7 +394,7 @@ func TestInteractor_StartTools_DefaultRuntime(t *testing.T) {
 
 	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capability.ID).Return(capability, nil)
 	// AND the CR creation does not return any error
-	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, username, data).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, data).Return(nil)
 
 	// WHEN the tools are started
 	returnedUser, err := s.interactor.StartTools(ctx, email, nil, &capability.ID)
@@ -399,6 +417,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 
 	const (
 		username     = "john"
+		slugUsername = "john"
 		email        = "john@doe.com"
 		toolsRunning = true
 		dockerImage  = "image"
@@ -420,6 +439,8 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 	}
 
 	data := k8s.UserToolsData{
+		Username:     username,
+		SlugUsername: slugUsername,
 		RuntimeID:    runtimeID,
 		RuntimeImage: dockerImage,
 		RuntimeTag:   dockerTag,
@@ -439,7 +460,7 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 
 	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capability.ID).Return(capability, nil)
 	// AND the CR creation does not return any error
-	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, username, data).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, data).Return(nil)
 
 	// WHEN the tools are started
 	returnedUser, err := s.interactor.StartTools(ctx, email, &runtimeID, &capability.ID)
@@ -878,7 +899,6 @@ func TestInteractor_UpdateKDLUserTools(t *testing.T) {
 	configMap.Data["template"] = ""
 
 	crd := map[string]interface{}{}
-	data := k8s.UserToolsData{}
 
 	listKDLUserTools := []unstructured.Unstructured{
 		{
@@ -898,10 +918,8 @@ func TestInteractor_UpdateKDLUserTools(t *testing.T) {
 
 	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
 	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.runtimeRepo.EXPECT().Get(ctx, "12345").Return(entity.Runtime{}, nil)
-	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, "54321").Return(entity.Capabilities{}, nil)
 	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
-	s.mocks.k8sClientMock.EXPECT().UpdateKDLUserToolsCR(ctx, "kdlusertools-v1", data, &crd).Return(nil)
+	s.mocks.k8sClientMock.EXPECT().UpdateKDLUserToolsCR(ctx, "kdlusertools-v1", &crd).Return(nil)
 
 	err := s.interactor.UpdateKDLUserTools(ctx)
 	require.NoError(t, err)
@@ -919,7 +937,6 @@ func TestInteractor_UpdateKDLUserTools_UpdateKDLUserToolsCR_Error(t *testing.T) 
 	configMap.Data["template"] = ""
 
 	crd := map[string]interface{}{}
-	data := k8s.UserToolsData{}
 
 	listKDLUserTools := []unstructured.Unstructured{
 		{
@@ -940,141 +957,7 @@ func TestInteractor_UpdateKDLUserTools_UpdateKDLUserToolsCR_Error(t *testing.T) 
 	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
 	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
 	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
-	s.mocks.runtimeRepo.EXPECT().Get(ctx, "12345").Return(entity.Runtime{}, nil)
-	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, "54321").Return(entity.Capabilities{}, nil)
-	s.mocks.k8sClientMock.EXPECT().UpdateKDLUserToolsCR(ctx, "kdlusertools-v1", data, &crd).Return(errUpdatingCrd)
-
-	// even if there is an error updating the CRD,
-	// the function should return no error to allow updating the next CRD
-	err := s.interactor.UpdateKDLUserTools(ctx)
-	require.NoError(t, err)
-}
-func TestInteractor_UpdateKDLUserTools_NoSpec(t *testing.T) {
-	s := newUserSuite(t)
-	defer s.ctrl.Finish()
-
-	ctx := context.Background()
-
-	configMap := v1.ConfigMap{
-		Data: map[string]string{},
-	}
-	configMap.Data["template"] = ""
-
-	listKDLUserTools := []unstructured.Unstructured{
-		{
-			Object: map[string]interface{}{
-				"metadata": map[string]interface{}{
-					"name": "kdlusertools-v1",
-				},
-			},
-		},
-	}
-
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
-	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
-
-	// even if there is an error updating the CRD,
-	// the function should return no error to allow updating the next CRD
-	err := s.interactor.UpdateKDLUserTools(ctx)
-	require.NoError(t, err)
-}
-
-func TestInteractor_UpdateKDLUserTools_NoPodLabels(t *testing.T) {
-	s := newUserSuite(t)
-	defer s.ctrl.Finish()
-
-	ctx := context.Background()
-
-	configMap := v1.ConfigMap{
-		Data: map[string]string{},
-	}
-	configMap.Data["template"] = ""
-
-	listKDLUserTools := []unstructured.Unstructured{
-		{
-			Object: map[string]interface{}{
-				"metadata": map[string]interface{}{
-					"name": "kdlusertools-v1",
-				},
-				"spec": map[string]interface{}{},
-			},
-		},
-	}
-
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
-	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
-
-	// even if there is an error updating the CRD,
-	// the function should return no error to allow updating the next CRD
-	err := s.interactor.UpdateKDLUserTools(ctx)
-	require.NoError(t, err)
-}
-
-func TestInteractor_UpdateKDLUserTools_NoRuntimeId(t *testing.T) {
-	s := newUserSuite(t)
-	defer s.ctrl.Finish()
-
-	ctx := context.Background()
-
-	configMap := v1.ConfigMap{
-		Data: map[string]string{},
-	}
-	configMap.Data["template"] = ""
-
-	listKDLUserTools := []unstructured.Unstructured{
-		{
-			Object: map[string]interface{}{
-				"metadata": map[string]interface{}{
-					"name": "kdlusertools-v1",
-				},
-				"spec": map[string]interface{}{
-					"podLabels": map[string]interface{}{},
-				},
-			},
-		},
-	}
-
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
-	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
-
-	// even if there is an error updating the CRD,
-	// the function should return no error to allow updating the next CRD
-	err := s.interactor.UpdateKDLUserTools(ctx)
-	require.NoError(t, err)
-}
-
-func TestInteractor_UpdateKDLUserTools_NoCapabilityId(t *testing.T) {
-	s := newUserSuite(t)
-	defer s.ctrl.Finish()
-
-	ctx := context.Background()
-
-	configMap := v1.ConfigMap{
-		Data: map[string]string{},
-	}
-	configMap.Data["template"] = ""
-
-	listKDLUserTools := []unstructured.Unstructured{
-		{
-			Object: map[string]interface{}{
-				"metadata": map[string]interface{}{
-					"name": "kdlusertools-v1",
-				},
-				"spec": map[string]interface{}{
-					"podLabels": map[string]interface{}{
-						"runtimeId": "12345",
-					},
-				},
-			},
-		},
-	}
-
-	s.mocks.k8sClientMock.EXPECT().GetConfigMapTemplateNameKDLUserTools().Return(templateConfigMap)
-	s.mocks.k8sClientMock.EXPECT().GetConfigMap(ctx, templateConfigMap).Return(&configMap, nil)
-	s.mocks.k8sClientMock.EXPECT().ListKDLUserToolsCR(ctx).Return(listKDLUserTools, nil)
+	s.mocks.k8sClientMock.EXPECT().UpdateKDLUserToolsCR(ctx, "kdlusertools-v1", &crd).Return(errUpdatingCrd)
 
 	// even if there is an error updating the CRD,
 	// the function should return no error to allow updating the next CRD

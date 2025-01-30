@@ -104,7 +104,48 @@ In order to develop in a local environment there are several things to consider:
 5. Run `go run http/main.go` (or launch it from your preferred IDE)
 6. You can now access the graphQL playground at <http://localhost:3000/api/playground>
 
+### Additional scripts
+
+Asides from starting KDL server, there are some additional go scripts that can
+be used from inside the kdl-server pod:
+
+#### Sync MinIO data
+
+This script syncs data from the KDL server database to the MinIO instance.
+
+Logic inside the script is:
+
+* find all users, and for each user:
+  * create a user in MinIO
+  * update MinIO Credentials for the user in database
+
+* find all projects, and for each project:
+  * create a policy in MinIO for the project
+  * create a user for the project and assign to the project's policy
+  * update MinIO Credentials for the project in database
+  * for each project's member:
+    * join the user to the project in MinIO
+
+To run the script execute:
+
+```bash
+/app/scripts/sync-minio-data
+```
+
 ## Development
+
+### GraphQL
+
+The GraphQL schema is defined in the `../graphql/schema.graphqls` file. The
+schema is used to generate the Go code for the GraphQL server. To generate the
+code execute:
+
+```console
+go generate ./...
+```
+
+Configuration for the code generation is defined in the `gqlgen.yml` It is well
+documented and can be customized to fit the needs of the project.
 
 ### Running tests
 

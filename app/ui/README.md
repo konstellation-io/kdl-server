@@ -1,5 +1,7 @@
 # KDL Server UI
+
 ## Contributing
+
 You can access contributing documentation [here](./docs/contributing.md).
 
 ## Development
@@ -7,7 +9,10 @@ You can access contributing documentation [here](./docs/contributing.md).
 To initialize the development environment:
 
 1. Run the mock-server
-- The mock-server uses the same graphql schema as the real server, but it returns mock data. To update the schema check "Other scripts" section.
+
+- The mock-server uses the same graphql schema as the real server, but it
+  returns mock data. To update the schema check "Other scripts" section.
+
 ```bash
 # Go to kdl-server/app/ui/mock-server
 cd mock-server
@@ -20,6 +25,7 @@ yarn start
 ```
 
 2. Check if `SERVER_URL` setting on `config.json` has value `http://localhost:4000`
+
 ```bash
 # Go to kdl-server/app/ui
 cd ..
@@ -39,6 +45,7 @@ vim public/config.json
 ```
 
 3. Run React app
+
 ```bash
 # (optional) install deps
 yarn install
@@ -47,35 +54,64 @@ yarn install
 yarn start
 ```
 
+## Generate types for graphql
+
+Any change in the graphql schema should be reflected in the frontend. To do
+this, you need to do the following after changing the schema:
+
+- Update the queries/mutation affected in folder `src/Graphql/**/*.ts` to match
+  the schema.
+- Regenerate all `interfaces`, `types` and `enums` for the graphql queries and
+  schema used. This schema is used to generate types for the frontend and is
+  used by the real backend and mock-server (without doing anything in the
+  mock-server code).
+
+  ```bash
+  yarn gen:types
+  ```
+
 ## Tests
+
 ### Unit tests
-* Launch the test runner in the interactive watch mode:
+
+- Launch the test runner in the interactive watch mode:
+
 ```bash
 yarn test
 ```
-* Launch the test runner in the interactive watch mode. It also launches the coverage report:
+
+- Launch the test runner in the interactive watch mode. It also launches the coverage report:
+
 ```bash
 yarn test:cov
 ```
+
 ### Integration tests
+
 The integration tests are made with `Cypress`. It accepts headed and headless execution.
 
-* Headed:
+- Headed:
+
 ```bash
 yarn cy
 ```
 
-* Headless:
+- Headless:
+
 ```bash
 yarn cy:run
 ```
+
 ## Linter
 
-* Pass eslint to all files inside the React application:
+- Pass eslint to all files inside the React application:
+
 ```bash
 yarn lint
 ```
-* Pass eslint to all files and fix errors:
+
+- Pass eslint to all files and fix errors:
+
 ```bash
 yarn lint:fix
 ```
@@ -83,22 +119,17 @@ yarn lint:fix
 ## Fix vulnerable dependencies
 
 This is equivalent to `npm audit --fix` but with `yarn`:
+
 ```bash
 yarn audit:fix
 ```
 
-## Other scripts
+## Other available scripts
 
-## Available Scripts
+- Builds the app for production to the `build` folder. It correctly bundles
+  React in production mode and optimizes the build for the best performance. The
+  build is minified, and the filenames include the hashes.
 
-* Regenerate all `interfaces`, `types` and `enums` for the graphql queries and schema used. This schema is used to generate types for the frontend and is used by the real backend and mock-server (without doing anything in the mock-server code).
-```bash
-yarn gen:types
-```
-
-* Builds the app for production to the `build` folder.\
-  It correctly bundles React in production mode and optimizes the build for the best performance.
-  The build is minified, and the filenames include the hashes.
-```bash
-yarn build
-```
+  ```bash
+  yarn build
+  ```

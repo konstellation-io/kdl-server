@@ -73,6 +73,14 @@ func (i *interactor) AddMembers(ctx context.Context, opt AddMembersOption) (enti
 		}
 	}
 
+	// Add new members to the project on MinIO
+	for _, u := range opt.Users {
+		err = i.minioAdminService.JoinProject(ctx, u.UsernameSlug(), opt.ProjectID)
+		if err != nil {
+			return entity.Project{}, fmt.Errorf("%w: user ID=%s", err, u.ID)
+		}
+	}
+
 	// Store new members into the DataBase
 	now := i.clock.Now()
 	newMembers := make([]entity.Member, len(opt.Users))
@@ -141,6 +149,14 @@ func (i *interactor) RemoveMembers(ctx context.Context, opt RemoveMembersOption)
 	// Check if after removing the user there is at least one administrator
 	if !i.checkAtLeastOneAdmin(opt.Users, p.Members) {
 		return entity.Project{}, ErrRemoveNoMoreAdmins
+	}
+
+	// Remove members from the project on MinIO
+	for _, u := range opt.Users {
+		err = i.minioAdminService.LeaveProject(ctx, u.UsernameSlug(), opt.ProjectID)
+		if err != nil {
+			return entity.Project{}, fmt.Errorf("%w: user ID=%s", err, u.ID)
+		}
 	}
 
 	// Remove members from stored project in our DataBase

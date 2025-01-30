@@ -23,14 +23,10 @@ import (
 )
 
 const (
-	dbName               = "kdl"
-	capabilitiesCollName = "capabilities"
-	projectCollName      = "projects"
-	runtimesCollName     = "runtimes"
-	userActivityCollName = "userActivity"
-	userCollName         = "users"
-	rootUsername         = "root"
-	rootPassword         = "root"
+	dbName       = "kdl"
+	userCollName = "users"
+	rootUsername = "root"
+	rootPassword = "root"
 )
 
 var (
@@ -77,6 +73,10 @@ var projectExamples = map[string]entity.Project{
 				AddedDate:   testTimeExample,
 			},
 		},
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: "project-project1",
+			SecretKey: "accessKey1",
+		},
 	},
 	"project2": {
 		ID:                 "2",
@@ -98,6 +98,10 @@ var projectExamples = map[string]entity.Project{
 				AccessLevel: entity.AccessLevelAdmin,
 				AddedDate:   testTimeExample,
 			},
+		},
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: "project-project2",
+			SecretKey: "accessKey2",
 		},
 	},
 }
@@ -135,6 +139,10 @@ var userExamples = map[string]entity.User{
 			Public:       "publicKey1",
 			Private:      "privateKey1",
 			CreationDate: testTimeExample,
+		},
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: "accessKey1",
+			SecretKey: "secretKey1",
 		},
 	},
 	"user2": {

@@ -31,6 +31,12 @@ RUN go build \
     -trimpath \
     -o kdl-server http/main.go
 
+RUN go build \
+    -ldflags="-s -w \
+    -extldflags '-static'" \
+    -trimpath \
+    -o sync-minio-data scripts/sync_minio_data.go
+
 ###
 # build app-ui
 ###
@@ -80,7 +86,7 @@ RUN apk update                               && \
         -u ${UID}                               \
         -G ${USER} ${USER}                   && \
     # setup application directories
-    mkdir -p /app /var/log/app               && \
+    mkdir -p /app/scripts /var/log/app       && \
     chown -R ${UID}:${GID} /app /var/log/app && \
     # setup SSH with secure permissions
     mkdir -p ${HOME}/.ssh                    && \
@@ -91,6 +97,7 @@ WORKDIR /app
 
 # copy from app-api and app-ui stages
 COPY --from=api-builder --chown=${USER}:${USER} /app/kdl-server ./
+COPY --from=api-builder --chown=${USER}:${USER} /app/sync-minio-data ./scripts/
 COPY --from=ui-builder --chown=${USER}:${USER} /app/build/ /public
 
 RUN setcap 'cap_net_bind_service=+ep' /app/kdl-server

@@ -29,7 +29,7 @@ updates:
     golang-dependencies:
       patterns:
         - "*"
-        
+
 - package-ecosystem: docker
   directories:
     - "/app"

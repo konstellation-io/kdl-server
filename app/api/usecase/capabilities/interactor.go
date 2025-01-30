@@ -16,6 +16,9 @@ type interactor struct {
 	k8sClient k8s.ClientInterface
 }
 
+// Assure implementation adheres to interface.
+var _ UseCase = (*interactor)(nil)
+
 // NewInteractor factory function.
 func NewInteractor(
 	logger logr.Logger,

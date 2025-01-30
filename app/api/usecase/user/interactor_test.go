@@ -698,16 +698,15 @@ func TestInteractor_UpdateAccessLevel(t *testing.T) {
 		},
 	}
 
+	s.mocks.repo.EXPECT().FindByIDs(ctx, ids).Return(users, nil)
 	s.mocks.repo.EXPECT().UpdateAccessLevel(ctx, ids, newAccessLevel).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
-	s.mocks.repo.EXPECT().Get(ctx, ids[0]).Return(users[0], nil)
 	s.mocks.userActivityRepo.EXPECT().Create(ctx, entity.UserActivity{
 		Date:   now,
 		UserID: loggedUser.ID,
 		Type:   entity.UserActivityTypeUpdateUserAccessLevel,
 		Vars:   actVars[0],
 	}).Return(nil)
-	s.mocks.repo.EXPECT().Get(ctx, ids[1]).Return(users[1], nil)
 	s.mocks.userActivityRepo.EXPECT().Create(ctx, entity.UserActivity{
 		Date:   now,
 		UserID: loggedUser.ID,

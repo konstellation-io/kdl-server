@@ -11,27 +11,22 @@ import (
 	"bou.ke/monkey"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
 
 	"github.com/go-logr/zapr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/mongodb"
+	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
 const (
-	dbName               = "kdl"
-	capabilitiesCollName = "capabilities"
-	projectCollName      = "projects"
-	runtimesCollName     = "runtimes"
-	userActivityCollName = "userActivity"
-	userCollName         = "users"
-	rootUsername         = "root"
-	rootPassword         = "root"
+	dbName       = "kdl"
+	userCollName = "users"
+	rootUsername = "root"
+	rootPassword = "root"
 )
 
 var (
@@ -67,11 +62,9 @@ var projectExamples = map[string]entity.Project{
 		Archived:           false,
 		Error:              nil,
 		Repository: entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: "http://repo1",
-			RepoName:        "repo1",
-			Error:           nil,
-			AuthMethod:      entity.RepositoryAuthToken,
+			URL:      "http://repo1",
+			RepoName: "repo1",
+			Error:    nil,
 		},
 		Members: []entity.Member{
 			{
@@ -79,6 +72,10 @@ var projectExamples = map[string]entity.Project{
 				AccessLevel: entity.AccessLevelAdmin,
 				AddedDate:   testTimeExample,
 			},
+		},
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: "project-project1",
+			SecretKey: "accessKey1",
 		},
 	},
 	"project2": {
@@ -91,11 +88,9 @@ var projectExamples = map[string]entity.Project{
 		Archived:           false,
 		Error:              nil,
 		Repository: entity.Repository{
-			Type:            entity.RepositoryTypeExternal,
-			ExternalRepoURL: "http://repo2",
-			RepoName:        "repo2",
-			Error:           nil,
-			AuthMethod:      entity.RepositoryAuthToken,
+			URL:      "http://repo2",
+			RepoName: "repo2",
+			Error:    nil,
 		},
 		Members: []entity.Member{
 			{
@@ -103,6 +98,10 @@ var projectExamples = map[string]entity.Project{
 				AccessLevel: entity.AccessLevelAdmin,
 				AddedDate:   testTimeExample,
 			},
+		},
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: "project-project2",
+			SecretKey: "accessKey2",
 		},
 	},
 }
@@ -134,11 +133,16 @@ var userExamples = map[string]entity.User{
 		Sub:          "d5d70477-5192-4182-b80e-5d34550eb4fe",
 		Deleted:      false,
 		CreationDate: testTimeExample,
+		LastActivity: testTimeExample,
 		AccessLevel:  entity.AccessLevelAdmin,
 		SSHKey: entity.SSHKey{
 			Public:       "publicKey1",
 			Private:      "privateKey1",
 			CreationDate: testTimeExample,
+		},
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: "accessKey1",
+			SecretKey: "secretKey1",
 		},
 	},
 	"user2": {
@@ -148,6 +152,7 @@ var userExamples = map[string]entity.User{
 		Sub:          "4c5c3da6-2847-4a8a-9f68-9532fe559b6d",
 		Deleted:      false,
 		CreationDate: testTimeExample,
+		LastActivity: testTimeExample,
 		AccessLevel:  entity.AccessLevelAdmin,
 		SSHKey: entity.SSHKey{
 			Public:       "publicKey2",
@@ -160,7 +165,7 @@ var userExamples = map[string]entity.User{
 type TestSuite struct {
 	suite.Suite
 	mongoDBContainer testcontainers.Container
-	mongoClient      *mongo.Client
+	mongoClient      *mongodbutils.MongoDB
 	capabilitiesRepo *mongodb.CapabilitiesRepo
 	projectRepo      *mongodb.ProjectRepo
 	runtimeRepo      *mongodb.RuntimeRepo
@@ -203,7 +208,7 @@ func (s *TestSuite) SetupSuite() {
 
 	port := p.Int()
 	uri := fmt.Sprintf("mongodb://%v:%v@%v:%v/", rootUsername, rootPassword, host, port) // NOSONAR not used in secure contexts
-	mongoClient, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
+	mongoClient, err := mongodbutils.NewMongoDB(logger, uri)
 	s.Require().NoError(err)
 
 	s.mongoDBContainer = mongoDBContainer
@@ -251,10 +256,8 @@ func (s *TestSuite) SetupTest() {
 }
 
 func (s *TestSuite) TearDownTest() {
-	err := s.mongoClient.Database(dbName).Drop(context.Background())
-	if err != nil {
-		fmt.Println("Error dropping database: %w", err)
-	}
+	err := s.mongoClient.DropDatabase(dbName)
+	s.Require().NoError(err)
 }
 
 func (s *TestSuite) TestCapabilitiesGet_OK() {
@@ -763,7 +766,7 @@ func (s *TestSuite) TestUserUpdateSub_OK() {
 }
 
 func (s *TestSuite) TestUserEnsureIndexes_OK() {
-	collection := s.mongoClient.Database(dbName).Collection(userCollName)
+	collection := s.mongoClient.CreateCollection(dbName, userCollName)
 	indexView := collection.Indexes()
 
 	cursor, err := indexView.List(context.Background())

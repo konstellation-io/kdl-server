@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { RepositoryType, AccessLevel } from "./../../types/globalTypes";
+import { AccessLevel } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL query operation: GetProjects
@@ -11,7 +11,6 @@ import { RepositoryType, AccessLevel } from "./../../types/globalTypes";
 
 export interface GetProjects_projects_repository {
   __typename: "Repository";
-  type: RepositoryType;
   url: string;
   error: string | null;
 }
@@ -21,7 +20,6 @@ export interface GetProjects_projects_toolUrls {
   knowledgeGalaxy: string;
   filebrowser: string;
   mlflow: string;
-  vscode: string;
 }
 
 export interface GetProjects_projects_members_user {
@@ -38,6 +36,12 @@ export interface GetProjects_projects_members {
   addedDate: string;
 }
 
+export interface GetProjects_projects_minioAccessKey {
+  __typename: "MinioAccessKey";
+  accessKey: string;
+  secretKey: string;
+}
+
 export interface GetProjects_projects {
   __typename: "Project";
   id: string;
@@ -52,6 +56,7 @@ export interface GetProjects_projects {
   error: string | null;
   toolUrls: GetProjects_projects_toolUrls;
   members: GetProjects_projects_members[];
+  minioAccessKey: GetProjects_projects_minioAccessKey;
 }
 
 export interface GetProjects {

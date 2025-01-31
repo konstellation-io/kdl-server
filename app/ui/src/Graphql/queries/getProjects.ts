@@ -12,7 +12,6 @@ export default gql`
       creationDate
       lastActivationDate
       repository {
-        type
         url
         error
       }
@@ -23,10 +22,13 @@ export default gql`
         knowledgeGalaxy
         filebrowser
         mlflow
-        vscode
       }
       members {
         ...MemberFields
+      }
+      minioAccessKey {
+        accessKey
+        secretKey
       }
     }
   }

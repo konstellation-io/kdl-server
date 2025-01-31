@@ -70,7 +70,6 @@ exports[`Project component Component match snapshot 1`] = `
             "filebrowser": "https://filebrowser",
             "knowledgeGalaxy": "https://knowledgeGalaxy",
             "mlflow": "https://mlflow",
-            "vscode": "https://vscode",
           },
         }
       }
@@ -129,7 +128,6 @@ exports[`Project component Component match snapshot 1`] = `
                   "filebrowser": "https://filebrowser",
                   "knowledgeGalaxy": "https://knowledgeGalaxy",
                   "mlflow": "https://mlflow",
-                  "vscode": "https://vscode",
                 },
               }
             }
@@ -210,7 +208,6 @@ exports[`Project component Component match snapshot 1`] = `
                   "filebrowser": "https://filebrowser",
                   "knowledgeGalaxy": "https://knowledgeGalaxy",
                   "mlflow": "https://mlflow",
-                  "vscode": "https://vscode",
                 },
               }
             }
@@ -297,7 +294,6 @@ exports[`Project component Component match snapshot 1`] = `
                   "filebrowser": "https://filebrowser",
                   "knowledgeGalaxy": "https://knowledgeGalaxy",
                   "mlflow": "https://mlflow",
-                  "vscode": "https://vscode",
                 },
               }
             }
@@ -305,9 +301,6 @@ exports[`Project component Component match snapshot 1`] = `
             <div
               className="band"
             >
-              <div
-                className="label"
-              />
               <div
                 className="otherLabels"
               >
@@ -365,7 +358,6 @@ exports[`Project component Component match snapshot 1`] = `
                   "filebrowser": "https://filebrowser",
                   "knowledgeGalaxy": "https://knowledgeGalaxy",
                   "mlflow": "https://mlflow",
-                  "vscode": "https://vscode",
                 },
               }
             }
@@ -376,13 +368,13 @@ exports[`Project component Component match snapshot 1`] = `
               <div
                 className="repoType"
               >
-                <Memo(RepositoryTypeComponent)
+                <Memo(RepositoryIcon)
                   customSize={38}
                   shouldAnimate={false}
-                  squareLocation="in"
+                  squareLocation="out"
                 >
                   <div
-                    className="square in medium notAnimate"
+                    className="square out medium notAnimate"
                     style={
                       Object {
                         "height": 38,
@@ -403,7 +395,7 @@ exports[`Project component Component match snapshot 1`] = `
                       className="s1"
                     />
                   </div>
-                </Memo(RepositoryTypeComponent)>
+                </Memo(RepositoryIcon)>
               </div>
             </div>
           </Square>

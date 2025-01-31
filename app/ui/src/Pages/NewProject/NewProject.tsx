@@ -6,7 +6,6 @@ import DefaultPage from 'Components/Layout/Page/DefaultPage/DefaultPage';
 import Information from './pages/Information/Information';
 import ROUTE from 'Constants/routes';
 import RepositoryDetails from './pages/RepositoryDetails/RepositoryDetails';
-import { RepositoryType } from 'Graphql/types/globalTypes';
 import Stepper from 'Components/Stepper/Stepper';
 import Summary from './pages/Summary/Summary';
 import cx from 'classnames';
@@ -17,22 +16,18 @@ import useUnloadPrompt from 'Hooks/useUnloadPrompt/useUnloadPrompt';
 import { newProject } from 'Graphql/client/cache';
 import SidebarTop from 'Components/Layout/Page/DefaultPage/SidebarTop';
 import SidebarInformation from './pages/SidebarComponents/Information/SidebarInformation';
-import SidebarExternalRepository from './pages/SidebarComponents/SidebarExternalRepository/SidebarExternalRepository';
+import SidebarRepository from './pages/SidebarComponents/SidebarRepository/SidebarRepository';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 
 enum Steps {
   INFORMATION,
   REPOSITORY,
-  REPOSITORY_DETAILS,
   SUMMARY,
 }
 
 enum StepNames {
   INFORMATION = 'information',
   REPOSITORY = 'repository',
-  DETAILS = 'repository details',
-  EXTERNAL = 'externalRepository',
-  INTERNAL = 'internalRepository',
   SUMMARY = 'summary',
 }
 
@@ -42,7 +37,7 @@ const stepperSteps = [
     Component: Information,
   },
   {
-    id: StepNames.DETAILS,
+    id: StepNames.REPOSITORY,
     Component: RepositoryDetails,
   },
   {
@@ -50,12 +45,6 @@ const stepperSteps = [
     Component: Summary,
   },
 ];
-
-export const repoTypeToStepName: {
-  [k: string]: StepNames.EXTERNAL;
-} = {
-  [RepositoryType.EXTERNAL]: StepNames.EXTERNAL,
-};
 
 function NewProject() {
   const history = useHistory();
@@ -65,13 +54,11 @@ function NewProject() {
   const [isPromptEnabled, setIsPromptEnabled] = useState(false);
 
   const { enableUnloadPrompt, disableUnloadPrompt } = useUnloadPrompt();
-  const data = useReactiveVar(newProject);
+  const data: { [key in StepNames.INFORMATION | StepNames.REPOSITORY]?: any } = useReactiveVar(newProject);
 
-  const type = data.repository.values.type;
-
-  const stepsWithData: (StepNames.INFORMATION | StepNames.EXTERNAL)[] = useMemo(() => {
-    return [StepNames.INFORMATION, repoTypeToStepName[type || '']];
-  }, [type]);
+  const stepsWithData: (StepNames.INFORMATION | StepNames.REPOSITORY)[] = useMemo(() => {
+    return [StepNames.INFORMATION, StepNames.REPOSITORY];
+  }, []);
 
   // We want to execute this on on component mount and unmount
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -151,7 +138,6 @@ function NewProject() {
 
       const values = Object.values(actStepData.values).filter((v) => typeof v !== 'boolean');
       const completed = values && values.every((v) => !!v) && !error;
-
       updateState(completed, error);
       return !error;
     } else if (!hasData) {
@@ -165,8 +151,8 @@ function NewProject() {
     switch (step) {
       case StepNames.INFORMATION:
         return <SidebarInformation />;
-      case StepNames.EXTERNAL:
-        return <SidebarExternalRepository />;
+      case StepNames.REPOSITORY:
+        return <SidebarRepository />;
       default:
         return <></>;
     }
@@ -181,7 +167,7 @@ function NewProject() {
       <>
         <Prompt
           when={isPromptEnabled}
-          message="You are going to leave this page. You'll lose your changes, please confirm."
+          message="You are going to leave this page. You'll lose your changes, ¿Are you sure?."
         />
         {isMounted && <SidebarTop>{getSideContent()}</SidebarTop>}
         <div className={styles.container}>

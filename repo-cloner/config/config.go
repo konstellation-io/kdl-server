@@ -1,44 +1,59 @@
 package config
 
 import (
-	"log"
-	"os"
+	"errors"
+	"fmt"
+	"reflect"
 
 	"github.com/kelseyhightower/envconfig"
-	"gopkg.in/yaml.v3"
 )
+
+var errFieldEmpty = errors.New("cannot be empty")
 
 // Config holds the configuration values of the application.
 type Config struct {
 	MongoDB struct {
-		URI              string `yaml:"uri" envconfig:"KDL_SERVER_MONGODB_URI"`
-		DBName           string `yaml:"dbName" envconfig:"DB_NAME"`
-		ProjectsCollName string `yaml:"projectCollName" envconfig:"PROJECT_COLL_NAME"`
-		UsersCollName    string `yaml:"userCollName" envconfig:"USER_COLL_NAME"`
+		URI    string `envconfig:"KDL_SERVER_MONGODB_URI"`
+		DBName string `envconfig:"DB_NAME" default:"kdl"`
 	}
 	UsrName               string `envconfig:"KDL_USER_NAME"`
-	ReposPath             string `yaml:"reposPath" envconfig:"REPOS_PATH"`
-	PemFile               string `yaml:"pemFile" envconfig:"PEM_FILE"`
-	PemFilePassword       string `yaml:"pemFilePassword" envconfig:"PEM_FILE_PASSWORD"`
-	CheckFrequencySeconds int    `yaml:"checkFrequencySeconds" envconfig:"CHECK_FREQUENCY_SECONDS"`
+	ReposPath             string `envconfig:"REPOS_PATH" default:"/home/kdl/repos/"`
+	PemFile               string `envconfig:"PEM_FILE" default:"/home/kdl/.ssh/id_rsa"`
+	PemFilePassword       string `envconfig:"PEM_FILE_PASSWORD" optional:"true"`
+	CheckFrequencySeconds int    `envconfig:"CHECK_FREQUENCY_SECONDS" default:"10"`
 }
 
-// NewConfig will read the config.yml file and override values with env vars.
+func (c *Config) Validate() error {
+	v := reflect.ValueOf(*c)
+	t := reflect.TypeOf(*c)
+
+	for i := 0; i < v.NumField(); i++ {
+		fieldType := t.Field(i)
+
+		optionalTag := fieldType.Tag.Get("optional")
+		if optionalTag == "true" {
+			continue
+		}
+
+		field := v.Field(i)
+		if field.Interface() == reflect.Zero(field.Type()).Interface() {
+			return fmt.Errorf("error in field %s: %w", v.Type().Field(i).Name, errFieldEmpty)
+		}
+	}
+
+	return nil
+}
+
+// NewConfig will read the values from env vars.
 func NewConfig() Config {
-	f, err := os.Open("config.yml")
-	if err != nil {
-		log.Fatalf("Error opening config.yml: %s", err)
-	}
-
 	cfg := Config{}
-	decoder := yaml.NewDecoder(f)
 
-	err = decoder.Decode(&cfg)
+	err := envconfig.Process("", &cfg)
 	if err != nil {
-		log.Fatalf("Error loading config.yml: %s", err)
+		panic(err)
 	}
 
-	err = envconfig.Process("", &cfg)
+	err = cfg.Validate()
 	if err != nil {
 		panic(err)
 	}

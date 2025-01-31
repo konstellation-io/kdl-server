@@ -5,12 +5,12 @@ import (
 	"errors"
 	"time"
 
+	"github.com/go-logr/logr"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
@@ -28,10 +28,13 @@ type userDTO struct {
 	Email              string             `bson:"email"`
 	Sub                string             `bson:"sub"`
 	CreationDate       time.Time          `bson:"creation_date"`
+	LastActivity       time.Time          `bson:"last_activity"`
 	AccessLevel        string             `bson:"access_level"`
 	PublicSSHKey       string             `bson:"public_ssh_key"`
 	PrivateSSHKey      string             `bson:"private_ssh_key"`
 	SSHKeyCreationDate time.Time          `bson:"ssh_key_creation_date"`
+	MinioAccessKey     string             `bson:"minio_access_key"`
+	MinioSecretKey     string             `bson:"minio_secret_key"`
 }
 
 type UserRepo struct {
@@ -42,8 +45,8 @@ type UserRepo struct {
 // UserRepo implements the user.Repository interface.
 var _ user.Repository = (*UserRepo)(nil)
 
-func NewUserRepo(logger logr.Logger, client *mongo.Client, dbName string) *UserRepo {
-	collection := client.Database(dbName).Collection(userCollName)
+func NewUserRepo(logger logr.Logger, mongo *mongodbutils.MongoDB, dbName string) *UserRepo {
+	collection := mongo.CreateCollection(dbName, userCollName)
 	return &UserRepo{logger, collection}
 }
 
@@ -197,6 +200,13 @@ func (m *UserRepo) UpdateEmail(ctx context.Context, username, email string) erro
 	return m.updateUserFields(ctx, username, bson.M{"email": email})
 }
 
+func (m *UserRepo) UpdateMinioAccess(ctx context.Context, username, accessKey, secretKey string) error {
+	return m.updateUserFields(ctx, username, bson.M{
+		"minio_access_key": accessKey,
+		"minio_secret_key": secretKey,
+	})
+}
+
 func (m *UserRepo) UpdateSub(ctx context.Context, username, sub string) error {
 	return m.updateUserFields(ctx, username, bson.M{"sub": sub})
 }
@@ -217,6 +227,10 @@ func (m *UserRepo) UpdateUsername(ctx context.Context, email, username string) e
 
 func (m *UserRepo) UpdateDeleted(ctx context.Context, username string, deleted bool) error {
 	return m.updateUserFields(ctx, username, bson.M{"deleted": deleted})
+}
+
+func (m *UserRepo) UpdateLastActivity(ctx context.Context, username string, lastActivity time.Time) error {
+	return m.updateUserFields(ctx, username, bson.M{"last_activity": lastActivity})
 }
 
 func (m *UserRepo) updateUserFields(ctx context.Context, username string, fields bson.M) error {
@@ -283,7 +297,10 @@ func (m *UserRepo) entityToDTO(u entity.User) (userDTO, error) {
 		PublicSSHKey:       u.SSHKey.Public,
 		SSHKeyCreationDate: u.SSHKey.CreationDate,
 		CreationDate:       u.CreationDate,
+		LastActivity:       u.LastActivity,
 		Deleted:            u.Deleted,
+		MinioAccessKey:     u.MinioAccessKey.AccessKey,
+		MinioSecretKey:     u.MinioAccessKey.SecretKey,
 	}
 
 	if u.ID != "" {
@@ -306,12 +323,17 @@ func (m *UserRepo) dtoToEntity(dto userDTO) entity.User {
 		Sub:          dto.Sub,
 		AccessLevel:  entity.AccessLevel(dto.AccessLevel),
 		CreationDate: dto.CreationDate,
+		LastActivity: dto.LastActivity,
 		SSHKey: entity.SSHKey{
 			Public:       dto.PublicSSHKey,
 			Private:      dto.PrivateSSHKey,
 			CreationDate: dto.SSHKeyCreationDate,
 		},
 		Deleted: dto.Deleted,
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: dto.MinioAccessKey,
+			SecretKey: dto.MinioSecretKey,
+		},
 	}
 }
 

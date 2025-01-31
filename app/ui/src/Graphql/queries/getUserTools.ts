@@ -7,7 +7,6 @@ export default gql`
       toolUrls {
         knowledgeGalaxy
         filebrowser
-        vscode
         mlflow
       }
     }

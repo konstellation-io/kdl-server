@@ -1,0 +1,39 @@
+# KDLProject
+
+{{- if .Values.mlflow.enabled }}
+=== MLflow ===
+{{- if .Values.mlflow.ingress.enabled }}
+MLflow can be accessed through the following ingress hosts:
+{{- range .Values.mlflow.ingress.hosts }}
+  - http{{ if $.Values.mlflow.ingress.tls }}s{{ end }}://{{ .host }}
+{{- end }}
+{{- else }}
+MLflow can be accessed within your cluster at:
+  - http://{{ include "kdl-project.fullname" . }}-mlflow:{{ .Values.mlflow.service.port }}
+
+To access MLflow from outside the cluster, you can:
+  1. Port-forward the service:
+     kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "kdl-project.fullname" . }}-mlflow {{ .Values.mlflow.service.port }}:{{ .Values.mlflow.service.port }}
+  2. Then access MLflow at:
+     http://localhost:{{ .Values.mlflow.service.port }}
+{{- end }}
+{{- end }}
+
+=== Filebrowser ===
+Filebrowser can be accessed within your cluster at:
+  - http://{{ include "kdl-project.fullname" . }}-filebrowser:{{ .Values.filebrowser.service.port }}
+
+To access Filebrowser from outside the cluster, you can:
+  1. Port-forward the service:
+     kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "kdl-project.fullname" . }}-filebrowser {{ .Values.filebrowser.service.port }}:{{ .Values.filebrowser.service.port }}
+  2. Then access Filebrowser at:
+     http://localhost:{{ .Values.filebrowser.service.port }}
+
+=== Additional Information ===
+To get more details about the deployment, run:
+  kubectl get all -n {{ .Release.Namespace }} -l "app.kubernetes.io/instance={{ .Release.Name }}"
+
+For troubleshooting, check the pods logs:
+  kubectl logs -n {{ .Release.Namespace }} -l "app.kubernetes.io/instance={{ .Release.Name }}" -f
+
+Visit https://github.com/konstellation-io/kdl-server for documentation and updates.

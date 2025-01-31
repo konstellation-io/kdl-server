@@ -5,11 +5,22 @@ import (
 	"math/big"
 )
 
+//go:generate mockgen -source=${GOFILE} -destination=mocks_${GOFILE} -package=${GOPACKAGE}
+type RandomGenerator interface {
+	GenerateRandomString(n int) (string, error)
+}
+
+type RandomGeneratorImplementation struct{}
+
+func NewRandomGenerator() *RandomGeneratorImplementation {
+	return &RandomGeneratorImplementation{}
+}
+
 // GenerateRandomString returns a securely generated random string.
 // It will return an error if the system's secure random
 // number generator fails to function correctly, in which
 // case the caller should not continue.
-func GenerateRandomString(n int) (string, error) {
+func (r *RandomGeneratorImplementation) GenerateRandomString(n int) (string, error) {
 	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
 
 	ret := make([]byte, n)

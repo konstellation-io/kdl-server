@@ -3,11 +3,11 @@
 Follow these steps to setup your development environment:
 
 * **golang**: `1.23.2`
-* **microk8s**: `1.26`
+* **microk8s**: `1.30`
 
   ```console
   # ubuntu install
-  snap install --channel=1.26/stable microk8s --classic
+  snap install --channel=1.30/stable microk8s --classic
 
   # deploy
   cd hack/
@@ -43,3 +43,14 @@ Follow these steps to setup your development environment:
   ```
 
 Continue reading the [Running your develop environment](../hack/README.md) guide.
+
+## Local Development
+
+In order to use go development tools in your local environment, you need to have
+a `go.work` file in your root path in the supported go version of KDL (1.23.2).
+
+How to generate a `go.work` file:
+
+```console
+go work init ./app/api ./repo-cloner
+```

@@ -20,16 +20,8 @@ type MongoDB struct {
 }
 
 // NewMongoDB is a constructor function.
-func NewMongoDB(logger logr.Logger) *MongoDB {
-	return &MongoDB{
-		logger,
-		nil,
-	}
-}
-
-// Connect open a database connection and check if it is connecting using ping.
-func (m *MongoDB) Connect(uri string) (*mongo.Client, error) {
-	m.logger.Info("MongoDB connecting...")
+func NewMongoDB(logger logr.Logger, uri string) (*MongoDB, error) {
+	logger.Info("MongoDB connecting...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -39,17 +31,19 @@ func (m *MongoDB) Connect(uri string) (*mongo.Client, error) {
 		return nil, err
 	}
 
-	m.logger.Info("MongoDB ping...")
+	logger.Info("MongoDB connected")
 
-	err = client.Ping(ctx, readpref.Primary())
+	return &MongoDB{logger, client}, nil
+}
+
+func (m *MongoDB) Ping() bool {
+	err := m.client.Ping(context.Background(), readpref.Primary())
 	if err != nil {
-		return nil, err
+		m.logger.Error(err, "MongoDB ping failed")
+		return false
 	}
 
-	m.logger.Info("MongoDB connected")
-	m.client = client
-
-	return client, nil
+	return true
 }
 
 // Disconnect closes the connection with the database.
@@ -69,5 +63,27 @@ func (m *MongoDB) Disconnect() {
 		return
 	}
 
-	m.logger.Info("Connection to MongoDB closed.")
+	m.logger.Info("Connection to MongoDB closed")
+}
+
+// CreateCollection creates a new collection in the database.
+func (m *MongoDB) CreateCollection(dbName, collName string) *mongo.Collection {
+	return m.client.Database(dbName).Collection(collName)
+}
+
+// Drop database.
+func (m *MongoDB) DropDatabase(dbName string) error {
+	m.logger.Info("MongoDB dropping database...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	err := m.client.Database(dbName).Drop(ctx)
+	if err != nil {
+		return err
+	}
+
+	m.logger.Info("Database dropped")
+
+	return nil
 }

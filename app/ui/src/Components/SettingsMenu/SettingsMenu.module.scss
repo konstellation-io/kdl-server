@@ -10,8 +10,8 @@
 .settingButton {
   background-color: palette(base, 400);
   border-left: 3px solid transparent;
-  transition: 
-    background-color ease 0.3s, 
+  transition:
+    background-color ease 0.3s,
     border-left-color ease 0.3s,
     color ease 0.2s, opacity ease 0.3s;
 
@@ -19,6 +19,21 @@
     border-left-color: palette(highlight);
     color: palette(highlight);
     text-shadow: 0 0 16px  palette(highlight);
+  }
+}
+
+.logoutButton {
+  background-color: palette(base, 400);
+  border-left: 3px solid transparent;
+  transition:
+    background-color ease 0.3s,
+    border-left-color ease 0.3s,
+    color ease 0.2s, opacity ease 0.3s;
+  color: rgb(204, 110, 110);
+  &:hover {
+    border-left-color: rgb(204, 110, 110);
+    color: red;
+    text-shadow: 0 0 16px  rgb(204, 110, 110);
   }
 }
 

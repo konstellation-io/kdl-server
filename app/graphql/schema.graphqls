@@ -1,29 +1,114 @@
+# This schema.graphqls file uses the following sorting criteria:
+# 1. Queries (alphabetical order)
+# 2. Mutations (grouped by returned type, then alphabetical order)
+# 3. Types and Enums (apparicion order in schema.graphqls)
+# 3.1  Types that are contained within other types are to be under the parent type
+
+
 type Query {
-  me: User!
-  projects: [Project!]!
-  project(id: ID!): Project!
-  users: [User!]!
-  qualityProjectDesc(description: String!): QualityProjectDesc!
-  runtimes: [Runtime!]!
-  runningRuntime: Runtime
   capabilities: [Capability!]!
-  runningCapability: Capability
   kubeconfig: String!
+  me: User!
+  project(id: ID!): Project!
+  projects: [Project!]!
+  qualityProjectDesc(description: String!): QualityProjectDesc!
+  runningCapability: Capability
+  runningRuntime: Runtime
+  runtimes: [Runtime!]!
+  users: [User!]!
 }
 
 type Mutation {
-  removeUsers(input: RemoveUsersInput!): [User!]!
-  updateAccessLevel(input: UpdateAccessLevelInput!): [User!]!
   regenerateSSHKey: User!
-  createProject(input: CreateProjectInput!): Project!
-  updateProject(input: UpdateProjectInput!): Project!
-  deleteProject(input: DeleteProjectInput!): Project
+  setActiveUserTools(input: SetActiveUserToolsInput!): User!
+  updateAccessLevel(input: UpdateAccessLevelInput!): [User!]!
+
   addMembers(input: AddMembersInput!): Project!
+  createProject(input: CreateProjectInput!): Project!
+  deleteProject(input: DeleteProjectInput!): Project
   removeMembers(input: RemoveMembersInput!): Project!
   updateMembers(input: UpdateMembersInput!): Project!
+  updateProject(input: UpdateProjectInput!): Project!
+
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
-  setActiveUserTools(input: SetActiveUserToolsInput!): User!
+}
+
+type Capability {
+  id: ID!
+  name: String!
+  default: Boolean!
+}
+
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  creationDate: String!
+  accessLevel: AccessLevel!
+  lastActivity: String
+  apiTokens: [ApiToken!]!
+  isKubeconfigEnabled: Boolean!
+  sshKey: SSHKey!
+}
+
+enum AccessLevel {
+  VIEWER
+  MANAGER
+  ADMIN
+}
+
+type ApiToken {
+  id: ID!
+  name: String!
+  creationDate: String!
+  lastUsedDate: String!
+  token: String!
+}
+
+type SSHKey {
+  public: String!
+  private: String!
+  creationDate: String!
+  lastActivity: String
+}
+
+type Project {
+  id: ID!
+  name: String!
+  description: String!
+  favorite: Boolean!
+  repository: Repository
+  creationDate: String!
+  lastActivationDate: String!
+  error: String
+  members: [Member!]!
+  toolUrls: ToolUrls!
+  needAccess: Boolean!
+  archived: Boolean!
+  minioAccessKey: MinioAccessKey!
+}
+
+type Repository {
+  url: String!
+  error: String
+}
+
+type Member {
+  user: User!
+  accessLevel: AccessLevel!
+  addedDate: String!
+}
+
+type MinioAccessKey {
+  accessKey: String!
+  secretKey: String!
+}
+
+type ToolUrls {
+  knowledgeGalaxy: String!
+  filebrowser: String!
+  mlflow: String!
 }
 
 type QualityProjectDesc {
@@ -40,113 +125,20 @@ type Runtime {
   runtimePod: String!
 }
 
-type Capability {
-  id: ID!
-  name: String!
-  default: Boolean!
-}
-
-type Topic {
-  name: String!
-  relevance: Float!
-}
-
-type SSHKey {
-  public: String!
-  private: String!
-  creationDate: String!
-  lastActivity: String
-}
-
-type User {
-  id: ID!
-  username: String!
-  email: String!
-  creationDate: String!
-  accessLevel: AccessLevel!
-  lastActivity: String
-  apiTokens: [ApiToken!]!
-  isKubeconfigEnabled: Boolean!
-  sshKey: SSHKey!
-}
-
-type ApiToken {
-  id: ID!
-  name: String!
-  creationDate: String!
-  lastUsedDate: String!
-  token: String!
-}
-
-type Member {
-  user: User!
-  accessLevel: AccessLevel!
-  addedDate: String!
-}
-
-type ToolUrls {
-  knowledgeGalaxy: String!
-  filebrowser: String!
-  vscode: String!
-  mlflow: String!
-}
-
-enum AccessLevel {
-  VIEWER
-  MANAGER
-  ADMIN
-}
-
-input ApiTokenInput {
-  userId: ID!
-  name: String
-}
-
-input UpdateProjectInput {
-  id: ID!
-  name: String
-  description: String
-  archived: Boolean
-}
-
-input DeleteProjectInput {
-  id: ID!
-}
-
-input AddMembersInput {
-  projectId: ID!
-  userIds: [ID!]!
-}
-
-input RemoveMembersInput {
-  projectId: ID!
-  userIds: [ID!]!
-}
-
-input RemoveApiTokenInput {
-  apiTokenId: ID!
-}
-
-input UpdateMembersInput {
-  projectId: ID!
-  userIds: [ID!]!
-  accessLevel: AccessLevel!
-}
-
-input RemoveUsersInput {
-  userIds: [ID!]!
-}
-
-input AddUserInput {
-  email: String!
-  username: String!
-  password: String!
-  accessLevel: AccessLevel!
+input SetActiveUserToolsInput {
+  active: Boolean!,
+  runtimeId: String,
+  capabilitiesId: String
 }
 
 input UpdateAccessLevelInput {
   userIds: [ID!]!
   accessLevel: AccessLevel!
+}
+
+input AddMembersInput {
+  projectId: ID!
+  userIds: [ID!]!
 }
 
 input CreateProjectInput {
@@ -156,56 +148,38 @@ input CreateProjectInput {
   repository: RepositoryInput!
 }
 
-input SetBoolFieldInput {
-  id: ID!
-  value: Boolean!
-}
-
-input SetActiveUserToolsInput {
-  active: Boolean!,
-  runtimeId: String,
-  capabilitiesId: String
-}
-
-type Project {
-  id: ID!
-  name: String!
-  description: String!
-  favorite: Boolean!
-  repository: Repository
-  creationDate: String!
-  lastActivationDate: String!
-  error: String
-  members: [Member!]!
-  toolUrls: ToolUrls!
-  needAccess: Boolean!
-  archived: Boolean!
-}
-
 input RepositoryInput {
-  type: RepositoryType!
-  external: ExternalRepositoryInput
-}
-
-input ExternalRepositoryInput {
   url: String!
   username: String!
-  credential: String!
-  authMethod: RepositoryAuthMethod!
 }
 
-type Repository {
-  type: RepositoryType!
-  url: String!
-  error: String
+input DeleteProjectInput {
+  id: ID!
 }
 
-enum RepositoryAuthMethod {
-  PASSWORD
-  TOKEN
+input RemoveMembersInput {
+  projectId: ID!
+  userIds: [ID!]!
 }
 
-enum RepositoryType {
-  INTERNAL
-  EXTERNAL
+input UpdateMembersInput {
+  projectId: ID!
+  userIds: [ID!]!
+  accessLevel: AccessLevel!
+}
+
+input UpdateProjectInput {
+  id: ID!
+  name: String
+  description: String
+  archived: Boolean
+}
+
+input ApiTokenInput {
+  userId: ID!
+  name: String
+}
+
+input RemoveApiTokenInput {
+  apiTokenId: ID!
 }

@@ -16,12 +16,15 @@ function buildProject(_, index) {
     needAccess: index < activeProjectsCount ? false : casual.boolean,
     members: buildRandomMembers(casual.integer(1, 5)),
     archived: index < activeProjectsCount ? false : casual.boolean,
-    toolUrls: () => ({
+    toolUrls: {
       knowledgeGalaxy: 'https://filebrowser.org/',
       filebrowser: 'https://filebrowser.org/',
-      vscode: 'https://code.visualstudio.com/',
       mlflow: 'https://mlflow.org/',
-    }),
+    },
+    minioAccessKey: {
+      accessKey: casual.uuid,
+      secretKey: casual.uuid,
+    },
   };
 }
 

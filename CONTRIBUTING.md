@@ -15,6 +15,8 @@ pre-commit install
 
 Please also install [`golangci-lint`](https://golangci-lint.run/welcome/install/) because it is executed by a pre-commit hook, e.g. via snap.
 
+*Note: If you use MacOS you have to set the environment variable `GOARCH=amd64` in order that the golang lint works properly.*
+
 ## Sign off contributions (DCO)
 
 The Developer Certificate of Origin (DCO) is a lightweight way for contributors to certify that they wrote or otherwise have the right to submit the code they are contributing to the project.
@@ -157,12 +159,10 @@ The following is the list of supported component:
 
 * `api`
 * `ui`
-* `cleaner`
 * `mlflow`
 * `project-operator`
 * `repo-cloner`
 * `user-tools`
-* `vscode`
 
 ### Subject
 

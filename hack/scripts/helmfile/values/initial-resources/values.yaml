@@ -396,7 +396,6 @@ resources:
               ]
             },
             {
-              "id": "b4a43542-ebd1-4aca-9e81-48b5328707b1",
               "clientId": "minio",
               "name": "MinIO client",
               "description": "",
@@ -470,7 +469,12 @@ resources:
                 "organization",
                 "offline_access",
                 "microprofile-jwt"
-              ]
+              ],
+              "access": {
+                "view": true,
+                "configure": true,
+                "manage": true
+              }
             },
             {
               "id": "07ef6dca-5bcb-49a1-9b28-a4a9b7a52500",

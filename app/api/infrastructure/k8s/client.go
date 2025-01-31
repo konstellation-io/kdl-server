@@ -1,7 +1,6 @@
 package k8s
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 
@@ -15,40 +14,40 @@ import (
 )
 
 const (
-	userToolsGroup      = "kdl.konstellation.io"
-	userToolsResource   = "usertools"
-	userToolsVersion    = "v1alpha1"
-	userToolsAPIVersion = userToolsGroup + "/" + userToolsVersion
+	kdlUserToolsGroup      = "kdl.konstellation.io"
+	kdlUserToolsResource   = "kdlusertools"
+	kdlUserToolsVersion    = "v1"
+	kdlUserToolsAPIVersion = kdlUserToolsGroup + "/" + kdlUserToolsVersion
 
-	kdlprojectGroup      = "project.konstellation.io"
-	kdlprojectResource   = "kdlprojects"
-	kdlprojectVersion    = "v1"
-	kdlprojectAPIVersion = kdlprojectGroup + "/" + kdlprojectVersion
+	kdlProjectGroup      = "kdl.konstellation.io"
+	kdlProjectResource   = "kdlprojects"
+	kdlProjectVersion    = "v1"
+	kdlProjectAPIVersion = kdlProjectGroup + "/" + kdlProjectVersion
 )
 
-var _ ClientInterface = &Client{}
+var _ ClientInterface = (*Client)(nil)
 
 type Client struct {
-	logger        logr.Logger
-	cfg           config.Config
-	clientset     *kubernetes.Clientset
-	userToolsRes  dynamic.NamespaceableResourceInterface
-	kdlprojectRes dynamic.NamespaceableResourceInterface
+	logger          logr.Logger
+	cfg             config.Config
+	clientset       *kubernetes.Clientset
+	kdlUserToolsRes dynamic.NamespaceableResourceInterface
+	kdlProjectRes   dynamic.NamespaceableResourceInterface
 }
 
-func New(logger logr.Logger, cfg config.Config, clientset *kubernetes.Clientset, userToolsRes,
-	kdlprojectRes dynamic.NamespaceableResourceInterface) *Client {
+func New(logger logr.Logger, cfg config.Config, clientset *kubernetes.Clientset, kdlUserToolsRes,
+	kdlProjectRes dynamic.NamespaceableResourceInterface) *Client {
 	return &Client{
-		logger:        logger,
-		cfg:           cfg,
-		clientset:     clientset,
-		userToolsRes:  userToolsRes,
-		kdlprojectRes: kdlprojectRes,
+		logger:          logger,
+		cfg:             cfg,
+		clientset:       clientset,
+		kdlUserToolsRes: kdlUserToolsRes,
+		kdlProjectRes:   kdlProjectRes,
 	}
 }
 
 func NewK8sClient(logger logr.Logger, cfg config.Config) (ClientInterface, error) {
-	kubeConfig := newKubernetesConfig(cfg)
+	kubeConfig := newKubernetesConfig(logger, cfg)
 
 	clientset, err := kubernetes.NewForConfig(kubeConfig)
 	if err != nil {
@@ -60,37 +59,38 @@ func NewK8sClient(logger logr.Logger, cfg config.Config) (ClientInterface, error
 		return nil, err
 	}
 
-	userToolsRes := dynamicClient.Resource(schema.GroupVersionResource{
-		Group:    userToolsGroup,
-		Version:  userToolsVersion,
-		Resource: userToolsResource,
+	kdlUserToolsRes := dynamicClient.Resource(schema.GroupVersionResource{
+		Group:    kdlUserToolsGroup,
+		Version:  kdlUserToolsVersion,
+		Resource: kdlUserToolsResource,
 	})
 
-	kdlprojectRes := dynamicClient.Resource(schema.GroupVersionResource{
-		Group:    kdlprojectGroup,
-		Version:  kdlprojectVersion,
-		Resource: kdlprojectResource,
+	kdlProjectRes := dynamicClient.Resource(schema.GroupVersionResource{
+		Group:    kdlProjectGroup,
+		Version:  kdlProjectVersion,
+		Resource: kdlProjectResource,
 	})
-	c := New(logger, cfg, clientset, userToolsRes, kdlprojectRes)
+
+	c := New(logger, cfg, clientset, kdlUserToolsRes, kdlProjectRes)
 
 	return c, nil
 }
 
-func newKubernetesConfig(cfg config.Config) *rest.Config {
+func newKubernetesConfig(logger logr.Logger, cfg config.Config) *rest.Config {
 	if cfg.Kubernetes.IsInsideCluster {
 		// retrieve k8 config from the cluster service
-		log.Printf("Creating K8s config in-cluster")
+		logger.Info("Creating K8s config in-cluster")
 
 		kubeConfig, err := rest.InClusterConfig()
 		if err != nil {
-			log.Fatalf("fatal error kubernetes config: %s", err)
+			logger.Error(err, "fatal error kubernetes config")
 		}
 
 		return kubeConfig
 	}
 
 	// retrieve k8 config from the LOCAL KUBECONFIG file
-	log.Printf("Creating K8s config from local .kube/config")
+	logger.Info("Creating K8s config from local .kube/config")
 
 	// NOTE: It works only with the default user's config, not even the exported KUBECONFIG value
 	kubeConfigPath := filepath.Join(os.Getenv("HOME"), ".kube", "config")
@@ -98,8 +98,18 @@ func newKubernetesConfig(cfg config.Config) *rest.Config {
 	// use the current context in kubeConfigPath
 	kubeConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
 	if err != nil {
-		log.Fatalf("fatal error kubernetes config: %s", err)
+		logger.Error(err, "fatal error kubernetes config")
 	}
 
 	return kubeConfig
+}
+
+func (k *Client) CheckConnection() bool {
+	_, err := k.clientset.Discovery().ServerVersion()
+	if err != nil {
+		k.logger.Error(err, "Error checking connection to k8s")
+		return false
+	}
+
+	return true
 }

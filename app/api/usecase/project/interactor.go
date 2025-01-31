@@ -5,11 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"time"
+	"strconv"
 
 	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioadminservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
@@ -25,15 +26,12 @@ var (
 
 // CreateProjectOption options when creating project.
 type CreateProjectOption struct {
-	ProjectID              string
-	Name                   string
-	Description            string
-	RepoType               entity.RepositoryType
-	ExternalRepoURL        *string
-	ExternalRepoUsername   *string
-	ExternalRepoCredential string
-	ExternalRepoAuthMethod entity.RepositoryAuthMethod
-	Owner                  entity.User
+	ProjectID   string
+	Name        string
+	Description string
+	URL         *string
+	Username    *string
+	Owner       entity.User
 }
 
 // DeleteProjectOption options when deleting a project.
@@ -76,26 +74,12 @@ func (c CreateProjectOption) Validate() error {
 		return fmt.Errorf("%w: project description cannot be null", ErrCreateProjectValidation)
 	}
 
-	if !c.RepoType.IsValid() {
-		return fmt.Errorf("%w: invalid repository type", ErrCreateProjectValidation)
+	if kdlutil.IsNilOrEmpty(c.URL) {
+		return fmt.Errorf("%w: repository URL cannot be null", ErrCreateProjectValidation)
 	}
 
-	if c.RepoType == entity.RepositoryTypeExternal {
-		if kdlutil.IsNilOrEmpty(c.ExternalRepoURL) {
-			return fmt.Errorf("%w: external repository URL cannot be null", ErrCreateProjectValidation)
-		}
-
-		if kdlutil.IsNilOrEmpty(c.ExternalRepoUsername) {
-			return fmt.Errorf("%w: external repository username cannot be null", ErrCreateProjectValidation)
-		}
-
-		if !c.ExternalRepoAuthMethod.IsValid() {
-			return fmt.Errorf("%w: invalid repository authentication method", ErrCreateProjectValidation)
-		}
-
-		if c.ExternalRepoCredential == "" {
-			return fmt.Errorf("%w: external repository token cannot be null", ErrCreateProjectValidation)
-		}
+	if kdlutil.IsNilOrEmpty(c.Username) {
+		return fmt.Errorf("%w: repository username cannot be null", ErrCreateProjectValidation)
 	}
 
 	return nil
@@ -103,34 +87,50 @@ func (c CreateProjectOption) Validate() error {
 
 // interactor implements the UseCase interface.
 type interactor struct {
-	logger           logr.Logger
-	projectRepo      Repository
-	userActivityRepo UserActivityRepo
-	clock            clock.Clock
-	minioService     minioservice.MinioService
-	k8sClient        k8s.ClientInterface
+	logger            logr.Logger
+	projectRepo       Repository
+	userActivityRepo  UserActivityRepo
+	clock             clock.Clock
+	minioService      minioservice.MinioService
+	minioAdminService minioadminservice.MinioAdminInterface
+	k8sClient         k8s.ClientInterface
+	randomGenerator   kdlutil.RandomGenerator
 }
 
-// InteractorDeps encapsulates all project interactor dependencies.
-type InteractorDeps struct {
-	Logger           logr.Logger
-	Repo             Repository
-	UserActivityRepo UserActivityRepo
-	Clock            clock.Clock
-	MinioService     minioservice.MinioService
-	K8sClient        k8s.ClientInterface
-}
+// Assure implementation adheres to interface.
+var _ UseCase = (*interactor)(nil)
 
 // NewInteractor is a constructor function.
-func NewInteractor(deps *InteractorDeps) UseCase {
+func NewInteractor(
+	logger logr.Logger,
+	k8sClient k8s.ClientInterface,
+	minioService minioservice.MinioService,
+	minioAdminService minioadminservice.MinioAdminInterface,
+	realClock clock.Clock,
+	projectRepo Repository,
+	userActivityRepo UserActivityRepo,
+	randomGenerator kdlutil.RandomGenerator,
+) UseCase {
 	return &interactor{
-		logger:           deps.Logger,
-		projectRepo:      deps.Repo,
-		userActivityRepo: deps.UserActivityRepo,
-		clock:            deps.Clock,
-		minioService:     deps.MinioService,
-		k8sClient:        deps.K8sClient,
+		logger:            logger,
+		projectRepo:       projectRepo,
+		userActivityRepo:  userActivityRepo,
+		clock:             realClock,
+		minioService:      minioService,
+		minioAdminService: minioAdminService,
+		k8sClient:         k8sClient,
+		randomGenerator:   randomGenerator,
 	}
+}
+
+// Save user activity.
+func (i *interactor) SaveUserActivity(ctx context.Context, userActivity entity.UserActivity) error {
+	err := i.userActivityRepo.Create(ctx, userActivity)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 /*
@@ -140,6 +140,8 @@ Depending on the repository type:
   - Create a k8s KDLProject containing a MLFLow instance
   - Create Minio bucket
   - Create Minio folders
+  - Create Minio project user
+  - Create Minio policy for the project user
 */
 func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
 	// Validate the creation input
@@ -149,6 +151,12 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 	}
 
 	now := i.clock.Now()
+
+	// Generate a secret key for the Minio project user
+	secretKey, err := i.randomGenerator.GenerateRandomString(40)
+	if err != nil {
+		return entity.Project{}, err
+	}
 
 	project := entity.NewProject(opt.ProjectID, opt.Name, opt.Description)
 	project.CreationDate = now
@@ -162,15 +170,8 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 
 	// Set project repository
 	project.Repository = entity.Repository{
-		Type:            entity.RepositoryTypeExternal,
-		ExternalRepoURL: *opt.ExternalRepoURL,
-		RepoName:        opt.ProjectID,
-	}
-
-	// Create a k8s KDLProject containing a MLFLow instance
-	err = i.k8sClient.CreateKDLProjectCR(ctx, opt.ProjectID)
-	if err != nil {
-		return entity.Project{}, err
+		URL:      *opt.URL,
+		RepoName: opt.ProjectID,
 	}
 
 	// Create Minio bucket
@@ -185,8 +186,44 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		return entity.Project{}, err
 	}
 
+	// Create Minio policy for the project user
+	err = i.minioAdminService.CreateProjectPolicy(ctx, opt.ProjectID)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	// Create Minio project user
+	accessKey, err := i.minioAdminService.CreateProjectUser(ctx, opt.ProjectID, secretKey)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	project.MinioAccessKey = entity.MinioAccessKey{
+		AccessKey: accessKey,
+		SecretKey: secretKey,
+	}
+
+	// Create a k8s KDLProject containing a MLFLow instance
+	err = i.k8sClient.CreateKDLProjectCR(ctx, k8s.ProjectData{ProjectID: opt.ProjectID, MinioAccessKey: project.MinioAccessKey})
+	if err != nil {
+		return entity.Project{}, err
+	}
+
 	// Store the project into the database
 	insertedID, err := i.projectRepo.Create(ctx, project)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	createRepoActVars := entity.NewActivityVarsWithProjectAndUserID(project.ID, opt.Owner.ID)
+	createRepoUserAct := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: opt.Owner.ID,
+		Type:   entity.UserActivityTypeCreateProject,
+		Vars:   createRepoActVars,
+	}
+
+	err = i.SaveUserActivity(ctx, createRepoUserAct)
 	if err != nil {
 		return entity.Project{}, err
 	}
@@ -210,8 +247,24 @@ func (i *interactor) GetByID(ctx context.Context, id string) (entity.Project, er
 
 // Update changes the desired information about a project.
 func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
+	p, _ := i.projectRepo.Get(ctx, opt.ProjectID)
+
+	userActivity := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: opt.UserID,
+	}
+
 	if !kdlutil.IsNilOrEmpty(opt.Name) {
 		err := i.projectRepo.UpdateName(ctx, opt.ProjectID, *opt.Name)
+		if err != nil {
+			return entity.Project{}, err
+		}
+
+		// Save project name updated in user activity
+		userActivity.Type = entity.UserActivityTypeUpdateProjectName
+		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(opt.ProjectID, p.Name, *opt.Name)
+		err = i.SaveUserActivity(ctx, userActivity)
+
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -222,10 +275,32 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 		if err != nil {
 			return entity.Project{}, err
 		}
+
+		// Save project description updated in user activity
+		userActivity.Type = entity.UserActivityTypeUpdateProjectDescription
+		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(opt.ProjectID, p.Description, *opt.Description)
+		err = i.SaveUserActivity(ctx, userActivity)
+
+		if err != nil {
+			return entity.Project{}, err
+		}
 	}
 
 	if opt.Archived != nil {
 		err := i.projectRepo.UpdateArchived(ctx, opt.ProjectID, *opt.Archived)
+		if err != nil {
+			return entity.Project{}, err
+		}
+
+		// Save project archived updated in user activity
+		userActivity.Type = entity.UserActivityTypeUpdateProjectArchived
+		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(
+			opt.ProjectID,
+			strconv.FormatBool(p.Archived),
+			strconv.FormatBool(*opt.Archived),
+		)
+		err = i.SaveUserActivity(ctx, userActivity)
+
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -262,6 +337,19 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 		return nil, err
 	}
 
+	// Determine policy/user name
+	accessKey := fmt.Sprintf("project-%s", projectID)
+
+	err = i.minioAdminService.DeleteProjectPolicy(ctx, accessKey)
+	if err != nil {
+		return nil, err
+	}
+
+	err = i.minioAdminService.DeleteUser(ctx, accessKey)
+	if err != nil {
+		return nil, err
+	}
+
 	err = i.projectRepo.DeleteOne(ctx, projectID)
 	if err != nil {
 		return nil, err
@@ -269,13 +357,13 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 
 	deleteRepoActVars := entity.NewActivityVarsDeleteRepo(projectID, minioBackup)
 	deleteRepoUserAct := entity.UserActivity{
-		Date:   time.Now(),
+		Date:   i.clock.Now(),
 		UserID: opt.LoggedUser.ID,
 		Type:   entity.UserActivityTypeDeleteProject,
 		Vars:   deleteRepoActVars,
 	}
 
-	err = i.userActivityRepo.Create(ctx, deleteRepoUserAct)
+	err = i.SaveUserActivity(ctx, deleteRepoUserAct)
 	if err != nil {
 		return nil, err
 	}
@@ -283,4 +371,33 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 	i.logger.Info("Project with successfully deleted", "projectID", projectID)
 
 	return &p, nil
+}
+
+func (i *interactor) UpdateKDLProjects(ctx context.Context) error {
+	// get the CRD template from the ConfigMap
+	configMap, err := i.k8sClient.GetConfigMap(ctx, i.k8sClient.GetConfigMapTemplateNameKDLProject())
+	if err != nil {
+		return err
+	}
+	// get the CRD template converted from yaml to go object from the ConfigMap
+	crd, err := kdlutil.GetCrdTemplateFromConfigMap(configMap)
+	if err != nil {
+		return err
+	}
+
+	// get all the KDL Projects in the namespace and iterate over to update them
+	kdlProjectName, err := i.k8sClient.ListKDLProjectsNameCR(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, pID := range kdlProjectName {
+		// NOTE: update method below to add a new struct with extra data to update into CRD
+		err = i.k8sClient.UpdateKDLProjectsCR(ctx, pID, &crd)
+		if err != nil {
+			i.logger.Error(err, "Error updating KDL Project CR in k8s", "projectName", pID)
+		}
+	}
+
+	return nil
 }

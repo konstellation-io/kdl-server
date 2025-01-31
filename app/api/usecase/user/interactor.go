@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/go-logr/logr"
@@ -13,10 +12,12 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/config"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioadminservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 )
 
@@ -26,14 +27,17 @@ var (
 )
 
 type Interactor struct {
-	logger           logr.Logger
-	cfg              config.Config
-	repo             Repository
-	repoRuntimes     runtime.Repository
-	repoCapabilities capabilities.Repository
-	sshGenerator     sshhelper.SSHKeyGenerator
-	clock            clock.Clock
-	k8sClient        k8s.ClientInterface
+	logger            logr.Logger
+	cfg               config.Config
+	repo              Repository
+	userActivityRepo  project.UserActivityRepo
+	repoRuntimes      runtime.Repository
+	repoCapabilities  capabilities.Repository
+	sshGenerator      sshhelper.SSHKeyGenerator
+	clock             clock.Clock
+	k8sClient         k8s.ClientInterface
+	minioAdminService minioadminservice.MinioAdminInterface
+	randomGenerator   kdlutil.RandomGenerator
 }
 
 // Interactor implements the UseCase interface.
@@ -44,22 +48,38 @@ func NewInteractor(
 	logger logr.Logger,
 	cfg config.Config,
 	repo Repository,
+	userActivityRepo project.UserActivityRepo,
 	repoRuntimes runtime.Repository,
 	repoCapabilities capabilities.Repository,
 	sshGenerator sshhelper.SSHKeyGenerator,
 	c clock.Clock,
 	k8sClient k8s.ClientInterface,
+	minioAdminService minioadminservice.MinioAdminInterface,
+	randomGenerator kdlutil.RandomGenerator,
 ) UseCase {
 	return &Interactor{
-		logger:           logger,
-		cfg:              cfg,
-		repo:             repo,
-		repoRuntimes:     repoRuntimes,
-		repoCapabilities: repoCapabilities,
-		sshGenerator:     sshGenerator,
-		clock:            c,
-		k8sClient:        k8sClient,
+		logger:            logger,
+		cfg:               cfg,
+		repo:              repo,
+		userActivityRepo:  userActivityRepo,
+		repoRuntimes:      repoRuntimes,
+		repoCapabilities:  repoCapabilities,
+		sshGenerator:      sshGenerator,
+		clock:             c,
+		k8sClient:         k8sClient,
+		minioAdminService: minioAdminService,
+		randomGenerator:   randomGenerator,
 	}
+}
+
+// Save user activity.
+func (i *Interactor) SaveUserActivity(ctx context.Context, userActivity entity.UserActivity) error {
+	err := i.userActivityRepo.Create(ctx, userActivity)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Create add a new user to the server.
@@ -72,7 +92,6 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 	// extract username from email
 	username := kdlutil.GetUsernameFromEmail(email)
 
-	fmt.Println("Creating user", "username", username, "email", email)
 	i.logger.Info("Creating user", "username", username, "email", email)
 
 	// Check if the user already exists
@@ -135,9 +154,37 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 	}
 
 	// Created a service account for the user
-	_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
+	slug := user.UsernameSlug()
+
+	_, err = i.k8sClient.CreateUserServiceAccount(ctx, slug)
 	if err != nil {
 		i.logger.Error(err, "Error creating service account", "username", username)
+		return entity.User{}, err
+	}
+
+	user.MinioAccessKey.SecretKey, err = i.randomGenerator.GenerateRandomString(40)
+	if err != nil {
+		i.logger.Error(err, "Error creating a MinIO secret key", "username", username)
+		return entity.User{}, err
+	}
+
+	user.MinioAccessKey.AccessKey, err = i.minioAdminService.CreateUser(ctx, slug, user.MinioAccessKey.SecretKey)
+	if err != nil {
+		i.logger.Error(err, "Error creating a MinIO user", "accessKey", user.MinioAccessKey.AccessKey)
+		return entity.User{}, err
+	}
+
+	// Save user creation in user activity
+	createUserActVars := entity.NewActivityVarsWithUserID(insertedID)
+	createUserAct := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: insertedID,
+		Type:   entity.UserActivityTypeCreateUser,
+		Vars:   createUserActVars,
+	}
+
+	err = i.SaveUserActivity(ctx, createUserAct)
+	if err != nil {
 		return entity.User{}, err
 	}
 
@@ -178,7 +225,7 @@ func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, ca
 		}
 	}
 
-	var rID, rImage, rTag string
+	var data = k8s.UserToolsData{}
 
 	if runtimeID != nil {
 		r, err := i.repoRuntimes.Get(ctx, *runtimeID)
@@ -186,28 +233,29 @@ func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, ca
 			return entity.User{}, err
 		}
 
-		rID = r.ID
-		rImage = r.DockerImage
-		rTag = r.DockerTag
-		i.logger.Info("Runtime with docker image", "runtimeId", rID, "image", rImage, "tag", rTag)
+		data.RuntimeID = r.ID
+		data.RuntimeImage = r.DockerImage
+		data.RuntimeTag = r.DockerTag
+		i.logger.Info("Runtime with docker image", "runtimeId", r.ID, "image", r.DockerImage, "tag", r.DockerTag)
 	} else {
-		rID = "default"
-		rImage = i.cfg.UserToolsVsCodeRuntime.Image.Repository
-		rTag = i.cfg.UserToolsVsCodeRuntime.Image.Tag
-		i.logger.Info("Using default runtime image", "image", rImage, "tag", rTag)
+		i.logger.Info("No runtime ID provided, using default runtime values")
 	}
 
-	retrievedCapabilities := entity.Capabilities{}
 	if capabilitiesID != nil {
-		retrievedCapabilities, err = i.repoCapabilities.Get(ctx, *capabilitiesID)
+		data.Capabilities, err = i.repoCapabilities.Get(ctx, *capabilitiesID)
 		if err != nil {
 			return entity.User{}, err
 		}
+	} else {
+		i.logger.Info("No capabilities ID provided, using default capabilities values")
 	}
 
 	i.logger.Info("Creating user tools for user", "email", email)
 
-	err = i.k8sClient.CreateUserToolsCR(ctx, user.Username, rID, rImage, rTag, retrievedCapabilities)
+	data.Username = user.Username
+	data.SlugUsername = user.UsernameSlug()
+
+	err = i.k8sClient.CreateKDLUserToolsCR(ctx, data)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -249,7 +297,7 @@ func (i *Interactor) AreToolsRunning(ctx context.Context, username string) (bool
 
 // IsKubeconfigActive checks if the kubeconfig is active.
 func (i *Interactor) IsKubeconfigActive() bool {
-	return i.cfg.UserToolsKubeconfig.Enabled
+	return i.cfg.Kubeconfig.Enabled
 }
 
 // FindByIDs retrieves the users for the given identifiers.
@@ -263,10 +311,37 @@ func (i *Interactor) GetByID(ctx context.Context, userID string) (entity.User, e
 }
 
 // UpdateAccessLevel update access level for the given identifiers.
-func (i *Interactor) UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error) {
+func (i *Interactor) UpdateAccessLevel(
+	ctx context.Context,
+	userIDs []string,
+	level entity.AccessLevel,
+	loggedUserID string,
+) ([]entity.User, error) {
+	// Get all users by their IDs to get the current access level
+	users, err := i.repo.FindByIDs(ctx, userIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	// Update access level in our DataBase
 	if err := i.repo.UpdateAccessLevel(ctx, userIDs, level); err != nil {
 		return nil, err
+	}
+
+	userAct := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: loggedUserID,
+		Type:   entity.UserActivityTypeUpdateUserAccessLevel,
+	}
+
+	for _, u := range users {
+		// Save update user access level activity
+		userAct.Vars = entity.NewActivityVarsUpdateUserAccessLevel(u.ID, u.AccessLevel.String(), level.String())
+
+		err = i.SaveUserActivity(ctx, userAct)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return i.repo.FindByIDs(ctx, userIDs)
@@ -281,6 +356,17 @@ func (i *Interactor) UpdateSub(ctx context.Context, user entity.User, sub string
 	}
 
 	if err := i.repo.UpdateSub(ctx, user.Username, sub); err != nil {
+		return entity.User{}, err
+	}
+
+	return i.repo.GetByUsername(ctx, user.Username)
+}
+
+// UpdateLastActivity updates the lastActivity for the given user.
+func (i *Interactor) UpdateLastActivity(ctx context.Context, user entity.User) (entity.User, error) {
+	i.logger.Info("Updating user lastActivity", "username", user.Username)
+
+	if err := i.repo.UpdateLastActivity(ctx, user.Username, i.clock.Now()); err != nil {
 		return entity.User{}, err
 	}
 
@@ -380,4 +466,35 @@ func (i *Interactor) GetKubeconfig(ctx context.Context, username string) (string
 	kubeConfTxt = strings.TrimPrefix(kubeConfTxt, "\n")
 
 	return kubeConfTxt, nil
+}
+
+// Get the CRD template from the ConfigMap and update all the KDL UserTools in the namespace.
+func (i *Interactor) UpdateKDLUserTools(ctx context.Context) error {
+	configMap, err := i.k8sClient.GetConfigMap(ctx, i.k8sClient.GetConfigMapTemplateNameKDLUserTools())
+	if err != nil {
+		return err
+	}
+
+	// get the CRD template converted from yaml to go object from the ConfigMap
+	crd, err := kdlutil.GetCrdTemplateFromConfigMap(configMap)
+	if err != nil {
+		return err
+	}
+
+	// get all the KDL UserTools in the namespace and iterate over to update them
+	kdlUserTools, err := i.k8sClient.ListKDLUserToolsCR(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, userTool := range kdlUserTools {
+		resourceName := userTool.GetName()
+
+		err = i.k8sClient.UpdateKDLUserToolsCR(ctx, resourceName, &crd)
+		if err != nil {
+			i.logger.Error(err, "Error updating KDL UserTools CR in k8s", "userToolName", resourceName)
+		}
+	}
+
+	return nil
 }

@@ -164,6 +164,20 @@ func (mr *MockRepositoryMockRecorder) UpdateMembersAccessLevel(ctx, projectID, u
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMembersAccessLevel", reflect.TypeOf((*MockRepository)(nil).UpdateMembersAccessLevel), ctx, projectID, users, accessLevel)
 }
 
+// UpdateMinioAccess mocks base method.
+func (m *MockRepository) UpdateMinioAccess(ctx context.Context, projectID, accessKey, secretKey string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateMinioAccess", ctx, projectID, accessKey, secretKey)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateMinioAccess indicates an expected call of UpdateMinioAccess.
+func (mr *MockRepositoryMockRecorder) UpdateMinioAccess(ctx, projectID, accessKey, secretKey interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMinioAccess", reflect.TypeOf((*MockRepository)(nil).UpdateMinioAccess), ctx, projectID, accessKey, secretKey)
+}
+
 // UpdateName mocks base method.
 func (m *MockRepository) UpdateName(ctx context.Context, projectID, name string) error {
 	m.ctrl.T.Helper()
@@ -341,6 +355,20 @@ func (m *MockUseCase) Update(ctx context.Context, opt UpdateProjectOption) (enti
 func (mr *MockUseCaseMockRecorder) Update(ctx, opt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUseCase)(nil).Update), ctx, opt)
+}
+
+// UpdateKDLProjects mocks base method.
+func (m *MockUseCase) UpdateKDLProjects(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateKDLProjects", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateKDLProjects indicates an expected call of UpdateKDLProjects.
+func (mr *MockUseCaseMockRecorder) UpdateKDLProjects(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateKDLProjects", reflect.TypeOf((*MockUseCase)(nil).UpdateKDLProjects), ctx)
 }
 
 // UpdateMembers mocks base method.

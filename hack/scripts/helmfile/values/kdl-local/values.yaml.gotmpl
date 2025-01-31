@@ -186,9 +186,6 @@ oauth2proxy:
 
   httpScheme: http
 
-  image:
-    tag: "v7.7.1"
-
   config:
     clientID: proxy
     clientSecret: proxy654321
@@ -328,7 +325,7 @@ userToolsOperator:
         image:
           repository: konstellation/kdl-repo-cloner
           pullPolicy: Always
-          tag: "latest"
+          tag: latest
 
         env:
           KDL_SERVER_MONGODB_URI: "mongodb://{{ .Values.mongodb_user }}:{{ .Values.mongodb_password }}@mongodb-svc.mongodb:27017/{{ .Values.mongodb_user }}?authSource={{ .Values.mongodb_user }}&authMechanism=SCRAM-SHA-256"

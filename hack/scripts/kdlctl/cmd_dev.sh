@@ -16,6 +16,12 @@ cmd_dev() {
       SKIP_BUILD=1
       shift
       ;;
+
+    --clean)
+      MINIKUBE_CLEAN=1
+      shift
+    ;;
+
     *)
       shift
       ;;

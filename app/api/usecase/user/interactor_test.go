@@ -24,6 +24,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/sshhelper"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
@@ -45,6 +46,7 @@ type userSuite struct {
 
 type userMocks struct {
 	repo              *user.MockRepository
+	userActivityRepo  *project.MockUserActivityRepo
 	runtimeRepo       *runtime.MockRepository
 	capabilitiesRepo  *capabilities.MockRepository
 	sshGenerator      *sshhelper.MockSSHKeyGenerator
@@ -59,6 +61,7 @@ type userMocks struct {
 func newUserSuite(t *testing.T) *userSuite {
 	ctrl := gomock.NewController(t)
 	repo := user.NewMockRepository(ctrl)
+	userActivityRepo := project.NewMockUserActivityRepo(ctrl)
 	repoRuntimes := runtime.NewMockRepository(ctrl)
 	repoCapabilities := capabilities.NewMockRepository(ctrl)
 	clockMock := clock.NewMockClock(ctrl)
@@ -74,7 +77,7 @@ func newUserSuite(t *testing.T) *userSuite {
 
 	cfg := &config.Config{}
 
-	interactor := user.NewInteractor(logger, *cfg, repo, repoRuntimes, repoCapabilities, sshGenerator,
+	interactor := user.NewInteractor(logger, *cfg, repo, userActivityRepo, repoRuntimes, repoCapabilities, sshGenerator,
 		clockMock, k8sClientMock, minioAdminService, randomGenerator)
 
 	return &userSuite{
@@ -84,6 +87,7 @@ func newUserSuite(t *testing.T) *userSuite {
 			logger:            logger,
 			cfg:               *cfg,
 			repo:              repo,
+			userActivityRepo:  userActivityRepo,
 			runtimeRepo:       repoRuntimes,
 			capabilitiesRepo:  repoCapabilities,
 			sshGenerator:      sshGenerator,
@@ -137,6 +141,13 @@ func TestInteractor_Create(t *testing.T) {
 	expectedUser := userWithCredentials
 	expectedUser.ID = id
 
+	expectedCreateUserActVars := []entity.UserActivityVar{
+		{
+			Key:   "USER_ID",
+			Value: id,
+		},
+	}
+
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
@@ -148,6 +159,16 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
 	s.mocks.repo.EXPECT().Create(ctx, userWithCredentials).Return(id, nil)
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.userActivityRepo.EXPECT().Create(
+		ctx,
+		entity.UserActivity{
+			Date:   now,
+			UserID: id,
+			Type:   entity.UserActivityTypeCreateUser,
+			Vars:   expectedCreateUserActVars,
+		},
+	).Return(nil)
 
 	createdUser, err := s.interactor.Create(ctx, email, sub, accessLevel)
 
@@ -647,29 +668,64 @@ func TestInteractor_UpdateAccessLevel(t *testing.T) {
 	s := newUserSuite(t)
 	defer s.ctrl.Finish()
 
-	const (
-		id          = "user.1234"
-		username    = "john.doe"
-		email       = "john@doe.com"
-		accessLevel = entity.AccessLevelAdmin
-	)
+	const newAccessLevel = entity.AccessLevelManager
 
 	ctx := context.Background()
+	now := time.Now().UTC()
 
-	targetUser := entity.User{
-		ID:          id,
-		Username:    username,
-		Email:       email,
-		AccessLevel: accessLevel,
+	loggedUser := entity.User{
+		ID: "logged-user",
 	}
 
-	ids := []string{id}
-	users := []entity.User{targetUser}
+	users := []entity.User{
+		{ID: "userA", Username: "user_a", AccessLevel: entity.AccessLevelViewer},
+		{ID: "userB", Username: "user_b", AccessLevel: entity.AccessLevelViewer},
+	}
+	ids := []string{users[0].ID, users[1].ID}
 
-	s.mocks.repo.EXPECT().UpdateAccessLevel(ctx, ids, accessLevel).Return(nil)
+	actVars := [][]entity.UserActivityVar{
+		{
+			{
+				Key: "USER_ID", Value: users[0].ID,
+			},
+			{
+				Key: "OLD_ACCESS_LEVEL", Value: string(entity.AccessLevelViewer),
+			},
+			{
+				Key: "NEW_ACCESS_LEVEL", Value: string(newAccessLevel),
+			},
+		},
+		{
+			{
+				Key: "USER_ID", Value: users[1].ID,
+			},
+			{
+				Key: "OLD_ACCESS_LEVEL", Value: string(entity.AccessLevelViewer),
+			},
+			{
+				Key: "NEW_ACCESS_LEVEL", Value: string(newAccessLevel),
+			},
+		},
+	}
+
+	s.mocks.repo.EXPECT().FindByIDs(ctx, ids).Return(users, nil)
+	s.mocks.repo.EXPECT().UpdateAccessLevel(ctx, ids, newAccessLevel).Return(nil)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.userActivityRepo.EXPECT().Create(ctx, entity.UserActivity{
+		Date:   now,
+		UserID: loggedUser.ID,
+		Type:   entity.UserActivityTypeUpdateUserAccessLevel,
+		Vars:   actVars[0],
+	}).Return(nil)
+	s.mocks.userActivityRepo.EXPECT().Create(ctx, entity.UserActivity{
+		Date:   now,
+		UserID: loggedUser.ID,
+		Type:   entity.UserActivityTypeUpdateUserAccessLevel,
+		Vars:   actVars[1],
+	}).Return(nil)
 	s.mocks.repo.EXPECT().FindByIDs(ctx, ids).Return(users, nil).AnyTimes()
 
-	returnedUsers, err := s.interactor.UpdateAccessLevel(ctx, ids, accessLevel)
+	returnedUsers, err := s.interactor.UpdateAccessLevel(ctx, ids, newAccessLevel, loggedUser.ID)
 
 	require.NoError(t, err)
 	require.Equal(t, users, returnedUsers)

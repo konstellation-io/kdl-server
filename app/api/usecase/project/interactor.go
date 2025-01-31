@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"time"
+	"strconv"
 
 	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
@@ -123,6 +123,16 @@ func NewInteractor(
 	}
 }
 
+// Save user activity.
+func (i *interactor) SaveUserActivity(ctx context.Context, userActivity entity.UserActivity) error {
+	err := i.userActivityRepo.Create(ctx, userActivity)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 /*
 Create stores into the DB a new project.
 Depending on the repository type:
@@ -205,6 +215,19 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		return entity.Project{}, err
 	}
 
+	createRepoActVars := entity.NewActivityVarsWithProjectAndUserID(project.ID, opt.Owner.ID)
+	createRepoUserAct := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: opt.Owner.ID,
+		Type:   entity.UserActivityTypeCreateProject,
+		Vars:   createRepoActVars,
+	}
+
+	err = i.SaveUserActivity(ctx, createRepoUserAct)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
 	i.logger.Info("Created a new project", "projectName", project.Name, "projectID", insertedID)
 
 	return i.projectRepo.Get(ctx, insertedID)
@@ -224,8 +247,24 @@ func (i *interactor) GetByID(ctx context.Context, id string) (entity.Project, er
 
 // Update changes the desired information about a project.
 func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
+	p, _ := i.projectRepo.Get(ctx, opt.ProjectID)
+
+	userActivity := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: opt.UserID,
+	}
+
 	if !kdlutil.IsNilOrEmpty(opt.Name) {
 		err := i.projectRepo.UpdateName(ctx, opt.ProjectID, *opt.Name)
+		if err != nil {
+			return entity.Project{}, err
+		}
+
+		// Save project name updated in user activity
+		userActivity.Type = entity.UserActivityTypeUpdateProjectName
+		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(opt.ProjectID, p.Name, *opt.Name)
+		err = i.SaveUserActivity(ctx, userActivity)
+
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -236,10 +275,32 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 		if err != nil {
 			return entity.Project{}, err
 		}
+
+		// Save project description updated in user activity
+		userActivity.Type = entity.UserActivityTypeUpdateProjectDescription
+		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(opt.ProjectID, p.Description, *opt.Description)
+		err = i.SaveUserActivity(ctx, userActivity)
+
+		if err != nil {
+			return entity.Project{}, err
+		}
 	}
 
 	if opt.Archived != nil {
 		err := i.projectRepo.UpdateArchived(ctx, opt.ProjectID, *opt.Archived)
+		if err != nil {
+			return entity.Project{}, err
+		}
+
+		// Save project archived updated in user activity
+		userActivity.Type = entity.UserActivityTypeUpdateProjectArchived
+		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(
+			opt.ProjectID,
+			strconv.FormatBool(p.Archived),
+			strconv.FormatBool(*opt.Archived),
+		)
+		err = i.SaveUserActivity(ctx, userActivity)
+
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -296,13 +357,13 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 
 	deleteRepoActVars := entity.NewActivityVarsDeleteRepo(projectID, minioBackup)
 	deleteRepoUserAct := entity.UserActivity{
-		Date:   time.Now(),
+		Date:   i.clock.Now(),
 		UserID: opt.LoggedUser.ID,
 		Type:   entity.UserActivityTypeDeleteProject,
 		Vars:   deleteRepoActVars,
 	}
 
-	err = i.userActivityRepo.Create(ctx, deleteRepoUserAct)
+	err = i.SaveUserActivity(ctx, deleteRepoUserAct)
 	if err != nil {
 		return nil, err
 	}

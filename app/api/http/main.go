@@ -125,8 +125,9 @@ func loadInteractors(
 		repos.userActivityRepo, randomGenerator,
 	)
 	runtimeInteractor := runtime.NewInteractor(logger, k8sClient, repos.runtimeRepo)
+
 	userInteractor := user.NewInteractor(
-		logger, cfg, repos.userRepo, repos.runtimeRepo, repos.capabilitiesRepo,
+		logger, cfg, repos.userRepo, repos.userActivityRepo, repos.runtimeRepo, repos.capabilitiesRepo,
 		sshHelper, realClock, k8sClient, dependencies.minioAdminService, randomGenerator,
 	)
 	configmapInteractor := configmap.NewInteractor(logger, cfg, k8sClient, projectInteractor, userInteractor)

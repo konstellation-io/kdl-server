@@ -39,10 +39,6 @@ deploy: ## Deploys Helm charts
 restart: ## Restarts kdl pods and minikube (use after build)
 	cd hack && ./kdlctl.sh restart && cd -
 
-.PHONY: refresh-certs
-refresh-certs: ## Refreshes the certificates
-	cd hack && ./kdlctl.sh refresh-certs && cd -
-
 .PHONY: uninstall
 uninstall: ## Remove all minikube resources
 	cd hack && ./kdlctl.sh uninstall && cd -

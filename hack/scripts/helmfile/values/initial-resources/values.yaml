@@ -396,6 +396,83 @@ resources:
               ]
             },
             {
+              "id": "b4a43542-ebd1-4aca-9e81-48b5328707b1",
+              "clientId": "minio",
+              "name": "MinIO client",
+              "description": "",
+              "rootUrl": "https://minio-console.kdl.10.0.1.1.nip.io/",
+              "adminUrl": "https://minio-console.kdl.10.0.1.1.nip.io/",
+              "baseUrl": "",
+              "surrogateAuthRequired": false,
+              "enabled": true,
+              "alwaysDisplayInConsole": true,
+              "clientAuthenticatorType": "client-secret",
+              "secret": "minio123456",
+              "redirectUris": [
+                "https://minio-console.kdl.10.0.1.1.nip.io/oauth_callback"
+              ],
+              "webOrigins": [
+                "*"
+              ],
+              "notBefore": 0,
+              "bearerOnly": false,
+              "consentRequired": false,
+              "standardFlowEnabled": true,
+              "implicitFlowEnabled": false,
+              "directAccessGrantsEnabled": false,
+              "serviceAccountsEnabled": false,
+              "publicClient": false,
+              "frontchannelLogout": true,
+              "protocol": "openid-connect",
+              "attributes": {
+                "realm_client": "false",
+                "oidc.ciba.grant.enabled": "false",
+                "client.secret.creation.time": "1733141642",
+                "backchannel.logout.session.required": "true",
+                "post.logout.redirect.uris": "+",
+                "display.on.consent.screen": "false",
+                "oauth2.device.authorization.grant.enabled": "false",
+                "backchannel.logout.revoke.offline.tokens": "false"
+              },
+              "authenticationFlowBindingOverrides": {},
+              "fullScopeAllowed": true,
+              "nodeReRegistrationTimeout": -1,
+              "protocolMappers": [
+                {
+                  "id": "e8b15cab-eb5a-4bad-a93f-b78bead3f753",
+                  "name": "email to policy",
+                  "protocol": "openid-connect",
+                  "protocolMapper": "oidc-usermodel-attribute-mapper",
+                  "consentRequired": false,
+                  "config": {
+                    "introspection.token.claim": "true",
+                    "userinfo.token.claim": "true",
+                    "user.attribute": "email",
+                    "id.token.claim": "true",
+                    "lightweight.claim": "false",
+                    "access.token.claim": "true",
+                    "claim.name": "policy",
+                    "jsonType.label": "String"
+                  }
+                }
+              ],
+              "defaultClientScopes": [
+                "web-origins",
+                "acr",
+                "roles",
+                "profile",
+                "basic",
+                "email"
+              ],
+              "optionalClientScopes": [
+                "address",
+                "phone",
+                "organization",
+                "offline_access",
+                "microprofile-jwt"
+              ]
+            },
+            {
               "id": "07ef6dca-5bcb-49a1-9b28-a4a9b7a52500",
               "clientId": "proxy",
               "name": "KDL OAuth2Proxy",

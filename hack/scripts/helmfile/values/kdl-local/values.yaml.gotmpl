@@ -8,12 +8,14 @@ service:
 
 livenessProbe:
   enabled: true
+  initialDelaySeconds: 10
 
 readinessProbe:
   enabled: true
 
 startupProbe:
   enabled: true
+  initialDelaySeconds: 20
 
 image:
   repository: konstellation/kdl-server
@@ -54,7 +56,7 @@ keycloak:
 
   ingress:
     enabled: true
-    className: public
+    className: nginx
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
     hosts:
@@ -121,7 +123,7 @@ minio:
 
   ingress:
     enabled: false
-    ingressClassName: public
+    ingressClassName: nginx
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
       nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
@@ -135,7 +137,7 @@ minio:
 
   consoleIngress:
     enabled: true
-    ingressClassName: public
+    ingressClassName: nginx
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
       nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
@@ -176,7 +178,7 @@ oauth2proxy:
         }
       nginx.ingress.kubernetes.io/server-snippet: |
         add_header Cache-Control "no-cache, no-store, must-revalidate";
-    className: public
+    className: nginx
     path: /
     pathType: ImplementationSpecific
     hosts:
@@ -271,7 +273,7 @@ projectOperator:
           enabled: true
           tls:
             enabled: true
-          className: public
+          className: nginx
           annotations:
             cert-manager.io/cluster-issuer: selfsigned-clusterissuer
             nginx.ingress.kubernetes.io/proxy-body-size: "4096m"

@@ -7,7 +7,7 @@ cmd_dev() {
   while test $# -gt 0; do
     case "$1" in
     # WARNING: Doing a hard reset before deploying
-    --hard | --dracarys)
+    --hard)
       minikube_hard_reset
       shift
       ;;

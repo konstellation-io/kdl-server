@@ -25,6 +25,7 @@ show_deploy_help() {
 }
 
 deploy() {
+  HOST_IP=$(minikube -p $MINIKUBE_PROFILE ip)
   export DOMAIN=kdl.$HOST_IP.nip.io
 
   if [ "$BUILD_DOCKER_IMAGES" = "1" ]; then
@@ -60,10 +61,12 @@ deploy_helm_chart() {
     export KNOWLEDGE_GALAXY_IMAGE_TAG="latest"
     echo_info "LOCAL KG"
   fi
+
   if [ "$KUBECONFIG_ENABLED" = "true" ] || [ ! -z "$KUBECONFIG" ]; then
-    export EXTERNAL_SERVER_URL=$(yq eval '.clusters[] | select (.name == "minikube-cluster") | .cluster.server' ${KUBECONFIG})
+    export EXTERNAL_SERVER_URL=$(yq eval '.clusters[] | select (.name == "kdl-local") | .cluster.server' $KUBECONFIG)
     echo_info "KDL Remote Development enabled"
   fi
+
   echo_info "📦 Applying helm chart..."
   helmfile -f scripts/helmfile/helmfile.yaml deps
   helmfile -f scripts/helmfile/helmfile.yaml apply

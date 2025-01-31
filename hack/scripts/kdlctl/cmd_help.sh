@@ -59,10 +59,6 @@ show_root_help() {
       build         calls docker to build all images and push them to minikube registry.
       deploy        calls helm to create install/upgrade a kdl release on minikube.
       restart       restarts kdl pods or minikube useful after build command.
-      refresh-certs refresh minikube local x509 certificates
-                    (ca.cert, server.crt, front-proxy-client.crt)
-                    after this operation you must execute kdlctl.sh deploy.
-
       uninstall     remove all resources from minikube.
 
     $(help_global_options)

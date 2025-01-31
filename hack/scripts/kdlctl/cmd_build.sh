@@ -78,7 +78,7 @@ build_image() {
   FOLDER="$2"
   echo_build_header "$NAME"
 
-  run docker build -t "konstellation/${NAME}:latest" "../${FOLDER}"
+  docker build -t "konstellation/${NAME}:latest" "../${FOLDER}"
 }
 
 echo_build_header() {

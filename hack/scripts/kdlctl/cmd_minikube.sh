@@ -3,7 +3,7 @@ minikube_hard_reset() {
     read -p "⚠️  Do you wish to delete the $MINIKUBE_PROFILE minikube profile? CAUTION: all data will be permanently deleted. 🔥" yn
     case $yn in
     [Yy]*)
-      dracarys_header && minikube delete -p "${MINIKUBE_PROFILE}"
+      minikube delete -p "${MINIKUBE_PROFILE}"
       break
       ;;
     [Nn]*) exit ;;
@@ -54,6 +54,8 @@ minikube_start() {
 }
 
 minikube_profile_update() {
+  export KUBECONFIG=${HOME}/.kube/config-minikube
+  chmod 600 ${KUBECONFIG}
   minikube profile "${MINIKUBE_PROFILE}" && minikube update-context
 }
 
@@ -87,15 +89,4 @@ minikube_clean() {
     /bin/sh -c "docker system prune --filter \"until=${KEEP_THRESHOLD_HOURS}h\" -f"
 
   unset DOCKER_TLS_VERIFY DOCKER_HOST DOCKER_CERT_PATH MINIKUBE_ACTIVE_DOCKERD
-}
-
-dracarys_header() {
-  echo "          ____ __"
-  echo "         { --.\  |          .)%%%)%%"
-  echo "          '-._\\ | (\___   %)%%(%%(%%%"
-  echo '🔥DRACARYS🔥  `\\|{/ ^ _)-%(%%%%)%%;%%%'
-  echo "          .'^^^^^^^  /\`    %%)%%%%)%%%'"
-  echo "         //\   ) ,  /       '%%%%(%%'"
-  echo "   ,  _.'/  \`\<-- \<"
-  echo "    \`^^^\`     ^^   ^^"
 }

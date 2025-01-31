@@ -124,9 +124,7 @@ type Runtime {
 enum PodStatus {
   pending
   running
-  succeeded
   failed
-  unknown
 }
 
 input SetActiveUserToolsInput {

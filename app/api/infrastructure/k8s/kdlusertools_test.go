@@ -570,9 +570,9 @@ func (s *testSuite) TestGetUserToolsPodStatus() {
 }
 
 func (s *testSuite) TestGetUserToolsPodStatus_PodNotFound() {
-	s.createPod("pod-status-unknown")
+	s.createPod("pod-status-failed")
 
-	status, err := s.Client.GetUserToolsPodStatus(context.Background(), "unknown-username")
+	status, err := s.Client.GetUserToolsPodStatus(context.Background(), "failed-username")
 	s.Require().Error(err)
-	s.Require().Equal(entity.PodStatusUnknown, status)
+	s.Require().Equal(entity.PodStatusFailed, status)
 }

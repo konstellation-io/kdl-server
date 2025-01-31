@@ -90,7 +90,7 @@ func TestInteractor_GetRunningRuntime_GetUserToolsPodStatusError(t *testing.T) {
 		runtimeName      = "Runtime 1"
 		runtimeImage     = "konstellation/image"
 		runtimeTag       = "3.9"
-		runtimePodStatus = entity.PodStatusUnknown
+		runtimePodStatus = entity.PodStatusFailed
 	)
 
 	ctx := context.Background()
@@ -100,7 +100,7 @@ func TestInteractor_GetRunningRuntime_GetUserToolsPodStatusError(t *testing.T) {
 	expectedRuntime.RuntimePodStatus = runtimePodStatus
 
 	s.mocks.k8client.EXPECT().GetRuntimeIDFromUserTools(ctx, username).Return(runtimeID, nil)
-	s.mocks.k8client.EXPECT().GetUserToolsPodStatus(ctx, username).Return(entity.PodStatusUnknown, errUnknown)
+	s.mocks.k8client.EXPECT().GetUserToolsPodStatus(ctx, username).Return(entity.PodStatusFailed, errUnknown)
 	s.mocks.repo.EXPECT().Get(ctx, runtimeID).Return(expectedRuntime, nil)
 
 	f, err := s.interactor.GetRunningRuntime(ctx, username)
@@ -127,6 +127,7 @@ func TestInteractor_GetProjectRuntimes(t *testing.T) {
 		entity.NewRuntime(genRuntimeID, runtimeName, runtimeImage, runtimeTag),
 	}
 
+	s.mocks.k8client.EXPECT().GetUserToolsPodStatus(ctx, username).Return(entity.PodStatusRunning, nil)
 	s.mocks.repo.EXPECT().FindAll(ctx).Return(expectedGenericRuntimes, nil)
 
 	f, err := s.interactor.GetRuntimes(ctx, username)

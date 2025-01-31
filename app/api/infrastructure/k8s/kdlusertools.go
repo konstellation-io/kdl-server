@@ -191,10 +191,10 @@ func (k Client) IsUserToolPODRunning(ctx context.Context, username string) (bool
 func (k Client) GetUserToolsPodStatus(ctx context.Context, username string) (entity.PodStatus, error) {
 	pod, err := k.getUserToolsPod(ctx, username)
 	if err != nil {
-		return entity.PodStatusUnknown, err
+		return entity.PodStatusFailed, err
 	}
 
-	return entity.PodStatusFromK8sStatus(pod.Status.Phase), nil
+	return entity.PodStatusFromK8sStatus(pod.Status), nil
 }
 
 // getUserToolsPod returns the UserToolsPod object.

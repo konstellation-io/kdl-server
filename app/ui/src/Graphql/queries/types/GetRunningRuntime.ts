@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { PodStatus } from "./../../types/globalTypes";
+
 // ====================================================
 // GraphQL query operation: GetRunningRuntime
 // ====================================================
@@ -16,6 +18,7 @@ export interface GetRunningRuntime_runningRuntime {
   dockerImage: string;
   dockerTag: string;
   runtimePod: string;
+  runtimePodStatus: PodStatus;
 }
 
 export interface GetRunningRuntime {

@@ -33,18 +33,8 @@ func (s *PodStatusTestSuite) TestPodStatus_IsValid() {
 			want: true,
 		},
 		{
-			name: "valid succeeded",
-			ps:   entity.PodStatusSucceeded,
-			want: true,
-		},
-		{
 			name: "valid failed",
 			ps:   entity.PodStatusFailed,
-			want: true,
-		},
-		{
-			name: "valid unknown",
-			ps:   entity.PodStatusUnknown,
 			want: true,
 		},
 		{
@@ -78,19 +68,9 @@ func (s *PodStatusTestSuite) TestPodStatus_String() {
 			want: "running",
 		},
 		{
-			name: "is succeeded string",
-			ps:   entity.PodStatusSucceeded,
-			want: "succeeded",
-		},
-		{
 			name: "is failed string",
 			ps:   entity.PodStatusFailed,
 			want: "failed",
-		},
-		{
-			name: "is unknown string",
-			ps:   entity.PodStatusUnknown,
-			want: "unknown",
 		},
 	}
 	for _, tt := range tests {
@@ -104,38 +84,177 @@ func (s *PodStatusTestSuite) TestPodStatus_String() {
 func (s *PodStatusTestSuite) TestPodStatus_PodStatusFromK8sStatus() {
 	tests := []struct {
 		name string
-		ph   v1.PodPhase
+		ps   v1.PodStatus
 		want entity.PodStatus
 	}{
 		{
 			name: "pod pending status",
-			ph:   v1.PodPending,
+			ps: v1.PodStatus{
+				Phase: v1.PodPending,
+				ContainerStatuses: []v1.ContainerStatus{
+					{
+						State: v1.ContainerState{
+							Waiting: &v1.ContainerStateWaiting{
+								Reason: "BuildingImage",
+							},
+						},
+					},
+				},
+			},
 			want: entity.PodStatusPending,
 		},
 		{
+			name: "pod pending status with CrashLoopBackOff container error",
+			ps: v1.PodStatus{
+				Phase: v1.PodPending,
+				ContainerStatuses: []v1.ContainerStatus{
+					{
+						State: v1.ContainerState{
+							Waiting: &v1.ContainerStateWaiting{
+								Reason: "CrashLoopBackOff",
+							},
+						},
+					},
+				},
+			},
+			want: entity.PodStatusFailed,
+		},
+		{
+			name: "pod pending status with ImagePullBackOff container error",
+			ps: v1.PodStatus{
+				Phase: v1.PodPending,
+				ContainerStatuses: []v1.ContainerStatus{
+					{
+						State: v1.ContainerState{
+							Waiting: &v1.ContainerStateWaiting{
+								Reason: "ImagePullBackOff",
+							},
+						},
+					},
+				},
+			},
+			want: entity.PodStatusFailed,
+		},
+		{
+			name: "pod pending status with ErrImagePull container error",
+			ps: v1.PodStatus{
+				Phase: v1.PodPending,
+				ContainerStatuses: []v1.ContainerStatus{
+					{
+						State: v1.ContainerState{
+							Waiting: &v1.ContainerStateWaiting{
+								Reason: "ErrImagePull",
+							},
+						},
+					},
+				},
+			},
+			want: entity.PodStatusFailed,
+		},
+		{
+			name: "pod pending status with CreateContainerConfigError container error",
+			ps: v1.PodStatus{
+				Phase: v1.PodPending,
+				ContainerStatuses: []v1.ContainerStatus{
+					{
+						State: v1.ContainerState{
+							Waiting: &v1.ContainerStateWaiting{
+								Reason: "CreateContainerConfigError",
+							},
+						},
+					},
+				},
+			},
+			want: entity.PodStatusFailed,
+		},
+		{
+			name: "pod pending status with CreateContainerError container error",
+			ps: v1.PodStatus{
+				Phase: v1.PodPending,
+				ContainerStatuses: []v1.ContainerStatus{
+					{
+						State: v1.ContainerState{
+							Waiting: &v1.ContainerStateWaiting{
+								Reason: "CreateContainerError",
+							},
+						},
+					},
+				},
+			},
+			want: entity.PodStatusFailed,
+		},
+		{
+			name: "pod pending status with RunContainerError container error",
+			ps: v1.PodStatus{
+				Phase: v1.PodPending,
+				ContainerStatuses: []v1.ContainerStatus{
+					{
+						State: v1.ContainerState{
+							Waiting: &v1.ContainerStateWaiting{
+								Reason: "RunContainerError",
+							},
+						},
+					},
+				},
+			},
+			want: entity.PodStatusFailed,
+		},
+		{
+			name: "pod pending status with ErrImageNeverPull container error",
+			ps: v1.PodStatus{
+				Phase: v1.PodPending,
+				ContainerStatuses: []v1.ContainerStatus{
+					{
+						State: v1.ContainerState{
+							Waiting: &v1.ContainerStateWaiting{
+								Reason: "ErrImageNeverPull",
+							},
+						},
+					},
+				},
+			},
+			want: entity.PodStatusFailed,
+		},
+		{
+			name: "pod pending status with NetworkNotReady container error",
+			ps: v1.PodStatus{
+				Phase: v1.PodPending,
+				ContainerStatuses: []v1.ContainerStatus{
+					{
+						State: v1.ContainerState{
+							Waiting: &v1.ContainerStateWaiting{
+								Reason: "NetworkNotReady",
+							},
+						},
+					},
+				},
+			},
+			want: entity.PodStatusFailed,
+		},
+		{
 			name: "pod running status",
-			ph:   v1.PodRunning,
+			ps:   v1.PodStatus{Phase: v1.PodRunning},
 			want: entity.PodStatusRunning,
 		},
 		{
-			name: "pod succeeded status",
-			ph:   v1.PodSucceeded,
-			want: entity.PodStatusSucceeded,
+			name: "pod success status",
+			ps:   v1.PodStatus{Phase: v1.PodSucceeded},
+			want: entity.PodStatusRunning,
 		},
 		{
 			name: "pod failed status",
-			ph:   v1.PodFailed,
+			ps:   v1.PodStatus{Phase: v1.PodFailed},
 			want: entity.PodStatusFailed,
 		},
 		{
 			name: "pod unknown status",
-			ph:   v1.PodUnknown,
-			want: entity.PodStatusUnknown,
+			ps:   v1.PodStatus{Phase: v1.PodUnknown},
+			want: entity.PodStatusFailed,
 		},
 	}
 	for _, tt := range tests {
 		s.Run(tt.name, func() {
-			got := entity.PodStatusFromK8sStatus(tt.ph)
+			got := entity.PodStatusFromK8sStatus(tt.ps)
 			s.Equal(tt.want, got)
 		})
 	}

@@ -10,6 +10,7 @@ export default gql`
       dockerImage
       dockerTag
       runtimePod
+      runtimePodStatus
     }
   }
 `;

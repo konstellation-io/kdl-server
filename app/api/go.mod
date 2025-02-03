@@ -5,6 +5,7 @@ go 1.23.2
 require (
 	bou.ke/monkey v1.0.2
 	github.com/99designs/gqlgen v0.17.64
+	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-logr/logr v1.4.2
 	github.com/go-logr/zapr v1.3.0
@@ -30,14 +31,21 @@ require (
 )
 
 require (
+	github.com/Masterminds/goutils v1.1.1 // indirect
+	github.com/Masterminds/semver/v3 v3.3.0 // indirect
+	github.com/huandu/xstrings v1.5.0 // indirect
+	github.com/mitchellh/copystructure v1.2.0 // indirect
+	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/philhofer/fwd v1.1.2 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/secure-io/sio-go v0.3.1 // indirect
+	github.com/shopspring/decimal v1.4.0 // indirect
+	github.com/spf13/cast v1.7.0 // indirect
 	github.com/tinylib/msgp v1.1.8 // indirect
 )
 
 require (
-	dario.cat/mergo v1.0.0 // indirect
+	dario.cat/mergo v1.0.1 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/Nerzal/gocloak/v13 v13.9.0

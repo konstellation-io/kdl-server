@@ -111,7 +111,6 @@ func TestInteractor_Create(t *testing.T) {
 		accessLevel    = entity.AccessLevelAdmin
 		publicSSHKey   = "test-ssh-key-public"
 		privateSSHKey  = "test-ssh-key-private"
-		minioAccessKey = "user-user"             // derived from username
 		minioSecretKey = "test-minio-secret-key" // #nosec G101
 	)
 
@@ -133,15 +132,14 @@ func TestInteractor_Create(t *testing.T) {
 		CreationDate: now,
 	}
 
-	expectedUser := entity.User{
-		ID:           id,
-		Username:     username,
-		Sub:          sub,
-		Email:        email,
-		AccessLevel:  accessLevel,
-		SSHKey:       sshKey,
-		CreationDate: now,
+	userWithCredentials := u
+	userWithCredentials.MinioAccessKey = entity.MinioAccessKey{
+		AccessKey: email,
+		SecretKey: minioSecretKey,
 	}
+
+	expectedUser := userWithCredentials
+	expectedUser.ID = id
 
 	expectedCreateUserActVars := []entity.UserActivityVar{
 		{
@@ -155,12 +153,12 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
-	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
-	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
 	s.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(minioSecretKey, nil)
-	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, u.UsernameSlug(), minioSecretKey).Return(minioAccessKey, nil)
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, minioSecretKey).Return(email, nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
+	s.mocks.repo.EXPECT().Create(ctx, userWithCredentials).Return(id, nil)
+	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.userActivityRepo.EXPECT().Create(
 		ctx,
@@ -311,12 +309,13 @@ func TestInteractor_StartTools(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const (
-		username     = "john"
-		slugUsername = "john"
-		email        = "john@doe.com"
-		toolsRunning = false
-		runtimeImage = "konstellation/image"
-		runtimeTag   = "3.9"
+		username       = "john"
+		slugUsername   = "john"
+		email          = "john@doe.com"
+		toolsRunning   = false
+		runtimeImage   = "konstellation/image"
+		runtimeTag     = "3.9"
+		minioSecretKey = "john-doe-secret"
 	)
 
 	capability := entity.Capabilities{
@@ -338,10 +337,21 @@ func TestInteractor_StartTools(t *testing.T) {
 		RuntimeImage: runtimeImage,
 		RuntimeTag:   runtimeTag,
 		Capabilities: capability,
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: email,
+			SecretKey: minioSecretKey,
+		},
 	}
 
 	ctx := context.Background()
-	expectedUser := entity.User{Username: username, Email: email}
+	expectedUser := entity.User{
+		Username: username,
+		Email:    email,
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: email,
+			SecretKey: minioSecretKey,
+		},
+	}
 	expectedRuntime := entity.Runtime{ID: runtimeID, DockerImage: runtimeImage, DockerTag: runtimeTag}
 
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(expectedUser, nil)

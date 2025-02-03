@@ -25,6 +25,14 @@ const (
 	password = "admin123"
 )
 
+const (
+	testProjectName     string = "trinity"
+	testProjectName2    string = "tarpcheck"
+	testProjectPassword string = "-i2YaLei0ohwayaes_hz" // gitleaks:allow
+	testEmail           string = "foo@example.com"
+	testPassword        string = "Aeb_xum0zeng6p-o" // gitleaks:allow
+)
+
 type TestSuite struct {
 	suite.Suite
 	container   *tcminio.MinioContainer
@@ -73,11 +81,11 @@ func (s *TestSuite) TearDownSuite() {
 func (s *TestSuite) TearDownTest() {
 	ctx := context.Background()
 
-	for _, group := range []string{"project1", "project2"} {
+	for _, group := range []string{testProjectName, testProjectName2} {
 		_ = s.adminClient.UpdateGroupMembers(ctx, madmin.GroupAddRemove{
 			Group:    group,
 			IsRemove: true,
-			Members:  []string{"user-foo"},
+			Members:  []string{"foo@example.com"},
 		})
 
 		// a call to this method on an empty group removes it
@@ -94,27 +102,29 @@ func (s *TestSuite) TearDownTest() {
 	for username := range users {
 		err = s.adminClient.RemoveUser(ctx, username)
 		s.Require().NoError(err)
+
+		_ = s.adminClient.RemoveCannedPolicy(ctx, username)
 	}
 
-	err = s.adminClient.RemoveCannedPolicy(ctx, "project1")
+	err = s.adminClient.RemoveCannedPolicy(ctx, testProjectName)
 	s.Require().NoError(err)
 
-	err = s.adminClient.RemoveCannedPolicy(ctx, "project2")
+	err = s.adminClient.RemoveCannedPolicy(ctx, testProjectName2)
 	s.Require().NoError(err)
 
-	err = s.client.RemoveObject(ctx, "project1", "hello.txt", minio.RemoveObjectOptions{})
+	err = s.client.RemoveObject(ctx, testProjectName, "hello.txt", minio.RemoveObjectOptions{})
 	s.Require().NoError(err)
-	err = s.client.RemoveBucket(ctx, "project1")
+	err = s.client.RemoveBucket(ctx, testProjectName)
 	s.Require().NoError(err)
 }
 
 func (s *TestSuite) SetupTest() {
 	ctx := context.Background()
 
-	err := s.client.MakeBucket(ctx, "project1", minio.MakeBucketOptions{})
+	err := s.client.MakeBucket(ctx, testProjectName, minio.MakeBucketOptions{})
 	s.Require().NoError(err)
 
-	_, err = s.client.PutObject(ctx, "project1", "hello.txt",
+	_, err = s.client.PutObject(ctx, testProjectName, "hello.txt",
 		bytes.NewReader([]byte("hello world")), -1, minio.PutObjectOptions{})
 	s.Require().NoError(err)
 }
@@ -122,15 +132,9 @@ func (s *TestSuite) SetupTest() {
 func (s *TestSuite) TestCreateUser() {
 	ctx := context.Background()
 
-	const (
-		// # gitleaks ignore
-		username string = "foo"
-		password string = "-i2YaLei0ohwayaes_hz" // gitleaks:allow
-	)
-
-	accessKey, err := s.service.CreateUser(ctx, username, password)
+	accessKey, err := s.service.CreateUser(ctx, testEmail, password)
 	s.Require().NoError(err)
-	s.Require().Equal("user-foo", accessKey)
+	s.Require().Equal(testEmail, accessKey)
 
 	users, err := s.adminClient.ListUsers(ctx)
 	s.Require().NoError(err)
@@ -142,11 +146,11 @@ func (s *TestSuite) TestCreateUser() {
 func (s *TestSuite) TestDeleteUser() {
 	ctx := context.Background()
 
-	accessKey, err := s.service.CreateUser(ctx, "foo", "foo12345678")
+	accessKey, err := s.service.CreateUser(ctx, testEmail, password)
 	s.Require().NoError(err)
-	s.Require().Equal("user-foo", accessKey)
+	s.Require().Equal(testEmail, accessKey)
 
-	err = s.service.DeleteUser(ctx, "foo")
+	err = s.service.DeleteUser(ctx, testEmail)
 	s.Require().NoError(err)
 
 	users, err := s.adminClient.ListUsers(ctx)
@@ -157,18 +161,12 @@ func (s *TestSuite) TestDeleteUser() {
 func (s *TestSuite) TestCreateProjectUser() {
 	ctx := context.Background()
 
-	const (
-		// # gitleaks ignore
-		projectName string = "trinity"
-		password    string = "-i2YaLei0ohwayaes_hz" // gitleaks:allow
-	)
-
-	err := s.service.CreateProjectPolicy(ctx, projectName)
+	err := s.service.CreateProjectPolicy(ctx, testProjectName)
 	s.Require().NoError(err)
 
-	accessKey, err := s.service.CreateProjectUser(ctx, projectName, password)
+	accessKey, err := s.service.CreateProjectUser(ctx, testProjectName, testProjectPassword)
 	s.Require().NoError(err)
-	s.Require().Equal("project-trinity", accessKey)
+	s.Require().Equal(testProjectName, accessKey)
 
 	users, err := s.adminClient.ListUsers(ctx)
 	s.Require().NoError(err)
@@ -180,20 +178,14 @@ func (s *TestSuite) TestCreateProjectUser() {
 func (s *TestSuite) TestDeleteProjectUser() {
 	ctx := context.Background()
 
-	const (
-		// # gitleaks ignore
-		projectName string = "trinity"
-		password    string = "-i2YaLei0ohwayaes_hz" // gitleaks:allow
-	)
-
-	err := s.service.CreateProjectPolicy(ctx, projectName)
+	err := s.service.CreateProjectPolicy(ctx, testProjectName)
 	s.Require().NoError(err)
 
-	accessKey, err := s.service.CreateProjectUser(ctx, projectName, password)
+	accessKey, err := s.service.CreateProjectUser(ctx, testProjectName, testProjectPassword)
 	s.Require().NoError(err)
-	s.Require().Equal("project-trinity", accessKey)
+	s.Require().Equal(testProjectName, accessKey)
 
-	err = s.service.DeleteProjectUser(ctx, projectName)
+	err = s.service.DeleteProjectUser(ctx, testProjectName)
 	s.Require().NoError(err)
 
 	users, err := s.adminClient.ListUsers(ctx)
@@ -204,21 +196,21 @@ func (s *TestSuite) TestDeleteProjectUser() {
 func (s *TestSuite) TestDeleteUserIdempotence() {
 	ctx := context.Background()
 
-	err := s.service.DeleteUser(ctx, "nonexistent")
+	err := s.service.DeleteUser(ctx, "nonexistent@example.com")
 	s.Require().NoError(err)
 }
 
 func (s *TestSuite) TestAssignProject() {
 	ctx := context.Background()
 
-	err := s.service.CreateProjectPolicy(ctx, "project1")
+	err := s.service.CreateProjectPolicy(ctx, testProjectName)
 	s.Require().NoError(err)
 
-	accessKey, err := s.service.CreateUser(ctx, "foo", "foo12345678")
+	accessKey, err := s.service.CreateUser(ctx, testEmail, testPassword)
 	s.Require().NoError(err)
-	s.Require().Equal("user-foo", accessKey)
+	s.Require().Equal(testEmail, accessKey)
 
-	err = s.service.JoinProject(ctx, "foo", "project1")
+	err = s.service.JoinProject(ctx, testEmail, testProjectName)
 	s.Require().NoError(err)
 
 	// User login
@@ -226,7 +218,7 @@ func (s *TestSuite) TestAssignProject() {
 	s.Require().NoError(err)
 
 	client, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4("user-foo", "foo12345678", ""),
+		Creds:  credentials.NewStaticV4(testEmail, testPassword, ""),
 		Secure: false,
 	})
 	s.Require().NoError(err)
@@ -236,10 +228,10 @@ func (s *TestSuite) TestAssignProject() {
 	s.Require().NoError(err)
 
 	s.Len(buckets, 1)
-	s.Equal("project1", buckets[0].Name)
+	s.Equal(testProjectName, buckets[0].Name)
 
 	// List objects
-	objectCh := client.ListObjects(ctx, "project1", minio.ListObjectsOptions{})
+	objectCh := client.ListObjects(ctx, testProjectName, minio.ListObjectsOptions{})
 	objects := make([]minio.ObjectInfo, 0)
 
 	for object := range objectCh {
@@ -255,14 +247,14 @@ func (s *TestSuite) TestAssignProject() {
 func (s *TestSuite) TestBucketNotAllowed() {
 	ctx := context.Background()
 
-	err := s.service.CreateProjectPolicy(ctx, "project2")
+	err := s.service.CreateProjectPolicy(ctx, testProjectName2)
 	s.Require().NoError(err)
 
-	accessKey, err := s.service.CreateUser(ctx, "foo", "foo12345678")
+	accessKey, err := s.service.CreateUser(ctx, testEmail, testPassword)
 	s.Require().NoError(err)
-	s.Require().Equal("user-foo", accessKey)
+	s.Require().Equal(testEmail, accessKey)
 
-	err = s.service.JoinProject(ctx, "foo", "project2")
+	err = s.service.JoinProject(ctx, testEmail, testProjectName2)
 	s.Require().NoError(err)
 
 	// User login
@@ -270,13 +262,13 @@ func (s *TestSuite) TestBucketNotAllowed() {
 	s.Require().NoError(err)
 
 	client, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4("user-foo", "foo12345678", ""),
+		Creds:  credentials.NewStaticV4(testEmail, testPassword, ""),
 		Secure: false,
 	})
 	s.Require().NoError(err)
 
 	// List objects shall fail
-	objectCh := client.ListObjects(ctx, "project1", minio.ListObjectsOptions{})
+	objectCh := client.ListObjects(ctx, testProjectName, minio.ListObjectsOptions{})
 	object := <-objectCh
 	s.Require().Error(object.Err)
 }
@@ -284,17 +276,17 @@ func (s *TestSuite) TestBucketNotAllowed() {
 func (s *TestSuite) TestDeletePolicy() {
 	ctx := context.Background()
 
-	err := s.service.CreateProjectPolicy(ctx, "project1")
+	err := s.service.CreateProjectPolicy(ctx, testProjectName)
 	s.Require().NoError(err)
 
-	err = s.service.DeleteProjectPolicy(ctx, "project1")
+	err = s.service.DeleteProjectPolicy(ctx, testProjectName)
 	s.Require().NoError(err)
 
 	policies, err := s.adminClient.ListCannedPolicies(ctx)
 	s.Require().NoError(err)
 
 	for policy := range policies {
-		s.Require().NotEqual("project1", policy)
+		s.Require().NotEqual(testProjectName, policy)
 	}
 }
 

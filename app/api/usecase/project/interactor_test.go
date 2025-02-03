@@ -93,7 +93,6 @@ func TestInteractor_Create(t *testing.T) {
 	const (
 		projectName           = "The Project Y"
 		projectDesc           = "The Project Y Description"
-		projectMinioAccessKey = "project-test-project" // derived from project ID
 		projectMinioSecretKey = "projectY123"
 		ownerUserID           = "user.1234"
 		ownerUsername         = "john"
@@ -119,7 +118,7 @@ func TestInteractor_Create(t *testing.T) {
 		RepoName: testProjectID,
 	}
 	createProject.MinioAccessKey = entity.MinioAccessKey{
-		AccessKey: projectMinioAccessKey,
+		AccessKey: testProjectID,
 		SecretKey: projectMinioSecretKey,
 	}
 
@@ -133,7 +132,7 @@ func TestInteractor_Create(t *testing.T) {
 			RepoName: testProjectID,
 		},
 		MinioAccessKey: entity.MinioAccessKey{
-			AccessKey: projectMinioAccessKey,
+			AccessKey: testProjectID,
 			SecretKey: projectMinioSecretKey,
 		},
 	}
@@ -164,7 +163,7 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.userActivityRepo.EXPECT().Create(ctx, userActivity).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(expectedProject, nil)
 	s.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(projectMinioSecretKey, nil)
-	s.mocks.minioAdminService.EXPECT().CreateProjectUser(ctx, testProjectID, projectMinioSecretKey).Return(projectMinioAccessKey, nil)
+	s.mocks.minioAdminService.EXPECT().CreateProjectUser(ctx, testProjectID, projectMinioSecretKey).Return(testProjectID, nil)
 	s.mocks.minioAdminService.EXPECT().CreateProjectPolicy(ctx, testProjectID).Return(nil)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
@@ -236,8 +235,8 @@ func TestInteractor_AddMembers(t *testing.T) {
 	}
 
 	usersToAdd := []entity.User{
-		{ID: "userA", Username: "user_a"},
-		{ID: "userB", Username: "user_b"},
+		{ID: "userA", Username: "user_a", Email: "user-a@example.com"},
+		{ID: "userB", Username: "user_b", Email: "user-b@example.com"},
 	}
 
 	newMembers := []entity.Member{
@@ -293,8 +292,8 @@ func TestInteractor_AddMembers(t *testing.T) {
 		},
 	).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
-	s.mocks.minioAdminService.EXPECT().JoinProject(ctx, "user-a", testProjectID).Return(nil)
-	s.mocks.minioAdminService.EXPECT().JoinProject(ctx, "user-b", testProjectID).Return(nil)
+	s.mocks.minioAdminService.EXPECT().JoinProject(ctx, "user-a@example.com", testProjectID).Return(nil)
+	s.mocks.minioAdminService.EXPECT().JoinProject(ctx, "user-b@example.com", testProjectID).Return(nil)
 
 	p, err := s.interactor.AddMembers(ctx, project.AddMembersOption{
 		ProjectID:  p.ID,
@@ -323,8 +322,8 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 	}
 
 	usersToRemove := []entity.User{
-		{ID: "userA", Username: "user_a"},
-		{ID: "userB", Username: "user_b"},
+		{ID: "userA", Username: "user_a", Email: "user-a@example.com"},
+		{ID: "userB", Username: "user_b", Email: "user-b@example.com"},
 	}
 
 	p := entity.NewProject(testProjectID, "project-x", "Project X")
@@ -387,8 +386,8 @@ func TestInteractor_RemoveMembers(t *testing.T) {
 		},
 	).Return(nil)
 	s.mocks.repo.EXPECT().Get(ctx, p.ID).Return(expectedProject, nil)
-	s.mocks.minioAdminService.EXPECT().LeaveProject(ctx, "user-a", testProjectID).Return(nil)
-	s.mocks.minioAdminService.EXPECT().LeaveProject(ctx, "user-b", testProjectID).Return(nil)
+	s.mocks.minioAdminService.EXPECT().LeaveProject(ctx, "user-a@example.com", testProjectID).Return(nil)
+	s.mocks.minioAdminService.EXPECT().LeaveProject(ctx, "user-b@example.com", testProjectID).Return(nil)
 
 	p, err := s.interactor.RemoveMembers(ctx, project.RemoveMembersOption{
 		ProjectID:  p.ID,

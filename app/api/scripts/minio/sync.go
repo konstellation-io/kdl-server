@@ -34,7 +34,7 @@ func SyncUsers(
 		}
 
 		// create the User in MinIO
-		accessKey, err := minioAdminService.CreateUser(ctx, u.UsernameSlug(), secretKey)
+		accessKey, err := minioAdminService.CreateUser(ctx, u.Email, secretKey)
 		if err != nil {
 			logger.Error(err, "Error creating a MinIO User", "username", u.Username)
 			return err
@@ -103,7 +103,7 @@ func SyncProjects(
 				return err
 			}
 
-			err = minioAdminService.JoinProject(ctx, u.UsernameSlug(), p.ID)
+			err = minioAdminService.JoinProject(ctx, u.Email, p.ID)
 			if err != nil {
 				logger.Error(err, "Error joining user to project", "username", u.Username, "projectID", p.ID)
 				return err

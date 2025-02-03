@@ -3,10 +3,13 @@ package minioadminservice
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"text/template"
 
+	"github.com/Masterminds/sprig/v3"
 	"github.com/go-logr/logr"
 	"github.com/minio/madmin-go/v2"
 
@@ -34,26 +37,26 @@ func NewMinioAdminService(logger logr.Logger, endpoint, accessKey, secretKey str
 	return &MinioAdminService{logger: logger, client: client}, nil
 }
 
-func (m *MinioAdminService) getUserAccessKey(userSlug string) string {
-	return fmt.Sprintf("user-%s", userSlug)
+func (m *MinioAdminService) getUserAccessKey(email string) string {
+	return email
 }
 
 func (m *MinioAdminService) getProjectAccessKey(projectName string) string {
-	return fmt.Sprintf("project-%s", projectName)
+	return projectName
 }
 
-func (m *MinioAdminService) CreateUser(ctx context.Context, userSlug, secretKey string) (string, error) {
-	if userSlug == "" {
-		return "", errEmptySlug
+func (m *MinioAdminService) CreateUser(ctx context.Context, email, secretKey string) (string, error) {
+	if email == "" {
+		return "", errEmptyEmail
 	}
 
-	accessKey := m.getUserAccessKey(userSlug)
+	accessKey := m.getUserAccessKey(email)
 
-	m.logger.Info("Creating user", "userSlug", userSlug, "accessKey", accessKey)
+	m.logger.Info("Creating user", "email", email, "accessKey", accessKey)
 
 	err := m.client.AddUser(ctx, accessKey, secretKey)
 	if err != nil {
-		return "", fmt.Errorf("failed to create user %s, access key %s: %w", userSlug, accessKey, err)
+		return "", fmt.Errorf("failed to create user %s, access key %s: %w", email, accessKey, err)
 	}
 
 	return accessKey, nil
@@ -92,10 +95,10 @@ func (m *MinioAdminService) removeUser(ctx context.Context, accessKey string) er
 	return err
 }
 
-func (m *MinioAdminService) DeleteUser(ctx context.Context, userSlug string) error {
-	accessKey := m.getUserAccessKey(userSlug)
+func (m *MinioAdminService) DeleteUser(ctx context.Context, email string) error {
+	accessKey := m.getUserAccessKey(email)
 
-	m.logger.Info("Deleting user", "userSlug", userSlug, "accessKey", accessKey)
+	m.logger.Info("Deleting user", "email", email, "accessKey", accessKey)
 
 	return m.removeUser(ctx, accessKey)
 }
@@ -108,22 +111,31 @@ func (m *MinioAdminService) DeleteProjectUser(ctx context.Context, projectName s
 	return m.removeUser(ctx, accessKey)
 }
 
-func (m *MinioAdminService) CreateProjectPolicy(ctx context.Context, projectName string) error {
-	tmpl, err := template.New("policy").Parse(policyTemplate)
-	if err != nil {
-		return fmt.Errorf("failed to parse policy template: %w", err)
-	}
-
+func (m *MinioAdminService) renderPolicy(bucketNames []string) ([]byte, error) {
 	var policyBuffer bytes.Buffer
-	err = tmpl.Execute(&policyBuffer, struct{ BucketName string }{BucketName: projectName})
 
+	tmpl, err := template.New("policy").Funcs(sprig.FuncMap()).Parse(policyTemplate)
 	if err != nil {
-		return fmt.Errorf("failed to apply policy template: %w", err)
+		return nil, fmt.Errorf("failed to parse policy template: %w", err)
 	}
 
+	err = tmpl.Execute(&policyBuffer, struct{ BucketNames []string }{BucketNames: bucketNames})
+	if err != nil {
+		return nil, fmt.Errorf("failed to apply policy template: %w", err)
+	}
+
+	return policyBuffer.Bytes(), nil
+}
+
+func (m *MinioAdminService) CreateProjectPolicy(ctx context.Context, projectName string) error {
 	m.logger.Info("Updating policy", "projectName", projectName)
 
-	err = m.client.AddCannedPolicy(ctx, projectName, policyBuffer.Bytes())
+	policy, err := m.renderPolicy([]string{projectName})
+	if err != nil {
+		return err
+	}
+
+	err = m.client.AddCannedPolicy(ctx, projectName, policy)
 	if err != nil {
 		return fmt.Errorf("failed to add policy %s: %w", projectName, err)
 	}
@@ -142,42 +154,122 @@ func (m *MinioAdminService) DeleteProjectPolicy(ctx context.Context, projectName
 	return err
 }
 
-func (m *MinioAdminService) updateProjectMembership(ctx context.Context, userSlug, projectName string, remove bool) error {
-	accessKey := m.getUserAccessKey(userSlug)
+func (m *MinioAdminService) updateProjectMembership(ctx context.Context, email, projectName string, remove bool) error {
+	accessKey := m.getUserAccessKey(email)
 
-	return m.client.UpdateGroupMembers(ctx, madmin.GroupAddRemove{
-		Group:    projectName,
-		IsRemove: remove,
-		Members:  []string{accessKey},
-	})
-}
-
-func (m *MinioAdminService) JoinProject(ctx context.Context, userSlug, projectName string) error {
-	m.logger.Info("Adding user to project group", "userSlug", userSlug, "projectName", projectName)
-
-	err := m.updateProjectMembership(ctx, userSlug, projectName, false)
+	buckets, err := m.extractBucketsFromPolicy(ctx, accessKey)
 	if err != nil {
-		return fmt.Errorf("failed to add user %s to group %s: %w", userSlug, projectName, err)
+		return err
 	}
 
-	/* Adding group to policy. This has to be done after adding a user to group,
-	because the first user creates the group itself. */
-	m.logger.Info("Associating homonimous group to policy", "policyName", projectName)
+	// Add or remove project bucket from list
+	if remove {
+		for i, bucket := range buckets {
+			if bucket == projectName {
+				buckets = append(buckets[:i], buckets[i+1:]...)
+				break
+			}
+		}
+	} else {
+		buckets = append(buckets, projectName)
+	}
 
-	err = m.client.SetPolicy(ctx, projectName, projectName, true)
+	// re-render and save the policy
+	policy, err := m.renderPolicy(buckets)
 	if err != nil {
-		return fmt.Errorf("failed associate group to policy %s: %w", projectName, err)
+		return err
+	}
+
+	err = m.client.AddCannedPolicy(ctx, accessKey, policy)
+	if err != nil {
+		return fmt.Errorf("failed to update policy %s: %w", accessKey, err)
+	}
+
+	// Associate user to his policy (idempotent)
+	err = m.client.SetPolicy(ctx, accessKey, accessKey, false)
+	if err != nil {
+		return fmt.Errorf("failed associate user to his policy %s: %w", accessKey, err)
 	}
 
 	return err
 }
 
-func (m *MinioAdminService) LeaveProject(ctx context.Context, userSlug, projectName string) error {
-	m.logger.Info("Removing user from project group", "userSlug", userSlug, "projectName", projectName)
-
-	err := m.updateProjectMembership(ctx, userSlug, projectName, true)
+func (m *MinioAdminService) extractBucketsFromPolicy(ctx context.Context, policyName string) ([]string, error) {
+	// Retrieve existing policy
+	policy, err := m.client.InfoCannedPolicyV2(ctx, policyName)
 	if err != nil {
-		return fmt.Errorf("failed to remove user %s from group %s: %w", userSlug, projectName, err)
+		var target madmin.ErrorResponse
+
+		if errors.As(err, &target) && target.Code == "XMinioAdminNoSuchPolicy" {
+			m.logger.Info("Previous policy not found, assuming empty.", "policyName", policyName)
+			return []string{}, nil
+		}
+
+		return nil, fmt.Errorf("failed to retrieve existing policy %s: %w", policyName, err)
+	}
+
+	// Parse policy data
+	var policyData map[string]interface{}
+	if err := json.Unmarshal(policy.Policy, &policyData); err != nil {
+		return nil, fmt.Errorf("failed to parse policy data: %w", err)
+	}
+
+	// Iterate of policy resources (assume single statement)
+	bucketNames := []string{}
+
+	statementList, ok := policyData["Statement"].([]interface{})
+	if !ok || len(statementList) == 0 {
+		return nil, fmt.Errorf("failed to retrieve policy statement: %w", err)
+	}
+
+	statement, ok := statementList[0].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("failed to parse policy statement: %w", err)
+	}
+
+	resources, ok := statement["Resource"].([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("failed to get resources from policy statement: %w", err)
+	}
+
+	for _, resource := range resources {
+		var resourceStr string
+
+		resourceStr, ok = resource.(string)
+		if !ok {
+			return nil, fmt.Errorf("failed to parse resource string: %w", err)
+		}
+
+		// skip resource if it contains an asterisk
+		if strings.Contains(resourceStr, "*") {
+			continue
+		}
+
+		// strip arn address from resource to get bucket name
+		bucketName := resourceStr[len("arn:aws:s3:::"):]
+		bucketNames = append(bucketNames, bucketName)
+	}
+
+	return bucketNames, nil
+}
+
+func (m *MinioAdminService) JoinProject(ctx context.Context, email, projectName string) error {
+	m.logger.Info("Adding project bucket to user policy", "email", email, "projectName", projectName)
+
+	err := m.updateProjectMembership(ctx, email, projectName, false)
+	if err != nil {
+		return fmt.Errorf("failed to add user %s to group %s: %w", email, projectName, err)
+	}
+
+	return nil
+}
+
+func (m *MinioAdminService) LeaveProject(ctx context.Context, email, projectName string) error {
+	m.logger.Info("Removing project bucket from user policy", "email", email, "projectName", projectName)
+
+	err := m.updateProjectMembership(ctx, email, projectName, true)
+	if err != nil {
+		return fmt.Errorf("failed to remove user %s from group %s: %w", email, projectName, err)
 	}
 
 	return err

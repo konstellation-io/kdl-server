@@ -139,14 +139,6 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 		SSHKey:       keys,
 	}
 
-	insertedID, err := i.repo.Create(ctx, user)
-	if err != nil {
-		i.logger.Error(err, "Error creating user", "username", username, "email", email)
-		return entity.User{}, err
-	}
-
-	i.logger.Info("The user was created", "username", user.Username, "userEmail", user.Email, "insertedID", insertedID)
-
 	err = i.k8sClient.CreateUserSSHKeySecret(ctx, user, keys.Public, keys.Private)
 	if err != nil {
 		i.logger.Error(err, "Error creating ssh key secret", "username", username)
@@ -154,9 +146,7 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 	}
 
 	// Created a service account for the user
-	slug := user.UsernameSlug()
-
-	_, err = i.k8sClient.CreateUserServiceAccount(ctx, slug)
+	_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
 	if err != nil {
 		i.logger.Error(err, "Error creating service account", "username", username)
 		return entity.User{}, err
@@ -168,11 +158,19 @@ func (i *Interactor) Create(ctx context.Context, email, sub string, accessLevel 
 		return entity.User{}, err
 	}
 
-	user.MinioAccessKey.AccessKey, err = i.minioAdminService.CreateUser(ctx, slug, user.MinioAccessKey.SecretKey)
+	user.MinioAccessKey.AccessKey, err = i.minioAdminService.CreateUser(ctx, user.Email, user.MinioAccessKey.SecretKey)
 	if err != nil {
 		i.logger.Error(err, "Error creating a MinIO user", "accessKey", user.MinioAccessKey.AccessKey)
 		return entity.User{}, err
 	}
+
+	insertedID, err := i.repo.Create(ctx, user)
+	if err != nil {
+		i.logger.Error(err, "Error creating user", "username", username, "email", email)
+		return entity.User{}, err
+	}
+
+	i.logger.Info("The user was created", "username", user.Username, "userEmail", user.Email, "insertedID", insertedID)
 
 	// Save user creation in user activity
 	createUserActVars := entity.NewActivityVarsWithUserID(insertedID)
@@ -254,6 +252,7 @@ func (i *Interactor) StartTools(ctx context.Context, email string, runtimeID, ca
 
 	data.Username = user.Username
 	data.SlugUsername = user.UsernameSlug()
+	data.MinioAccessKey = user.MinioAccessKey
 
 	err = i.k8sClient.CreateKDLUserToolsCR(ctx, data)
 	if err != nil {

@@ -75,7 +75,7 @@ func (i *interactor) AddMembers(ctx context.Context, opt AddMembersOption) (enti
 
 	// Add new members to the project on MinIO
 	for _, u := range opt.Users {
-		err = i.minioAdminService.JoinProject(ctx, u.UsernameSlug(), opt.ProjectID)
+		err = i.minioAdminService.JoinProject(ctx, u.Email, opt.ProjectID)
 		if err != nil {
 			return entity.Project{}, fmt.Errorf("%w: user ID=%s", err, u.ID)
 		}
@@ -153,7 +153,7 @@ func (i *interactor) RemoveMembers(ctx context.Context, opt RemoveMembersOption)
 
 	// Remove members from the project on MinIO
 	for _, u := range opt.Users {
-		err = i.minioAdminService.LeaveProject(ctx, u.UsernameSlug(), opt.ProjectID)
+		err = i.minioAdminService.LeaveProject(ctx, u.Email, opt.ProjectID)
 		if err != nil {
 			return entity.Project{}, fmt.Errorf("%w: user ID=%s", err, u.ID)
 		}

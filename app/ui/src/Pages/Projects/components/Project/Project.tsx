@@ -99,7 +99,7 @@ const LowerBg: FC<BaseProps> = ({ project }) => (
 
 function Band({ project }: BaseProps) {
   const { data: dataMe, error: errorMe, loading: loadingMe } = useQuery<GetMe>(GetMeQuery);
-  const canAccess = dataMe?.me?.accessLevel != AccessLevel.VIEWER;
+  const hasAccess = dataMe?.me?.accessLevel != AccessLevel.VIEWER;
 
   const {
     archiveProjectAction: { updateProjectArchived, loading },
@@ -121,7 +121,7 @@ function Band({ project }: BaseProps) {
             Archived
           </div>
         )}
-        {project.archived && canAccess && (
+        {project.archived && hasAccess && (
           <Button label="Unarchive" className={styles.labelUnarchive} primary onClick={unarchivePrj} />
         )}
         {project.needAccess && <div className={styles.labelNoAccess}>No Access</div>}

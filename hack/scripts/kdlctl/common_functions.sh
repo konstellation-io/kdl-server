@@ -4,11 +4,6 @@
 # shellcheck disable=SC2028 # https://github.com/koalaman/shellcheck/wiki/SC2028
 # shellcheck disable=SC2034 # https://github.com/koalaman/shellcheck/wiki/SC2034
 
-replace_env_vars() {
-  echo_wait "replacing env vars"
-  ./scripts/replace_env_path.sh > /dev/null 2>&1
-}
-
 run() {
   set -e
   # shellcheck disable=SC2048
@@ -16,7 +11,7 @@ run() {
     echo_run "$*"
     $*
   else
-    $* > /dev/null 2>&1
+    $* >/dev/null 2>&1
   fi
 }
 
@@ -65,7 +60,6 @@ check_not_empty() {
   return 0
 }
 
-
 ## Print lines helpers (NO DIRECT COLORING, call echo_<color> instead)
 echo_run() {
   echo_info "  🏃 $*"
@@ -101,7 +95,7 @@ echo_done() {
 
 echo_debug() {
   if [ "$DEBUG" = "1" ]; then
-      echo "$* $*\n" "$(echo_red "[DEBUG]")" "$@"
+    echo "$* $*\n" "$(echo_red "[DEBUG]")" "$@"
   fi
 }
 

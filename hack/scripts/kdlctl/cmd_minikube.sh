@@ -37,14 +37,9 @@ minikube_start() {
       --disk-size="${MINIKUBE_DISK_SIZE}" \
       --driver="${MINIKUBE_DRIVER:-docker}" \
       --insecure-registry="${MINIKUBE_INSECURE_REGISTRY_CIDR}" \
+      --addons="${MINIKUBE_ADDONS}" \
       --delete-on-failure=true \
       --force || exit 1
-
-    run minikube addons enable ingress -p "${MINIKUBE_PROFILE}"
-    run minikube addons enable registry -p "${MINIKUBE_PROFILE}"
-    run minikube addons enable registry-aliases -p "${MINIKUBE_PROFILE}"
-    run minikube addons enable storage-provisioner -p "${MINIKUBE_PROFILE}"
-    run minikube addons enable metrics-server -p "${MINIKUBE_PROFILE}"
     ;;
   esac
 

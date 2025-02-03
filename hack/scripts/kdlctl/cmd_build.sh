@@ -7,9 +7,9 @@ cmd_build() {
 show_build_help() {
   echo "$(help_global_header "build")
 
-    Build all KDL docker images.
+Build all KDL docker images.
 
-    $(help_global_options)
+$(help_global_options)
 "
 }
 
@@ -48,26 +48,37 @@ build_mlflow() {
 }
 
 build_kg() {
-    if [ "$KNOWLEDGE_GALAXY_LOCAL" != "true"  ]; then
-        echo_info "ℹ️ Knowledge Galaxy disabled. skipping build."
-        return
-    fi
+  if [ "$KNOWLEDGE_GALAXY_LOCAL" != "true" ]; then
+    echo_info "ℹ️ Knowledge Galaxy disabled. skipping build."
+    return
+  fi
 
-    if [ ! -d $KNOWLEDGE_GALAXY_PATH ] || [ -z $KNOWLEDGE_GALAXY_PATH ]; then
-      echo_warning "\$KNOWLEDGE_GALAXY_PATH=\"${KNOWLEDGE_GALAXY_PATH}\" is invalid. skipping build."
-      return
-    fi
+  if [ ! -d $KNOWLEDGE_GALAXY_PATH ] || [ -z $KNOWLEDGE_GALAXY_PATH ]; then
+    echo_warning "\$KNOWLEDGE_GALAXY_PATH=\"${KNOWLEDGE_GALAXY_PATH}\" is invalid. skipping build."
+    return
+  fi
 
-    build_image kdl-knowledge-galaxy $KNOWLEDGE_GALAXY_PATH
+  build_image kdl-knowledge-galaxy $KNOWLEDGE_GALAXY_PATH
+}
+
+setup_env() {
+  if [ "$SETUP_ENV" = 1 ]; then
+    return
+  fi
+
+  # Setup environment to build images inside minikube
+  eval "$(minikube docker-env -p "$MINIKUBE_PROFILE")"
+  SETUP_ENV=1
 }
 
 build_image() {
-  NAME=$1
-  FOLDER=$2
+  setup_env
+
+  NAME="$1"
+  FOLDER="$2"
   echo_build_header "$NAME"
 
-  run docker build --network host -t ${DOCKER_REGISTRY_HOST}:32000/konstellation/"${NAME}":latest "../$FOLDER"
-  run docker push ${DOCKER_REGISTRY_HOST}:32000/konstellation/"${NAME}":latest
+  docker build -t "konstellation/${NAME}:latest" "../${FOLDER}"
 }
 
 echo_build_header() {

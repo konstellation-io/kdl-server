@@ -25,8 +25,8 @@ show_deploy_help() {
 }
 
 deploy() {
-  HOST_IP=$(minikube -p $MINIKUBE_PROFILE ip)
-  export DOMAIN=kdl.$HOST_IP.nip.io
+  export HOST_IP="$(minikube -p ${MINIKUBE_PROFILE} ip)"
+  export DOMAIN="kdl.${HOST_IP}.nip.io"
 
   if [ "$BUILD_DOCKER_IMAGES" = "1" ]; then
     build_docker_images
@@ -34,7 +34,14 @@ deploy() {
 
   ./scripts/create_nginx_ingress_configmap.sh
 
+  update_host_ip
+
   deploy_helm_chart
+}
+
+update_host_ip() {
+  echo_info "Updating HOST_IP value to $HOST_IP"
+  envsubst '$HOST_IP' <./scripts/helmfile/values/initial-resources/values.yaml.tpl >./scripts/helmfile/values/initial-resources/values.yaml
 }
 
 get_kubectl_dry_run() {

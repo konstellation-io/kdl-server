@@ -3,26 +3,13 @@ nameOverride: minio
 
 mode: standalone
 
-image:
-  repository: quay.io/minio/minio
-  tag: RELEASE.2024-04-18T19-09-19Z
-  pullPolicy: IfNotPresent
-
-mcImage:
-  repository: quay.io/minio/mc
-  tag: RELEASE.2024-04-18T16-45-29Z
-  pullPolicy: IfNotPresent
-
-mode: standalone
-
 minioAPIPort: "9000"
 minioConsolePort: "9001"
 
-rootUser: minio
-rootPassword: minio123
+rootUser: {{ .Values.minio_access_key }}
+rootPassword: {{ .Values.minio_secret_key }}
 
 configPathmc: "/etc/minio/mc/"
-
 mountPath: "/export"
 
 tls:
@@ -36,8 +23,7 @@ trustedCertsSecret: ""
 persistence:
   enabled: true
   storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
-  existingClaim: "kdl-local-claim"
-  size: 1Gi
+  size: 5Gi
   accessMode: ReadWriteOnce
 
 ingress:
@@ -45,7 +31,6 @@ ingress:
   ingressClassName: public
   annotations:
     cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-    nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
   path: /
   hosts:
     - minio.{{ requiredEnv "DOMAIN" }}
@@ -59,7 +44,6 @@ consoleIngress:
   ingressClassName: public
   annotations:
     cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-    nginx.ingress.kubernetes.io/proxy-body-size: "1000000m"
   path: /
   hosts:
     - minio-console.{{ requiredEnv "DOMAIN" }}

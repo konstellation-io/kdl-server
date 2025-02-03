@@ -92,7 +92,7 @@ releases:
       - template: default
 
   # ref: https://github.com/minio/minio/blob/RELEASE.2024-11-07T00-52-20Z/helm/minio/values.yaml
-  - name: "minio"
+  - name: minio
     chart: minio/minio
     version: 5.3.0
     namespace: kdl

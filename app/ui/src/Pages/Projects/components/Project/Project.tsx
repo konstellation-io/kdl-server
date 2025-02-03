@@ -4,6 +4,10 @@ import React, { FC } from 'react';
 import { capitalize } from 'lodash';
 import RepositoryIcon, { LOCATION } from 'Pages/NewProject/pages/RepositoryIcon/RepositoryIcon';
 
+import { useQuery, useReactiveVar } from '@apollo/client';
+import { GetMe } from 'Graphql/queries/types/GetMe';
+import GetMeQuery from 'Graphql/queries/getMe';
+
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
@@ -94,6 +98,9 @@ const LowerBg: FC<BaseProps> = ({ project }) => (
 );
 
 function Band({ project }: BaseProps) {
+  const { data: dataMe, error: errorMe, loading: loadingMe } = useQuery<GetMe>(GetMeQuery);
+  const canAccess = dataMe?.me?.accessLevel != AccessLevel.VIEWER;
+
   const {
     archiveProjectAction: { updateProjectArchived, loading },
   } = useProject({ onUpdateCompleted: handleUpdateCompleted });
@@ -114,7 +121,7 @@ function Band({ project }: BaseProps) {
             Archived
           </div>
         )}
-        {project.archived && (
+        {project.archived && canAccess && (
           <Button label="Unarchive" className={styles.labelUnarchive} primary onClick={unarchivePrj} />
         )}
         {project.needAccess && <div className={styles.labelNoAccess}>No Access</div>}

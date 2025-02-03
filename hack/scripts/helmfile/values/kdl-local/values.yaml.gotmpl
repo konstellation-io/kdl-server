@@ -3,6 +3,18 @@ global:
   domain: {{ requiredEnv "DOMAIN" | quote }}
   enableHttps: true
 
+service:
+  healthPath: /healthz
+
+livenessProbe:
+  enabled: true
+
+readinessProbe:
+  enabled: true
+
+startupProbe:
+  enabled: true
+
 image:
   repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-server
   tag: latest

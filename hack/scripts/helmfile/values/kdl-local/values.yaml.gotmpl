@@ -8,17 +8,13 @@ service:
 
 livenessProbe:
   enabled: true
-  initialDelaySeconds: 5
+  initialDelaySeconds: 10
 
 readinessProbe:
   enabled: true
 
-startupProbe:
-  enabled: true
-  initialDelaySeconds: 0
-
 image:
-  repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-server
+  repository: konstellation/kdl-server
   tag: latest
   pullPolicy: Always
 
@@ -56,7 +52,7 @@ keycloak:
 
   ingress:
     enabled: true
-    className: public
+    className: nginx
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
     hosts:
@@ -123,7 +119,7 @@ minio:
 
   ingress:
     enabled: false
-    ingressClassName: public
+    ingressClassName: nginx
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
       nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
@@ -137,7 +133,7 @@ minio:
 
   consoleIngress:
     enabled: true
-    ingressClassName: public
+    ingressClassName: nginx
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
       nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
@@ -178,16 +174,13 @@ oauth2proxy:
         }
       nginx.ingress.kubernetes.io/server-snippet: |
         add_header Cache-Control "no-cache, no-store, must-revalidate";
-    className: public
+    className: nginx
     path: /
     pathType: ImplementationSpecific
     hosts:
       - kdlapp.{{ requiredEnv "DOMAIN" }}
 
   httpScheme: http
-
-  image:
-    tag: "v7.7.1"
 
   config:
     clientID: proxy
@@ -256,7 +249,7 @@ projectOperator:
   enabled: true
 
   image:
-    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-project-operator
+    repository: konstellation/kdl-project-operator
     pullPolicy: Always
     tag: latest
 
@@ -265,7 +258,7 @@ projectOperator:
       domain: {{ requiredEnv "DOMAIN" | quote }}
       mlflow:
         image:
-          repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-mlflow
+          repository: konstellation/kdl-mlflow
           pullPolicy: Always
           tag: latest
 
@@ -273,7 +266,7 @@ projectOperator:
           enabled: true
           tls:
             enabled: true
-          className: public
+          className: nginx
           annotations:
             cert-manager.io/cluster-issuer: selfsigned-clusterissuer
             nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
@@ -292,7 +285,7 @@ projectOperator:
 
       filebrowser:
         image:
-          repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-filebrowser
+          repository: konstellation/kdl-filebrowser
           pullPolicy: Always
           tag: latest
 
@@ -311,7 +304,7 @@ userToolsOperator:
   enabled: true
 
   image:
-    repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-user-tools-operator
+    repository: konstellation/kdl-user-tools-operator
     tag: latest
     pullPolicy: Always
 
@@ -326,9 +319,9 @@ userToolsOperator:
 
       repoCloner:
         image:
-          repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-repo-cloner
+          repository: konstellation/kdl-repo-cloner
           pullPolicy: Always
-          tag: "latest"
+          tag: latest
 
         env:
           KDL_SERVER_MONGODB_URI: "mongodb://{{ .Values.mongodb_user }}:{{ .Values.mongodb_password }}@mongodb-svc.mongodb:27017/{{ .Values.mongodb_user }}?authSource={{ .Values.mongodb_user }}&authMechanism=SCRAM-SHA-256"

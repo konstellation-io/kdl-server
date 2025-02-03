@@ -12,6 +12,7 @@ show_login_help() {
 }
 
 local_login() {
+  HOST_IP=$(minikube -p $MINIKUBE_PROFILE ip)
   LINK=https://kdlapp.kdl.$HOST_IP.nip.io
   echo "Login link  : ${LINK}"
   echo "👤 User     : ${KEYCLOAK_DEFAULT_USER}"

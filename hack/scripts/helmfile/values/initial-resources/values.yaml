@@ -428,6 +428,7 @@ resources:
                 "oidc.ciba.grant.enabled": "false",
                 "client.secret.creation.time": "1733141642",
                 "backchannel.logout.session.required": "true",
+                "post.logout.redirect.uris": "+",
                 "display.on.consent.screen": "false",
                 "oauth2.device.authorization.grant.enabled": "false",
                 "backchannel.logout.revoke.offline.tokens": "false"
@@ -435,6 +436,25 @@ resources:
               "authenticationFlowBindingOverrides": {},
               "fullScopeAllowed": true,
               "nodeReRegistrationTimeout": -1,
+              "protocolMappers": [
+                {
+                  "id": "e8b15cab-eb5a-4bad-a93f-b78bead3f753",
+                  "name": "email to policy",
+                  "protocol": "openid-connect",
+                  "protocolMapper": "oidc-usermodel-attribute-mapper",
+                  "consentRequired": false,
+                  "config": {
+                    "introspection.token.claim": "true",
+                    "userinfo.token.claim": "true",
+                    "user.attribute": "email",
+                    "id.token.claim": "true",
+                    "lightweight.claim": "false",
+                    "access.token.claim": "true",
+                    "claim.name": "policy",
+                    "jsonType.label": "String"
+                  }
+                }
+              ],
               "defaultClientScopes": [
                 "web-origins",
                 "acr",

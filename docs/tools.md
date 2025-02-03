@@ -7,8 +7,8 @@ Follow these steps to setup your development environment:
 
   ```console
   # ubuntu
-  curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
-  sudo dpkg -i minikube_latest_amd64.deb
+  curl -LO https://github.com/kubernetes/minikube/releases/download/v1.35.0/minikube_1.35.0-0_amd64.deb
+  sudo dpkg -i minikube_1.35.0-0_amd64.deb
 
   # macos
   brew install minikube

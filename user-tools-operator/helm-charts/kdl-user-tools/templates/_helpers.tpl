@@ -53,17 +53,6 @@ kdl-user-tools/usernameSlug: {{ .Values.usernameSlug | quote }}
 {{- end }}
 
 {{/*
-Create the name of the service account to use
-*/}}
-{{- define "kdl-user-tools.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
-{{- default (include "kdl-user-tools.fullname" .) .Values.serviceAccount.name -}}
-{{- else -}}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Ref: https://github.com/aws/karpenter-provider-aws/blob/main/charts/karpenter/templates/_helpers.tpl
 Patch the label selector on an object
 This template will add a labelSelector using matchLabels to the object referenced at _target if there is no labelSelector specified.

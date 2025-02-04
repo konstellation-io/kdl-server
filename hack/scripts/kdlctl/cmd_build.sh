@@ -17,6 +17,7 @@ $(help_global_options)
 }
 
 build_docker_images() {
+  setup_env
   build_server
   build_project_operator
   build_user_tools_operator
@@ -24,6 +25,7 @@ build_docker_images() {
   build_filebrowser
   build_mlflow
   build_kg
+  clean_env
 }
 
 build_server() {
@@ -70,17 +72,36 @@ setup_env() {
   fi
 
   # Setup environment to build images inside minikube
-  eval "$(minikube docker-env -p "$MINIKUBE_PROFILE")"
+  eval "$(minikube docker-env -p "${MINIKUBE_PROFILE}")"
+
+  # if [ "${OS}" = "Darwin" ]; then
+  if [ -z "$(docker ps --format "{{.Names}}" | egrep -E '^(socat)$')" ]; then
+    docker run --name socat --rm -it -d --network=host alpine ash \
+      -c "apk add socat && socat TCP-LISTEN:5000,reuseaddr,fork TCP:$(minikube ip -p "${MINIKUBE_PROFILE}"):5000" &&
+      curl -s -o /dev/null --connect-timeout 2 "http://${IMAGE_REGISTRY}/v2/_catalog" 2>/dev/null ||
+      exit 1
+  fi
+  # fi
+
   SETUP_ENV=1
+}
+
+clean_env() {
+  # if [ "${OS}" = "Darwin" ]; then
+  docker ps --format "{{.Names}}" | egrep -E '^(socat)$' | xargs --no-run-if-empty docker stop
+  # fi
 }
 
 build_image() {
   NAME="$1"
   FOLDER="$2"
   echo_build_header "$NAME"
-  setup_env
 
+  # if [ "${OS}" = "Darwin" ]; then
+  # works with IMAGE_REGISTRY="localhost:5000"
   docker build -t ${IMAGE_REGISTRY}/konstellation/${NAME}:latest ../${FOLDER} || exit 1
+  docker push ${IMAGE_REGISTRY}/konstellation/${NAME}:latest || exit 1
+  # fi
 }
 
 echo_build_header() {

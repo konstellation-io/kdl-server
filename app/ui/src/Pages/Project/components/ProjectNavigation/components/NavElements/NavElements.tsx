@@ -96,7 +96,15 @@ function NavElements({ isOpened }: Props) {
         >
           <div className={cx(styles.usertoolsOptions, { [styles.opened]: isOpened })}>
             <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
-              <div className={styles.userToolLabel}>USER TOOLS</div>
+              <div
+                className={cx(styles.userToolLabel, {
+                  [styles.pending]: runtimeRunning,
+                  [styles.running]: !runtimeRunning,
+                  [styles.error]: isLoading,
+                })}
+              >
+                USER TOOLS
+              </div>
             </AnimateHeight>
             <div
               className={cx(styles.usertoolsSettings, { [styles.opened]: isOpened })}

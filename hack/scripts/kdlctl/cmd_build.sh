@@ -1,6 +1,9 @@
 #!/bin/sh
 
 cmd_build() {
+  # initialize vars
+  SETUP_ENV=0
+
   build_docker_images
 }
 
@@ -72,13 +75,12 @@ setup_env() {
 }
 
 build_image() {
-  setup_env
-
   NAME="$1"
   FOLDER="$2"
   echo_build_header "$NAME"
+  setup_env
 
-  docker build -t "konstellation/${NAME}:latest" "../${FOLDER}"
+  docker build -t ${IMAGE_REGISTRY}/konstellation/${NAME}:latest ../${FOLDER} || exit 1
 }
 
 echo_build_header() {

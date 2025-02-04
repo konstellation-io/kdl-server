@@ -1,6 +1,10 @@
 #!/bin/sh
 
 cmd_dev() {
+  # initialize vars
+  MINIKUBE_CLEAN=0
+  SKIP_BUILD=0
+
   minikube_start "$@"
 
   # NOTE: Use this loop to capture multiple unsorted args
@@ -20,7 +24,7 @@ cmd_dev() {
     --clean)
       MINIKUBE_CLEAN=1
       shift
-    ;;
+      ;;
 
     *)
       shift

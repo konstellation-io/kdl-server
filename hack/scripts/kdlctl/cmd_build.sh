@@ -74,14 +74,22 @@ setup_env() {
   # Setup environment to build images inside minikube
   eval "$(minikube docker-env -p "${MINIKUBE_PROFILE}")"
 
+  MINIKUBE_IP=$(minikube ip -p "${MINIKUBE_PROFILE}")
   # if [ "${OS}" = "Darwin" ]; then
   if [ -z "$(docker ps --format "{{.Names}}" | egrep -E '^(socat)$')" ]; then
+    echo_run "Setting up socat"
     docker run --name socat --rm -it -d --network=host alpine ash \
-      -c "apk add socat && socat TCP-LISTEN:5000,reuseaddr,fork TCP:$(minikube ip -p "${MINIKUBE_PROFILE}"):5000" &&
-      curl -s -o /dev/null --connect-timeout 2 "http://${IMAGE_REGISTRY}/v2/_catalog" 2>/dev/null ||
+      -c "apk add socat && socat TCP-LISTEN:5000,reuseaddr,fork TCP:${MINIKUBE_IP}):5000"||
       exit 1
   fi
   # fi
+
+  # wait for registry to be ready
+  echo_run "Waiting for registry to be ready"
+  until [ $(curl -s --connect-timeout 1 "http://${MINIKUBE_IP}:5000/v2/_catalog") ]; do
+    printf "."
+    sleep 5
+  done
 
   SETUP_ENV=1
 }

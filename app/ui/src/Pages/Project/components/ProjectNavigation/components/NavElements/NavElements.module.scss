@@ -34,10 +34,6 @@
       white-space: nowrap;
       margin-left: 2 * $grid-unit;
       @include circle-before(#3d3d3d);
-      &.null:before {
-        background-color: #3d3d3d;
-        top: $grid-unit - 5px;
-      }
       &.pending:before {
         background-color: palette(alert);
         top: $grid-unit - 5px;

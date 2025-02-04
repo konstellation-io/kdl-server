@@ -18,7 +18,7 @@ function buildRuntime(_) {
     dockerImage: casual.url,
     dockerTag: casual.numerify('#.##'),
     runtimePod: casual.url,
-    runningPodStatus: casual.random_element(['success', 'pending', 'error', null]),
+    runningPodStatus: casual.random_element(['success', 'pending', 'error']),
   };
 }
 

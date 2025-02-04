@@ -98,13 +98,10 @@ function NavElements({ isOpened }: Props) {
             <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
               <div
                 className={cx(styles.userToolLabel, {
-                  [styles.null]: runtimeRunning?.runtimePodStatus === null,
                   [styles.pending]: runtimeRunning?.runtimePodStatus === 'pending',
                   [styles.running]: runtimeRunning?.runtimePodStatus === 'running',
                   [styles.error]:
-                    runtimeRunning?.runtimePodStatus !== 'running' &&
-                    runtimeRunning?.runtimePodStatus !== 'pending' &&
-                    runtimeRunning?.runtimePodStatus !== null,
+                    runtimeRunning?.runtimePodStatus !== 'running' && runtimeRunning?.runtimePodStatus !== 'pending',
                 })}
               >
                 USER TOOLS

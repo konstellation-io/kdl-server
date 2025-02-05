@@ -7,6 +7,9 @@ show_help() {
   *dev*)
     show_dev_help
     ;;
+  *kdl*)
+    show_build_kdl_help
+    ;;
   *etchost*)
     show_etchost_help
     ;;
@@ -54,6 +57,7 @@ show_root_help() {
 
     commands:
       dev           creates a complete local environment.
+      kdl           build and upload KDL server image.
       start         starts minikube.
       stop          stops minikube.
       build         calls docker to build all images and push them to minikube registry.

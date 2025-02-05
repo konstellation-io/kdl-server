@@ -4,12 +4,20 @@ import React, { FC } from 'react';
 import { capitalize } from 'lodash';
 import RepositoryIcon, { LOCATION } from 'Pages/NewProject/pages/RepositoryIcon/RepositoryIcon';
 
+import { useQuery, useReactiveVar } from '@apollo/client';
+import { GetMe } from 'Graphql/queries/types/GetMe';
+import GetMeQuery from 'Graphql/queries/getMe';
+
 import { GetProjects_projects } from 'Graphql/queries/types/GetProjects';
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import { formatDate } from 'Utils/format';
 import styles from './Project.module.scss';
 import { ProjectAdmins } from '../../Projects';
+
+import { Button } from 'kwc';
+import useProject from 'Graphql/hooks/useProject';
+import { toast } from 'react-toastify';
 
 type BaseProps = {
   project: GetProjects_projects;
@@ -22,6 +30,7 @@ type Props = {
 
 function Project({ project, showAdmins }: Props) {
   const disabled = project.needAccess || project.archived;
+
   const Component = (
     <div
       data-testid="project"
@@ -88,19 +97,39 @@ const LowerBg: FC<BaseProps> = ({ project }) => (
   </div>
 );
 
-const Band: FC<BaseProps> = ({ project }) => (
-  <div className={styles.band}>
-    <div className={styles.otherLabels}>
-      {project.archived && (
-        <div className={styles.labelArchived} data-testid="projectArchived">
-          Archived
-        </div>
-      )}
-      {project.needAccess && <div className={styles.labelNoAccess}>No Access</div>}
+function Band({ project }: BaseProps) {
+  const { data: dataMe, error: errorMe, loading: loadingMe } = useQuery<GetMe>(GetMeQuery);
+  const hasAccess = dataMe?.me?.accessLevel != AccessLevel.VIEWER;
+
+  const {
+    archiveProjectAction: { updateProjectArchived, loading },
+  } = useProject({ onUpdateCompleted: handleUpdateCompleted });
+
+  function unarchivePrj() {
+    updateProjectArchived(project.id, false);
+  }
+
+  function handleUpdateCompleted() {
+    toast.info('The project has been unarchived successfully!');
+  }
+
+  return (
+    <div className={styles.band}>
+      <div className={styles.otherLabels}>
+        {project.archived && (
+          <div className={styles.labelArchived} data-testid="projectArchived">
+            Archived
+          </div>
+        )}
+        {project.archived && hasAccess && (
+          <Button label="Unarchive" className={styles.labelUnarchive} primary onClick={unarchivePrj} />
+        )}
+        {project.needAccess && <div className={styles.labelNoAccess}>No Access</div>}
+      </div>
+      {project.error && <div className={styles.warning}>WARNING</div>}
     </div>
-    {project.error && <div className={styles.warning}>WARNING</div>}
-  </div>
-);
+  );
+}
 
 const Square: FC<BaseProps> = ({ project }) => (
   <div className={styles.square}>

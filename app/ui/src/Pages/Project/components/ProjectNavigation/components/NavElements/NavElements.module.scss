@@ -28,10 +28,28 @@
 
     .userToolLabel {
       @include font-caption;
+      display: flex;
       color: font-color(regular);
       width: 100%;
       white-space: nowrap;
-      margin-left: 5 * $grid-unit;
+      margin-left: 2 * $grid-unit;
+      @include circle-before(#3d3d3d);
+      &.pending:before {
+        background-color: palette(alert);
+        top: $grid-unit - 5px;
+      }
+      &.running:before {
+        background-color: palette(success);
+        top: $grid-unit - 5px;
+      }
+      &.error:before {
+        background-color: palette(error);
+        top: $grid-unit - 5px;
+      }
+      padding-left: 3 * $grid-unit;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
     }
 
     .usertoolsIcon {
@@ -110,4 +128,3 @@
     }
   }
 }
-

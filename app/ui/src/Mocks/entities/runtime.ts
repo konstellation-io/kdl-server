@@ -1,3 +1,4 @@
+import { PodStatus } from 'Graphql/types/globalTypes';
 import { GetRunningRuntime_runningRuntime } from '../../Graphql/queries/types/GetRunningRuntime';
 
 export const runtime: GetRunningRuntime_runningRuntime = {
@@ -9,6 +10,7 @@ export const runtime: GetRunningRuntime_runningRuntime = {
   dockerImage: 'test/image',
   dockerTag: 'testTag',
   runtimePod: 'test pod',
+  runtimePodStatus: PodStatus.running
 };
 
 export const runtime2: GetRunningRuntime_runningRuntime = {
@@ -20,4 +22,5 @@ export const runtime2: GetRunningRuntime_runningRuntime = {
   dockerImage: 'test/image2',
   dockerTag: 'testTag',
   runtimePod: 'test pod 2',
+  runtimePodStatus: PodStatus.running,
 };

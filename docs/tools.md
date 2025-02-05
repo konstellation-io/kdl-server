@@ -2,43 +2,48 @@
 
 Follow these steps to setup your development environment:
 
-* **golang**: `1.23.2`
-* **microk8s**: `1.30`
+- **golang**: `1.23.2`
+- **minikube**: `>= 1.34`
 
   ```console
-  # ubuntu install
-  snap install --channel=1.30/stable microk8s --classic
+  # ubuntu
+  curl -LO https://github.com/kubernetes/minikube/releases/download/v1.35.0/minikube_1.35.0-0_amd64.deb
+  sudo dpkg -i minikube_1.35.0-0_amd64.deb
+
+  # macos
+  brew install minikube
 
   # deploy
   cd hack/
-  microk8s install --cpu ${MICROK8S_CPUS} --mem ${MICROK8S_MEMORY} --disk ${MICROK8S_DISK} --channel ${MICROK8S_CHANNEL}
+  ./kdlctl.sh dev
+  ./kdlctl.sh deploy
   ```
 
-* **docker**: `>= 25` [install](https://docs.docker.com/get-docker/)
-* **helm**: `>= v3.14` [install](https://helm.sh/docs/intro/install/)
-* **helmfile**: `>= v0.168.0` [install](https://helmfile.readthedocs.io/en/latest/#installation)
-* **gettext**: OS package to fill templates during deployment
+- **docker**: `>= 25` [install](https://docs.docker.com/get-docker/)
+- **helm**: `>= v3.14` [install](https://helm.sh/docs/intro/install/)
+- **helmfile**: `>= v0.168.0` [install](https://helmfile.readthedocs.io/en/latest/#installation)
+- **gettext**: OS package to fill templates during deployment
 
   ```console
   # ubuntu
   sudo apt-get install gettext
 
-  # macosx
+  # macos
   brew install gettext
   ```
 
-* **kubectl**: `>= v1.25` [install](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-* **jq**: JSON processor to configure insecure-registries.
+- **kubectl**: `>= v1.28` [install](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+- **jq**: JSON processor to configure insecure-registries.
 
   ```console
-  # macosx
+  # macos
   brew install jq
   ```
 
-* **yq**: YAML processor to configure KDL Remote developement.
+- **yq**: YAML processor to configure KDL Remote developement.
 
   ```console
-  # macosx
+  # macos
   brew install yq
   ```
 

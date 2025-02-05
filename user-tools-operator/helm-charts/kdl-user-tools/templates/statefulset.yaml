@@ -36,7 +36,7 @@ spec:
     spec:
       imagePullSecrets:
         {{- toYaml .Values.imagePullSecrets | nindent 8 }}
-      serviceAccountName: {{ include "kdl-user-tools.serviceAccountName" . }}
+      serviceAccountName: {{ .Values.usernameSlug }}-service-account
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       {{- with .Values.initContainers }}

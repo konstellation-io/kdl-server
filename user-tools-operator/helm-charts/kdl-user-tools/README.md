@@ -132,7 +132,7 @@ helm template test . -f ci/ci-values.yaml
 | persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Persistent Volume access modes Must match those of existing PV or dynamic provisioner </br> Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/ |
 | persistentVolume.enabled | bool | `true` | Enable or disable persistence |
 | persistentVolume.size | string | `"1Gi"` | Persistent Volume size |
-| persistentVolume.storageClass | string | `""` | Persistent Volume Storage Class If defined, storageClassName: <storageClass> If set to "-", storageClassName: "", which disables dynamic provisioning If undefined (the default) or set to null, no storageClassName spec is   set, choosing the default provisioner.  (gp2 on AWS, standard on   GKE, AWS & OpenStack) |
+| persistentVolume.storageClass | string | `""` | Persistent Volume Storage Class If defined, storageClass: <storageClass> If set to "-", storageClass: "", which disables dynamic provisioning If undefined (the default) or set to null, no storageClass spec is   set, choosing the default provisioner.  (gp2 on AWS, standard on   GKE, AWS & OpenStack) |
 | podAnnotations | object | `{}` | Configure annotations on Pods |
 | podDisruptionBudget | object | `{"enabled":false,"maxUnavailable":1,"minAvailable":null}` | Pod Disruption Budget </br> Ref: https://kubernetes.io/docs/reference/kubernetes-api/policy-resources/pod-disruption-budget-v1/ |
 | podLabels | object | `{}` | Configure labels on Pods |
@@ -151,7 +151,6 @@ helm template test . -f ci/ci-values.yaml
 | repoCloner.volumeMounts | list | `[]` | Additional volumeMounts on the output Deployment definition |
 | resources | object | `{}` | Resources limits and requested </br> Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/ |
 | securityContext | object | `{}` | Defines privilege and access control settings for a Container </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/ </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ |
-| serviceAccount | object | `{"annotations":{},"automount":true,"create":true,"name":""}` | Enable creation of ServiceAccount </br> Ref: https://kubernetes.io/docs/concepts/security/service-accounts/ |
 | sharedVolume | object | `{"enabled":false,"name":""}` | String to set external volume to use on user-tools workspace |
 | sharedVolume.enabled | bool | `false` | Enable or disable sharedVolume use |
 | terminationGracePeriodSeconds | int | `30` | Configure Pod termination grace period </br> Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination |

@@ -72,6 +72,7 @@ jobs:
             org.opencontainers.image.vendor=Konstellation
           tags: |
             type=raw,value=${{ env.TAG_NAME_FIXED }}
+            type=raw,value=develop
             type=raw,value=latest,enable=${{ env.TAG_NAME_FIXED != 'develop' }}
             type=sha,enable=false
 

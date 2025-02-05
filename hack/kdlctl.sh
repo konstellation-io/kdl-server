@@ -84,8 +84,8 @@ dev)
   ;;
 
 kdl)
-  build_server "$@"
-  echo_done "Dev environment created"
+  cmd_build_kdl "$@"
+  echo_done "KDL server updated"
   exit 0
   ;;
 

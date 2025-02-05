@@ -16,6 +16,25 @@ $(help_global_options)
 "
 }
 
+show_build_kdl_help() {
+  echo "$(help_global_header "kdl")
+
+Build KDL server docker image.
+
+$(help_global_options)
+"
+}
+
+
+cmd_build_kdl() {
+  # initialize vars
+  SETUP_ENV=0
+
+  setup_env
+  build_server
+  clean_env
+}
+
 build_docker_images() {
   setup_env
   build_server

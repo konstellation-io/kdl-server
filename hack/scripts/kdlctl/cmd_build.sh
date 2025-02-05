@@ -54,7 +54,7 @@ build_mlflow() {
 
 build_kg() {
   if [ "$KNOWLEDGE_GALAXY_LOCAL" != "true" ]; then
-    echo_info "ℹ️ Knowledge Galaxy disabled. skipping build."
+    echo_info "Knowledge Galaxy disabled. skipping build."
     return
   fi
 
@@ -71,33 +71,42 @@ setup_env() {
     return
   fi
 
-  # Setup environment to build images inside minikube
+  # Setup environment to run docker commands inside minikube
   eval "$(minikube docker-env -p "${MINIKUBE_PROFILE}")"
 
+  # Check & clean orphans
+  clean_env
+
   MINIKUBE_IP=$(minikube ip -p "${MINIKUBE_PROFILE}")
-  # if [ "${OS}" = "Darwin" ]; then
-  if [ -z "$(docker ps --format "{{.Names}}" | egrep -E '^(socat)$')" ]; then
-    echo_run "Setting up socat"
+  if [ -z "$(docker ps --format "{{.Names}}" | grep '^socat')" ]; then
+    echo_info "Setting up socat container (minikube registry addon comm)"
     docker run --name socat --rm -it -d --network=host alpine ash \
-      -c "apk add socat && socat TCP-LISTEN:5000,reuseaddr,fork TCP:${MINIKUBE_IP}):5000"||
-      exit 1
+      -c "apk add socat && socat TCP-LISTEN:5000,reuseaddr,fork TCP:${MINIKUBE_IP}:5000" || {
+      clean_env && exit 1
+    }
   fi
-  # fi
 
   # wait for registry to be ready
-  echo_run "Waiting for registry to be ready"
-  until [ $(curl -s --connect-timeout 1 "http://${MINIKUBE_IP}:5000/v2/_catalog") ]; do
+  echo_info "Waiting for registry to be ready"
+  until [ $(minikube -p "${MINIKUBE_PROFILE}" ssh -- curl -s --connect-timeout 1 "http://${IMAGE_REGISTRY}/v2/_catalog") ]; do
     printf "."
-    sleep 5
+    sleep 2
   done
+  echo_check "Registry is reachable"
 
   SETUP_ENV=1
 }
 
 clean_env() {
-  # if [ "${OS}" = "Darwin" ]; then
-  docker ps --format "{{.Names}}" | egrep -E '^(socat)$' | xargs --no-run-if-empty docker stop
-  # fi
+  # Setup environment to run docker commands inside minikube
+  eval "$(minikube docker-env -p "${MINIKUBE_PROFILE}")"
+
+  SOCAT_CONTAINER="$(docker ps -a | awk '/socat$/ {print $1}')"
+  if [ -n "${SOCAT_CONTAINER}" ]; then
+    echo_info "Killing socat container ${SOCAT_CONTAINER}"
+    docker rm -f ${SOCAT_CONTAINER} 2>&1 >/dev/null
+    echo_check "Done"
+  fi
 }
 
 build_image() {
@@ -105,11 +114,8 @@ build_image() {
   FOLDER="$2"
   echo_build_header "$NAME"
 
-  # if [ "${OS}" = "Darwin" ]; then
-  # works with IMAGE_REGISTRY="localhost:5000"
-  docker build -t ${IMAGE_REGISTRY}/konstellation/${NAME}:latest ../${FOLDER} || exit 1
-  docker push ${IMAGE_REGISTRY}/konstellation/${NAME}:latest || exit 1
-  # fi
+  docker build -t "${IMAGE_REGISTRY}/konstellation/${NAME}:latest" "../${FOLDER}" || exit 1
+  docker push "${IMAGE_REGISTRY}/konstellation/${NAME}:latest" || exit 1
 }
 
 echo_build_header() {

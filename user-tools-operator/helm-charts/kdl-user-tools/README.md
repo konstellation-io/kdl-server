@@ -151,7 +151,6 @@ helm template test . -f ci/ci-values.yaml
 | repoCloner.volumeMounts | list | `[]` | Additional volumeMounts on the output Deployment definition |
 | resources | object | `{}` | Resources limits and requested </br> Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/ |
 | securityContext | object | `{}` | Defines privilege and access control settings for a Container </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/ </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ |
-| serviceAccount | object | `{"annotations":{},"automount":true,"create":true,"name":""}` | Enable creation of ServiceAccount </br> Ref: https://kubernetes.io/docs/concepts/security/service-accounts/ |
 | sharedVolume | object | `{"enabled":false,"name":""}` | String to set external volume to use on user-tools workspace |
 | sharedVolume.enabled | bool | `false` | Enable or disable sharedVolume use |
 | terminationGracePeriodSeconds | int | `30` | Configure Pod termination grace period </br> Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination |

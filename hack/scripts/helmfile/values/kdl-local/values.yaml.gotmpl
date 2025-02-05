@@ -8,11 +8,9 @@ service:
 
 livenessProbe:
   enabled: true
+  initialDelaySeconds: 10
 
 readinessProbe:
-  enabled: true
-
-startupProbe:
   enabled: true
 
 image:
@@ -54,7 +52,7 @@ keycloak:
 
   ingress:
     enabled: true
-    className: public
+    className: nginx
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
     hosts:
@@ -129,7 +127,7 @@ oauth2proxy:
         }
       nginx.ingress.kubernetes.io/server-snippet: |
         add_header Cache-Control "no-cache, no-store, must-revalidate";
-    className: public
+    className: nginx
     path: /
     pathType: ImplementationSpecific
     hosts:
@@ -221,7 +219,7 @@ projectOperator:
           enabled: true
           tls:
             enabled: true
-          className: public
+          className: nginx
           annotations:
             cert-manager.io/cluster-issuer: selfsigned-clusterissuer
             nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
@@ -276,7 +274,7 @@ userToolsOperator:
         image:
           repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-repo-cloner
           pullPolicy: Always
-          tag: "latest"
+          tag: latest
 
         env:
           KDL_SERVER_MONGODB_URI: "mongodb://{{ .Values.mongodb_user }}:{{ .Values.mongodb_password }}@mongodb-svc.mongodb:27017/{{ .Values.mongodb_user }}?authSource={{ .Values.mongodb_user }}&authMechanism=SCRAM-SHA-256"

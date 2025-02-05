@@ -1,20 +1,42 @@
 #!/bin/sh
 
 cmd_dev() {
-  microk8s_start "$@"
+  # initialize vars
+  MINIKUBE_CLEAN=0
+  SKIP_BUILD=0
+
+  minikube_start "$@"
 
   # NOTE: Use this loop to capture multiple unsorted args
-   while test $# -gt 0; do
-     case "$1" in
-       --skip-build)
-         SKIP_BUILD=1
-         shift
-       ;;
-       *)
-         shift
-       ;;
-     esac
-   done
+  while test $# -gt 0; do
+    case "$1" in
+    # WARNING: Doing a hard reset before deploying
+    --hard)
+      minikube_hard_reset
+      shift
+      ;;
+
+    --skip-build)
+      SKIP_BUILD=1
+      shift
+      ;;
+
+    --clean)
+      MINIKUBE_CLEAN=1
+      shift
+      ;;
+
+    *)
+      shift
+      ;;
+    esac
+  done
+
+  minikube_start
+
+  if [ "$MINIKUBE_CLEAN" = "1" ]; then
+    minikube_clean
+  fi
 
   if [ "$SKIP_BUILD" = "0" ]; then
     cmd_build "$@"
@@ -29,8 +51,9 @@ show_dev_help() {
   echo "$(help_global_header "dev")
 
     options:
+      --hard, --dracarys  remove all contents of minikube kai profile. $(echo_yellow "(WARNING: will re-build all docker images again)").
       --skip-build        skip all docker images build, useful for non-development environments
-      --gpu enables the GPU in MicroK8s
+      --gpu               enables the GPU in minikube
 
     $(help_global_options)
 "

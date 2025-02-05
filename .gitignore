@@ -8,6 +8,7 @@
 .trunk/
 coverage/
 deprecations
+hack/scripts/helmfile/values/initial-resources/values.yaml
 main
 .hadolint.yml
 

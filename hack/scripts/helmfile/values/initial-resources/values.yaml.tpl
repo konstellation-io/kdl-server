@@ -481,16 +481,16 @@ resources:
               "clientId": "proxy",
               "name": "KDL OAuth2Proxy",
               "description": "",
-              "rootUrl": "https://kdlapp.kdl.10.0.1.1.nip.io",
+              "rootUrl": "https://kdlapp.kdl.$HOST_IP.nip.io",
               "adminUrl": "",
-              "baseUrl": "https://kdlapp.kdl.10.0.1.1.nip.io/",
+              "baseUrl": "https://kdlapp.kdl.$HOST_IP.nip.io/",
               "surrogateAuthRequired": false,
               "enabled": true,
               "alwaysDisplayInConsole": true,
               "clientAuthenticatorType": "client-secret",
               "secret": "proxy654321",
               "redirectUris": [
-                "https://kdlapp.kdl.10.0.1.1.nip.io/oauth2/callback"
+                "https://kdlapp.kdl.$HOST_IP.nip.io/oauth2/callback"
               ],
               "webOrigins": [
                 "*"

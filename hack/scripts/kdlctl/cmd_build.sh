@@ -79,10 +79,10 @@ setup_env() {
 
   MINIKUBE_IP=$(minikube ip -p "${MINIKUBE_PROFILE}")
   if [ -z "$(docker ps --format "{{.Names}}" | grep '^socat')" ]; then
-    echo_info "Setting up socat container (minikube registry addon comm)"
+    echo_info "Setting up socat container"
     docker run --name socat --rm -it -d --network=host alpine ash \
       -c "apk add socat && socat TCP-LISTEN:5000,reuseaddr,fork TCP:${MINIKUBE_IP}:5000" || {
-      clean_env && exit 1
+      clean_env && echo_fatal "Could not create container"
     }
   fi
 
@@ -114,8 +114,8 @@ build_image() {
   FOLDER="$2"
   echo_build_header "$NAME"
 
-  docker build -t "${IMAGE_REGISTRY}/konstellation/${NAME}:latest" "../${FOLDER}" || exit 1
-  docker push "${IMAGE_REGISTRY}/konstellation/${NAME}:latest" || exit 1
+  docker build -t "${IMAGE_REGISTRY}/konstellation/${NAME}:latest" "../${FOLDER}" || echo_fatal "Cannot build image [${NAME}] from folder [../${FOLDER}]"
+  docker push "${IMAGE_REGISTRY}/konstellation/${NAME}:latest" || echo_fatal "Cannot push image ${IMAGE_REGISTRY}/konstellation/${NAME}:latest"
 }
 
 echo_build_header() {
@@ -127,6 +127,6 @@ echo_build_header() {
     echo_light_green "#########################################"
     echo
   else
-    echo_info "  🏭 $*"
+    echo "🏭  $(echo_yellow "$*")"
   fi
 }

@@ -96,6 +96,7 @@ func TestInteractor_Create(t *testing.T) {
 		projectMinioSecretKey = "projectY123"
 		ownerUserID           = "user.1234"
 		ownerUsername         = "john"
+		ownerEmail            = "john@doe.com"
 	)
 
 	url := "https://github.com/org/repo.git"
@@ -165,6 +166,7 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(projectMinioSecretKey, nil)
 	s.mocks.minioAdminService.EXPECT().CreateProjectUser(ctx, testProjectID, projectMinioSecretKey).Return(testProjectID, nil)
 	s.mocks.minioAdminService.EXPECT().CreateProjectPolicy(ctx, testProjectID).Return(nil)
+	s.mocks.minioAdminService.EXPECT().JoinProject(ctx, ownerEmail, testProjectID).Return(nil)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
 		ProjectID:   testProjectID,
@@ -172,7 +174,7 @@ func TestInteractor_Create(t *testing.T) {
 		Description: projectDesc,
 		URL:         &url,
 		Username:    &username,
-		Owner:       entity.User{ID: ownerUserID, Username: ownerUsername},
+		Owner:       entity.User{ID: ownerUserID, Username: ownerUsername, Email: ownerEmail},
 	})
 
 	require.NoError(t, err)

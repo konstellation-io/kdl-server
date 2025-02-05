@@ -203,6 +203,12 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		SecretKey: secretKey,
 	}
 
+	// Add admin as member of the project on MinIO
+	err = i.minioAdminService.JoinProject(ctx, opt.Owner.Email, opt.ProjectID)
+	if err != nil {
+		return entity.Project{}, fmt.Errorf("%w: user ID=%s", err, opt.Owner.ID)
+	}
+
 	// Create a k8s KDLProject containing a MLFLow instance
 	err = i.k8sClient.CreateKDLProjectCR(ctx, k8s.ProjectData{ProjectID: opt.ProjectID, MinioAccessKey: project.MinioAccessKey})
 	if err != nil {

@@ -41,7 +41,7 @@ check_requirements() {
 }
 
 cmd_installed() {
-  if command -v "$1" >/dev/null 2>&1; then
+  if (command -v "$1" >/dev/null 2>&1); then
     echo 1
   else
     echo 0
@@ -62,34 +62,34 @@ check_not_empty() {
 
 ## Print lines helpers (NO DIRECT COLORING, call echo_<color> instead)
 echo_run() {
-  echo_info "  🏃 $*"
+  echo "🏃  $(echo_yellow "$*")"
 }
 
 echo_warning() {
-  echo "⚠️️  $(echo_yellow "$*") ⚠️️"
+  echo "⚠️️  $(echo_yellow "$*")"
 }
 
 echo_fatal() {
-  echo "⚠️️  $(echo_red "$*")"
+  echo "❌  $(echo_red "$*")"
   exit 1
 }
 
 echo_wait() {
-  echo "⏳ $*"
+  echo "⏳  $(echo_yellow "$*")"
 }
 
 echo_info() {
-  echo_yellow "$*"
+  echo "ℹ️  $(echo_cyan "$*")"
 }
 
 echo_check() {
-  echo_light_green "✔ $*"
+  echo "✅  $(echo_light_green "$*")"
 }
 
 echo_done() {
   MSG=${1:-"Done"}
   echo
-  echo_green "✔ ${MSG}."
+  echo "✅  $(echo_green "${MSG}")"
   echo
 }
 
@@ -117,6 +117,6 @@ echo_yellow() {
   echo "\033[33m$*\033[m"
 }
 
-echo_red() {
-  echo "\033[31m$*\033[m"
+echo_cyan() {
+  echo "\033[96m$*\033[m"
 }

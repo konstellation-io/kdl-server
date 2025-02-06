@@ -19,9 +19,11 @@ export default gql`
       archived
       error
       toolUrls {
+        knowledgeGalaxyEnabled
         knowledgeGalaxy
         filebrowser
         mlflow
+        minio
       }
       members {
         ...MemberFields

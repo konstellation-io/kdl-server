@@ -52,7 +52,6 @@ docker build \
 | `KDL_SERVER_STATIC_FILES_PATH`   | Path for the static files of the KDL server   | `../public`   |
 | `POD_NAMESPACE`                  | Namespace for the KDL server                  |               |
 | `PROJECT_FILEBROWSER_URL`        | URL for the File Browser service              |               |
-| `MINIO_CONSOLE_ENDPOINT`        | URL for the MinIO Console service             |               |
 | `PROJECT_MLFLOW_URL`             | URL for the MLflow service                    |               |
 | `KUBECONFIG_DOWNLOAD_ENABLED`    | Enable kubeconfig download for the User Tools | `false`       |
 | `KUBECONFIG_EXTERNAL_SERVER_URL` | URL for the kubeconfig download service       |               |

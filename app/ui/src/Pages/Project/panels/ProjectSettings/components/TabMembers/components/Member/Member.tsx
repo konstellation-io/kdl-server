@@ -5,7 +5,7 @@ import { Check, Select } from 'kwc';
 import styles from './Member.module.scss';
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import cx from 'classnames';
-import { mapAccessLevel } from 'Utils/accessLevel';
+import { mapProjectAccessLevel } from 'Utils/accessLevel';
 
 const gravatarStyle = {
   borderRadius: '50%',
@@ -58,7 +58,7 @@ function Member({
                   className={styles.accessLevelSelector}
                   options={Object.keys(AccessLevel)}
                   formSelectedOption={member.accessLevel}
-                  valuesMapper={mapAccessLevel}
+                  valuesMapper={mapProjectAccessLevel}
                   height={30}
                   onChange={(newLevel: AccessLevel) => onChangeMemberLevel([member.user.id], newLevel)}
                   disabled={!canBeSelected}
@@ -67,7 +67,7 @@ function Member({
               </div>
             ) : (
               <span className={styles.accessLevel} onClick={() => onInfoClick(member)}>
-                {mapAccessLevel[member.accessLevel]}
+                {mapProjectAccessLevel[member.accessLevel]}
               </span>
             )}
             <div className={styles.button}>

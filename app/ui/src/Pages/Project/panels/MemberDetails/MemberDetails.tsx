@@ -19,7 +19,7 @@ import styles from './MemberDetails.module.scss';
 import { useForm } from 'react-hook-form';
 import useMembers from 'Graphql/hooks/useMembers';
 import { useQuery } from '@apollo/client';
-import { mapAccessLevel } from 'Utils/accessLevel';
+import { mapProjectAccessLevel } from 'Utils/accessLevel';
 import GetMeQuery from 'Graphql/queries/getMe';
 import GetMembersQuery from 'Graphql/queries/getProjectMembers';
 
@@ -92,7 +92,7 @@ function MemberDetails({ member, projectId, close }: Props) {
       <div className={styles.container}>
         <div className={styles.info}>
           <Gravatar email={member.user.email} size={160} style={gravatarStyle} />
-          <p className={styles.accessLevel}>{mapAccessLevel[member.accessLevel]}</p>
+          <p className={styles.accessLevel}>{mapProjectAccessLevel[member.accessLevel]}</p>
           <p className={styles.email}>{member.user.email}</p>
           <div className={styles.added}>
             <IconDate className="icon-small" />
@@ -112,7 +112,7 @@ function MemberDetails({ member, projectId, close }: Props) {
           <Select
             label="What access level does the user have?"
             options={Object.keys(AccessLevel)}
-            valuesMapper={mapAccessLevel}
+            valuesMapper={mapProjectAccessLevel}
             formSelectedOption={watch('accessLevel')}
             className={styles.formAccessLevel}
             onChange={(value: AccessLevel) => {

@@ -10,7 +10,6 @@ import { useQuery } from '@apollo/client';
 import useUserSettings from 'Graphql/client/hooks/useUserSettings';
 
 import GetUsersQuery from 'Graphql/queries/getUsers';
-import { mapAccessLevel } from 'Utils/accessLevel';
 
 type FormData = {
   userEmail?: string;

@@ -1,5 +1,4 @@
 import { AccessLevel } from 'Graphql/types/globalTypes';
-import { mapAccessLevel } from 'Utils/accessLevel';
 
 export type ModalInfo = {
   action?: () => void;
@@ -36,12 +35,11 @@ export function getModalInfo({ type, action, nUsers, userIds, plural, accessLeve
         acceptLabel: `Remove ${nUsers} user${plural ? 's' : ''}`,
       };
     case 'update':
-      const mappedAccessLevel = mapAccessLevel[accessLevel as AccessLevel] ?? "Unknown";
       return {
         action,
         userIds,
         title: 'User access level update',
-        message: `The following user${plural ? 's' : ''}' Access Level will be updated to ${mappedAccessLevel}:`,
+        message: `The following user${plural ? 's' : ''}' Access Level will be updated to ${accessLevel}:`,
         acceptLabel: `Update ${nUsers} user${plural ? 's' : ''}`,
       };
     default:

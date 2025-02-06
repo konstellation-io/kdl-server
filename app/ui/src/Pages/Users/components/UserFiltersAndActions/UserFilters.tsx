@@ -64,7 +64,6 @@ function UserFilters() {
         <Select
           label="User type"
           options={Object.keys(AccessLevel)}
-          valuesMapper={mapAccessLevel}
           onChange={(value: AccessLevel) => {
             setValue('userType', value);
             handleSubmit(onSubmit)();

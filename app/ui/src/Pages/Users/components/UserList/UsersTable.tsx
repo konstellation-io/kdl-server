@@ -14,7 +14,6 @@ import useUserSettings from 'Graphql/client/hooks/useUserSettings';
 import TableHeader from './TableHeader';
 import useUser from 'Graphql/hooks/useUser';
 import { userSettings } from 'Graphql/client/cache';
-import { mapAccessLevel } from 'Utils/accessLevel';
 
 export type Data = {
   creationDate: string;
@@ -92,7 +91,6 @@ function UsersTable({ users }: Props) {
               <Select
                 options={Object.keys(AccessLevel)}
                 formSelectedOption={value}
-                valuesMapper={mapAccessLevel}
                 height={30}
                 onChange={(newValue: AccessLevel) => {
                   updateUsersAccessLevel([row.original.id], newValue);

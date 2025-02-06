@@ -187,6 +187,18 @@ func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.Remo
 	return nil, entity.ErrNotImplemented
 }
 
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context) (*entity.User, error) {
+	email := ctx.Value(middleware.LoggedUserEmailKey).(string)
+	sub := ctx.Value(middleware.LoggedUserSubKey).(string)
+
+	user, err := r.users.Login(ctx, email, sub)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 // CreationDate is the resolver for the creationDate field.
 func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project) (string, error) {
 	return obj.CreationDate.Format(time.RFC3339), nil

@@ -1090,3 +1090,251 @@ func TestInteractor_UpdateKDLUserTools_ListKDLUserToolsNameCR_EmptyList(t *testi
 	err := s.interactor.UpdateKDLUserTools(ctx)
 	require.NoError(t, err)
 }
+
+func TestLogin_UsernameNotFound(t *testing.T) {
+	// Arrange
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		id            = "user.1234"
+		email         = "user@email.com"
+		username      = "user"
+		sub           = "d5d70477-5192-4182-b80e-5d34550eb4fe"
+		accessLevel   = entity.AccessLevelViewer
+		publicSSHKey  = "test-ssh-key-public"
+		privateSSHKey = "test-ssh-key-private"
+	)
+
+	ctx := context.Background()
+	now := time.Now().UTC()
+
+	sshKey := entity.SSHKey{
+		Public:       publicSSHKey,
+		Private:      privateSSHKey,
+		CreationDate: now,
+	}
+
+	u := entity.User{
+		Username:     username,
+		Email:        email,
+		Sub:          sub,
+		AccessLevel:  accessLevel,
+		SSHKey:       sshKey,
+		CreationDate: now,
+	}
+	expectedUser := entity.User{
+		ID:           id,
+		Username:     username,
+		Email:        email,
+		Sub:          sub,
+		AccessLevel:  accessLevel,
+		SSHKey:       sshKey,
+		CreationDate: now,
+	}
+
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
+	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
+	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
+	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
+	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, expectedUser.UsernameSlug())
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.repo.EXPECT().UpdateLastActivity(ctx, expectedUser.Username, now).Return(nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, expectedUser.Username).Return(expectedUser, nil)
+
+	// Act
+	userLogged, err := s.interactor.Login(ctx, email, sub)
+
+	// Assert
+	require.NoError(t, err)
+	require.Equal(t, expectedUser, userLogged)
+}
+
+func TestLogin_UsernameNotFound_CreateError(t *testing.T) {
+	// Arrange
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		id            = "user.1234"
+		email         = "user@email.com"
+		username      = "user"
+		sub           = "d5d70477-5192-4182-b80e-5d34550eb4fe"
+		accessLevel   = entity.AccessLevelViewer
+		publicSSHKey  = "test-ssh-key-public"
+		privateSSHKey = "test-ssh-key-private"
+	)
+
+	ctx := context.Background()
+	now := time.Now().UTC()
+
+	sshKey := entity.SSHKey{
+		Public:       publicSSHKey,
+		Private:      privateSSHKey,
+		CreationDate: now,
+	}
+
+	u := entity.User{
+		Username:     username,
+		Email:        email,
+		Sub:          sub,
+		AccessLevel:  accessLevel,
+		SSHKey:       sshKey,
+		CreationDate: now,
+	}
+
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
+	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, errUnexpected)
+
+	// Act
+	userLogged, err := s.interactor.Login(ctx, email, sub)
+
+	// Assert
+	require.Empty(t, userLogged)
+	require.Error(t, err)
+}
+
+func TestLogin_UsernameFound_SubEmpty(t *testing.T) {
+	// Arrange
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		email    = "user@email.com"
+		username = "user"
+		sub      = "e8fc5009-d220-427f-bf8c-dd63b69ca6f5"
+	)
+
+	ctx := context.Background()
+	now := time.Now().UTC()
+
+	user := entity.User{
+		Username: username,
+		Email:    email,
+	}
+
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(user, nil)
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().UpdateSub(ctx, user.Username, sub).Return(nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, user.Username).Return(user, nil)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.repo.EXPECT().UpdateLastActivity(ctx, user.Username, now).Return(nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, user.Username).Return(user, nil)
+
+	// Act
+	userLogged, err := s.interactor.Login(ctx, email, sub)
+
+	// Assert
+	require.NoError(t, err)
+	require.NotEmpty(t, userLogged)
+}
+
+func TestLogin_UsernameFound_DifferentSub(t *testing.T) {
+	// Arrange
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		email       = "user@email.com"
+		username    = "user"
+		originalSub = "e8fc5009-d220-427f-bf8c-dd63b69ca6f5"
+		sub         = "e8fc5009-d220-427f-bf8c-dd63b69ca6f6"
+	)
+
+	ctx := context.Background()
+	now := time.Now().UTC()
+
+	user := entity.User{
+		Username: username,
+		Email:    email,
+		Sub:      originalSub,
+	}
+
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(user, nil)
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().UpdateSub(ctx, user.Username, sub).Return(nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, user.Username).Return(user, nil)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.repo.EXPECT().UpdateLastActivity(ctx, user.Username, now).Return(nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, user.Username).Return(user, nil)
+
+	// Act
+	userLogged, err := s.interactor.Login(ctx, email, sub)
+
+	// Assert
+	require.NoError(t, err)
+	require.NotEmpty(t, userLogged)
+}
+
+func TestLogin_UsernameFound_EqualSub(t *testing.T) {
+	// Arrange
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		email    = "user@email.com"
+		username = "user"
+		sub      = "e8fc5009-d220-427f-bf8c-dd63b69ca6f5"
+	)
+
+	ctx := context.Background()
+	now := time.Now().UTC()
+
+	user := entity.User{
+		Username: username,
+		Email:    email,
+		Sub:      sub,
+	}
+
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(user, nil)
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.repo.EXPECT().UpdateLastActivity(ctx, user.Username, now).Return(nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, user.Username).Return(user, nil)
+
+	// Act
+	userLogged, err := s.interactor.Login(ctx, email, sub)
+
+	// Assert
+	require.NoError(t, err)
+	require.NotEmpty(t, userLogged)
+}
+
+func TestLogin_UsernameFound_UpdateSubErr(t *testing.T) {
+	// Arrange
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		email    = "user@email.com"
+		username = "user"
+		sub      = "e8fc5009-d220-427f-bf8c-dd63b69ca6f5"
+	)
+
+	ctx := context.Background()
+
+	user := entity.User{
+		Username: username,
+		Email:    email,
+	}
+
+	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(user, nil)
+	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
+	s.mocks.repo.EXPECT().UpdateSub(ctx, user.Username, sub).Return(errUnexpected)
+
+	// Act
+	userLogged, err := s.interactor.Login(ctx, email, sub)
+
+	// Assert
+	require.Empty(t, userLogged)
+	require.Error(t, err)
+}

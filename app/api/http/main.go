@@ -205,14 +205,12 @@ func startHTTPServer(
 		dedependencies.k8sClient,
 		dedependencies.mongodbClient,
 	)
-	loginController := controller.NewLoginController(interactors.userInteractor)
 
 	http.Handle("/", fs)
 	http.Handle("/api/playground", middleware.AuthMiddleware(pg))
 	http.Handle(apiQueryPath, middleware.AuthMiddleware(dataloader.Middleware(repos.userRepo, srv)))
 	http.HandleFunc("/api/auth/project", authController.HandleProjectAuth)
 	http.HandleFunc("/healthz", healthzController.HandleHealthz)
-	http.HandleFunc("/login", loginController.HandleLogin)
 
 	logger.Info("Server running", "port", cfg.Port)
 

@@ -9,6 +9,7 @@ type contextKey int
 
 const (
 	LoggedUserEmailKey contextKey = iota
+	LoggedUserSubKey
 )
 
 /*
@@ -43,6 +44,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		// only truth is the email
 		r = r.WithContext(context.WithValue(r.Context(), LoggedUserEmailKey, email))
+		r = r.WithContext(context.WithValue(r.Context(), LoggedUserSubKey, sub))
 
 		next.ServeHTTP(w, r)
 	})

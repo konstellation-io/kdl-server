@@ -32,6 +32,8 @@ type Mutation {
 
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
+
+  login: User!
 }
 
 type Capability {

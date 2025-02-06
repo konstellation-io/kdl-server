@@ -2,19 +2,13 @@ import { GetProjectMembers_project_members } from 'Graphql/queries/types/GetProj
 import Gravatar from 'react-gravatar';
 import IconOpen from '@material-ui/icons/ArrowForward';
 import { Check, Select } from 'kwc';
-import * as React from 'react';
 import styles from './Member.module.scss';
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import cx from 'classnames';
+import { mapAccessLevel } from 'Utils/accessLevel';
 
 const gravatarStyle = {
   borderRadius: '50%',
-};
-
-export const mapAccessLevel = {
-  [AccessLevel.ADMIN]: 'Admin',
-  [AccessLevel.MANAGER]: 'Manager',
-  [AccessLevel.VIEWER]: 'Viewer',
 };
 
 type Props = {

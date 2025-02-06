@@ -1,8 +1,8 @@
 import { Left, Right } from 'kwc';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
-import * as React from 'react';
 import styles from './UserRow.module.scss';
+import { mapAccessLevel } from 'Utils/accessLevel';
 
 type Props = {
   email?: string;
@@ -10,13 +10,14 @@ type Props = {
 };
 
 function UserRow({ email, accessLevel }: Props) {
+  const mappedAccessLevel = mapAccessLevel[accessLevel as AccessLevel] ?? "Unknown";
   return (
     <div className={styles.container}>
       <Left>
         <>{email}</>
       </Left>
       <Right className={styles.right}>
-        <>{accessLevel}</>
+        <>{mappedAccessLevel}</>
       </Right>
     </div>
   );

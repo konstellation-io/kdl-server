@@ -1,17 +1,16 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { SearchSelect, Select } from 'kwc';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import { GetUsers } from 'Graphql/queries/types/GetUsers';
-import { capitalize, get } from 'lodash';
+import { get } from 'lodash';
 import styles from './UserFiltersAndActions.module.scss';
 import { useForm } from 'react-hook-form';
 import { useQuery } from '@apollo/client';
 import useUserSettings from 'Graphql/client/hooks/useUserSettings';
 
 import GetUsersQuery from 'Graphql/queries/getUsers';
-
-const types = Object.values(AccessLevel).map((al) => capitalize(al));
+import { mapAccessLevel } from 'Utils/accessLevel';
 
 type FormData = {
   userEmail?: string;
@@ -64,7 +63,8 @@ function UserFilters() {
       <div className={styles.filterTypes}>
         <Select
           label="User type"
-          options={types}
+          options={Object.keys(AccessLevel)}
+          valuesMapper={mapAccessLevel}
           onChange={(value: AccessLevel) => {
             setValue('userType', value);
             handleSubmit(onSubmit)();

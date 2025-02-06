@@ -30,9 +30,9 @@ const CustomSeparator: FC<CustomOptionProps> = ({ label }) => (
 
 enum Actions {
   CHANGE_ACCESS_LEVEL_TO = 'CHANGE ACCESS LEVEL TO',
-  VIEWER = 'Viewer',
-  MANAGER = 'Manager',
-  ADMIN = 'Admin',
+  VIEWER = 'Member',
+  MANAGER = 'Developer',
+  ADMIN = 'Owner',
 }
 
 const types = Object.values(Actions);

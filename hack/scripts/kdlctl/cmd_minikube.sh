@@ -31,14 +31,17 @@ minikube_start() {
   *)
     echo_wait "Creating new minikube profile"
     minikube start -p "${MINIKUBE_PROFILE}" \
+      --namespace="${NAMESPACE}" \
       --cpus="${MINIKUBE_CPUS}" \
       --memory="${MINIKUBE_MEMORY}" \
       --kubernetes-version="${MINIKUBE_KUBERNETES_VERSION:-stable}" \
       --disk-size="${MINIKUBE_DISK_SIZE}" \
       --driver="${MINIKUBE_DRIVER:-docker}" \
+      --container-runtime="${MINIKUBE_RUNTIME:-docker}" \
       --insecure-registry="${MINIKUBE_INSECURE_REGISTRY_CIDR}" \
       --addons="${MINIKUBE_ADDONS}" \
       --delete-on-failure=true \
+      --interactive=false \
       --force || exit 1
     ;;
   esac

@@ -1,6 +1,9 @@
 #!/bin/sh
 
 cmd_build() {
+  # initialize vars
+  SETUP_ENV=0
+
   build_docker_images
 }
 
@@ -13,7 +16,27 @@ $(help_global_options)
 "
 }
 
+show_build_kdl_help() {
+  echo "$(help_global_header "kdl")
+
+Build KDL server docker image.
+
+$(help_global_options)
+"
+}
+
+
+cmd_build_kdl() {
+  # initialize vars
+  SETUP_ENV=0
+
+  setup_env
+  build_server
+  clean_env
+}
+
 build_docker_images() {
+  setup_env
   build_server
   build_project_operator
   build_user_tools_operator
@@ -21,6 +44,7 @@ build_docker_images() {
   build_filebrowser
   build_mlflow
   build_kg
+  clean_env
 }
 
 build_server() {
@@ -49,7 +73,7 @@ build_mlflow() {
 
 build_kg() {
   if [ "$KNOWLEDGE_GALAXY_LOCAL" != "true" ]; then
-    echo_info "ℹ️ Knowledge Galaxy disabled. skipping build."
+    echo_info "Knowledge Galaxy disabled. skipping build."
     return
   fi
 
@@ -66,19 +90,51 @@ setup_env() {
     return
   fi
 
-  # Setup environment to build images inside minikube
-  eval "$(minikube docker-env -p "$MINIKUBE_PROFILE")"
+  # Setup environment to run docker commands inside minikube
+  eval "$(minikube docker-env -p "${MINIKUBE_PROFILE}")"
+
+  # Check & clean orphans
+  clean_env
+
+  MINIKUBE_IP=$(minikube ip -p "${MINIKUBE_PROFILE}")
+  if [ -z "$(docker ps --format "{{.Names}}" | grep '^socat')" ]; then
+    echo_info "Setting up socat container"
+    docker run --name socat --rm -it -d --network=host alpine ash \
+      -c "apk add socat && socat TCP-LISTEN:5000,reuseaddr,fork TCP:${MINIKUBE_IP}:5000" || {
+      clean_env && echo_fatal "Could not create container"
+    }
+  fi
+
+  # wait for registry to be ready
+  echo_info "Waiting for registry to be ready"
+  until [ $(minikube -p "${MINIKUBE_PROFILE}" ssh -- curl -s --connect-timeout 1 "http://${IMAGE_REGISTRY}/v2/_catalog") ]; do
+    printf "."
+    sleep 2
+  done
+  echo_check "Registry is reachable"
+
   SETUP_ENV=1
 }
 
-build_image() {
-  setup_env
+clean_env() {
+  # Setup environment to run docker commands inside minikube
+  eval "$(minikube docker-env -p "${MINIKUBE_PROFILE}")"
 
+  SOCAT_CONTAINER="$(docker ps -a | awk '/socat$/ {print $1}')"
+  if [ -n "${SOCAT_CONTAINER}" ]; then
+    echo_info "Killing socat container ${SOCAT_CONTAINER}"
+    docker rm -f ${SOCAT_CONTAINER} 2>&1 >/dev/null
+    echo_check "Done"
+  fi
+}
+
+build_image() {
   NAME="$1"
   FOLDER="$2"
   echo_build_header "$NAME"
 
-  docker build -t "konstellation/${NAME}:latest" "../${FOLDER}"
+  docker build -t "${IMAGE_REGISTRY}/konstellation/${NAME}:latest" "../${FOLDER}" || echo_fatal "Cannot build image [${NAME}] from folder [../${FOLDER}]"
+  docker push "${IMAGE_REGISTRY}/konstellation/${NAME}:latest" || echo_fatal "Cannot push image ${IMAGE_REGISTRY}/konstellation/${NAME}:latest"
 }
 
 echo_build_header() {
@@ -90,6 +146,6 @@ echo_build_header() {
     echo_light_green "#########################################"
     echo
   else
-    echo_info "  🏭 $*"
+    echo "🏭  $(echo_yellow "$*")"
   fi
 }

@@ -3,7 +3,7 @@
 # disable unused vars check, vars are used on functions inside subscripts
 # shellcheck disable=SC2034 # https://github.com/koalaman/shellcheck/wiki/SC2034
 
-# set -eu
+set -eu
 
 DEBUG=${DEBUG:-0}
 
@@ -84,8 +84,8 @@ dev)
   ;;
 
 kdl)
-  build_server "$@"
-  echo_done "Dev environment created"
+  cmd_build_kdl "$@"
+  echo_done "KDL server updated"
   exit 0
   ;;
 

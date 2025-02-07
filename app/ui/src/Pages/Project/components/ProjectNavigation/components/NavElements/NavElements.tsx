@@ -51,6 +51,12 @@ function NavElements({ isOpened }: Props) {
     else closeRuntimesList();
   }
 
+  function getPodStatusStyles() {
+    if (runtimeRunning?.runtimePodStatus === 'pending') return styles.userToolStatusPending;
+    else if (runtimeRunning?.runtimePodStatus === 'running') return styles.userToolStatusRunning;
+    else return styles.userToolStatusError;
+  }
+
   function renderToggleToolsIcon() {
     const Progress = (
       <div className={styles.progressSpinnerContainer}>
@@ -96,15 +102,9 @@ function NavElements({ isOpened }: Props) {
         >
           <div className={cx(styles.usertoolsOptions, { [styles.opened]: isOpened })}>
             <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
-              <div
-                className={cx(styles.userToolLabel, {
-                  [styles.pending]: runtimeRunning?.runtimePodStatus === 'pending',
-                  [styles.running]: runtimeRunning?.runtimePodStatus === 'running',
-                  [styles.error]:
-                    runtimeRunning?.runtimePodStatus !== 'running' && runtimeRunning?.runtimePodStatus !== 'pending',
-                })}
-              >
-                USER TOOLS
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div className={getPodStatusStyles()}></div>
+                <div className={cx(styles.userToolLabel)}>USER TOOLS</div>
               </div>
             </AnimateHeight>
             <div

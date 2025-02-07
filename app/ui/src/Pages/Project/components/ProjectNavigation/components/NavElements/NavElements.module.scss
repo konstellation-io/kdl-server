@@ -32,28 +32,45 @@
       color: font-color(regular);
       width: 100%;
       white-space: nowrap;
-      margin-left: 2 * $grid-unit;
-      @include circle-before(#3d3d3d);
-      &.pending:before {
-        background-color: palette(alert);
-        top: $grid-unit - 5px;
-      }
-      &.running:before {
-        background-color: palette(success);
-        top: $grid-unit - 5px;
-      }
-      &.error:before {
-        background-color: palette(error);
-        top: $grid-unit - 5px;
-      }
-      padding-left: 3 * $grid-unit;
-      flex-direction: row;
-      justify-content: flex-start;
-      align-items: center;
+      margin-left: -0.1 * $grid-unit;
+      margin-top: 0.5 * $grid-unit;
+    }
+
+    .userToolStatusPending {
+      display: list-item;
+      list-style-type: disc;
+      font-size: 40px;
+      margin-left: 5.25 * $grid-unit;
+      color: palette(alert);
+    }
+
+    .userToolStatusRunning {
+      display: list-item;
+      list-style-type: disc;
+      font-size: 40px;
+      margin-left: 5.25 * $grid-unit;
+      color: palette(success);
+    }
+
+    .userToolStatusError {
+      display: list-item;
+      list-style-type: disc;
+      font-size: 40px;
+      margin-left: 5.25 * $grid-unit;
+      color: palette(error);
+    }
+
+    .userToolStatusDefault {
+      display: list-item;
+      list-style-type: disc;
+      font-size: 40px;
+      margin-left: 5.25 * $grid-unit;
+      color: lowlight;
     }
 
     .usertoolsIcon {
       margin: $grid-unit;
+      margin-top: 2 * $grid-unit;
       cursor: pointer;
       &.blocked {
         color: palette(alert);

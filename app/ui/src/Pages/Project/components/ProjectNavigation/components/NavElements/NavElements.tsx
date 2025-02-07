@@ -54,7 +54,8 @@ function NavElements({ isOpened }: Props) {
   function getPodStatusStyles() {
     if (runtimeRunning?.runtimePodStatus === 'pending') return styles.userToolStatusPending;
     else if (runtimeRunning?.runtimePodStatus === 'running') return styles.userToolStatusRunning;
-    else return styles.userToolStatusError;
+    else if (runtimeRunning?.runtimePodStatus === 'failed') return styles.userToolStatusError;
+    else return styles.userToolStatusDefault;
   }
 
   function renderToggleToolsIcon() {
@@ -79,6 +80,10 @@ function NavElements({ isOpened }: Props) {
       </Tooltip>
     );
   }
+
+  React.useEffect(() => {
+    getPodStatusStyles();
+  }, [runtimeRunning]);
 
   return (
     <>

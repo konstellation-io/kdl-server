@@ -5,9 +5,11 @@ export default gql`
     project(id: $id) {
       id
       toolUrls {
+        knowledgeGalaxyEnabled
         knowledgeGalaxy
         filebrowser
         mlflow
+        minio
       }
     }
     me {

@@ -80,11 +80,12 @@ Keycloak. At the moment, Keycloak connection is optional in KDL server.
 
 #### MinIO
 
-| Environment variable | Description                            | Default value |
-|----------------------|----------------------------------------|---------------|
-| `MINIO_ACCESS_KEY`   | Access key for the Minio service       |               |
-| `MINIO_ENDPOINT`     | URL for the Minio service              |               |
-| `MINIO_SECRET_KEY`   | Secret key for the Minio service       |               |
+| Environment variable     | Description                       | Default value |
+|--------------------------|-----------------------------------|---------------|
+| `MINIO_ACCESS_KEY`       | Access key for the Minio service  |               |
+| `MINIO_ENDPOINT`         | URL for the Minio service         |               |
+| `MINIO_SECRET_KEY`       | Secret key for the Minio service  |               |
+| `MINIO_CONSOLE_ENDPOINT` | URL for the MinIO Console service |               |
 
 #### Labels
 

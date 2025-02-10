@@ -39,9 +39,10 @@ type Config struct {
 	Keycloak   KeycloakConfig `optional:"true"`
 	Kubernetes KubernetesConfig
 	Minio      struct {
-		Endpoint  string `envconfig:"MINIO_ENDPOINT"`
-		AccessKey string `envconfig:"MINIO_ACCESS_KEY"`
-		SecretKey string `envconfig:"MINIO_SECRET_KEY"`
+		Endpoint   string `envconfig:"MINIO_ENDPOINT"`
+		AccessKey  string `envconfig:"MINIO_ACCESS_KEY"`
+		SecretKey  string `envconfig:"MINIO_SECRET_KEY"`
+		ConsoleURL string `envconfig:"MINIO_CONSOLE_ENDPOINT"`
 	}
 	Kg struct {
 		Enabled bool   `envconfig:"KNOWLEDGE_GALAXY_ENABLED" default:"false"`

@@ -140,9 +140,11 @@ type ComplexityRoot struct {
 	}
 
 	ToolUrls struct {
-		Filebrowser     func(childComplexity int) int
-		KnowledgeGalaxy func(childComplexity int) int
-		MLFlow          func(childComplexity int) int
+		Filebrowser            func(childComplexity int) int
+		KnowledgeGalaxy        func(childComplexity int) int
+		KnowledgeGalaxyEnabled func(childComplexity int) int
+		MLFlow                 func(childComplexity int) int
+		Minio                  func(childComplexity int) int
 	}
 
 	User struct {
@@ -705,12 +707,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ToolUrls.KnowledgeGalaxy(childComplexity), true
 
+	case "ToolUrls.knowledgeGalaxyEnabled":
+		if e.complexity.ToolUrls.KnowledgeGalaxyEnabled == nil {
+			break
+		}
+
+		return e.complexity.ToolUrls.KnowledgeGalaxyEnabled(childComplexity), true
+
 	case "ToolUrls.mlflow":
 		if e.complexity.ToolUrls.MLFlow == nil {
 			break
 		}
 
 		return e.complexity.ToolUrls.MLFlow(childComplexity), true
+
+	case "ToolUrls.minio":
+		if e.complexity.ToolUrls.Minio == nil {
+			break
+		}
+
+		return e.complexity.ToolUrls.Minio(childComplexity), true
 
 	case "User.apiTokens":
 		if e.complexity.User.APITokens == nil {
@@ -993,9 +1009,11 @@ type Member {
 }
 
 type ToolUrls {
+  knowledgeGalaxyEnabled: Boolean!
   knowledgeGalaxy: String!
   filebrowser: String!
   mlflow: String!
+  minio: String!
 }
 
 type QualityProjectDesc {
@@ -3337,12 +3355,16 @@ func (ec *executionContext) fieldContext_Project_toolUrls(_ context.Context, fie
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "knowledgeGalaxyEnabled":
+				return ec.fieldContext_ToolUrls_knowledgeGalaxyEnabled(ctx, field)
 			case "knowledgeGalaxy":
 				return ec.fieldContext_ToolUrls_knowledgeGalaxy(ctx, field)
 			case "filebrowser":
 				return ec.fieldContext_ToolUrls_filebrowser(ctx, field)
 			case "mlflow":
 				return ec.fieldContext_ToolUrls_mlflow(ctx, field)
+			case "minio":
+				return ec.fieldContext_ToolUrls_minio(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ToolUrls", field.Name)
 		},
@@ -4776,6 +4798,50 @@ func (ec *executionContext) fieldContext_SSHKey_lastActivity(_ context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _ToolUrls_knowledgeGalaxyEnabled(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ToolUrls_knowledgeGalaxyEnabled(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.KnowledgeGalaxyEnabled, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ToolUrls_knowledgeGalaxyEnabled(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ToolUrls",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ToolUrls_knowledgeGalaxy(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ToolUrls_knowledgeGalaxy(ctx, field)
 	if err != nil {
@@ -4896,6 +4962,50 @@ func (ec *executionContext) _ToolUrls_mlflow(ctx context.Context, field graphql.
 }
 
 func (ec *executionContext) fieldContext_ToolUrls_mlflow(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ToolUrls",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ToolUrls_minio(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ToolUrls_minio(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Minio, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ToolUrls_minio(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ToolUrls",
 		Field:      field,
@@ -8731,6 +8841,11 @@ func (ec *executionContext) _ToolUrls(ctx context.Context, sel ast.SelectionSet,
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ToolUrls")
+		case "knowledgeGalaxyEnabled":
+			out.Values[i] = ec._ToolUrls_knowledgeGalaxyEnabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "knowledgeGalaxy":
 			out.Values[i] = ec._ToolUrls_knowledgeGalaxy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -8743,6 +8858,11 @@ func (ec *executionContext) _ToolUrls(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "mlflow":
 			out.Values[i] = ec._ToolUrls_mlflow(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "minio":
+			out.Values[i] = ec._ToolUrls_minio(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

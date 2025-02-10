@@ -18,6 +18,7 @@ import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
 import RuntimeRunner, { RuntimeAction } from 'Components/RuntimeRunner/RuntimeRunner';
 import Tooltip from 'Components/Tooltip/Tooltip';
+import RuntimeIcon, { RUNTIME_STATUS } from 'Components/Icons/RuntimeIcon/RuntimeIcon';
 
 type Props = {
   isOpened: boolean;
@@ -32,6 +33,12 @@ function NavElements({ isOpened }: Props) {
   const runtimeRunning = useReactiveVar(runningRuntime);
   const panelData = useReactiveVar(primaryPanel);
   const runtimeLastRun = useReactiveVar(lastRanRuntime);
+
+  const executionPodFailed =
+    runtimeRunning?.runtimePodStatus === 'failed' ? RUNTIME_STATUS.STOPPED : RUNTIME_STATUS.NOT_SELECTED;
+  const executionPodStatus =
+    runtimeRunning?.runtimePodStatus === 'running' ? RUNTIME_STATUS.RUNNING : executionPodFailed;
+  const runtimePodStatus = runtimeRunning?.runtimePodStatus === 'pending' ? RUNTIME_STATUS.LOADING : executionPodStatus;
 
   const { openPanel: openRuntimesList, closePanel: closeRuntimesList } = usePanel(
     PanelType.PRIMARY,
@@ -49,13 +56,6 @@ function NavElements({ isOpened }: Props) {
 
     if (shouldOpen) openRuntimesList();
     else closeRuntimesList();
-  }
-
-  function getPodStatusStyles() {
-    if (runtimeRunning?.runtimePodStatus === 'pending') return styles.userToolStatusPending;
-    else if (runtimeRunning?.runtimePodStatus === 'running') return styles.userToolStatusRunning;
-    else if (runtimeRunning?.runtimePodStatus === 'failed') return styles.userToolStatusError;
-    else return styles.userToolStatusDefault;
   }
 
   function renderToggleToolsIcon() {
@@ -81,10 +81,6 @@ function NavElements({ isOpened }: Props) {
     );
   }
 
-  React.useEffect(() => {
-    getPodStatusStyles();
-  }, [runtimeRunning]);
-
   return (
     <>
       {mainRoutes.map(({ Icon, label, route }) => (
@@ -108,7 +104,9 @@ function NavElements({ isOpened }: Props) {
           <div className={cx(styles.usertoolsOptions, { [styles.opened]: isOpened })}>
             <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div className={getPodStatusStyles()}></div>
+                <div className={styles.userToolStatusIcon}>
+                  <RuntimeIcon className="icon-regular" status={runtimePodStatus} />
+                </div>
                 <div className={cx(styles.userToolLabel)}>USER TOOLS</div>
               </div>
             </AnimateHeight>

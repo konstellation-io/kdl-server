@@ -35,7 +35,7 @@ function NavElements({ isOpened }: Props) {
   const runtimeLastRun = useReactiveVar(lastRanRuntime);
 
   const executionPodFailed =
-    runtimeRunning?.runtimePodStatus === 'failed' ? RUNTIME_STATUS.STOPPED : RUNTIME_STATUS.NOT_SELECTED;
+    runtimeRunning?.runtimePodStatus === 'failed' ? RUNTIME_STATUS.ERROR : RUNTIME_STATUS.NOT_SELECTED;
   const executionPodStatus =
     runtimeRunning?.runtimePodStatus === 'running' ? RUNTIME_STATUS.RUNNING : executionPodFailed;
   const runtimePodStatus = runtimeRunning?.runtimePodStatus === 'pending' ? RUNTIME_STATUS.PENDING : executionPodStatus;

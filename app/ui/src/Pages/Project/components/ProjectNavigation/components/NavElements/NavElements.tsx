@@ -38,7 +38,7 @@ function NavElements({ isOpened }: Props) {
     runtimeRunning?.runtimePodStatus === 'failed' ? RUNTIME_STATUS.STOPPED : RUNTIME_STATUS.NOT_SELECTED;
   const executionPodStatus =
     runtimeRunning?.runtimePodStatus === 'running' ? RUNTIME_STATUS.RUNNING : executionPodFailed;
-  const runtimePodStatus = runtimeRunning?.runtimePodStatus === 'pending' ? RUNTIME_STATUS.LOADING : executionPodStatus;
+  const runtimePodStatus = runtimeRunning?.runtimePodStatus === 'pending' ? RUNTIME_STATUS.PENDING : executionPodStatus;
 
   const { openPanel: openRuntimesList, closePanel: closeRuntimesList } = usePanel(
     PanelType.PRIMARY,

@@ -1,0 +1,90 @@
+fullnameOverride: minio
+nameOverride: minio
+
+mode: standalone
+
+minioAPIPort: "9000"
+minioConsolePort: "9001"
+
+rootUser: {{ .Values.minio_access_key }}
+rootPassword: {{ .Values.minio_secret_key }}
+
+configPathmc: "/etc/minio/mc/"
+mountPath: "/export"
+
+tls:
+  enabled: false
+  certSecret: ""
+  publicCrt: public.crt
+  privateKey: private.key
+
+trustedCertsSecret: ""
+
+persistence:
+  enabled: true
+  storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+  size: 5Gi
+  accessMode: ReadWriteOnce
+
+ingress:
+  enabled: true
+  ingressClassName: public
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-clusterissuer
+  path: /
+  hosts:
+    - minio.{{ requiredEnv "DOMAIN" }}
+  tls:
+    - secretName: minio-tls
+      hosts:
+      - minio.{{ requiredEnv "DOMAIN" }}
+
+consoleIngress:
+  enabled: true
+  ingressClassName: public
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-clusterissuer
+  path: /
+  hosts:
+    - minio-console.{{ requiredEnv "DOMAIN" }}
+  tls:
+    - secretName: minio-console-tls
+      hosts:
+      - minio-console.{{ requiredEnv "DOMAIN" }}
+
+resources:
+  requests:
+    memory: 1Gi
+
+users: []
+
+## OpenID Identity Management
+## The following section documents environment variables for enabling external identity management using an OpenID Connect (OIDC)-compatible provider.
+## See https://min.io/docs/minio/linux/operations/external-iam/configure-openid-external-identity-management.html for a tutorial on using these variables.
+oidc:
+  enabled: true
+  configUrl: "https://keycloak.{{ requiredEnv "DOMAIN" }}/realms/kdl/.well-known/openid-configuration"
+  clientId: "minio"
+  clientSecret: "minio123456"
+  claimName: "policy"
+  scopes: "openid email"
+  redirectUri: "https://minio-console.{{ requiredEnv "DOMAIN" }}/oauth_callback"
+  displayName: "Your VASS Account"
+  rolePolicy: "readwrite"
+
+certsPath: "/certs/"
+
+extraVolumes:
+  - name: cert
+    secret:
+      secretName: keycloak-kdl-tls
+      defaultMode: 420
+      items:
+      - key: ca.crt
+        path: ca.crt
+
+extraVolumeMounts:
+  - name: cert
+    mountPath: /certs/CAs/ca.crt
+    readOnly: true
+    subPath: ca.crt

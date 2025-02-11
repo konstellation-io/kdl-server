@@ -5,11 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"time"
+	"strconv"
 
 	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
+	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioadminservice"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/minioservice"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/clock"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
@@ -86,31 +87,50 @@ func (c CreateProjectOption) Validate() error {
 
 // interactor implements the UseCase interface.
 type interactor struct {
-	logger           logr.Logger
-	projectRepo      Repository
-	userActivityRepo UserActivityRepo
-	clock            clock.Clock
-	minioService     minioservice.MinioService
-	k8sClient        k8s.ClientInterface
+	logger            logr.Logger
+	projectRepo       Repository
+	userActivityRepo  UserActivityRepo
+	clock             clock.Clock
+	minioService      minioservice.MinioService
+	minioAdminService minioadminservice.MinioAdminInterface
+	k8sClient         k8s.ClientInterface
+	randomGenerator   kdlutil.RandomGenerator
 }
+
+// Assure implementation adheres to interface.
+var _ UseCase = (*interactor)(nil)
 
 // NewInteractor is a constructor function.
 func NewInteractor(
 	logger logr.Logger,
 	k8sClient k8s.ClientInterface,
 	minioService minioservice.MinioService,
+	minioAdminService minioadminservice.MinioAdminInterface,
 	realClock clock.Clock,
 	projectRepo Repository,
 	userActivityRepo UserActivityRepo,
+	randomGenerator kdlutil.RandomGenerator,
 ) UseCase {
 	return &interactor{
-		logger:           logger,
-		projectRepo:      projectRepo,
-		userActivityRepo: userActivityRepo,
-		clock:            realClock,
-		minioService:     minioService,
-		k8sClient:        k8sClient,
+		logger:            logger,
+		projectRepo:       projectRepo,
+		userActivityRepo:  userActivityRepo,
+		clock:             realClock,
+		minioService:      minioService,
+		minioAdminService: minioAdminService,
+		k8sClient:         k8sClient,
+		randomGenerator:   randomGenerator,
 	}
+}
+
+// Save user activity.
+func (i *interactor) SaveUserActivity(ctx context.Context, userActivity entity.UserActivity) error {
+	err := i.userActivityRepo.Create(ctx, userActivity)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 /*
@@ -120,6 +140,8 @@ Depending on the repository type:
   - Create a k8s KDLProject containing a MLFLow instance
   - Create Minio bucket
   - Create Minio folders
+  - Create Minio project user
+  - Create Minio policy for the project user
 */
 func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entity.Project, error) {
 	// Validate the creation input
@@ -129,6 +151,12 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 	}
 
 	now := i.clock.Now()
+
+	// Generate a secret key for the Minio project user
+	secretKey, err := i.randomGenerator.GenerateRandomString(40)
+	if err != nil {
+		return entity.Project{}, err
+	}
 
 	project := entity.NewProject(opt.ProjectID, opt.Name, opt.Description)
 	project.CreationDate = now
@@ -146,12 +174,6 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		RepoName: opt.ProjectID,
 	}
 
-	// Create a k8s KDLProject containing a MLFLow instance
-	err = i.k8sClient.CreateKDLProjectCR(ctx, opt.ProjectID)
-	if err != nil {
-		return entity.Project{}, err
-	}
-
 	// Create Minio bucket
 	err = i.minioService.CreateBucket(ctx, opt.ProjectID)
 	if err != nil {
@@ -164,8 +186,50 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 		return entity.Project{}, err
 	}
 
+	// Create Minio policy for the project user
+	err = i.minioAdminService.CreateProjectPolicy(ctx, opt.ProjectID)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	// Create Minio project user
+	accessKey, err := i.minioAdminService.CreateProjectUser(ctx, opt.ProjectID, secretKey)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	project.MinioAccessKey = entity.MinioAccessKey{
+		AccessKey: accessKey,
+		SecretKey: secretKey,
+	}
+
+	// Add admin as member of the project on MinIO
+	err = i.minioAdminService.JoinProject(ctx, opt.Owner.Email, opt.ProjectID)
+	if err != nil {
+		return entity.Project{}, fmt.Errorf("%w: user ID=%s", err, opt.Owner.ID)
+	}
+
+	// Create a k8s KDLProject containing a MLFLow instance
+	err = i.k8sClient.CreateKDLProjectCR(ctx, k8s.ProjectData{ProjectID: opt.ProjectID, MinioAccessKey: project.MinioAccessKey})
+	if err != nil {
+		return entity.Project{}, err
+	}
+
 	// Store the project into the database
 	insertedID, err := i.projectRepo.Create(ctx, project)
+	if err != nil {
+		return entity.Project{}, err
+	}
+
+	createRepoActVars := entity.NewActivityVarsWithProjectAndUserID(project.ID, opt.Owner.ID)
+	createRepoUserAct := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: opt.Owner.ID,
+		Type:   entity.UserActivityTypeCreateProject,
+		Vars:   createRepoActVars,
+	}
+
+	err = i.SaveUserActivity(ctx, createRepoUserAct)
 	if err != nil {
 		return entity.Project{}, err
 	}
@@ -189,8 +253,24 @@ func (i *interactor) GetByID(ctx context.Context, id string) (entity.Project, er
 
 // Update changes the desired information about a project.
 func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
+	p, _ := i.projectRepo.Get(ctx, opt.ProjectID)
+
+	userActivity := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: opt.UserID,
+	}
+
 	if !kdlutil.IsNilOrEmpty(opt.Name) {
 		err := i.projectRepo.UpdateName(ctx, opt.ProjectID, *opt.Name)
+		if err != nil {
+			return entity.Project{}, err
+		}
+
+		// Save project name updated in user activity
+		userActivity.Type = entity.UserActivityTypeUpdateProjectName
+		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(opt.ProjectID, p.Name, *opt.Name)
+		err = i.SaveUserActivity(ctx, userActivity)
+
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -201,10 +281,32 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 		if err != nil {
 			return entity.Project{}, err
 		}
+
+		// Save project description updated in user activity
+		userActivity.Type = entity.UserActivityTypeUpdateProjectDescription
+		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(opt.ProjectID, p.Description, *opt.Description)
+		err = i.SaveUserActivity(ctx, userActivity)
+
+		if err != nil {
+			return entity.Project{}, err
+		}
 	}
 
 	if opt.Archived != nil {
 		err := i.projectRepo.UpdateArchived(ctx, opt.ProjectID, *opt.Archived)
+		if err != nil {
+			return entity.Project{}, err
+		}
+
+		// Save project archived updated in user activity
+		userActivity.Type = entity.UserActivityTypeUpdateProjectArchived
+		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(
+			opt.ProjectID,
+			strconv.FormatBool(p.Archived),
+			strconv.FormatBool(*opt.Archived),
+		)
+		err = i.SaveUserActivity(ctx, userActivity)
+
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -241,6 +343,19 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 		return nil, err
 	}
 
+	// Determine policy/user name
+	accessKey := fmt.Sprintf("project-%s", projectID)
+
+	err = i.minioAdminService.DeleteProjectPolicy(ctx, accessKey)
+	if err != nil {
+		return nil, err
+	}
+
+	err = i.minioAdminService.DeleteUser(ctx, accessKey)
+	if err != nil {
+		return nil, err
+	}
+
 	err = i.projectRepo.DeleteOne(ctx, projectID)
 	if err != nil {
 		return nil, err
@@ -248,13 +363,13 @@ func (i *interactor) Delete(ctx context.Context, opt DeleteProjectOption) (*enti
 
 	deleteRepoActVars := entity.NewActivityVarsDeleteRepo(projectID, minioBackup)
 	deleteRepoUserAct := entity.UserActivity{
-		Date:   time.Now(),
+		Date:   i.clock.Now(),
 		UserID: opt.LoggedUser.ID,
 		Type:   entity.UserActivityTypeDeleteProject,
 		Vars:   deleteRepoActVars,
 	}
 
-	err = i.userActivityRepo.Create(ctx, deleteRepoUserAct)
+	err = i.SaveUserActivity(ctx, deleteRepoUserAct)
 	if err != nil {
 		return nil, err
 	}

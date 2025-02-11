@@ -1,0 +1,15 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": [
+                {{- range $index, $bucket := .BucketNames }}
+                "arn:aws:s3:::{{ $bucket }}",
+                "arn:aws:s3:::{{ $bucket }}/*"{{- if ne (add $index 1) (len $.BucketNames) }},{{- end }}
+                {{- end }}
+            ]
+        }
+    ]
+}

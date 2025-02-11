@@ -21,6 +21,10 @@ function buildProject(_, index) {
       filebrowser: 'https://filebrowser.org/',
       mlflow: 'https://mlflow.org/',
     },
+    minioAccessKey: {
+      accessKey: casual.uuid,
+      secretKey: casual.uuid,
+    },
   };
 }
 

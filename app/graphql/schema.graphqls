@@ -88,6 +88,7 @@ type Project {
   toolUrls: ToolUrls!
   needAccess: Boolean!
   archived: Boolean!
+  minioAccessKey: MinioAccessKey!
 }
 
 type Repository {
@@ -99,6 +100,11 @@ type Member {
   user: User!
   accessLevel: AccessLevel!
   addedDate: String!
+}
+
+type MinioAccessKey {
+  accessKey: String!
+  secretKey: String!
 }
 
 type ToolUrls {

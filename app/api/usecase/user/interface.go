@@ -26,13 +26,14 @@ type Repository interface {
 	UpdateUsername(ctx context.Context, email, userID string) error
 	UpdateDeleted(ctx context.Context, userID string, deleted bool) error
 	UpdateLastActivity(ctx context.Context, userID string, lastActivity time.Time) error
+	UpdateMinioAccess(ctx context.Context, username, accessKey, secretKey string) error
 }
 
 // UseCase interface to manage all operations related with users.
 type UseCase interface {
 	Create(ctx context.Context, email, sub string, accessLevel entity.AccessLevel) (entity.User, error)
 	UpdateSub(ctx context.Context, user entity.User, sub string) (entity.User, error)
-	UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel) ([]entity.User, error)
+	UpdateAccessLevel(ctx context.Context, userIDs []string, level entity.AccessLevel, loggedUserID string) ([]entity.User, error)
 	UpdateLastActivity(ctx context.Context, user entity.User) (entity.User, error)
 	FindAll(ctx context.Context) ([]entity.User, error)
 	GetByEmail(ctx context.Context, email string) (entity.User, error)

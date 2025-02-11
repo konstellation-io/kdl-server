@@ -71,6 +71,11 @@ type ComplexityRoot struct {
 		User        func(childComplexity int) int
 	}
 
+	MinioAccessKey struct {
+		AccessKey func(childComplexity int) int
+		SecretKey func(childComplexity int) int
+	}
+
 	Mutation struct {
 		AddAPIToken        func(childComplexity int, input *model.APITokenInput) int
 		AddMembers         func(childComplexity int, input model.AddMembersInput) int
@@ -95,6 +100,7 @@ type ComplexityRoot struct {
 		ID                 func(childComplexity int) int
 		LastActivationDate func(childComplexity int) int
 		Members            func(childComplexity int) int
+		MinioAccessKey     func(childComplexity int) int
 		Name               func(childComplexity int) int
 		NeedAccess         func(childComplexity int) int
 		Repository         func(childComplexity int) int
@@ -304,6 +310,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Member.User(childComplexity), true
 
+	case "MinioAccessKey.accessKey":
+		if e.complexity.MinioAccessKey.AccessKey == nil {
+			break
+		}
+
+		return e.complexity.MinioAccessKey.AccessKey(childComplexity), true
+
+	case "MinioAccessKey.secretKey":
+		if e.complexity.MinioAccessKey.SecretKey == nil {
+			break
+		}
+
+		return e.complexity.MinioAccessKey.SecretKey(childComplexity), true
+
 	case "Mutation.addApiToken":
 		if e.complexity.Mutation.AddAPIToken == nil {
 			break
@@ -493,6 +513,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Project.Members(childComplexity), true
+
+	case "Project.minioAccessKey":
+		if e.complexity.Project.MinioAccessKey == nil {
+			break
+		}
+
+		return e.complexity.Project.MinioAccessKey(childComplexity), true
 
 	case "Project.name":
 		if e.complexity.Project.Name == nil {
@@ -990,6 +1017,7 @@ type Project {
   toolUrls: ToolUrls!
   needAccess: Boolean!
   archived: Boolean!
+  minioAccessKey: MinioAccessKey!
 }
 
 type Repository {
@@ -1001,6 +1029,11 @@ type Member {
   user: User!
   accessLevel: AccessLevel!
   addedDate: String!
+}
+
+type MinioAccessKey {
+  accessKey: String!
+  secretKey: String!
 }
 
 type ToolUrls {
@@ -2077,6 +2110,94 @@ func (ec *executionContext) fieldContext_Member_addedDate(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _MinioAccessKey_accessKey(ctx context.Context, field graphql.CollectedField, obj *entity.MinioAccessKey) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MinioAccessKey_accessKey(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AccessKey, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MinioAccessKey_accessKey(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MinioAccessKey",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MinioAccessKey_secretKey(ctx context.Context, field graphql.CollectedField, obj *entity.MinioAccessKey) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MinioAccessKey_secretKey(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SecretKey, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MinioAccessKey_secretKey(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MinioAccessKey",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_regenerateSSHKey(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_regenerateSSHKey(ctx, field)
 	if err != nil {
@@ -2354,6 +2475,8 @@ func (ec *executionContext) fieldContext_Mutation_addMembers(ctx context.Context
 				return ec.fieldContext_Project_needAccess(ctx, field)
 			case "archived":
 				return ec.fieldContext_Project_archived(ctx, field)
+			case "minioAccessKey":
+				return ec.fieldContext_Project_minioAccessKey(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -2435,6 +2558,8 @@ func (ec *executionContext) fieldContext_Mutation_createProject(ctx context.Cont
 				return ec.fieldContext_Project_needAccess(ctx, field)
 			case "archived":
 				return ec.fieldContext_Project_archived(ctx, field)
+			case "minioAccessKey":
+				return ec.fieldContext_Project_minioAccessKey(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -2513,6 +2638,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteProject(ctx context.Cont
 				return ec.fieldContext_Project_needAccess(ctx, field)
 			case "archived":
 				return ec.fieldContext_Project_archived(ctx, field)
+			case "minioAccessKey":
+				return ec.fieldContext_Project_minioAccessKey(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -2594,6 +2721,8 @@ func (ec *executionContext) fieldContext_Mutation_removeMembers(ctx context.Cont
 				return ec.fieldContext_Project_needAccess(ctx, field)
 			case "archived":
 				return ec.fieldContext_Project_archived(ctx, field)
+			case "minioAccessKey":
+				return ec.fieldContext_Project_minioAccessKey(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -2675,6 +2804,8 @@ func (ec *executionContext) fieldContext_Mutation_updateMembers(ctx context.Cont
 				return ec.fieldContext_Project_needAccess(ctx, field)
 			case "archived":
 				return ec.fieldContext_Project_archived(ctx, field)
+			case "minioAccessKey":
+				return ec.fieldContext_Project_minioAccessKey(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -2756,6 +2887,8 @@ func (ec *executionContext) fieldContext_Mutation_updateProject(ctx context.Cont
 				return ec.fieldContext_Project_needAccess(ctx, field)
 			case "archived":
 				return ec.fieldContext_Project_archived(ctx, field)
+			case "minioAccessKey":
+				return ec.fieldContext_Project_minioAccessKey(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -3513,6 +3646,56 @@ func (ec *executionContext) fieldContext_Project_archived(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Project_minioAccessKey(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_minioAccessKey(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MinioAccessKey, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entity.MinioAccessKey)
+	fc.Result = res
+	return ec.marshalNMinioAccessKey2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMinioAccessKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Project_minioAccessKey(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "accessKey":
+				return ec.fieldContext_MinioAccessKey_accessKey(ctx, field)
+			case "secretKey":
+				return ec.fieldContext_MinioAccessKey_secretKey(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MinioAccessKey", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _QualityProjectDesc_quality(ctx context.Context, field graphql.CollectedField, obj *model.QualityProjectDesc) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_QualityProjectDesc_quality(ctx, field)
 	if err != nil {
@@ -3780,6 +3963,8 @@ func (ec *executionContext) fieldContext_Query_project(ctx context.Context, fiel
 				return ec.fieldContext_Project_needAccess(ctx, field)
 			case "archived":
 				return ec.fieldContext_Project_archived(ctx, field)
+			case "minioAccessKey":
+				return ec.fieldContext_Project_minioAccessKey(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -3861,6 +4046,8 @@ func (ec *executionContext) fieldContext_Query_projects(_ context.Context, field
 				return ec.fieldContext_Project_needAccess(ctx, field)
 			case "archived":
 				return ec.fieldContext_Project_archived(ctx, field)
+			case "minioAccessKey":
+				return ec.fieldContext_Project_minioAccessKey(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -7978,6 +8165,50 @@ func (ec *executionContext) _Member(ctx context.Context, sel ast.SelectionSet, o
 	return out
 }
 
+var minioAccessKeyImplementors = []string{"MinioAccessKey"}
+
+func (ec *executionContext) _MinioAccessKey(ctx context.Context, sel ast.SelectionSet, obj *entity.MinioAccessKey) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, minioAccessKeyImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MinioAccessKey")
+		case "accessKey":
+			out.Values[i] = ec._MinioAccessKey_accessKey(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "secretKey":
+			out.Values[i] = ec._MinioAccessKey_secretKey(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -8253,6 +8484,11 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "archived":
 			out.Values[i] = ec._Project_archived(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "minioAccessKey":
+			out.Values[i] = ec._Project_minioAccessKey(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -9615,6 +9851,10 @@ func (ec *executionContext) marshalNMember2ᚕgithubᚗcomᚋkonstellationᚑio�
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalNMinioAccessKey2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMinioAccessKey(ctx context.Context, sel ast.SelectionSet, v entity.MinioAccessKey) graphql.Marshaler {
+	return ec._MinioAccessKey(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNProject2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx context.Context, sel ast.SelectionSet, v entity.Project) graphql.Marshaler {

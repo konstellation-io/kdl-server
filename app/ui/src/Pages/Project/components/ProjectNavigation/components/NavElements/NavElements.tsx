@@ -18,6 +18,7 @@ import { USERTOOLS_PANEL_OPTIONS } from 'Pages/Project/panelSettings';
 import { PANEL_ID } from 'Graphql/client/models/Panel';
 import RuntimeRunner, { RuntimeAction } from 'Components/RuntimeRunner/RuntimeRunner';
 import Tooltip from 'Components/Tooltip/Tooltip';
+import RuntimeIcon, { RUNTIME_STATUS } from 'Components/Icons/RuntimeIcon/RuntimeIcon';
 
 type Props = {
   isOpened: boolean;
@@ -32,6 +33,12 @@ function NavElements({ isOpened }: Props) {
   const runtimeRunning = useReactiveVar(runningRuntime);
   const panelData = useReactiveVar(primaryPanel);
   const runtimeLastRun = useReactiveVar(lastRanRuntime);
+
+  const executionPodFailed =
+    runtimeRunning?.runtimePodStatus === 'failed' ? RUNTIME_STATUS.ERROR : RUNTIME_STATUS.NOT_SELECTED;
+  const executionPodStatus =
+    runtimeRunning?.runtimePodStatus === 'running' ? RUNTIME_STATUS.RUNNING : executionPodFailed;
+  const runtimePodStatus = runtimeRunning?.runtimePodStatus === 'pending' ? RUNTIME_STATUS.PENDING : executionPodStatus;
 
   const { openPanel: openRuntimesList, closePanel: closeRuntimesList } = usePanel(
     PanelType.PRIMARY,
@@ -96,15 +103,11 @@ function NavElements({ isOpened }: Props) {
         >
           <div className={cx(styles.usertoolsOptions, { [styles.opened]: isOpened })}>
             <AnimateHeight height={isOpened ? 'auto' : 0} duration={300}>
-              <div
-                className={cx(styles.userToolLabel, {
-                  [styles.pending]: runtimeRunning?.runtimePodStatus === 'pending',
-                  [styles.running]: runtimeRunning?.runtimePodStatus === 'running',
-                  [styles.error]:
-                    runtimeRunning?.runtimePodStatus !== 'running' && runtimeRunning?.runtimePodStatus !== 'pending',
-                })}
-              >
-                USER TOOLS
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div className={styles.userToolStatusIcon}>
+                  <RuntimeIcon className="icon-regular" status={runtimePodStatus} />
+                </div>
+                <div className={cx(styles.userToolLabel)}>USER TOOLS</div>
               </div>
             </AnimateHeight>
             <div

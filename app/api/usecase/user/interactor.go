@@ -24,6 +24,7 @@ import (
 var (
 	ErrStopUserTools   = errors.New("cannot stop uninitialized user tools")
 	ErrUserToolsActive = errors.New("it is not possible to regenerate SSH keys with the usertools active")
+	ErrSyncData        = errors.New("error synchronizing user data")
 )
 
 type Interactor struct {
@@ -397,16 +398,36 @@ func (i *Interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 		return entity.User{}, err
 	}
 
-	// Update the user SSH keys secret in k8s.
-	err = i.k8sClient.UpdateUserSSHKeySecret(ctx, user, keys.Public, keys.Private)
-	if err != nil {
-		return entity.User{}, err
+	// Update the user SSH keys secret in k8s if exist, else create it.
+	sshKey, err := i.k8sClient.GetUserSSHKeyPublic(ctx, user.UsernameSlug())
+
+	updatedSSHKey := false
+
+	if sshKey != nil {
+		err = i.k8sClient.UpdateUserSSHKeySecret(ctx, user, keys.Public, keys.Private)
+		if err != nil {
+			return entity.User{}, err
+		}
+
+		updatedSSHKey = true
 	}
 
-	// Update the user ssh keys in the DB.
-	err = i.repo.UpdateSSHKey(ctx, user.Username, keys)
-	if err != nil {
-		return entity.User{}, err
+	if err != nil && k8errors.IsNotFound(err) {
+		// Create the secret if it doesn't exist.
+		err = i.k8sClient.CreateUserSSHKeySecret(ctx, user, keys.Public, keys.Private)
+		if err != nil {
+			return entity.User{}, err
+		}
+
+		updatedSSHKey = true
+	}
+
+	if updatedSSHKey {
+		// Update the user ssh keys in the DB.
+		err = i.repo.UpdateSSHKey(ctx, user.Username, keys)
+		if err != nil {
+			return entity.User{}, err
+		}
 	}
 
 	i.logger.Info("The SSH keys for user has been successfully regenerated", "username", user.Username)
@@ -414,27 +435,65 @@ func (i *Interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (e
 	return i.repo.GetByUsername(ctx, user.Username)
 }
 
-// SynchronizeServiceAccountsForUsers ensures all users has their serviceAccount created and delete it
-// - for users that has been removed.
-func (i *Interactor) SynchronizeServiceAccountsForUsers() error {
-	ctx := context.Background()
+func (i *Interactor) synchronizeServiceAccount(ctx context.Context, user entity.User) error {
+	i.logger.Info("Creating user serviceAccount", "username", user.UsernameSlug())
+	_, err := i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
 
-	users, err := i.repo.FindAll(ctx, true)
+	if err == nil {
+		i.logger.Info("User serviceAccount created successfully", "username", user.UsernameSlug())
+		return nil
+	}
+
+	if k8errors.IsNotFound(err) {
+		i.logger.Info("User serviceAccount already exists", "username", user.UsernameSlug())
+		return nil
+	}
+
+	return err
+}
+
+// SyncUserData ensures user data is sync across other 3pp systems (k8s serviceAccount, ssh keys and minIO user).
+func (i *Interactor) SyncUserData(ctx context.Context, userID string, syncSA, syncSSHKeys, syncMinio bool) error {
+	user, err := i.repo.Get(ctx, userID)
 	if err != nil {
 		return err
 	}
 
-	for _, user := range users {
-		if user.Deleted {
-			if err := i.k8sClient.DeleteUserServiceAccount(ctx, user.UsernameSlug()); err != nil {
-				i.logger.Error(err, "Error deleting user service account for user", "username", user.UsernameSlug())
-			}
-		} else {
-			_, err = i.k8sClient.CreateUserServiceAccount(ctx, user.UsernameSlug())
-			if err != nil && !k8errors.IsNotFound(err) {
-				i.logger.Error(err, "Error creating user serviceAccount for user", "username", user.UsernameSlug())
-			}
+	syncHasError := false
+
+	i.logger.Info("Synchronizing user data", "username", user.Username)
+
+	if syncSA {
+		// sync service account
+		if err = i.synchronizeServiceAccount(ctx, user); err != nil {
+			syncHasError = true
+
+			i.logger.Error(err, "Error creating user serviceAccount", "username", user.UsernameSlug())
 		}
+	}
+
+	if syncSSHKeys {
+		// sync ssh keys
+		_, err = i.RegenerateSSHKeys(ctx, user)
+		if err != nil {
+			syncHasError = true
+
+			i.logger.Error(err, "Error creating user sshKeys", "username", user.UsernameSlug())
+		}
+	}
+
+	if syncMinio {
+		// sync minIO user
+		_, err = i.minioAdminService.CreateUser(ctx, user.Email, user.MinioAccessKey.SecretKey)
+		if err != nil {
+			syncHasError = true
+
+			i.logger.Error(err, "Error creating user in MinIO", "username", user.UsernameSlug())
+		}
+	}
+
+	if syncHasError {
+		return ErrSyncData
 	}
 
 	return nil

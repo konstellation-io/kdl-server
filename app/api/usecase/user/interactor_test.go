@@ -14,6 +14,7 @@ import (
 	"go.uber.org/zap"
 	"gotest.tools/v3/assert"
 	v1 "k8s.io/api/core/v1"
+	k8errors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
@@ -582,7 +583,7 @@ func TestInteractor_GetByID(t *testing.T) {
 	require.Equal(t, expectedUser, users)
 }
 
-func TestInteractor_RegenerateSSHKeys(t *testing.T) {
+func TestInteractor_RegenerateSSHKeys_ExistingSSHKeys(t *testing.T) {
 	s := newUserSuite(t)
 	defer s.ctrl.Finish()
 
@@ -590,6 +591,7 @@ func TestInteractor_RegenerateSSHKeys(t *testing.T) {
 		id            = "user.1234"
 		email         = "user@email.com"
 		username      = "john.doe"
+		usernameSlug  = "john-doe"
 		accessLevel   = entity.AccessLevelAdmin
 		publicSSHKey  = "test-ssh-key-public"
 		privateSSHKey = "test-ssh-key-private"
@@ -615,7 +617,53 @@ func TestInteractor_RegenerateSSHKeys(t *testing.T) {
 
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(false, nil)
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
+	s.mocks.k8sClientMock.EXPECT().GetUserSSHKeyPublic(ctx, usernameSlug).Return([]byte{}, nil)
 	s.mocks.k8sClientMock.EXPECT().UpdateUserSSHKeySecret(ctx, targetUser, publicSSHKey, privateSSHKey)
+	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, sshKey).Return(nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(targetUser, nil).AnyTimes()
+
+	userData, err := s.interactor.RegenerateSSHKeys(ctx, targetUser)
+
+	require.NoError(t, err)
+	require.Equal(t, targetUser, userData)
+}
+
+func TestInteractor_RegenerateSSHKeys_NotExistingSSHKeys(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		id            = "user.1234"
+		email         = "user@email.com"
+		username      = "john.doe"
+		usernameSlug  = "john-doe"
+		accessLevel   = entity.AccessLevelAdmin
+		publicSSHKey  = "test-ssh-key-public"
+		privateSSHKey = "test-ssh-key-private"
+	)
+
+	ctx := context.Background()
+	now := time.Now().UTC()
+
+	sshKey := entity.SSHKey{
+		Public:       publicSSHKey,
+		Private:      privateSSHKey,
+		CreationDate: now,
+	}
+
+	targetUser := entity.User{
+		ID:           id,
+		Username:     username,
+		Email:        email,
+		AccessLevel:  accessLevel,
+		SSHKey:       sshKey,
+		CreationDate: now,
+	}
+
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(false, nil)
+	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
+	s.mocks.k8sClientMock.EXPECT().GetUserSSHKeyPublic(ctx, usernameSlug).Return(nil, k8errors.NewNotFound(v1.Resource("user"), usernameSlug))
+	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, targetUser, publicSSHKey, privateSSHKey).Return(nil)
 	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, sshKey).Return(nil)
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(targetUser, nil).AnyTimes()
 
@@ -847,12 +895,43 @@ func TestInteractor_GetKubeconfig(t *testing.T) {
 	require.Equal(t, string(expectedKubeconfig), returnedKubeconfig)
 }
 
-func TestInteractor_SynchronizeServiceAccountsForUsers(t *testing.T) {
-	// GIVEN there are two active users and one deleted user
-	// WHEN the serviceAccounts for the users are called
-	// AND k8client.CreateUserServiceAccount is called two times
-	// AND k8client.DeleteUserServiceAccount is called one time
-	// AND there are no errors
+func TestInteractor_SyncUserData(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		id           = "user.1234"
+		username     = "john.doe"
+		usernameSlug = "john-doe"
+		email        = "john@doe.com"
+		syncSA       = true
+		syncSSHKeys  = true
+		syncMinio    = true
+	)
+
+	ctx := context.Background()
+
+	user := entity.User{
+		ID:       id,
+		Username: username,
+		Email:    email,
+	}
+
+	s.mocks.repo.EXPECT().Get(ctx, id).Return(user, nil)
+	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, user.UsernameSlug()).Return(nil, nil)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(false, nil)
+	s.mocks.sshGenerator.EXPECT().NewKeys().Return(entity.SSHKey{}, nil)
+	s.mocks.k8sClientMock.EXPECT().GetUserSSHKeyPublic(ctx, usernameSlug).Return([]byte{}, nil)
+	s.mocks.k8sClientMock.EXPECT().UpdateUserSSHKeySecret(ctx, user, gomock.Any(), gomock.Any()).Return(nil)
+	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, gomock.Any()).Return(nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(user, nil)
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, "").Return(email, nil)
+
+	err := s.interactor.SyncUserData(ctx, id, syncSA, syncSSHKeys, syncMinio)
+	require.NoError(t, err)
+}
+
+func TestInteractor_SyncUserData_InputSyncIsFalse(t *testing.T) {
 	s := newUserSuite(t)
 	defer s.ctrl.Finish()
 
@@ -860,40 +939,148 @@ func TestInteractor_SynchronizeServiceAccountsForUsers(t *testing.T) {
 		id          = "user.1234"
 		username    = "john.doe"
 		email       = "john@doe.com"
-		accessLevel = entity.AccessLevelAdmin
+		syncSA      = false
+		syncSSHKeys = false
+		syncMinio   = false
 	)
 
 	ctx := context.Background()
 
-	targetUser := entity.User{
-		ID:          id,
-		Username:    username,
-		Email:       email,
-		AccessLevel: accessLevel,
-		Deleted:     false,
+	user := entity.User{
+		ID:       id,
+		Username: username,
+		Email:    email,
 	}
 
-	deletedTargetUser := entity.User{
-		ID:          id,
-		Username:    "rick.sanchez",
-		Email:       email,
-		AccessLevel: accessLevel,
-		Deleted:     true,
-	}
+	s.mocks.repo.EXPECT().Get(ctx, id).Return(user, nil)
 
-	users := []entity.User{targetUser, targetUser, deletedTargetUser}
-	toDeleteUsers := []entity.User{deletedTargetUser}
-
-	s.mocks.repo.EXPECT().FindAll(ctx, true).Return(users, nil)
-	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(
-		ctx, targetUser.UsernameSlug()).Return(nil, nil).Times(len(users) - len(toDeleteUsers))
-	s.mocks.k8sClientMock.EXPECT().DeleteUserServiceAccount(
-		ctx, deletedTargetUser.UsernameSlug()).Return(nil).Times(len(toDeleteUsers))
-
-	// WHEN the CreateMissingServiceAccountsForUsers is called
-	err := s.interactor.SynchronizeServiceAccountsForUsers()
-
+	err := s.interactor.SyncUserData(ctx, id, syncSA, syncSSHKeys, syncMinio)
 	require.NoError(t, err)
+}
+
+func TestInteractor_SyncUserData_MissingUserId(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		id          = "user.1234"
+		syncSA      = true
+		syncSSHKeys = true
+		syncMinio   = true
+	)
+
+	ctx := context.Background()
+
+	s.mocks.repo.EXPECT().Get(ctx, id).Return(entity.User{}, errUnexpected)
+
+	err := s.interactor.SyncUserData(ctx, id, syncSA, syncSSHKeys, syncMinio)
+	require.Error(t, err)
+}
+
+func TestInteractor_SyncUserData_CreateServiceAccountError(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		id           = "user.1234"
+		username     = "john.doe"
+		usernameSlug = "john-doe"
+		email        = "john@doe.com"
+		syncSA       = true
+		syncSSHKeys  = true
+		syncMinio    = true
+	)
+
+	ctx := context.Background()
+
+	user := entity.User{
+		ID:       id,
+		Username: username,
+		Email:    email,
+	}
+
+	s.mocks.repo.EXPECT().Get(ctx, id).Return(user, nil)
+	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, user.UsernameSlug()).Return(nil, errUnexpected)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(false, nil)
+	s.mocks.sshGenerator.EXPECT().NewKeys().Return(entity.SSHKey{}, nil)
+	s.mocks.k8sClientMock.EXPECT().GetUserSSHKeyPublic(ctx, usernameSlug).Return([]byte{}, nil)
+	s.mocks.k8sClientMock.EXPECT().UpdateUserSSHKeySecret(ctx, user, gomock.Any(), gomock.Any()).Return(nil)
+	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, gomock.Any()).Return(nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(user, nil)
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, "").Return(email, nil)
+
+	err := s.interactor.SyncUserData(ctx, id, syncSA, syncSSHKeys, syncMinio)
+	require.Error(t, err)
+}
+
+func TestInteractor_SyncUserData_RegenerateSSHKeysError(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		id           = "user.1234"
+		username     = "john.doe"
+		usernameSlug = "john-doe"
+		email        = "john@doe.com"
+		syncSA       = true
+		syncSSHKeys  = true
+		syncMinio    = true
+	)
+
+	ctx := context.Background()
+
+	user := entity.User{
+		ID:       id,
+		Username: username,
+		Email:    email,
+	}
+
+	s.mocks.repo.EXPECT().Get(ctx, id).Return(user, nil)
+	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, user.UsernameSlug()).Return(nil, errUnexpected)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(false, nil)
+	s.mocks.sshGenerator.EXPECT().NewKeys().Return(entity.SSHKey{}, nil)
+	s.mocks.k8sClientMock.EXPECT().GetUserSSHKeyPublic(ctx, usernameSlug).Return(nil, errUnexpected)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(user, nil)
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, "").Return(email, nil)
+
+	err := s.interactor.SyncUserData(ctx, id, syncSA, syncSSHKeys, syncMinio)
+	require.Error(t, err)
+}
+
+func TestInteractor_SyncUserData_CreateMinioUserError(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		id           = "user.1234"
+		username     = "john.doe"
+		usernameSlug = "john-doe"
+		email        = "john@doe.com"
+		syncSA       = true
+		syncSSHKeys  = true
+		syncMinio    = true
+	)
+
+	ctx := context.Background()
+
+	user := entity.User{
+		ID:       id,
+		Username: username,
+		Email:    email,
+	}
+
+	s.mocks.repo.EXPECT().Get(ctx, id).Return(user, nil)
+	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, user.UsernameSlug()).Return(nil, errUnexpected)
+	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(false, nil)
+	s.mocks.sshGenerator.EXPECT().NewKeys().Return(entity.SSHKey{}, nil)
+	s.mocks.k8sClientMock.EXPECT().GetUserSSHKeyPublic(ctx, usernameSlug).Return([]byte{}, nil)
+	s.mocks.k8sClientMock.EXPECT().UpdateUserSSHKeySecret(ctx, user, gomock.Any(), gomock.Any()).Return(nil)
+	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, gomock.Any()).Return(nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(user, nil)
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, "").Return("", errUnexpected)
+
+	err := s.interactor.SyncUserData(ctx, id, syncSA, syncSSHKeys, syncMinio)
+	require.Error(t, err)
 }
 
 func TestInteractor_UpdateKDLUserTools(t *testing.T) {

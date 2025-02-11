@@ -198,6 +198,23 @@ func (r *mutationResolver) RemoveAPIToken(ctx context.Context, input *model.Remo
 	return nil, entity.ErrNotImplemented
 }
 
+// SynchronizeUsersData is the resolver for the synchronizeUsersData field.
+func (r *mutationResolver) SynchronizeUsersData(ctx context.Context, input *model.SyncUsersDataInput) (*bool, error) {
+	lastError := error(nil)
+	for _, userID := range input.UserIds {
+		err := r.users.SyncUserData(ctx, userID, input.ServiceAccount, input.SSHKeys, input.MinioUser)
+		if err != nil {
+			lastError = err
+			r.logger.Error(err, "Error synchronizing user data", "userID", userID)
+		}
+	}
+	if lastError != nil {
+		return nil, lastError
+	}
+	result := true
+	return &result, nil
+}
+
 // CreationDate is the resolver for the creationDate field.
 func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project) (string, error) {
 	return obj.CreationDate.Format(time.RFC3339), nil

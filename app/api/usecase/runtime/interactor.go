@@ -37,8 +37,9 @@ func (i interactor) GetRuntimes(ctx context.Context, username string) ([]entity.
 	}
 
 	// update the runtime pods names
-	for i := range runtimes {
-		runtimes[i].RuntimePod = getUsertoolsPodName(username)
+	for j := range runtimes {
+		runtimes[j].RuntimePod = getUsertoolsPodName(username)
+		runtimes[j].RuntimePodStatus, _ = i.k8sClient.GetUserToolsPodStatus(ctx, username)
 	}
 
 	return runtimes, nil
@@ -60,6 +61,7 @@ func (i interactor) GetRunningRuntime(ctx context.Context, username string) (*en
 		}
 
 		runtime.RuntimePod = getUsertoolsPodName(username)
+		runtime.RuntimePodStatus, _ = i.k8sClient.GetUserToolsPodStatus(ctx, username)
 
 		return &runtime, nil
 	}

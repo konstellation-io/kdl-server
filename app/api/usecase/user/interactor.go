@@ -219,17 +219,12 @@ func (i *Interactor) StopTools(ctx context.Context, email string) (entity.User, 
 		return entity.User{}, err
 	}
 
-	running, err := i.AreToolsRunning(ctx, user.Username)
-
+	podStatus, err := i.k8sClient.GetUserToolsPodStatus(ctx, user.Username)
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	if !running {
-		return entity.User{}, ErrStopUserTools
-	}
-
-	i.logger.Info("Deleting user tools for user", "username", user.Username)
+	i.logger.Info("Deleting user tools for user", "podStatus", podStatus, "username", user.Username)
 
 	err = i.k8sClient.DeleteUserToolsCR(ctx, user.Username)
 	if err != nil {
@@ -241,7 +236,8 @@ func (i *Interactor) StopTools(ctx context.Context, email string) (entity.User, 
 
 // AreToolsRunning checks if the user tools are running for the given username.
 func (i *Interactor) AreToolsRunning(ctx context.Context, username string) (bool, error) {
-	return i.k8sClient.IsUserToolPODRunning(ctx, username)
+	running, _ := i.k8sClient.IsUserToolPODRunning(ctx, username)
+	return running, nil
 }
 
 // IsKubeconfigActive checks if the kubeconfig is active.
@@ -296,12 +292,18 @@ func (i *Interactor) UpdateLastActivity(ctx context.Context, user entity.User) (
 }
 
 // RegenerateSSHKeys generate new SSH key pair for the given user.
-// - Check if user exists. (if no, returns ErrUserNotFound error)
-// - Check if userTools are Running. (if yes, returns ErrUserNotFound error)
+// - Check if user exists. (if no, returns entity.ErrUserNotFound error)
+// - Check if userTools are Running. (if yes, returns ErrUserToolsActive error)
 // - Generate a new ssh key pair
 // - Check if k8s secret exists. If yes, update it. Else, create it.
 // - Update ssh keys for user in database.
 func (i *Interactor) RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error) {
+	// Check if user exists
+	_, err := i.repo.GetByUsername(ctx, user.Username)
+	if err != nil {
+		return entity.User{}, entity.ErrUserNotFound
+	}
+
 	i.logger.Info("Regenerating user SSH keys for user", "username", user.Username)
 
 	// Check if userTools are running

@@ -14,6 +14,7 @@ import (
 
 const (
 	username                         = "test.username"
+	clearUsername                    = "test-username"
 	resName                          = "usertools-test-username"
 	runtimeID                        = "test-runtime-id"
 	runtimeImage                     = "test-runtime-image"
@@ -523,4 +524,55 @@ func (s *testSuite) TestUpdateKDLUserToolsCR() {
 
 	err = s.Client.DeleteUserToolsCR(ctx, username)
 	s.Require().NoError(err)
+}
+
+func (s *testSuite) createPod(podName string) {
+	_, err := s.Clientset.CoreV1().Pods(namespace).Create(context.Background(), &v1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: podName,
+			Labels: map[string]string{
+				"app.kubernetes.io/instance": resName,
+			},
+		},
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name:  "container",
+					Image: "busybox",
+				},
+			},
+		},
+	}, metav1.CreateOptions{})
+	s.Require().NoError(err)
+}
+func (s *testSuite) TestIsUserToolPODRunning() {
+	s.createPod("pod-running-valid")
+
+	running, err := s.Client.IsUserToolPODRunning(context.Background(), clearUsername)
+	s.Require().NoError(err)
+	s.Require().True(running)
+}
+
+func (s *testSuite) TestIsUserToolPODRunning_PodNotFound() {
+	s.createPod("pod-running-invalid")
+
+	running, err := s.Client.IsUserToolPODRunning(context.Background(), "not-found-username")
+	s.Require().Error(err)
+	s.Require().False(running)
+}
+
+func (s *testSuite) TestGetUserToolsPodStatus() {
+	s.createPod("pod-status")
+
+	status, err := s.Client.GetUserToolsPodStatus(context.Background(), clearUsername)
+	s.Require().NoError(err)
+	s.Require().Equal(entity.PodStatusPending, status)
+}
+
+func (s *testSuite) TestGetUserToolsPodStatus_PodNotFound() {
+	s.createPod("pod-status-failed")
+
+	status, err := s.Client.GetUserToolsPodStatus(context.Background(), "failed-username")
+	s.Require().Error(err)
+	s.Require().Equal(entity.PodStatusFailed, status)
 }

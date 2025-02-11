@@ -23,6 +23,7 @@ type ClientInterface interface {
 	UpdateKDLUserToolsCR(ctx context.Context, resourceName string, data UserToolsData, crd *map[string]interface{}) error
 	ListKDLUserToolsCR(ctx context.Context) ([]unstructured.Unstructured, error)
 	GetKDLUserToolsCR(ctx context.Context, username string) (*unstructured.Unstructured, error)
+	GetUserToolsPodStatus(ctx context.Context, username string) (entity.PodStatus, error)
 	IsUserToolPODRunning(ctx context.Context, username string) (bool, error)
 	GetRuntimeIDFromUserTools(ctx context.Context, username string) (string, error)
 	GetCapabilitiesIDFromUserTools(ctx context.Context, username string) (string, error)

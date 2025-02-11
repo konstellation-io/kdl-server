@@ -177,13 +177,24 @@ func (k *Client) CreateKDLUserToolsCR(
 }
 
 // IsUserToolPODRunning checks if the there is a user tool POD running for the given username.
+// NOTE: in this context, running means POD is started, but not that POD is ready to use.
 func (k Client) IsUserToolPODRunning(ctx context.Context, username string) (bool, error) {
-	pod, err := k.getUserToolsPod(ctx, username)
+	_, err := k.getUserToolsPod(ctx, username)
 	if err != nil {
-		return false, nil
+		return false, err
 	}
 
-	return pod.Status.Phase == v1.PodRunning, nil
+	return true, nil
+}
+
+// GetUserToolsPodStatus returns the status of the UserTools POD.
+func (k Client) GetUserToolsPodStatus(ctx context.Context, username string) (entity.PodStatus, error) {
+	pod, err := k.getUserToolsPod(ctx, username)
+	if err != nil {
+		return entity.PodStatusFailed, err
+	}
+
+	return entity.PodStatusFromK8sStatus(pod.Status), nil
 }
 
 // getUserToolsPod returns the UserToolsPod object.
@@ -198,7 +209,7 @@ func (k Client) getUserToolsPod(ctx context.Context, username string) (v1.Pod, e
 	}
 
 	if len(list.Items) < 1 {
-		return v1.Pod{}, nil
+		return v1.Pod{}, errNoPodFound
 	}
 
 	return list.Items[0], nil

@@ -2,7 +2,9 @@ package entity
 
 // ToolUrls entity definition.
 type ToolUrls struct {
-	KnowledgeGalaxy string `json:"knowledgeGalaxy"`
-	Filebrowser     string `json:"filebrowser"`
-	MLFlow          string `json:"mlflow"`
+	KnowledgeGalaxyEnabled bool   `json:"KnowledgeGalaxyEnabled"`
+	KnowledgeGalaxy        string `json:"knowledgeGalaxy"`
+	Filebrowser            string `json:"filebrowser"`
+	MLFlow                 string `json:"mlflow"`
+	Minio                  string `json:"minio"`
 }

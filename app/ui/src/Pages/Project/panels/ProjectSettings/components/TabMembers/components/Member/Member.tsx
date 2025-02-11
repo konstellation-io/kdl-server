@@ -2,19 +2,13 @@ import { GetProjectMembers_project_members } from 'Graphql/queries/types/GetProj
 import Gravatar from 'react-gravatar';
 import IconOpen from '@material-ui/icons/ArrowForward';
 import { Check, Select } from 'kwc';
-import * as React from 'react';
 import styles from './Member.module.scss';
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import cx from 'classnames';
+import { mapProjectAccessLevel } from 'Utils/accessLevel';
 
 const gravatarStyle = {
   borderRadius: '50%',
-};
-
-export const mapAccessLevel = {
-  [AccessLevel.ADMIN]: 'Admin',
-  [AccessLevel.MANAGER]: 'Manager',
-  [AccessLevel.VIEWER]: 'Viewer',
 };
 
 type Props = {
@@ -64,7 +58,7 @@ function Member({
                   className={styles.accessLevelSelector}
                   options={Object.keys(AccessLevel)}
                   formSelectedOption={member.accessLevel}
-                  valuesMapper={mapAccessLevel}
+                  valuesMapper={mapProjectAccessLevel}
                   height={30}
                   onChange={(newLevel: AccessLevel) => onChangeMemberLevel([member.user.id], newLevel)}
                   disabled={!canBeSelected}
@@ -73,7 +67,7 @@ function Member({
               </div>
             ) : (
               <span className={styles.accessLevel} onClick={() => onInfoClick(member)}>
-                {mapAccessLevel[member.accessLevel]}
+                {mapProjectAccessLevel[member.accessLevel]}
               </span>
             )}
             <div className={styles.button}>

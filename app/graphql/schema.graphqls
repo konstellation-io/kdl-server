@@ -108,9 +108,11 @@ type MinioAccessKey {
 }
 
 type ToolUrls {
+  knowledgeGalaxyEnabled: Boolean!
   knowledgeGalaxy: String!
   filebrowser: String!
   mlflow: String!
+  minio: String!
 }
 
 type QualityProjectDesc {

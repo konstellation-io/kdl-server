@@ -17,9 +17,11 @@ export interface GetProjects_projects_repository {
 
 export interface GetProjects_projects_toolUrls {
   __typename: "ToolUrls";
+  knowledgeGalaxyEnabled: boolean;
   knowledgeGalaxy: string;
   filebrowser: string;
   mlflow: string;
+  minio: string;
 }
 
 export interface GetProjects_projects_members_user {

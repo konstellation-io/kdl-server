@@ -60,6 +60,7 @@ enum AccessLevel {
   ADMIN
 }
 
+
 type ApiToken {
   id: ID!
   name: String!
@@ -127,6 +128,13 @@ type Runtime {
   dockerImage: String!
   dockerTag: String!
   runtimePod: String!
+  runtimePodStatus: PodStatus!
+}
+
+enum PodStatus {
+  pending
+  running
+  failed
 }
 
 input SetActiveUserToolsInput {

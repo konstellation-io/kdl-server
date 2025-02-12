@@ -12,7 +12,6 @@ import (
 	"github.com/gosimple/slug"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
-	"gotest.tools/v3/assert"
 	v1 "k8s.io/api/core/v1"
 	k8errors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -194,8 +193,8 @@ func TestInteractor_Create_UserDuplEmail(t *testing.T) {
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, nil)
 
 	createdUser, err := s.interactor.Create(ctx, email, sub, accessLevel)
-	assert.DeepEqual(t, entity.User{}, createdUser)
-	assert.ErrorIs(t, err, entity.ErrDuplicatedUser)
+	require.ElementsMatch(t, entity.User{}, createdUser)
+	require.ErrorIs(t, err, entity.ErrDuplicatedUser)
 }
 
 func TestInteractor_Create_UserDuplUsername(t *testing.T) {
@@ -214,8 +213,8 @@ func TestInteractor_Create_UserDuplUsername(t *testing.T) {
 	s.mocks.repo.EXPECT().GetByUsername(ctx, user).Return(entity.User{}, nil)
 
 	createdUser, err := s.interactor.Create(ctx, email, sub, accessLevel)
-	assert.DeepEqual(t, entity.User{}, createdUser)
-	assert.ErrorIs(t, err, entity.ErrDuplicatedUser)
+	require.ElementsMatch(t, entity.User{}, createdUser)
+	require.ErrorIs(t, err, entity.ErrDuplicatedUser)
 }
 
 func TestInteractor_Create_UserDuplSub(t *testing.T) {
@@ -236,8 +235,8 @@ func TestInteractor_Create_UserDuplSub(t *testing.T) {
 	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, nil)
 
 	createdUser, err := s.interactor.Create(ctx, email, sub, accessLevel)
-	assert.DeepEqual(t, entity.User{}, createdUser)
-	assert.ErrorIs(t, err, entity.ErrDuplicatedUser)
+	require.ElementsMatch(t, entity.User{}, createdUser)
+	require.ErrorIs(t, err, entity.ErrDuplicatedUser)
 }
 
 func TestInteractor_AreToolsRunning(t *testing.T) {
@@ -273,7 +272,7 @@ func TestInteractor_StopTools(t *testing.T) {
 	expectedUser := entity.User{Username: username, Email: email}
 
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(expectedUser, nil)
-	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
+	s.mocks.k8sClientMock.EXPECT().GetUserToolsPodStatus(ctx, username).Return(entity.PodStatusRunning, nil)
 	s.mocks.k8sClientMock.EXPECT().DeleteUserToolsCR(ctx, username).Return(nil)
 
 	returnedUser, err := s.interactor.StopTools(ctx, email)
@@ -297,11 +296,12 @@ func TestInteractor_StopTools_Err(t *testing.T) {
 	emptyUser := entity.User{}
 
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(u, nil)
-	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(toolsRunning, nil)
+	s.mocks.k8sClientMock.EXPECT().GetUserToolsPodStatus(ctx, username).Return(entity.PodStatusRunning, nil)
+	s.mocks.k8sClientMock.EXPECT().DeleteUserToolsCR(ctx, username).Return(errUnexpected)
 
 	returnedUser, err := s.interactor.StopTools(ctx, email)
 
-	require.Equal(t, user.ErrStopUserTools, err)
+	require.Error(t, err)
 	require.Equal(t, returnedUser, emptyUser)
 }
 
@@ -472,6 +472,8 @@ func TestInteractor_StartTools_Replace(t *testing.T) {
 	s.mocks.capabilitiesRepo.EXPECT().Get(ctx, capability.ID).Return(capability, nil)
 	// AND the CR creation does not return any error
 	s.mocks.k8sClientMock.EXPECT().CreateKDLUserToolsCR(ctx, data).Return(nil)
+	// AND the Pod status is Running
+	s.mocks.k8sClientMock.EXPECT().GetUserToolsPodStatus(ctx, username).Return(entity.PodStatusRunning, nil)
 
 	// WHEN the tools are started
 	returnedUser, err := s.interactor.StartTools(ctx, email, &runtimeID, &capability.ID)
@@ -510,7 +512,7 @@ func TestInteractor_FindAll_Err(t *testing.T) {
 
 	users, err := s.interactor.FindAll(ctx)
 
-	assert.ErrorIs(t, someErr, err)
+	require.ErrorIs(t, someErr, err)
 	require.Equal(t, emptyUsers, users)
 }
 
@@ -545,7 +547,7 @@ func TestInteractor_GetByEmail_Err(t *testing.T) {
 
 	u, err := s.interactor.GetByEmail(ctx, email)
 
-	assert.ErrorIs(t, someErr, err)
+	require.ErrorIs(t, someErr, err)
 	require.Equal(t, emptyUser, u)
 }
 
@@ -704,12 +706,12 @@ func TestInteractor_RegenerateSSHKeys_UserToolsRunning(t *testing.T) {
 		CreationDate: now,
 	}
 
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(targetUser, nil)
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(true, nil)
 	userData, err := s.interactor.RegenerateSSHKeys(ctx, targetUser)
 
-	// assert.Equal(t, entity.User{}, userData)
-	assert.DeepEqual(t, entity.User{}, userData)
-	assert.ErrorIs(t, err, user.ErrUserToolsActive)
+	require.ElementsMatch(t, entity.User{}, userData)
+	require.ErrorIs(t, err, user.ErrUserToolsActive)
 }
 
 func TestInteractor_UpdateAccessLevel(t *testing.T) {

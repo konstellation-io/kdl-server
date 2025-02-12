@@ -1048,13 +1048,14 @@ func TestLogin_UsernameNotFound(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const (
-		id            = "user.1234"
-		email         = "user@email.com"
-		username      = "user"
-		sub           = "d5d70477-5192-4182-b80e-5d34550eb4fe"
-		accessLevel   = entity.AccessLevelViewer
-		publicSSHKey  = "test-ssh-key-public"
-		privateSSHKey = "test-ssh-key-private"
+		id             = "user.1234"
+		email          = "user@email.com"
+		username       = "user"
+		sub            = "d5d70477-5192-4182-b80e-5d34550eb4fe"
+		accessLevel    = entity.AccessLevelViewer
+		publicSSHKey   = "test-ssh-key-public"
+		privateSSHKey  = "test-ssh-key-private"
+		minioSecretKey = "john-doe-secret"
 	)
 
 	ctx := context.Background()
@@ -1074,15 +1075,21 @@ func TestLogin_UsernameNotFound(t *testing.T) {
 		SSHKey:       sshKey,
 		CreationDate: now,
 	}
-	expectedUser := entity.User{
-		ID:           id,
-		Username:     username,
-		Email:        email,
-		Sub:          sub,
-		AccessLevel:  accessLevel,
-		SSHKey:       sshKey,
-		CreationDate: now,
+
+	userWithCredentials := u
+	userWithCredentials.MinioAccessKey = entity.MinioAccessKey{
+		AccessKey: email,
+		SecretKey: minioSecretKey,
 	}
+	expectedActVars := []entity.UserActivityVar{
+		{
+			Key:   "USER_ID",
+			Value: id,
+		},
+	}
+
+	expectedUser := userWithCredentials
+	expectedUser.ID = id
 
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
@@ -1090,10 +1097,22 @@ func TestLogin_UsernameNotFound(t *testing.T) {
 	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
-	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, nil)
+	s.mocks.repo.EXPECT().Create(ctx, userWithCredentials).Return(id, nil)
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(expectedUser, nil)
+	s.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(minioSecretKey, nil)
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, minioSecretKey).Return(email, nil)
 	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
 	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, expectedUser.UsernameSlug())
+	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.userActivityRepo.EXPECT().Create(
+		ctx,
+		entity.UserActivity{
+			Date:   now,
+			UserID: id,
+			Type:   entity.UserActivityTypeCreateUser,
+			Vars:   expectedActVars,
+		},
+	).Return(nil)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.repo.EXPECT().UpdateLastActivity(ctx, expectedUser.Username, now).Return(nil)
 	s.mocks.repo.EXPECT().GetByUsername(ctx, expectedUser.Username).Return(expectedUser, nil)
@@ -1112,13 +1131,14 @@ func TestLogin_UsernameNotFound_CreateError(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const (
-		id            = "user.1234"
-		email         = "user@email.com"
-		username      = "user"
-		sub           = "d5d70477-5192-4182-b80e-5d34550eb4fe"
-		accessLevel   = entity.AccessLevelViewer
-		publicSSHKey  = "test-ssh-key-public"
-		privateSSHKey = "test-ssh-key-private"
+		id             = "user.1234"
+		email          = "user@email.com"
+		username       = "user"
+		sub            = "d5d70477-5192-4182-b80e-5d34550eb4fe"
+		accessLevel    = entity.AccessLevelViewer
+		publicSSHKey   = "test-ssh-key-public"
+		privateSSHKey  = "test-ssh-key-private"
+		minioSecretKey = "secret123"
 	)
 
 	ctx := context.Background()
@@ -1138,6 +1158,11 @@ func TestLogin_UsernameNotFound_CreateError(t *testing.T) {
 		SSHKey:       sshKey,
 		CreationDate: now,
 	}
+	userWithCredentials := u
+	userWithCredentials.MinioAccessKey = entity.MinioAccessKey{
+		AccessKey: email,
+		SecretKey: minioSecretKey,
+	}
 
 	s.mocks.repo.EXPECT().GetByEmail(ctx, email).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(entity.User{}, entity.ErrUserNotFound)
@@ -1145,7 +1170,11 @@ func TestLogin_UsernameNotFound_CreateError(t *testing.T) {
 	s.mocks.repo.EXPECT().GetBySub(ctx, sub).Return(entity.User{}, entity.ErrUserNotFound)
 	s.mocks.clock.EXPECT().Now().Return(now)
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(sshKey, nil)
-	s.mocks.repo.EXPECT().Create(ctx, u).Return(id, errUnexpected)
+	s.mocks.randomGenerator.EXPECT().GenerateRandomString(40).Return(minioSecretKey, nil)
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, minioSecretKey).Return(email, nil)
+	s.mocks.k8sClientMock.EXPECT().CreateUserSSHKeySecret(ctx, u, publicSSHKey, privateSSHKey)
+	s.mocks.k8sClientMock.EXPECT().CreateUserServiceAccount(ctx, u.UsernameSlug())
+	s.mocks.repo.EXPECT().Create(ctx, userWithCredentials).Return(id, errUnexpected)
 
 	// Act
 	userLogged, err := s.interactor.Login(ctx, email, sub)

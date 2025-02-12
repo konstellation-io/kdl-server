@@ -129,13 +129,14 @@ type ComplexityRoot struct {
 	}
 
 	Runtime struct {
-		Desc        func(childComplexity int) int
-		DockerImage func(childComplexity int) int
-		DockerTag   func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Labels      func(childComplexity int) int
-		Name        func(childComplexity int) int
-		RuntimePod  func(childComplexity int) int
+		Desc             func(childComplexity int) int
+		DockerImage      func(childComplexity int) int
+		DockerTag        func(childComplexity int) int
+		ID               func(childComplexity int) int
+		Labels           func(childComplexity int) int
+		Name             func(childComplexity int) int
+		RuntimePod       func(childComplexity int) int
+		RuntimePodStatus func(childComplexity int) int
 	}
 
 	SSHKey struct {
@@ -146,9 +147,11 @@ type ComplexityRoot struct {
 	}
 
 	ToolUrls struct {
-		Filebrowser     func(childComplexity int) int
-		KnowledgeGalaxy func(childComplexity int) int
-		MLFlow          func(childComplexity int) int
+		Filebrowser            func(childComplexity int) int
+		KnowledgeGalaxy        func(childComplexity int) int
+		KnowledgeGalaxyEnabled func(childComplexity int) int
+		MLFlow                 func(childComplexity int) int
+		Minio                  func(childComplexity int) int
 	}
 
 	User struct {
@@ -690,6 +693,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Runtime.RuntimePod(childComplexity), true
 
+	case "Runtime.runtimePodStatus":
+		if e.complexity.Runtime.RuntimePodStatus == nil {
+			break
+		}
+
+		return e.complexity.Runtime.RuntimePodStatus(childComplexity), true
+
 	case "SSHKey.creationDate":
 		if e.complexity.SSHKey.CreationDate == nil {
 			break
@@ -732,12 +742,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ToolUrls.KnowledgeGalaxy(childComplexity), true
 
+	case "ToolUrls.knowledgeGalaxyEnabled":
+		if e.complexity.ToolUrls.KnowledgeGalaxyEnabled == nil {
+			break
+		}
+
+		return e.complexity.ToolUrls.KnowledgeGalaxyEnabled(childComplexity), true
+
 	case "ToolUrls.mlflow":
 		if e.complexity.ToolUrls.MLFlow == nil {
 			break
 		}
 
 		return e.complexity.ToolUrls.MLFlow(childComplexity), true
+
+	case "ToolUrls.minio":
+		if e.complexity.ToolUrls.Minio == nil {
+			break
+		}
+
+		return e.complexity.ToolUrls.Minio(childComplexity), true
 
 	case "User.apiTokens":
 		if e.complexity.User.APITokens == nil {
@@ -978,6 +1002,7 @@ enum AccessLevel {
   ADMIN
 }
 
+
 type ApiToken {
   id: ID!
   name: String!
@@ -1026,9 +1051,11 @@ type MinioAccessKey {
 }
 
 type ToolUrls {
+  knowledgeGalaxyEnabled: Boolean!
   knowledgeGalaxy: String!
   filebrowser: String!
   mlflow: String!
+  minio: String!
 }
 
 type QualityProjectDesc {
@@ -1043,6 +1070,13 @@ type Runtime {
   dockerImage: String!
   dockerTag: String!
   runtimePod: String!
+  runtimePodStatus: PodStatus!
+}
+
+enum PodStatus {
+  pending
+  running
+  failed
 }
 
 input SetActiveUserToolsInput {
@@ -3470,12 +3504,16 @@ func (ec *executionContext) fieldContext_Project_toolUrls(_ context.Context, fie
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "knowledgeGalaxyEnabled":
+				return ec.fieldContext_ToolUrls_knowledgeGalaxyEnabled(ctx, field)
 			case "knowledgeGalaxy":
 				return ec.fieldContext_ToolUrls_knowledgeGalaxy(ctx, field)
 			case "filebrowser":
 				return ec.fieldContext_ToolUrls_filebrowser(ctx, field)
 			case "mlflow":
 				return ec.fieldContext_ToolUrls_mlflow(ctx, field)
+			case "minio":
+				return ec.fieldContext_ToolUrls_minio(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ToolUrls", field.Name)
 		},
@@ -4138,6 +4176,8 @@ func (ec *executionContext) fieldContext_Query_runningRuntime(_ context.Context,
 				return ec.fieldContext_Runtime_dockerTag(ctx, field)
 			case "runtimePod":
 				return ec.fieldContext_Runtime_runtimePod(ctx, field)
+			case "runtimePodStatus":
+				return ec.fieldContext_Runtime_runtimePodStatus(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Runtime", field.Name)
 		},
@@ -4198,6 +4238,8 @@ func (ec *executionContext) fieldContext_Query_runtimes(_ context.Context, field
 				return ec.fieldContext_Runtime_dockerTag(ctx, field)
 			case "runtimePod":
 				return ec.fieldContext_Runtime_runtimePod(ctx, field)
+			case "runtimePodStatus":
+				return ec.fieldContext_Runtime_runtimePodStatus(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Runtime", field.Name)
 		},
@@ -4790,6 +4832,50 @@ func (ec *executionContext) fieldContext_Runtime_runtimePod(_ context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Runtime_runtimePodStatus(ctx context.Context, field graphql.CollectedField, obj *entity.Runtime) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Runtime_runtimePodStatus(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RuntimePodStatus, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entity.PodStatus)
+	fc.Result = res
+	return ec.marshalNPodStatus2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐPodStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Runtime_runtimePodStatus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Runtime",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type PodStatus does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _SSHKey_public(ctx context.Context, field graphql.CollectedField, obj *entity.SSHKey) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_SSHKey_public(ctx, field)
 	if err != nil {
@@ -4963,6 +5049,50 @@ func (ec *executionContext) fieldContext_SSHKey_lastActivity(_ context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _ToolUrls_knowledgeGalaxyEnabled(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ToolUrls_knowledgeGalaxyEnabled(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.KnowledgeGalaxyEnabled, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ToolUrls_knowledgeGalaxyEnabled(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ToolUrls",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ToolUrls_knowledgeGalaxy(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ToolUrls_knowledgeGalaxy(ctx, field)
 	if err != nil {
@@ -5083,6 +5213,50 @@ func (ec *executionContext) _ToolUrls_mlflow(ctx context.Context, field graphql.
 }
 
 func (ec *executionContext) fieldContext_ToolUrls_mlflow(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ToolUrls",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ToolUrls_minio(ctx context.Context, field graphql.CollectedField, obj *entity.ToolUrls) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ToolUrls_minio(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Minio, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ToolUrls_minio(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ToolUrls",
 		Field:      field,
@@ -8820,6 +8994,11 @@ func (ec *executionContext) _Runtime(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "runtimePodStatus":
+			out.Values[i] = ec._Runtime_runtimePodStatus(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8967,6 +9146,11 @@ func (ec *executionContext) _ToolUrls(ctx context.Context, sel ast.SelectionSet,
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ToolUrls")
+		case "knowledgeGalaxyEnabled":
+			out.Values[i] = ec._ToolUrls_knowledgeGalaxyEnabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "knowledgeGalaxy":
 			out.Values[i] = ec._ToolUrls_knowledgeGalaxy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -8979,6 +9163,11 @@ func (ec *executionContext) _ToolUrls(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "mlflow":
 			out.Values[i] = ec._ToolUrls_mlflow(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "minio":
+			out.Values[i] = ec._ToolUrls_minio(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -9773,6 +9962,22 @@ func (ec *executionContext) marshalNMember2ᚕgithubᚗcomᚋkonstellationᚑio�
 
 func (ec *executionContext) marshalNMinioAccessKey2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐMinioAccessKey(ctx context.Context, sel ast.SelectionSet, v entity.MinioAccessKey) graphql.Marshaler {
 	return ec._MinioAccessKey(ctx, sel, &v)
+}
+
+func (ec *executionContext) unmarshalNPodStatus2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐPodStatus(ctx context.Context, v any) (entity.PodStatus, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := entity.PodStatus(tmp)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPodStatus2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐPodStatus(ctx context.Context, sel ast.SelectionSet, v entity.PodStatus) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalNProject2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐProject(ctx context.Context, sel ast.SelectionSet, v entity.Project) graphql.Marshaler {

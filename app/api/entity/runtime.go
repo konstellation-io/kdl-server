@@ -2,13 +2,14 @@ package entity
 
 // Runtime entity definition.
 type Runtime struct {
-	ID          string
-	Name        string
-	Desc        string
-	Labels      []string
-	DockerImage string
-	DockerTag   string
-	RuntimePod  string
+	ID               string
+	Name             string
+	Desc             string
+	Labels           []string
+	DockerImage      string
+	DockerTag        string
+	RuntimePod       string
+	RuntimePodStatus PodStatus
 }
 
 // NewRuntime is a constructor function.

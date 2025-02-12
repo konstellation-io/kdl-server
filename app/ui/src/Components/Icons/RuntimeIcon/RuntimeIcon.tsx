@@ -7,6 +7,8 @@ export enum RUNTIME_STATUS {
   RUNNING,
   STOPPED,
   LOADING,
+  PENDING,
+  ERROR,
   NOT_SELECTED,
 }
 
@@ -25,6 +27,8 @@ const RuntimeIcon = (props: AdditionalProps & SvgIconProps) => (
           [styles.RUNNING]: props.status === RUNTIME_STATUS.RUNNING,
           [styles.STOPPED]: props.status === RUNTIME_STATUS.STOPPED,
           [styles.LOADING]: props.status === RUNTIME_STATUS.LOADING,
+          [styles.PENDING]: props.status === RUNTIME_STATUS.PENDING,
+          [styles.ERROR]: props.status === RUNTIME_STATUS.ERROR,
           [styles.NOT_SELECTED]: props.status === RUNTIME_STATUS.NOT_SELECTED,
         })}
       />

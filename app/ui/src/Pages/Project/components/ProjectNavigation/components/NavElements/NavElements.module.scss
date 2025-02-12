@@ -12,39 +12,22 @@
 
   .userTools {
     border-top: 2px solid palette(base, 400);
-    margin-top: $grid-unit;
     transition: border-right 0.3s ease;
     border-right: 2px solid transparent;
 
-    &.started {
-      border-right: 2px solid palette(success);
-    }
-    &.stopped {
-      border-right: 2px solid palette(alert);
-    }
-    &.loading {
-      border-right: 2px solid palette(feedback);
-    }
-
     .userToolLabel {
       @include font-caption;
+      display: flex;
       color: font-color(regular);
       width: 100%;
       white-space: nowrap;
-      margin-left: 5 * $grid-unit;
+      margin-top: 0.5 * $grid-unit;
     }
 
-    .usertoolsIcon {
-      margin: $grid-unit;
-      cursor: pointer;
-      &.blocked {
-        color: palette(alert);
-      }
-      &:active,
-      &:hover,
-      &:focus {
-        color: palette(highlight);
-      }
+    .userToolStatusIcon {
+      margin-left: $grid-unit;
+      margin-right: 2 * $grid-unit;
+      padding-top: 5px;
     }
 
     .usertoolsOptions {
@@ -70,6 +53,8 @@
           svg {
             width: $grid-unit + 4;
             height: $grid-unit + 4;
+            margin-right: $grid-unit;
+            margin-top: 5px;
           }
         }
       }
@@ -79,6 +64,7 @@
       display: flex;
       flex-direction: column;
       width: 100%;
+      margin-right: $grid-unit;
       .progressSpinnerContainer {
         margin-top: 0;
         margin-left: 13px;
@@ -110,4 +96,3 @@
     }
   }
 }
-

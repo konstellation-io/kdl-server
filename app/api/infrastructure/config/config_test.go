@@ -23,6 +23,7 @@ var envs = map[string]string{
 	"KDL_SERVER_MONGODB_URI":         "mongodb_uri",
 	"KDL_SERVER_MONGODB_NAME":        "mongodb_name",
 	"MINIO_ENDPOINT":                 "minio_endpoint",
+	"MINIO_CONSOLE_ENDPOINT":         "console.min.io",
 	"MINIO_ACCESS_KEY":               "minio_access_key",
 	"KNOWLEDGE_GALAXY_ENABLED":       "true",
 	"KNOWLEDGE_GALAXY_URL":           "knowledge_galaxy_url",
@@ -59,6 +60,7 @@ func (s *configTestSuite) TestConfig() {
 	s.Require().Equal("mongodb_uri", cfg.MongoDB.URI)
 	s.Require().Equal("mongodb_name", cfg.MongoDB.DBName)
 	s.Require().Equal("minio_endpoint", cfg.Minio.Endpoint)
+	s.Require().Equal("console.min.io", cfg.Minio.ConsoleURL)
 	s.Require().Equal("minio_access_key", cfg.Minio.AccessKey)
 	s.Require().True(cfg.Kg.Enabled)
 	s.Require().Equal("knowledge_galaxy_url", cfg.Kg.URL)

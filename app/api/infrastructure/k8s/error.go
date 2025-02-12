@@ -14,3 +14,4 @@ var errCRDNoSpecVscodeRuntimeImage = errors.New("CRD does not have a 'spec.vscod
 var errCRDNoSpecPodLabels = errors.New("CRD does not have a 'spec.podLabels' field")
 var errCRDCantEncodeInputData = errors.New("can't encode input data for CR")
 var errCRDCantDecodeInputData = errors.New("can't decode input data from CR")
+var errNoPodFound = errors.New("no pod found")

@@ -30,9 +30,9 @@ const RemoveMembersButton = () => (
 enum Actions {
   REMOVE_MEMBERS = 'REMOVE_MEMBERS',
   ACCESS_LEVEL_SEPARATOR = 'ACCESS_LEVEL_SEPARATOR',
-  VIEWER = 'Viewer',
-  MANAGER = 'Manager',
-  ADMIN = 'Admin',
+  VIEWER = 'Member',
+  MANAGER = 'Developer',
+  ADMIN = 'Owner',
 }
 
 const actions = Object.values(Actions);

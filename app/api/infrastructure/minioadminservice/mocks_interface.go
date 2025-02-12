@@ -64,18 +64,18 @@ func (mr *MockMinioAdminInterfaceMockRecorder) CreateProjectUser(ctx, projectNam
 }
 
 // CreateUser mocks base method.
-func (m *MockMinioAdminInterface) CreateUser(ctx context.Context, userSlug, secretKey string) (string, error) {
+func (m *MockMinioAdminInterface) CreateUser(ctx context.Context, email, secretKey string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUser", ctx, userSlug, secretKey)
+	ret := m.ctrl.Call(m, "CreateUser", ctx, email, secretKey)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateUser indicates an expected call of CreateUser.
-func (mr *MockMinioAdminInterfaceMockRecorder) CreateUser(ctx, userSlug, secretKey interface{}) *gomock.Call {
+func (mr *MockMinioAdminInterfaceMockRecorder) CreateUser(ctx, email, secretKey interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockMinioAdminInterface)(nil).CreateUser), ctx, userSlug, secretKey)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockMinioAdminInterface)(nil).CreateUser), ctx, email, secretKey)
 }
 
 // DeleteProjectPolicy mocks base method.
@@ -107,43 +107,43 @@ func (mr *MockMinioAdminInterfaceMockRecorder) DeleteProjectUser(ctx, projectNam
 }
 
 // DeleteUser mocks base method.
-func (m *MockMinioAdminInterface) DeleteUser(ctx context.Context, userSlug string) error {
+func (m *MockMinioAdminInterface) DeleteUser(ctx context.Context, email string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteUser", ctx, userSlug)
+	ret := m.ctrl.Call(m, "DeleteUser", ctx, email)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteUser indicates an expected call of DeleteUser.
-func (mr *MockMinioAdminInterfaceMockRecorder) DeleteUser(ctx, userSlug interface{}) *gomock.Call {
+func (mr *MockMinioAdminInterfaceMockRecorder) DeleteUser(ctx, email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockMinioAdminInterface)(nil).DeleteUser), ctx, userSlug)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockMinioAdminInterface)(nil).DeleteUser), ctx, email)
 }
 
 // JoinProject mocks base method.
-func (m *MockMinioAdminInterface) JoinProject(ctx context.Context, userSlug, projectName string) error {
+func (m *MockMinioAdminInterface) JoinProject(ctx context.Context, email, projectName string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "JoinProject", ctx, userSlug, projectName)
+	ret := m.ctrl.Call(m, "JoinProject", ctx, email, projectName)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // JoinProject indicates an expected call of JoinProject.
-func (mr *MockMinioAdminInterfaceMockRecorder) JoinProject(ctx, userSlug, projectName interface{}) *gomock.Call {
+func (mr *MockMinioAdminInterfaceMockRecorder) JoinProject(ctx, email, projectName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JoinProject", reflect.TypeOf((*MockMinioAdminInterface)(nil).JoinProject), ctx, userSlug, projectName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JoinProject", reflect.TypeOf((*MockMinioAdminInterface)(nil).JoinProject), ctx, email, projectName)
 }
 
 // LeaveProject mocks base method.
-func (m *MockMinioAdminInterface) LeaveProject(ctx context.Context, userSlug, projectName string) error {
+func (m *MockMinioAdminInterface) LeaveProject(ctx context.Context, email, projectName string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LeaveProject", ctx, userSlug, projectName)
+	ret := m.ctrl.Call(m, "LeaveProject", ctx, email, projectName)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // LeaveProject indicates an expected call of LeaveProject.
-func (mr *MockMinioAdminInterfaceMockRecorder) LeaveProject(ctx, userSlug, projectName interface{}) *gomock.Call {
+func (mr *MockMinioAdminInterfaceMockRecorder) LeaveProject(ctx, email, projectName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LeaveProject", reflect.TypeOf((*MockMinioAdminInterface)(nil).LeaveProject), ctx, userSlug, projectName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LeaveProject", reflect.TypeOf((*MockMinioAdminInterface)(nil).LeaveProject), ctx, email, projectName)
 }

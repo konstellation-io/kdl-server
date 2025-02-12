@@ -20,3 +20,11 @@
   fill: transparent;
   stroke: palette(lowlight);
 }
+
+.PENDING {
+  fill: palette(alert);
+}
+
+.ERROR {
+  fill: palette(error);
+}

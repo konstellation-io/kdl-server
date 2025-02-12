@@ -926,8 +926,8 @@ func TestInteractor_SyncUserData(t *testing.T) {
 	s.mocks.k8sClientMock.EXPECT().GetUserSSHKeyPublic(ctx, usernameSlug).Return([]byte{}, nil)
 	s.mocks.k8sClientMock.EXPECT().UpdateUserSSHKeySecret(ctx, user, gomock.Any(), gomock.Any()).Return(nil)
 	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, gomock.Any()).Return(nil)
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(user, nil)
-	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, "").Return(email, nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(user, nil).AnyTimes()
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, user.MinioAccessKey.SecretKey).Return(email, nil)
 
 	err := s.interactor.SyncUserData(ctx, id, syncSA, syncSSHKeys, syncMinio)
 	require.NoError(t, err)
@@ -952,6 +952,10 @@ func TestInteractor_SyncUserData_InputSyncIsFalse(t *testing.T) {
 		ID:       id,
 		Username: username,
 		Email:    email,
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: email,
+			SecretKey: "john-doe-secret",
+		},
 	}
 
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(user, nil)
@@ -999,6 +1003,10 @@ func TestInteractor_SyncUserData_CreateServiceAccountError(t *testing.T) {
 		ID:       id,
 		Username: username,
 		Email:    email,
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: email,
+			SecretKey: "john-doe-secret",
+		},
 	}
 
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(user, nil)
@@ -1008,8 +1016,8 @@ func TestInteractor_SyncUserData_CreateServiceAccountError(t *testing.T) {
 	s.mocks.k8sClientMock.EXPECT().GetUserSSHKeyPublic(ctx, usernameSlug).Return([]byte{}, nil)
 	s.mocks.k8sClientMock.EXPECT().UpdateUserSSHKeySecret(ctx, user, gomock.Any(), gomock.Any()).Return(nil)
 	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, gomock.Any()).Return(nil)
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(user, nil)
-	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, "").Return(email, nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(user, nil).AnyTimes()
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, user.MinioAccessKey.SecretKey).Return(email, nil)
 
 	err := s.interactor.SyncUserData(ctx, id, syncSA, syncSSHKeys, syncMinio)
 	require.Error(t, err)
@@ -1035,6 +1043,10 @@ func TestInteractor_SyncUserData_RegenerateSSHKeysError(t *testing.T) {
 		ID:       id,
 		Username: username,
 		Email:    email,
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: email,
+			SecretKey: "john-doe-secret",
+		},
 	}
 
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(user, nil)
@@ -1042,8 +1054,8 @@ func TestInteractor_SyncUserData_RegenerateSSHKeysError(t *testing.T) {
 	s.mocks.k8sClientMock.EXPECT().IsUserToolPODRunning(ctx, username).Return(false, nil)
 	s.mocks.sshGenerator.EXPECT().NewKeys().Return(entity.SSHKey{}, nil)
 	s.mocks.k8sClientMock.EXPECT().GetUserSSHKeyPublic(ctx, usernameSlug).Return(nil, errUnexpected)
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(user, nil)
-	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, "").Return(email, nil)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(user, nil).AnyTimes()
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, user.MinioAccessKey.SecretKey).Return(email, nil)
 
 	err := s.interactor.SyncUserData(ctx, id, syncSA, syncSSHKeys, syncMinio)
 	require.Error(t, err)
@@ -1069,6 +1081,10 @@ func TestInteractor_SyncUserData_CreateMinioUserError(t *testing.T) {
 		ID:       id,
 		Username: username,
 		Email:    email,
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: email,
+			SecretKey: "john-doe-secret",
+		},
 	}
 
 	s.mocks.repo.EXPECT().Get(ctx, id).Return(user, nil)
@@ -1078,8 +1094,8 @@ func TestInteractor_SyncUserData_CreateMinioUserError(t *testing.T) {
 	s.mocks.k8sClientMock.EXPECT().GetUserSSHKeyPublic(ctx, usernameSlug).Return([]byte{}, nil)
 	s.mocks.k8sClientMock.EXPECT().UpdateUserSSHKeySecret(ctx, user, gomock.Any(), gomock.Any()).Return(nil)
 	s.mocks.repo.EXPECT().UpdateSSHKey(ctx, username, gomock.Any()).Return(nil)
-	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(user, nil)
-	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, "").Return("", errUnexpected)
+	s.mocks.repo.EXPECT().GetByUsername(ctx, username).Return(user, nil).AnyTimes()
+	s.mocks.minioAdminService.EXPECT().CreateUser(ctx, email, user.MinioAccessKey.SecretKey).Return("", errUnexpected)
 
 	err := s.interactor.SyncUserData(ctx, id, syncSA, syncSSHKeys, syncMinio)
 	require.Error(t, err)

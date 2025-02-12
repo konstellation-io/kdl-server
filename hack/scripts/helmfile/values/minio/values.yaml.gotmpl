@@ -27,21 +27,11 @@ persistence:
   accessMode: ReadWriteOnce
 
 ingress:
-  enabled: true
-  ingressClassName: public
-  annotations:
-    cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-  path: /
-  hosts:
-    - minio.{{ requiredEnv "DOMAIN" }}
-  tls:
-    - secretName: minio-tls
-      hosts:
-      - minio.{{ requiredEnv "DOMAIN" }}
+  enabled: false
 
 consoleIngress:
   enabled: true
-  ingressClassName: public
+  ingressClassName: nginx
   annotations:
     cert-manager.io/cluster-issuer: selfsigned-clusterissuer
   path: /

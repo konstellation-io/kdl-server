@@ -217,13 +217,7 @@ projectOperator:
           tag: latest
 
         ingress:
-          enabled: true
-          tls:
-            enabled: true
-          className: nginx
-          annotations:
-            cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-            nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
+          enabled: false
 
         persistentVolume:
           enabled: true

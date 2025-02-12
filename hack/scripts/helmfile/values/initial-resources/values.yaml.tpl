@@ -399,8 +399,8 @@ resources:
               "clientId": "minio",
               "name": "MinIO client",
               "description": "",
-              "rootUrl": "https://minio-console.kdl.10.0.1.1.nip.io/",
-              "adminUrl": "https://minio-console.kdl.10.0.1.1.nip.io/",
+              "rootUrl": "https://minio-console.kdl.$HOST_IP.nip.io/",
+              "adminUrl": "https://minio-console.kdl.$HOST_IP.nip.io/",
               "baseUrl": "",
               "surrogateAuthRequired": false,
               "enabled": true,
@@ -408,7 +408,7 @@ resources:
               "clientAuthenticatorType": "client-secret",
               "secret": "minio123456",
               "redirectUris": [
-                "https://minio-console.kdl.10.0.1.1.nip.io/oauth_callback"
+                "https://minio-console.kdl.$HOST_IP.nip.io/oauth_callback"
               ],
               "webOrigins": [
                 "*"

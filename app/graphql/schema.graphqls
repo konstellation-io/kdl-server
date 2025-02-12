@@ -60,6 +60,7 @@ enum AccessLevel {
   ADMIN
 }
 
+
 type ApiToken {
   id: ID!
   name: String!
@@ -108,9 +109,11 @@ type MinioAccessKey {
 }
 
 type ToolUrls {
+  knowledgeGalaxyEnabled: Boolean!
   knowledgeGalaxy: String!
   filebrowser: String!
   mlflow: String!
+  minio: String!
 }
 
 type QualityProjectDesc {
@@ -125,6 +128,13 @@ type Runtime {
   dockerImage: String!
   dockerTag: String!
   runtimePod: String!
+  runtimePodStatus: PodStatus!
+}
+
+enum PodStatus {
+  pending
+  running
+  failed
 }
 
 input SetActiveUserToolsInput {

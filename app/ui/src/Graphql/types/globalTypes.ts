@@ -13,6 +13,12 @@ export enum AccessLevel {
   VIEWER = "VIEWER",
 }
 
+export enum PodStatus {
+  failed = "failed",
+  pending = "pending",
+  running = "running",
+}
+
 export interface AddMembersInput {
   projectId: string;
   userIds: string[];

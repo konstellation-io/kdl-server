@@ -182,7 +182,7 @@ The footer only uses for **Breaking Changes** and is also the place to reference
 Example:
 
 ```console
-<type>(compoenent): <subject>
+<type>(component): <subject>
 
 BREAKING CHANGE:
 

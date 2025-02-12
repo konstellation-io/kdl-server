@@ -358,6 +358,21 @@ func (mr *MockClientInterfaceMockRecorder) GetUserServiceAccount(ctx, usernameSl
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserServiceAccount", reflect.TypeOf((*MockClientInterface)(nil).GetUserServiceAccount), ctx, usernameSlug)
 }
 
+// GetUserToolsPodStatus mocks base method.
+func (m *MockClientInterface) GetUserToolsPodStatus(ctx context.Context, username string) (entity.PodStatus, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserToolsPodStatus", ctx, username)
+	ret0, _ := ret[0].(entity.PodStatus)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserToolsPodStatus indicates an expected call of GetUserToolsPodStatus.
+func (mr *MockClientInterfaceMockRecorder) GetUserToolsPodStatus(ctx, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserToolsPodStatus", reflect.TypeOf((*MockClientInterface)(nil).GetUserToolsPodStatus), ctx, username)
+}
+
 // IsUserToolPODRunning mocks base method.
 func (m *MockClientInterface) IsUserToolPODRunning(ctx context.Context, username string) (bool, error) {
 	m.ctrl.T.Helper()

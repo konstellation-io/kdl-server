@@ -91,11 +91,6 @@ function UsersTable({ users }: Props) {
               <Select
                 options={Object.keys(AccessLevel)}
                 formSelectedOption={value}
-                valuesMapper={{
-                  [AccessLevel.ADMIN]: 'Administrator',
-                  [AccessLevel.MANAGER]: 'Manager',
-                  [AccessLevel.VIEWER]: 'Viewer',
-                }}
                 height={30}
                 onChange={(newValue: AccessLevel) => {
                   updateUsersAccessLevel([row.original.id], newValue);

@@ -25,6 +25,7 @@ env:
   MINIO_ACCESS_KEY: "{{ .Values.minio_access_key }}"
   MINIO_ENDPOINT: "minio:9000"
   MINIO_SECRET_KEY: "{{ .Values.minio_secret_key }}"
+  MINIO_CONSOLE_ENDPOINT: "https://minio-console.{{ requiredEnv "DOMAIN" }}"
   SERVER_URL: https://kdlapp.{{ requiredEnv "DOMAIN" }}
 
 readyChecker:
@@ -216,13 +217,7 @@ projectOperator:
           tag: latest
 
         ingress:
-          enabled: true
-          tls:
-            enabled: true
-          className: nginx
-          annotations:
-            cert-manager.io/cluster-issuer: selfsigned-clusterissuer
-            nginx.ingress.kubernetes.io/proxy-body-size: "4096m"
+          enabled: false
 
         persistentVolume:
           enabled: true

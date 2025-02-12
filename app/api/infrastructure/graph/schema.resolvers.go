@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -219,6 +220,7 @@ func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project)
 func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*entity.ToolUrls, error) {
 	mlflowWithProject := strings.Replace(r.cfg.ProjectMLFlowURL, "PROJECT_ID", obj.ID, 1)
 	filebrowserWithProject := strings.Replace(r.cfg.ProjectFilebrowserURL, "PROJECT_ID", obj.ID, 1)
+	minioConsole := fmt.Sprintf("%s/buckets/%s/browse", r.cfg.Minio.ConsoleURL, obj.ID)
 	kgWithProject := ""
 
 	if r.cfg.Kg.Enabled {
@@ -226,9 +228,11 @@ func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*e
 	}
 
 	return &entity.ToolUrls{
-		KnowledgeGalaxy: kgWithProject,
-		Filebrowser:     filebrowserWithProject,
-		MLFlow:          mlflowWithProject,
+		KnowledgeGalaxyEnabled: r.cfg.Kg.Enabled,
+		KnowledgeGalaxy:        kgWithProject,
+		Filebrowser:            filebrowserWithProject,
+		MLFlow:                 mlflowWithProject,
+		Minio:                  minioConsole,
 	}, nil
 }
 

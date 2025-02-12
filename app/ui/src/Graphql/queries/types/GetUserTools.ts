@@ -9,9 +9,11 @@
 
 export interface GetUserTools_project_toolUrls {
   __typename: "ToolUrls";
+  knowledgeGalaxyEnabled: boolean;
   knowledgeGalaxy: string;
   filebrowser: string;
   mlflow: string;
+  minio: string;
 }
 
 export interface GetUserTools_project {

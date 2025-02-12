@@ -2,18 +2,21 @@ package runtime_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/infrastructure/k8s"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
-	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
-	"gotest.tools/v3/assert"
 )
+
+var errUnknown = errors.New("unknown error")
 
 type Runtimesuite struct {
 	ctrl       *gomock.Controller
@@ -53,19 +56,51 @@ func TestInteractor_GetRunningRuntime(t *testing.T) {
 	defer s.ctrl.Finish()
 
 	const (
-		username     = "john.doe"
-		runtimeID    = "1234"
-		runtimeName  = "Runtime 1"
-		runtimeImage = "konstellation/image"
-		runtimeTag   = "3.9"
+		username         = "john.doe"
+		runtimeID        = "1234"
+		runtimeName      = "Runtime 1"
+		runtimeImage     = "konstellation/image"
+		runtimeTag       = "3.9"
+		runtimePodStatus = entity.PodStatusRunning
 	)
 
 	ctx := context.Background()
 
 	expectedRuntime := entity.NewRuntime(runtimeID, runtimeName, runtimeImage, runtimeTag)
 	expectedRuntime.RuntimePod = "usertools-" + username + "-user-tools-0"
+	expectedRuntime.RuntimePodStatus = runtimePodStatus
 
 	s.mocks.k8client.EXPECT().GetRuntimeIDFromUserTools(ctx, username).Return(runtimeID, nil)
+	s.mocks.k8client.EXPECT().GetUserToolsPodStatus(ctx, username).Return(runtimePodStatus, nil)
+	s.mocks.repo.EXPECT().Get(ctx, runtimeID).Return(expectedRuntime, nil)
+
+	f, err := s.interactor.GetRunningRuntime(ctx, username)
+
+	require.NoError(t, err)
+	require.Equal(t, &expectedRuntime, f)
+}
+
+func TestInteractor_GetRunningRuntime_GetUserToolsPodStatusError(t *testing.T) {
+	s := newRuntimesuite(t)
+	defer s.ctrl.Finish()
+
+	const (
+		username         = "john.doe"
+		runtimeID        = "1234"
+		runtimeName      = "Runtime 1"
+		runtimeImage     = "konstellation/image"
+		runtimeTag       = "3.9"
+		runtimePodStatus = entity.PodStatusFailed
+	)
+
+	ctx := context.Background()
+
+	expectedRuntime := entity.NewRuntime(runtimeID, runtimeName, runtimeImage, runtimeTag)
+	expectedRuntime.RuntimePod = "usertools-" + username + "-user-tools-0"
+	expectedRuntime.RuntimePodStatus = runtimePodStatus
+
+	s.mocks.k8client.EXPECT().GetRuntimeIDFromUserTools(ctx, username).Return(runtimeID, nil)
+	s.mocks.k8client.EXPECT().GetUserToolsPodStatus(ctx, username).Return(entity.PodStatusFailed, errUnknown)
 	s.mocks.repo.EXPECT().Get(ctx, runtimeID).Return(expectedRuntime, nil)
 
 	f, err := s.interactor.GetRunningRuntime(ctx, username)
@@ -92,10 +127,11 @@ func TestInteractor_GetProjectRuntimes(t *testing.T) {
 		entity.NewRuntime(genRuntimeID, runtimeName, runtimeImage, runtimeTag),
 	}
 
+	s.mocks.k8client.EXPECT().GetUserToolsPodStatus(ctx, username).Return(entity.PodStatusRunning, nil)
 	s.mocks.repo.EXPECT().FindAll(ctx).Return(expectedGenericRuntimes, nil)
 
 	f, err := s.interactor.GetRuntimes(ctx, username)
 
 	require.NoError(t, err)
-	assert.DeepEqual(t, expectedGenericRuntimes, f)
+	require.ElementsMatch(t, expectedGenericRuntimes, f)
 }

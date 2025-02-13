@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import styles from './Projects.module.scss';
 import useProjectFilters from 'Graphql/client/hooks/useProjectFilters';
 import { useQuery, useReactiveVar } from '@apollo/client';
+import useBoolState from 'Hooks/useBoolState';
 
 import GetProjectsQuery from 'Graphql/queries/getProjects';
 import GetMeQuery from 'Graphql/queries/getMe';
@@ -49,12 +50,13 @@ function Projects() {
           canAccessUsers && <AddProject key="add-project" />,
         ]}
       </div>
-      {showProjectAdmins !== null && (
+      {showProjectAdmins && (
         <ModalContainer
           title={showProjectAdmins.projectName}
           actionButtonLabel="Close"
           actionButtonCancel="Cancel"
           onAccept={() => setShowProjectAdmins(null)}
+          onCancel={() => setShowProjectAdmins(null)}
           className={styles.adminsModal}
           blocking
         >

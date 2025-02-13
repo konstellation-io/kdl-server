@@ -9,7 +9,6 @@ import React, { useState } from 'react';
 import styles from './Projects.module.scss';
 import useProjectFilters from 'Graphql/client/hooks/useProjectFilters';
 import { useQuery, useReactiveVar } from '@apollo/client';
-import useBoolState from 'Hooks/useBoolState';
 
 import GetProjectsQuery from 'Graphql/queries/getProjects';
 import GetMeQuery from 'Graphql/queries/getMe';

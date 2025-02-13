@@ -23,7 +23,7 @@ function ProjectContentRoutes({ openedProject }: ProjectRoute) {
 
   function redirectDisabledKG() {
     return (
-      !CONFIG.KNOWLEDGE_GALAXY_ENABLED && (
+      openedProject.toolUrls.knowledgeGalaxyEnabled && (
         <Redirect key={ROUTE.PROJECT_TOOL_KG} from={ROUTE.PROJECT_TOOL_KG} to={ROUTE.PROJECT_OVERVIEW} />
       )
     );

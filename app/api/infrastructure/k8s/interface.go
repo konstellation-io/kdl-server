@@ -18,16 +18,16 @@ type ClientInterface interface {
 	CreateSecret(ctx context.Context, name string, values, labels map[string]string) error
 	UpdateSecret(ctx context.Context, name string, values, labels map[string]string) error
 	GetSecret(ctx context.Context, name string) (map[string][]byte, error)
-	CreateKDLUserToolsCR(ctx context.Context, username string, data UserToolsData) error
+	CreateKDLUserToolsCR(ctx context.Context, data UserToolsData) error
 	DeleteUserToolsCR(ctx context.Context, username string) error
-	UpdateKDLUserToolsCR(ctx context.Context, resourceName string, data UserToolsData, crd *map[string]interface{}) error
+	UpdateKDLUserToolsCR(ctx context.Context, resourceName string, crd *map[string]interface{}) error
 	ListKDLUserToolsCR(ctx context.Context) ([]unstructured.Unstructured, error)
 	GetKDLUserToolsCR(ctx context.Context, username string) (*unstructured.Unstructured, error)
 	GetUserToolsPodStatus(ctx context.Context, username string) (entity.PodStatus, error)
 	IsUserToolPODRunning(ctx context.Context, username string) (bool, error)
 	GetRuntimeIDFromUserTools(ctx context.Context, username string) (string, error)
 	GetCapabilitiesIDFromUserTools(ctx context.Context, username string) (string, error)
-	CreateKDLProjectCR(ctx context.Context, projectID string) error
+	CreateKDLProjectCR(ctx context.Context, data ProjectData) error
 	DeleteKDLProjectCR(ctx context.Context, projectID string) error
 	UpdateKDLProjectsCR(ctx context.Context, projectID string, crd *map[string]interface{}) error
 	ListKDLProjectsNameCR(ctx context.Context) ([]string, error)

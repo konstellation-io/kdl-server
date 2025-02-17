@@ -2,18 +2,61 @@ package k8s
 
 import (
 	"context"
+	"encoding/json"
 
+	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/kdlutil"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
+type ProjectData struct {
+	ProjectID      string
+	MinioAccessKey entity.MinioAccessKey
+}
+
+func (k *Client) ProjectDataToMap(data ProjectData) (map[string]string, error) {
+	minioAccessKeyJSON, err := json.Marshal(data.MinioAccessKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]string{
+		"projectId":      data.ProjectID,
+		"minioAccessKey": string(minioAccessKeyJSON),
+	}, nil
+}
+
+func (k *Client) MapToProjectData(data map[string]interface{}) (ProjectData, error) {
+	minioAccessKeyJSON, ok := data["minioAccessKey"].(string)
+	if !ok {
+		return ProjectData{}, errCRDCantDecodeInputData
+	}
+
+	var minioAccessKey entity.MinioAccessKey
+
+	err := json.Unmarshal([]byte(minioAccessKeyJSON), &minioAccessKey)
+	if err != nil {
+		return ProjectData{}, err
+	}
+
+	projectID, ok := data["projectId"].(string)
+	if !ok {
+		return ProjectData{}, errCRDCantDecodeInputData
+	}
+
+	return ProjectData{
+		ProjectID:      projectID,
+		MinioAccessKey: minioAccessKey,
+	}, nil
+}
+
 func (k *Client) GetConfigMapTemplateNameKDLProject() string {
 	return k.cfg.ReleaseName + "-server-project-template"
 }
 
-func (k *Client) updateKDLProjectTemplate(projectID string, crd *map[string]interface{}) (*map[string]interface{}, error) {
+func (k *Client) updateKDLProjectTemplate(data ProjectData, crd *map[string]interface{}) (*map[string]interface{}, error) {
 	crdToUpdate := *crd
 
 	// update the spec.projectId in the CRD object
@@ -22,9 +65,15 @@ func (k *Client) updateKDLProjectTemplate(projectID string, crd *map[string]inte
 		return nil, errCRDNoSpec
 	}
 
-	spec["projectId"] = projectID
+	inputData, err := k.ProjectDataToMap(data)
+	if err != nil {
+		return nil, errCRDCantEncodeInputData
+	}
 
-	// update spec.mlflow.env.ARTIFACTS_BUCKET in the CRD object
+	spec["inputData"] = inputData
+	spec["projectId"] = data.ProjectID
+
+	// update spec.mlflow.env in the CRD object
 	mlflow, ok := spec["mlflow"].(map[string]interface{})
 
 	if !ok {
@@ -36,8 +85,9 @@ func (k *Client) updateKDLProjectTemplate(projectID string, crd *map[string]inte
 		return nil, errCRDNoSpecMlflowEnv
 	}
 
-	mlflowEnv["ARTIFACTS_BUCKET"] = projectID
-	// FUTURE: update AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY with minIO values for the project
+	mlflowEnv["ARTIFACTS_BUCKET"] = data.ProjectID
+	mlflowEnv["AWS_ACCESS_KEY_ID"] = data.MinioAccessKey.AccessKey
+	mlflowEnv["AWS_SECRET_ACCESS_KEY"] = data.MinioAccessKey.SecretKey
 
 	// update metadata.name and metadata.namespace in the CRD object
 	metadata, ok := crdToUpdate["metadata"].(map[string]interface{})
@@ -46,13 +96,28 @@ func (k *Client) updateKDLProjectTemplate(projectID string, crd *map[string]inte
 		return nil, errCRDNoMetadata
 	}
 
-	metadata["name"] = projectID
+	metadata["name"] = data.ProjectID
 	metadata["namespace"] = k.cfg.Kubernetes.Namespace
+
+	// update spec.filebrowser.env in the CRD object
+	filebrowser, ok := spec["filebrowser"].(map[string]interface{})
+
+	if !ok {
+		return nil, errCRDNoSpecFilebrowser
+	}
+
+	filebrowserEnv, ok := filebrowser["env"].(map[string]interface{})
+	if !ok {
+		return nil, errCRDNoSpecFilebrowserEnv
+	}
+
+	filebrowserEnv["AWS_S3_ACCESS_KEY_ID"] = data.MinioAccessKey.AccessKey
+	filebrowserEnv["AWS_S3_SECRET_ACCESS_KEY"] = data.MinioAccessKey.SecretKey
 
 	return &crdToUpdate, nil
 }
 
-func (k *Client) CreateKDLProjectCR(ctx context.Context, projectID string) error {
+func (k *Client) CreateKDLProjectCR(ctx context.Context, data ProjectData) error {
 	// get the CRD template from the ConfigMap
 	configMap, err := k.GetConfigMap(ctx, k.GetConfigMapTemplateNameKDLProject())
 
@@ -67,7 +132,7 @@ func (k *Client) CreateKDLProjectCR(ctx context.Context, projectID string) error
 	}
 
 	// update the CRD object with correct values
-	crdUpdated, err := k.updateKDLProjectTemplate(projectID, &crd)
+	crdUpdated, err := k.updateKDLProjectTemplate(data, &crd)
 	if err != nil {
 		return err
 	}
@@ -84,7 +149,7 @@ func (k *Client) CreateKDLProjectCR(ctx context.Context, projectID string) error
 		return err
 	}
 
-	k.logger.Info("KDL project created correctly in k8s", "projectName", projectID)
+	k.logger.Info("KDL project created correctly in k8s", "projectName", data.ProjectID)
 
 	return nil
 }
@@ -126,8 +191,32 @@ func (k *Client) GetKDLProjectCR(ctx context.Context, name string) (*unstructure
 }
 
 func (k *Client) UpdateKDLProjectsCR(ctx context.Context, projectID string, crd *map[string]interface{}) error {
-	// update the CRD object with correct values
-	crdUpdated, err := k.updateKDLProjectTemplate(projectID, crd)
+	k.logger.Info("Updating kdl project", "projectName", projectID)
+
+	// Get existing CR
+	existingKDLProject, err := k.GetKDLProjectCR(ctx, projectID)
+	if err != nil {
+		return err
+	}
+
+	// Recover the input data from the existing CR
+	existingSpec, _, err := unstructured.NestedMap(existingKDLProject.Object, "spec")
+	if err != nil {
+		return errCRDCantDecodeInputData
+	}
+
+	inputDataMap, ok := existingSpec["inputData"].(map[string]interface{})
+	if !ok {
+		return errCRDCantDecodeInputData
+	}
+
+	inputData, err := k.MapToProjectData(inputDataMap)
+	if err != nil {
+		return errCRDCantDecodeInputData
+	}
+
+	// Re-apply the input data with the updated template
+	crdUpdated, err := k.updateKDLProjectTemplate(inputData, crd)
 	if err != nil {
 		return err
 	}
@@ -138,16 +227,9 @@ func (k *Client) UpdateKDLProjectsCR(ctx context.Context, projectID string, crd 
 		return errCRDNoSpec
 	}
 
-	existingKDLProject, err := k.GetKDLProjectCR(ctx, projectID)
-	if err != nil {
-		return err
-	}
-
 	existingKDLProject.Object["spec"] = specValue
 
 	// CRD object is now updated and ready to be created
-	k.logger.Info("Updating kdl project", "projectName", projectID)
-
 	_, err = k.kdlProjectRes.Namespace(k.cfg.Kubernetes.Namespace).Update(ctx, existingKDLProject, metav1.UpdateOptions{})
 	if err != nil {
 		k.logger.Error(err, "Error updating KDL Project CR in k8s", "projectName", projectID)

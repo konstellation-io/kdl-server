@@ -60,7 +60,12 @@ func (r *mutationResolver) SetActiveUserTools(ctx context.Context, input model.S
 
 // UpdateAccessLevel is the resolver for the updateAccessLevel field.
 func (r *mutationResolver) UpdateAccessLevel(ctx context.Context, input model.UpdateAccessLevelInput) ([]entity.User, error) {
-	return r.users.UpdateAccessLevel(ctx, input.UserIds, input.AccessLevel)
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.users.UpdateAccessLevel(ctx, input.UserIds, input.AccessLevel, loggedUser.ID)
 }
 
 // AddMembers is the resolver for the addMembers field.
@@ -168,11 +173,17 @@ func (r *mutationResolver) UpdateMembers(ctx context.Context, input model.Update
 
 // UpdateProject is the resolver for the updateProject field.
 func (r *mutationResolver) UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error) {
+	loggedUser, err := r.getLoggedUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	p, err := r.projects.Update(ctx, project.UpdateProjectOption{
 		ProjectID:   input.ID,
 		Name:        input.Name,
 		Description: input.Description,
 		Archived:    input.Archived,
+		UserID:      loggedUser.ID,
 	})
 
 	return &p, err

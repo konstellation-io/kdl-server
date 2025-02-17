@@ -28,6 +28,10 @@ export default gql`
       members {
         ...MemberFields
       }
+      minioAccessKey {
+        accessKey
+        secretKey
+      }
     }
   }
 `;

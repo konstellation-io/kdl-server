@@ -41,102 +41,192 @@ const (
 
 type testSuite struct {
 	suite.Suite
-	Container *k3s.K3sContainer
-	Client    *k8s.Client
-	Clientset *kubernetes.Clientset
+	Container       *k3s.K3sContainer
+	Client          *k8s.Client
+	Clientset       *kubernetes.Clientset
+	kdlUserToolsRes dynamic.NamespaceableResourceInterface
+	kdlProjectRes   dynamic.NamespaceableResourceInterface
 }
 
 func TestSuite(t *testing.T) {
 	suite.Run(t, new(testSuite))
 }
 
-func (s *testSuite) defineCRD(restcfg *rest.Config) {
+var preserve = true
+var crdKdlUserTools = &apiextensionsv1.CustomResourceDefinition{
+	ObjectMeta: metav1.ObjectMeta{
+		Name: "kdlusertools.kdl.konstellation.io", // Format: plural.group
+	},
+	Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+		Group: "kdl.konstellation.io",
+		Names: apiextensionsv1.CustomResourceDefinitionNames{
+			Plural:   "kdlusertools",
+			Singular: "kdlusertool",
+			Kind:     "KDLUserTools",
+			ListKind: "KDLUserToolsList",
+		},
+		Scope: apiextensionsv1.NamespaceScoped,
+		Versions: []apiextensionsv1.CustomResourceDefinitionVersion{
+			{
+				Name:    "v1",
+				Served:  true,
+				Storage: true,
+				Schema: &apiextensionsv1.CustomResourceValidation{
+					OpenAPIV3Schema: &apiextensionsv1.JSONSchemaProps{
+						Type: "object",
+						Properties: map[string]apiextensionsv1.JSONSchemaProps{
+							"spec": {
+								Type: "object",
+								Properties: map[string]apiextensionsv1.JSONSchemaProps{
+									"inputData": {
+										Type: "object",
+										AdditionalProperties: &apiextensionsv1.JSONSchemaPropsOrBool{
+											Schema: &apiextensionsv1.JSONSchemaProps{
+												Type: "string",
+											},
+										},
+									},
+									"username":     {Type: "string"},
+									"usernameSlug": {Type: "string"},
+									"vscodeRuntime": {
+										Type: "object",
+										Properties: map[string]apiextensionsv1.JSONSchemaProps{
+											"image": {
+												Type: "object",
+												Properties: map[string]apiextensionsv1.JSONSchemaProps{
+													"repository": {Type: "string"},
+													"tag":        {Type: "string"},
+												},
+											},
+											"env": {
+												Type:                   "object",
+												Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
+												XPreserveUnknownFields: &preserve,
+											},
+										},
+									},
+									"affinity": {
+										Type:                   "object",
+										Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
+										XPreserveUnknownFields: &preserve,
+									},
+									"nodeSelector": {
+										Type:                   "object",
+										Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
+										XPreserveUnknownFields: &preserve,
+									},
+									"tolerations": {
+										Type: "array",
+										Items: &apiextensionsv1.JSONSchemaPropsOrArray{
+											Schema: &apiextensionsv1.JSONSchemaProps{
+												Type: "object",
+												Properties: map[string]apiextensionsv1.JSONSchemaProps{
+													"effect":            {Type: "string"},
+													"key":               {Type: "string"},
+													"operator":          {Type: "string"},
+													"tolerationSeconds": {Type: "integer"},
+													"value":             {Type: "string"},
+												},
+											},
+										},
+									},
+									"podLabels": {
+										Type:                   "object",
+										Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
+										XPreserveUnknownFields: &preserve,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+}
+
+func (s *testSuite) defineCRDKDLUserTools(restcfg *rest.Config) {
 	// Create a clientset for CRD operations
 	apiExtensionsClient, err := apiextensionsclient.NewForConfig(restcfg)
 	s.Require().NoError(err)
 
-	// Define the CRD for KDLUserTools
-	crdKdlUserTools := &apiextensionsv1.CustomResourceDefinition{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "kdlusertools.kdl.konstellation.io", // Format: plural.group
-		},
-		Spec: apiextensionsv1.CustomResourceDefinitionSpec{
-			Group: "kdl.konstellation.io",
-			Names: apiextensionsv1.CustomResourceDefinitionNames{
-				Plural:   "kdlusertools",
-				Singular: "kdlusertool",
-				Kind:     "KDLUserTools",
-				ListKind: "KDLUserToolsList",
-			},
-			Scope: apiextensionsv1.NamespaceScoped,
-			Versions: []apiextensionsv1.CustomResourceDefinitionVersion{
-				{
-					Name:    "v1",
-					Served:  true,
-					Storage: true,
-					Schema: &apiextensionsv1.CustomResourceValidation{
-						OpenAPIV3Schema: &apiextensionsv1.JSONSchemaProps{
-							Type: "object",
-							Properties: map[string]apiextensionsv1.JSONSchemaProps{
-								"spec": {
-									Type: "object",
-									Properties: map[string]apiextensionsv1.JSONSchemaProps{
-										"username":     {Type: "string"},
-										"usernameSlug": {Type: "string"},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-
 	// Create the CRD KDLUserTools in the cluster
 	_, err = apiExtensionsClient.ApiextensionsV1().CustomResourceDefinitions().Create(context.TODO(), crdKdlUserTools, metav1.CreateOptions{})
 	s.Require().NoError(err)
+}
 
-	// Define the CRD for KDLProject
-	crdKdlProject := &apiextensionsv1.CustomResourceDefinition{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "kdlprojects.kdl.konstellation.io", // Format: plural.group
+var crdKdlProject = &apiextensionsv1.CustomResourceDefinition{
+	ObjectMeta: metav1.ObjectMeta{
+		Name: "kdlprojects.kdl.konstellation.io", // Format: plural.group
+	},
+	Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+		Group: "kdl.konstellation.io",
+		Names: apiextensionsv1.CustomResourceDefinitionNames{
+			Plural:   "kdlprojects",
+			Singular: "kdlproject",
+			Kind:     "KDLProject",
+			ListKind: "KDLProjectList",
 		},
-		Spec: apiextensionsv1.CustomResourceDefinitionSpec{
-			Group: "kdl.konstellation.io",
-			Names: apiextensionsv1.CustomResourceDefinitionNames{
-				Plural:   "kdlprojects",
-				Singular: "kdlproject",
-				Kind:     "KDLProject",
-				ListKind: "KDLProjectList",
-			},
-			Scope: apiextensionsv1.NamespaceScoped,
-			Versions: []apiextensionsv1.CustomResourceDefinitionVersion{
-				{
-					Name:    "v1",
-					Served:  true,
-					Storage: true,
-					Schema: &apiextensionsv1.CustomResourceValidation{
-						OpenAPIV3Schema: &apiextensionsv1.JSONSchemaProps{
-							Type: "object",
-							Properties: map[string]apiextensionsv1.JSONSchemaProps{
-								"spec": {
-									Type: "object",
-									Properties: map[string]apiextensionsv1.JSONSchemaProps{
-										"projectId": {
-											Type: "string",
+		Scope: apiextensionsv1.NamespaceScoped,
+		Versions: []apiextensionsv1.CustomResourceDefinitionVersion{
+			{
+				Name:    "v1",
+				Served:  true,
+				Storage: true,
+				Schema: &apiextensionsv1.CustomResourceValidation{
+					OpenAPIV3Schema: &apiextensionsv1.JSONSchemaProps{
+						Type: "object",
+						Properties: map[string]apiextensionsv1.JSONSchemaProps{
+							"spec": {
+								Type: "object",
+								Properties: map[string]apiextensionsv1.JSONSchemaProps{
+									"inputData": {
+										Type: "object",
+										AdditionalProperties: &apiextensionsv1.JSONSchemaPropsOrBool{
+											Schema: &apiextensionsv1.JSONSchemaProps{
+												Type: "string",
+											},
 										},
 									},
-									Required: []string{"projectId"},
+									"projectId": {
+										Type: "string",
+									},
+									"mlflow": {
+										Type: "object",
+										Properties: map[string]apiextensionsv1.JSONSchemaProps{
+											"env": {
+												Type:                   "object",
+												Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
+												XPreserveUnknownFields: &preserve,
+											},
+										},
+									},
+									"filebrowser": {
+										Type: "object",
+										Properties: map[string]apiextensionsv1.JSONSchemaProps{
+											"env": {
+												Type:                   "object",
+												Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
+												XPreserveUnknownFields: &preserve,
+											},
+										},
+									},
 								},
+								Required: []string{"projectId"},
 							},
-							Required: []string{"spec"},
 						},
+						Required: []string{"spec"},
 					},
 				},
 			},
 		},
-	}
+	},
+}
+
+func (s *testSuite) defineCRDKDLProject(restcfg *rest.Config) {
+	// Create a clientset for CRD operations
+	apiExtensionsClient, err := apiextensionsclient.NewForConfig(restcfg)
+	s.Require().NoError(err)
 
 	// Create the CRD KDLProject in the cluster
 	_, err = apiExtensionsClient.ApiextensionsV1().CustomResourceDefinitions().Create(context.TODO(), crdKdlProject, metav1.CreateOptions{})
@@ -187,27 +277,28 @@ func (s *testSuite) SetupSuite() {
 	dynamicClient, err := dynamic.NewForConfig(restcfg)
 	s.Require().NoError(err)
 
-	kdlUserToolsRes := dynamicClient.Resource(schema.GroupVersionResource{
+	s.kdlUserToolsRes = dynamicClient.Resource(schema.GroupVersionResource{
 		Group:    kdlUserToolsGroup,
 		Version:  kdlUserToolsVersion,
 		Resource: kdlUserToolsResource,
 	})
 
-	kdlProjectRes := dynamicClient.Resource(schema.GroupVersionResource{
+	s.kdlProjectRes = dynamicClient.Resource(schema.GroupVersionResource{
 		Group:    kdlProjectGroup,
 		Version:  kdlProjectVersion,
 		Resource: kdlProjectResource,
 	})
 
-	s.defineCRD(restcfg)
+	s.defineCRDKDLProject(restcfg)
+	s.defineCRDKDLUserTools(restcfg)
 
 	// Create the client
 	s.Client = k8s.New(
 		logger,
 		cfg,
 		s.Clientset,
-		kdlUserToolsRes,
-		kdlProjectRes,
+		s.kdlUserToolsRes,
+		s.kdlProjectRes,
 	)
 }
 

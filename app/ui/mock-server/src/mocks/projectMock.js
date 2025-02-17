@@ -23,6 +23,10 @@ function buildProject(_, index) {
       mlflow: 'https://mlflow.org/',
       minio: 'https://minio.io/',
     },
+    minioAccessKey: {
+      accessKey: casual.uuid,
+      secretKey: casual.uuid,
+    },
   };
 }
 

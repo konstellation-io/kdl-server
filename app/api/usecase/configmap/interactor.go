@@ -21,6 +21,9 @@ type interactor struct {
 	user      user.UseCase
 }
 
+// Assure implementation adheres to interface.
+var _ UseCase = (*interactor)(nil)
+
 // NewInteractor factory function.
 func NewInteractor(
 	logger logr.Logger,

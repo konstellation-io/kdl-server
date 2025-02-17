@@ -5,12 +5,12 @@ import (
 	"errors"
 	"time"
 
+	"github.com/go-logr/logr"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/go-logr/logr"
 	"github.com/konstellation-io/kdl-server/app/api/entity"
 	"github.com/konstellation-io/kdl-server/app/api/pkg/mongodbutils"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
@@ -33,6 +33,8 @@ type userDTO struct {
 	PublicSSHKey       string             `bson:"public_ssh_key"`
 	PrivateSSHKey      string             `bson:"private_ssh_key"`
 	SSHKeyCreationDate time.Time          `bson:"ssh_key_creation_date"`
+	MinioAccessKey     string             `bson:"minio_access_key"`
+	MinioSecretKey     string             `bson:"minio_secret_key"`
 }
 
 type UserRepo struct {
@@ -198,6 +200,13 @@ func (m *UserRepo) UpdateEmail(ctx context.Context, username, email string) erro
 	return m.updateUserFields(ctx, username, bson.M{"email": email})
 }
 
+func (m *UserRepo) UpdateMinioAccess(ctx context.Context, username, accessKey, secretKey string) error {
+	return m.updateUserFields(ctx, username, bson.M{
+		"minio_access_key": accessKey,
+		"minio_secret_key": secretKey,
+	})
+}
+
 func (m *UserRepo) UpdateSub(ctx context.Context, username, sub string) error {
 	return m.updateUserFields(ctx, username, bson.M{"sub": sub})
 }
@@ -290,6 +299,8 @@ func (m *UserRepo) entityToDTO(u entity.User) (userDTO, error) {
 		CreationDate:       u.CreationDate,
 		LastActivity:       u.LastActivity,
 		Deleted:            u.Deleted,
+		MinioAccessKey:     u.MinioAccessKey.AccessKey,
+		MinioSecretKey:     u.MinioAccessKey.SecretKey,
 	}
 
 	if u.ID != "" {
@@ -319,6 +330,10 @@ func (m *UserRepo) dtoToEntity(dto userDTO) entity.User {
 			CreationDate: dto.SSHKeyCreationDate,
 		},
 		Deleted: dto.Deleted,
+		MinioAccessKey: entity.MinioAccessKey{
+			AccessKey: dto.MinioAccessKey,
+			SecretKey: dto.MinioSecretKey,
+		},
 	}
 }
 

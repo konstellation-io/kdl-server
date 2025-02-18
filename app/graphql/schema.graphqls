@@ -33,6 +33,7 @@ type Mutation {
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
 
+  synchronizeUsersData(input: SyncUsersDataInput): Boolean
   login: User!
 }
 
@@ -194,4 +195,11 @@ input ApiTokenInput {
 
 input RemoveApiTokenInput {
   apiTokenId: ID!
+}
+
+input SyncUsersDataInput{
+  serviceAccount: Boolean!
+  sshKeys: Boolean!
+  minioUser: Boolean!
+  userIds: [ID!]!
 }

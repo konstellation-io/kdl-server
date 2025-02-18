@@ -43,6 +43,8 @@ var (
 	ErrCapabilitiesInvalidEffect = errors.New("the following value is not a valid toleration effect")
 
 	ErrCapabilitiesInvalidSeconds = errors.New("the following value is not a valid duration for toleration seconds")
+
+	ErrSynchronizeUsersData = errors.New("error while synchronizing users data. Check logs for more information")
 )
 
 func wrapCapabilitiesNotValidErr(err error) error {

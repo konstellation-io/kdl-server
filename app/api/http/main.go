@@ -174,11 +174,6 @@ func actionsBeforeStartingHTTPServer(logger logr.Logger, repos dbRepos, interact
 		logger.Error(err, "Error creating indexes for users")
 	}
 
-	// Create service accounts for users
-	if err = interactors.userInteractor.SynchronizeServiceAccountsForUsers(); err != nil {
-		logger.Error(err, "Unexpected error creating serviceAccount for users")
-	}
-
 	// Start watching ConfigMaps
 	go func() {
 		err := interactors.configmapInteractor.WatchConfigMapTemplates(context.Background())

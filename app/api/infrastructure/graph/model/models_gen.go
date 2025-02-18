@@ -63,6 +63,13 @@ type SetActiveUserToolsInput struct {
 	CapabilitiesID *string `json:"capabilitiesId,omitempty"`
 }
 
+type SyncUsersDataInput struct {
+	ServiceAccount bool     `json:"serviceAccount"`
+	SSHKeys        bool     `json:"sshKeys"`
+	MinioUser      bool     `json:"minioUser"`
+	UserIds        []string `json:"userIds"`
+}
+
 type UpdateAccessLevelInput struct {
 	UserIds     []string           `json:"userIds"`
 	AccessLevel entity.AccessLevel `json:"accessLevel"`

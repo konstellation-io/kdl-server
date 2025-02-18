@@ -77,18 +77,19 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddAPIToken        func(childComplexity int, input *model.APITokenInput) int
-		AddMembers         func(childComplexity int, input model.AddMembersInput) int
-		CreateProject      func(childComplexity int, input model.CreateProjectInput) int
-		DeleteProject      func(childComplexity int, input model.DeleteProjectInput) int
-		Login              func(childComplexity int) int
-		RegenerateSSHKey   func(childComplexity int) int
-		RemoveAPIToken     func(childComplexity int, input *model.RemoveAPITokenInput) int
-		RemoveMembers      func(childComplexity int, input model.RemoveMembersInput) int
-		SetActiveUserTools func(childComplexity int, input model.SetActiveUserToolsInput) int
-		UpdateAccessLevel  func(childComplexity int, input model.UpdateAccessLevelInput) int
-		UpdateMembers      func(childComplexity int, input model.UpdateMembersInput) int
-		UpdateProject      func(childComplexity int, input model.UpdateProjectInput) int
+		AddAPIToken          func(childComplexity int, input *model.APITokenInput) int
+		AddMembers           func(childComplexity int, input model.AddMembersInput) int
+		CreateProject        func(childComplexity int, input model.CreateProjectInput) int
+		DeleteProject        func(childComplexity int, input model.DeleteProjectInput) int
+		Login                func(childComplexity int) int
+		RegenerateSSHKey     func(childComplexity int) int
+		RemoveAPIToken       func(childComplexity int, input *model.RemoveAPITokenInput) int
+		RemoveMembers        func(childComplexity int, input model.RemoveMembersInput) int
+		SetActiveUserTools   func(childComplexity int, input model.SetActiveUserToolsInput) int
+		SynchronizeUsersData func(childComplexity int, input *model.SyncUsersDataInput) int
+		UpdateAccessLevel    func(childComplexity int, input model.UpdateAccessLevelInput) int
+		UpdateMembers        func(childComplexity int, input model.UpdateMembersInput) int
+		UpdateProject        func(childComplexity int, input model.UpdateProjectInput) int
 	}
 
 	Project struct {
@@ -185,6 +186,7 @@ type MutationResolver interface {
 	UpdateProject(ctx context.Context, input model.UpdateProjectInput) (*entity.Project, error)
 	AddAPIToken(ctx context.Context, input *model.APITokenInput) (*entity.APIToken, error)
 	RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error)
+	SynchronizeUsersData(ctx context.Context, input *model.SyncUsersDataInput) (*bool, error)
 	Login(ctx context.Context) (*entity.User, error)
 }
 type ProjectResolver interface {
@@ -424,6 +426,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.SetActiveUserTools(childComplexity, args["input"].(model.SetActiveUserToolsInput)), true
+
+	case "Mutation.synchronizeUsersData":
+		if e.complexity.Mutation.SynchronizeUsersData == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_synchronizeUsersData_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.SynchronizeUsersData(childComplexity, args["input"].(*model.SyncUsersDataInput)), true
 
 	case "Mutation.updateAccessLevel":
 		if e.complexity.Mutation.UpdateAccessLevel == nil {
@@ -851,6 +865,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputRemoveMembersInput,
 		ec.unmarshalInputRepositoryInput,
 		ec.unmarshalInputSetActiveUserToolsInput,
+		ec.unmarshalInputSyncUsersDataInput,
 		ec.unmarshalInputUpdateAccessLevelInput,
 		ec.unmarshalInputUpdateMembersInput,
 		ec.unmarshalInputUpdateProjectInput,
@@ -986,6 +1001,7 @@ type Mutation {
   addApiToken(input: ApiTokenInput): ApiToken
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
 
+  synchronizeUsersData(input: SyncUsersDataInput): Boolean
   login: User!
 }
 
@@ -1147,6 +1163,13 @@ input ApiTokenInput {
 
 input RemoveApiTokenInput {
   apiTokenId: ID!
+}
+
+input SyncUsersDataInput{
+  serviceAccount: Boolean!
+  sshKeys: Boolean!
+  minioUser: Boolean!
+  userIds: [ID!]!
 }
 `, BuiltIn: false},
 }
@@ -1349,6 +1372,34 @@ func (ec *executionContext) field_Mutation_setActiveUserTools_argsInput(
 	}
 
 	var zeroVal model.SetActiveUserToolsInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_synchronizeUsersData_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_synchronizeUsersData_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_synchronizeUsersData_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*model.SyncUsersDataInput, error) {
+	if _, ok := rawArgs["input"]; !ok {
+		var zeroVal *model.SyncUsersDataInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalOSyncUsersDataInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSyncUsersDataInput(ctx, tmp)
+	}
+
+	var zeroVal *model.SyncUsersDataInput
 	return zeroVal, nil
 }
 
@@ -3066,6 +3117,58 @@ func (ec *executionContext) fieldContext_Mutation_removeApiToken(ctx context.Con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_removeApiToken_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_synchronizeUsersData(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_synchronizeUsersData(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().SynchronizeUsersData(rctx, fc.Args["input"].(*model.SyncUsersDataInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_synchronizeUsersData(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_synchronizeUsersData_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -7989,6 +8092,54 @@ func (ec *executionContext) unmarshalInputSetActiveUserToolsInput(ctx context.Co
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputSyncUsersDataInput(ctx context.Context, obj any) (model.SyncUsersDataInput, error) {
+	var it model.SyncUsersDataInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"serviceAccount", "sshKeys", "minioUser", "userIds"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "serviceAccount":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("serviceAccount"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ServiceAccount = data
+		case "sshKeys":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sshKeys"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SSHKeys = data
+		case "minioUser":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("minioUser"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MinioUser = data
+		case "userIds":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIds"))
+			data, err := ec.unmarshalNID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserIds = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateAccessLevelInput(ctx context.Context, obj any) (model.UpdateAccessLevelInput, error) {
 	var it model.UpdateAccessLevelInput
 	asMap := map[string]any{}
@@ -8473,6 +8624,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "synchronizeUsersData":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_synchronizeUsersData(ctx, field)
+			})
 		case "login":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_login(ctx, field)
@@ -10682,6 +10837,14 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOSyncUsersDataInput2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐSyncUsersDataInput(ctx context.Context, v any) (*model.SyncUsersDataInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputSyncUsersDataInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

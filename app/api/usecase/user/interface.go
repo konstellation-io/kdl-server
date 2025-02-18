@@ -45,6 +45,6 @@ type UseCase interface {
 	GetByID(ctx context.Context, userID string) (entity.User, error)
 	RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error)
 	GetKubeconfig(ctx context.Context, username string) (string, error)
-	SynchronizeServiceAccountsForUsers() error
+	SyncUserData(ctx context.Context, userID string, syncSA, syncSSHKeys, syncMinio bool) error
 	UpdateKDLUserTools(ctx context.Context) error
 }

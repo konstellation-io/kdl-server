@@ -454,18 +454,18 @@ func (mr *MockUseCaseMockRecorder) StopTools(ctx, email interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopTools", reflect.TypeOf((*MockUseCase)(nil).StopTools), ctx, email)
 }
 
-// SynchronizeServiceAccountsForUsers mocks base method.
-func (m *MockUseCase) SynchronizeServiceAccountsForUsers() error {
+// SyncUserData mocks base method.
+func (m *MockUseCase) SyncUserData(ctx context.Context, userID string, syncSA, syncSSHKeys, syncMinio bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SynchronizeServiceAccountsForUsers")
+	ret := m.ctrl.Call(m, "SyncUserData", ctx, userID, syncSA, syncSSHKeys, syncMinio)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// SynchronizeServiceAccountsForUsers indicates an expected call of SynchronizeServiceAccountsForUsers.
-func (mr *MockUseCaseMockRecorder) SynchronizeServiceAccountsForUsers() *gomock.Call {
+// SyncUserData indicates an expected call of SyncUserData.
+func (mr *MockUseCaseMockRecorder) SyncUserData(ctx, userID, syncSA, syncSSHKeys, syncMinio interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SynchronizeServiceAccountsForUsers", reflect.TypeOf((*MockUseCase)(nil).SynchronizeServiceAccountsForUsers))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SyncUserData", reflect.TypeOf((*MockUseCase)(nil).SyncUserData), ctx, userID, syncSA, syncSSHKeys, syncMinio)
 }
 
 // UpdateAccessLevel mocks base method.

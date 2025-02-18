@@ -60,6 +60,13 @@ export interface SetActiveUserToolsInput {
   capabilitiesId?: string | null;
 }
 
+export interface SyncUsersDataInput {
+  serviceAccount: boolean;
+  sshKeys: boolean;
+  minioUser: boolean;
+  userIds: string[];
+}
+
 export interface UpdateAccessLevelInput {
   userIds: string[];
   accessLevel: AccessLevel;

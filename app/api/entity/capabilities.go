@@ -40,12 +40,12 @@ func IsTolerationEffect(effect string) bool {
 
 // Capabilities entity definition.
 type Capabilities struct {
-	ID            string
-	Name          string
-	Default       bool
-	NodeSelectors map[string]string
-	Tolerations   []map[string]interface{}
-	Affinities    map[string]interface{}
+	ID            string                   `json:"id"`
+	Name          string                   `json:"name"`
+	Default       bool                     `json:"default"`
+	NodeSelectors map[string]string        `json:"nodeSelectors"`
+	Tolerations   []map[string]interface{} `json:"tolerations"`
+	Affinities    map[string]interface{}   `json:"affinities"`
 }
 
 func (c Capabilities) Validate() error {

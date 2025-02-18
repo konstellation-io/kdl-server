@@ -210,7 +210,11 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 	}
 
 	// Create a k8s KDLProject containing a MLFLow instance
-	err = i.k8sClient.CreateKDLProjectCR(ctx, k8s.ProjectData{ProjectID: opt.ProjectID, MinioAccessKey: project.MinioAccessKey})
+	err = i.k8sClient.CreateKDLProjectCR(ctx, k8s.ProjectData{
+		ProjectID:      opt.ProjectID,
+		MinioAccessKey: project.MinioAccessKey,
+		Archived:       false,
+	})
 	if err != nil {
 		return entity.Project{}, err
 	}
@@ -293,7 +297,15 @@ func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entit
 	}
 
 	if opt.Archived != nil {
-		err := i.projectRepo.UpdateArchived(ctx, opt.ProjectID, *opt.Archived)
+		// update KDLProject CRD to disable Filebrowser and MLFlow
+		err := i.k8sClient.ToggleArchiveKDLProjectCR(ctx, opt.ProjectID, *opt.Archived)
+		if err != nil {
+			i.logger.Error(err, "Error toggling archive field in KDLProject", "projectName", opt.ProjectID)
+			return entity.Project{}, err
+		}
+
+		// update project archived field
+		err = i.projectRepo.UpdateArchived(ctx, opt.ProjectID, *opt.Archived)
 		if err != nil {
 			return entity.Project{}, err
 		}
@@ -398,10 +410,9 @@ func (i *interactor) UpdateKDLProjects(ctx context.Context) error {
 	}
 
 	for _, pID := range kdlProjectName {
-		// NOTE: update method below to add a new struct with extra data to update into CRD
 		err = i.k8sClient.UpdateKDLProjectsCR(ctx, pID, &crd)
 		if err != nil {
-			i.logger.Error(err, "Error updating KDL Project CR in k8s", "projectName", pID)
+			i.logger.Error(err, "Error updating KDLProject CR", "projectName", pID)
 		}
 	}
 

@@ -83,7 +83,7 @@ releases:
 
   - name: kdl-local
     chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
-    version: 6.2.6
+    version: 6.2.7
     namespace: kdl
     needs:
       - kdl/initial-resources

@@ -418,6 +418,20 @@ func (mr *MockClientInterfaceMockRecorder) ListKDLUserToolsCR(ctx interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListKDLUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).ListKDLUserToolsCR), ctx)
 }
 
+// ToggleArchiveKDLProjectCR mocks base method.
+func (m *MockClientInterface) ToggleArchiveKDLProjectCR(ctx context.Context, projectID string, archived bool) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ToggleArchiveKDLProjectCR", ctx, projectID, archived)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ToggleArchiveKDLProjectCR indicates an expected call of ToggleArchiveKDLProjectCR.
+func (mr *MockClientInterfaceMockRecorder) ToggleArchiveKDLProjectCR(ctx, projectID, archived interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ToggleArchiveKDLProjectCR", reflect.TypeOf((*MockClientInterface)(nil).ToggleArchiveKDLProjectCR), ctx, projectID, archived)
+}
+
 // UpdateKDLProjectsCR mocks base method.
 func (m *MockClientInterface) UpdateKDLProjectsCR(ctx context.Context, projectID string, crd *map[string]interface{}) error {
 	m.ctrl.T.Helper()

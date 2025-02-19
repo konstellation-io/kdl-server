@@ -17,7 +17,7 @@ function buildProject(_, index) {
     members: buildRandomMembers(casual.integer(1, 5)),
     archived: index < activeProjectsCount ? false : casual.boolean,
     toolUrls: {
-      knowledgeGalaxyEnable: true,
+      knowledgeGalaxyEnable: false,
       knowledgeGalaxy: 'https://filebrowser.org/',
       filebrowser: 'https://filebrowser.org/',
       mlflow: 'https://mlflow.org/',

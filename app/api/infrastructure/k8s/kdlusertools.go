@@ -37,7 +37,7 @@ func (k *Client) userToolsDataToMap(data UserToolsData) map[string]interface{} {
 	}
 }
 
-func (k *Client) mapToUserToolsData(data map[string]interface{}) (UserToolsData, error) {
+func (k *Client) MapToUserToolsData(data map[string]interface{}) (UserToolsData, error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		k.logger.Info("inputData cannot be marshal to json")
@@ -352,7 +352,7 @@ func (k *Client) UpdateKDLUserToolsCR(ctx context.Context, resourceName string, 
 		return errCRDCantDecodeInputData
 	}
 
-	inputData, err := k.mapToUserToolsData(inputDataMap)
+	inputData, err := k.MapToUserToolsData(inputDataMap)
 	if err != nil {
 		return errCRDCantDecodeInputData
 	}

@@ -188,6 +188,7 @@ var crdKdlProject = &apiextensionsv1.CustomResourceDefinition{
 									"mlflow": {
 										Type: "object",
 										Properties: map[string]apiextensionsv1.JSONSchemaProps{
+											"enabled": {Type: "boolean"},
 											"env": {
 												Type:                   "object",
 												Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
@@ -198,6 +199,7 @@ var crdKdlProject = &apiextensionsv1.CustomResourceDefinition{
 									"filebrowser": {
 										Type: "object",
 										Properties: map[string]apiextensionsv1.JSONSchemaProps{
+											"enabled": {Type: "boolean"},
 											"env": {
 												Type:                   "object",
 												Properties:             map[string]apiextensionsv1.JSONSchemaProps{},

@@ -25,7 +25,7 @@ func (k *Client) projectDataToMap(data ProjectData) map[string]interface{} {
 	}
 }
 
-func (k *Client) mapToProjectData(data map[string]interface{}) (ProjectData, error) {
+func (k *Client) MapToProjectData(data map[string]interface{}) (ProjectData, error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		k.logger.Info("inputData cannot be marshal to json")
@@ -199,7 +199,7 @@ func (k *Client) getCRDInputData(existingKDLProject *unstructured.Unstructured) 
 		return ProjectData{}, errCRDCantDecodeInputData
 	}
 
-	inputData, err := k.mapToProjectData(inputDataMap)
+	inputData, err := k.MapToProjectData(inputDataMap)
 	if err != nil {
 		return ProjectData{}, errCRDCantDecodeInputData
 	}

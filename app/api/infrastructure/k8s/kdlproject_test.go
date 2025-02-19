@@ -39,9 +39,11 @@ metadata:
 spec:
   projectId: my-demo-projectId
   mlflow:
+    enabled: true
     env:
       ARTIFACTS_BUCKET: my-demo-bucket
   filebrowser:
+    enabled: true
     env: {}
 `
 	_, err := s.Clientset.CoreV1().ConfigMaps(namespace).Create(
@@ -65,28 +67,36 @@ func (s *testSuite) TestCreateKDLProjectCR_and_DeleteKDLProjectCR() {
 	s.Require().NoError(err)
 
 	// Retrieve the Custom Resource
-	resource, err := s.kdlProjectRes.Namespace(namespace).Get(context.Background(), projectID, metav1.GetOptions{})
+	resource, err := s.Client.GetKDLProjectCR(context.Background(), projectID)
 	s.Require().NoError(err)
 
 	// Check its data
 	spec, _ := resource.Object["spec"].(map[string]interface{})
 	mlflow, _ := spec["mlflow"].(map[string]interface{})
+	mlflowEnabled, _ := mlflow["enabled"].(bool)
 	mlflowEnv, _ := mlflow["env"].(map[string]interface{})
 	filebrowser, _ := spec["filebrowser"].(map[string]interface{})
+	filebrowserEnabled, _ := filebrowser["enabled"].(bool)
 	filebrowserEnv, _ := filebrowser["env"].(map[string]interface{})
 
 	s.Require().Equal(projectID, spec["projectId"])
+	s.Require().True(mlflowEnabled)
 	s.Require().Equal(projectMinioAccessKey, mlflowEnv["AWS_ACCESS_KEY_ID"])
 	s.Require().Equal(projectMinioSecretKey, mlflowEnv["AWS_SECRET_ACCESS_KEY"])
+	s.Require().True(filebrowserEnabled)
 	s.Require().Equal(projectMinioAccessKey, filebrowserEnv["AWS_S3_ACCESS_KEY_ID"])
 	s.Require().Equal(projectMinioSecretKey, filebrowserEnv["AWS_S3_SECRET_ACCESS_KEY"])
 
 	// Check the input data itself is stored as well
-	minioAccessKeyJSON := "{\"AccessKey\":\"project-test-project-id\",\"SecretKey\":\"testproject123\"}"
-	inputData, _ := spec["inputData"].(map[string]interface{})
-	inputProjectID, _ := inputData["projectId"].(string)
-	s.Require().Equal(projectID, inputProjectID)
-	s.Require().Equal(minioAccessKeyJSON, inputData["minioAccessKey"])
+	minioAccessKey := entity.MinioAccessKey{
+		AccessKey: "project-test-project-id",
+		SecretKey: "testproject123",
+	}
+	specInputData, _ := spec["inputData"].(map[string]interface{})
+	inputData, _ := s.Client.MapToProjectData(specInputData)
+	s.Require().Equal(projectID, inputData.ProjectID)
+	s.Require().False(inputData.Archived)
+	s.Require().Equal(minioAccessKey, inputData.MinioAccessKey)
 
 	// Delete the CR
 	err = s.Client.DeleteKDLProjectCR(context.Background(), projectID)
@@ -278,6 +288,7 @@ func (s *testSuite) TestUpdateKDLProjectsCR() {
 					"AccessKey": "my-demo-accessKey",
 					"SecretKey": "my-demo-secretKey",
 				},
+				"archived": false,
 			},
 			"projectId": "my-demo-projectId",
 			"mlflow": map[string]interface{}{
@@ -296,6 +307,38 @@ func (s *testSuite) TestUpdateKDLProjectsCR() {
 	}
 	err = s.Client.UpdateKDLProjectsCR(context.Background(), projectID, &crd)
 	s.Require().NoError(err)
+
+	// asserts Retrieve the Custom Resource
+	resource, err := s.Client.GetKDLProjectCR(context.Background(), projectID)
+	s.Require().NoError(err)
+
+	// Check its data
+	spec, _ := resource.Object["spec"].(map[string]interface{})
+	mlflow, _ := spec["mlflow"].(map[string]interface{})
+	mlflowEnabled, _ := mlflow["enabled"].(bool)
+	mlflowEnv, _ := mlflow["env"].(map[string]interface{})
+	filebrowser, _ := spec["filebrowser"].(map[string]interface{})
+	filebrowserEnabled, _ := filebrowser["enabled"].(bool)
+	filebrowserEnv, _ := filebrowser["env"].(map[string]interface{})
+
+	s.Require().Equal(projectID, spec["projectId"])
+	s.Require().True(mlflowEnabled)
+	s.Require().Equal(projectMinioAccessKey, mlflowEnv["AWS_ACCESS_KEY_ID"])
+	s.Require().Equal(projectMinioSecretKey, mlflowEnv["AWS_SECRET_ACCESS_KEY"])
+	s.Require().True(filebrowserEnabled)
+	s.Require().Equal(projectMinioAccessKey, filebrowserEnv["AWS_S3_ACCESS_KEY_ID"])
+	s.Require().Equal(projectMinioSecretKey, filebrowserEnv["AWS_S3_SECRET_ACCESS_KEY"])
+
+	// Check the input data itself is stored as well
+	minioAccessKey := entity.MinioAccessKey{
+		AccessKey: "project-test-project-id",
+		SecretKey: "testproject123",
+	}
+	specInputData, _ := spec["inputData"].(map[string]interface{})
+	inputData, _ := s.Client.MapToProjectData(specInputData)
+	s.Require().Equal(projectID, inputData.ProjectID)
+	s.Require().False(inputData.Archived)
+	s.Require().Equal(minioAccessKey, inputData.MinioAccessKey)
 
 	// Delete the CR
 	err = s.Client.DeleteKDLProjectCR(context.Background(), projectID)
@@ -316,4 +359,49 @@ func (s *testSuite) TestUpdateKDLProjectsCR_WithoutCRD() {
 	}
 	err := s.Client.UpdateKDLProjectsCR(context.Background(), projectID, &crd)
 	s.Require().Error(err)
+}
+
+func (s *testSuite) ToggleArchiveKDLProjectCR() {
+	// Arrange by creating the CR
+	s.createKDLProjectConfigMapTemplate()
+	err := s.Client.CreateKDLProjectCR(context.Background(), projectData)
+	s.Require().NoError(err)
+
+	// Toggle the archive to true
+	err = s.Client.ToggleArchiveKDLProjectCR(context.Background(), projectID, true)
+	s.Require().NoError(err)
+
+	// Assert filebrowser and mlflow are disabled
+	resource, err := s.Client.GetKDLProjectCR(context.Background(), projectID)
+	s.Require().NoError(err)
+
+	spec, _ := resource.Object["spec"].(map[string]interface{})
+	mlflow, _ := spec["mlflow"].(map[string]interface{})
+	mflowEnabled, _ := mlflow["enabled"].(bool)
+	filebrowser, _ := spec["filebrowser"].(map[string]interface{})
+	filebrowserEnabled, _ := filebrowser["enabled"].(bool)
+
+	s.Require().False(mflowEnabled)
+	s.Require().False(filebrowserEnabled)
+
+	// Toggle the archive to false
+	err = s.Client.ToggleArchiveKDLProjectCR(context.Background(), projectID, false)
+	s.Require().NoError(err)
+
+	// Assert filebrowser and mlflow are enabled
+	resource, err = s.Client.GetKDLProjectCR(context.Background(), projectID)
+	s.Require().NoError(err)
+
+	spec, _ = resource.Object["spec"].(map[string]interface{})
+	mlflow, _ = spec["mlflow"].(map[string]interface{})
+	mflowEnabled, _ = mlflow["enabled"].(bool)
+	filebrowser, _ = spec["filebrowser"].(map[string]interface{})
+	filebrowserEnabled, _ = filebrowser["enabled"].(bool)
+
+	s.Require().True(mflowEnabled)
+	s.Require().True(filebrowserEnabled)
+
+	// Delete the CR
+	err = s.Client.DeleteKDLProjectCR(context.Background(), projectID)
+	s.Require().NoError(err)
 }

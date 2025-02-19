@@ -641,6 +641,7 @@ func TestInteractor_Update(t *testing.T) {
 		},
 	).Return(nil)
 
+	s.mocks.k8sClient.EXPECT().ToggleArchiveKDLProjectCR(ctx, testProjectID, newArchived).Return(nil)
 	s.mocks.repo.EXPECT().UpdateArchived(ctx, testProjectID, newArchived).Return(nil)
 	s.mocks.userActivityRepo.EXPECT().Create(
 		ctx,

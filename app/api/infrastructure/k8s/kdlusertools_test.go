@@ -4,7 +4,6 @@ package k8s_test
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
@@ -111,7 +110,7 @@ func (s *testSuite) TestCreateKDLUserToolsCR_and_DeleteUserToolsCR() {
 	s.Require().NoError(err)
 
 	// Retrieve the Custom Resource
-	resource, err := s.kdlUserToolsRes.Namespace(namespace).Get(context.Background(), resName, metav1.GetOptions{})
+	resource, err := s.Client.GetKDLUserToolsCR(context.Background(), resName)
 	s.Require().NoError(err)
 
 	// Check its data
@@ -137,28 +136,15 @@ func (s *testSuite) TestCreateKDLUserToolsCR_and_DeleteUserToolsCR() {
 	s.Require().Equal(int64(100), toleration["tolerationSeconds"])
 
 	// Check the input data itself is stored as well
-	inputData, _ := spec["inputData"].(map[string]interface{})
-	inputUserName, _ := inputData["username"].(string)
-	inputSlugUserName, _ := inputData["slugUsername"].(string)
-	inputRuntimeID, _ := inputData["runtimeID"].(string)
-	inputRuntimeImage, _ := inputData["runtimeImage"].(string)
-	inputRuntimeTag, _ := inputData["runtimeTag"].(string)
-
-	s.Require().Equal(username, inputUserName)
-	s.Require().Equal(slugUsername, inputSlugUserName)
-	s.Require().Equal(runtimeID, inputRuntimeID)
-	s.Require().Equal(runtimeImage, inputRuntimeImage)
-	s.Require().Equal(runtimeTag, inputRuntimeTag)
-
-	var decodedMinioAccessKey entity.MinioAccessKey
-
-	inputMinioAccessKey, _ := inputData["minioAccessKey"].(string)
-
-	err = json.Unmarshal([]byte(inputMinioAccessKey), &decodedMinioAccessKey)
-	s.Require().NoError(err)
-
-	s.Require().Equal(minioAccessKey, decodedMinioAccessKey.AccessKey)
-	s.Require().Equal(minioSecretKey, decodedMinioAccessKey.SecretKey)
+	specInputData, _ := spec["inputData"].(map[string]interface{})
+	inputData, _ := s.Client.MapToUserToolsData(specInputData)
+	s.Require().Equal(username, inputData.Username)
+	s.Require().Equal(slugUsername, inputData.SlugUsername)
+	s.Require().Equal(runtimeID, inputData.RuntimeID)
+	s.Require().Equal(runtimeImage, inputData.RuntimeImage)
+	s.Require().Equal(runtimeTag, inputData.RuntimeTag)
+	s.Require().Equal(minioAccessKey, inputData.MinioAccessKey.AccessKey)
+	s.Require().Equal(minioSecretKey, inputData.MinioAccessKey.SecretKey)
 
 	// Delete the CR
 	// create go routine to cancel the context in 5 seconds. Risk of flaky test
@@ -582,7 +568,7 @@ func (s *testSuite) TestUpdateKDLUserToolsCR() {
 	s.Require().NoError(err)
 
 	// Retrieve the Custom Resource
-	resource, err := s.kdlUserToolsRes.Namespace(namespace).Get(context.Background(), resName, metav1.GetOptions{})
+	resource, err := s.Client.GetKDLUserToolsCR(context.Background(), resName)
 	s.Require().NoError(err)
 
 	// Check the data is still there, in spite of the template update
@@ -606,6 +592,18 @@ func (s *testSuite) TestUpdateKDLUserToolsCR() {
 	s.Require().Equal("value1", toleration["value"])
 	s.Require().Equal("NoExecute", toleration["effect"])
 	s.Require().Equal(int64(100), toleration["tolerationSeconds"])
+
+	// Check the input data itself is stored as well
+
+	specInputData, _ := spec["inputData"].(map[string]interface{})
+	inputData, _ := s.Client.MapToUserToolsData(specInputData)
+	s.Require().Equal(username, inputData.Username)
+	s.Require().Equal(slugUsername, inputData.SlugUsername)
+	s.Require().Equal(runtimeID, inputData.RuntimeID)
+	s.Require().Equal(runtimeImage, inputData.RuntimeImage)
+	s.Require().Equal(runtimeTag, inputData.RuntimeTag)
+	s.Require().Equal(minioAccessKey, inputData.MinioAccessKey.AccessKey)
+	s.Require().Equal(minioSecretKey, inputData.MinioAccessKey.SecretKey)
 
 	// Delete the CR
 	// create go routine to cancel the context in 5 seconds. Risk of flaky test

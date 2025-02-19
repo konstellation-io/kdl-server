@@ -1,9 +1,10 @@
 import { GetQualityProjectDesc, GetQualityProjectDescVariables } from 'Graphql/queries/types/GetQualityProjectDesc';
 import { useEffect, useRef, useState } from 'react';
 
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery, useReactiveVar } from '@apollo/client';
 
 import GetQualityProjectDescQuery from 'Graphql/queries/getQualityProjectDesc';
+import { openedProject } from '../../Graphql/client/cache';
 import { CONFIG } from 'index';
 
 type Options = {
@@ -14,6 +15,7 @@ type Options = {
 function useQualityDescription(description: string, { skipFirstRun = true, debounceTime = 1000 }: Options = {}) {
   const [descriptionScore, setDescriptionScore] = useState(0);
   const [loading, setLoading] = useState(false);
+  const project = useReactiveVar(openedProject);
 
   const [getQualityProjectDesc, { error }] = useLazyQuery<GetQualityProjectDesc, GetQualityProjectDescVariables>(
     GetQualityProjectDescQuery,
@@ -33,7 +35,7 @@ function useQualityDescription(description: string, { skipFirstRun = true, debou
   }
 
   useEffect(() => {
-    if (CONFIG.KNOWLEDGE_GALAXY_ENABLED && !skipFirstRun) fetchDescriptionScore();
+    if (project?.toolUrls.knowledgeGalaxyEnabled && !skipFirstRun) fetchDescriptionScore();
     // We want to run this only on hook instantiation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

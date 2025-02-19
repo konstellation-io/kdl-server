@@ -49,12 +49,13 @@ function Projects() {
           canAccessUsers && <AddProject key="add-project" />,
         ]}
       </div>
-      {showProjectAdmins !== null && (
+      {showProjectAdmins && (
         <ModalContainer
           title={showProjectAdmins.projectName}
           actionButtonLabel="Close"
           actionButtonCancel="Cancel"
           onAccept={() => setShowProjectAdmins(null)}
+          onCancel={() => setShowProjectAdmins(null)}
           className={styles.adminsModal}
           blocking
         >

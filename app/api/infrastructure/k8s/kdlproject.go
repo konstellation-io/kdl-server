@@ -137,7 +137,11 @@ func (k *Client) CreateKDLProjectCR(ctx context.Context, data ProjectData) error
 		Object: *crdUpdated,
 	}
 
-	_, err = k.kdlProjectRes.Namespace(k.cfg.Kubernetes.Namespace).Create(ctx, definition, metav1.CreateOptions{})
+	_, err = k.kdlProjectRes.Namespace(k.cfg.Kubernetes.Namespace).Create(
+		ctx,
+		definition,
+		metav1.CreateOptions{FieldValidation: "Strict"},
+	)
 	if err != nil {
 		return err
 	}
@@ -215,7 +219,11 @@ func (k *Client) updateKDLProject(
 	existingKDLProject.Object["spec"] = specValue
 
 	// CRD object is now updated and ready to be created
-	_, err := k.kdlProjectRes.Namespace(k.cfg.Kubernetes.Namespace).Update(ctx, existingKDLProject, metav1.UpdateOptions{})
+	_, err := k.kdlProjectRes.Namespace(k.cfg.Kubernetes.Namespace).Update(
+		ctx,
+		existingKDLProject,
+		metav1.UpdateOptions{FieldValidation: "Strict"},
+	)
 	if err != nil {
 		k.logger.Error(err, "Error updating KDLProject CR", "projectName", projectID)
 		return err

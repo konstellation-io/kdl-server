@@ -255,70 +255,104 @@ func (i *interactor) GetByID(ctx context.Context, id string) (entity.Project, er
 	return i.projectRepo.Get(ctx, id)
 }
 
+func (i *interactor) updateName(ctx context.Context, projectID, oldName, newName, userID string) error {
+	err := i.projectRepo.UpdateName(ctx, projectID, newName)
+	if err != nil {
+		return err
+	}
+
+	// Save project name updated in user activity
+	userActivity := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: userID,
+		Type:   entity.UserActivityTypeUpdateProjectName,
+		Vars:   entity.NewActivityVarsUpdateProjectInfo(projectID, oldName, newName),
+	}
+
+	err = i.SaveUserActivity(ctx, userActivity)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i *interactor) updateDescription(ctx context.Context, projectID, oldDesc, newDesc, userID string) error {
+	err := i.projectRepo.UpdateDescription(ctx, projectID, newDesc)
+	if err != nil {
+		return err
+	}
+
+	// Save project description updated in user activity
+	userActivity := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: userID,
+		Type:   entity.UserActivityTypeUpdateProjectDescription,
+		Vars:   entity.NewActivityVarsUpdateProjectInfo(projectID, oldDesc, newDesc),
+	}
+
+	err = i.SaveUserActivity(ctx, userActivity)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i *interactor) updateArchived(ctx context.Context, projectID string, oldArchived, newArchived bool, userID string) error {
+	// update KDLProject CRD to disable Filebrowser and MLFlow
+	err := i.k8sClient.ToggleArchiveKDLProjectCR(ctx, projectID, newArchived)
+	if err != nil {
+		i.logger.Error(err, "Error toggling archive field in KDLProject", "projectName", projectID)
+		return err
+	}
+
+	// update project archived field
+	err = i.projectRepo.UpdateArchived(ctx, projectID, newArchived)
+	if err != nil {
+		return err
+	}
+
+	// Save project archived updated in user activity
+	userActivity := entity.UserActivity{
+		Date:   i.clock.Now(),
+		UserID: userID,
+		Type:   entity.UserActivityTypeUpdateProjectArchived,
+		Vars: entity.NewActivityVarsUpdateProjectInfo(
+			projectID,
+			strconv.FormatBool(oldArchived),
+			strconv.FormatBool(newArchived),
+		),
+	}
+
+	err = i.SaveUserActivity(ctx, userActivity)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Update changes the desired information about a project.
 func (i *interactor) Update(ctx context.Context, opt UpdateProjectOption) (entity.Project, error) {
 	p, _ := i.projectRepo.Get(ctx, opt.ProjectID)
 
-	userActivity := entity.UserActivity{
-		Date:   i.clock.Now(),
-		UserID: opt.UserID,
-	}
-
 	if !kdlutil.IsNilOrEmpty(opt.Name) {
-		err := i.projectRepo.UpdateName(ctx, opt.ProjectID, *opt.Name)
-		if err != nil {
-			return entity.Project{}, err
-		}
-
-		// Save project name updated in user activity
-		userActivity.Type = entity.UserActivityTypeUpdateProjectName
-		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(opt.ProjectID, p.Name, *opt.Name)
-		err = i.SaveUserActivity(ctx, userActivity)
-
+		err := i.updateName(ctx, opt.ProjectID, p.Name, *opt.Name, opt.UserID)
 		if err != nil {
 			return entity.Project{}, err
 		}
 	}
 
 	if !kdlutil.IsNilOrEmpty(opt.Description) {
-		err := i.projectRepo.UpdateDescription(ctx, opt.ProjectID, *opt.Description)
-		if err != nil {
-			return entity.Project{}, err
-		}
-
-		// Save project description updated in user activity
-		userActivity.Type = entity.UserActivityTypeUpdateProjectDescription
-		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(opt.ProjectID, p.Description, *opt.Description)
-		err = i.SaveUserActivity(ctx, userActivity)
-
+		err := i.updateDescription(ctx, opt.ProjectID, p.Description, *opt.Description, opt.UserID)
 		if err != nil {
 			return entity.Project{}, err
 		}
 	}
 
 	if opt.Archived != nil {
-		// update KDLProject CRD to disable Filebrowser and MLFlow
-		err := i.k8sClient.ToggleArchiveKDLProjectCR(ctx, opt.ProjectID, *opt.Archived)
-		if err != nil {
-			i.logger.Error(err, "Error toggling archive field in KDLProject", "projectName", opt.ProjectID)
-			return entity.Project{}, err
-		}
-
-		// update project archived field
-		err = i.projectRepo.UpdateArchived(ctx, opt.ProjectID, *opt.Archived)
-		if err != nil {
-			return entity.Project{}, err
-		}
-
-		// Save project archived updated in user activity
-		userActivity.Type = entity.UserActivityTypeUpdateProjectArchived
-		userActivity.Vars = entity.NewActivityVarsUpdateProjectInfo(
-			opt.ProjectID,
-			strconv.FormatBool(p.Archived),
-			strconv.FormatBool(*opt.Archived),
-		)
-		err = i.SaveUserActivity(ctx, userActivity)
-
+		err := i.updateArchived(ctx, opt.ProjectID, p.Archived, *opt.Archived, opt.UserID)
 		if err != nil {
 			return entity.Project{}, err
 		}

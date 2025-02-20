@@ -9,15 +9,18 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
-var errFieldEmpty = errors.New("cannot be empty")
+var (
+	errFieldEmpty = errors.New("cannot be empty")
+	errValidation = errors.New("validation error")
+)
 
 type KeycloakConfig struct {
-	AdminUser        string `envconfig:"KEYCLOAK_ADMIN_USER"`
-	AdminPasswordKey string `envconfig:"KEYCLOAK_PASSWORD_KEY"`
-	AdminClientID    string `envconfig:"KEYCLOAK_ADMIN_CLIENT_ID"`
-	MasterRealm      string `envconfig:"KEYCLOAK_MASTER_REALM"`
-	Realm            string `envconfig:"KEYCLOAK_REALM"`
-	URL              string `envconfig:"KEYCLOAK_URL"`
+	AdminUser        string `envconfig:"KEYCLOAK_ADMIN_USER" optional:"true"`
+	AdminPasswordKey string `envconfig:"KEYCLOAK_PASSWORD_KEY" optional:"true"`
+	AdminClientID    string `envconfig:"KEYCLOAK_ADMIN_CLIENT_ID" optional:"true"`
+	MasterRealm      string `envconfig:"KEYCLOAK_MASTER_REALM" optional:"true"`
+	Realm            string `envconfig:"KEYCLOAK_REALM" optional:"true"`
+	URL              string `envconfig:"KEYCLOAK_URL" optional:"true"`
 }
 
 type KubernetesConfig struct {
@@ -32,11 +35,12 @@ type Config struct {
 	ProjectFilebrowserURL string `envconfig:"PROJECT_FILEBROWSER_URL"`
 	ReleaseName           string `envconfig:"RELEASE_NAME"`
 	StaticFilesPath       string `envconfig:"KDL_SERVER_STATIC_FILES_PATH" default:"../public"`
+	WatchConfigMap        bool   `envconfig:"KDL_WATCHER_CONFIGMAP_ENABLED" default:"false"`
 	MongoDB               struct {
 		URI    string `envconfig:"KDL_SERVER_MONGODB_URI"`
 		DBName string `envconfig:"KDL_SERVER_MONGODB_NAME" default:"kdl"`
 	}
-	Keycloak   KeycloakConfig `optional:"true"`
+	Keycloak   KeycloakConfig
 	Kubernetes KubernetesConfig
 	Minio      struct {
 		Endpoint   string `envconfig:"MINIO_ENDPOINT"`
@@ -61,21 +65,44 @@ type Config struct {
 }
 
 func (c *Config) Validate() error {
-	v := reflect.ValueOf(*c)
-	t := reflect.TypeOf(*c)
+	return validateStruct(reflect.ValueOf(c).Elem())
+}
 
+func validateStruct(v reflect.Value) error {
 	for i := 0; i < v.NumField(); i++ {
-		fieldType := t.Field(i)
-
-		optionalTag := fieldType.Tag.Get("optional")
-		if optionalTag == "true" {
-			continue
-		}
-
 		field := v.Field(i)
-		if field.Interface() == reflect.Zero(field.Type()).Interface() {
-			return fmt.Errorf("error in field %s: %w", v.Type().Field(i).Name, errFieldEmpty)
+		fieldType := v.Type().Field(i)
+
+		if err := validateField(field, fieldType); err != nil {
+			return fmt.Errorf("%w: field %s", errValidation, fieldType.Name)
 		}
+	}
+
+	return nil
+}
+
+func validateField(field reflect.Value, fieldType reflect.StructField) error {
+	// check if the field is a struct and call validateStruct recursively
+	if field.Kind() == reflect.Struct {
+		if err := validateStruct(field); err != nil {
+			return fmt.Errorf("error in field %s: %w", fieldType.Name, err)
+		}
+
+		return nil
+	}
+	// optional field, continue
+	if fieldType.Tag.Get("optional") == "true" {
+		return nil
+	}
+
+	// check if the field is a bool, if so, continue
+	if field.Kind() == reflect.Bool {
+		return nil
+	}
+
+	if reflect.DeepEqual(field.Interface(), reflect.Zero(field.Type()).Interface()) {
+		// return error if field is empty
+		return fmt.Errorf("%w: %s", errFieldEmpty, fieldType.Name)
 	}
 
 	return nil

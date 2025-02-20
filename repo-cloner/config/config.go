@@ -8,7 +8,10 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
-var errFieldEmpty = errors.New("cannot be empty")
+var (
+	errFieldEmpty = errors.New("cannot be empty")
+	errValidation = errors.New("validation error")
+)
 
 // Config holds the configuration values of the application.
 type Config struct {
@@ -24,21 +27,44 @@ type Config struct {
 }
 
 func (c *Config) Validate() error {
-	v := reflect.ValueOf(*c)
-	t := reflect.TypeOf(*c)
+	return validateStruct(reflect.ValueOf(c).Elem())
+}
 
+func validateStruct(v reflect.Value) error {
 	for i := 0; i < v.NumField(); i++ {
-		fieldType := t.Field(i)
-
-		optionalTag := fieldType.Tag.Get("optional")
-		if optionalTag == "true" {
-			continue
-		}
-
 		field := v.Field(i)
-		if field.Interface() == reflect.Zero(field.Type()).Interface() {
-			return fmt.Errorf("error in field %s: %w", v.Type().Field(i).Name, errFieldEmpty)
+		fieldType := v.Type().Field(i)
+
+		if err := validateField(field, fieldType); err != nil {
+			return fmt.Errorf("%w: field %s", errValidation, fieldType.Name)
 		}
+	}
+
+	return nil
+}
+
+func validateField(field reflect.Value, fieldType reflect.StructField) error {
+	// check if the field is a struct and call validateStruct recursively
+	if field.Kind() == reflect.Struct {
+		if err := validateStruct(field); err != nil {
+			return fmt.Errorf("error in field %s: %w", fieldType.Name, err)
+		}
+
+		return nil
+	}
+	// optional field, continue
+	if fieldType.Tag.Get("optional") == "true" {
+		return nil
+	}
+
+	// check if the field is a bool, if so, continue
+	if field.Kind() == reflect.Bool {
+		return nil
+	}
+
+	if reflect.DeepEqual(field.Interface(), reflect.Zero(field.Type()).Interface()) {
+		// return error if field is empty
+		return fmt.Errorf("%w: %s", errFieldEmpty, fieldType.Name)
 	}
 
 	return nil

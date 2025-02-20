@@ -50,6 +50,7 @@ docker build \
 | `KDL_SERVER_MONGODB_URI`         | MongoDB URI for the KDL server                |               |
 | `KDL_SERVER_PORT`                | Port for the KDL API                          | `8080`        |
 | `KDL_SERVER_STATIC_FILES_PATH`   | Path for the static files of the KDL server   | `../public`   |
+| `KDL_WATCHER_CONFIGMAP_ENABLED`  | Enable watching for the configmap changes     | `false`       |
 | `POD_NAMESPACE`                  | Namespace for the KDL server                  |               |
 | `PROJECT_FILEBROWSER_URL`        | URL for the File Browser service              |               |
 | `PROJECT_MLFLOW_URL`             | URL for the MLflow service                    |               |

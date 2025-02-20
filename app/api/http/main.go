@@ -161,13 +161,13 @@ func main() {
 	interactors := loadInteractors(logger, cfg, dependencies.k8sClient, dependencies, repos)
 
 	// Execute actions before starting the HTTP server
-	actionsBeforeStartingHTTPServer(logger, repos, interactors)
+	actionsBeforeStartingHTTPServer(logger, cfg, repos, interactors)
 
 	// Start the HTTP server
 	startHTTPServer(logger, cfg, repos, interactors, dependencies)
 }
 
-func actionsBeforeStartingHTTPServer(logger logr.Logger, repos dbRepos, interactors useCaseInteractors) {
+func actionsBeforeStartingHTTPServer(logger logr.Logger, cfg config.Config, repos dbRepos, interactors useCaseInteractors) {
 	// Ensure db indexes in user collection
 	err := repos.userRepo.EnsureIndexes()
 	if err != nil {
@@ -175,12 +175,14 @@ func actionsBeforeStartingHTTPServer(logger logr.Logger, repos dbRepos, interact
 	}
 
 	// Start watching ConfigMaps
-	go func() {
-		err := interactors.configmapInteractor.WatchConfigMapTemplates(context.Background())
-		if err != nil {
-			logger.Error(err, "Error watching ConfigMaps")
-		}
-	}()
+	if cfg.WatchConfigMap {
+		go func() {
+			err := interactors.configmapInteractor.WatchConfigMapTemplates(context.Background())
+			if err != nil {
+				logger.Error(err, "Error watching ConfigMaps")
+			}
+		}()
+	}
 }
 
 func startHTTPServer(

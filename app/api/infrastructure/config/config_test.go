@@ -46,6 +46,7 @@ var defaultEnv = map[string]string{
 	"KDL_SERVER_MONGODB_NAME":       "mongodb_name",
 	"KNOWLEDGE_GALAXY_ENABLED":      "true",
 	"KUBECONFIG_DOWNLOAD_ENABLED":   "true",
+	"KDL_ENV":                       "dev",
 }
 
 const (
@@ -136,6 +137,7 @@ func (s *configTestSuite) TestConfig_SetAllValues() {
 	s.Require().Equal("mongodb_uri", cfg.MongoDB.URI)
 	s.Require().Equal("mongodb_name", cfg.MongoDB.DBName)
 	s.Require().Equal("pod_namespace", cfg.Kubernetes.Namespace)
+	s.Require().False(cfg.Kubernetes.IsInsideCluster)
 	s.Require().Equal("minio_endpoint", cfg.Minio.Endpoint)
 	s.Require().Equal("console.min.io", cfg.Minio.ConsoleURL)
 	s.Require().Equal("minio_access_key", cfg.Minio.AccessKey)

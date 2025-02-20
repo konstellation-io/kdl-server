@@ -11,7 +11,6 @@ import (
 
 var (
 	errFieldEmpty = errors.New("cannot be empty")
-	errNilStruct  = errors.New("struct is nil")
 	errValidation = errors.New("validation error")
 )
 
@@ -70,18 +69,6 @@ func (c *Config) Validate() error {
 }
 
 func validateStruct(v reflect.Value) error {
-	if v.Kind() == reflect.Ptr {
-		if v.IsNil() {
-			return errNilStruct
-		}
-
-		v = v.Elem()
-	}
-
-	if v.Kind() != reflect.Struct {
-		return nil
-	}
-
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Field(i)
 		fieldType := v.Type().Field(i)

@@ -12,6 +12,7 @@ enum ROUTE {
   PROJECT_TOOL_FILEBROWSER = '/projects/:projectId/tool/filebrowser',
   PROJECT_TOOL_MLFLOW = '/projects/:projectId/tool/mlflow',
   PROJECT_TOOL_KG = '/projects/:projectId/tool/kg',
+  PROJECT_TOOL_MINIO = '/projects/:projectId/tool/minio',
   NEW_PROJECT = '/new-project',
   PROJECT_CREATION = '/new-project/create',
   LOGOUT = '/oauth2/sign_out',

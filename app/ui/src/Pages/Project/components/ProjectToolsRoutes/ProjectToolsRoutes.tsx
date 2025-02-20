@@ -9,6 +9,7 @@ const toolsRoutes: [ROUTE, keyof GetUserTools_project_toolUrls][] = [
   [ROUTE.PROJECT_TOOL_KG, 'knowledgeGalaxy'],
   [ROUTE.PROJECT_TOOL_FILEBROWSER, 'filebrowser'],
   [ROUTE.PROJECT_TOOL_MLFLOW, 'mlflow'],
+  [ROUTE.PROJECT_TOOL_MINIO, 'minio'],
 ];
 function ProjectToolsRoutes() {
   const { resetCurrentTool } = useTools();

@@ -224,7 +224,7 @@ func (r *projectResolver) CreationDate(ctx context.Context, obj *entity.Project)
 func (r *projectResolver) ToolUrls(ctx context.Context, obj *entity.Project) (*entity.ToolUrls, error) {
 	mlflowWithProject := strings.Replace(r.cfg.ProjectMLFlowURL, "PROJECT_ID", obj.ID, 1)
 	filebrowserWithProject := strings.Replace(r.cfg.ProjectFilebrowserURL, "PROJECT_ID", obj.ID, 1)
-	minioConsole := fmt.Sprintf("%s/buckets/%s/browse", r.cfg.Minio.ConsoleURL, obj.ID)
+	minioConsole := fmt.Sprintf("%s/browse/%s", r.cfg.Minio.ConsoleURL, obj.ID)
 	kgWithProject := ""
 
 	if r.cfg.Kg.Enabled {

@@ -49,6 +49,13 @@ resources:
                 proxy_pass http://$1-filebrowser.kdl.svc.cluster.local:9696/$query$is_args$args;
             }
 
+            location ~ ^/minio/([^/]+)/(.*)$ {
+                auth_request /auth;
+                auth_request_set $auth_status $upstream_status;
+                set $query $2;
+                proxy_pass http://minio-console.kdl.svc.cluster.local:9000/$query$is_args$args;
+            }
+
             location ~ ^/kg/(api|static)/(.*)$ {
                 proxy_pass http://knowledge-galaxy.kdl.svc.cluster.local:8080/kg/$1/$2$is_args$args;
             }

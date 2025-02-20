@@ -667,3 +667,42 @@ func (s *testSuite) TestGetUserToolsPodStatus_PodNotFound() {
 	s.Require().Error(err)
 	s.Require().Equal(entity.PodStatusFailed, status)
 }
+
+func (s *testSuite) TestMapToUserToolsData() {
+	data := map[string]interface{}{
+		"username":     username,
+		"slugUsername": slugUsername,
+		"runtimeID":    runtimeID,
+		"runtimeImage": runtimeImage,
+		"runtimeTag":   runtimeTag,
+		"minioAccessKey": map[string]interface{}{
+			"accessKey": minioAccessKey,
+			"secretKey": minioSecretKey,
+		},
+		"capabilities": map[string]interface{}{},
+	}
+
+	project, err := s.Client.MapToUserToolsData(data)
+	s.Require().NoError(err)
+	s.Require().NotEmpty(project)
+}
+
+func (s *testSuite) TestMapToUserToolsData_CannotConvertToJson() {
+	invalidMarshalData := map[string]interface{}{
+		"invalid": make(chan int),
+	}
+
+	project, err := s.Client.MapToUserToolsData(invalidMarshalData)
+	s.Require().Error(err)
+	s.Require().Empty(project)
+}
+
+func (s *testSuite) TestMapToUserToolsData_CannotMarshall() {
+	invalidMarshalData := map[string]interface{}{
+		"username": []string{"username"},
+	}
+
+	project, err := s.Client.MapToUserToolsData(invalidMarshalData)
+	s.Require().Error(err)
+	s.Require().Empty(project)
+}

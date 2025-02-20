@@ -361,7 +361,42 @@ func (s *testSuite) TestUpdateKDLProjectsCR_WithoutCRD() {
 	s.Require().Error(err)
 }
 
-func (s *testSuite) ToggleArchiveKDLProjectCR() {
+func (s *testSuite) TestMapToProjectData() {
+	data := map[string]interface{}{
+		"projectId": "project-id",
+		"minioAccessKey": map[string]interface{}{
+			"accessKey": "access",
+			"secretKey": "secret",
+		},
+		"archived": false,
+	}
+
+	project, err := s.Client.MapToProjectData(data)
+	s.Require().NoError(err)
+	s.Require().NotEmpty(project)
+}
+
+func (s *testSuite) TestMapToProjectData_CannotConvertToJson() {
+	invalidMarshalData := map[string]interface{}{
+		"invalid": make(chan int),
+	}
+
+	project, err := s.Client.MapToProjectData(invalidMarshalData)
+	s.Require().Error(err)
+	s.Require().Empty(project)
+}
+
+func (s *testSuite) TestMapToProjectData_CannotMarshall() {
+	invalidMarshalData := map[string]interface{}{
+		"projectID": []string{"project-id"},
+	}
+
+	project, err := s.Client.MapToProjectData(invalidMarshalData)
+	s.Require().Error(err)
+	s.Require().Empty(project)
+}
+
+func (s *testSuite) TestToggleArchiveKDLProjectCR() {
 	// Arrange by creating the CR
 	s.createKDLProjectConfigMapTemplate()
 	err := s.Client.CreateKDLProjectCR(context.Background(), projectData)

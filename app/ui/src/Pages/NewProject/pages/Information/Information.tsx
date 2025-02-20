@@ -4,7 +4,7 @@ import { validateProjectDescription, validateProjectId, validateProjectName } fr
 
 import DescriptionScore from 'Components/DescriptionScore/DescriptionScore';
 import * as React from 'react';
-import { newProject } from 'Graphql/client/cache';
+import { newProject, openedProject } from 'Graphql/client/cache';
 import styles from './Information.module.scss';
 import useNewProject from 'Graphql/client/hooks/useNewProject';
 import useQualityDescription from 'Hooks/useQualityDescription/useQualityDescription';
@@ -24,6 +24,7 @@ type Props = {
 function Information({ showErrors }: Props) {
   const project = useReactiveVar(newProject);
   const { updateValue, updateError, clearError } = useNewProject('information');
+  const actualProject = useReactiveVar(openedProject);
 
   const { values, errors } = project.information;
   const { name, description, id } = values;
@@ -99,7 +100,7 @@ function Information({ showErrors }: Props) {
         limits={limits}
         error={showErrors ? errorDescription : ''}
         helpText={
-          CONFIG.KNOWLEDGE_GALAXY_ENABLED
+          actualProject?.toolUrls.knowledgeGalaxyEnabled
             ? `A minimum of ${CONFIG.DESCRIPTION_MIN_WORDS} words is required to get a valid score.` +
               `Words: ${description.split(' ').length}`
             : ''
@@ -108,7 +109,7 @@ function Information({ showErrors }: Props) {
         textArea
         lockHorizontalGrowth
       />
-      {CONFIG.KNOWLEDGE_GALAXY_ENABLED && (
+      {actualProject?.toolUrls.knowledgeGalaxyEnabled && (
         <DescriptionScore score={descriptionScore} loading={loadingQualityDescription} />
       )}
     </div>

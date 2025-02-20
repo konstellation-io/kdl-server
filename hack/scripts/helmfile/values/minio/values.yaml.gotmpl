@@ -29,11 +29,18 @@ persistence:
 ingress:
   enabled: false
 
+environment:
+    MINIO_CORS_ALLOW_ORIGIN: "*"
+    MINIO_BROWSER_REFERRER_POLICY: "no-referrer-when-downgrade"
+    MINIO_BROWSER_CONTENT_SECURITY_POLICY: "default-src * 'unsafe-inline' 'unsafe-eval'; frame-ancestors * 'self' file://* http://localhost:* http://127.0.0.1:* http://0.0.0.0:*"
+    MINIO_BROWSER_XSS_PROTECTION: "1; mode=block"
+
 consoleIngress:
   enabled: true
   ingressClassName: nginx
   annotations:
     cert-manager.io/cluster-issuer: selfsigned-clusterissuer
+    nginx.ingress.kubernetes.io/auth-signin: "https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/start?rd=https://minio-console.{{ requiredEnv "DOMAIN" }}"
   path: /
   hosts:
     - minio-console.{{ requiredEnv "DOMAIN" }}

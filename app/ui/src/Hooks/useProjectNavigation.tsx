@@ -8,9 +8,8 @@ import FolderIcon from '@material-ui/icons/Folder';
 import { OverridableComponent } from '@material-ui/core/OverridableComponent';
 import { SvgIconTypeMap } from '@material-ui/core';
 import { useReactiveVar } from '@apollo/client';
-import { CONFIG } from 'index';
 
-import { loadingRuntime, runningRuntime } from '../Graphql/client/cache';
+import { loadingRuntime, runningRuntime, openedProject } from '../Graphql/client/cache';
 
 export interface RouteConfiguration {
   id: string;
@@ -47,6 +46,12 @@ export const projectToolsRoutesConfig: RouteConfiguration[] = [
     label: 'Mlflow',
     Icon: MlFlowIcon,
   },
+  {
+    id: 'minio',
+    route: ROUTE.PROJECT_TOOL_MINIO,
+    label: 'Minio',
+    Icon: FolderIcon,
+  },
 ];
 
 export const userToolsRoutesConfig: RouteConfiguration[] = [];
@@ -61,6 +66,7 @@ export interface RoutesConfiguration {
 function useProjectNavigation(projectId: string): RoutesConfiguration {
   const runtimeRunning = useReactiveVar(runningRuntime);
   const runtimeLoading = useReactiveVar(loadingRuntime);
+  const project = useReactiveVar(openedProject);
 
   const buildRoutes = useCallback(
     (route: RouteConfiguration) =>
@@ -82,7 +88,7 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
     let projectToolsRoutes = projectToolsRoutesConfig.map(buildRoutes);
     const mainRoutes = mainRoutesConfig.map(buildRoutes);
 
-    if (!CONFIG.KNOWLEDGE_GALAXY_ENABLED) {
+    if (project?.toolUrls.knowledgeGalaxyEnabled === false) {
       projectToolsRoutes = projectToolsRoutes.filter((r: RouteConfiguration) => r.id !== 'knowledgeGalaxy');
     }
 
@@ -92,7 +98,7 @@ function useProjectNavigation(projectId: string): RoutesConfiguration {
       projectToolsRoutes,
       userToolsRoutes,
     };
-  }, [buildRoutes, runtimeRunning, runtimeLoading]);
+  }, [buildRoutes, runtimeRunning, runtimeLoading, project?.toolUrls.knowledgeGalaxyEnabled]);
 }
 
 export default useProjectNavigation;

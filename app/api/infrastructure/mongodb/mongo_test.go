@@ -162,15 +162,20 @@ var userExamples = map[string]entity.User{
 	},
 }
 
+var screenConfigCreateProjectSettingsExample = entity.CreateProjectSettings{
+	MLFlowStorage: []string{"1Gi", "2Gi"},
+}
+
 type TestSuite struct {
 	suite.Suite
-	mongoDBContainer testcontainers.Container
-	mongoClient      *mongodbutils.MongoDB
-	capabilitiesRepo *mongodb.CapabilitiesRepo
-	projectRepo      *mongodb.ProjectRepo
-	runtimeRepo      *mongodb.RuntimeRepo
-	userActivityRepo *mongodb.UserActivityRepo
-	userRepo         *mongodb.UserRepo
+	mongoDBContainer        testcontainers.Container
+	mongoClient             *mongodbutils.MongoDB
+	capabilitiesRepo        *mongodb.CapabilitiesRepo
+	projectRepo             *mongodb.ProjectRepo
+	runtimeRepo             *mongodb.RuntimeRepo
+	userActivityRepo        *mongodb.UserActivityRepo
+	userRepo                *mongodb.UserRepo
+	screenConfigurationRepo *mongodb.ScreenConfigurationRepo
 }
 
 func TestProcessRepositoryTestSuite(t *testing.T) {
@@ -218,6 +223,7 @@ func (s *TestSuite) SetupSuite() {
 	s.runtimeRepo = mongodb.NewRuntimeRepo(logger, mongoClient, dbName)
 	s.userActivityRepo = mongodb.NewUserActivityRepo(logger, mongoClient, dbName)
 	s.userRepo = mongodb.NewUserRepo(logger, mongoClient, dbName)
+	s.screenConfigurationRepo = mongodb.NewScreenConfigurationRepo(logger, mongoClient, dbName)
 
 	monkey.Patch(time.Now, func() time.Time {
 		return time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
@@ -253,6 +259,10 @@ func (s *TestSuite) SetupTest() {
 		_, err := s.userRepo.Create(context.Background(), u)
 		s.Require().NoError(err)
 	}
+
+	// setup screen configuration
+	err := s.screenConfigurationRepo.CreateCreateProjectSettings(context.Background(), screenConfigCreateProjectSettingsExample)
+	s.Require().NoError(err)
 }
 
 func (s *TestSuite) TearDownTest() {
@@ -821,4 +831,13 @@ func (s *TestSuite) TestUserEnsureIndexes_OK() {
 	s.Contains(indexes, "email_1")
 	s.Contains(indexes, "username_1")
 	s.Contains(indexes, "sub_1")
+}
+
+func (s *TestSuite) TestScreenConfiguration_CreateProjectSettings_OK() {
+	ctx := context.Background()
+
+	actualCreateProjectSettings, err := s.screenConfigurationRepo.GetCreateProjectSettings(ctx)
+	s.Require().NoError(err)
+
+	s.Equal(screenConfigCreateProjectSettingsExample, actualCreateProjectSettings)
 }

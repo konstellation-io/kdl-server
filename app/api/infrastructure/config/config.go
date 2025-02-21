@@ -9,10 +9,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
-var (
-	errFieldEmpty = errors.New("cannot be empty")
-	errValidation = errors.New("validation error")
-)
+var errFieldEmpty = errors.New("cannot be empty")
 
 type KeycloakConfig struct {
 	AdminUser        string `envconfig:"KEYCLOAK_ADMIN_USER" optional:"true"`
@@ -74,7 +71,7 @@ func validateStruct(v reflect.Value) error {
 		fieldType := v.Type().Field(i)
 
 		if err := validateField(field, fieldType); err != nil {
-			return fmt.Errorf("%w: field %s", errValidation, fieldType.Name)
+			return err
 		}
 	}
 
@@ -85,7 +82,7 @@ func validateField(field reflect.Value, fieldType reflect.StructField) error {
 	// check if the field is a struct and call validateStruct recursively
 	if field.Kind() == reflect.Struct {
 		if err := validateStruct(field); err != nil {
-			return fmt.Errorf("error in field %s: %w", fieldType.Name, err)
+			return fmt.Errorf("in field %s, %w", fieldType.Name, err)
 		}
 
 		return nil

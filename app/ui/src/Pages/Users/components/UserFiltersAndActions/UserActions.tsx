@@ -35,7 +35,15 @@ enum Actions {
   ADMIN = 'Admin',
 }
 
+enum SyncData {
+  SYNC_USERS_DATA = 'SYNC USERS DATA ABOUT',
+  MINIO = 'MinIO',
+  SSH_KEYS = 'SSH Keys',
+  SERVICE_ACCOUNT = 'Service Account',
+}
+
 const types = Object.values(Actions);
+const syncTypes = Object.values(SyncData);
 
 type Props = {
   onUpdateUsers: (newAccessLevel: AccessLevel) => void;
@@ -60,6 +68,20 @@ function UserActions({ onUpdateUsers }: Props) {
         break;
       case Actions.ADMIN:
         onUpdateUsers(AccessLevel.ADMIN);
+        break;
+    }
+  }
+
+    function onSyncData(action: SyncData) {
+    switch (action) {
+      case SyncData.MINIO:
+        console.log("Syncing MinIO data");
+        break;
+      case SyncData.SSH_KEYS:
+        console.log("Syncing SSH Keys data");
+        break;
+      case SyncData.SERVICE_ACCOUNT:
+        console.log("Syncing Service Account data");
         break;
     }
   }
@@ -101,6 +123,21 @@ function UserActions({ onUpdateUsers }: Props) {
           }}
         />
       </div>
+      <div className={styles.formActions} data-testid="bulkSelect">
+        <Select
+          label="Sync Data"
+          options={syncTypes}
+          onChange={onSyncData}
+          placeholder="Select one"
+          showSelectAllOption={false}
+          shouldSort={false}
+          disabled={nSelections === 0}
+          disabledOptions={[syncTypes[0]]}
+          CustomOptions={{
+            [SyncData.SYNC_USERS_DATA]: CustomSeparator,
+          }}
+        />
+        </div>
     </div>
   );
 }

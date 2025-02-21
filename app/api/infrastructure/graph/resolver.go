@@ -14,6 +14,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/usecase/capabilities"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/screenconfiguration"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
 
@@ -29,12 +30,13 @@ var _ generated.ResolverRoot = (*Resolver)(nil)
 
 // Resolver serves as dependency injection for the app, add any dependencies app require here.
 type Resolver struct {
-	logger       logr.Logger
-	cfg          config.Config
-	projects     project.UseCase
-	users        user.UseCase
-	runtimes     runtime.UseCase
-	capabilities capabilities.UseCase
+	logger              logr.Logger
+	cfg                 config.Config
+	projects            project.UseCase
+	users               user.UseCase
+	runtimes            runtime.UseCase
+	capabilities        capabilities.UseCase
+	screenConfiguration screenconfiguration.UseCase
 }
 
 // NewResolver is a constructor function.
@@ -45,14 +47,16 @@ func NewResolver(
 	userInteractor user.UseCase,
 	runtimeInteractor runtime.UseCase,
 	capabilitiesInteractor capabilities.UseCase,
+	screenConfigurationInteractor screenconfiguration.UseCase,
 ) *Resolver {
 	return &Resolver{
-		logger:       logger,
-		cfg:          cfg,
-		projects:     projectInteractor,
-		users:        userInteractor,
-		runtimes:     runtimeInteractor,
-		capabilities: capabilitiesInteractor,
+		logger:              logger,
+		cfg:                 cfg,
+		projects:            projectInteractor,
+		users:               userInteractor,
+		runtimes:            runtimeInteractor,
+		capabilities:        capabilitiesInteractor,
+		screenConfiguration: screenConfigurationInteractor,
 	}
 }
 

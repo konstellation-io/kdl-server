@@ -841,3 +841,10 @@ func (s *TestSuite) TestScreenConfiguration_CreateProjectSettings_OK() {
 
 	s.Equal(screenConfigCreateProjectSettingsExample, actualCreateProjectSettings)
 }
+
+func (s *TestSuite) TestScreenConfiguration_CreateProjectSettings_Duplicated() {
+	ctx := context.Background()
+
+	err := s.screenConfigurationRepo.CreateCreateProjectSettings(ctx, screenConfigCreateProjectSettingsExample)
+	s.Require().Error(err)
+}

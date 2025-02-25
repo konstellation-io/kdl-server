@@ -20,8 +20,8 @@ const (
 )
 
 var (
-	errParsingSettings              = errors.New("error parsing settings")
-	errParsingSettingsMLFlowStorage = errors.New("error parsing settings.mlflow_storage")
+	errParsingSettings                  = errors.New("error parsing settings")
+	errParsingSettingsMlflowStorageSize = errors.New("error parsing settings.mlflow_storage_size")
 )
 
 type screenConfigurationDTO struct {
@@ -84,7 +84,7 @@ func (sc *ScreenConfigurationRepo) createProjectSettingsEntityToDTO(cps entity.C
 	dto := screenConfigurationDTO{
 		ID: createProjectSettingsID,
 		Settings: bson.M{
-			"mlflow_storage": cps.MLFlowStorage,
+			"mlflow_storage_size": cps.MLFlowStorageSize,
 		},
 	}
 
@@ -92,7 +92,7 @@ func (sc *ScreenConfigurationRepo) createProjectSettingsEntityToDTO(cps entity.C
 }
 
 func (sc *ScreenConfigurationRepo) dtoToCreateProjectSettingsEntity(dto screenConfigurationDTO) (entity.CreateProjectSettings, error) {
-	var mlflowStorage []string
+	var mlflowStorageSize []string
 
 	for k, v := range dto.Settings {
 		bsonV, ok := v.(bson.A)
@@ -100,20 +100,20 @@ func (sc *ScreenConfigurationRepo) dtoToCreateProjectSettingsEntity(dto screenCo
 			return entity.CreateProjectSettings{}, errParsingSettings
 		}
 
-		if k == "mlflow_storage" {
+		if k == "mlflow_storage_size" {
 			for _, vv := range bsonV {
 				strV, okV := vv.(string)
 				if !okV {
-					return entity.CreateProjectSettings{}, errParsingSettingsMLFlowStorage
+					return entity.CreateProjectSettings{}, errParsingSettingsMlflowStorageSize
 				}
 
-				mlflowStorage = append(mlflowStorage, strV)
+				mlflowStorageSize = append(mlflowStorageSize, strV)
 			}
 		}
 	}
 
 	cps := entity.CreateProjectSettings{
-		MLFlowStorage: mlflowStorage,
+		MLFlowStorageSize: mlflowStorageSize,
 	}
 
 	return cps, nil

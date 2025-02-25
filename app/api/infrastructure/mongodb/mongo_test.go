@@ -163,7 +163,7 @@ var userExamples = map[string]entity.User{
 }
 
 var screenConfigCreateProjectSettingsExample = entity.CreateProjectSettings{
-	MLFlowStorage: []string{"1Gi", "2Gi"},
+	MLFlowStorageSize: []string{"1Gi", "2Gi"},
 }
 
 type TestSuite struct {

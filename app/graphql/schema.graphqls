@@ -56,7 +56,7 @@ type User {
 }
 
 type CreateProjectSettings {
-  mlflow_storage: [String!]!
+  mlflow_storage_size: [String!]!
 }
 
 enum AccessLevel {

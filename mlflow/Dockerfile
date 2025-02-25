@@ -1,6 +1,5 @@
-ARG MLFOW_IMAGE=v2.18.0
-
-FROM ghcr.io/mlflow/mlflow:${MLFOW_IMAGE}
+# ghcr.io/mlflow/mlflow:v2.18.0
+FROM ghcr.io/mlflow/mlflow@sha256:09d25b0c80efa2c1dd4b5e4834a1a0ed861d6b1c2b43017ff99493bd5c6bb4ee
 
 # maintainer of the Dockerfile
 LABEL maintainer="Intelygenz - Konstellation Team"
@@ -16,9 +15,9 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /mlflow/tracking
 
 # non-root user
-RUN groupadd -r -g ${GID} ${USER} && \
+RUN groupadd -r -g ${GID} ${USER}                                  && \
     useradd -l -r -u ${UID} -g ${USER} -m -s /sbin/nologin ${USER} && \
-    chown -R ${UID}:${GID} /mlflow && \
+    chown -R ${UID}:${GID} /mlflow                                 && \
     chown -R ${UID}:${GID} /home/${USER}
 
 # packages to use sqlite

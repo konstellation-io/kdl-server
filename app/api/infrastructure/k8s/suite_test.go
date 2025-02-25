@@ -79,12 +79,9 @@ var crdKdlUserTools = &apiextensionsv1.CustomResourceDefinition{
 								Type: "object",
 								Properties: map[string]apiextensionsv1.JSONSchemaProps{
 									"inputData": {
-										Type: "object",
-										AdditionalProperties: &apiextensionsv1.JSONSchemaPropsOrBool{
-											Schema: &apiextensionsv1.JSONSchemaProps{
-												Type: "string",
-											},
-										},
+										Type:                   "object",
+										Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
+										XPreserveUnknownFields: &preserve,
 									},
 									"username":     {Type: "string"},
 									"usernameSlug": {Type: "string"},
@@ -181,12 +178,9 @@ var crdKdlProject = &apiextensionsv1.CustomResourceDefinition{
 								Type: "object",
 								Properties: map[string]apiextensionsv1.JSONSchemaProps{
 									"inputData": {
-										Type: "object",
-										AdditionalProperties: &apiextensionsv1.JSONSchemaPropsOrBool{
-											Schema: &apiextensionsv1.JSONSchemaProps{
-												Type: "string",
-											},
-										},
+										Type:                   "object",
+										Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
+										XPreserveUnknownFields: &preserve,
 									},
 									"projectId": {
 										Type: "string",
@@ -194,6 +188,7 @@ var crdKdlProject = &apiextensionsv1.CustomResourceDefinition{
 									"mlflow": {
 										Type: "object",
 										Properties: map[string]apiextensionsv1.JSONSchemaProps{
+											"enabled": {Type: "boolean"},
 											"env": {
 												Type:                   "object",
 												Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
@@ -204,6 +199,7 @@ var crdKdlProject = &apiextensionsv1.CustomResourceDefinition{
 									"filebrowser": {
 										Type: "object",
 										Properties: map[string]apiextensionsv1.JSONSchemaProps{
+											"enabled": {Type: "boolean"},
 											"env": {
 												Type:                   "object",
 												Properties:             map[string]apiextensionsv1.JSONSchemaProps{},

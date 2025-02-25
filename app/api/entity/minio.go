@@ -1,6 +1,6 @@
 package entity
 
 type MinioAccessKey struct {
-	AccessKey string
-	SecretKey string
+	AccessKey string `json:"accessKey"`
+	SecretKey string `json:"secretKey"`
 }

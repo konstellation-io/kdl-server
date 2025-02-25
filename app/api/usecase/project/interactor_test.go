@@ -617,7 +617,7 @@ func TestInteractor_Update(t *testing.T) {
 	}
 
 	s.mocks.repo.EXPECT().Get(ctx, testProjectID).Return(originalProject, nil)
-	s.mocks.clock.EXPECT().Now().Return(now)
+	s.mocks.clock.EXPECT().Now().Return(now).Times(3)
 
 	s.mocks.repo.EXPECT().UpdateName(ctx, testProjectID, newName).Return(nil)
 	s.mocks.userActivityRepo.EXPECT().Create(
@@ -641,6 +641,7 @@ func TestInteractor_Update(t *testing.T) {
 		},
 	).Return(nil)
 
+	s.mocks.k8sClient.EXPECT().ToggleArchiveKDLProjectCR(ctx, testProjectID, newArchived).Return(nil)
 	s.mocks.repo.EXPECT().UpdateArchived(ctx, testProjectID, newArchived).Return(nil)
 	s.mocks.userActivityRepo.EXPECT().Create(
 		ctx,

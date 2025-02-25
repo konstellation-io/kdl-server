@@ -30,6 +30,7 @@ type ClientInterface interface {
 	CreateKDLProjectCR(ctx context.Context, data ProjectData) error
 	DeleteKDLProjectCR(ctx context.Context, projectID string) error
 	UpdateKDLProjectsCR(ctx context.Context, projectID string, crd *map[string]interface{}) error
+	ToggleArchiveKDLProjectCR(ctx context.Context, projectID string, archived bool) error
 	ListKDLProjectsNameCR(ctx context.Context) ([]string, error)
 	GetKDLProjectCR(ctx context.Context, name string) (*unstructured.Unstructured, error)
 	CreateUserSSHKeySecret(ctx context.Context, user entity.User, public, private string) error

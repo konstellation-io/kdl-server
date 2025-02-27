@@ -10,7 +10,7 @@ export const runtime: GetRunningRuntime_runningRuntime = {
   dockerImage: 'test/image',
   dockerTag: 'testTag',
   runtimePod: 'test pod',
-  runtimePodStatus: PodStatus.running
+  runtimePodStatus: PodStatus.running,
 };
 
 export const runtime2: GetRunningRuntime_runningRuntime = {

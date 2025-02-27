@@ -15,6 +15,10 @@ username: "replaced-by-kdl-api"
 # </br> Ref: https://pkg.go.dev/github.com/gosimple/slug
 usernameSlug: "replaced-by-kdl-api"
 
+# -- String for runtimeClass
+# </br> Ref: https://docs.rke2.io/advanced?_highlight=gpu#deploy-nvidia-operator
+runtimeClass: ""
+
 # -- String to set external volume to use on user-tools workspace
 sharedVolume:
   # -- Enable or disable sharedVolume use

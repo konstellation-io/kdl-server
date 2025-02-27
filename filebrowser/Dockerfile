@@ -1,8 +1,7 @@
-ARG BASE_S3FUSE_IMAGE_VERSION=1.94
-ARG BASE_FILEBROWSER_IMAGE_VERSION=v2.31.2
-
-FROM efrecon/s3fs:${BASE_S3FUSE_IMAGE_VERSION} AS s3fs
-FROM filebrowser/filebrowser:${BASE_FILEBROWSER_IMAGE_VERSION}
+# efrecon/s3fs:1.94
+FROM efrecon/s3fs@sha256:ddeb138f14313c0fd79084298f633f56f3d789f6e68a2d2d12bc8fa084301f68 AS s3fs
+# filebrowser/filebrowser:v2.31.2
+FROM filebrowser/filebrowser@sha256:a4da9ca8364b0a1fc5dd36f7add92582bf673c0ae0bda8dd9bd13062c41d1715
 
 LABEL maintainer="Intelygenz - Konstellation Team"
 
@@ -22,8 +21,8 @@ RUN apk add --no-cache                 \
     fuse=2.9.9-r5                      \
     libxml2=2.12.7-r0                  \
     libcurl=8.10.1-r0                  \
-    libgcc=13.2.1_git20240309-r0       \
-    libstdc++=13.2.1_git20240309-r0    \
+    libgcc=13.2.1_git20240309-r1       \
+    libstdc++=13.2.1_git20240309-r1    \
     tini=0.19.0-r3                  && \
     mkdir -p /srv                   && \
     # create non-root user

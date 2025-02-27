@@ -32,6 +32,7 @@ export default gql`
         accessKey
         secretKey
       }
+      mlflowStorageSize
     }
   }
 `;

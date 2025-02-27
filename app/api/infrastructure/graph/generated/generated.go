@@ -105,6 +105,7 @@ type ComplexityRoot struct {
 		LastActivationDate func(childComplexity int) int
 		Members            func(childComplexity int) int
 		MinioAccessKey     func(childComplexity int) int
+		MlflowStorageSize  func(childComplexity int) int
 		Name               func(childComplexity int) int
 		NeedAccess         func(childComplexity int) int
 		Repository         func(childComplexity int) int
@@ -541,6 +542,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Project.MinioAccessKey(childComplexity), true
+
+	case "Project.mlflowStorageSize":
+		if e.complexity.Project.MlflowStorageSize == nil {
+			break
+		}
+
+		return e.complexity.Project.MlflowStorageSize(childComplexity), true
 
 	case "Project.name":
 		if e.complexity.Project.Name == nil {
@@ -1074,6 +1082,7 @@ type Project {
   needAccess: Boolean!
   archived: Boolean!
   minioAccessKey: MinioAccessKey!
+  mlflowStorageSize: String!
 }
 
 type Repository {
@@ -2622,6 +2631,8 @@ func (ec *executionContext) fieldContext_Mutation_addMembers(ctx context.Context
 				return ec.fieldContext_Project_archived(ctx, field)
 			case "minioAccessKey":
 				return ec.fieldContext_Project_minioAccessKey(ctx, field)
+			case "mlflowStorageSize":
+				return ec.fieldContext_Project_mlflowStorageSize(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -2705,6 +2716,8 @@ func (ec *executionContext) fieldContext_Mutation_createProject(ctx context.Cont
 				return ec.fieldContext_Project_archived(ctx, field)
 			case "minioAccessKey":
 				return ec.fieldContext_Project_minioAccessKey(ctx, field)
+			case "mlflowStorageSize":
+				return ec.fieldContext_Project_mlflowStorageSize(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -2785,6 +2798,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteProject(ctx context.Cont
 				return ec.fieldContext_Project_archived(ctx, field)
 			case "minioAccessKey":
 				return ec.fieldContext_Project_minioAccessKey(ctx, field)
+			case "mlflowStorageSize":
+				return ec.fieldContext_Project_mlflowStorageSize(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -2868,6 +2883,8 @@ func (ec *executionContext) fieldContext_Mutation_removeMembers(ctx context.Cont
 				return ec.fieldContext_Project_archived(ctx, field)
 			case "minioAccessKey":
 				return ec.fieldContext_Project_minioAccessKey(ctx, field)
+			case "mlflowStorageSize":
+				return ec.fieldContext_Project_mlflowStorageSize(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -2951,6 +2968,8 @@ func (ec *executionContext) fieldContext_Mutation_updateMembers(ctx context.Cont
 				return ec.fieldContext_Project_archived(ctx, field)
 			case "minioAccessKey":
 				return ec.fieldContext_Project_minioAccessKey(ctx, field)
+			case "mlflowStorageSize":
+				return ec.fieldContext_Project_mlflowStorageSize(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -3034,6 +3053,8 @@ func (ec *executionContext) fieldContext_Mutation_updateProject(ctx context.Cont
 				return ec.fieldContext_Project_archived(ctx, field)
 			case "minioAccessKey":
 				return ec.fieldContext_Project_minioAccessKey(ctx, field)
+			case "mlflowStorageSize":
+				return ec.fieldContext_Project_mlflowStorageSize(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -3833,6 +3854,50 @@ func (ec *executionContext) fieldContext_Project_minioAccessKey(_ context.Contex
 	return fc, nil
 }
 
+func (ec *executionContext) _Project_mlflowStorageSize(ctx context.Context, field graphql.CollectedField, obj *entity.Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_mlflowStorageSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MlflowStorageSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Project_mlflowStorageSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _QualityProjectDesc_quality(ctx context.Context, field graphql.CollectedField, obj *model.QualityProjectDesc) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_QualityProjectDesc_quality(ctx, field)
 	if err != nil {
@@ -4102,6 +4167,8 @@ func (ec *executionContext) fieldContext_Query_project(ctx context.Context, fiel
 				return ec.fieldContext_Project_archived(ctx, field)
 			case "minioAccessKey":
 				return ec.fieldContext_Project_minioAccessKey(ctx, field)
+			case "mlflowStorageSize":
+				return ec.fieldContext_Project_mlflowStorageSize(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -4185,6 +4252,8 @@ func (ec *executionContext) fieldContext_Query_projects(_ context.Context, field
 				return ec.fieldContext_Project_archived(ctx, field)
 			case "minioAccessKey":
 				return ec.fieldContext_Project_minioAccessKey(ctx, field)
+			case "mlflowStorageSize":
+				return ec.fieldContext_Project_mlflowStorageSize(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -8901,6 +8970,11 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "minioAccessKey":
 			out.Values[i] = ec._Project_minioAccessKey(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "mlflowStorageSize":
+			out.Values[i] = ec._Project_mlflowStorageSize(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}

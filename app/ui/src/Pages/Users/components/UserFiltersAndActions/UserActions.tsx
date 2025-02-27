@@ -1,5 +1,7 @@
 import { Check, CustomOptionProps, Select } from 'kwc';
 import React, { FC } from 'react';
+import { useMutation } from '@apollo/client';
+import SynchronizeUsersData from 'Graphql/mutations/syncronizeUsersData';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import { UserSelection } from 'Graphql/client/models/UserSettings';
@@ -8,6 +10,8 @@ import styles from './UserFiltersAndActions.module.scss';
 import { useReactiveVar } from '@apollo/client';
 import useUserSettings from 'Graphql/client/hooks/useUserSettings';
 import { userSettings } from 'Graphql/client/cache';
+
+import { toast } from 'react-toastify';
 
 type CheckSelectAllPros = {
   handleCheckClick: (value: boolean) => void;
@@ -35,7 +39,15 @@ enum Actions {
   ADMIN = 'Admin',
 }
 
+enum SyncData {
+  SYNC_USERS_DATA = 'SYNC USERS DATA ABOUT',
+  MINIO = 'MinIO',
+  SSH_KEYS = 'SSH Keys',
+  SERVICE_ACCOUNT = 'Service Account',
+}
+
 const types = Object.values(Actions);
+const syncTypes = Object.values(SyncData);
 
 type Props = {
   onUpdateUsers: (newAccessLevel: AccessLevel) => void;
@@ -50,6 +62,8 @@ function UserActions({ onUpdateUsers }: Props) {
 
   const nSelectionsText = `(${nSelections} selected)`;
 
+  const [synchronizeUsersData] = useMutation(SynchronizeUsersData);
+
   function onAction(action: Actions) {
     switch (action) {
       case Actions.VIEWER:
@@ -63,6 +77,22 @@ function UserActions({ onUpdateUsers }: Props) {
         break;
     }
   }
+
+  const onSyncData = async (action: SyncData) => {
+    const input = {
+      serviceAccount: action === SyncData.SERVICE_ACCOUNT,
+      sshKeys: action === SyncData.SSH_KEYS,
+      minioUser: action === SyncData.MINIO,
+      userIds: selectedUserIds,
+    };
+
+    try {
+      await synchronizeUsersData({ variables: { input } });
+        toast.info('Syncronization done');
+    } catch (error) {
+        toast.error('Syncronization failed');
+    }
+  };
 
   function handleCheckClick() {
     let newUserSelection = UserSelection.NONE;
@@ -101,6 +131,21 @@ function UserActions({ onUpdateUsers }: Props) {
           }}
         />
       </div>
+      <div className={styles.formActions} data-testid="bulkSelect">
+        <Select
+          label="Sync Data"
+          options={syncTypes}
+          onChange={onSyncData}
+          placeholder="Select one"
+          showSelectAllOption={false}
+          shouldSort={false}
+          disabled={nSelections === 0}
+          disabledOptions={[syncTypes[0]]}
+          CustomOptions={{
+            [SyncData.SYNC_USERS_DATA]: CustomSeparator,
+          }}
+        />
+        </div>
     </div>
   );
 }

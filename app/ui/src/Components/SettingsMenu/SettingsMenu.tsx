@@ -53,7 +53,17 @@ function SettingsMenu() {
   }
 
   function kubeconfigButton() {
-    if (!data?.me.isKubeconfigEnabled || !runtimeRunning) return <div />;
+    if (!data?.me.isKubeconfigEnabled || !runtimeRunning) {
+      return (
+        <Button
+          label="Kubeconfig"
+          key="Kubeconfig"
+          disabled
+          Icon={DescriptionIcon}
+          className={styles.settingButtonDisabled}
+          align={BUTTON_ALIGN.LEFT}
+        />
+    )};
 
     return (
       <Button

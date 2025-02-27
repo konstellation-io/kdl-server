@@ -16,6 +16,7 @@ const (
 	configMapKdlProjectName = "kdl-server-project-template"
 	projectMinioAccessKey   = "project-test-project-id"
 	projectMinioSecretKey   = "testproject123"
+	mlflowStorageSize       = "1Gi"
 )
 
 var projectData = k8s.ProjectData{
@@ -24,6 +25,8 @@ var projectData = k8s.ProjectData{
 		AccessKey: projectMinioAccessKey,
 		SecretKey: projectMinioSecretKey,
 	},
+	Archived:          false,
+	MlflowStorageSize: mlflowStorageSize,
 }
 
 func (s *testSuite) createKDLProjectConfigMapTemplate() {
@@ -42,6 +45,9 @@ spec:
     enabled: true
     env:
       ARTIFACTS_BUCKET: my-demo-bucket
+    persistentVolume:
+      enabled: true
+      size: 100Gi
   filebrowser:
     enabled: true
     env: {}
@@ -75,6 +81,7 @@ func (s *testSuite) TestCreateKDLProjectCR_and_DeleteKDLProjectCR() {
 	mlflow, _ := spec["mlflow"].(map[string]interface{})
 	mlflowEnabled, _ := mlflow["enabled"].(bool)
 	mlflowEnv, _ := mlflow["env"].(map[string]interface{})
+	mlflowPersistentVolume, _ := mlflow["persistentVolume"].(map[string]interface{})
 	filebrowser, _ := spec["filebrowser"].(map[string]interface{})
 	filebrowserEnabled, _ := filebrowser["enabled"].(bool)
 	filebrowserEnv, _ := filebrowser["env"].(map[string]interface{})
@@ -83,6 +90,7 @@ func (s *testSuite) TestCreateKDLProjectCR_and_DeleteKDLProjectCR() {
 	s.Require().True(mlflowEnabled)
 	s.Require().Equal(projectMinioAccessKey, mlflowEnv["AWS_ACCESS_KEY_ID"])
 	s.Require().Equal(projectMinioSecretKey, mlflowEnv["AWS_SECRET_ACCESS_KEY"])
+	s.Require().Equal(mlflowStorageSize, mlflowPersistentVolume["size"])
 	s.Require().True(filebrowserEnabled)
 	s.Require().Equal(projectMinioAccessKey, filebrowserEnv["AWS_S3_ACCESS_KEY_ID"])
 	s.Require().Equal(projectMinioSecretKey, filebrowserEnv["AWS_S3_SECRET_ACCESS_KEY"])
@@ -97,6 +105,7 @@ func (s *testSuite) TestCreateKDLProjectCR_and_DeleteKDLProjectCR() {
 	s.Require().Equal(projectID, inputData.ProjectID)
 	s.Require().False(inputData.Archived)
 	s.Require().Equal(minioAccessKey, inputData.MinioAccessKey)
+	s.Require().Equal(mlflowStorageSize, inputData.MlflowStorageSize)
 
 	// Delete the CR
 	err = s.Client.DeleteKDLProjectCR(context.Background(), projectID)
@@ -226,6 +235,39 @@ spec:
 	s.Require().Error(err)
 }
 
+func (s *testSuite) TestCreateKDLProjectCR_ConfigMapWithoutSpecMlflowPersistentVolume() {
+	yamlContent := `
+apiVersion: kdl.konstellation.io/v1
+kind: KDLProject
+metadata:
+  generation: 1
+  labels:
+    app: kdl
+  name: my-demo-name
+  namespace: my-demo-namespace
+spec:
+  projectId: my-demo-projectId
+  mlflow:
+    env:
+      ARTIFACTS_BUCKET: my-demo-bucket
+`
+	_, err := s.Clientset.CoreV1().ConfigMaps(namespace).Create(
+		context.Background(), &v1.ConfigMap{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: configMapKdlProjectName,
+			},
+			Data: map[string]string{
+				"template": yamlContent,
+			},
+		},
+		metav1.CreateOptions{},
+	)
+	s.Require().NoError(err)
+
+	err = s.Client.CreateKDLProjectCR(context.Background(), projectData)
+	s.Require().Error(err)
+}
+
 func (s *testSuite) TestListKDLProjectsNameCR() {
 	// Arrange by creating the CR
 	s.createKDLProjectConfigMapTemplate()
@@ -295,6 +337,10 @@ func (s *testSuite) TestUpdateKDLProjectsCR() {
 				"env": map[string]interface{}{
 					"ARTIFACTS_BUCKET": "my-demo-bucket",
 				},
+				"persistentVolume": map[string]interface{}{
+					"enabled": true,
+					"size":    "100Gi",
+				},
 			},
 			"filebrowser": map[string]interface{}{
 				"env": map[string]interface{}{},
@@ -317,6 +363,7 @@ func (s *testSuite) TestUpdateKDLProjectsCR() {
 	mlflow, _ := spec["mlflow"].(map[string]interface{})
 	mlflowEnabled, _ := mlflow["enabled"].(bool)
 	mlflowEnv, _ := mlflow["env"].(map[string]interface{})
+	mlflowPersistentVolume, _ := mlflow["persistentVolume"].(map[string]interface{})
 	filebrowser, _ := spec["filebrowser"].(map[string]interface{})
 	filebrowserEnabled, _ := filebrowser["enabled"].(bool)
 	filebrowserEnv, _ := filebrowser["env"].(map[string]interface{})
@@ -325,6 +372,7 @@ func (s *testSuite) TestUpdateKDLProjectsCR() {
 	s.Require().True(mlflowEnabled)
 	s.Require().Equal(projectMinioAccessKey, mlflowEnv["AWS_ACCESS_KEY_ID"])
 	s.Require().Equal(projectMinioSecretKey, mlflowEnv["AWS_SECRET_ACCESS_KEY"])
+	s.Require().Equal(mlflowStorageSize, mlflowPersistentVolume["size"])
 	s.Require().True(filebrowserEnabled)
 	s.Require().Equal(projectMinioAccessKey, filebrowserEnv["AWS_S3_ACCESS_KEY_ID"])
 	s.Require().Equal(projectMinioSecretKey, filebrowserEnv["AWS_S3_SECRET_ACCESS_KEY"])
@@ -339,6 +387,7 @@ func (s *testSuite) TestUpdateKDLProjectsCR() {
 	s.Require().Equal(projectID, inputData.ProjectID)
 	s.Require().False(inputData.Archived)
 	s.Require().Equal(minioAccessKey, inputData.MinioAccessKey)
+	s.Require().Equal(mlflowStorageSize, inputData.MlflowStorageSize)
 
 	// Delete the CR
 	err = s.Client.DeleteKDLProjectCR(context.Background(), projectID)

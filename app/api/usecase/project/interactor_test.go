@@ -97,6 +97,7 @@ func TestInteractor_Create(t *testing.T) {
 		ownerUserID           = "user.1234"
 		ownerUsername         = "john"
 		ownerEmail            = "john@doe.com"
+		mlflowStorageSize     = "1Gi"
 	)
 
 	url := "https://github.com/org/repo.git"
@@ -122,6 +123,7 @@ func TestInteractor_Create(t *testing.T) {
 		AccessKey: testProjectID,
 		SecretKey: projectMinioSecretKey,
 	}
+	createProject.MlflowStorageSize = mlflowStorageSize
 
 	expectedProject := entity.Project{
 		ID:           testProjectID,
@@ -136,6 +138,7 @@ func TestInteractor_Create(t *testing.T) {
 			AccessKey: testProjectID,
 			SecretKey: projectMinioSecretKey,
 		},
+		MlflowStorageSize: mlflowStorageSize,
 	}
 
 	userActivity := entity.UserActivity{
@@ -153,10 +156,15 @@ func TestInteractor_Create(t *testing.T) {
 			},
 		},
 	}
+	projectData := k8s.ProjectData{
+		ProjectID:         testProjectID,
+		MinioAccessKey:    createProject.MinioAccessKey,
+		Archived:          false,
+		MlflowStorageSize: mlflowStorageSize,
+	}
 
 	s.mocks.clock.EXPECT().Now().Return(now)
-	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx,
-		k8s.ProjectData{ProjectID: testProjectID, MinioAccessKey: createProject.MinioAccessKey}).Return(nil)
+	s.mocks.k8sClient.EXPECT().CreateKDLProjectCR(ctx, projectData).Return(nil)
 	s.mocks.minioService.EXPECT().CreateBucket(ctx, testProjectID).Return(nil)
 	s.mocks.minioService.EXPECT().CreateProjectDirs(ctx, testProjectID).Return(nil)
 	s.mocks.repo.EXPECT().Create(ctx, createProject).Return(testProjectID, nil)
@@ -169,12 +177,13 @@ func TestInteractor_Create(t *testing.T) {
 	s.mocks.minioAdminService.EXPECT().JoinProject(ctx, ownerEmail, testProjectID).Return(nil)
 
 	createdProject, err := s.interactor.Create(ctx, project.CreateProjectOption{
-		ProjectID:   testProjectID,
-		Name:        projectName,
-		Description: projectDesc,
-		URL:         &url,
-		Username:    &username,
-		Owner:       entity.User{ID: ownerUserID, Username: ownerUsername, Email: ownerEmail},
+		ProjectID:         testProjectID,
+		Name:              projectName,
+		Description:       projectDesc,
+		URL:               &url,
+		Username:          &username,
+		Owner:             entity.User{ID: ownerUserID, Username: ownerUsername, Email: ownerEmail},
+		MlflowStorageSize: mlflowStorageSize,
 	})
 
 	require.NoError(t, err)

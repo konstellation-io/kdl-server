@@ -1142,6 +1142,7 @@ input CreateProjectInput {
   name: String!
   description: String!
   repository: RepositoryInput!
+  mlflowStorageSize: String!
 }
 
 input RepositoryInput {
@@ -7931,7 +7932,7 @@ func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "description", "repository"}
+	fieldsInOrder := [...]string{"id", "name", "description", "repository", "mlflowStorageSize"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7966,6 +7967,13 @@ func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context
 				return it, err
 			}
 			it.Repository = data
+		case "mlflowStorageSize":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mlflowStorageSize"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MlflowStorageSize = data
 		}
 	}
 

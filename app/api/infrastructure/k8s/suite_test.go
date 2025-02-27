@@ -194,6 +194,16 @@ var crdKdlProject = &apiextensionsv1.CustomResourceDefinition{
 												Properties:             map[string]apiextensionsv1.JSONSchemaProps{},
 												XPreserveUnknownFields: &preserve,
 											},
+											"persistentVolume": {
+												Type: "object",
+												Properties: map[string]apiextensionsv1.JSONSchemaProps{
+													"enabled": {Type: "boolean"},
+													"size": {
+														Type:    "string",
+														Pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$",
+													},
+												},
+											},
 										},
 									},
 									"filebrowser": {

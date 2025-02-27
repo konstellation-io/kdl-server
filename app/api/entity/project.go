@@ -17,6 +17,7 @@ type Project struct {
 	Repository         Repository
 	Members            []Member
 	MinioAccessKey     MinioAccessKey
+	MlflowStorageSize  string
 }
 
 // NewProject is a constructor function.

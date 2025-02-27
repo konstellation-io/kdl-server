@@ -34,6 +34,7 @@ export interface CreateProjectInput {
   name: string;
   description: string;
   repository: RepositoryInput;
+  mlflowStorageSize: string;
 }
 
 export interface DeleteProjectInput {

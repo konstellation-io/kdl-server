@@ -163,6 +163,7 @@ input CreateProjectInput {
   name: String!
   description: String!
   repository: RepositoryInput!
+  mlflowStorageSize: String!
 }
 
 input RepositoryInput {

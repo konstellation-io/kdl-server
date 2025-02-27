@@ -16,6 +16,7 @@ type Query {
   runningRuntime: Runtime
   runtimes: [Runtime!]!
   users: [User!]!
+  createProjectSettings: CreateProjectSettings!
 }
 
 type Mutation {
@@ -52,6 +53,10 @@ type User {
   apiTokens: [ApiToken!]!
   isKubeconfigEnabled: Boolean!
   sshKey: SSHKey!
+}
+
+type CreateProjectSettings {
+  mlflow_storage_size: [String!]!
 }
 
 enum AccessLevel {

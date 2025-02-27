@@ -346,6 +346,16 @@ func (r *queryResolver) Users(ctx context.Context) ([]entity.User, error) {
 	return r.users.FindAll(ctx)
 }
 
+// CreateProjectSettings is the resolver for the createProjectSettings field.
+func (r *queryResolver) CreateProjectSettings(ctx context.Context) (*entity.CreateProjectSettings, error) {
+	entity, err := r.screenConfiguration.GetCreateProjectSettings(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entity, nil
+}
+
 // CreationDate is the resolver for the creationDate field.
 func (r *sSHKeyResolver) CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error) {
 	return obj.CreationDate.Format(time.RFC3339), nil

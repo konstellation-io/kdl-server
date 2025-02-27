@@ -1,7 +1,8 @@
 ###
 # build app-api
 ###
-FROM golang:1.23.2-alpine3.20 AS api-builder
+# golang:1.23.2-alpine3.20
+FROM golang@sha256:9dd2625a1ff2859b8d8b01d8f7822c0f528942fe56cfe7a1e7c38d3b8d72d679 AS api-builder
 
 # environment variables
 ENV CGO_ENABLED=0 \
@@ -40,7 +41,8 @@ RUN go build \
 ###
 # build app-ui
 ###
-FROM node:16 AS ui-builder
+# node:16
+FROM node@sha256:f77a1aef2da8d83e45ec990f45df50f1a286c5fe8bbfb8c6e4246c6389705c0b AS ui-builder
 
 ENV SASS_PATH=src
 
@@ -62,7 +64,8 @@ RUN yarn build
 ###
 # final image
 ###
-FROM alpine:3.20.0
+# alpine:3.20.0
+FROM alpine@sha256:77726ef6b57ddf65bb551896826ec38bc3e53f75cdde31354fbffb4f25238ebd
 
 LABEL maintainer="Intelygenz - Konstellation Team"
 
@@ -76,7 +79,7 @@ ENV HOME=/home/${USER}
 RUN apk update                               && \
     apk upgrade                              && \
     apk add --no-cache                          \
-        openssh-client=9.7_p1-r4                \
+        openssh-client=9.7_p1-r5                \
         libcap=2.70-r0                       && \
     rm -rf /var/cache/apk/*                  && \
     # create non-root user

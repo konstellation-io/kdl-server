@@ -1,4 +1,5 @@
-FROM golang:1.23.2-alpine3.20 AS builder
+# golang:1.23.2-alpine3.20
+FROM golang@sha256:9dd2625a1ff2859b8d8b01d8f7822c0f528942fe56cfe7a1e7c38d3b8d72d679 AS builder
 
 # environment variables
 ENV CGO_ENABLED=0 \
@@ -24,7 +25,8 @@ RUN go build -ldflags="-s -w -extldflags '-static'" \
     -o repo-cloner
 
 # final image
-FROM alpine:3.20.0
+# alpine:3.20.0
+FROM alpine@sha256:77726ef6b57ddf65bb551896826ec38bc3e53f75cdde31354fbffb4f25238ebd
 
 LABEL maintainer="Intelygenz - Konstellation Team"
 
@@ -39,7 +41,7 @@ RUN apk update                          && \
     apk upgrade                         && \
     apk add --no-cache                     \
       git=2.45.2-r0                        \
-      openssh-client=9.7_p1-r4             \
+      openssh-client=9.7_p1-r5             \
     rm -rf /var/cache/apk/*             && \
     # create non-root user
     addgroup -g ${GID} ${USER}          && \

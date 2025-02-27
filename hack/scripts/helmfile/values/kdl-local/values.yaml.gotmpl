@@ -31,9 +31,11 @@ env:
 readyChecker:
   enabled: true
   services:
-  - name: mongodb-svc.mongodb
+  - name: mongodb
+    address: mongodb-svc.mongodb
     port: 27017
   - name: keycloak
+    address: keycloak
     port: 80
 
 # -- Keycloak subchart deployment
@@ -62,7 +64,7 @@ keycloak:
       - path: /
         pathType: ImplementationSpecific
     tls:
-      - secretName: keycloak-kdl-tls
+      - secretName: keycloak-tls
         hosts:
         - keycloak.{{ requiredEnv "DOMAIN" }}
 
@@ -219,11 +221,19 @@ projectOperator:
         ingress:
           enabled: false
 
+        podSecurityContext:
+          fsGroup: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+
         persistentVolume:
           enabled: true
           size: "1Gi"
-          accessModes:
-            - ReadWriteOnce
           storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
         env:
@@ -236,6 +246,21 @@ projectOperator:
           repository: {{ requiredEnv "IMAGE_REGISTRY" }}/konstellation/kdl-filebrowser
           pullPolicy: Always
           tag: latest
+
+        podSecurityContext:
+          fsGroup: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
+          runAsUser: 1000
+
+        securityContext:
+          allowPrivilegeEscalation: true
+          readOnlyRootFilesystem: false
+
+        initContainers:
+          - name: minio-checker
+            image: busybox
+            command: ['sh', '-c', 'while true; do nc -z minio 9000 && break; "[INFO] Waiting to reach minio endpoint..." && sleep 1; done']
 
         env:
           AWS_S3_ACCESS_KEY_ID: "{{ .Values.minio_access_key }}"
@@ -258,6 +283,16 @@ userToolsOperator:
 
   templateCustomResource:
     spec:
+      sharedVolume:
+        enabled: true
+        name: "shared-volume"
+
+      podSecurityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+
       persistentVolume:
         storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
 
@@ -279,3 +314,7 @@ userToolsOperator:
           AWS_ACCESS_KEY: "{{ .Values.minio_access_key }}"
           AWS_SECRET_KEY: "{{ .Values.minio_secret_key }}"
           MINIO_ENDPOINT: "minio:9000"
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false

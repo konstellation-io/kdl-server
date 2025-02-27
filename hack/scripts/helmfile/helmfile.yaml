@@ -40,10 +40,10 @@ repositories:
     url: https://mongodb.github.io/helm-charts
 
 releases:
-  # ref: https://github.com/cert-manager/cert-manager/blob/v1.16.1/deploy/charts/cert-manager/values.yaml
+  # ref: https://github.com/cert-manager/cert-manager/blob/v1.17.1/deploy/charts/cert-manager/values.yaml
   - name: cert-manager
     chart: jetstack/cert-manager
-    version: v1.16.1
+    version: v1.17.1
     namespace: cert-manager
     inherit:
       - template: default
@@ -64,11 +64,21 @@ releases:
     inherit:
       - template: default
 
-  # ref: https://github.com/mongodb/helm-charts/blob/community-operator-0.11.0/charts/community-operator/values.yaml
+  # ref: https://github.com/mongodb/helm-charts/blob/community-operator-crds-0.12.0/charts/community-operator-crds/values.yaml
+  - name: mongodb-community-operator-crds
+    chart: mongodb/community-operator-crds
+    version: 0.12.0
+    namespace: mongodb-operator
+    inherit:
+      - template: default
+
+  # ref: https://github.com/mongodb/helm-charts/blob/community-operator-0.12.0/charts/community-operator/values.yaml
   - name: mongodb-community-operator
     chart: mongodb/community-operator
-    version: 0.11.0
+    version: 0.12.0
     namespace: mongodb-operator
+    needs:
+      - mongodb-operator/mongodb-community-operator-crds
     inherit:
       - template: default
 
@@ -81,22 +91,23 @@ releases:
     inherit:
       - template: default
 
-  - name: kdl-local
-    chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
-    version: 6.2.6
-    namespace: kdl
-    needs:
-      - kdl/initial-resources
-      - mongodb/mongodb-database
-    inherit:
-      - template: default
-
   - name: mongodb-initial-data
     chart: bedag/raw
     version: 2.0.0
     namespace: mongodb
     needs:
-      - kdl/kdl-local
+      - mongodb/mongodb-database
+    inherit:
+      - template: default
+
+  # ref: https://gitlab.intelygenz.com/konstellation-io/helm-charts/blob/kdl-server-6.2.8/charts/kdl-server/values.yaml
+  - name: kdl-local
+    chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
+    version: 6.2.8
+    namespace: kdl
+    needs:
+      - kdl/initial-resources
+      - mongodb/mongodb-database
     inherit:
       - template: default
 

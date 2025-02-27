@@ -7,6 +7,8 @@
 username: "john.doe"
 usernameSlug: "john-doe"  # Slugified version for resource naming
 
+runtimeClass: ""
+
 # Shared volume configuration
 sharedVolume:
   enabled: true

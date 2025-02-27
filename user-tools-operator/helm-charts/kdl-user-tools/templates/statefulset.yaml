@@ -39,6 +39,9 @@ spec:
       serviceAccountName: {{ .Values.usernameSlug }}-service-account
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.runtimeClass }}
+      runtimeClassName: {{ .Values.runtimeClass }}
+      {{- end }}
       {{- with .Values.initContainers }}
       initContainers:
         {{- toYaml . | nindent 8 }}

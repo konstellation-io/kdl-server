@@ -150,6 +150,7 @@ helm template test . -f ci/ci-values.yaml
 | repoCloner.lifecycle | object | `{}` | Configure lifecycle hooks </br> Ref: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/ </br> Ref: https://learnk8s.io/graceful-shutdown |
 | repoCloner.volumeMounts | list | `[]` | Additional volumeMounts on the output Deployment definition |
 | resources | object | `{}` | Resources limits and requested </br> Ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/ |
+| runtimeClass | string | `""` | String for runtimeClass </br> Ref: https://docs.rke2.io/advanced?_highlight=gpu#deploy-nvidia-operator |
 | securityContext | object | `{}` | Defines privilege and access control settings for a Container </br> Ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/ </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ |
 | sharedVolume | object | `{"enabled":false,"name":""}` | String to set external volume to use on user-tools workspace |
 | sharedVolume.enabled | bool | `false` | Enable or disable sharedVolume use |

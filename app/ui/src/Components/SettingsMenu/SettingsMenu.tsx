@@ -13,6 +13,7 @@ import { CONFIG } from 'index';
 
 import GetMeQuery from 'Graphql/queries/getMe';
 import { runningRuntime } from 'Graphql/client/cache';
+import Tooltip from 'Components/Tooltip/Tooltip';
 
 const UserSettingsSeparator = ({ label }: CustomOptionProps) => (
   <div className={styles.separator}>{label.toUpperCase()}</div>
@@ -53,7 +54,25 @@ function SettingsMenu() {
   }
 
   function kubeconfigButton() {
-    if (!data?.me.isKubeconfigEnabled || !runtimeRunning) return <div />;
+
+    const tooltipProps = {
+      effect: 'solid',
+      textColor: 'white',
+      backgroundColor: '#888',
+    };
+    if (!data?.me.isKubeconfigEnabled || !runtimeRunning) {
+      return (
+        <Tooltip tooltipId="settings" spanText="Started UserTools is required" tooltipProps={tooltipProps}>
+          <Button
+            label="Kubeconfig"
+            key="Kubeconfig"
+            disabled
+            Icon={DescriptionIcon}
+            className={styles.settingButtonDisabled}
+            align={BUTTON_ALIGN.LEFT}
+          />
+        </Tooltip>
+      )};
 
     return (
       <Button

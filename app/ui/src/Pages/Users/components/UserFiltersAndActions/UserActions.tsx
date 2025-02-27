@@ -1,5 +1,7 @@
 import { Check, CustomOptionProps, Select } from 'kwc';
 import React, { FC } from 'react';
+import { useMutation } from '@apollo/client';
+import SynchronizeUsersData from 'Graphql/mutations/syncronizeUsersData';
 
 import { AccessLevel } from 'Graphql/types/globalTypes';
 import { UserSelection } from 'Graphql/client/models/UserSettings';
@@ -8,6 +10,8 @@ import styles from './UserFiltersAndActions.module.scss';
 import { useReactiveVar } from '@apollo/client';
 import useUserSettings from 'Graphql/client/hooks/useUserSettings';
 import { userSettings } from 'Graphql/client/cache';
+
+import { toast } from 'react-toastify';
 
 type CheckSelectAllPros = {
   handleCheckClick: (value: boolean) => void;
@@ -58,6 +62,8 @@ function UserActions({ onUpdateUsers }: Props) {
 
   const nSelectionsText = `(${nSelections} selected)`;
 
+  const [synchronizeUsersData] = useMutation(SynchronizeUsersData);
+
   function onAction(action: Actions) {
     switch (action) {
       case Actions.VIEWER:
@@ -72,19 +78,21 @@ function UserActions({ onUpdateUsers }: Props) {
     }
   }
 
-    function onSyncData(action: SyncData) {
-    switch (action) {
-      case SyncData.MINIO:
-        console.log("Syncing MinIO data");
-        break;
-      case SyncData.SSH_KEYS:
-        console.log("Syncing SSH Keys data");
-        break;
-      case SyncData.SERVICE_ACCOUNT:
-        console.log("Syncing Service Account data");
-        break;
+  const onSyncData = async (action: SyncData) => {
+    const input = {
+      serviceAccount: action === SyncData.SERVICE_ACCOUNT,
+      sshKeys: action === SyncData.SSH_KEYS,
+      minioUser: action === SyncData.MINIO,
+      userIds: selectedUserIds,
+    };
+
+    try {
+      await synchronizeUsersData({ variables: { input } });
+        toast.info('Syncronization done');
+    } catch (error) {
+        toast.error('Syncronization failed');
     }
-  }
+  };
 
   function handleCheckClick() {
     let newUserSelection = UserSelection.NONE;

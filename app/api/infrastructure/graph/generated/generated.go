@@ -65,6 +65,10 @@ type ComplexityRoot struct {
 		Name    func(childComplexity int) int
 	}
 
+	CreateProjectSettings struct {
+		MLFlowStorageSize func(childComplexity int) int
+	}
+
 	Member struct {
 		AccessLevel func(childComplexity int) int
 		AddedDate   func(childComplexity int) int
@@ -112,16 +116,17 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Capabilities       func(childComplexity int) int
-		Kubeconfig         func(childComplexity int) int
-		Me                 func(childComplexity int) int
-		Project            func(childComplexity int, id string) int
-		Projects           func(childComplexity int) int
-		QualityProjectDesc func(childComplexity int, description string) int
-		RunningCapability  func(childComplexity int) int
-		RunningRuntime     func(childComplexity int) int
-		Runtimes           func(childComplexity int) int
-		Users              func(childComplexity int) int
+		Capabilities          func(childComplexity int) int
+		CreateProjectSettings func(childComplexity int) int
+		Kubeconfig            func(childComplexity int) int
+		Me                    func(childComplexity int) int
+		Project               func(childComplexity int, id string) int
+		Projects              func(childComplexity int) int
+		QualityProjectDesc    func(childComplexity int, description string) int
+		RunningCapability     func(childComplexity int) int
+		RunningRuntime        func(childComplexity int) int
+		Runtimes              func(childComplexity int) int
+		Users                 func(childComplexity int) int
 	}
 
 	Repository struct {
@@ -204,6 +209,7 @@ type QueryResolver interface {
 	RunningRuntime(ctx context.Context) (*entity.Runtime, error)
 	Runtimes(ctx context.Context) ([]entity.Runtime, error)
 	Users(ctx context.Context) ([]entity.User, error)
+	CreateProjectSettings(ctx context.Context) (*entity.CreateProjectSettings, error)
 }
 type SSHKeyResolver interface {
 	CreationDate(ctx context.Context, obj *entity.SSHKey) (string, error)
@@ -291,6 +297,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Capability.Name(childComplexity), true
+
+	case "CreateProjectSettings.mlflow_storage_size":
+		if e.complexity.CreateProjectSettings.MLFlowStorageSize == nil {
+			break
+		}
+
+		return e.complexity.CreateProjectSettings.MLFlowStorageSize(childComplexity), true
 
 	case "Member.accessLevel":
 		if e.complexity.Member.AccessLevel == nil {
@@ -570,6 +583,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Capabilities(childComplexity), true
+
+	case "Query.createProjectSettings":
+		if e.complexity.Query.CreateProjectSettings == nil {
+			break
+		}
+
+		return e.complexity.Query.CreateProjectSettings(childComplexity), true
 
 	case "Query.kubeconfig":
 		if e.complexity.Query.Kubeconfig == nil {
@@ -975,6 +995,7 @@ type Query {
   runningRuntime: Runtime
   runtimes: [Runtime!]!
   users: [User!]!
+  createProjectSettings: CreateProjectSettings!
 }
 
 type Mutation {
@@ -1011,6 +1032,10 @@ type User {
   apiTokens: [ApiToken!]!
   isKubeconfigEnabled: Boolean!
   sshKey: SSHKey!
+}
+
+type CreateProjectSettings {
+  mlflow_storage_size: [String!]!
 }
 
 enum AccessLevel {
@@ -2028,6 +2053,50 @@ func (ec *executionContext) fieldContext_Capability_default(_ context.Context, f
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateProjectSettings_mlflow_storage_size(ctx context.Context, field graphql.CollectedField, obj *entity.CreateProjectSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateProjectSettings_mlflow_storage_size(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MLFlowStorageSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateProjectSettings_mlflow_storage_size(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateProjectSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4410,6 +4479,54 @@ func (ec *executionContext) fieldContext_Query_users(_ context.Context, field gr
 				return ec.fieldContext_User_sshKey(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_createProjectSettings(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_createProjectSettings(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().CreateProjectSettings(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*entity.CreateProjectSettings)
+	fc.Result = res
+	return ec.marshalNCreateProjectSettings2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐCreateProjectSettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_createProjectSettings(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "mlflow_storage_size":
+				return ec.fieldContext_CreateProjectSettings_mlflow_storage_size(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateProjectSettings", field.Name)
 		},
 	}
 	return fc, nil
@@ -8305,6 +8422,45 @@ func (ec *executionContext) _Capability(ctx context.Context, sel ast.SelectionSe
 	return out
 }
 
+var createProjectSettingsImplementors = []string{"CreateProjectSettings"}
+
+func (ec *executionContext) _CreateProjectSettings(ctx context.Context, sel ast.SelectionSet, obj *entity.CreateProjectSettings) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createProjectSettingsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateProjectSettings")
+		case "mlflow_storage_size":
+			out.Values[i] = ec._CreateProjectSettings_mlflow_storage_size(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var memberImplementors = []string{"Member"}
 
 func (ec *executionContext) _Member(ctx context.Context, sel ast.SelectionSet, obj *entity.Member) graphql.Marshaler {
@@ -9023,6 +9179,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_users(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "createProjectSettings":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_createProjectSettings(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -10001,6 +10179,20 @@ func (ec *executionContext) unmarshalNCreateProjectInput2githubᚗcomᚋkonstell
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNCreateProjectSettings2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐCreateProjectSettings(ctx context.Context, sel ast.SelectionSet, v entity.CreateProjectSettings) graphql.Marshaler {
+	return ec._CreateProjectSettings(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateProjectSettings2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐCreateProjectSettings(ctx context.Context, sel ast.SelectionSet, v *entity.CreateProjectSettings) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateProjectSettings(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNDeleteProjectInput2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋinfrastructureᚋgraphᚋmodelᚐDeleteProjectInput(ctx context.Context, v any) (model.DeleteProjectInput, error) {
 	res, err := ec.unmarshalInputDeleteProjectInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -10288,6 +10480,38 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
+	var vSlice []any
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalNToolUrls2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐToolUrls(ctx context.Context, sel ast.SelectionSet, v entity.ToolUrls) graphql.Marshaler {

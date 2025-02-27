@@ -32,6 +32,7 @@ import (
 	"github.com/konstellation-io/kdl-server/app/api/usecase/configmap"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/project"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/runtime"
+	"github.com/konstellation-io/kdl-server/app/api/usecase/screenconfiguration"
 	"github.com/konstellation-io/kdl-server/app/api/usecase/user"
 )
 
@@ -83,29 +84,32 @@ func loadDependencies(logger logr.Logger, cfg config.Config) deps {
 }
 
 type dbRepos struct {
-	capabilitiesRepo capabilities.Repository
-	projectRepo      project.Repository
-	runtimeRepo      runtime.Repository
-	userActivityRepo project.UserActivityRepo
-	userRepo         user.Repository
+	capabilitiesRepo        capabilities.Repository
+	projectRepo             project.Repository
+	runtimeRepo             runtime.Repository
+	userActivityRepo        project.UserActivityRepo
+	userRepo                user.Repository
+	screenConfigurationRepo screenconfiguration.Repository
 }
 
 func loadRepos(logger logr.Logger, dbName string, mongodbClient *mongodbutils.MongoDB) dbRepos {
 	return dbRepos{
-		capabilitiesRepo: mongodb.NewCapabilitiesRepo(logger, mongodbClient, dbName),
-		projectRepo:      mongodb.NewProjectRepo(logger, mongodbClient, dbName),
-		runtimeRepo:      mongodb.NewRuntimeRepo(logger, mongodbClient, dbName),
-		userActivityRepo: mongodb.NewUserActivityRepo(logger, mongodbClient, dbName),
-		userRepo:         mongodb.NewUserRepo(logger, mongodbClient, dbName),
+		capabilitiesRepo:        mongodb.NewCapabilitiesRepo(logger, mongodbClient, dbName),
+		projectRepo:             mongodb.NewProjectRepo(logger, mongodbClient, dbName),
+		runtimeRepo:             mongodb.NewRuntimeRepo(logger, mongodbClient, dbName),
+		userActivityRepo:        mongodb.NewUserActivityRepo(logger, mongodbClient, dbName),
+		userRepo:                mongodb.NewUserRepo(logger, mongodbClient, dbName),
+		screenConfigurationRepo: mongodb.NewScreenConfigurationRepo(logger, mongodbClient, dbName),
 	}
 }
 
 type useCaseInteractors struct {
-	capabilitiesInteractor capabilities.UseCase
-	projectInteractor      project.UseCase
-	runtimeInteractor      runtime.UseCase
-	userInteractor         user.UseCase
-	configmapInteractor    configmap.UseCase
+	capabilitiesInteractor        capabilities.UseCase
+	projectInteractor             project.UseCase
+	runtimeInteractor             runtime.UseCase
+	userInteractor                user.UseCase
+	configmapInteractor           configmap.UseCase
+	screenConfigurationInteractor screenconfiguration.UseCase
 }
 
 func loadInteractors(
@@ -125,19 +129,20 @@ func loadInteractors(
 		repos.userActivityRepo, randomGenerator,
 	)
 	runtimeInteractor := runtime.NewInteractor(logger, k8sClient, repos.runtimeRepo)
-
 	userInteractor := user.NewInteractor(
 		logger, cfg, repos.userRepo, repos.userActivityRepo, repos.runtimeRepo, repos.capabilitiesRepo,
 		sshHelper, realClock, k8sClient, dependencies.minioAdminService, randomGenerator,
 	)
 	configmapInteractor := configmap.NewInteractor(logger, cfg, k8sClient, projectInteractor, userInteractor)
+	screenConfigurationInteractor := screenconfiguration.NewInteractor(logger, repos.screenConfigurationRepo)
 
 	return useCaseInteractors{
-		capabilitiesInteractor: capabilitiesInteractor,
-		projectInteractor:      projectInteractor,
-		runtimeInteractor:      runtimeInteractor,
-		userInteractor:         userInteractor,
-		configmapInteractor:    configmapInteractor,
+		capabilitiesInteractor:        capabilitiesInteractor,
+		projectInteractor:             projectInteractor,
+		runtimeInteractor:             runtimeInteractor,
+		userInteractor:                userInteractor,
+		configmapInteractor:           configmapInteractor,
+		screenConfigurationInteractor: screenConfigurationInteractor,
 	}
 }
 
@@ -202,6 +207,7 @@ func startHTTPServer(
 		interactors.userInteractor,
 		interactors.runtimeInteractor,
 		interactors.capabilitiesInteractor,
+		interactors.screenConfigurationInteractor,
 	)
 
 	srv := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: resolvers}))

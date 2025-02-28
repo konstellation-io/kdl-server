@@ -36,6 +36,7 @@ type projectDTO struct {
 	Members            []memberDTO `bson:"members"`
 	MinioAccessKey     string      `bson:"minio_access_key"`
 	MinioSecretKey     string      `bson:"minio_secret_key"`
+	MlflowStorageSize  string      `bson:"mlflow_storage_size"`
 }
 
 type ProjectRepo struct {
@@ -256,6 +257,7 @@ func (m *ProjectRepo) entityToDTO(p entity.Project) (projectDTO, error) {
 		Archived:           p.Archived,
 		MinioAccessKey:     p.MinioAccessKey.AccessKey,
 		MinioSecretKey:     p.MinioAccessKey.SecretKey,
+		MlflowStorageSize:  p.MlflowStorageSize,
 	}
 
 	memberDTOS, err := m.membersToDTOs(p.Members)
@@ -303,6 +305,7 @@ func (m *ProjectRepo) dtoToEntity(dto projectDTO) entity.Project {
 			AccessKey: dto.MinioAccessKey,
 			SecretKey: dto.MinioSecretKey,
 		},
+		MlflowStorageSize: dto.MlflowStorageSize,
 	}
 
 	p.Members = make([]entity.Member, len(dto.Members))

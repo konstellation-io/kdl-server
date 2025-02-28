@@ -9,7 +9,7 @@
 
 export interface CreateProjectSettings_createProjectSettings {
   __typename: "CreateProjectSettings";
-  mlflow_storage_size: string[];
+  mlflowStorageSize: string[];
 }
 
 export interface CreateProjectSettings {

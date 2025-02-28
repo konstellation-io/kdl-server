@@ -97,12 +97,13 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input model.Create
 	}
 
 	opts := project.CreateProjectOption{
-		ProjectID:   input.ID,
-		Name:        input.Name,
-		Description: input.Description,
-		URL:         &input.Repository.URL,
-		Username:    &input.Repository.Username,
-		Owner:       loggedUser,
+		ProjectID:         input.ID,
+		Name:              input.Name,
+		Description:       input.Description,
+		URL:               &input.Repository.URL,
+		Username:          &input.Repository.Username,
+		Owner:             loggedUser,
+		MlflowStorageSize: input.MlflowStorageSize,
 	}
 
 	createdProject, err := r.projects.Create(ctx, opts)

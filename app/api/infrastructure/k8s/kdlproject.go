@@ -12,16 +12,18 @@ import (
 )
 
 type ProjectData struct {
-	ProjectID      string                `json:"projectId"`
-	MinioAccessKey entity.MinioAccessKey `json:"minioAccessKey"`
-	Archived       bool                  `json:"archived"`
+	ProjectID         string                `json:"projectId"`
+	MinioAccessKey    entity.MinioAccessKey `json:"minioAccessKey"`
+	Archived          bool                  `json:"archived"`
+	MlflowStorageSize string                `json:"mlflowStorageSize"`
 }
 
 func (k *Client) projectDataToMap(data ProjectData) map[string]interface{} {
 	return map[string]interface{}{
-		"projectId":      data.ProjectID,
-		"minioAccessKey": data.MinioAccessKey,
-		"archived":       data.Archived,
+		"projectId":         data.ProjectID,
+		"minioAccessKey":    data.MinioAccessKey,
+		"archived":          data.Archived,
+		"mlflowStorageSize": data.MlflowStorageSize,
 	}
 }
 
@@ -77,6 +79,14 @@ func (k *Client) updateKDLProjectTemplate(data ProjectData, crd *map[string]inte
 	mlflowEnv["ARTIFACTS_BUCKET"] = data.ProjectID
 	mlflowEnv["AWS_ACCESS_KEY_ID"] = data.MinioAccessKey.AccessKey
 	mlflowEnv["AWS_SECRET_ACCESS_KEY"] = data.MinioAccessKey.SecretKey
+
+	// update spec.mlflow.persistentVolume.size in the CRD object
+	mlflowPersistentVolume, ok := mlflow["persistentVolume"].(map[string]interface{})
+	if !ok {
+		return nil, errCRDNoSpecMlflowPersistentVolume
+	}
+
+	mlflowPersistentVolume["size"] = data.MlflowStorageSize
 
 	// update metadata.name and metadata.namespace in the CRD object
 	metadata, ok := crdToUpdate["metadata"].(map[string]interface{})

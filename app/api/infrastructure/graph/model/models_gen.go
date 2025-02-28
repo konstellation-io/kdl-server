@@ -23,10 +23,11 @@ type Capability struct {
 }
 
 type CreateProjectInput struct {
-	ID          string           `json:"id"`
-	Name        string           `json:"name"`
-	Description string           `json:"description"`
-	Repository  *RepositoryInput `json:"repository"`
+	ID                string           `json:"id"`
+	Name              string           `json:"name"`
+	Description       string           `json:"description"`
+	Repository        *RepositoryInput `json:"repository"`
+	MlflowStorageSize string           `json:"mlflowStorageSize"`
 }
 
 type DeleteProjectInput struct {

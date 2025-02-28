@@ -26,12 +26,13 @@ var (
 
 // CreateProjectOption options when creating project.
 type CreateProjectOption struct {
-	ProjectID   string
-	Name        string
-	Description string
-	URL         *string
-	Username    *string
-	Owner       entity.User
+	ProjectID         string
+	Name              string
+	Description       string
+	URL               *string
+	Username          *string
+	Owner             entity.User
+	MlflowStorageSize string
 }
 
 // DeleteProjectOption options when deleting a project.
@@ -160,6 +161,7 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 
 	project := entity.NewProject(opt.ProjectID, opt.Name, opt.Description)
 	project.CreationDate = now
+	project.MlflowStorageSize = opt.MlflowStorageSize
 	project.Members = []entity.Member{
 		{
 			UserID:      opt.Owner.ID,
@@ -211,9 +213,10 @@ func (i *interactor) Create(ctx context.Context, opt CreateProjectOption) (entit
 
 	// Create a k8s KDLProject containing a MLFLow instance
 	err = i.k8sClient.CreateKDLProjectCR(ctx, k8s.ProjectData{
-		ProjectID:      opt.ProjectID,
-		MinioAccessKey: project.MinioAccessKey,
-		Archived:       false,
+		ProjectID:         opt.ProjectID,
+		MinioAccessKey:    project.MinioAccessKey,
+		Archived:          false,
+		MlflowStorageSize: opt.MlflowStorageSize,
 	})
 	if err != nil {
 		return entity.Project{}, err

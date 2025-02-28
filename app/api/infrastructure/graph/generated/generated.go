@@ -298,7 +298,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Capability.Name(childComplexity), true
 
-	case "CreateProjectSettings.mlflow_storage_size":
+	case "CreateProjectSettings.mlflowStorageSize":
 		if e.complexity.CreateProjectSettings.MLFlowStorageSize == nil {
 			break
 		}
@@ -1035,7 +1035,7 @@ type User {
 }
 
 type CreateProjectSettings {
-  mlflow_storage_size: [String!]!
+  mlflowStorageSize: [String!]!
 }
 
 enum AccessLevel {
@@ -1142,6 +1142,7 @@ input CreateProjectInput {
   name: String!
   description: String!
   repository: RepositoryInput!
+  mlflowStorageSize: String!
 }
 
 input RepositoryInput {
@@ -2058,8 +2059,8 @@ func (ec *executionContext) fieldContext_Capability_default(_ context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _CreateProjectSettings_mlflow_storage_size(ctx context.Context, field graphql.CollectedField, obj *entity.CreateProjectSettings) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_CreateProjectSettings_mlflow_storage_size(ctx, field)
+func (ec *executionContext) _CreateProjectSettings_mlflowStorageSize(ctx context.Context, field graphql.CollectedField, obj *entity.CreateProjectSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateProjectSettings_mlflowStorageSize(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2089,7 +2090,7 @@ func (ec *executionContext) _CreateProjectSettings_mlflow_storage_size(ctx conte
 	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_CreateProjectSettings_mlflow_storage_size(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_CreateProjectSettings_mlflowStorageSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "CreateProjectSettings",
 		Field:      field,
@@ -4523,8 +4524,8 @@ func (ec *executionContext) fieldContext_Query_createProjectSettings(_ context.C
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "mlflow_storage_size":
-				return ec.fieldContext_CreateProjectSettings_mlflow_storage_size(ctx, field)
+			case "mlflowStorageSize":
+				return ec.fieldContext_CreateProjectSettings_mlflowStorageSize(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CreateProjectSettings", field.Name)
 		},
@@ -7931,7 +7932,7 @@ func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "name", "description", "repository"}
+	fieldsInOrder := [...]string{"id", "name", "description", "repository", "mlflowStorageSize"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7966,6 +7967,13 @@ func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context
 				return it, err
 			}
 			it.Repository = data
+		case "mlflowStorageSize":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mlflowStorageSize"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MlflowStorageSize = data
 		}
 	}
 
@@ -8433,8 +8441,8 @@ func (ec *executionContext) _CreateProjectSettings(ctx context.Context, sel ast.
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("CreateProjectSettings")
-		case "mlflow_storage_size":
-			out.Values[i] = ec._CreateProjectSettings_mlflow_storage_size(ctx, field, obj)
+		case "mlflowStorageSize":
+			out.Values[i] = ec._CreateProjectSettings_mlflowStorageSize(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

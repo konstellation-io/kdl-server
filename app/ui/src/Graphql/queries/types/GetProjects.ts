@@ -59,6 +59,7 @@ export interface GetProjects_projects {
   toolUrls: GetProjects_projects_toolUrls;
   members: GetProjects_projects_members[];
   minioAccessKey: GetProjects_projects_minioAccessKey;
+  mlflowStorageSize: string;
 }
 
 export interface GetProjects {

@@ -95,6 +95,7 @@ type Project {
   needAccess: Boolean!
   archived: Boolean!
   minioAccessKey: MinioAccessKey!
+  mlflowStorageSize: String!
 }
 
 type Repository {

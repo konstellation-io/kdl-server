@@ -22,6 +22,21 @@
   }
 }
 
+.settingButtonDisabled {
+  background-color: palette(base, 400);
+  border-left: 3px solid transparent;
+  transition:
+    background-color ease 0.3s,
+    border-left-color ease 0.3s,
+    color ease 0.2s, opacity ease 0.3s;
+
+  &:hover {
+    border-left-color: palette(highlight);
+    color: palette(white);
+    text-shadow: 0 0 16px  palette(white);
+  }
+}
+
 .logoutButton {
   background-color: palette(base, 400);
   border-left: 3px solid transparent;

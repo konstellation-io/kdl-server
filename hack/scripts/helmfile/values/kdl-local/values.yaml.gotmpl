@@ -23,7 +23,7 @@ env:
   KUBECONFIG_DOWNLOAD_ENABLED: {{ requiredEnv "KUBECONFIG_ENABLED" }}
   KUBECONFIG_EXTERNAL_SERVER_URL: {{ env "EXTERNAL_SERVER_URL" | quote }}
   MINIO_ACCESS_KEY: "{{ .Values.minio_access_key }}"
-  MINIO_ENDPOINT: "minio:9000"
+  MINIO_ENDPOINT: "minio.minio:9000"
   MINIO_SECRET_KEY: "{{ .Values.minio_secret_key }}"
   MINIO_CONSOLE_ENDPOINT: "https://minio-console.{{ requiredEnv "DOMAIN" }}"
   SERVER_URL: https://kdlapp.{{ requiredEnv "DOMAIN" }}
@@ -58,6 +58,8 @@ keycloak:
     className: nginx
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-clusterissuer
+      cert-manager.io/secret-template: |
+        {"annotations": {"reflector.v1.k8s.emberstack.com/reflection-auto-enabled": "true", "reflector.v1.k8s.emberstack.com/reflection-allowed": "true", "reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces": "minio"}}
     hosts:
     - host: keycloak.{{ requiredEnv "DOMAIN" }}
       paths:
@@ -208,7 +210,7 @@ oauth2proxy:
       skip_auth_routes="/config.json"
       skip_provider_button=true
       ssl_insecure_skip_verify=true
-      upstreams=["http://kdl-local-server:80/", "http://127.0.0.1:9000/mlflow/", "http://127.0.0.1:9000/filebrowser/", "http://127.0.0.1:9000/kg/"]
+      upstreams=["http://kdl-local-server:80/", "http://127.0.0.1:9000/mlflow/", "http://127.0.0.1:9000/filebrowser/", "http://127.0.0.1:9000/kg/", "http://127.0.0.1:9000/minio/"]
       whitelist_domains=[".{{ requiredEnv "DOMAIN" }}"]
 
   extraContainers:
@@ -286,7 +288,7 @@ projectOperator:
         env:
           AWS_ACCESS_KEY_ID: "{{ .Values.minio_access_key }}"
           AWS_SECRET_ACCESS_KEY: "{{ .Values.minio_secret_key }}"
-          MLFLOW_S3_ENDPOINT_URL: "http://minio:9000"
+          MLFLOW_S3_ENDPOINT_URL: "http://minio.minio:9000"
 
       filebrowser:
         image:
@@ -312,13 +314,7 @@ projectOperator:
         env:
           AWS_S3_ACCESS_KEY_ID: "{{ .Values.minio_access_key }}"
           AWS_S3_SECRET_ACCESS_KEY: "{{ .Values.minio_secret_key }}"
-          AWS_S3_URL: "http://minio:9000"
-
-sharedVolume:
-  enabled: true
-
-  name: shared-volume
-  storageClassName: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+          AWS_S3_URL: "http://minio.minio:9000"
 
 userToolsOperator:
   enabled: true
@@ -330,10 +326,6 @@ userToolsOperator:
 
   templateCustomResource:
     spec:
-      sharedVolume:
-        enabled: true
-        name: "shared-volume"
-
       podSecurityContext:
         fsGroup: 1000
         runAsGroup: 1000
@@ -342,6 +334,7 @@ userToolsOperator:
 
       persistentVolume:
         storageClass: {{ requiredEnv "STORAGE_CLASS_NAME" | quote }}
+        keepPVC: false
 
       kubeconfig:
         enabled: {{ requiredEnv "KUBECONFIG_ENABLED" }}
@@ -360,7 +353,7 @@ userToolsOperator:
         env:
           AWS_ACCESS_KEY: "{{ .Values.minio_access_key }}"
           AWS_SECRET_KEY: "{{ .Values.minio_secret_key }}"
-          MINIO_ENDPOINT: "minio:9000"
+          MINIO_ENDPOINT: "minio.minio:9000"
 
         securityContext:
           allowPrivilegeEscalation: false

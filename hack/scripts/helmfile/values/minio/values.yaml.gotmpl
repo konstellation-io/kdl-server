@@ -74,7 +74,7 @@ certsPath: "/certs/"
 extraVolumes:
   - name: cert
     secret:
-      secretName: keycloak-kdl-tls
+      secretName: keycloak-tls
       defaultMode: 420
       items:
       - key: ca.crt

@@ -1,0 +1,22 @@
+{{- if not .Values.persistentVolume.keepPVC }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "kdl-user-tools.fullname" . }}-pvc-cleaner
+  annotations:
+    "helm.sh/hook": post-delete
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      serviceAccountName: {{ include "kdl-user-tools.fullname" . }}-pvc-cleaner
+      restartPolicy: Never
+      containers:
+        - name: cleanup
+          image: bitnami/kubectl:latest
+          command:
+            - "/bin/sh"
+            - "-c"
+            - "kubectl -n {{ .Release.Namespace }} delete pvc -l app.kubernetes.io/instance={{ .Release.Name }} --force"
+{{- end }}

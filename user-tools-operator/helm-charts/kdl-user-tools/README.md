@@ -128,9 +128,10 @@ helm template test . -f ci/ci-values.yaml
 | networkPolicy.enabled | bool | `false` | Enable or disable NetworkPolicy |
 | networkPolicy.policyTypes | list | `[]` | Policy types |
 | nodeSelector | object | `{}` | Node labels for pod assignment </br> Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector |
-| persistentVolume | object | `{"accessModes":["ReadWriteOnce"],"enabled":true,"size":"1Gi","storageClass":""}` | Persistent Volume configuration </br> Ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/ |
+| persistentVolume | object | `{"accessModes":["ReadWriteOnce"],"enabled":true,"keepPVC":true,"size":"1Gi","storageClass":""}` | Persistent Volume configuration </br> Ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/ |
 | persistentVolume.accessModes | list | `["ReadWriteOnce"]` | Persistent Volume access modes Must match those of existing PV or dynamic provisioner </br> Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/ |
 | persistentVolume.enabled | bool | `true` | Enable or disable persistence |
+| persistentVolume.keepPVC | bool | `true` | Keep a claim after a release is deleted If false, create a Job to delete the PVC after uninstall |
 | persistentVolume.size | string | `"1Gi"` | Persistent Volume size |
 | persistentVolume.storageClass | string | `""` | Persistent Volume Storage Class If defined, storageClass: <storageClass> If set to "-", storageClass: "", which disables dynamic provisioning If undefined (the default) or set to null, no storageClass spec is   set, choosing the default provisioner.  (gp2 on AWS, standard on   GKE, AWS & OpenStack) |
 | podAnnotations | object | `{}` | Configure annotations on Pods |

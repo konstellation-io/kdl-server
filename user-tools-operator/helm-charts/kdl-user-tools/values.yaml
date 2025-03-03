@@ -214,6 +214,10 @@ persistentVolume:
   #   GKE, AWS & OpenStack)
   storageClass: ""
 
+  # -- Keep a claim after a release is deleted
+  # If false, create a Job to delete the PVC after uninstall
+  keepPVC: true
+
 # -- Additional volumes on the output Deployment definition
 # </br> Ref: https://kubernetes.io/docs/concepts/storage/volumes/
 # </br> Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/

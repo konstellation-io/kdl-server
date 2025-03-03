@@ -406,8 +406,8 @@ resources:
               "clientId": "minio",
               "name": "MinIO client",
               "description": "",
-              "rootUrl": "https://minio-console.kdl.$HOST_IP.nip.io/",
-              "adminUrl": "https://minio-console.kdl.$HOST_IP.nip.io/",
+              "rootUrl": "https://minio-console.{{ requiredEnv "DOMAIN" }}/",
+              "adminUrl": "https://minio-console.{{ requiredEnv "DOMAIN" }}/",
               "baseUrl": "",
               "surrogateAuthRequired": false,
               "enabled": true,
@@ -415,7 +415,7 @@ resources:
               "clientAuthenticatorType": "client-secret",
               "secret": "minio123456",
               "redirectUris": [
-                "https://minio-console.kdl.$HOST_IP.nip.io/oauth_callback"
+                "https://minio-console.{{ requiredEnv "DOMAIN" }}/oauth_callback"
               ],
               "webOrigins": [
                 "*"
@@ -488,16 +488,16 @@ resources:
               "clientId": "proxy",
               "name": "KDL OAuth2Proxy",
               "description": "",
-              "rootUrl": "https://kdlapp.kdl.$HOST_IP.nip.io",
+              "rootUrl": "https://kdlapp.{{ requiredEnv "DOMAIN" }}",
               "adminUrl": "",
-              "baseUrl": "https://kdlapp.kdl.$HOST_IP.nip.io/",
+              "baseUrl": "https://kdlapp.{{ requiredEnv "DOMAIN" }}/",
               "surrogateAuthRequired": false,
               "enabled": true,
               "alwaysDisplayInConsole": true,
               "clientAuthenticatorType": "client-secret",
               "secret": "proxy654321",
               "redirectUris": [
-                "https://kdlapp.kdl.$HOST_IP.nip.io/oauth2/callback"
+                "https://kdlapp.{{ requiredEnv "DOMAIN" }}/oauth2/callback"
               ],
               "webOrigins": [
                 "*"

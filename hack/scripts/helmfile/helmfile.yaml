@@ -38,6 +38,8 @@ repositories:
     url: https://charts.min.io/
   - name: mongodb
     url: https://mongodb.github.io/helm-charts
+  - name: reflector
+    url: https://emberstack.github.io/helm-charts
 
 releases:
   # ref: https://github.com/cert-manager/cert-manager/blob/v1.17.1/deploy/charts/cert-manager/values.yaml
@@ -96,14 +98,14 @@ releases:
     version: 2.0.0
     namespace: mongodb
     needs:
-      - mongodb/mongodb-database
+      - kdl/kdl-local
     inherit:
       - template: default
 
-  # ref: https://gitlab.intelygenz.com/konstellation-io/helm-charts/blob/kdl-server-6.2.8/charts/kdl-server/values.yaml
+  # ref: https://gitlab.intelygenz.com/konstellation-io/helm-charts/blob/kdl-server-6.2.9/charts/kdl-server/values.yaml
   - name: kdl-local
     chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
-    version: 6.2.8
+    version: 6.2.9
     namespace: kdl
     needs:
       - kdl/initial-resources
@@ -111,10 +113,30 @@ releases:
     inherit:
       - template: default
 
+  # ref: https://github.com/minio/minio/blob/RELEASE.2025-02-28T09-55-16Z/helm/minio/values.yaml
+  - name: minio
+    chart: minio/minio
+    version: 5.4.0
+    namespace: minio
+    needs:
+      - kube-system/reflector
+    inherit:
+      - template: default
+
   - name: keycloak-initial-data
     chart: bedag/raw
     version: 2.0.0
     namespace: kdl
+    needs:
+      - kdl/kdl-local
+    inherit:
+      - template: default
+
+  # ref: https://github.com/emberstack/kubernetes-reflector/blob/v9.0.318/src/helm/reflector/values.yaml
+  - name: reflector
+    chart: emberstack/reflector
+    version: 9.0.318
+    namespace: kube-system
     needs:
       - kdl/kdl-local
     inherit:

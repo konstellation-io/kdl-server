@@ -9,11 +9,6 @@ usernameSlug: "john-doe"  # Slugified version for resource naming
 
 runtimeClass: ""
 
-# Shared volume configuration
-sharedVolume:
-  enabled: true
-  name: "shared-workspace"
-
 # External IDE connection configuration
 kubeconfig:
   enabled: true
@@ -49,6 +44,7 @@ persistentVolume:
   accessModes:
     - ReadWriteOnce
   storageClass: "standard"
+  keepPVC: true
 
 # Network policies
 networkPolicy:
@@ -108,14 +104,14 @@ repoCloner:
 # VSCode runtime configuration
 vscodeRuntime:
   image:
-    repository: konstellation/python-ds-runtime
-    tag: "3.9"
+    repository: alpine
+    tag: "latest"
     pullPolicy: IfNotPresent
 
   homePath: "/home/coder"
 
   command:
-    - /bin/bash
+    - /bin/sh
   args:
     - "-c"
     - "trap : TERM INT; sleep infinity & wait"

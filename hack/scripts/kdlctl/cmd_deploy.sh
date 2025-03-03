@@ -34,14 +34,7 @@ deploy() {
 
   ./scripts/create_nginx_ingress_configmap.sh
 
-  update_host_ip
-
   deploy_helm_chart
-}
-
-update_host_ip() {
-  echo_info "Updating HOST_IP value to $HOST_IP"
-  envsubst '$HOST_IP' <./scripts/helmfile/values/initial-resources/values.yaml.tpl >./scripts/helmfile/values/initial-resources/values.yaml
 }
 
 get_kubectl_dry_run() {
@@ -61,7 +54,6 @@ get_kubectl_dry_run() {
 }
 
 deploy_helm_chart() {
-
   export KNOWLEDGE_GALAXY_IMAGE_REPOSITORY="konstellation/knowledge-galaxy"
   if [ "$KNOWLEDGE_GALAXY_LOCAL" = "true" ]; then
     export KNOWLEDGE_GALAXY_IMAGE_REPOSITORY="$IMAGE_REGISTRY/konstellation/kdl-knowledge-galaxy"
@@ -77,4 +69,7 @@ deploy_helm_chart() {
   echo_info "📦 Applying helm chart..."
   helmfile -f scripts/helmfile/helmfile.yaml deps
   helmfile -f scripts/helmfile/helmfile.yaml apply
+
+  # restart MinIO to apply OIDC changes
+  kubectl -n minio rollout restart deployment/minio
 }

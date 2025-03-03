@@ -1,0 +1,25 @@
+replicaCount: 1
+
+image:
+  repository: docker.io/emberstack/kubernetes-reflector
+
+configuration:
+  logging:
+    minimumLevel: Information
+
+rbac:
+  enabled: true
+
+serviceAccount:
+  create: true
+
+podSecurityContext:
+  fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000

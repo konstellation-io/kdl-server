@@ -1,4 +1,4 @@
-import { ApolloClient, ApolloLink, ApolloProvider, HttpLink, useQuery } from '@apollo/client';
+import { ApolloClient, ApolloLink, ApolloProvider, HttpLink, useMutation, useQuery } from '@apollo/client';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { Slide, toast, ToastContainer } from 'react-toastify';
 
@@ -21,10 +21,17 @@ import GetMeQuery from './Graphql/queries/getMe';
 import { ErrorMessage, SpinnerCircular } from 'kwc';
 import { AccessLevel } from './Graphql/types/globalTypes';
 import UserKubeconfig from './Pages/UserKubeconfig/UserKubeconfig';
+import { Login } from 'Graphql/mutations/types/Login';
+import login from 'Graphql/mutations/login';
 
 const routesWithTopBar = [ROUTE.USERS, ROUTE.HOME, ROUTE.PROJECT, ROUTE.USER_SSH_KEY];
 
 function Routes() {
+  const [loginMutation, { data: dataLogin, loading: loadingLogin, error: errorLogin }] = useMutation<Login>(login);
+
+  if (loadingLogin || !dataLogin) return <SpinnerCircular />;
+  if (errorLogin) return <ErrorMessage />;
+
   const { data, loading, error } = useQuery<GetMe>(GetMeQuery);
 
   if (loading || !data) return <SpinnerCircular />;

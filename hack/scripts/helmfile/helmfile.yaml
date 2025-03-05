@@ -36,7 +36,7 @@ repositories:
     url: https://charts.min.io/
   - name: mongodb
     url: https://mongodb.github.io/helm-charts
-  - name: reflector
+  - name: emberstack
     url: https://emberstack.github.io/helm-charts
   - name: konstellation-io
     url: registry.gitlab.intelygenz.com

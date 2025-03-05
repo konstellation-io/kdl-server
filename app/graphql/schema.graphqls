@@ -53,6 +53,11 @@ type User {
   apiTokens: [ApiToken!]!
   isKubeconfigEnabled: Boolean!
   sshKey: SSHKey!
+  userTools: UserTools!
+}
+
+type UserTools {
+  currentStorageSize: String!
 }
 
 type CreateProjectSettings {

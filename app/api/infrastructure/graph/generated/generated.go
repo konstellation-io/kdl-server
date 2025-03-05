@@ -170,7 +170,12 @@ type ComplexityRoot struct {
 		IsKubeconfigEnabled func(childComplexity int) int
 		LastActivity        func(childComplexity int) int
 		SSHKey              func(childComplexity int) int
+		UserTools           func(childComplexity int) int
 		Username            func(childComplexity int) int
+	}
+
+	UserTools struct {
+		CurrentStorageSize func(childComplexity int) int
 	}
 }
 
@@ -222,6 +227,8 @@ type UserResolver interface {
 	LastActivity(ctx context.Context, obj *entity.User) (*string, error)
 
 	IsKubeconfigEnabled(ctx context.Context, obj *entity.User) (bool, error)
+
+	UserTools(ctx context.Context, obj *entity.User) (*entity.UserTools, error)
 }
 
 type executableSchema struct {
@@ -861,12 +868,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.SSHKey(childComplexity), true
 
+	case "User.userTools":
+		if e.complexity.User.UserTools == nil {
+			break
+		}
+
+		return e.complexity.User.UserTools(childComplexity), true
+
 	case "User.username":
 		if e.complexity.User.Username == nil {
 			break
 		}
 
 		return e.complexity.User.Username(childComplexity), true
+
+	case "UserTools.currentStorageSize":
+		if e.complexity.UserTools.CurrentStorageSize == nil {
+			break
+		}
+
+		return e.complexity.UserTools.CurrentStorageSize(childComplexity), true
 
 	}
 	return 0, false
@@ -1040,6 +1061,11 @@ type User {
   apiTokens: [ApiToken!]!
   isKubeconfigEnabled: Boolean!
   sshKey: SSHKey!
+  userTools: UserTools!
+}
+
+type UserTools {
+  currentStorageSize: String!
 }
 
 type CreateProjectSettings {
@@ -2169,6 +2195,8 @@ func (ec *executionContext) fieldContext_Member_user(_ context.Context, field gr
 				return ec.fieldContext_User_isKubeconfigEnabled(ctx, field)
 			case "sshKey":
 				return ec.fieldContext_User_sshKey(ctx, field)
+			case "userTools":
+				return ec.fieldContext_User_userTools(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -2409,6 +2437,8 @@ func (ec *executionContext) fieldContext_Mutation_regenerateSSHKey(_ context.Con
 				return ec.fieldContext_User_isKubeconfigEnabled(ctx, field)
 			case "sshKey":
 				return ec.fieldContext_User_sshKey(ctx, field)
+			case "userTools":
+				return ec.fieldContext_User_userTools(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -2473,6 +2503,8 @@ func (ec *executionContext) fieldContext_Mutation_setActiveUserTools(ctx context
 				return ec.fieldContext_User_isKubeconfigEnabled(ctx, field)
 			case "sshKey":
 				return ec.fieldContext_User_sshKey(ctx, field)
+			case "userTools":
+				return ec.fieldContext_User_userTools(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -2548,6 +2580,8 @@ func (ec *executionContext) fieldContext_Mutation_updateAccessLevel(ctx context.
 				return ec.fieldContext_User_isKubeconfigEnabled(ctx, field)
 			case "sshKey":
 				return ec.fieldContext_User_sshKey(ctx, field)
+			case "userTools":
+				return ec.fieldContext_User_userTools(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -4095,6 +4129,8 @@ func (ec *executionContext) fieldContext_Query_me(_ context.Context, field graph
 				return ec.fieldContext_User_isKubeconfigEnabled(ctx, field)
 			case "sshKey":
 				return ec.fieldContext_User_sshKey(ctx, field)
+			case "userTools":
+				return ec.fieldContext_User_userTools(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -4547,6 +4583,8 @@ func (ec *executionContext) fieldContext_Query_users(_ context.Context, field gr
 				return ec.fieldContext_User_isKubeconfigEnabled(ctx, field)
 			case "sshKey":
 				return ec.fieldContext_User_sshKey(ctx, field)
+			case "userTools":
+				return ec.fieldContext_User_userTools(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -5970,6 +6008,98 @@ func (ec *executionContext) fieldContext_User_sshKey(_ context.Context, field gr
 				return ec.fieldContext_SSHKey_lastActivity(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type SSHKey", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_userTools(ctx context.Context, field graphql.CollectedField, obj *entity.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_userTools(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.User().UserTools(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*entity.UserTools)
+	fc.Result = res
+	return ec.marshalNUserTools2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUserTools(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_userTools(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "currentStorageSize":
+				return ec.fieldContext_UserTools_currentStorageSize(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserTools", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserTools_currentStorageSize(ctx context.Context, field graphql.CollectedField, obj *entity.UserTools) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserTools_currentStorageSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CurrentStorageSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserTools_currentStorageSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserTools",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -9756,6 +9886,81 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "userTools":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_userTools(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var userToolsImplementors = []string{"UserTools"}
+
+func (ec *executionContext) _UserTools(ctx context.Context, sel ast.SelectionSet, obj *entity.UserTools) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userToolsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserTools")
+		case "currentStorageSize":
+			out.Values[i] = ec._UserTools_currentStorageSize(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10681,6 +10886,20 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋ
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUserTools2githubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUserTools(ctx context.Context, sel ast.SelectionSet, v entity.UserTools) graphql.Marshaler {
+	return ec._UserTools(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserTools2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUserTools(ctx context.Context, sel ast.SelectionSet, v *entity.UserTools) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UserTools(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

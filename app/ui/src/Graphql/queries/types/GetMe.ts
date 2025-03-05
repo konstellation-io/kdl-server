@@ -9,6 +9,11 @@ import { AccessLevel } from "./../../types/globalTypes";
 // GraphQL query operation: GetMe
 // ====================================================
 
+export interface GetMe_me_userTools {
+  __typename: "UserTools";
+  currentStorageSize: string;
+}
+
 export interface GetMe_me_apiTokens {
   __typename: "ApiToken";
   id: string;
@@ -22,6 +27,7 @@ export interface GetMe_me {
   id: string;
   email: string;
   isKubeconfigEnabled: boolean;
+  userTools: GetMe_me_userTools;
   accessLevel: AccessLevel;
   apiTokens: GetMe_me_apiTokens[];
 }

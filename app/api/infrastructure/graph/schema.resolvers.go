@@ -394,6 +394,11 @@ func (r *userResolver) IsKubeconfigEnabled(ctx context.Context, obj *entity.User
 	return r.users.IsKubeconfigActive(), nil
 }
 
+// UserTools is the resolver for the userTools field.
+func (r *userResolver) UserTools(ctx context.Context, obj *entity.User) (*entity.UserTools, error) {
+	return r.users.GetUserTools(ctx, obj.Username)
+}
+
 // Member returns generated.MemberResolver implementation.
 func (r *Resolver) Member() generated.MemberResolver { return &memberResolver{r} }
 

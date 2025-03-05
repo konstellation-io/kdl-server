@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/go-logr/logr"
@@ -294,6 +295,26 @@ func (i *Interactor) AreToolsRunning(ctx context.Context, username string) (bool
 // IsKubeconfigActive checks if the kubeconfig is active.
 func (i *Interactor) IsKubeconfigActive() bool {
 	return i.cfg.Kubeconfig.Enabled
+}
+
+// GetUserTools gets information related to UserTools.
+func (i *Interactor) GetUserTools(ctx context.Context, username string) (*entity.UserTools, error) {
+	size := ""
+	pvcName := fmt.Sprintf("data-usertools-%s-0", username)
+	pvc, err := i.k8sClient.GetPVC(ctx, pvcName)
+
+	if err != nil && !k8errors.IsNotFound(err) {
+		i.logger.Error(err, "Error getting PVC", "pvcName", pvcName)
+		return nil, err
+	}
+
+	if pvc != nil {
+		size = pvc.Status.Capacity.Storage().String()
+	}
+
+	return &entity.UserTools{
+		CurrentStorageSize: size,
+	}, nil
 }
 
 // FindByIDs retrieves the users for the given identifiers.

@@ -105,7 +105,7 @@ releases:
   # ref: https://gitlab.intelygenz.com/konstellation-io/helm-charts/blob/kdl-server-6.2.9/charts/kdl-server/values.yaml
   - name: kdl-local
     chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
-    version: 6.2.9
+    version: 6.2.11
     namespace: kdl
     needs:
       - kdl/initial-resources

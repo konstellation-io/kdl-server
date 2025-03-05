@@ -22,9 +22,15 @@ export interface GetUserTools_project {
   toolUrls: GetUserTools_project_toolUrls;
 }
 
+export interface GetUserTools_me_userTools {
+  __typename: "UserTools";
+  currentStorageSize: string;
+}
+
 export interface GetUserTools_me {
   __typename: "User";
   id: string;
+  userTools: GetUserTools_me_userTools;
 }
 
 export interface GetUserTools {

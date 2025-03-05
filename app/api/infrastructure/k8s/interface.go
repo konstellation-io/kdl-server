@@ -45,4 +45,5 @@ type ClientInterface interface {
 	GetConfigMapTemplateNameKDLProject() string
 	GetConfigMapTemplateNameKDLUserTools() string
 	CreateConfigMapWatcher(ctx context.Context) (watch.Interface, error)
+	GetPVC(ctx context.Context, name string) (*v1.PersistentVolumeClaim, error)
 }

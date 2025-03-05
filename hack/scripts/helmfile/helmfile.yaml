@@ -8,9 +8,7 @@ environments:
       - mongodb_password: "123456"
       - mongodb_user: "kdl"
       - mongodb_version: "7.0.15"
-
 ---
-
 helmDefaults:
   createNamespace: true
   atomic: false
@@ -40,6 +38,10 @@ repositories:
     url: https://mongodb.github.io/helm-charts
   - name: reflector
     url: https://emberstack.github.io/helm-charts
+  - name: konstellation-io
+    url: registry.gitlab.intelygenz.com
+    oci: true
+    password: { { requiredEnv "GITLAB_TOKEN" } }
 
 releases:
   # ref: https://github.com/cert-manager/cert-manager/blob/v1.17.1/deploy/charts/cert-manager/values.yaml
@@ -104,7 +106,7 @@ releases:
 
   # ref: https://gitlab.intelygenz.com/konstellation-io/helm-charts/blob/kdl-server-6.2.9/charts/kdl-server/values.yaml
   - name: kdl-local
-    chart: oci://ghcr.io/konstellation-io/helm-charts/kdl-server
+    chart: oci://registry.gitlab.intelygenz.com/konstellation-io/helm-charts/kdl-server
     version: 6.2.9
     namespace: kdl
     needs:

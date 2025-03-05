@@ -395,6 +395,21 @@ func (mr *MockUseCaseMockRecorder) GetKubeconfig(ctx, username interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKubeconfig", reflect.TypeOf((*MockUseCase)(nil).GetKubeconfig), ctx, username)
 }
 
+// GetUserTools mocks base method.
+func (m *MockUseCase) GetUserTools(ctx context.Context, username string) (*entity.UserTools, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserTools", ctx, username)
+	ret0, _ := ret[0].(*entity.UserTools)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserTools indicates an expected call of GetUserTools.
+func (mr *MockUseCaseMockRecorder) GetUserTools(ctx, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserTools", reflect.TypeOf((*MockUseCase)(nil).GetUserTools), ctx, username)
+}
+
 // IsKubeconfigActive mocks base method.
 func (m *MockUseCase) IsKubeconfigActive() bool {
 	m.ctrl.T.Helper()

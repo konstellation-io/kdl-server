@@ -14,6 +14,9 @@ export default gql`
     }
     me {
       id
+      userTools{
+        currentStorageSize
+      }
     }
   }
 `;

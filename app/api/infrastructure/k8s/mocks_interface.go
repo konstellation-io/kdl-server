@@ -268,6 +268,21 @@ func (mr *MockClientInterfaceMockRecorder) GetKDLUserToolsCR(ctx, username inter
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKDLUserToolsCR", reflect.TypeOf((*MockClientInterface)(nil).GetKDLUserToolsCR), ctx, username)
 }
 
+// GetPVC mocks base method.
+func (m *MockClientInterface) GetPVC(ctx context.Context, name string) (*v1.PersistentVolumeClaim, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPVC", ctx, name)
+	ret0, _ := ret[0].(*v1.PersistentVolumeClaim)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPVC indicates an expected call of GetPVC.
+func (mr *MockClientInterfaceMockRecorder) GetPVC(ctx, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPVC", reflect.TypeOf((*MockClientInterface)(nil).GetPVC), ctx, name)
+}
+
 // GetRuntimeIDFromUserTools mocks base method.
 func (m *MockClientInterface) GetRuntimeIDFromUserTools(ctx context.Context, username string) (string, error) {
 	m.ctrl.T.Helper()

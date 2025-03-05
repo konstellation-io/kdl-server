@@ -14,6 +14,8 @@ import (
 	"go.uber.org/zap"
 	v1 "k8s.io/api/core/v1"
 	k8errors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/konstellation-io/kdl-server/app/api/entity"
@@ -1243,4 +1245,71 @@ func TestInteractor_UpdateKDLUserTools_ListKDLUserToolsNameCR_EmptyList(t *testi
 
 	err := s.interactor.UpdateKDLUserTools(ctx)
 	require.NoError(t, err)
+}
+
+func TestInteractor_GetUserTools(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	const (
+		username = "user"
+		pvcName  = "data-usertools-user-0"
+	)
+
+	pvc := &v1.PersistentVolumeClaim{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: pvcName,
+		},
+		Status: v1.PersistentVolumeClaimStatus{
+			Phase: v1.ClaimBound,
+			Capacity: v1.ResourceList{
+				v1.ResourceStorage: resource.MustParse("2Gi"),
+			},
+		},
+	}
+
+	s.mocks.k8sClientMock.EXPECT().GetPVC(ctx, pvcName).Return(pvc, nil)
+
+	userTools, err := s.interactor.GetUserTools(ctx, username)
+	require.NoError(t, err)
+	require.NotEmpty(t, userTools)
+	require.Equal(t, "2Gi", userTools.CurrentStorageSize)
+}
+
+func TestInteractor_GetUserTools_NotFoundError(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	const (
+		username = "user"
+		pvcName  = "data-usertools-user-0"
+	)
+
+	s.mocks.k8sClientMock.EXPECT().GetPVC(ctx, pvcName).Return(nil, k8errors.NewNotFound(v1.Resource("pvc"), pvcName))
+
+	userTools, err := s.interactor.GetUserTools(ctx, username)
+	require.NoError(t, err)
+	require.Equal(t, "", userTools.CurrentStorageSize)
+}
+
+func TestInteractor_GetUserTools_UnexpectedError(t *testing.T) {
+	s := newUserSuite(t)
+	defer s.ctrl.Finish()
+
+	ctx := context.Background()
+
+	const (
+		username = "user"
+		pvcName  = "data-usertools-user-0"
+	)
+
+	s.mocks.k8sClientMock.EXPECT().GetPVC(ctx, pvcName).Return(nil, errUnexpected)
+
+	userTools, err := s.interactor.GetUserTools(ctx, username)
+	require.Error(t, err)
+	require.Empty(t, userTools)
 }

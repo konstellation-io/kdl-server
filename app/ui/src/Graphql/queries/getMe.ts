@@ -6,6 +6,9 @@ export default gql`
       id
       email
       isKubeconfigEnabled
+      userTools{
+        currentStorageSize
+      }
       accessLevel
       apiTokens {
         id

@@ -40,6 +40,10 @@ check_requirements() {
   fi
 }
 
+check_required_env_vars() {
+  [ -n "${GITLAB_TOKEN+x}" ] || echo_fatal "GITLAB_TOKEN environment variable is required"
+}
+
 cmd_installed() {
   if (command -v "$1" >/dev/null 2>&1); then
     echo 1

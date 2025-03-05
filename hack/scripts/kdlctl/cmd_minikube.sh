@@ -29,6 +29,7 @@ minikube_start() {
     minikube start -p "${MINIKUBE_PROFILE}"
     ;;
   *)
+    export KUBECONFIG="${HOME}/.kube/config-${MINIKUBE_PROFILE}"
     echo_wait "Creating new minikube profile"
     minikube start -p "${MINIKUBE_PROFILE}" \
       --namespace="${NAMESPACE}" \
@@ -52,9 +53,10 @@ minikube_start() {
 }
 
 minikube_profile_update() {
-  export KUBECONFIG=${HOME}/.kube/config-minikube
+  export KUBECONFIG="${HOME}/.kube/config-${MINIKUBE_PROFILE}"
   chmod 600 ${KUBECONFIG}
-  minikube profile "${MINIKUBE_PROFILE}" && minikube update-context
+  minikube profile "${MINIKUBE_PROFILE}"
+  minikube update-context -p "${MINIKUBE_PROFILE}"
 }
 
 minikube_wait_for_registry() {

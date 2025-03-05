@@ -36,6 +36,7 @@ OS=$(uname)
 . ./scripts/kdlctl/cmd_uninstall.sh
 
 check_requirements
+check_required_env_vars
 
 echo
 

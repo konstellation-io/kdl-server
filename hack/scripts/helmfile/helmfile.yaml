@@ -41,7 +41,7 @@ repositories:
   - name: konstellation-io
     url: registry.gitlab.intelygenz.com
     oci: true
-    password: { { requiredEnv "GITLAB_TOKEN" } }
+    password: {{ requiredEnv "GITLAB_TOKEN" }}
 
 releases:
   # ref: https://github.com/cert-manager/cert-manager/blob/v1.17.1/deploy/charts/cert-manager/values.yaml

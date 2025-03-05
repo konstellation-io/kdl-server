@@ -325,4 +325,11 @@ func (s *testSuite) TearDownTest() {
 
 	err = s.Clientset.CoreV1().Pods(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{})
 	s.Require().NoError(err)
+
+	err = s.Clientset.CoreV1().PersistentVolumeClaims(namespace).DeleteCollection(
+		context.Background(),
+		metav1.DeleteOptions{},
+		metav1.ListOptions{},
+	)
+	s.Require().NoError(err)
 }

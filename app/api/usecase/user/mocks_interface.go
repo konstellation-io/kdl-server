@@ -409,6 +409,21 @@ func (mr *MockUseCaseMockRecorder) IsKubeconfigActive() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsKubeconfigActive", reflect.TypeOf((*MockUseCase)(nil).IsKubeconfigActive))
 }
 
+// Login mocks base method.
+func (m *MockUseCase) Login(ctx context.Context, email, sub string) (entity.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Login", ctx, email, sub)
+	ret0, _ := ret[0].(entity.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Login indicates an expected call of Login.
+func (mr *MockUseCaseMockRecorder) Login(ctx, email, sub interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockUseCase)(nil).Login), ctx, email, sub)
+}
+
 // RegenerateSSHKeys mocks base method.
 func (m *MockUseCase) RegenerateSSHKeys(ctx context.Context, user entity.User) (entity.User, error) {
 	m.ctrl.T.Helper()

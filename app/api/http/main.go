@@ -229,10 +229,8 @@ func startHTTPServer(
 	)
 
 	http.Handle("/", fs)
-	http.Handle("/api/playground", middleware.AuthMiddleware(pg, interactors.userInteractor))
-	http.Handle(apiQueryPath, middleware.AuthMiddleware(
-		dataloader.Middleware(repos.userRepo, srv), interactors.userInteractor),
-	)
+	http.Handle("/api/playground", middleware.AuthMiddleware(pg))
+	http.Handle(apiQueryPath, middleware.AuthMiddleware(dataloader.Middleware(repos.userRepo, srv)))
 	http.HandleFunc("/api/auth/project", authController.HandleProjectAuth)
 	http.HandleFunc("/healthz", healthzController.HandleHealthz)
 

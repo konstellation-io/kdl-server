@@ -558,3 +558,31 @@ func (i *Interactor) UpdateKDLUserTools(ctx context.Context) error {
 
 	return nil
 }
+
+func (i *Interactor) Login(ctx context.Context, email, sub string) (entity.User, error) {
+	i.logger.Info("Login user", "email", email, "sub", sub)
+	user, err := i.GetByEmail(ctx, email)
+
+	if err != nil && !errors.Is(err, entity.ErrUserNotFound) {
+		return entity.User{}, err
+	}
+
+	if errors.Is(err, entity.ErrUserNotFound) {
+		user, err = i.Create(ctx, email, sub, entity.AccessLevelViewer)
+		if err != nil {
+			return entity.User{}, err
+		}
+	} else if user.Sub != sub {
+		user, err = i.UpdateSub(ctx, user, sub)
+		if err != nil {
+			return entity.User{}, err
+		}
+	}
+	// Update last activity
+	_, err = i.UpdateLastActivity(ctx, user)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	return user, nil
+}

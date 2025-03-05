@@ -47,4 +47,5 @@ type UseCase interface {
 	GetKubeconfig(ctx context.Context, username string) (string, error)
 	SyncUserData(ctx context.Context, userID string, syncSA, syncSSHKeys, syncMinio bool) error
 	UpdateKDLUserTools(ctx context.Context) error
+	Login(ctx context.Context, email, sub string) (entity.User, error)
 }

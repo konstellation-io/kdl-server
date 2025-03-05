@@ -85,6 +85,7 @@ type ComplexityRoot struct {
 		AddMembers           func(childComplexity int, input model.AddMembersInput) int
 		CreateProject        func(childComplexity int, input model.CreateProjectInput) int
 		DeleteProject        func(childComplexity int, input model.DeleteProjectInput) int
+		Login                func(childComplexity int) int
 		RegenerateSSHKey     func(childComplexity int) int
 		RemoveAPIToken       func(childComplexity int, input *model.RemoveAPITokenInput) int
 		RemoveMembers        func(childComplexity int, input model.RemoveMembersInput) int
@@ -192,6 +193,7 @@ type MutationResolver interface {
 	AddAPIToken(ctx context.Context, input *model.APITokenInput) (*entity.APIToken, error)
 	RemoveAPIToken(ctx context.Context, input *model.RemoveAPITokenInput) (*entity.APIToken, error)
 	SynchronizeUsersData(ctx context.Context, input *model.SyncUsersDataInput) (*bool, error)
+	Login(ctx context.Context) (*entity.User, error)
 }
 type ProjectResolver interface {
 	CreationDate(ctx context.Context, obj *entity.Project) (string, error)
@@ -388,6 +390,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteProject(childComplexity, args["input"].(model.DeleteProjectInput)), true
+
+	case "Mutation.login":
+		if e.complexity.Mutation.Login == nil {
+			break
+		}
+
+		return e.complexity.Mutation.Login(childComplexity), true
 
 	case "Mutation.regenerateSSHKey":
 		if e.complexity.Mutation.RegenerateSSHKey == nil {
@@ -1022,6 +1031,7 @@ type Mutation {
   removeApiToken(input: RemoveApiTokenInput): ApiToken!
 
   synchronizeUsersData(input: SyncUsersDataInput): Boolean
+  login: User!
 }
 
 type Capability {
@@ -3252,6 +3262,70 @@ func (ec *executionContext) fieldContext_Mutation_synchronizeUsersData(ctx conte
 	if fc.Args, err = ec.field_Mutation_synchronizeUsersData_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_login(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Login(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*entity.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋkonstellationᚑioᚋkdlᚑserverᚋappᚋapiᚋentityᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_login(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "creationDate":
+				return ec.fieldContext_User_creationDate(ctx, field)
+			case "accessLevel":
+				return ec.fieldContext_User_accessLevel(ctx, field)
+			case "lastActivity":
+				return ec.fieldContext_User_lastActivity(ctx, field)
+			case "apiTokens":
+				return ec.fieldContext_User_apiTokens(ctx, field)
+			case "isKubeconfigEnabled":
+				return ec.fieldContext_User_isKubeconfigEnabled(ctx, field)
+			case "sshKey":
+				return ec.fieldContext_User_sshKey(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -8787,6 +8861,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_synchronizeUsersData(ctx, field)
 			})
+		case "login":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_login(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
